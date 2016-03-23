@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>cn.restoplus</groupId>
-		<artifactId>resto</artifactId>
+		<artifactId>resto-shop</artifactId>
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>resto-shop-web</artifactId>
@@ -75,7 +75,11 @@
 		<dependency>
 			<groupId>cn.restoplus</groupId>
 			<artifactId>resto-brand-core</artifactId>
-			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>cn.restoplus</groupId>
+			<artifactId>resto-brand-api</artifactId>
 		</dependency>
 
 		<dependency>
