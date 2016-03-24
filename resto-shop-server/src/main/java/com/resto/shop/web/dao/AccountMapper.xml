@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.AccountMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Account">
+    <id column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="remain" property="remain" jdbcType="DECIMAL"/>
+    <result column="status" property="status" jdbcType="TINYINT"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, remain, status</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
+    <include refid="Base_Column_List"/> from tb_account where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_account where id = #{id,jdbcType=VARCHAR}</delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Account">insert into tb_account (id, remain, status ) values (#{id,jdbcType=VARCHAR}, #{remain,jdbcType=DECIMAL}, #{status,jdbcType=TINYINT} )</insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Account">insert into tb_account 
+    <trim prefix="(" suffix=")" suffixOverrides=","> 
+      <if test="id != null">id,</if>  
+      <if test="remain != null">remain,</if>  
+      <if test="status != null">status,</if> 
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=","> 
+      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
+      <if test="remain != null">#{remain,jdbcType=DECIMAL},</if>  
+      <if test="status != null">#{status,jdbcType=TINYINT},</if> 
+    </trim> 
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Account">update tb_account 
+    <set> 
+      <if test="remain != null">remain = #{remain,jdbcType=DECIMAL},</if>  
+      <if test="status != null">status = #{status,jdbcType=TINYINT},</if> 
+    </set> where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Account">update tb_account set remain = #{remain,jdbcType=DECIMAL}, status = #{status,jdbcType=TINYINT} where id = #{id,jdbcType=VARCHAR}</update>
+  <select id="selectList" resultType="Account">select * from tb_account</select>
+</mapper>

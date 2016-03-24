@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.generic.GenericController;
 import com.resto.brand.web.model.UserGroup;
 import com.resto.brand.web.service.RoleService;
 import com.resto.brand.web.service.UserGroupService;
+import com.resto.shop.web.controller.GenericController;
 
 @RequestMapping("usergroup")
 @Controller

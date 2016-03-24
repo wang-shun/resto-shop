@@ -1,0 +1,25 @@
+package com.resto.shop.web.service.impl;
+
+import javax.annotation.Resource;
+import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.shop.web.dao.PrinterMapper;
+import com.resto.shop.web.model.Printer;
+import com.resto.shop.web.service.PrinterService;
+import cn.restoplus.rpc.server.RpcService;
+
+/**
+ *
+ */
+@RpcService
+public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> implements PrinterService {
+
+    @Resource
+    private PrinterMapper printerMapper;
+
+    @Override
+    public GenericDao<Printer, Integer> getDao() {
+        return printerMapper;
+    } 
+
+}

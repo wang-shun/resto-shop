@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.KitchenMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Kitchen">
+    <id column="id" property="id" jdbcType="INTEGER"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    <result column="printer_id" property="printerId" jdbcType="INTEGER"/>
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, name, remark, printer_id, shop_detail_id</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
+    <include refid="Base_Column_List"/> from tb_kitchen where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from tb_kitchen where id = #{id,jdbcType=INTEGER}</delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Kitchen">insert into tb_kitchen (id, name, remark, printer_id, shop_detail_id) values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{printerId,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR})</insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Kitchen">insert into tb_kitchen 
+    <trim prefix="(" suffix=")" suffixOverrides=","> 
+      <if test="id != null">id,</if>  
+      <if test="name != null">name,</if>  
+      <if test="remark != null">remark,</if>  
+      <if test="printerId != null">printer_id,</if>  
+      <if test="shopDetailId != null">shop_detail_id,</if> 
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=","> 
+      <if test="id != null">#{id,jdbcType=INTEGER},</if>  
+      <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
+      <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
+      <if test="printerId != null">#{printerId,jdbcType=INTEGER},</if>  
+      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
+    </trim> 
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Kitchen">update tb_kitchen 
+    <set> 
+      <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>  
+      <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
+      <if test="printerId != null">printer_id = #{printerId,jdbcType=INTEGER},</if>  
+      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
+    </set> where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Kitchen">update tb_kitchen set name = #{name,jdbcType=VARCHAR}, remark = #{remark,jdbcType=VARCHAR}, printer_id = #{printerId,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
+  <select id="selectList" resultType="Kitchen">select * from tb_kitchen</select>
+</mapper>

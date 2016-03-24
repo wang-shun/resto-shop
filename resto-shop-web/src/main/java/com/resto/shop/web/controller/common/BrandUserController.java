@@ -14,11 +14,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.generic.GenericController;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.service.RoleService;
 import com.resto.brand.web.service.BrandUserService;
 import com.resto.shop.web.config.SessionKey;
+import com.resto.shop.web.controller.GenericController;
 
 /**
  * 用户控制器

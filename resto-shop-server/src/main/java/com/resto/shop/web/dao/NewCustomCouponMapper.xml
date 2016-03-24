@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.NewCustomCouponMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.NewCustomCoupon">
+    <id column="id" property="id" jdbcType="BIGINT"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="coupon_value" property="couponValue" jdbcType="DECIMAL"/>
+    <result column="coupon_validay" property="couponValiday" jdbcType="INTEGER"/>
+    <result column="coupon_number" property="couponNumber" jdbcType="INTEGER"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="use_with_account" property="useWithAccount" jdbcType="TINYINT"/>
+    <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+    <result column="coupon_min_money" property="couponMinMoney" jdbcType="DECIMAL"/>
+    <result column="begin_time" property="beginTime" jdbcType="TIME"/>
+    <result column="end_time" property="endTime" jdbcType="TIME"/>
+    <result column="is_activty" property="isActivty" jdbcType="TINYINT"/>
+    <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+    <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select 
+    <include refid="Base_Column_List"/> from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}</delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.NewCustomCoupon">insert into tb_new_custom_coupon (id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id) values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{couponValue,jdbcType=DECIMAL}, #{couponValiday,jdbcType=INTEGER}, #{couponNumber,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{useWithAccount,jdbcType=TINYINT}, #{couponName,jdbcType=VARCHAR}, #{couponMinMoney,jdbcType=DECIMAL}, #{beginTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, #{isActivty,jdbcType=TINYINT}, #{brandId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER})</insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.NewCustomCoupon">insert into tb_new_custom_coupon 
+    <trim prefix="(" suffix=")" suffixOverrides=","> 
+      <if test="id != null">id,</if>  
+      <if test="name != null">name,</if>  
+      <if test="couponValue != null">coupon_value,</if>  
+      <if test="couponValiday != null">coupon_validay,</if>  
+      <if test="couponNumber != null">coupon_number,</if>  
+      <if test="createTime != null">create_time,</if>  
+      <if test="useWithAccount != null">use_with_account,</if>  
+      <if test="couponName != null">coupon_name,</if>  
+      <if test="couponMinMoney != null">coupon_min_money,</if>  
+      <if test="beginTime != null">begin_time,</if>  
+      <if test="endTime != null">end_time,</if>  
+      <if test="isActivty != null">is_activty,</if>  
+      <if test="brandId != null">brand_id,</if>  
+      <if test="distributionModeId != null">distribution_mode_id,</if> 
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=","> 
+      <if test="id != null">#{id,jdbcType=BIGINT},</if>  
+      <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
+      <if test="couponValue != null">#{couponValue,jdbcType=DECIMAL},</if>  
+      <if test="couponValiday != null">#{couponValiday,jdbcType=INTEGER},</if>  
+      <if test="couponNumber != null">#{couponNumber,jdbcType=INTEGER},</if>  
+      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>  
+      <if test="useWithAccount != null">#{useWithAccount,jdbcType=TINYINT},</if>  
+      <if test="couponName != null">#{couponName,jdbcType=VARCHAR},</if>  
+      <if test="couponMinMoney != null">#{couponMinMoney,jdbcType=DECIMAL},</if>  
+      <if test="beginTime != null">#{beginTime,jdbcType=TIME},</if>  
+      <if test="endTime != null">#{endTime,jdbcType=TIME},</if>  
+      <if test="isActivty != null">#{isActivty,jdbcType=TINYINT},</if>  
+      <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>  
+      <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if> 
+    </trim> 
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon 
+    <set> 
+      <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>  
+      <if test="couponValue != null">coupon_value = #{couponValue,jdbcType=DECIMAL},</if>  
+      <if test="couponValiday != null">coupon_validay = #{couponValiday,jdbcType=INTEGER},</if>  
+      <if test="couponNumber != null">coupon_number = #{couponNumber,jdbcType=INTEGER},</if>  
+      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>  
+      <if test="useWithAccount != null">use_with_account = #{useWithAccount,jdbcType=TINYINT},</if>  
+      <if test="couponName != null">coupon_name = #{couponName,jdbcType=VARCHAR},</if>  
+      <if test="couponMinMoney != null">coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL},</if>  
+      <if test="beginTime != null">begin_time = #{beginTime,jdbcType=TIME},</if>  
+      <if test="endTime != null">end_time = #{endTime,jdbcType=TIME},</if>  
+      <if test="isActivty != null">is_activty = #{isActivty,jdbcType=TINYINT},</if>  
+      <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if>  
+      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
+    </set> where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon set name = #{name,jdbcType=VARCHAR}, coupon_value = #{couponValue,jdbcType=DECIMAL}, coupon_validay = #{couponValiday,jdbcType=INTEGER}, coupon_number = #{couponNumber,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP}, use_with_account = #{useWithAccount,jdbcType=TINYINT}, coupon_name = #{couponName,jdbcType=VARCHAR}, coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_activty = #{isActivty,jdbcType=TINYINT}, brand_id = #{brandId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=BIGINT}</update>
+  <select id="selectList" resultType="NewCustomCoupon">select * from tb_new_custom_coupon</select>
+</mapper>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.ArticleMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Article">
+    <id column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="name_alias" property="nameAlias" jdbcType="VARCHAR"/>
+    <result column="name_short" property="nameShort" jdbcType="VARCHAR"/>
+    <result column="photo_big" property="photoBig" jdbcType="VARCHAR"/>
+    <result column="photo_small" property="photoSmall" jdbcType="VARCHAR"/>
+    <result column="ingredients" property="ingredients" jdbcType="VARCHAR"/>
+    <result column="description" property="description" jdbcType="VARCHAR"/>
+    <result column="is_empty" property="isEmpty" jdbcType="BIT"/>
+    <result column="sort" property="sort" jdbcType="INTEGER"/>
+    <result column="activated" property="activated" jdbcType="TINYINT"/>
+    <result column="state" property="state" jdbcType="BIT"/>
+    <result column="remain_number" property="remainNumber" jdbcType="INTEGER"/>
+    <result column="sale_number" property="saleNumber" jdbcType="BIGINT"/>
+    <result column="show_sale_number" property="showSaleNumber" jdbcType="BIGINT"/>
+    <result column="show_price" property="showPrice" jdbcType="INTEGER"/>
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="article_family_id" property="articleFamilyId" jdbcType="VARCHAR"/>
+    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR"/>
+    <result column="update_user_id" property="updateUserId" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, show_price, update_time, create_time, shop_detail_id, article_family_id, create_user_id, update_user_id</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
+    <include refid="Base_Column_List"/> from tb_article where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_article where id = #{id,jdbcType=VARCHAR}</delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Article">insert into tb_article (id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, show_price, update_time, create_time, shop_detail_id, article_family_id, create_user_id, update_user_id) values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, #{sort,jdbcType=INTEGER}, #{activated,jdbcType=TINYINT}, #{state,jdbcType=BIT}, #{remainNumber,jdbcType=INTEGER}, #{saleNumber,jdbcType=BIGINT}, #{showSaleNumber,jdbcType=BIGINT}, #{showPrice,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{shopDetailId,jdbcType=VARCHAR}, #{articleFamilyId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{updateUserId,jdbcType=VARCHAR})</insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">insert into tb_article 
+    <trim prefix="(" suffix=")" suffixOverrides=","> 
+      <if test="id != null">id,</if>  
+      <if test="name != null">name,</if>  
+      <if test="nameAlias != null">name_alias,</if>  
+      <if test="nameShort != null">name_short,</if>  
+      <if test="photoBig != null">photo_big,</if>  
+      <if test="photoSmall != null">photo_small,</if>  
+      <if test="ingredients != null">ingredients,</if>  
+      <if test="description != null">description,</if>  
+      <if test="isEmpty != null">is_empty,</if>  
+      <if test="sort != null">sort,</if>  
+      <if test="activated != null">activated,</if>  
+      <if test="state != null">state,</if>  
+      <if test="remainNumber != null">remain_number,</if>  
+      <if test="saleNumber != null">sale_number,</if>  
+      <if test="showSaleNumber != null">show_sale_number,</if>  
+      <if test="showPrice != null">show_price,</if>  
+      <if test="updateTime != null">update_time,</if>  
+      <if test="createTime != null">create_time,</if>  
+      <if test="shopDetailId != null">shop_detail_id,</if>  
+      <if test="articleFamilyId != null">article_family_id,</if>  
+      <if test="createUserId != null">create_user_id,</if>  
+      <if test="updateUserId != null">update_user_id,</if> 
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=","> 
+      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
+      <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
+      <if test="nameAlias != null">#{nameAlias,jdbcType=VARCHAR},</if>  
+      <if test="nameShort != null">#{nameShort,jdbcType=VARCHAR},</if>  
+      <if test="photoBig != null">#{photoBig,jdbcType=VARCHAR},</if>  
+      <if test="photoSmall != null">#{photoSmall,jdbcType=VARCHAR},</if>  
+      <if test="ingredients != null">#{ingredients,jdbcType=VARCHAR},</if>  
+      <if test="description != null">#{description,jdbcType=VARCHAR},</if>  
+      <if test="isEmpty != null">#{isEmpty,jdbcType=BIT},</if>  
+      <if test="sort != null">#{sort,jdbcType=INTEGER},</if>  
+      <if test="activated != null">#{activated,jdbcType=TINYINT},</if>  
+      <if test="state != null">#{state,jdbcType=BIT},</if>  
+      <if test="remainNumber != null">#{remainNumber,jdbcType=INTEGER},</if>  
+      <if test="saleNumber != null">#{saleNumber,jdbcType=BIGINT},</if>  
+      <if test="showSaleNumber != null">#{showSaleNumber,jdbcType=BIGINT},</if>  
+      <if test="showPrice != null">#{showPrice,jdbcType=INTEGER},</if>  
+      <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>  
+      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>  
+      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>  
+      <if test="articleFamilyId != null">#{articleFamilyId,jdbcType=VARCHAR},</if>  
+      <if test="createUserId != null">#{createUserId,jdbcType=VARCHAR},</if>  
+      <if test="updateUserId != null">#{updateUserId,jdbcType=VARCHAR},</if> 
+    </trim> 
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">update tb_article 
+    <set> 
+      <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>  
+      <if test="nameAlias != null">name_alias = #{nameAlias,jdbcType=VARCHAR},</if>  
+      <if test="nameShort != null">name_short = #{nameShort,jdbcType=VARCHAR},</if>  
+      <if test="photoBig != null">photo_big = #{photoBig,jdbcType=VARCHAR},</if>  
+      <if test="photoSmall != null">photo_small = #{photoSmall,jdbcType=VARCHAR},</if>  
+      <if test="ingredients != null">ingredients = #{ingredients,jdbcType=VARCHAR},</if>  
+      <if test="description != null">description = #{description,jdbcType=VARCHAR},</if>  
+      <if test="isEmpty != null">is_empty = #{isEmpty,jdbcType=BIT},</if>  
+      <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
+      <if test="activated != null">activated = #{activated,jdbcType=TINYINT},</if>  
+      <if test="state != null">state = #{state,jdbcType=BIT},</if>  
+      <if test="remainNumber != null">remain_number = #{remainNumber,jdbcType=INTEGER},</if>  
+      <if test="saleNumber != null">sale_number = #{saleNumber,jdbcType=BIGINT},</if>  
+      <if test="showSaleNumber != null">show_sale_number = #{showSaleNumber,jdbcType=BIGINT},</if>  
+      <if test="showPrice != null">show_price = #{showPrice,jdbcType=INTEGER},</if>  
+      <if test="updateTime != null">update_time = #{updateTime,jdbcType=TIMESTAMP},</if>  
+      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>  
+      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>  
+      <if test="articleFamilyId != null">article_family_id = #{articleFamilyId,jdbcType=VARCHAR},</if>  
+      <if test="createUserId != null">create_user_id = #{createUserId,jdbcType=VARCHAR},</if>  
+      <if test="updateUserId != null">update_user_id = #{updateUserId,jdbcType=VARCHAR},</if> 
+    </set> where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Article">update tb_article set name = #{name,jdbcType=VARCHAR}, name_alias = #{nameAlias,jdbcType=VARCHAR}, name_short = #{nameShort,jdbcType=VARCHAR}, photo_big = #{photoBig,jdbcType=VARCHAR}, photo_small = #{photoSmall,jdbcType=VARCHAR}, ingredients = #{ingredients,jdbcType=VARCHAR}, description = #{description,jdbcType=VARCHAR}, is_empty = #{isEmpty,jdbcType=BIT}, sort = #{sort,jdbcType=INTEGER}, activated = #{activated,jdbcType=TINYINT}, state = #{state,jdbcType=BIT}, remain_number = #{remainNumber,jdbcType=INTEGER}, sale_number = #{saleNumber,jdbcType=BIGINT}, show_sale_number = #{showSaleNumber,jdbcType=BIGINT}, show_price = #{showPrice,jdbcType=INTEGER}, update_time = #{updateTime,jdbcType=TIMESTAMP}, create_time = #{createTime,jdbcType=TIMESTAMP}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, article_family_id = #{articleFamilyId,jdbcType=VARCHAR}, create_user_id = #{createUserId,jdbcType=VARCHAR}, update_user_id = #{updateUserId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <select id="selectList" resultType="Article">select * from tb_article</select>
+</mapper>

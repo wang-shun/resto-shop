@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.resto.shop.web.dao.FreeDayMapper" >
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.FreeDay" >
+    <id column="free_day" property="freeDay" jdbcType="DATE" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.util.Date" >
+    delete from tb_free_day
+    where free_day = #{freeDay,jdbcType=DATE}
+  </delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.FreeDay" >
+    insert into tb_free_day (free_day)
+    values (#{freeDay,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.FreeDay" >
+    insert into tb_free_day
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="freeDay != null" >
+        free_day,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="freeDay != null" >
+        #{freeDay,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+</mapper>
