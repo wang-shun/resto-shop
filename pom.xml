@@ -14,7 +14,22 @@
 	</parent>
 	<artifactId>resto-shop</artifactId>
 	<packaging>pom</packaging>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>cn.restoplus</groupId>
+				<artifactId>resto-brand-api</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.restoplus</groupId>
+				<artifactId>resto-brand-core</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<modules>
 		<module>resto-shop-web</module>
 		<module>resto-shop-server</module>

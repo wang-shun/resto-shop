@@ -10,7 +10,6 @@
 	<packaging>war</packaging>
 
 	<build>
-		<finalName>resto</finalName>
 		<plugins>
 			<!-- Maven插件 配置 -->
 			<plugin>
