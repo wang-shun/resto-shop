@@ -4,7 +4,7 @@
 
 	<parent>
 		<groupId>cn.restoplus</groupId>
-		<artifactId>resto</artifactId>
+		<artifactId>resto-shop</artifactId>
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>resto-shop-server</artifactId>
