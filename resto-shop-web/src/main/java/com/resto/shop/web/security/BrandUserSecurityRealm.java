@@ -48,7 +48,7 @@ public class BrandUserSecurityRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         String username = String.valueOf(principals.getPrimaryPrincipal());
         final BrandUser brandUser = brandUserService.selectByUsername(username);
-        Role role= roleService.selectById(brandUser.getRoldId());
+        Role role= roleService.selectById(brandUser.getRoleId());
             // 添加角色
         System.err.println(role);
         authorizationInfo.addRole(role.getRoleSign());
