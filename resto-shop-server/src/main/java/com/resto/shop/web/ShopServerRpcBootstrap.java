@@ -6,9 +6,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.resto.shop.web.config.ServerConfig;
 
-public class RpcBootstrap {
+public class ShopServerRpcBootstrap {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcBootstrap.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShopServerRpcBootstrap.class);
 
     @SuppressWarnings("resource")
 	public static void main(String[] args) {

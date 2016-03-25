@@ -1,8 +1,6 @@
 package com.resto.shop.web.config;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -28,9 +26,7 @@ public class ServerConfig {
 	}
 	
 	@Bean
-	public DataSource dataSource(){
-		DynamicDataSource dynamicDataSource = new DynamicDataSource(defaultDataSource);
-		dynamicDataSource.setDefaultTargetDataSource(defaultDataSource);
-		return dynamicDataSource;
+	public DynamicDataSource dataSource(){
+		return new DynamicDataSource();
 	}
 }

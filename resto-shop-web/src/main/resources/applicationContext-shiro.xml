@@ -18,6 +18,7 @@
                 /assets/** = anon
                 <!-- 登录页允许访问 -->
                 /branduser/login = anon
+                /installedPermission =anon
                 <!-- 其他资源需要认证 -->
                 /** = authc
             </value>

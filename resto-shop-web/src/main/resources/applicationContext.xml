@@ -54,7 +54,10 @@
 
     <bean id="rpcProxy" class="cn.restoplus.rpc.client.RpcProxy">
         <constructor-arg name="serviceDiscovery" ref="serviceDiscovery"/>
+        <property name="beforeSendListener" ref="rpcSendListener"/> 
     </bean>
+    
+    <bean id="rpcSendListener" class="com.resto.shop.web.rpcinterceptors.RpcDataSourceInterceptor"></bean>
 	 
 
 	<!-- 配置使Spring采用CGLIB代理 -->

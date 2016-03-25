@@ -21,13 +21,10 @@ import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 
 /**
- * 用户控制器
- * 
- * @author StarZou
- * @since 2014年5月28日 下午3:54:00
+ * 商家用户控制器
  **/
 @Controller
-@RequestMapping(value = "/brandUser")
+@RequestMapping(value = "/branduser")
 public class BrandUserController extends GenericController{
 	
     @Resource
@@ -65,7 +62,7 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
         } catch (AuthenticationException e) {
             // 身份验证失败
-            model.addAttribute("error", "用户名或密码错误 ！");
+            model.addAttribute("error", e.getMessage());
             return "login";
         }
         return "redirect:/";
