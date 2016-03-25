@@ -34,52 +34,59 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<!-- Rpc 配置 -->
- 	<bean id="serviceRegistry" class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
-        <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
-    </bean>
+	<bean id="serviceRegistry"
+		class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
+		<constructor-arg name="zkAddress" value="${rpc.registry_address}" />
+	</bean>
 
-    <bean id="rpcServer" class="cn.restoplus.rpc.server.RpcServer">
-        <constructor-arg name="serviceAddress" value="${rpc.service_address}"/>
-        <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
-    </bean>
+	<bean id="rpcServer" class="cn.restoplus.rpc.server.RpcServer">
+		<constructor-arg name="serviceAddress" value="${rpc.service_address}" />
+		<constructor-arg name="serviceRegistry" ref="serviceRegistry" />
+	</bean>
 
+	<bean id="serviceDiscovery"
+		class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceDiscovery">
+		<constructor-arg name="zkAddress" value="${rpc.registry_address}" />
+	</bean>
+
+	<bean id="rpcProxy" class="cn.restoplus.rpc.client.RpcProxy">
+		<constructor-arg name="serviceDiscovery" ref="serviceDiscovery" />
+	</bean>
 
 	<!-- dataSource 配置 -->
-	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
-		init-method="init" destroy-method="close">
-		<!-- 基本属性 url、user、password -->
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
+	<bean id="defaultDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	<!-- 基本属性 url、user、password -->
+	<property name="url" value="${jdbc.url}" />
+	<property name="username" value="${jdbc.username}" />
+	<property name="password" value="${jdbc.password}" />
 
-		<!-- 配置初始化大小、最小、最大 -->
-		<property name="initialSize" value="${ds.initialSize}" />
-		<property name="minIdle" value="${ds.minIdle}" />
-		<property name="maxActive" value="${ds.maxActive}" />
+	<!-- 配置初始化大小、最小、最大 -->
+	<property name="initialSize" value="${ds.initialSize}" />
+	<property name="minIdle" value="${ds.minIdle}" />
+	<property name="maxActive" value="${ds.maxActive}" />
 
-		<!-- 配置获取连接等待超时的时间 -->
-		<property name="maxWait" value="${ds.maxWait}" />
+	<!-- 配置获取连接等待超时的时间 -->
+	<property name="maxWait" value="${ds.maxWait}" />
 
-		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
-		<property name="timeBetweenEvictionRunsMillis" value="${ds.timeBetweenEvictionRunsMillis}" />
+	<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+	<property name="timeBetweenEvictionRunsMillis" value="${ds.timeBetweenEvictionRunsMillis}"	/>
 
-		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
-		<property name="minEvictableIdleTimeMillis" value="${ds.minEvictableIdleTimeMillis}" />
+	<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+	<property name="minEvictableIdleTimeMillis" value="${ds.minEvictableIdleTimeMillis}" 	/>
 
-		<property name="validationQuery" value="SELECT 'x'" />
-		<property name="testWhileIdle" value="true" />
-		<property name="testOnBorrow" value="false" />
-		<property name="testOnReturn" value="false" />
+	<property name="validationQuery" value="SELECT 'x'" />
+	<property name="testWhileIdle" value="true" />
+	<property name="testOnBorrow" value="false" />
+	<property name="testOnReturn" value="false" />
 
-		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
-		<property name="poolPreparedStatements" value="false" />
-		<property name="maxPoolPreparedStatementPerConnectionSize"
-			value="20" />
+	<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+	<property name="poolPreparedStatements" value="false" />
+	<property name="maxPoolPreparedStatementPerConnectionSize"	value="20" />
 
-		<!-- 配置监控统计拦截的filters -->
-		<property name="filters" value="stat" />
+	<!-- 配置监控统计拦截的filters -->
+	<!-- <property name="filters" value="stat" /> -->
 	</bean>
 
 	<!-- mybatis文件配置，扫描所有mapper文件 -->
@@ -116,9 +123,10 @@
 
 	<!-- 事务 aop 配置 -->
 	<aop:config>
-		<aop:pointcut id="serviceMethods"	expression="execution(* com.resto.shop.web.service..*(..))" />
+		<aop:pointcut id="serviceMethods"
+			expression="execution(* com.resto.shop.web.service..*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods" />
-	</aop:config> 
+	</aop:config>
 
 	<!-- 配置使Spring采用CGLIB代理 -->
 	<aop:aspectj-autoproxy proxy-target-class="true" />

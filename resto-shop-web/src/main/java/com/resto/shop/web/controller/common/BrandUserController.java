@@ -29,7 +29,7 @@ import com.resto.shop.web.controller.GenericController;
 @Controller
 @RequestMapping(value = "/brandUser")
 public class BrandUserController extends GenericController{
-
+	
     @Resource
     private BrandUserService brandUserService;
 
@@ -59,7 +59,10 @@ public class BrandUserController extends GenericController{
             subject.login(new UsernamePasswordToken(brandUser.getUsername(),ApplicationUtils.pwd( brandUser.getPassword())));
             // 验证成功在Session中保存用户信息
             final BrandUser authUserInfo = brandUserService.selectByUsername(brandUser.getUsername());
-            request.getSession().setAttribute(SessionKey.USER_INFO, authUserInfo);
+            HttpSession session = request.getSession();
+            session.setAttribute(SessionKey.USER_INFO, authUserInfo);
+            session.setAttribute(SessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());
+            session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
         } catch (AuthenticationException e) {
             // 身份验证失败
             model.addAttribute("error", "用户名或密码错误 ！");
