@@ -8,6 +8,7 @@ import com.resto.brand.web.service.DatabaseConfigService;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 
 import cn.restoplus.rpc.common.bean.RpcRequest;
+import cn.restoplus.rpc.common.listener.ReceiverInterceptor;
 
 @Component
 public class RpcReceiverInterceptor implements ReceiverInterceptor{

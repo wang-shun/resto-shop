@@ -13,7 +13,6 @@
 		<version>1.0.1</version>
 	</parent>
 	<artifactId>resto-shop</artifactId>
-	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	
 	<dependencyManagement>
@@ -21,12 +20,12 @@
 			<dependency>
 				<groupId>cn.restoplus</groupId>
 				<artifactId>resto-brand-api</artifactId>
-				<version>1.0.0</version>
+				<version>1.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>cn.restoplus</groupId>
 				<artifactId>resto-brand-core</artifactId>
-				<version>1.0.0</version>
+				<version>1.0.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
