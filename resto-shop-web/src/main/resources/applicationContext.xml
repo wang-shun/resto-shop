@@ -52,7 +52,7 @@
         <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
     </bean>
 
-    <bean id="rpcProxy" class="cn.restoplus.rpc.client.RpcProxy">
+    <bean id="proxy" class="cn.restoplus.rpc.client.RpcProxy">
         <constructor-arg name="serviceDiscovery" ref="serviceDiscovery"/>
         <property name="beforeSendListener" ref="rpcSendListener"/> 
     </bean>

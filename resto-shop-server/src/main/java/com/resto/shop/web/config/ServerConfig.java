@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.resto.brand.web.service.DatabaseConfigService;
 import com.resto.shop.web.datasource.DynamicDataSource;
 
@@ -17,13 +16,12 @@ public class ServerConfig {
 	@Resource
 	RpcProxy proxy;
 	
-	@Resource
-	DruidDataSource defaultDataSource;
-	
 	@Bean
 	public DatabaseConfigService databaseConfigService(){
 		return proxy.create(DatabaseConfigService.class);
 	}
+	
+	
 	
 	@Bean
 	public DynamicDataSource dataSource(){
