@@ -49,10 +49,24 @@
     <label>结束时间</label>
     <input type="text" class="form-control" name="endTime" v-model="m.endTime">
 </div>
+
+<%-- <input type="radio" id="one" value="One" v-model="picked">
+<label for="one">One</label>
+<br>
+<input type="radio" id="two" value="Two" v-model="picked">
+<label for="two">Two</label>
+<br>
+<span>Picked: {{ picked }}</span> --%>
 <div class="form-group">
-    <label>是否启动</label>
-    <input type="text" class="form-control" name="isActivty" v-model="m.isActivty">
+	<div class="control-label">选择是否启动优惠券</div>
+    <input type="radio" class="form-control" name="isActivty" v-model="m.isActivty">
+    <label for="one">是</label>
+    
+    <input type="radio" class="form-control" name="isActivty" v-model="m.isActivty">
+    <label for="one">否</label>
 </div>
+
+
 <div class="form-group">
     <label>品牌</label>
     <input type="text" class="form-control" name="brandId" v-model="m.brandId">
@@ -220,7 +234,7 @@
 					},
 					initdistributionMode :function(){
 						$.ajax({
-							url:"distributionmode/list_all",
+							url:"newcustomcoupon/distributionmode/list_all",
 							type:"post",
 							dataType:"json",
 							success:function(result){
@@ -238,6 +252,7 @@
 						})
 						
 					},
+					
 					
 					initTime :function(){
 						$(".timepicker-no-seconds").timepicker({

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.DistributionMode;
+import com.resto.brand.web.service.DistributionModeService;
 import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.service.NewCustomCouponService;
 
@@ -21,9 +23,12 @@ public class NewCustomCouponController extends GenericController{
 	@Resource
 	NewCustomCouponService newcustomcouponService;
 	
+	@Resource
+	DistributionModeService distributionmodeService;
+	
 	@RequestMapping("/list")
-    public void list(){
-    }
+	public void list(){
+        }
 
 	@RequestMapping("/list_all")
 	@ResponseBody
@@ -58,4 +63,10 @@ public class NewCustomCouponController extends GenericController{
 		newcustomcouponService.delete(id);
 		return Result.getSuccess();
 	}
+	
+	@RequestMapping("distributionmode/list_all")
+	@ResponseBody
+	public List<DistributionMode> lists(){
+            return distributionmodeService.selectList();
+    }
 }
