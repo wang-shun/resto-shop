@@ -239,10 +239,9 @@
 							dataType:"json",
 							success:function(result){
 								if(result){
-									console.log(result);
-									var distributionMode=[];
-									for(var i=0;i<data.length;i++){
-										allDistributionMode[i]={"id":data[i].id,"name":data[i].name};
+									var allDistributionMode=[];
+									for(var i=0;i<result.length;i++){
+										allDistributionMode[i]={"id":result[i].id,"name":result[i].name};
 									}
 									vueObj.$set("allDistributionMode",allDistributionMode)
 								}
