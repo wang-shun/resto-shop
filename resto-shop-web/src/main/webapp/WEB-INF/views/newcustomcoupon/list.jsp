@@ -41,36 +41,41 @@
     <label>最低消费额度</label>
     <input type="text" class="form-control" name="couponMinMoney" v-model="m.couponMinMoney">
 </div>
+
+        
 <div class="form-group">
     <label>开始时间</label>
-    <input type="text" class="form-control" name="beginTime" v-model="m.beginTime">
+    <div class="input-group">
+    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" v-model="m.beginTime" @focus="initTime">
+    <span class="input-group-btn">
+				<button class="btn default" type="button">
+					<i class="fa fa-clock-o"></i>
+				</button>
+	</span>
+    </div>
 </div>
 <div class="form-group">
     <label>结束时间</label>
-    <input type="text" class="form-control" name="endTime" v-model="m.endTime">
+     <div class="input-group">
+    <input type="text" class="form-control timepicker timepicker-no-seconds" name="endTime" v-model="m.endTime" @focus="initTime">
+    <span class="input-group-btn">
+				<button class="btn default" type="button">
+					<i class="fa fa-clock-o"></i>
+				</button>
+	</span>
+    </div>
 </div>
 
-<%-- <input type="radio" id="one" value="One" v-model="picked">
-<label for="one">One</label>
-<br>
-<input type="radio" id="two" value="Two" v-model="picked">
-<label for="two">Two</label>
-<br>
-<span>Picked: {{ picked }}</span> --%>
+
+
 <div class="form-group">
 	<div class="control-label">选择是否启动优惠券</div>
-    <input type="radio" class="form-control" name="isActivty" v-model="m.isActivty">
-    <label for="one">是</label>
-    
-    <input type="radio" class="form-control" name="isActivty" v-model="m.isActivty">
-    <label for="one">否</label>
+    <input type="radio"  name="isActivty" v-model="m.isActivty">
+    <label for="isActivty">是</label>
+    <input type="radio"  name="isActivty" v-model="m.isActivty"> 
+    <label for="isActivty">否</label>
 </div>
 
-
-<div class="form-group">
-    <label>品牌</label>
-    <input type="text" class="form-control" name="brandId" v-model="m.brandId">
-</div>
 <div class="form-group">
    <div class="control-label">选择店铺模式</div>
    <div>
