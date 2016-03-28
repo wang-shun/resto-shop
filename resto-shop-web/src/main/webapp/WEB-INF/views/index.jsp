@@ -140,8 +140,6 @@
         
         <!-- BEGIN THEME LAYOUT SCRIPTS -->
         <script src="<%=resourcePath%>/assets/layouts/layout/scripts/layout.js" type="text/javascript"></script>
-        <script src="<%=resourcePath%>/assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
-        <script src="<%=resourcePath%>/assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
 		<!--	CUSTOMER SCRIPTS -->
         <script src="<%=resourcePath%>/assets/customer/datatable_lang_ch.js" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/dialog/customer_dialog.js" type="text/javascript" charset="utf-8"></script>

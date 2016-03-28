@@ -1,18 +1,23 @@
  package com.resto.shop.web.controller.business;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.DistributionMode;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DistributionModeService;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.service.NewCustomCouponService;
 
@@ -25,6 +30,9 @@ public class NewCustomCouponController extends GenericController{
 	
 	@Resource
 	DistributionModeService distributionmodeService;
+	
+	@Resource
+	BrandService brandService;
 	
 	@RequestMapping("/list")
 	public void list(){
@@ -45,8 +53,25 @@ public class NewCustomCouponController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid NewCustomCoupon brand){
-		newcustomcouponService.insert(brand);
+	public Result create(@Valid NewCustomCoupon brand, HttpServletRequest request){
+	        String brandId =  (String) request.getSession().getAttribute("brandId");
+	        brand.setBrandId(brandId);
+	        brand.setCreateTime(new Date());
+	        brand.getBeginTime();
+	        String beginTime1 = brand.getBeginTime().toString();
+	        String endTime1 = brand.getEndTime().toString();
+	        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+	        Date beginTime = null;
+	        Date endTime = null;
+	         try {
+                beginTime = sdf.parse(beginTime1);
+                endTime = sdf.parse(endTime1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+	         brand.setBeginTime(beginTime);
+	         brand.setEndTime(endTime);
+		newcustomcouponService.insertNewCustomCoupon(brand);
 		return Result.getSuccess();
 	}
 	
@@ -68,5 +93,11 @@ public class NewCustomCouponController extends GenericController{
 	@ResponseBody
 	public List<DistributionMode> lists(){
             return distributionmodeService.selectList();
-    }
-}
+        }
+	@RequestMapping("distributionMode/list_one")
+	@ResponseBody
+	public DistributionMode listOne(Integer id){
+	   return distributionmodeService.selectById(id);
+	}
+	
+}	

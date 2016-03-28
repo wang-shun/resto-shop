@@ -11,19 +11,19 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'newcustomcoupon/modify':'newcustomcoupon/create'}}" @submit.prevent="save">
+	            	<form role="form" class="newcustomform" action="{{m.id?'newcustomcoupon/modify':'newcustomcoupon/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
 			    <label>活动名称</label>
-			    <input type="text" class="form-control" name="name" v-model="m.name">
+			    <input type="text" class="form-control"  name="name" v-model="m.name">
 			</div>
 			<div class="form-group">
 			    <label>优惠券的价值</label>
-			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue">
+			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" range:[5,10]>
 			</div>
 			<div class="form-group">
-			    <label>优惠券使用日期</label>
-			    <input type="text" class="form-control" name="couponValiday" v-model="m.couponValiday">
+			    <label>优惠券有效日期</label>
+			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday">
 			</div>
 			<div class="form-group">
 			    <label>优惠券的数量</label>
@@ -52,7 +52,7 @@
 			<div class="form-group">
 			    <label>开始时间</label>
 			    <div class="input-group">
-			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" v-model="m.beginTime" @focus="initTime">
+			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" :value="m.beginTime" @focus="initTime">
 			    <span class="input-group-btn">
 							<button class="btn default" type="button">
 								<i class="fa fa-clock-o"></i>
@@ -119,6 +119,7 @@
 			
 			<script>
 				$(document).ready(function(){ 
+					
 					var C;
 					var vueObj;
 					var cid="#control";
@@ -160,22 +161,49 @@
 							{                 
 								title : "优惠券开始时间",//00:01:00
 								data : "beginTime",
+								"render":function(data){
+									return (new Date(data).format('hh:mm:ss'))
+								}
 							},                 
 							{                 
 								title : "优惠券结束时间",//'23:59:00'
 								data : "endTime",
+								"render":function(data){
+									return (new Date(data)).format('hh:mm:ss');
+								}
 							},                 
 							{                 
 								title : "是否启动",
 								data : "isActivty",
-							},                 
-							{                 
-								title : "品牌",
-								data : "brandId",
+								"render":function(data){
+									if(data==1){
+										data='是';
+									}else if(data==0){
+										data='否';
+									}else{
+										data='未知';
+									}
+									return data;
+								}
 							},                 
 							{                 
 								title : "配送模式",
 								data : "distributionModeId",
+								createdCell:function(td,tdData,rowData,row){
+									$.ajax({
+										data:{"id":tdData},
+										type:"post",
+										dataType:"json",
+										url:"newcustomcoupon/distributionMode/list_one",
+										success:function(result){
+											console.log(result);
+											$(td).html(result.name);
+										}
+										
+										
+									})
+									
+								}
 							},                 
 			
 							{
@@ -228,20 +256,17 @@
 									this.openForm();
 									Vue.nextTick(function(){
 										vueObj.initdistributionMode();
+										vueObj.initTime();
 									})
 								},
 								save:function(e){
-									var that =this;
-									 $.ajax({
-										url:"newcustomcoupon/create",
-										type:"post",
-										data:$("form").serialize(),
-										dataType:"json",
-										success:function(data){
+									
+									var that = this;
+										var formDom = e.target;
+										C.ajaxFormEx(formDom,function(){
 											that.cancel();
 											tb.ajax.reload();
-										}
-									}) 
+										});
 								},
 								initdistributionMode :function(){
 									$.ajax({
@@ -267,7 +292,9 @@
 								initTime :function(){
 									$(".timepicker-no-seconds").timepicker({
 										 autoclose: true,
-							                minuteStep: 5
+										 showMeridian:false,
+										 showInputs:false,
+							             minuteStep: 5
 									    });
 								},
 								
