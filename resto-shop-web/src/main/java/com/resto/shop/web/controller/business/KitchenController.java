@@ -3,14 +3,17 @@
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.shop.web.config.SessionKey;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.service.KitchenService;
 
@@ -40,15 +43,16 @@ public class KitchenController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid Kitchen brand){
-		kitchenService.insert(brand);
+	public Result create(@Valid Kitchen kitchen,HttpServletRequest request){
+		kitchen.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
+		kitchenService.insert(kitchen);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid Kitchen brand){
-		kitchenService.update(brand);
+	public Result modify(@Valid Kitchen kitchen){
+		kitchenService.update(kitchen);
 		return Result.getSuccess();
 	}
 	

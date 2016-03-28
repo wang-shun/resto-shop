@@ -40,5 +40,7 @@
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Kitchen">update tb_kitchen set name = #{name,jdbcType=VARCHAR}, remark = #{remark,jdbcType=VARCHAR}, printer_id = #{printerId,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
-  <select id="selectList" resultType="Kitchen">select * from tb_kitchen</select>
+  <select id="selectList" resultType="Kitchen">
+  	select k.id, k.name, k.remark, k.shop_detail_id, p.name printerName from tb_kitchen k LEFT JOIN tb_printer p on k.printer_id = p.id
+  </select>
 </mapper>

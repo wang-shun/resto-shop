@@ -7,41 +7,40 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">新建菜品类型</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'articlefamily/modify':'articlefamily/create'}}" @submit.prevent="save">
+	            	<form role="form" class="form-horizontal" action="{{m.id?'articlefamily/modify':'articlefamily/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>peference</label>
-    <input type="text" class="form-control" name="peference" v-model="m.peference">
-</div>
-<div class="form-group">
-    <label>parentId</label>
-    <input type="text" class="form-control" name="parentId" v-model="m.parentId">
-</div>
-<div class="form-group">
-    <label>level</label>
-    <input type="text" class="form-control" name="level" v-model="m.level">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-<div class="form-group">
-    <label>distributionModeId</label>
-    <input type="text" class="form-control" name="distributionModeId" v-model="m.distributionModeId">
-</div>
-
+			           			<label class="col-sm-3 control-label">类型名称：</label>
+							    <div class="col-sm-8">
+									<input type="text" class="form-control" required name="name" v-model="m.name">
+							    </div>
+							</div>
+							<div class="form-group">
+			           			<label class="col-sm-3 control-label">序号：</label>
+							    <div class="col-sm-8">
+							    <input type="number" class="form-control" required placeholder="只能输入数字！" name="peference" v-model="m.peference">
+							    </div>
+							</div>
+							<div class="form-group">
+			           			<label class="col-sm-3 control-label">就餐模式：</label>
+							    <div class="col-sm-8">
+							    <select class="form-control" name="distributionModeId" required v-model="m.distributionModeId?m.distributionModeId:selected">
+							    	<option v-for="temp in distributionMode" v-bind:value="temp.id">
+							    		{{ temp.name }}
+							    	</option>
+							    </select>
+							    </div>
+							</div>
+							<div class="text-center">
+								<input type="hidden" name="id" v-model="m.id" />
+								<input class="btn green"  type="submit"  value="保存"/>
+								<a class="btn default" @click="cancel" >取消</a>
+							</div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
 					</form>
 	            </div>
 	        </div>
@@ -74,29 +73,28 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "peference",
-	data : "peference",
-},                 
-{                 
-	title : "parentId",
-	data : "parentId",
-},                 
-{                 
-	title : "level",
-	data : "level",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-{                 
-	title : "distributionModeId",
-	data : "distributionModeId",
-},                 
+					title : "类型名称",
+					data : "name",
+				},                 
+				{                 
+					title : "序号",
+					data : "peference",
+				},              
+				{                 
+					title : "就餐模式",
+					data : "distributionModeId",
+					createdCell:function(td,tdData,rowData,row){
+						var str = "";
+						if("1" == tdData){
+							str = "堂吃" ;
+						}else if("2" == tdData){
+							str = "外卖" ;
+						}else{
+							str = "情况不明" ;
+						}
+						$(td).html(str);
+					}
+				},                 
 
 				{
 					title : "操作",
@@ -116,10 +114,61 @@
 		});
 		
 		var C = new Controller(cid,tb);
+		
+		//重写option
+		var option = {
+				el:cid,
+				data:{
+					m:{},
+					showform:false,
+					distributionMode:{},
+					selected:""
+				},
+				methods:{
+					openForm:function(){
+						this.showform = true;
+					},
+					closeForm:function(){
+						this.m={};
+						this.showform = false;
+					},
+					cancel:function(){
+						this.m={};
+						this.closeForm();
+					},
+					create:function(){
+						this.m={};
+						this.openForm();
+					},
+					edit:function(model){
+						this.m= model;
+						this.openForm();
+					},
+					save:function(e){
+						var that = this;
+						var formDom = e.target;
+						C.ajaxFormEx(formDom,function(){
+							that.cancel();
+							tb.ajax.reload();
+						});
+					},
+				},
+			};
+		
 		var vueObj = C.vueObj();
+		
+		
+		//获取 就餐模式
+		$.ajax({
+			type:"post",
+			url:"articlefamily/querydistributionMode",
+			dataType:"json",
+			success:function(data){
+				vueObj.$set("distributionMode",data.data);
+				vueObj.$set("selected",data.data[0].id);
+			}
+		})
+		
 	}());
-	
-	
-
 	
 </script>

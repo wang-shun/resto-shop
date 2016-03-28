@@ -1,16 +1,20 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.model.Notice;
 import com.resto.shop.web.service.NoticeService;
 
@@ -40,8 +44,9 @@ public class NoticeController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid Notice brand){
-		noticeService.insert(brand);
+	public Result create(@Valid Notice notice,HttpServletRequest request){
+		notice.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
+		noticeService.create(notice);
 		return Result.getSuccess();
 	}
 	

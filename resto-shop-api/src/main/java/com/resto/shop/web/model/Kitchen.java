@@ -11,6 +11,9 @@ public class Kitchen {
 
     private String shopDetailId;
 
+    //关联查询 打印机的名称
+    private String printerName;
+    
     public Integer getId() {
         return id;
     }
@@ -50,4 +53,13 @@ public class Kitchen {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public String getPrinterName() {
+		return printerName;
+	}
+
+	public void setPrinterName(String printerName) {
+		this.printerName = printerName == null ? null : printerName.trim();
+	}
+    
 }

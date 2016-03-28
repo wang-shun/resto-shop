@@ -7,33 +7,40 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">新建厨房配置</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'kitchen/modify':'kitchen/create'}}" @submit.prevent="save">
+	            	<form role="form" class="form-horizontal" action="{{m.id?'kitchen/modify':'kitchen/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>remark</label>
-    <input type="text" class="form-control" name="remark" v-model="m.remark">
-</div>
-<div class="form-group">
-    <label>printerId</label>
-    <input type="text" class="form-control" name="printerId" v-model="m.printerId">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+			           			<label class="col-sm-3 control-label">厨房名称：</label>
+							    <div class="col-sm-8">
+						    		<input type="text" class="form-control" name="name" v-model="m.name">
+							    </div>
+							</div>
+							<div class="form-group">
+			           			<label class="col-sm-3 control-label">备注信息：</label>
+							    <div class="col-sm-8">
+							    	<input type="text" class="form-control" name="remark" v-model="m.remark">
+							    </div>
+							</div>
+							<div class="form-group">
+			           			<label class="col-sm-3 control-label">打印机名称：</label>
+							    <div class="col-sm-8">
+						    		<select class="form-control" name="printerId" v-model="m.printerId?m.printerId:selected">
+						    			<option v-for="temp in printerList" v-bind:value="temp.id">
+						    				{{ temp.name }}
+						    			</option>
+						    		</select>
+							    </div>
+							</div>
+							<div class="text-center">
+								<input type="hidden" name="id" v-model="m.id" />
+								<input class="btn green"  type="submit"  value="保存"/>
+								<a class="btn default" @click="cancel" >取消</a>
+							</div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
 					</form>
 	            </div>
 	        </div>
@@ -66,22 +73,17 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "remark",
-	data : "remark",
-},                 
-{                 
-	title : "printerId",
-	data : "printerId",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
+					title : "厨房名称",
+					data : "name",
+				},                 
+				{                 
+					title : "备注",
+					data : "remark",
+				},                 
+				{                 
+					title : "打印机名称",
+					data : "printerName",
+				},
 				{
 					title : "操作",
 					data : "id",
@@ -101,6 +103,18 @@
 		
 		var C = new Controller(cid,tb);
 		var vueObj = C.vueObj();
+		
+		//获取 就餐模式
+		$.ajax({
+			type:"post",
+			url:"printer/list_all",
+			dataType:"json",
+			success:function(data){
+				console.log(data);
+				vueObj.$set("printerList",data);
+				vueObj.$set("selected",data[0].id);
+			}
+		})
 	}());
 	
 	

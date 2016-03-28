@@ -7,33 +7,36 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">新建打印机</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'printer/modify':'printer/create'}}" @submit.prevent="save">
+	            	<form role="form" class="form-horizontal" action="{{m.id?'printer/modify':'printer/create'}}" @submit.prevent="save">
 						<div class="form-body">
-							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>ip</label>
-    <input type="text" class="form-control" name="ip" v-model="m.ip">
-</div>
-<div class="form-group">
-    <label>port</label>
-    <input type="text" class="form-control" name="port" v-model="m.port">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+			           		<div class="form-group">
+			           			<label class="col-sm-3 control-label">打印机名称：</label>
+							    <div class="col-sm-8">
+							    	<input type="text" class="form-control" required name="name" v-model="m.name">
+							    </div>
+							</div>
+			           		<div class="form-group">
+			           			<label class="col-sm-3 control-label">I&nbsp;P&nbsp;地址：</label>
+							    <div class="col-sm-8">
+							   		<input type="text" class="form-control" required name="ip" v-model="m.ip">
+							    </div>
+							</div>
+			           		<div class="form-group">
+			           			<label class="col-sm-3 control-label">端&nbsp;口&nbsp;号：</label>
+							    <div class="col-sm-8">
+							    	<input type="text" class="form-control" required name="port" v-model="m.port">
+							    </div>
+							</div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
+						<div class="text-center">
+							<input type="hidden" name="id" v-model="m.id" />
+							<input class="btn green" type="submit" value="保存" />
+							<a class="btn default" @click="cancel">取消</a>
+						</div>
 					</form>
 	            </div>
 	        </div>
@@ -66,22 +69,17 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "ip",
-	data : "ip",
-},                 
-{                 
-	title : "port",
-	data : "port",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
+					title : "打印机名称",
+					data : "name",
+				},                 
+				{                 
+					title : "IP地址",
+					data : "ip",
+				},                 
+				{                 
+					title : "端口号",
+					data : "port",
+				},
 				{
 					title : "操作",
 					data : "id",
