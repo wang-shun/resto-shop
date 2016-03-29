@@ -3,19 +3,31 @@ package com.resto.shop.web.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
 public class ChargeSetting {
     private String id;
-
+    
+    @NotNull(message="充值金额不能为空")
+    @Min(message="充值金额最小为0",value=0)
     private BigDecimal chargeMoney;
-
+    
+    @NotNull(message="返还金额不能为空")
+    @Min(message="返还金额最小为0",value=0)
     private BigDecimal rewardMoney;
-
+    
+    @NotNull(message="是否显示到菜单栏上不能为空")
     private Byte showIn;
 
     private String labelText;
-
+    
+    @NotNull(message="排序不能为空")
     private Integer sort;
-
+    
+    @NotNull(message="活动状态不能为空")
     private Byte state;
 
     private Date createTime;
