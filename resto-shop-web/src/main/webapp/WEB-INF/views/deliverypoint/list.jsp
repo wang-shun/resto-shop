@@ -15,7 +15,7 @@
 						<div class="form-body">
 							<div class="form-group">
 						    <label>自提点名称</label>
-						    <input type="text" class="form-control" name="name" v-model="m.name">
+						    <input type="text" class="form-control" name="name" v-model="m.name" placeholder="必填" required="required">
 						</div>
 						<div class="form-group">
 						    <label>省</label>
@@ -31,15 +31,15 @@
 						</div>
 						<div class="form-group">
 						    <label>地址详情</label>
-						    <input type="text" class="form-control" name="detail" v-model="m.detail">
+						    <input type="text" class="form-control" name="detail" v-model="m.detail" required placeholder="必填">
 						</div>
 						<div class="form-group">
 						    <label>纬度</label>
-						    <input type="text" class="form-control" name="mapX" v-model="m.mapX">
+						    <input type="text" class="form-control" name="mapX" v-model="m.mapX" required placeholder="必填">
 						</div>
 						<div class="form-group">
 						    <label>经度</label>
-						    <input type="text" class="form-control" name="mapY" v-model="m.mapY">
+						    <input type="text" class="form-control" name="mapY" v-model="m.mapY" required placeholder="必填">
 						</div>
 						<div class="form-group">
 						    <label>配送人电话</label>

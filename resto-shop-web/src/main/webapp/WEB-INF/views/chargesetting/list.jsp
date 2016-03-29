@@ -15,19 +15,23 @@
 						<div class="form-body">
 							<div class="form-group">
 						    <label>充值金额</label>
-						    <input type="text" class="form-control" name="chargeMoney" v-model="m.chargeMoney">
+						    <input type="text" placeholder="请输入数字" required min="0" class="form-control" name="chargeMoney" v-model="m.chargeMoney">
 						</div>
 						<div class="form-group">
 						    <label>赠送金额</label>
-						    <input type="text" class="form-control" name="rewardMoney" v-model="m.rewardMoney">
+						    <input type="text" class="form-control" name="rewardMoney" v-model="m.rewardMoney" placeholder="请输入数字" min="0">
 						</div>
 						
 						<div class="form-group">
 								<div class="control-label">选择是否显示到一级菜单</div>
-							    <input type="radio"  name="showIn" v-model="m.showIn" value=1 checked="checked">
+							    <input type="radio"  name="showIn" v-model="m.showIn" value=1 v-if="m.id">
+							    <input type="radio"  name="showIn"  value=1 checked="checked"  v-if="!m.id">
 							    <label for="showIn">是</label>
-							    <input type="radio"  name="showIn" v-model="m.ishowIn" value=0> 
+							    <input type="radio"  name="showIn" value=0 v-if="!m.id"> 
+							    <input type="radio"  name="showIn" value=0 v-if="m.id" v-model="m.showIn"> 
 							    <label for="showIn">否</label>
+							    
+							    
 						</div>
 						
 						<div class="form-group">
@@ -38,16 +42,14 @@
 						    <label>排序</label>
 						    <input type="text" class="form-control" name="sort" v-model="m.sort">
 						</div>
-						<!-- <div class="form-group">
-						    <label>活动状态</label>
-						    <input type="text" class="form-control" name="state" v-model="m.state">
-						</div> -->
 						
 						<div class="form-group">
 								<div class="control-label">是否开启活动</div>
-							    <input type="radio"  name="state" v-model="m.state" value=1 >
+							    <input type="radio"  name="state" v-model="m.state" value=1 v-if="m.id">
+							    <input type="radio"  name="state"  value=1 v-if="!m.id">
 							    <label for="showIn">是</label>
-							    <input type="radio"  name="state" v-model="m.state" value=0 checked="checked"> 
+							    <input type="radio"  name="state" value=0 checked="checked" v-if="!m.id"> 
+							    <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state"> 
 							    <label for="showIn">否</label>
 						</div>
 						</div>

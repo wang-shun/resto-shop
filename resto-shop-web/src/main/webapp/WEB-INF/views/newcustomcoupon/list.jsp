@@ -18,24 +18,28 @@
 			    <label>活动名称</label>
 			    <input type="text" class="form-control"  name="name" v-model="m.name">
 			</div>
+			
 			<div class="form-group">
-			    <label>优惠券的价值(2-10)</label>
-			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" range:[5,10]>
+			    <label>优惠券的价值</label>
+			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" placeholder="请输入数字" required  min="0">
+			    <span class="glyphicon glyphicon-yen" aria-hidden="true"></span>
 			</div>
 			<div class="form-group">
-			    <label>优惠券有效日期(必填数字)</label>
-			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" number>
+			    <label>优惠券有效日期</label>
+			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" placeholder="请输入数字" required min="0">
 			</div>
 			<div class="form-group">
-			    <label>优惠券的数量(必填数字)</label>
-			    <input type="text" class="form-control" name="couponNumber" v-model="m.couponNumber">
+			    <label>优惠券的数量</label>
+			    <input type="text" class="form-control" name="couponNumber" v-model="m.couponNumber" placeholder="请输入数字" required min="0">
 			</div>
 			
 			 <div class="form-group">
 			 	<div class="control-label">是否可以和余额一起使用</div>
-			    <input type="radio" name="useWithAccount" v-model="m.useWithAccount" value=1>
+			    <input type="radio" name="useWithAccount" v-model="m.useWithAccount" value=1 v-if="m.id">
+			    <input type="radio" name="useWithAccount"  value=1 v-if="!m.id" checked="checked">
 			    <label for="useWithAccount">是</label>
-			    <input type="radio" name="useWithAccount" v-model="m.useWithAccount" value=0>
+			    <input type="radio" name="useWithAccount" v-model="m.useWithAccount" value=0 v-if="m.id">
+			    <input type="radio" name="useWithAccount"  value=0 v-if="!m.id">
 			    <label for="useWithAccount">否</label>
 			</div> 
 			
@@ -44,8 +48,8 @@
 			    <input type="text" class="form-control" name="couponName" v-model="m.couponName">
 			</div>
 			<div class="form-group">
-			    <label>最低消费额度(10-2)</label>
-			    <input type="text" class="form-control" min="0" required "couponMinMoney" v-model="m.couponMinMoney">
+			    <label>最低消费额度</label>
+			    <input type="text" class="form-control" placeholder="请输入数字"  min="0" required "couponMinMoney" v-model="m.couponMinMoney">
 			</div>
 			
 			<div class="form-group">
@@ -74,9 +78,11 @@
 			
 			<div class="form-group">
 				<div class="control-label">选择是否启动优惠券</div>
-			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=1 >
+			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=1 v-if="m.id">
+			    <input type="radio"  name="isActivty"  value=1  v-if="!m.id" checked="checked">
 			    <label for="isActivty">是</label>
-			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=0> 
+			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=0 v-if="m.id"> 
+			    <input type="radio"  name="isActivty" value=0 v-if="!m.id"> 
 			    <label for="isActivty">否</label>
 			</div>
 			
@@ -86,7 +92,6 @@
 			   		<select class="form-control" name="distributionModeId">
 			   			<option v-for="distributionMode in allDistributionMode" :value="distributionMode.id">{{distributionMode.name}}</option>
 			   		</select>
-			   
 			   </div>
 			</div>
 			
