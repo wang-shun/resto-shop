@@ -3,6 +3,8 @@ package com.resto.shop.web.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class NewCustomCoupon {
     private Long id;
 
@@ -11,7 +13,8 @@ public class NewCustomCoupon {
     private BigDecimal couponValue;
 
     private Integer couponValiday;
-
+    
+    
     private Integer couponNumber;
 
     private Date createTime;
@@ -19,11 +22,13 @@ public class NewCustomCoupon {
     private Byte useWithAccount;
 
     private String couponName;
-
+    
     private BigDecimal couponMinMoney;
-
+    
+    @DateTimeFormat(pattern=("HH:mm"))
     private Date beginTime;
-
+    
+    @DateTimeFormat(pattern=("HH:mm"))
     private Date endTime;
 
     private Byte isActivty;

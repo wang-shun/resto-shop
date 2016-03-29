@@ -28,7 +28,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     @Override
     public int insertNewCustomCoupon(NewCustomCoupon brand) {
         
-        return 0;
+        return newcustomcouponMapper.insertSelective(brand);
     } 
 
 }

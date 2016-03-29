@@ -17,6 +17,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DistributionModeService;
+import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.service.NewCustomCouponService;
@@ -54,23 +55,9 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid NewCustomCoupon brand, HttpServletRequest request){
-	        String brandId =  (String) request.getSession().getAttribute("brandId");
+	        String brandId = (String) request.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
 	        brand.setBrandId(brandId);
 	        brand.setCreateTime(new Date());
-	        brand.getBeginTime();
-	        String beginTime1 = brand.getBeginTime().toString();
-	        String endTime1 = brand.getEndTime().toString();
-	        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-	        Date beginTime = null;
-	        Date endTime = null;
-	         try {
-                beginTime = sdf.parse(beginTime1);
-                endTime = sdf.parse(endTime1);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-	         brand.setBeginTime(beginTime);
-	         brand.setEndTime(endTime);
 		newcustomcouponService.insertNewCustomCoupon(brand);
 		return Result.getSuccess();
 	}

@@ -11,9 +11,10 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" class="newcustomform" action="{{m.id?'newcustomcoupon/modify':'newcustomcoupon/create'}}" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
+	            	<form role="form" id="newcustomcoupn" class="newcustomform" action="{{m.id?'newcustomcoupon/modify':'newcustomcoupon/create'}}" @submit.prevent="save">
+	            	
+		<div class="form-body">
+			<div class="form-group">
 			    <label>活动名称</label>
 			    <input type="text" class="form-control"  name="name" v-model="m.name">
 			</div>
@@ -23,7 +24,7 @@
 			</div>
 			<div class="form-group">
 			    <label>优惠券有效日期</label>
-			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday">
+			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" number>
 			</div>
 			<div class="form-group">
 			    <label>优惠券的数量</label>
@@ -38,7 +39,6 @@
 			    <label for="useWithAccount">否</label>
 			</div> 
 			
-			
 			<div class="form-group">
 			    <label>优惠券名字</label>
 			    <input type="text" class="form-control" name="couponName" v-model="m.couponName">
@@ -48,35 +48,33 @@
 			    <input type="text" class="form-control" name="couponMinMoney" v-model="m.couponMinMoney">
 			</div>
 			
-			        
 			<div class="form-group">
 			    <label>开始时间</label>
 			    <div class="input-group">
-			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" :value="m.beginTime" @focus="initTime">
+			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" :value="m.beginTime" @focus="initTime" readonly>
 			    <span class="input-group-btn">
-							<button class="btn default" type="button">
-								<i class="fa fa-clock-o"></i>
-							</button>
+					<button class="btn default" type="button">
+						<i class="fa fa-clock-o"></i>
+					</button>
 				</span>
 			    </div>
 			</div>
+			
 			<div class="form-group">
 			    <label>结束时间</label>
 			     <div class="input-group">
-			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="endTime" v-model="m.endTime" @focus="initTime">
+			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="endTime" v-model="m.endTime" @focus="initTime" readonly>
 			    <span class="input-group-btn">
-							<button class="btn default" type="button">
-								<i class="fa fa-clock-o"></i>
-							</button>
+					<button class="btn default" type="button">
+						<i class="fa fa-clock-o"></i>
+					</button>
 				</span>
 			    </div>
 			</div>
 			
-			
-			
 			<div class="form-group">
 				<div class="control-label">选择是否启动优惠券</div>
-			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=1>
+			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=1 >
 			    <label for="isActivty">是</label>
 			    <input type="radio"  name="isActivty" v-model="m.isActivty" value=0> 
 			    <label for="isActivty">否</label>
@@ -93,33 +91,31 @@
 			</div>
 			
 			</div>
-									<input type="hidden" name="id" v-model="m.id" />
-									<input class="btn green"  type="submit"  value="保存"/>
-									<a class="btn default" @click="cancel" >取消</a>
-								</form>
-				            </div>
-				        </div>
-					</div>
-				</div>
+				<input type="hidden" name="id" v-model="m.id" />
+				<input class="btn green"  type="submit"  value="保存"/>
+				<a class="btn default" @click="cancel" >取消</a>
+					</form>
+	            </div>
+	        </div>
+		</div>
+	</div>
 				
-				<div class="table-div">
-					<div class="table-operator">
-						<s:hasPermission name="newcustomcoupon/add">
-						<button class="btn green pull-right" @click="create">新建</button>
-						</s:hasPermission>
-					</div>
-					<div class="clearfix"></div>
-					<div class="table-filter">&nbsp;</div>
-					<div class="table-body">
-						<table class="table table-striped table-hover table-bordered "></table>
-					</div>
-				</div>
+		<div class="table-div">
+			<div class="table-operator">
+				<s:hasPermission name="newcustomcoupon/add">
+				<button class="btn green pull-right" @click="create">新建</button>
+				</s:hasPermission>
 			</div>
-			
-			
+			<div class="clearfix"></div>
+			<div class="table-filter">&nbsp;</div>
+			<div class="table-body">
+				<table class="table table-striped table-hover table-bordered "></table>
+			</div>
+		</div>
+	</div>
+	
 			<script>
 				$(document).ready(function(){ 
-					
 					var C;
 					var vueObj;
 					var cid="#control";
@@ -249,6 +245,7 @@
 									this.openForm();
 									Vue.nextTick(function () {
 										vueObj.initdistributionMode();
+										
 									})
 								},
 								edit:function(model){
@@ -260,9 +257,27 @@
 									})
 								},
 								save:function(e){
-									
 									var that = this;
 										var formDom = e.target;
+										$(formDom).validate({
+											 debug:true,
+											 rules:{
+													name:"required",
+												},
+												messages:{
+													name:"请输入活动名称"
+												}
+										});
+										
+									/* 	$("#newcustomcoupn").validate({
+											rules:{
+												name:"required",
+											},
+											messages:{
+												name:"请输入活动名称"
+											}
+											
+										}) */
 										C.ajaxFormEx(formDom,function(){
 											that.cancel();
 											tb.ajax.reload();
@@ -306,5 +321,10 @@
 					
 				}); 
 				
+				$.validator.setDefaults({
+				    submitHandler: function() {
+				      alert("提交事件!");
+				    }
+				});
 	
 </script>
