@@ -14,34 +14,42 @@
 	            	<form role="form" action="{{m.id?'chargesetting/modify':'chargesetting/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>chargeMoney</label>
-    <input type="text" class="form-control" name="chargeMoney" v-model="m.chargeMoney">
-</div>
-<div class="form-group">
-    <label>rewardMoney</label>
-    <input type="text" class="form-control" name="rewardMoney" v-model="m.rewardMoney">
-</div>
-<div class="form-group">
-    <label>showIn</label>
-    <input type="text" class="form-control" name="showIn" v-model="m.showIn">
-</div>
-<div class="form-group">
-    <label>labelText</label>
-    <input type="text" class="form-control" name="labelText" v-model="m.labelText">
-</div>
-<div class="form-group">
-    <label>sort</label>
-    <input type="text" class="form-control" name="sort" v-model="m.sort">
-</div>
-<div class="form-group">
-    <label>state</label>
-    <input type="text" class="form-control" name="state" v-model="m.state">
-</div>
-<div class="form-group">
-    <label>brandId</label>
-    <input type="text" class="form-control" name="brandId" v-model="m.brandId">
-</div>
-
+						    <label>充值金额</label>
+						    <input type="text" class="form-control" name="chargeMoney" v-model="m.chargeMoney">
+						</div>
+						<div class="form-group">
+						    <label>赠送金额</label>
+						    <input type="text" class="form-control" name="rewardMoney" v-model="m.rewardMoney">
+						</div>
+						
+						<div class="form-group">
+								<div class="control-label">选择是否显示到一级菜单</div>
+							    <input type="radio"  name="showIn" v-model="m.showIn" value=1 checked="checked">
+							    <label for="showIn">是</label>
+							    <input type="radio"  name="showIn" v-model="m.ishowIn" value=0> 
+							    <label for="showIn">否</label>
+						</div>
+						
+						<div class="form-group">
+						    <label>显示的文本</label>
+						    <input type="text" class="form-control" name="labelText" v-model="m.labelText">
+						</div>
+						<div class="form-group">
+						    <label>排序</label>
+						    <input type="text" class="form-control" name="sort" v-model="m.sort">
+						</div>
+						<!-- <div class="form-group">
+						    <label>活动状态</label>
+						    <input type="text" class="form-control" name="state" v-model="m.state">
+						</div> -->
+						
+						<div class="form-group">
+								<div class="control-label">是否开启活动</div>
+							    <input type="radio"  name="state" v-model="m.state" value=1 >
+							    <label for="showIn">是</label>
+							    <input type="radio"  name="state" v-model="m.state" value=0 checked="checked"> 
+							    <label for="showIn">否</label>
+						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -78,33 +86,50 @@
 			},
 			columns : [
 				{                 
-	title : "chargeMoney",
-	data : "chargeMoney",
-},                 
-{                 
-	title : "rewardMoney",
-	data : "rewardMoney",
-},                 
-{                 
-	title : "showIn",
-	data : "showIn",
-},                 
-{                 
-	title : "labelText",
-	data : "labelText",
-},                 
-{                 
-	title : "sort",
-	data : "sort",
-},                 
-{                 
-	title : "state",
-	data : "state",
-},                 
-{                 
-	title : "brandId",
-	data : "brandId",
-},                 
+				title : "充值金额",
+				data : "chargeMoney",
+			},                 
+			{                 
+				title : "返还金额",
+				data : "rewardMoney",
+			},                 
+			{                 
+				title : "是否显示在菜单栏上",
+				data : "showIn",
+				"render": function(data){
+					if(data==0){
+						data="不显示";
+					}else if(data==1){
+						data="显示";
+					}else{
+						data="未知";
+					}
+					return data;
+				}
+			},                 
+			{                 
+				title : "显示的文本",
+				data : "labelText",
+			},                 
+			{                 
+				title : "排序",
+				data : "sort",
+			},                 
+			{                 
+				title : "活动状态",
+				data : "state",
+				"render": function(data){
+					if(data==0){
+						data="未开启";
+					}else if(data==1){
+						data="已开启";
+					}else{
+						data="未知";
+					}
+					return data;
+				}
+				
+			},                 
 
 				{
 					title : "操作",
