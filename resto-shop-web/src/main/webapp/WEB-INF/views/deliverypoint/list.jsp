@@ -14,46 +14,41 @@
 	            	<form role="form" action="{{m.id?'deliverypoint/modify':'deliverypoint/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>province</label>
-    <input type="text" class="form-control" name="province" v-model="m.province">
-</div>
-<div class="form-group">
-    <label>city</label>
-    <input type="text" class="form-control" name="city" v-model="m.city">
-</div>
-<div class="form-group">
-    <label>district</label>
-    <input type="text" class="form-control" name="district" v-model="m.district">
-</div>
-<div class="form-group">
-    <label>detail</label>
-    <input type="text" class="form-control" name="detail" v-model="m.detail">
-</div>
-<div class="form-group">
-    <label>mapX</label>
-    <input type="text" class="form-control" name="mapX" v-model="m.mapX">
-</div>
-<div class="form-group">
-    <label>mapY</label>
-    <input type="text" class="form-control" name="mapY" v-model="m.mapY">
-</div>
-<div class="form-group">
-    <label>empPhone</label>
-    <input type="text" class="form-control" name="empPhone" v-model="m.empPhone">
-</div>
-<div class="form-group">
-    <label>empName</label>
-    <input type="text" class="form-control" name="empName" v-model="m.empName">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+						    <label>自提点名称</label>
+						    <input type="text" class="form-control" name="name" v-model="m.name">
+						</div>
+						<div class="form-group">
+						    <label>省</label>
+						    <input type="text" class="form-control" name="province" v-model="m.province">
+						</div>
+						<div class="form-group">
+						    <label>市</label>
+						    <input type="text" class="form-control" name="city" v-model="m.city">
+						</div>
+						<div class="form-group">
+						    <label>区</label>
+						    <input type="text" class="form-control" name="district" v-model="m.district">
+						</div>
+						<div class="form-group">
+						    <label>地址详情</label>
+						    <input type="text" class="form-control" name="detail" v-model="m.detail">
+						</div>
+						<div class="form-group">
+						    <label>纬度</label>
+						    <input type="text" class="form-control" name="mapX" v-model="m.mapX">
+						</div>
+						<div class="form-group">
+						    <label>经度</label>
+						    <input type="text" class="form-control" name="mapY" v-model="m.mapY">
+						</div>
+						<div class="form-group">
+						    <label>配送人电话</label>
+						    <input type="text" class="form-control" name="empPhone" v-model="m.empPhone">
+						</div>
+						<div class="form-group">
+						    <label>配送人姓名</label>
+						    <input type="text" class="form-control" name="empName" v-model="m.empName">
+						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -90,45 +85,41 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "province",
-	data : "province",
-},                 
-{                 
-	title : "city",
-	data : "city",
-},                 
-{                 
-	title : "district",
-	data : "district",
-},                 
-{                 
-	title : "detail",
-	data : "detail",
-},                 
-{                 
-	title : "mapX",
-	data : "mapX",
-},                 
-{                 
-	title : "mapY",
-	data : "mapY",
-},                 
-{                 
-	title : "empPhone",
-	data : "empPhone",
-},                 
-{                 
-	title : "empName",
-	data : "empName",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
+					title : "自提点名称",
+					data : "name",
+				},                 
+				{                 
+					title : "省",
+					data : "province",
+				},                 
+				{                 
+					title : "市",
+					data : "city",
+				},                 
+				{                 
+					title : "区",
+					data : "district",
+				},                 
+				{                 
+					title : "详细地址",
+					data : "detail",
+				},                 
+				{                 
+					title : "经度",
+					data : "mapX",
+				},                 
+				{                 
+					title : "纬度",
+					data : "mapY",
+				},                 
+				{                 
+					title : "配送人电话",
+					data : "empPhone",
+				},                 
+				{                 
+					title : "配送人姓名",
+					data : "empName",
+				},                 
 
 				{
 					title : "操作",
