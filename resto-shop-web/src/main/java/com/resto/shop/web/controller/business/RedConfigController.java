@@ -3,12 +3,14 @@
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.RedConfig;
@@ -40,8 +42,9 @@ public class RedConfigController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid RedConfig brand){
-		redconfigService.insert(brand);
+	public Result create(@Valid RedConfig redConfig,HttpServletRequest request){
+		redConfig.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
+		redconfigService.insert(redConfig);
 		return Result.getSuccess();
 	}
 	

@@ -114,47 +114,6 @@
 		});
 		
 		var C = new Controller(cid,tb);
-		
-		//重写option
-		var option = {
-				el:cid,
-				data:{
-					m:{},
-					showform:false,
-					distributionMode:{},
-					selected:""
-				},
-				methods:{
-					openForm:function(){
-						this.showform = true;
-					},
-					closeForm:function(){
-						this.m={};
-						this.showform = false;
-					},
-					cancel:function(){
-						this.m={};
-						this.closeForm();
-					},
-					create:function(){
-						this.m={};
-						this.openForm();
-					},
-					edit:function(model){
-						this.m= model;
-						this.openForm();
-					},
-					save:function(e){
-						var that = this;
-						var formDom = e.target;
-						C.ajaxFormEx(formDom,function(){
-							that.cancel();
-							tb.ajax.reload();
-						});
-					},
-				},
-			};
-		
 		var vueObj = C.vueObj();
 		
 		

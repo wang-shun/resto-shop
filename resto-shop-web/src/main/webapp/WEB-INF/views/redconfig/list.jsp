@@ -7,61 +7,121 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">新建红包配置</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'redconfig/modify':'redconfig/create'}}" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-    <label>delay</label>
-    <input type="text" class="form-control" name="delay" v-model="m.delay">
-</div>
-<div class="form-group">
-    <label>minRatio</label>
-    <input type="text" class="form-control" name="minRatio" v-model="m.minRatio">
-</div>
-<div class="form-group">
-    <label>maxRatio</label>
-    <input type="text" class="form-control" name="maxRatio" v-model="m.maxRatio">
-</div>
-<div class="form-group">
-    <label>maxSingleRed</label>
-    <input type="text" class="form-control" name="maxSingleRed" v-model="m.maxSingleRed">
-</div>
-<div class="form-group">
-    <label>title</label>
-    <input type="text" class="form-control" name="title" v-model="m.title">
-</div>
-<div class="form-group">
-    <label>remark</label>
-    <input type="text" class="form-control" name="remark" v-model="m.remark">
-</div>
-<div class="form-group">
-    <label>minSignleRed</label>
-    <input type="text" class="form-control" name="minSignleRed" v-model="m.minSignleRed">
-</div>
-<div class="form-group">
-    <label>isAddRatio</label>
-    <input type="text" class="form-control" name="isAddRatio" v-model="m.isAddRatio">
-</div>
-<div class="form-group">
-    <label>minTranslateMoney</label>
-    <input type="text" class="form-control" name="minTranslateMoney" v-model="m.minTranslateMoney">
-</div>
-<div class="form-group">
-    <label>isActivity</label>
-    <input type="text" class="form-control" name="isActivity" v-model="m.isActivity">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+	            	<form role="form" class="form-horizontal" action="{{m.id?'redconfig/modify':'redconfig/create'}}" @submit.prevent="save">
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>红包提醒标题：</strong></label>
+						    <div class="col-sm-8">
+								<input type="text" class="form-control" required name="title" v-model="m.title">
+						    </div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>红包提醒备注：</strong></label>
+						    <div class="col-sm-8">
+								<textarea class="form-control" required name="remark" v-model="m.remark"></textarea>
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>延迟发送时间：</strong></label>
+						    <div class="col-sm-8">
+						    	<div class="input-group">
+							    	<input type="number" class="form-control" required placeholder="请输入数字！" name="delay" v-model="m.delay"/>
+									<div class="input-group-addon">分钟</div>
+						    	</div>
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>单个最小比例：</strong></label>
+						    <div class="col-sm-8">
+						    	<input type="number" class="form-control" required placeholder="请输入数字！" name="minRatio" v-model="m.minRatio"/>
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>单个最大比例：</strong></label>
+						    <div class="col-sm-8">
+								<input type="number" class="form-control" required placeholder="请输入数字！" name="maxRatio" v-model="m.maxRatio">
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>单个最大红包：</strong></label>
+						    <div class="col-sm-8">
+								<input type="number" class="form-control" required placeholder="请输入数字！" name="maxSingleRed" v-model="m.maxSingleRed">
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>单个最小红包：</strong></label>
+						    <div class="col-sm-8">
+								<input type="number" class="form-control" required placeholder="请输入数字！" name="minSignleRed" v-model="m.minSignleRed">
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>是否可以叠加：</strong></label>
+						    <div class="col-sm-8">
+						    	<div class="md-radio-inline">
+							        <div class="md-radio">
+						    			<!-- 判断是否 绑定的对象是否有值，如果没有则不绑定 -->
+							        	<input type="radio" class="md-radiobtn" id="isAddRatio_yes" name="isAddRatio" value="1" v-model="m.isAddRatio" v-if="m.id">
+							            <input type="radio" class="md-radiobtn" id="isAddRatio_yes" name="isAddRatio" value="1"  v-if="!m.id" checked="checked">
+							            <label for="isAddRatio_yes">
+							                <span></span>
+							                <span class="check"></span>
+							                <span class="box"></span>是
+							            </label>
+							        </div>
+							        <div class="md-radio">
+							        	<input type="radio" class="md-radiobtn" id="isAddRatio_no" name="isAddRatio" value="0" v-model="m.isAddRatio" v-if="m.id">
+							            <input type="radio" class="md-radiobtn" id="isAddRatio_no" name="isAddRatio" value="0" v-if="!m.id">
+							            <label for="isAddRatio_no">
+							                <span></span>
+							                <span class="check"></span>
+							                <span class="box"></span>否
+							            </label>
+							        </div>
+							    </div>
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>最小消费额度：</strong></label>
+						    <div class="col-sm-8">
+								<div class="input-group">
+							    	<input type="number" class="form-control" required placeholder="请输入数字！" name="minTranslateMoney" v-model="m.minTranslateMoney">
+									<div class="input-group-addon"><span class="glyphicon glyphicon-yen" aria-hidden="true"></span></div>
+						    	</div>
+						    </div>
+						</div>
+						<div class="form-group">
+		           			<label class="col-sm-3 control-label"><strong>红包是否启用：</strong></label>
+						    <div class="col-sm-8">
+								    <div class="md-radio-inline">
+								        <div class="md-radio">
+								        	<input type="radio" class="md-radiobtn" id="isActivity_start" name="isActivity" value="1" v-model="m.isActivity" v-if="m.id">
+								            <input type="radio" class="md-radiobtn" id="isActivity_start" name="isActivity" value="1"  v-if="!m.id" checked="checked">
+								            <label for="isActivity_start">
+								                <span></span>
+								                <span class="check"></span>
+								                <span class="box"></span>启用
+								            </label>
+								        </div>
+								        <div class="md-radio">
+								        	<input type="radio" class="md-radiobtn" id="isActivity_stop" name="isActivity" value="0" v-model="m.isActivity" v-if="m.id">
+								            <input type="radio" class="md-radiobtn" id="isActivity_stop" name="isActivity" value="0" v-if="!m.id">
+								            <label for="isActivity_stop">
+								                <span></span>
+								                <span class="check"></span>
+								                <span class="box"></span>停用
+								            </label>
+								        </div>
+								    </div>
+						    </div>
+						</div>
+						<div class="text-center">
+							<input type="hidden" name="id" v-model="m.id" />
+							<input class="btn green"  type="submit"  value="保存"/>
+							<a class="btn default" @click="cancel" >取消</a>
+						</div>
 					</form>
 	            </div>
 	        </div>
@@ -81,8 +141,6 @@
 		</div>
 	</div>
 </div>
-
-
 <script>
 	(function(){
 		var cid="#control";
@@ -94,50 +152,63 @@
 			},
 			columns : [
 				{                 
-	title : "delay",
-	data : "delay",
-},                 
-{                 
-	title : "minRatio",
-	data : "minRatio",
-},                 
-{                 
-	title : "maxRatio",
-	data : "maxRatio",
-},                 
-{                 
-	title : "maxSingleRed",
-	data : "maxSingleRed",
-},                 
-{                 
-	title : "title",
-	data : "title",
-},                 
-{                 
-	title : "remark",
-	data : "remark",
-},                 
-{                 
-	title : "minSignleRed",
-	data : "minSignleRed",
-},                 
-{                 
-	title : "isAddRatio",
-	data : "isAddRatio",
-},                 
-{                 
-	title : "minTranslateMoney",
-	data : "minTranslateMoney",
-},                 
-{                 
-	title : "isActivity",
-	data : "isActivity",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
+					title : "红包标题",
+					data : "title",
+				},                 
+				{                 
+					title : "红包备注",
+					data : "remark",
+				},
+				{                 
+					title : "发送延迟时间",
+					data : "delay",
+				},                 
+				{                 
+					title : "单个最小比例",
+					data : "minRatio",
+				},                 
+				{                 
+					title : "单个最大比例",
+					data : "maxRatio",
+				},                 
+				{                 
+					title : "单个最大红包",
+					data : "maxSingleRed",
+				},                 
+				{                 
+					title : "最小单个红包",
+					data : "minSignleRed",
+				},                 
+				{                 
+					title : "是否可以叠加",
+					data : "isAddRatio",
+					createdCell:function(td,tdData){
+						var str = "未知"
+						if(tdData == "0"){
+							str = "否"
+						}else if(tdData == "1"){
+							str = "是"
+						}
+						$(td).html(str);
+					}
+				},                 
+				{                 
+					title : "最低消费额度",
+					data : "minTranslateMoney",
+				},                 
+				{                 
+					title : "是否启用",
+					data : "isActivity",
+					createdCell:function(td,tdData){
+						var str = "未知"
+						if(tdData == "0"){
+							str = "停用"
+						}else if(tdData == "1"){
+							str = "启用"
+						}
+						$(td).html(str);
+					}
+				},       
 				{
 					title : "操作",
 					data : "id",
@@ -154,9 +225,9 @@
 					}
 				}],
 		});
-		
 		var C = new Controller(cid,tb);
 		var vueObj = C.vueObj();
+		
 	}());
 	
 	

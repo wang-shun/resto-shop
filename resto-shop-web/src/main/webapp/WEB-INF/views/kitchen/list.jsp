@@ -16,7 +16,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">厨房名称：</label>
 							    <div class="col-sm-8">
-						    		<input type="text" class="form-control" name="name" v-model="m.name">
+						    		<input type="text" class="form-control" required name="name" v-model="m.name">
 							    </div>
 							</div>
 							<div class="form-group">
@@ -28,7 +28,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">打印机名称：</label>
 							    <div class="col-sm-8">
-						    		<select class="form-control" name="printerId" v-model="m.printerId?m.printerId:selected">
+						    		<select class="form-control" name="printerId" required v-model="m.printerId?m.printerId:selected">
 						    			<option v-for="temp in printerList" v-bind:value="temp.id">
 						    				{{ temp.name }}
 						    			</option>
