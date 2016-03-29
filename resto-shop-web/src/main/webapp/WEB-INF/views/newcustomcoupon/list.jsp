@@ -45,7 +45,7 @@
 			</div>
 			<div class="form-group">
 			    <label>最低消费额度(10-2)</label>
-			    <input type="text" class="form-control" name="couponMinMoney" v-model="m.couponMinMoney">
+			    <input type="text" class="form-control" min="0" required "couponMinMoney" v-model="m.couponMinMoney">
 			</div>
 			
 			<div class="form-group">
@@ -224,9 +224,7 @@
 							el:cid,
 							data:{
 								m:{},
-								shopModeInfo:{},
 								showform:false,
-								showtest:false,
 							},
 							methods:{
 								openForm:function(){
@@ -302,10 +300,4 @@
 					
 				}); 
 				
-				$.validator.setDefaults({
-				    submitHandler: function() {
-				      alert("提交事件!");
-				    }
-				});
-	
 </script>

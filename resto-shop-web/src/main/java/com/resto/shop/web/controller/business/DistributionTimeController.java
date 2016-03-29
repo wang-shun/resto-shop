@@ -3,12 +3,14 @@
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.DistributionTime;
@@ -22,8 +24,8 @@ public class DistributionTimeController extends GenericController{
 	DistributionTimeService distributiontimeService;
 	
 	@RequestMapping("/list")
-    public void list(){
-    }
+        public void list(){
+        }
 
 	@RequestMapping("/list_all")
 	@ResponseBody
@@ -40,7 +42,9 @@ public class DistributionTimeController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DistributionTime brand){
+	public Result create(@Valid DistributionTime brand ,HttpServletRequest req){
+	    String shopDetailId = (String) req.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID);
+	        brand.setShopDetailId(shopDetailId);
 		distributiontimeService.insert(brand);
 		return Result.getSuccess();
 	}

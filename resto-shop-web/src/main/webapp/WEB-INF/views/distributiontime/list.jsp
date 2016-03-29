@@ -13,22 +13,35 @@
 	            <div class="portlet-body">
 	            	<form role="form" action="{{m.id?'distributiontime/modify':'distributiontime/create'}}" @submit.prevent="save">
 						<div class="form-body">
-							<div class="form-group">
-    <label>beginTime</label>
-    <input type="text" class="form-control" name="beginTime" v-model="m.beginTime">
-</div>
-<div class="form-group">
-    <label>stopOrderTime</label>
-    <input type="text" class="form-control" name="stopOrderTime" v-model="m.stopOrderTime">
-</div>
-<div class="form-group">
-    <label>remark</label>
-    <input type="text" class="form-control" name="remark" v-model="m.remark">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
+						
+						<div class="form-group">
+						   <labe>点餐开始时间</label>
+							  <div class="input-group">
+							<input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" @focus="initTime" v-model="m.beginTime">
+							<span class="input-group-btn">
+								<button class="btn default" type="button">
+									<i class="fa fa-clock-o"></i>
+								</button>
+							</span>
+							</div>
+				        </div>
+				        
+						<div class="form-group">
+						   <labe>停止点餐时间</label>
+							  <div class="input-group">
+							<input type="text" class="form-control timepicker timepicker-no-seconds" name="stopOrderTime" @focus="initTime" v-model="m.stopOrderTime">
+							<span class="input-group-btn">
+								<button class="btn default" type="button">
+									<i class="fa fa-clock-o"></i>
+								</button>
+							</span>
+							</div>
+				        </div>
+				        
+						<div class="form-group">
+						    <label>描述</label>
+						    <input type="text" class="form-control" name="remark" v-model="m.remark">
+						</div>
 
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -56,7 +69,10 @@
 
 
 <script>
-	(function(){
+	
+	$(document).ready(function(){
+		var C;
+		var vueObj;
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
@@ -65,22 +81,28 @@
 				dataSrc : ""
 			},
 			columns : [
+								{                 
+					title : "点餐开始时间",
+					data : "beginTime",
+					"render":function(data){
+						return (new Date(data).format('hh:mm:ss'))
+					}
+				},                 
 				{                 
-	title : "beginTime",
-	data : "beginTime",
-},                 
-{                 
-	title : "stopOrderTime",
-	data : "stopOrderTime",
-},                 
-{                 
-	title : "remark",
-	data : "remark",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
+					title : "点餐结束时间",
+					data : "stopOrderTime",
+					"render":function(data){
+						return (new Date(data).format('hh:mm:ss'))
+					}
+				},                 
+				{                 
+					title : "描述",
+					data : "remark",
+				},                 
+				/* {                 
+					title : "店铺",
+					data : "shopDetailId",
+				},      */            
 
 				{
 					title : "操作",
@@ -99,8 +121,60 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var option = {
+				el:cid,
+				data:{
+					m:{},
+					showform:false,
+				},
+				methods:{
+					openForm:function(){
+						this.showform = true;
+					},
+					closeForm:function(){
+						this.m={};
+						this.showform = false;
+					},
+					cancel:function(){
+						this.m={};
+						this.closeForm();
+					},
+					create:function(){
+						this.m={};
+						this.openForm();
+						Vue.nextTick(function(){
+							//vueObj.initTime();
+						})
+					},
+					edit:function(model){
+						this.m= model;
+						this.openForm();
+						Vue.nextTick(function(){
+							vueObj.initTime();
+						})
+					},
+					save:function(e){
+						var that = this;
+							var formDom = e.target;
+							C.ajaxFormEx(formDom,function(){
+								that.cancel();
+								tb.ajax.reload();
+							});
+					},
+					
+					initTime :function(){
+						$(".timepicker-no-seconds").timepicker({
+							 autoclose: true,
+							 showMeridian:false,
+							 showInputs:false,
+				             minuteStep: 5
+						    });
+					},
+					
+				},
+			};
+		 C = new Controller(cid,tb);
+		vueObj = C.vueObj(option);
 	}());
 	
 	

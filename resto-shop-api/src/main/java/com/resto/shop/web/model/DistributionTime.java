@@ -2,11 +2,15 @@ package com.resto.shop.web.model;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class DistributionTime {
     private Integer id;
-
+    
+    @DateTimeFormat(pattern="HH:mm")
     private Date beginTime;
-
+    
+    @DateTimeFormat(pattern="HH:mm")
     private Date stopOrderTime;
 
     private String remark;
