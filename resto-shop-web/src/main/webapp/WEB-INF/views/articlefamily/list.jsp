@@ -22,7 +22,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">序&nbsp;&nbsp;号：</label>
 							    <div class="col-sm-8">
-							    <input type="number" class="form-control" required placeholder="请输入数字！" name="peference" v-model="m.peference">
+							    <input type="number" class="form-control" required placeholder="请输入数字！" min="0" name="peference" v-model="m.peference">
 							    </div>
 							</div>
 							<div class="form-group">
@@ -95,7 +95,6 @@
 						$(td).html(str);
 					}
 				},                 
-
 				{
 					title : "操作",
 					data : "id",
