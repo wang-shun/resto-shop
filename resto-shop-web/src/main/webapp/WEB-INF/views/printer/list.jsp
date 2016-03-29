@@ -28,7 +28,7 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">端&nbsp;口&nbsp;号：</label>
 							    <div class="col-sm-8">
-							    	<input type="text" class="form-control" required name="port" v-model="m.port">
+							    	<input type="number" class="form-control" required placeholder="请输入数字!" name="port" v-model="m.port">
 							    </div>
 							</div>
 						</div>

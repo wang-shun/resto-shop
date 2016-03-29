@@ -22,7 +22,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">描述：</label>
 							    <div class="col-sm-8">
-									<input type="text" class="form-control" required name="description" v-model="m.description">
+							    	<textarea class="form-control" required name="description" v-model="m.description"></textarea>
 							    </div>
 							</div>
 							<div class="form-group">

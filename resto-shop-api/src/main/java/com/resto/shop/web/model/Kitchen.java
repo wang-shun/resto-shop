@@ -1,12 +1,18 @@
 package com.resto.shop.web.model;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Kitchen {
     private Integer id;
 
+    @NotBlank(message="{厨房名称   不能为空}")
     private String name;
 
     private String remark;
 
+    @NotNull(message="打印机 Id 不能为空")
     private Integer printerId;
 
     private String shopDetailId;

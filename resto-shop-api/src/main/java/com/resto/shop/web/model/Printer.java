@@ -1,12 +1,17 @@
 package com.resto.shop.web.model;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Printer {
     private Integer id;
 
+    @NotBlank(message="{打印机名称 不能为空}")
     private String name;
 
+    @NotBlank(message="{IP 地址不能为空}")
     private String ip;
-
+    
+    @NotBlank(message="{端口号 不能为空}")
     private String port;
 
     private String shopDetailId;

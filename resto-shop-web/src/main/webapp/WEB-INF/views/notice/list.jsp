@@ -36,13 +36,13 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">通知状态：</label>
 							    <div class="col-sm-8"> 
-									<input type="number" class="form-control" required placeholder="只能输入数字！" name="status" v-model="m.status">
+									<input type="number" class="form-control" required placeholder="请输入数字！" name="status" v-model="m.status">
 							    </div>
 							</div>
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">显示图片：</label>
 							    <div class="col-sm-8">
-									<input type="url" class="form-control" required name="noticeImage" v-model="m.noticeImage">
+									<input type="text" class="form-control" required name="noticeImage" v-model="m.noticeImage">
 							    </div>
 							</div>
 			           		<div class="form-group">

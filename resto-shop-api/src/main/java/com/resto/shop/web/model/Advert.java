@@ -1,15 +1,20 @@
 package com.resto.shop.web.model;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Advert {
     private Integer id;
-
+    
+    @NotBlank(message="{标题不能为空}")
     private String slogan;
 
+    @NotBlank(message="{描述不能为空}")
+    private String description;
+    
+    @NotBlank(message="{状态不能为空}")
     private Byte state;
 
     private String shopDetailId;
-
-    private String description;
 
     public Integer getId() {
         return id;
