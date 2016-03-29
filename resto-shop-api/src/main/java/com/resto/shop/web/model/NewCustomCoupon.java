@@ -3,14 +3,18 @@ package com.resto.shop.web.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.format.annotation.NumberFormat.Style;
 
 public class NewCustomCoupon {
     private Long id;
 
     private String name;
 
-    private BigDecimal couponValue;
+    @NumberFormat(style=Style.NUMBER,pattern="#.##")
+    private BigDecimal couponValue;//优惠券的价值
 
     private Integer couponValiday;
     

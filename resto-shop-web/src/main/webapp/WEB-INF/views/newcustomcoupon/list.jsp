@@ -19,15 +19,15 @@
 			    <input type="text" class="form-control"  name="name" v-model="m.name">
 			</div>
 			<div class="form-group">
-			    <label>优惠券的价值</label>
+			    <label>优惠券的价值(2-10)</label>
 			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" range:[5,10]>
 			</div>
 			<div class="form-group">
-			    <label>优惠券有效日期</label>
+			    <label>优惠券有效日期(必填数字)</label>
 			    <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" number>
 			</div>
 			<div class="form-group">
-			    <label>优惠券的数量</label>
+			    <label>优惠券的数量(必填数字)</label>
 			    <input type="text" class="form-control" name="couponNumber" v-model="m.couponNumber">
 			</div>
 			
@@ -44,7 +44,7 @@
 			    <input type="text" class="form-control" name="couponName" v-model="m.couponName">
 			</div>
 			<div class="form-group">
-			    <label>最低消费额度</label>
+			    <label>最低消费额度(10-2)</label>
 			    <input type="text" class="form-control" name="couponMinMoney" v-model="m.couponMinMoney">
 			</div>
 			
@@ -259,25 +259,6 @@
 								save:function(e){
 									var that = this;
 										var formDom = e.target;
-										$(formDom).validate({
-											 debug:true,
-											 rules:{
-													name:"required",
-												},
-												messages:{
-													name:"请输入活动名称"
-												}
-										});
-										
-									/* 	$("#newcustomcoupn").validate({
-											rules:{
-												name:"required",
-											},
-											messages:{
-												name:"请输入活动名称"
-											}
-											
-										}) */
 										C.ajaxFormEx(formDom,function(){
 											that.cancel();
 											tb.ajax.reload();
