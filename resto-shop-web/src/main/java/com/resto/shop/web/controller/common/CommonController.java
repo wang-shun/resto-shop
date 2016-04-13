@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,13 +42,19 @@ public class CommonController {
      * 
      * @param classPath  例如 D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/model
      * @param classPackage 例如 com.resto.shop.web.model
+     * @param className 例如 com.resto.shop.web.model.ArticleAttr
      * @return
      * @throws ClassNotFoundException
      */
     @RequestMapping("/installedPermission")
     @ResponseBody
-    public String[] installed(String classPath,String classPackage) throws ClassNotFoundException{
-    	String [] classPrimay = getModelClass(classPath,classPackage);
+    public String[] installed(String classPath,String classPackage,String className) throws ClassNotFoundException{
+    	
+    	String [] classPrimay =new String[]{className}; 
+    	if(StringUtils.isEmpty(className)){
+    		classPrimay = getModelClass(classPath,classPackage);
+    	}
+    	
     	String [] permissionList = new String[]{"add","delete","edit"};
     	long groupid = UserGroupSign.BRAND_GROUP;
 		Permission r = new Permission();

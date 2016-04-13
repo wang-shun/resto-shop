@@ -1,0 +1,61 @@
+ package com.resto.shop.web.controller.business;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.resto.shop.web.controller.GenericController;
+import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.model.ArticleAttr;
+import com.resto.shop.web.service.ArticleAttrService;
+
+@Controller
+@RequestMapping("articleattr")
+public class ArticleAttrController extends GenericController{
+
+	@Resource
+	ArticleAttrService articleattrService;
+	
+	@RequestMapping("/list")
+    public void list(){
+    }
+
+	@RequestMapping("/list_all")
+	@ResponseBody
+	public List<ArticleAttr> listData(){
+		return articleattrService.selectList();
+	}
+	
+	@RequestMapping("list_one")
+	@ResponseBody
+	public Result list_one(Integer id){
+		ArticleAttr articleattr = articleattrService.selectById(id);
+		return getSuccessResult(articleattr);
+	}
+	
+	@RequestMapping("create")
+	@ResponseBody
+	public Result create(@Valid ArticleAttr brand){
+		articleattrService.insert(brand);
+		return Result.getSuccess();
+	}
+	
+	@RequestMapping("modify")
+	@ResponseBody
+	public Result modify(@Valid ArticleAttr brand){
+		articleattrService.update(brand);
+		return Result.getSuccess();
+	}
+	
+	@RequestMapping("delete")
+	@ResponseBody
+	public Result delete(Integer id){
+		articleattrService.delete(id);
+		return Result.getSuccess();
+	}
+}

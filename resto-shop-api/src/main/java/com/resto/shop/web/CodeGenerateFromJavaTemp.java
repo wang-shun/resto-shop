@@ -44,7 +44,7 @@ public class CodeGenerateFromJavaTemp {
 		 * arr [classSimpleName,idType,tableName]
 		 */
 		String [][]  classPrimay = new String[][]{
-			new String[]{"ArticlePrice","String","tb_article_price"},
+			new String[]{"ArticleAttr","Integer","tb_article_attr"},
 		};
 		
 		for (String[] cp: classPrimay) {
@@ -57,9 +57,9 @@ public class CodeGenerateFromJavaTemp {
 			String mapperDir = DaoMapperPath+modelName+"Mapper.xml";
 			
 			Class<?> className = Class.forName(ModelClassPackage+"."+modelName);
-//			generaterJspFile(className);
+			generaterJspFile(className);
 			
-//			generaterControllerFile(modelName,primaryKey);
+			generaterControllerFile(modelName,primaryKey);
 //			
 			generaterSelectListSqlMapper(mapperDir,tableName,modelName);
 //			/**
