@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.ArticlePriceMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.ArticlePrice">
+    <id column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="price" property="price" jdbcType="DECIMAL"/>
+    <result column="fans_price" property="fansPrice" jdbcType="DECIMAL"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="peference" property="peference" jdbcType="VARCHAR"/>
+    <result column="sort" property="sort" jdbcType="INTEGER"/>
+    <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, price, fans_price, name, peference, sort, article_id</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
+    <include refid="Base_Column_List"/> from tb_article_price where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_article_price where id = #{id,jdbcType=VARCHAR}</delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.ArticlePrice">insert into tb_article_price (id, price, fans_price, name, peference, sort, article_id) values (#{id,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{articleId,jdbcType=VARCHAR})</insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.ArticlePrice">insert into tb_article_price 
+    <trim prefix="(" suffix=")" suffixOverrides=","> 
+      <if test="id != null">id,</if>  
+      <if test="price != null">price,</if>  
+      <if test="fansPrice != null">fans_price,</if>  
+      <if test="name != null">name,</if>  
+      <if test="peference != null">peference,</if>  
+      <if test="sort != null">sort,</if>  
+      <if test="articleId != null">article_id,</if> 
+    </trim>  
+    <trim prefix="values (" suffix=")" suffixOverrides=","> 
+      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
+      <if test="price != null">#{price,jdbcType=DECIMAL},</if>  
+      <if test="fansPrice != null">#{fansPrice,jdbcType=DECIMAL},</if>  
+      <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
+      <if test="peference != null">#{peference,jdbcType=VARCHAR},</if>  
+      <if test="sort != null">#{sort,jdbcType=INTEGER},</if>  
+      <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if> 
+    </trim> 
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price 
+    <set> 
+      <if test="price != null">price = #{price,jdbcType=DECIMAL},</if>  
+      <if test="fansPrice != null">fans_price = #{fansPrice,jdbcType=DECIMAL},</if>  
+      <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>  
+      <if test="peference != null">peference = #{peference,jdbcType=VARCHAR},</if>  
+      <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
+      <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if> 
+    </set> where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price set price = #{price,jdbcType=DECIMAL}, fans_price = #{fansPrice,jdbcType=DECIMAL}, name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, article_id = #{articleId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <select id="selectList" resultType="ArticlePrice">select * from tb_article_price</select>
+</mapper>

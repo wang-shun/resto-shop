@@ -40,7 +40,12 @@ public class CodeGenerateFromJavaTemp {
 		
 		
 		
-		String [][]  classPrimay = getModelClass();
+		/**
+		 * arr [classSimpleName,idType,tableName]
+		 */
+		String [][]  classPrimay = new String[][]{
+			new String[]{"ArticlePrice","String","tb_article_price"},
+		};
 		
 		for (String[] cp: classPrimay) {
 			String modelName = cp[0];
@@ -54,18 +59,18 @@ public class CodeGenerateFromJavaTemp {
 			Class<?> className = Class.forName(ModelClassPackage+"."+modelName);
 //			generaterJspFile(className);
 			
-			generaterControllerFile(modelName,primaryKey);
+//			generaterControllerFile(modelName,primaryKey);
 //			
-//			generaterSelectListSqlMapper(mapperDir,tableName,modelName);
+			generaterSelectListSqlMapper(mapperDir,tableName,modelName);
 //			/**
 //			 * 生成 service 和 impl
 //			 */
-//			generaterServiceAndImpl(modelName,primaryKey);
+			generaterServiceAndImpl(modelName,primaryKey);
 //			
 //			/**
 //			 * 让所有的Mapper 继承 GenericDao
 //			 */
-//			extendGenericDao(modelName,primaryKey);
+			extendGenericDao(modelName,primaryKey);
 		}
 	}
 	

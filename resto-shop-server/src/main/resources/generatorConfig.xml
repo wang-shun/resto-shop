@@ -40,32 +40,9 @@
         </javaClientGenerator>
 
         <!--对应数据库表名 mybatis-generator:generate -->
-       <table tableName="tb_article" domainObjectName="Article" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_article_family" domainObjectName="ArticleFamily" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
        <table tableName="tb_article_unit" domainObjectName="ArticleUnit" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_printer" domainObjectName="Printer" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_notice" domainObjectName="Notice" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_kitchen" domainObjectName="Kitchen" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_advert" domainObjectName="Advert" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_support_time" domainObjectName="SupportTime" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_charge_setting" domainObjectName="ChargeSetting" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_distribution_time" domainObjectName="DistributionTime" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_delivery_point" domainObjectName="DeliveryPoint" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_red_config" domainObjectName="RedConfig" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_free_day" domainObjectName="FreeDay" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_new_custom_coupon" domainObjectName="NewCustomCoupon" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_picture_slider" domainObjectName="PictureSlider" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_order" domainObjectName="Order" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_order_item" domainObjectName="OrderItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_order_payment_item" domainObjectName="OrderPaymentItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_appraise" domainObjectName="Appraise" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_sms_log" domainObjectName="SmsLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_change_payment" domainObjectName="ChargePayment" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_charge_order" domainObjectName="ChargeOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_shopcart" domainObjectName="ShopCart" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_customer" domainObjectName="Customer" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_account" domainObjectName="Account" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_account_log" domainObjectName="AccountLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
-       <table tableName="tb_coupon" domainObjectName="Coupon" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
+       <table tableName="tb_article_price" domainObjectName="ArticlePrice" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
+
+       
     </context>
 </generatorConfiguration>
