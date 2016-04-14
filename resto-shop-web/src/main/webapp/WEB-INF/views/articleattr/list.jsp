@@ -7,30 +7,50 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">新增菜品规格</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'articleattr/modify':'articleattr/create'}}" @submit.prevent="save">
-						<div class="form-body">
+	            	<form class="form-horizontal" role="form" action="{{m.id?'articleattr/modify':'articleattr/create'}}" @submit.prevent="save">
+				  		<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>sort</label>
-    <input type="text" class="form-control" name="sort" v-model="m.sort">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+							  <label class="col-sm-3 control-label">属&nbsp;性：</label>
+							  <div class="col-sm-7">
+							    <input type="text" class="form-control" name="name" required v-model="m.name">
+							  </div>
+							</div>
+							<div class="form-group">
+							  <label class="col-sm-3 control-label">排&nbsp;序：</label>
+							  <div class="col-sm-7">
+							    <input type="number" class="form-control" name="sort" required v-model="m.sort">
+							  </div>
+							</div>
+							<div class="form-group" v-for="unit in unitItems">
+								<label class="col-sm-3 control-label">规 格{{unit.sort}}：</label>
+								<div class="col-sm-3">
+									<input type="text" class="form-control" name="units" required>
+								</div>
+								<label class="col-sm-2 control-label">排&nbsp;序：</label>
+								<div class="col-sm-2">
+									<input type="text" class="form-control" name="unitSorts" value="{{unit.sort}}" required>
+								</div>
+								<div class="col-sm-1">
+									<a class="btn red" @click="removeUnit(unit)">移除</a>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-7 col-md-offset-3">
+							  		<a class="btn blue btn-block" @click="addUnit">添加规格</a>
+							  	</div>
+							</div>
+							<div class="form-group text-center">
+								<input type="hidden" name="id" v-model="m.id" />
+							  	<input class="btn green" type="submit" value="保存"/>
+							  	<a class="btn default" @click="cancel">取消</a>
+							</div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
 					</form>
+	            	
 	            </div>
 	        </div>
 		</div>
@@ -61,41 +81,67 @@
 				dataSrc : ""
 			},
 			columns : [
-				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "sort",
-	data : "sort",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
-				{
-					title : "操作",
-					data : "id",
-					createdCell:function(td,tdData,rowData,row){
-						var operator=[
-							<s:hasPermission name="articleattr/delete">
-							C.createDelBtn(tdData,"articleattr/delete"),
-							</s:hasPermission>
-							<s:hasPermission name="articleattr/edit">
-							C.createEditBtn(rowData),
-							</s:hasPermission>
-						];
-						$(td).html(operator);
+			{                 
+				title : "属性",
+				data : "name",
+			},                 
+			{                 
+				title : "规格",
+				data : "articleUnits",
+				createdCell:function(td,tdData,rowData){
+					var str = "";
+					if(tdData){
+						$(tdData).each(function(i,item){
+							str += "<span class='label label-info'>"+item.name +"</span>&nbsp;&nbsp;"
+						})
+					}else{
+						str = "暂无数据"
 					}
-				}],
+					
+					$(td).html(str);
+				}
+			},                 
+			{                 
+				title : "排序",
+				data : "sort",
+			}, 
+			{
+				title : "操作",
+				data : "id",
+				createdCell:function(td,tdData,rowData,row){
+					var operator=[
+						<s:hasPermission name="articleattr/delete">
+						C.createDelBtn(tdData,"articleattr/delete"),
+						</s:hasPermission>
+						<s:hasPermission name="articleattr/edit">
+						C.createEditBtn(rowData),
+						</s:hasPermission>
+					];
+					$(td).html(operator);
+				}
+			}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		
+		var C = new Controller(null,tb);
+		var sort = 1;
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			data:{
+				unitItems:[],
+			},
+			methods:{
+				addUnit:function(e){
+					this.unitItems.push({
+						name:"",
+						sort:sort++,
+					});
+				},
+				removeUnit:function(unit){
+					this.unitItems.$remove(unit);
+				}
+			}
+		});
 	}());
-	
-	
-
-	
 </script>

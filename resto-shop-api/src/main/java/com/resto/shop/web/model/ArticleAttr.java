@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import java.util.List;
+
 public class ArticleAttr {
     private Integer id;
 
@@ -8,6 +10,23 @@ public class ArticleAttr {
     private Integer sort;
 
     private String shopDetailId;
+    
+    private String state;
+    
+    /**
+     * 规格集合
+     */
+    private String[] units;
+    
+    /**
+     * 规格 排序 集合
+     */
+    private String[] unitSorts;
+    
+    /**
+     * 用于 查询时 保存 规格的集合
+     */
+    private List<ArticleUnit> articleUnits;
 
     public Integer getId() {
         return id;
@@ -40,4 +59,38 @@ public class ArticleAttr {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public String[] getUnits() {
+		return units;
+	}
+
+	public void setUnits(String[] units) {
+		this.units = units;
+	}
+
+	public String[] getUnitSorts() {
+		return unitSorts;
+	}
+
+	public void setUnitSorts(String[] unitSorts) {
+		this.unitSorts = unitSorts;
+	}
+
+	public List<ArticleUnit> getArticleUnits() {
+		return articleUnits;
+	}
+
+	public void setArticleUnits(List<ArticleUnit> articleUnits) {
+		this.articleUnits = articleUnits;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+	
 }

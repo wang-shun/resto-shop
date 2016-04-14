@@ -1,11 +1,18 @@
 package com.resto.shop.web.service.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ArticleAttrMapper;
+import com.resto.shop.web.dao.ArticleUnitMapper;
 import com.resto.shop.web.model.ArticleAttr;
+import com.resto.shop.web.model.ArticleUnit;
 import com.resto.shop.web.service.ArticleAttrService;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**
@@ -16,10 +23,42 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 
     @Resource
     private ArticleAttrMapper articleattrMapper;
+    @Resource
+    private ArticleUnitMapper articleUnitMapper;
 
     @Override
     public GenericDao<ArticleAttr, Integer> getDao() {
         return articleattrMapper;
-    } 
+    }
 
+    /**
+     * 根据店铺ID查询信息
+     */
+	@Override
+	public List<ArticleAttr> selectListByShopId(String shopId) {
+		List<ArticleAttr> articleAttrs = articleattrMapper.selectListByShopId(shopId);
+		for(ArticleAttr articleAttr : articleAttrs){
+			List<ArticleUnit> articleUnit = articleUnitMapper.selectListByAttrId(articleAttr.getId());
+			articleAttr.setArticleUnits(articleUnit);
+		}
+		return articleAttrs;
+	} 
+
+	/**
+	 * 添加 信息
+	 * @param articleAttr
+	 */
+	public void create(ArticleAttr articleAttr) {
+		articleattrMapper.insertInfo(articleAttr);
+		Integer tbArticleAttrId = articleAttr.getId();//添加完 ArticleAttr 的主键 ID
+		//判断是否 添加了规格
+		if(articleAttr.getUnits().length > 0){
+			String[] units = articleAttr.getUnits();
+			String[] unitSorts = articleAttr.getUnitSorts();
+			for(int i = 0; i <units.length ; i++){
+				ArticleUnit articleUnit= new ArticleUnit(units[i], new BigDecimal(unitSorts[i]), tbArticleAttrId);
+				articleUnitMapper.insert(articleUnit);
+			}
+		}
+	}
 }

@@ -80,4 +80,12 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectList" resultType="ArticleUnit">select * from tb_article_unit</select>
+  
+  <!-- 根据 属性ID 查询规格 -->
+  <select id="selectListByAttrId" resultType="ArticleUnit" parameterType="String">
+  	select * from tb_article_unit where tb_article_attr_id = #{0} and state = 1
+  </select>
+  
+  
+  
 </mapper>

@@ -11,7 +11,17 @@ public class ArticleUnit {
 
     private Integer tbArticleAttrId;
 
-    public Integer getId() {
+    //构造方法
+    public ArticleUnit(String name, BigDecimal sort, Integer tbArticleAttrId) {
+		super();
+		this.name = name;
+		this.sort = sort;
+		this.tbArticleAttrId = tbArticleAttrId;
+	}
+    //默认构造方法
+    public ArticleUnit() {}
+
+	public Integer getId() {
         return id;
     }
 

@@ -3,14 +3,15 @@
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.ArticleAttr;
 import com.resto.shop.web.service.ArticleAttrService;
 
@@ -28,7 +29,7 @@ public class ArticleAttrController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ArticleAttr> listData(){
-		return articleattrService.selectList();
+		return articleattrService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -40,8 +41,9 @@ public class ArticleAttrController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid ArticleAttr brand){
-		articleattrService.insert(brand);
+	public Result create(@Valid ArticleAttr articleAttr){
+		articleAttr.setShopDetailId(getCurrentShopId());
+		articleattrService.create(articleAttr);
 		return Result.getSuccess();
 	}
 	
