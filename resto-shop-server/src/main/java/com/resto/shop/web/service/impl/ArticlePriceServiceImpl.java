@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,15 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
     @Override
     public GenericDao<ArticlePrice, String> getDao() {
         return articlepriceMapper;
-    } 
+    }
+
+	@Override
+	public void saveArticlePrices(String articleId,List<ArticlePrice> articlePrises) {
+		articlepriceMapper.deleteArticlePrices(articleId);
+		for(ArticlePrice price:articlePrises){
+			price.setArticleId(articleId);
+			articlepriceMapper.insertSelective(price);
+		}
+	} 
 
 }

@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public class ArticlePrice {
     private String id;
 
+    private String unitIds;
+    
     private BigDecimal price;
 
     private BigDecimal fansPrice;
@@ -72,4 +74,12 @@ public class ArticlePrice {
     public void setArticleId(String articleId) {
         this.articleId = articleId == null ? null : articleId.trim();
     }
+
+	public String getUnitIds() {
+		return unitIds;
+	}
+
+	public void setUnitIds(String unitIds) {
+		this.unitIds = unitIds==null?null : unitIds.trim();
+	}
 }

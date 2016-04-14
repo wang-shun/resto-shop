@@ -26,6 +26,8 @@
       <if test="peference != null">peference,</if>  
       <if test="sort != null">sort,</if>  
       <if test="articleId != null">article_id,</if> 
+      <if test="unitIds != null">unit_ids,</if> 
+      
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -35,6 +37,7 @@
       <if test="peference != null">#{peference,jdbcType=VARCHAR},</if>  
       <if test="sort != null">#{sort,jdbcType=INTEGER},</if>  
       <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if> 
+      <if test="unitIds != null">#{unitIds,jdbcType=VARCHAR},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price 
@@ -45,8 +48,12 @@
       <if test="peference != null">peference = #{peference,jdbcType=VARCHAR},</if>  
       <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if> 
+      <if test="unitIds != null">unit_ids = #{unitIds,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price set price = #{price,jdbcType=DECIMAL}, fans_price = #{fansPrice,jdbcType=DECIMAL}, name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, article_id = #{articleId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price set price = #{price,jdbcType=DECIMAL}, fans_price = #{fansPrice,jdbcType=DECIMAL}, name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, article_id = #{articleId,jdbcType=VARCHAR},unit_ids=#{unitIds}  where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ArticlePrice">select * from tb_article_price</select>
+  <delete id="deleteArticlePrices">
+	delete from tb_article_price where article_id=#{0}  
+  </delete>
 </mapper>

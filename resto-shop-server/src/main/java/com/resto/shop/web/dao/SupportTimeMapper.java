@@ -4,6 +4,8 @@ import com.resto.shop.web.model.SupportTime;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface SupportTimeMapper  extends GenericDao<SupportTime,Integer> {
@@ -20,4 +22,8 @@ public interface SupportTimeMapper  extends GenericDao<SupportTime,Integer> {
     int updateByPrimaryKey(SupportTime record);
 
     List<SupportTime> selectList(String shopDetailId);
+
+	void insertArticleSupportTime(@Param("articleId") String articleId, @Param("supportTimes")Integer[] supportTimes);
+
+	void deleteArticleSupportTime(String articleId);
 }

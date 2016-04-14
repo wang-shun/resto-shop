@@ -8,5 +8,7 @@ import com.resto.shop.web.model.SupportTime;
 public interface SupportTimeService extends GenericService<SupportTime, Integer> {
 
     List<SupportTime> selectList(String shopDetailId);
+
+	void saveSupportTimes(String articleId, Integer[] supportTimes);
     
 }

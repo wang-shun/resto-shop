@@ -1,7 +1,9 @@
 package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Article {
     private String id;
@@ -51,6 +53,11 @@ public class Article {
     private BigDecimal fansPrice;
 
     private Boolean hasMultPrice;
+    
+    private String hasUnit;
+    
+    private List<ArticlePrice> articlePrises= new ArrayList<>();
+    private Integer [] supportTimes;
 
     public String getId() {
         return id;
@@ -168,7 +175,15 @@ public class Article {
         return showSaleNumber;
     }
 
-    public void setShowSaleNumber(Long showSaleNumber) {
+    public List<ArticlePrice> getArticlePrises() {
+		return articlePrises;
+	}
+
+	public void setArticlePrises(List<ArticlePrice> articlePrises) {
+		this.articlePrises = articlePrises;
+	}
+
+	public void setShowSaleNumber(Long showSaleNumber) {
         this.showSaleNumber = showSaleNumber;
     }
 
@@ -243,4 +258,20 @@ public class Article {
     public void setHasMultPrice(Boolean hasMultPrice) {
         this.hasMultPrice = hasMultPrice;
     }
+
+	public String getHasUnit() {
+		return hasUnit;
+	}
+
+	public void setHasUnit(String hasUnit) {
+		this.hasUnit = hasUnit;
+	}
+
+	public Integer[] getSupportTimes() {
+		return supportTimes;
+	}
+
+	public void setSupportTimes(Integer[] supportTimes) {
+		this.supportTimes = supportTimes;
+	}
 }

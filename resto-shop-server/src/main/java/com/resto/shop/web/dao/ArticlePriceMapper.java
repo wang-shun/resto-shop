@@ -15,4 +15,6 @@ public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
     int updateByPrimaryKeySelective(ArticlePrice record);
 
     int updateByPrimaryKey(ArticlePrice record);
+
+	void deleteArticlePrices(String articleId);
 }

@@ -27,7 +27,13 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
     @Override
     public List<SupportTime> selectList(String shopDetailId) {
         return supporttimeMapper.selectList(shopDetailId);
-    } 
+    }
+
+	@Override
+	public void saveSupportTimes(String articleId, Integer[] supportTimes) {
+		supporttimeMapper.deleteArticleSupportTime(articleId);
+		supporttimeMapper.insertArticleSupportTime(articleId,supportTimes);
+	} 
     
     
 
