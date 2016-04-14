@@ -16,7 +16,7 @@
 							<div class="form-group">
 							    <label>餐品类别</label>
 							    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
-							    	<option :value="f.id" v-for="f in article_familys">
+							    	<option :value="f.id" v-for="f in articlefamilys">
 							    		{{f.name}}
 							    	</option>
 							    </select>
@@ -42,8 +42,16 @@
 							    <input type="number" class="form-control" name="sort" v-model="m.sort">
 							</div>
 							<div class="form-group">
+							    <label>供应时间</label>
+							    <br />
+							    <label v-for="time in supporttimes">
+							    	<input type="checkbox" name="supporttimes" :value="time.id"  v-model="checkedTimes"> {{time.name}} &nbsp;&nbsp;
+							    </label>
+							</div>
+							<div class="form-group">
 							    <label>餐品图片</label>
-							    <input type="text" class="form-control" name="photoSmall" v-model="m.photoSmall" readonly>
+							    <img src="" id="photoSmall"/>
+							    <input type="hidden" class="form-control" name="photoSmall" v-model="m.photoSmall">
 							    <img-file-upload @success="uploadSuccess" @error="uploadError"></img-file-upload>
 							</div>
 							
@@ -94,43 +102,37 @@
 				dataSrc : ""
 			},
 			columns : [
+			    {
+			    	title:"餐品类别",
+			    	data:"articleFamilyId",
+			    },
 				{                 
-					title : "name",
+					title : "餐品名称",
 					data : "name",
 				},                 
 				{                 
-					title : "photoSmall",
+					title : "餐品图片",
 					data : "photoSmall",
 				},                 
 				{                 
-					title : "description",
+					title : "餐品描述",
 					data : "description",
 				},                 
 				{                 
-					title : "sort",
+					title : "餐品排序",
 					data : "sort",
 				},                 
 				{                 
-					title : "activated",
+					title : "是否上架",
 					data : "activated",
+					createdCell:function(td,tdData){
+						$(td).html(tdData?"是":"否");
+					}
 				},                 
 				{                 
-					title : "shopDetailId",
+					title : "所属店铺",
 					data : "shopDetailId",
 				},                 
-				{                 
-					title : "articleFamilyId",
-					data : "articleFamilyId",
-				},                 
-				{                 
-					title : "createUserId",
-					data : "createUserId",
-				},                 
-				{                 
-					title : "updateUserId",
-					data : "updateUserId",
-				},                 
-
 				{
 					title : "操作",
 					data : "id",
@@ -154,12 +156,15 @@
 			el:"#control",
 			mixins:[C.formVueMix],
 			data:{
-				article_familys:[]
+				articlefamilys:[],
+				supporttimes:[],
+				checkedTimes:[],
 			},
 			methods:{
 				uploadSuccess:function(url){
 					$("[name='photoSmall']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
+					$("#photoSmall").attr("src","/"+url);
 				},
 				uploadError:function(msg){
 					C.errorMsg(msg);
@@ -168,7 +173,11 @@
 			created:function(){
 				var that = this;
 				$.post("articlefamily/list_all",null,function(data){
-					that.article_familys = data;
+					that.articlefamilys = data;
+				});
+				$.post("supporttime/list_all",null,function(data){
+					console.log(data);
+					that.supporttimes=data;
 				});
 			}
 		});

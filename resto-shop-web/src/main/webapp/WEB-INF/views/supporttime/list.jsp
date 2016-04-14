@@ -46,45 +46,19 @@
 									</span>
 							    </div>
 							</div>
-							<!-- <div class="form-group">
-							    <label>供应时间</label>
-							    <input type="text" class="form-control" name="supportWeekBin" v-model="m.supportWeekBin">
-							</div> -->
-							
 							<div class="form-group">
 								<label>供应时间</label>
-								<br>
-								<input type="checkbox" id="Sunday" value="64" v-model="checkedNames"  v-bind:true-value="a" v-bind:false-value="b">
-									<label for="Sunday">周日</label>
-								<input type="checkbox" id="Monday" value="1" v-model="checkedNames">
-									<label for="Monday">周一</label>
-								<input type="checkbox" id="Tuesday" value="2" v-model="checkedNames">
-									<label for="Tuesday">周二</label>
-								<input type="checkbox" id="Wednesday" value="4" v-model="checkedNames">
-									<label for="Wednesday">周三</label>
-								<input type="checkbox" id="Thursday" value="8" v-model="checkedNames">
-									<label for="Thursday">周四</label>
-								<input type="checkbox" id="Friday" value="16" v-model="checkedNames">
-									<label for="Friday">周五</label>
-								<input type="checkbox" id="Saturday" value="32" v-model="checkedNames">
-									<label for="Saturday">周六</label>
-									
-								<input type="checkbox" id="workday" value="128" v-model="checkedNames">
-									<label for="workday">工作日</label>
-								<input type="checkbox" id="nonworkdays" value="256" v-model="checkedNames">
-									<label for="nonworkdays">非工作日</label>
-								<span>{{getSum}}</span>
-								<input type="test" class="form-control" name="supportWeekBin" id="supportWeekBin" value="{{getSum}}">
+								<br/>
+								<label v-for="day in supportDay">
+							    	<input type="checkbox" name="activated" :value="day[1]"  v-model="checkedValues"> {{day[0]}} &nbsp;&nbsp;
+							    </label>
+								<input type="hidden" class="form-control" name="supportWeekBin" id="supportWeekBin" :value="getSum">
 							</div>
 								
 							<div class="form-group">
 							    <label>描述</label>
 							    <input type="text" class="form-control" name="remark" v-model="m.remark">
 							</div>
-							<!-- <div class="form-group">
-							    <label>店铺id</label>
-							    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-							</div> -->
 					</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -116,6 +90,29 @@
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
+		
+		var supportDay=[
+			            ["周一",1<<0],
+			            ["周二",1<<1],
+			            ["周三",1<<2],
+			            ["周四",1<<3],
+			            ["周五",1<<4],
+			            ["周六",1<<5],
+			            ["周日",1<<6],
+			            ["工作日",1<<7],
+			            ["非工作日",1<<8],
+			            ];
+		function getWeekDayArr(weekBin){
+			var arr = [];
+			for(var i=0;i<supportDay.length;i++){
+				var day = supportDay[i];
+				if(weekBin&day[1]){
+					arr.push(day);
+				}
+			}
+			return arr;
+		}
+		
 		var tb = $table.DataTable({
 			ajax : {
 				url : "supporttime/list_all",
@@ -137,17 +134,19 @@
 				{                 
 					title : "供应时间",
 					data : "supportWeekBin",
+					createdCell:function(td,tdData){
+						var dayArr = getWeekDayArr(tdData);
+						$(td).html("");
+						console.log(dayArr);
+						for(var i=0;i<dayArr.length;i++){
+							$(td).append(dayArr[i][0]);
+						}
+					}
 				},                 
 				{                 
-					title : "描述",
+					title : "备注",
 					data : "remark",
 				},                 
-				{                 
-					title : "门店",
-					data : "shopName",
-					
-				},                 
-
 				{
 					title : "操作",
 					data : "id",
@@ -166,17 +165,17 @@
 		});
 		
 		var C = new Controller(null,tb);
-		
 		var vueObj = new Vue({
 			el:"#control",
 			data:{
-				checkedNames: [],
+				checkedValues: [],
+				supportDay:supportDay,
 			},
 			computed: {
 			 	getSum: function () {
 			 		var s=0;
-			 		for(var i in this.checkedNames){
-			 			var week = this.checkedNames[i];
+			 		for(var i in this.checkedValues){
+			 			var week = this.checkedValues[i];
 			 			s+=parseInt(week);
 			 		}
 			      return s;
@@ -184,6 +183,7 @@
 			},
 			mixins:[C.formVueMix],
 			methods:{ 
+				
 				initTime :function(){
 					$(".timepicker-no-seconds").timepicker({
 						 autoclose: true,
@@ -191,18 +191,20 @@
 			             minuteStep: 5
 					  });
 				},
-				
+				closeForm:function(){
+					this.m={};
+					this.showform=false;
+					this.checkedValues=[];
+				},
 				edit:function(model){
-					// 选中
-					vueObj.m= model;
-					vueObj.openForm();
-					Vue.nextTick(function(){
-						var sb = vueObj.m.supportWeekBin;
-						var i=sb.toString(2);
-						//$("#supportWeekBin").val(i);
-					
-						
-					})
+					var that = this;
+					this.m= model;
+					this.openForm();
+					this.checkedValues=[];
+					var dayArr = getWeekDayArr(this.m.supportWeekBin);
+					for(var i=0;i<dayArr.length ;i++){
+						this.checkedValues.push(dayArr[i][1]);
+					}
 				},
 			}
 		});
