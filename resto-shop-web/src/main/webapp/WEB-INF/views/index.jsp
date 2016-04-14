@@ -31,6 +31,7 @@
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-toastr/toastr.min.css">
+		
 		<link href="<%=resourcePath%>/assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link href="<%=resourcePath%>/assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<%=resourcePath%>/assets/global/plugins/typeahead/typeahead.css" rel="stylesheet" type="text/css" />        
@@ -68,7 +69,6 @@
                 <!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
                 <div class="page-sidebar navbar-collapse collapse">
                     <!-- BEGIN SIDEBAR MENU -->
-                    
                     <ul class="page-sidebar-menu  page-header-fixed " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
                     	<s:hasRole name="superAdmin">
 							<c:forEach items="${allMenu}" var="m">
@@ -120,6 +120,7 @@
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+        
         <!-- END CORE PLUGINS -->
         <!-- BEGIN PAGE LEVEL PLUGINS -->
         <script src="<%=resourcePath%>/assets/global/scripts/datatable.js" type="text/javascript"></script>

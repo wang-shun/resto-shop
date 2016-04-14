@@ -200,6 +200,11 @@ public class SpringContextConfig {
 		return getProxy(ArticleAttrService.class);
 	}
 	
+	@Bean
+	public FreedayService freedayService(){
+            return getProxy(FreedayService.class);
+        }
+	
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}

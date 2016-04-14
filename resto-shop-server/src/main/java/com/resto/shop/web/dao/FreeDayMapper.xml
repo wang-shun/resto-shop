@@ -25,4 +25,31 @@
       </if>
     </trim>
   </insert>
+  
+  <select id="selectList" resultType="FreeDay" parameterType="FreeDay">
+		<!--  SELECT
+			t.NAME,
+			t.begin_time,
+			t.end_time,
+			t.support_week_bin,
+			t.remark,
+			s.NAME shopName
+		FROM
+			tb_support_time t
+		LEFT JOIN resto_brand.shop_detail s ON t.shop_detail_id = s.id
+		WHERE t.shop_detail_id=#{shopDetailId} -->
+		
+		
+		select
+		free_day
+		from
+		tb_free_day
+		<![CDATA[
+		where FREE_DAY>=#{begin}
+		and FREE_DAY<=#{end}
+		]]>
+		where shop_detail_id=#{shopDetailId}
+	</select>
+  
+  
 </mapper>
