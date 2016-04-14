@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,11 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
     @Override
     public GenericDao<ArticleFamily, String> getDao() {
         return articlefamilyMapper;
-    } 
+    }
+
+	@Override
+	public List<ArticleFamily> selectList(String currentShopId) {
+		return articlefamilyMapper.selectList(currentShopId);
+	} 
 
 }

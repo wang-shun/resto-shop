@@ -35,7 +35,7 @@ public class ArticleFamilyController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ArticleFamily> listData(){
-		return articlefamilyService.selectList();
+		return articlefamilyService.selectList(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

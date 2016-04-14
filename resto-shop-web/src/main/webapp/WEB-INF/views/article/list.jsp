@@ -11,40 +11,51 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'article/modify':'article/create'}}" @submit.prevent="save">
+	            	<form class="form-hr" role="form " action="{{m.id?'article/modify':'article/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-							    <label>articleFamilyId</label>
-							    <input type="text" class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+							    <label>餐品类别</label>
+							    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+							    	<option :value="f.id" v-for="f in article_familys">
+							    		{{f.name}}
+							    	</option>
+							    </select>
 							</div>
 							<div class="form-group">
-							    <label>name</label>
+							    <label>餐品名称</label>
 							    <input type="text" class="form-control" name="name" v-model="m.name">
 							</div>
 							<div class="form-group">
-							    <label>price</label>
-							    <input type="text" class="form-control" name="price" v-model="m.price">
+							    <label>价格</label>
+							    <input type="text" class="form-control" name="price" v-model="m.price" required="required">
 							</div>
 							<div class="form-group">
-							    <label>price</label>
-							    <input type="text" class="form-control" name="fans_price" v-model="fans_price">
+							    <label>粉丝价</label>
+							    <input type="text" class="form-control" name="fansPrice" v-model="fansPrice">
 							</div>
 							<div class="form-group">
-							    <label>description</label>
+							    <label>描述</label>
 							    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
 							</div>
 							<div class="form-group">
-							    <label>sort</label>
-							    <input type="text" class="form-control" name="sort" v-model="m.sort">
+							    <label>排序</label>
+							    <input type="number" class="form-control" name="sort" v-model="m.sort">
 							</div>
 							<div class="form-group">
-							    <label>photoSmall</label>
+							    <label>餐品图片</label>
 							    <input type="text" class="form-control" name="photoSmall" v-model="m.photoSmall" readonly>
 							    <img-file-upload @success="uploadSuccess" @error="uploadError"></img-file-upload>
 							</div>
+							
 							<div class="form-group">
-							    <label>activated</label>
-							    <input type="text" class="form-control" name="activated" v-model="m.activated">
+							 	<div class="control-label">是否上架</div>
+							    <label>
+							    	<input type="radio" name="activated" value="1"  v-model="m.activated">是
+							    </label>
+							    
+							    <label for="useWithAccount">
+							    	 <input type="radio" name="activated" value="0"  v-model="m.activated">否
+						    	</label>
 							</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -88,32 +99,12 @@
 					data : "name",
 				},                 
 				{                 
-					title : "nameAlias",
-					data : "nameAlias",
-				},                 
-				{                 
-					title : "nameShort",
-					data : "nameShort",
-				},                 
-				{                 
-					title : "photoBig",
-					data : "photoBig",
-				},                 
-				{                 
 					title : "photoSmall",
 					data : "photoSmall",
 				},                 
 				{                 
-					title : "ingredients",
-					data : "ingredients",
-				},                 
-				{                 
 					title : "description",
 					data : "description",
-				},                 
-				{                 
-					title : "isEmpty",
-					data : "isEmpty",
 				},                 
 				{                 
 					title : "sort",
@@ -122,30 +113,6 @@
 				{                 
 					title : "activated",
 					data : "activated",
-				},                 
-				{                 
-					title : "state",
-					data : "state",
-				},                 
-				{                 
-					title : "remainNumber",
-					data : "remainNumber",
-				},                 
-				{                 
-					title : "saleNumber",
-					data : "saleNumber",
-				},                 
-				{                 
-					title : "showSaleNumber",
-					data : "showSaleNumber",
-				},                 
-				{                 
-					title : "showPrice",
-					data : "showPrice",
-				},                 
-				{                 
-					title : "updateTime",
-					data : "updateTime",
 				},                 
 				{                 
 					title : "shopDetailId",
@@ -186,6 +153,9 @@
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
+			data:{
+				article_familys:[]
+			},
 			methods:{
 				uploadSuccess:function(url){
 					$("[name='photoSmall']").val(url).trigger("change");
@@ -194,8 +164,15 @@
 				uploadError:function(msg){
 					C.errorMsg(msg);
 				}
+			},
+			created:function(){
+				var that = this;
+				$.post("articlefamily/list_all",null,function(data){
+					that.article_familys = data;
+				});
 			}
 		});
+		C.vue=vueObj;
 		
 	}());
 	

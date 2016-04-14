@@ -316,5 +316,11 @@
       has_mult_price = #{hasMultPrice,jdbcType=BIT}
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  <select id="selectList" resultType="Article">select * from tb_article</select>
+  <select id="selectList" resultType="Article">select * from tb_article
+	  <where>
+	  	<if test="shopId!=null and shopId!=''">
+	  		shop_detail_id = #{shopId} 
+	  	</if>
+	  </where>
+  </select>
 </mapper>

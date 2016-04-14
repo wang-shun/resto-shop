@@ -48,5 +48,11 @@
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticleFamily">update tb_article_family set name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=INTEGER}, parent_id = #{parentId,jdbcType=VARCHAR}, level = #{level,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=VARCHAR}</update>
-  <select id="selectList" resultType="ArticleFamily">select * from tb_article_family</select>
+  <select id="selectList" resultType="ArticleFamily">select * from tb_article_family
+  	<where>
+  		<if test="shopId!=null and shopId!=''">
+  			shop_detail_id=#{shopId}
+  		</if>
+  	</where>
+  </select>
 </mapper>

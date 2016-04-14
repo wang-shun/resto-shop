@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.service.ArticleService;
 
@@ -28,7 +29,7 @@ public class ArticleController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Article> listData(){
-		return articleService.selectList();
+		return articleService.selectList(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -41,9 +42,10 @@ public class ArticleController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid Article article){
+		article.setId(ApplicationUtils.randomUUID());
 		article.setShopDetailId(getCurrentShopId());
 		article.setCreateUserId(getCurrentUserId());
-		
+		article.setUpdateUserId(getCurrentUserId());
 		articleService.insert(article);
 		return Result.getSuccess();
 	}
