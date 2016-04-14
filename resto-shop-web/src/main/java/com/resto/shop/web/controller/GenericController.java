@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,8 @@ import com.resto.brand.core.entity.DataVailedException;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.feature.orm.mybatis.Page;
+import com.resto.brand.web.model.BrandUser;
+import com.resto.shop.web.config.SessionKey;
 
 
 public abstract class GenericController{
@@ -121,5 +124,21 @@ public abstract class GenericController{
 	}
 	public JSONPObject getJSONPObject(Object data){
 		return new JSONPObject(getRequest().getParameter("callback"), data);
+	}
+	
+	public String getCurrentShopId(){
+		return getCurrentBrandUser().getShopDetailId();
+	}
+	
+	public String getCurrentBrandId(){
+		return getCurrentBrandUser().getBrandId();
+	}
+	
+	public BrandUser getCurrentBrandUser(){
+		return (BrandUser) getRequest().getSession().getAttribute(SessionKey.USER_INFO);
+	}
+	
+	public String getCurrentUserId(){
+		return getCurrentBrandUser().getId();
 	}
 }

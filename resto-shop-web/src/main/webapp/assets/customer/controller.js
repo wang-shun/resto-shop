@@ -427,6 +427,45 @@ var Controller = function(controlId,datatable){
 			dlg.remove();
 		}
 	} 	
+	
+	this.formVueMix={
+		data:function(){
+			return {
+				m:{},
+				showform:false
+			}
+		},
+		methods:{
+			openForm:function(){
+				this.showform = true;
+			},
+			closeForm:function(){
+				this.m={};
+				this.showform = false;
+			},
+			cancel:function(){
+				this.m={};
+				this.closeForm();
+			},
+			create:function(){
+				this.m={};
+				this.openForm();
+			},
+			edit:function(model){
+				this.m= model;
+				this.openForm();
+			},
+			save:function(e){
+				var that = this;
+				var formDom = e.target;
+				_C.ajaxFormEx(formDom,function(){
+					that.cancel();
+					tb.ajax.reload();
+				});
+			},
+		}
+	};
+	
 	if(cid){
 		this.vueObj = function(option){
 			var o = {
@@ -463,8 +502,6 @@ var Controller = function(controlId,datatable){
 								tb.ajax.reload();
 							});
 						},
-						
-						
 					},
 				};
 			if(option){

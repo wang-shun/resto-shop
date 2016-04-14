@@ -40,8 +40,9 @@ public class ArticleController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid Article brand){
-		articleService.insert(brand);
+	public Result create(@Valid Article article){
+		
+		articleService.insert(article);
 		return Result.getSuccess();
 	}
 	

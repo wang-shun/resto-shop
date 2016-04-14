@@ -1,6 +1,5 @@
  package com.resto.shop.web.controller.business;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.model.Notice;
 import com.resto.shop.web.service.NoticeService;
 

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.model.Printer;
 import com.resto.shop.web.service.PrinterService;
 

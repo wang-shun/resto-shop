@@ -1,9 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.Article;
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.Article;
 
-public interface ArticleMapper  extends GenericDao<Article,String> {
+public interface ArticleMapper extends GenericDao<Article, String>{
     int deleteByPrimaryKey(String id);
 
     int insert(Article record);

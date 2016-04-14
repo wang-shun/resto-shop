@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Article {
@@ -33,8 +34,6 @@ public class Article {
 
     private Long showSaleNumber;
 
-    private Integer showPrice;
-
     private Date updateTime;
 
     private Date createTime;
@@ -46,6 +45,12 @@ public class Article {
     private String createUserId;
 
     private String updateUserId;
+
+    private BigDecimal price;
+
+    private BigDecimal fansPrice;
+
+    private Boolean hasMultPrice;
 
     public String getId() {
         return id;
@@ -167,14 +172,6 @@ public class Article {
         this.showSaleNumber = showSaleNumber;
     }
 
-    public Integer getShowPrice() {
-        return showPrice;
-    }
-
-    public void setShowPrice(Integer showPrice) {
-        this.showPrice = showPrice;
-    }
-
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -221,5 +218,29 @@ public class Article {
 
     public void setUpdateUserId(String updateUserId) {
         this.updateUserId = updateUserId == null ? null : updateUserId.trim();
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getFansPrice() {
+        return fansPrice;
+    }
+
+    public void setFansPrice(BigDecimal fansPrice) {
+        this.fansPrice = fansPrice;
+    }
+
+    public Boolean getHasMultPrice() {
+        return hasMultPrice;
+    }
+
+    public void setHasMultPrice(Boolean hasMultPrice) {
+        this.hasMultPrice = hasMultPrice;
     }
 }

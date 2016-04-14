@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 
 import com.resto.brand.web.service.*;
-import com.resto.shop.web.model.ArticleAttr;
-import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.*;
 import cn.restoplus.rpc.client.RpcProxy;
 
