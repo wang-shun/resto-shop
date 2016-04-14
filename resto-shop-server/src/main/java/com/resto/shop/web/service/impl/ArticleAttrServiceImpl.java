@@ -84,7 +84,6 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 		//删除  ArticleUnit  信息
 		List<ArticleUnit> articleUnits = articleUnitMapper.selectListByAttrId(articleAttr.getId());
 		for(ArticleUnit articleUnit : articleUnits){
-			System.out.println(articleUnit.getId());
 			articleUnitMapper.deleteByPrimaryKey(articleUnit.getId());
 		}
 		//添加  ArticleUnit  信息
