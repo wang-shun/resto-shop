@@ -143,5 +143,6 @@
 				}
 			}
 		});
+		C.vue = vueObj;
 	}());
 </script>
