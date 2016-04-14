@@ -21,8 +21,9 @@ public interface ArticleUnitMapper extends GenericDao<ArticleUnit,Integer>{
     List<ArticleUnit> selectListByAttrId(Integer attrId);
     
     /**
-     * 根据 属性 ID 删除 规格信息
+     * 根据 属性 ID 删除 规格信息(假删，修改状态)
      * @param id
      */
     void deleteByAttrId(Integer id);
+       
 }

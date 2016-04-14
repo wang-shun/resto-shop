@@ -50,7 +50,7 @@ public class ArticleAttrController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid ArticleAttr brand){
-		articleattrService.update(brand);
+		articleattrService.updateInfo(brand);
 		return Result.getSuccess();
 	}
 	

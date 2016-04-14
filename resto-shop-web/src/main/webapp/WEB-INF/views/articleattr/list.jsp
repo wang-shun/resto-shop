@@ -14,32 +14,32 @@
 	            	<form class="form-horizontal" role="form" action="{{m.id?'articleattr/modify':'articleattr/create'}}" @submit.prevent="save">
 				  		<div class="form-body">
 							<div class="form-group">
-							  <label class="col-sm-3 control-label">属&nbsp;性：</label>
-							  <div class="col-sm-7">
+							  <label class="col-sm-2 control-label">属&nbsp;性：</label>
+							  <div class="col-sm-8">
 							    <input type="text" class="form-control" name="name" required v-model="m.name">
 							  </div>
 							</div>
 							<div class="form-group">
-							  <label class="col-sm-3 control-label">排&nbsp;序：</label>
-							  <div class="col-sm-7">
+							  <label class="col-sm-2 control-label">排&nbsp;序：</label>
+							  <div class="col-sm-8">
 							    <input type="number" class="form-control" placeholder="请输入数字！" name="sort" required v-model="m.sort">
 							  </div>
 							</div>
-							<div class="form-group" v-for="unit in unitItems">
-								<label class="col-sm-3 control-label">规 格{{unit.sort}}：</label>
+							<div class="form-group" v-for="unit in articleUnits">
+								<label class="col-sm-2 control-label">规 格{{$index+1}}：</label>
 								<div class="col-sm-3">
-									<input type="text" class="form-control" name="units" required>
+									<input type="text" class="form-control" name="units" value="{{unit.name}}" required>
 								</div>
 								<label class="col-sm-2 control-label">排&nbsp;序：</label>
-								<div class="col-sm-2">
-									<input type="text" class="form-control" name="unitSorts" value="{{unit.sort}}" required>
+								<div class="col-sm-3">
+									<input type="number" class="form-control" placeholder="请输入数字！" name="unitSorts" value="{{unit.sort}}" required>
 								</div>
 								<div class="col-sm-1">
 									<a class="btn red" @click="removeUnit(unit)">移除</a>
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-7 col-md-offset-3">
+								<div class="col-sm-8 col-md-offset-2">
 							  		<a class="btn blue btn-block" @click="addUnit">添加规格</a>
 							  	</div>
 							</div>
@@ -109,6 +109,7 @@
 				title : "操作",
 				data : "id",
 				createdCell:function(td,tdData,rowData,row){
+					console.log(rowData);
 					var operator=[
 						<s:hasPermission name="articleattr/delete">
 						C.createDelBtn(tdData,"articleattr/delete"),
@@ -129,20 +130,30 @@
 			el:"#control",
 			mixins:[C.formVueMix],
 			data:{
-				unitItems:[],
+				articleUnits:[],
 			},
 			methods:{
 				addUnit:function(e){
-					this.unitItems.push({
+					this.articleUnits.push({
 						name:"",
-						sort:sort++,
+						sort:"",
 					});
 				},
 				removeUnit:function(unit){
-					this.unitItems.$remove(unit);
-				}
+					this.articleUnits.$remove(unit);
+				},
+				edit:function(model){
+					this.articleUnits = model.articleUnits == null ? [] : model.articleUnits;
+					this.m= model;
+					this.openForm();
+				},
+				create:function(){
+					this.articleUnits = [];
+					this.m={};
+					this.openForm();
+				},
 			}
 		});
-		C.vue = vueObj;
+		C.vue=vueObj;
 	}());
 </script>

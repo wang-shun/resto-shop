@@ -23,4 +23,10 @@ public interface ArticleAttrService extends GenericService<ArticleAttr, Integer>
 	 * @param id
 	 */
 	void deleteInfo(Integer id);
+	
+	/**
+	 * 修改信息
+	 * @param id
+	 */
+	void updateInfo(ArticleAttr articleAttr);
 }

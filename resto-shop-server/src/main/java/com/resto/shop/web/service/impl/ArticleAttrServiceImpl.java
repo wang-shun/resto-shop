@@ -72,5 +72,31 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 		articleattrMapper.deleteByPrimaryKey(id);
 		//删除 ArticleUnit 信息，改变  state 状态
 		articleUnitMapper.deleteByAttrId(id);
+	}
+
+	/**
+	 * 修改信息
+	 */
+	@Override
+	public void updateInfo(ArticleAttr articleAttr) {
+		//修改  ArticleAttr 信息
+		articleattrMapper.updateByPrimaryKeySelective(articleAttr);
+		//删除  ArticleUnit  信息
+		List<ArticleUnit> articleUnits = articleUnitMapper.selectListByAttrId(articleAttr.getId());
+		for(ArticleUnit articleUnit : articleUnits){
+			System.out.println(articleUnit.getId());
+			articleUnitMapper.deleteByPrimaryKey(articleUnit.getId());
+		}
+		//添加  ArticleUnit  信息
+		if(articleAttr.getUnits() != null && articleAttr.getUnits().length > 0){
+			Integer tbArticleAttrId = articleAttr.getId();
+			String[] units = articleAttr.getUnits();
+			String[] unitSorts = articleAttr.getUnitSorts();
+			for(int i = 0; i <units.length ; i++){
+				System.out.println(units[i]);
+				ArticleUnit articleUnit= new ArticleUnit(units[i], new BigDecimal(unitSorts[i]), tbArticleAttrId);
+				articleUnitMapper.insert(articleUnit);
+			}
+		}
 	} 
 }
