@@ -41,6 +41,8 @@ public class ArticleController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid Article article){
+		article.setShopDetailId(getCurrentShopId());
+		article.setCreateUserId(getCurrentUserId());
 		
 		articleService.insert(article);
 		return Result.getSuccess();

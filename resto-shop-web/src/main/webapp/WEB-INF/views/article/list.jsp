@@ -22,6 +22,14 @@
 							    <input type="text" class="form-control" name="name" v-model="m.name">
 							</div>
 							<div class="form-group">
+							    <label>price</label>
+							    <input type="text" class="form-control" name="price" v-model="m.price">
+							</div>
+							<div class="form-group">
+							    <label>price</label>
+							    <input type="text" class="form-control" name="fans_price" v-model="fans_price">
+							</div>
+							<div class="form-group">
 							    <label>description</label>
 							    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
 							</div>
