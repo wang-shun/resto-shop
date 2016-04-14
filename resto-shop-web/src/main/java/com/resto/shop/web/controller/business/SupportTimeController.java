@@ -22,13 +22,14 @@ public class SupportTimeController extends GenericController{
 	SupportTimeService supporttimeService;
 	
 	@RequestMapping("/list")
-    public void list(){
-    }
+           public void list(){
+        }
 
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<SupportTime> listData(){
-		return supporttimeService.selectList();
+	        String shopDetailId=getCurrentShopId();
+		return supporttimeService.selectList(shopDetailId);
 	}
 	
 	@RequestMapping("list_one")
@@ -41,6 +42,7 @@ public class SupportTimeController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid SupportTime brand){
+	    brand.setShopDetailId(getCurrentShopId());    
 		supporttimeService.insert(brand);
 		return Result.getSuccess();
 	}

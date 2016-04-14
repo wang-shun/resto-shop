@@ -22,8 +22,8 @@ public class SmsLogController extends GenericController{
 	SmsLogService smslogService;
 	
 	@RequestMapping("/list")
-    public void list(){
-    }
+        public void list(){
+        }
 
 	@RequestMapping("/list_all")
 	@ResponseBody

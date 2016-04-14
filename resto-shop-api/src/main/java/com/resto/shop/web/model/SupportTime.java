@@ -1,12 +1,16 @@
 package com.resto.shop.web.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class SupportTime {
     private Integer id;
 
     private String name;
-
+    
+    @DateTimeFormat(pattern="HH:mm")
     private String beginTime;
-
+    
+    @DateTimeFormat(pattern="HH:mm")
     private String endTime;
 
     private Integer supportWeekBin;
@@ -14,6 +18,16 @@ public class SupportTime {
     private String remark;
 
     private String shopDetailId;
+    
+    private String shopName;
+    
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
 
     public Integer getId() {
         return id;

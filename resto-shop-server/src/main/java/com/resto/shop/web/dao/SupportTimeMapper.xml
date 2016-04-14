@@ -48,5 +48,18 @@
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.SupportTime">update tb_support_time set name = #{name,jdbcType=VARCHAR}, begin_time = #{beginTime,jdbcType=VARCHAR}, end_time = #{endTime,jdbcType=VARCHAR}, support_week_bin = #{supportWeekBin,jdbcType=INTEGER}, remark = #{remark,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
-  <select id="selectList" resultType="SupportTime">select * from tb_support_time</select>
+  
+  <select id="selectList" resultType="SupportTime">
+		 SELECT
+			t.NAME,
+			t.begin_time,
+			t.end_time,
+			t.support_week_bin,
+			t.remark,
+			s.NAME shopName
+		FROM
+			tb_support_time t
+		LEFT JOIN resto_brand.shop_detail s ON t.shop_detail_id = s.id
+		WHERE t.shop_detail_id=#{shopDetailId}
+  </select>
 </mapper>

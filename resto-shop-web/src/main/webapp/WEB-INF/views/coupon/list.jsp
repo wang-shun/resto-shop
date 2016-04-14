@@ -106,61 +106,61 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "value",
-	data : "value",
-},                 
-{                 
-	title : "minAmount",
-	data : "minAmount",
-},                 
-{                 
-	title : "beginDate",
-	data : "beginDate",
-},                 
-{                 
-	title : "endDate",
-	data : "endDate",
-},                 
-{                 
-	title : "beginTime",
-	data : "beginTime",
-},                 
-{                 
-	title : "endTime",
-	data : "endTime",
-},                 
-{                 
-	title : "isUsed",
-	data : "isUsed",
-},                 
-{                 
-	title : "usingTime",
-	data : "usingTime",
-},                 
-{                 
-	title : "couponSource",
-	data : "couponSource",
-},                 
-{                 
-	title : "useWithAccount",
-	data : "useWithAccount",
-},                 
-{                 
-	title : "remark",
-	data : "remark",
-},                 
-{                 
-	title : "distributionModeId",
-	data : "distributionModeId",
-},                 
-{                 
-	title : "customerId",
-	data : "customerId",
-},                 
+					title : "name",
+					data : "name",
+				},                 
+				{                 
+					title : "value",
+					data : "value",
+				},                 
+				{                 
+					title : "minAmount",
+					data : "minAmount",
+				},                 
+				{                 
+					title : "beginDate",
+					data : "beginDate",
+				},                 
+				{                 
+					title : "endDate",
+					data : "endDate",
+				},                 
+				{                 
+					title : "beginTime",
+					data : "beginTime",
+				},                 
+				{                 
+					title : "endTime",
+					data : "endTime",
+				},                 
+				{                 
+					title : "isUsed",
+					data : "isUsed",
+				},                 
+				{                 
+					title : "usingTime",
+					data : "usingTime",
+				},                 
+				{                 
+					title : "couponSource",
+					data : "couponSource",
+				},                 
+				{                 
+					title : "useWithAccount",
+					data : "useWithAccount",
+				},                 
+				{                 
+					title : "remark",
+					data : "remark",
+				},                 
+				{                 
+					title : "distributionModeId",
+					data : "distributionModeId",
+				},                 
+				{                 
+					title : "customerId",
+					data : "customerId",
+				},                 
 
 				{
 					title : "操作",

@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.SupportTime;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface SupportTimeMapper  extends GenericDao<SupportTime,Integer> {
@@ -15,4 +18,6 @@ public interface SupportTimeMapper  extends GenericDao<SupportTime,Integer> {
     int updateByPrimaryKeySelective(SupportTime record);
 
     int updateByPrimaryKey(SupportTime record);
+
+    List<SupportTime> selectList(String shopDetailId);
 }

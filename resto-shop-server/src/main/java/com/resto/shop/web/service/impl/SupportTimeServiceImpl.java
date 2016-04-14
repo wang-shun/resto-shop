@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,13 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
     @Override
     public GenericDao<SupportTime, Integer> getDao() {
         return supporttimeMapper;
+    }
+
+    @Override
+    public List<SupportTime> selectList(String shopDetailId) {
+        return supporttimeMapper.selectList(shopDetailId);
     } 
+    
+    
 
 }
