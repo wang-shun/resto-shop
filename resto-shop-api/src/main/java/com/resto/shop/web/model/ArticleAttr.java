@@ -65,7 +65,7 @@ public class ArticleAttr {
 	}
 
 	public void setUnits(String[] units) {
-		this.units = units;
+		this.units = units == null ? null : units;
 	}
 
 	public String[] getUnitSorts() {

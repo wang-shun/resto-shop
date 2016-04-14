@@ -42,17 +42,18 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 			articleAttr.setArticleUnits(articleUnit);
 		}
 		return articleAttrs;
-	} 
+	}
 
 	/**
 	 * 添加 信息
 	 * @param articleAttr
 	 */
+	@Override
 	public void create(ArticleAttr articleAttr) {
 		articleattrMapper.insertInfo(articleAttr);
-		Integer tbArticleAttrId = articleAttr.getId();//添加完 ArticleAttr 的主键 ID
 		//判断是否 添加了规格
-		if(articleAttr.getUnits().length > 0){
+		if(articleAttr.getUnits() != null && articleAttr.getUnits().length > 0){
+			Integer tbArticleAttrId = articleAttr.getId();//添加完 ArticleAttr 的主键 ID
 			String[] units = articleAttr.getUnits();
 			String[] unitSorts = articleAttr.getUnitSorts();
 			for(int i = 0; i <units.length ; i++){
@@ -61,4 +62,15 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 			}
 		}
 	}
+
+	/**
+	 * 删除信息
+	 */
+	@Override
+	public void deleteInfo(Integer id) {
+		//删除 ArticleAttr 信息，改变  state 状态
+		articleattrMapper.deleteByPrimaryKey(id);
+		//删除 ArticleUnit 信息，改变  state 状态
+		articleUnitMapper.deleteByAttrId(id);
+	} 
 }

@@ -19,4 +19,10 @@ public interface ArticleUnitMapper extends GenericDao<ArticleUnit,Integer>{
     int updateByPrimaryKey(ArticleUnit record);
     
     List<ArticleUnit> selectListByAttrId(Integer attrId);
+    
+    /**
+     * 根据 属性 ID 删除 规格信息
+     * @param id
+     */
+    void deleteByAttrId(Integer id);
 }

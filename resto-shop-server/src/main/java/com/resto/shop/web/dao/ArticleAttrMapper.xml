@@ -17,8 +17,7 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from tb_article_attr
-    where id = #{id,jdbcType=INTEGER}
+  	UPDATE tb_article_attr set state=0 where id=#{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.ArticleAttr">
     insert into tb_article_attr (id, name, sort, 
@@ -81,7 +80,7 @@
   </update> 
   <select id="selectList" resultType="ArticleAttr">select * from tb_article_attr</select>
   
-  <!-- 添加信息,并返回此信息 -->
+  <!-- 添加信息,并给此实体的 ID 赋值 -->
   <insert id="insertInfo" parameterType="com.resto.shop.web.model.ArticleAttr" useGeneratedKeys="true" keyProperty="id">
     insert into tb_article_attr (name, sort, shop_detail_id)
     values (#{name,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR})

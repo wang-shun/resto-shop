@@ -86,6 +86,9 @@
   	select * from tb_article_unit where tb_article_attr_id = #{0} and state = 1
   </select>
   
-  
+  <!-- 根据 属性 ID 删除 规格信息 -->
+  <delete id="deleteByAttrId" parameterType="java.lang.Integer">
+    UPDATE tb_article_unit set state=0 where tb_article_attr_id = #{id,jdbcType=INTEGER}
+  </delete>
   
 </mapper>

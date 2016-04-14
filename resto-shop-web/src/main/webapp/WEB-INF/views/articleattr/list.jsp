@@ -22,7 +22,7 @@
 							<div class="form-group">
 							  <label class="col-sm-3 control-label">排&nbsp;序：</label>
 							  <div class="col-sm-7">
-							    <input type="number" class="form-control" name="sort" required v-model="m.sort">
+							    <input type="number" class="form-control" placeholder="请输入数字！" name="sort" required v-model="m.sort">
 							  </div>
 							</div>
 							<div class="form-group" v-for="unit in unitItems">

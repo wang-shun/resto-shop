@@ -25,9 +25,10 @@ public interface ArticleAttrMapper extends GenericDao<ArticleAttr, Integer>{
     List<ArticleAttr> selectListByShopId(String shopId);
     
     /**
-     * 添加 信息 ，并返回此数据数据的 ID
+     * 添加 信息 ，并设置此数据数据的 ID
      * @param record
      * @return
      */
     void insertInfo(ArticleAttr record);
+    
 }

@@ -57,7 +57,7 @@ public class ArticleAttrController extends GenericController{
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Integer id){
-		articleattrService.delete(id);
+		articleattrService.deleteInfo(id);
 		return Result.getSuccess();
 	}
 }
