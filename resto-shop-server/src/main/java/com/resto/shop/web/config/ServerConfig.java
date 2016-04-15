@@ -11,7 +11,7 @@ import com.resto.shop.web.datasource.DynamicDataSource;
 import cn.restoplus.rpc.client.RpcProxy;
 
 @Configurable
-@ImportResource({"classpath:applicationContext*.xml"})
+@ImportResource({"classpath:applicationContext.xml"})
 public class ServerConfig {
 	@Resource
 	RpcProxy proxy;
