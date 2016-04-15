@@ -18,6 +18,14 @@ public class ArticleUnit {
 		this.sort = sort;
 		this.tbArticleAttrId = tbArticleAttrId;
 	}
+    //构造方法
+    public ArticleUnit(String id, String name, BigDecimal sort, Integer tbArticleAttrId) {
+		super();
+		this.id = (("").equals(id.trim()) || id == null) ? null : Integer.parseInt(id);
+		this.name = name;
+		this.sort = sort;
+		this.tbArticleAttrId = tbArticleAttrId;
+	}
     //默认构造方法
     public ArticleUnit() {}
 

@@ -26,6 +26,7 @@
 							  </div>
 							</div>
 							<div class="form-group" v-for="unit in articleUnits">
+								<input type="hidden" name="unitIds" value="{{unit.id}}"/>
 								<label class="col-sm-2 control-label">规 格{{$index+1}}：</label>
 								<div class="col-sm-3">
 									<input type="text" class="form-control" name="units" value="{{unit.name}}" required>

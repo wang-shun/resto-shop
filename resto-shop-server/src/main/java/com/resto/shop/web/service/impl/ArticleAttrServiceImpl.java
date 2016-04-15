@@ -89,12 +89,12 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 		//添加  ArticleUnit  信息
 		if(articleAttr.getUnits() != null && articleAttr.getUnits().length > 0){
 			Integer tbArticleAttrId = articleAttr.getId();
+			String[] unitIds = articleAttr.getUnitIds();
 			String[] units = articleAttr.getUnits();
 			String[] unitSorts = articleAttr.getUnitSorts();
 			for(int i = 0; i <units.length ; i++){
-				System.out.println(units[i]);
-				ArticleUnit articleUnit= new ArticleUnit(units[i], new BigDecimal(unitSorts[i]), tbArticleAttrId);
-				articleUnitMapper.insert(articleUnit);
+				ArticleUnit articleUnit= new ArticleUnit(unitIds[i] ,units[i], new BigDecimal(unitSorts[i]), tbArticleAttrId);
+				articleUnitMapper.insertSelective(articleUnit);
 			}
 		}
 	} 

@@ -14,7 +14,11 @@ public class ArticleAttr {
     private String state;
     
     /**
-     * 规格集合
+     * 规格 ID集合
+     */
+    private String[] unitIds;
+    /**
+     * 规格名称 集合
      */
     private String[] units;
     
@@ -91,6 +95,13 @@ public class ArticleAttr {
 	public void setState(String state) {
 		this.state = state;
 	}
-	
+
+	public String[] getUnitIds() {
+		return unitIds;
+	}
+
+	public void setUnitIds(String[] unitIds) {
+		this.unitIds = unitIds;
+	}
 	
 }
