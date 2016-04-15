@@ -1,13 +1,15 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.dao.DuplicateKeyException;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.FreeDayMapper;
-import com.resto.shop.web.model.DistributionTime;
 import com.resto.shop.web.model.FreeDay;
 import com.resto.shop.web.service.FreedayService;
 
@@ -30,6 +32,48 @@ public class FreedayServiceImpl extends GenericServiceImpl<FreeDay, String> impl
     @Override
     public List<FreeDay> list(FreeDay day) {
         return freedayMapper.selectList(day);
+    }
+
+    @Override
+    public int delete(FreeDay day) {
+         return freedayMapper.deleteByDateAndId(day);
+    }
+
+    @Override
+    public void setMonthWeekend(FreeDay day) throws Exception{
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(day.getFreeDay());
+        for(int i=1;i<=cal.getMaximum(Calendar.DAY_OF_MONTH);i++){
+                cal.set(Calendar.DAY_OF_MONTH, i);
+                int week = cal.get(Calendar.DAY_OF_WEEK);
+                if(week==1||week==7){
+                        try{
+                            day.setFreeDay(cal.getTime());
+                            this.insert(day);
+                        }catch(DuplicateKeyException keyException){
+                                System.out.println(keyException.getMessage());
+                        }
+                }
+                
+        }
+        
+    }
+
+    @Override
+    public void setYearWeekend(FreeDay day) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(day.getFreeDay());
+        for(int i=0;i<12;i++){
+                cal.set(Calendar.MONTH, i);
+                FreeDay day2 = new FreeDay();
+                day2.setShopDetailId(day.getShopDetailId());
+                day2.setFreeDay(cal.getTime());
+               this.setMonthWeekend(day2);
+        }
+        
     } 
+    
+    
+    
 
 }

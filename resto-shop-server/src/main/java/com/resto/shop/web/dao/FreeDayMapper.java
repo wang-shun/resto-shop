@@ -13,4 +13,6 @@ public interface FreeDayMapper extends GenericDao<FreeDay, String> {
     int insertSelective(FreeDay record);
 
     List<FreeDay> selectList(FreeDay day);
+
+    int deleteByDateAndId(FreeDay day);
 }

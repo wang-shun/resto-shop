@@ -9,37 +9,28 @@
     where free_day = #{freeDay,jdbcType=DATE}
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.FreeDay" >
-    insert into tb_free_day (free_day)
-    values (#{freeDay,jdbcType=DATE})
+    insert into tb_free_day free_day,shop_detail_id
+    values (#{freeDay},#{shopDetailId})
   </insert>
+  
+  <!-- 新增一条记录 -->
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.FreeDay" >
     insert into tb_free_day
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="freeDay != null" >
-        free_day,
+        free_day,shop_detail_id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="freeDay != null" >
-        #{freeDay,jdbcType=DATE},
+        #{freeDay},#{shopDetailId},
       </if>
     </trim>
+    
   </insert>
   
-  <select id="selectList" resultType="FreeDay" parameterType="FreeDay">
-		<!--  SELECT
-			t.NAME,
-			t.begin_time,
-			t.end_time,
-			t.support_week_bin,
-			t.remark,
-			s.NAME shopName
-		FROM
-			tb_support_time t
-		LEFT JOIN resto_brand.shop_detail s ON t.shop_detail_id = s.id
-		WHERE t.shop_detail_id=#{shopDetailId} -->
-		
-		
+  <!-- 查询 -->
+  <select id="selectList" resultType="com.resto.shop.web.model.FreeDay" parameterType="com.resto.shop.web.model.FreeDay">
 		select
 		free_day
 		from
@@ -48,8 +39,13 @@
 		where FREE_DAY>=#{begin}
 		and FREE_DAY<=#{end}
 		]]>
-		where shop_detail_id=#{shopDetailId}
+		and shop_detail_id=#{shopDetailId}
 	</select>
-  
+	
+	<!-- 删除 -->
+	<delete id="deleteByDateAndId" parameterType="java.util.Date" >
+    delete from tb_free_day
+    where free_day = #{freeDay} and shop_detail_id=#{shopDetailId}
+  </delete>
   
 </mapper>

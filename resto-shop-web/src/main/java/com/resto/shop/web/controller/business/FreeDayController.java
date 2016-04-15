@@ -1,16 +1,19 @@
  package com.resto.shop.web.controller.business;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.FreeDay;
 import com.resto.shop.web.service.FreedayService;
@@ -26,35 +29,53 @@ public class FreeDayController extends GenericController{
         public void list(){
         }
 	
-	@RequestMapping("addFreeDay")
-        @ResponseBody
-        public String addFreeDay(FreeDay freeDay,HttpServletRequest request) throws Exception{
-	   String date = request.getParameter("FREE_DAY");
-	   SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd ");
-	   Date date2=  formatter.parse(date);
-	   freeDay.setFreeDay(date2);
-	   System.out.println(date2);
-	    return null;
-        }
-	
 	@RequestMapping("freeDayList")
         @ResponseBody
-        public List<FreeDay> freeDayList(HttpServletRequest request) throws Exception{
-	    FreeDay day = new FreeDay();
-	    String begin = request.getParameter("begin");
-	   String end = request.getParameter("end");
-	   SimpleDateFormat formatter = new SimpleDateFormat( "yyyy-MM-dd ");
-	   Date begin1 = formatter.parse(begin);
-	   Date end1 = formatter.parse(end);
-	   day.setBegin(begin1);
-	   day.setEnd(end1);
+        public Result freeDayList(FreeDay day) throws Exception{
 	   day.setShopDetailId(getCurrentShopId());
 	   List<FreeDay> list = freedayService.list(day);
-	    return list;
+	   return getSuccessResult(list);
         }
-
+	
+	
+	@RequestMapping("addFreeDay")
+        @ResponseBody
+        public Result addFreeDay(FreeDay day) throws Exception{
+           day.setShopDetailId(getCurrentShopId());
+           freedayService.insert(day);
+           return Result.getSuccess();
+        }
+	
+	@RequestMapping("removeFreeDay")
+	@ResponseBody
+	public Result removeFreeDay(FreeDay day) throws Exception{
+	    day.setShopDetailId(getCurrentShopId());
+	    freedayService.delete(day);
+	    return Result.getSuccess();
+	}
+	
+	//设置这个月的周末为休息日
+	@RequestMapping("setMonthWeekend")
+	@ResponseBody
+	public String setMonthWeekend(FreeDay day) throws Exception{
+	    day.setShopDetailId(getCurrentShopId());
+	    freedayService.setMonthWeekend(day);
+            return "success";
+	}
+	
+	//设置这年的周末为休息日
+	@RequestMapping("setYearWeekend")
+	@ResponseBody
+	public String setYearWeekend(FreeDay day) throws Exception{
+	    day.setShopDetailId(getCurrentShopId());
+	    freedayService.setYearWeekend(day);
+	    return "success";
+	}
+	
+	
+	
+	
         
-
 	/*@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Account> listData(){

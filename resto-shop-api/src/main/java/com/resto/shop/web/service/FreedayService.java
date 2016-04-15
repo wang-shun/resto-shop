@@ -8,6 +8,12 @@ import com.resto.shop.web.model.FreeDay;
 public interface FreedayService extends GenericService<FreeDay, String> {
 
     List<FreeDay> list(FreeDay day);
+
+    int delete(FreeDay day);
+
+    void setMonthWeekend(FreeDay day) throws Exception;
+
+    void setYearWeekend(FreeDay day) throws Exception;
     
     
 }

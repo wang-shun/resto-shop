@@ -121,33 +121,39 @@
 				async:true,
 				success:function(result){
 					if(callback){
-						callback(result);
+						var str = [];
+						$(result.data).each(function(i,item){
+							var freeDay_temp = new Date(item.freeDay).format("yyyy-MM-dd");
+							var temp = {"freeDay":freeDay_temp};
+							str.push(temp);
+						})
+						callback(str);
 					}
 				}
 			});	
 		} 
 		
-		/* function removeFreeDay(date){
+		 function removeFreeDay(date){
 			$.ajax({
 				type:"post",
-				url:"freeday/removeFreeDay?FREE_DAY="+date,
+				url:"freeday/removeFreeDay?freeDay="+date,
 				async:true,
 				success:function(success){
 					findDateDom(date).parent().removeClass("freeday");
 				},
 				error:function(){
-					alert("添加失败");
+					alert("删除失败---------");
 				}
 			});
-		} */
+		} 
 		
 		function addFreeDay(date){
 			$.ajax({
 				type:"post",
-				url:"freeday/addFreeDay?FREE_DAY="+date,
+				url:"freeday/addFreeDay?freeDay="+date,
 				async:true,
-				success:function(success){
-					if(success=="success"){
+				success:function(result){
+					if(result.success){
 						var dom = findDateDom(date);
 						if(!dom.parent().hasClass("freeday")){
 							dom.parent().addClass("freeday");
@@ -155,7 +161,7 @@
 					}
 				},
 				error:function(){
-					alert("添加失败");
+					alert("添加失败-------");
 				}
 			});
 		} 
@@ -179,39 +185,39 @@
 			}
 		} 
 		
-		/* function findDateDom(date){
+		 function findDateDom(date){
 			return $("[data-cal-date='"+date+"']");
-		}; */
+		}; 
 		
-		/* function setMonthWeekend(){
+		function setMonthWeekend(){
 			var date = calendar.options.position.start;
 			var dateStr = date.getFullYear()+"-"+date.getMonthFormatted()+"-01";
 			$.ajax({
 				type:"post",
-				url:"freeday/setMonthWeekend?DATE="+dateStr,
+				url:"freeday/setMonthWeekend?freeDay="+dateStr,
 				async:true,
 				success:function(success){
-					location.reload();
+					showTitle(currentView);
 				},
 				error:function(){
 					alert("添加失败");
 				}
 			});
-		} */
+		} 
 		
-		/* function setYearWeekend(){
+		 function setYearWeekend(){
 			var date = calendar.options.position.start;
 			var dateStr = date.getFullYear()+"-"+date.getMonthFormatted()+"-01";
 			$.ajax({
 				type:"post",
-				url:"freeday/setYearWeekend?DATE="+dateStr,
+				url:"freeday/setYearWeekend?freeDay="+dateStr,
 				async:true,
 				success:function(success){
-					location.reload();
+					showTitle(currentView);
 				},
 				error:function(){
 					alert("添加失败");
 				}
 			});
-		} */
+		} 
 	</script>
