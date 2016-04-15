@@ -1,11 +1,13 @@
  package com.resto.shop.web.controller.business;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,10 +43,30 @@ public class ArticleController extends GenericController{
 		return getSuccessResult(article);
 	}
 	
-	@RequestMapping("create")
+	@RequestMapping("list_one_full")
+	@ResponseBody
+	public Result list_one_full(String id){
+		Article article = articleService.selectFullById(id);
+		return getSuccessResult(article);
+	}
+	
+	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid Article article,Integer [] hasUnitIds,String[]unit_ids,String[]unitNames,Double []unitPrices,Double[]unitFansPrices,String[] unitPeferences){
-		String articleId = ApplicationUtils.randomUUID();
+		String articleId = article.getId();
+		boolean isCreate = false;
+		if(StringUtils.isEmpty(articleId)){
+			articleId = ApplicationUtils.randomUUID();
+			article.setId(articleId);
+			article.setShopDetailId(getCurrentShopId());
+			article.setCreateUserId(getCurrentUserId());
+			isCreate=true;
+		}else{
+			article.setUpdateUserId(getCurrentUserId());
+			article.setUpdateTime(new Date());			
+		}
+		
+		article.setUpdateUserId(getCurrentUserId());
 		if(unit_ids!=null&&unit_ids.length>0&&(unit_ids.length==unitNames.length&&unitNames.length==unitPrices.length)){
 			for(int i=0;i<unit_ids.length;i++){
 				ArticlePrice price = new ArticlePrice();
@@ -53,6 +75,7 @@ public class ArticleController extends GenericController{
 				price.setId(articleId+"@"+unitids);
 				price.setUnitIds(unitids);
 				price.setPrice(new BigDecimal(unitPrices[i]));
+				price.setName(unitNames[i]);
 				if(unitFansPrices!=null&&i<unitFansPrices.length&&unitFansPrices[i]!=null){
 					price.setFansPrice(new BigDecimal(unitFansPrices[i]));
 				}
@@ -69,21 +92,18 @@ public class ArticleController extends GenericController{
 			}
 			if(uids.length()>0){
 				uids = uids.substring(0, uids.length()-1);
+				article.setHasMultPrice(true);
+				article.setHasUnit(uids);
+			}else{
+				article.setHasMultPrice(false);
+				article.setHasUnit(" ");
 			}
-			article.setHasUnit(uids);
 		}
-		article.setId(articleId);
-		article.setShopDetailId(getCurrentShopId());
-		article.setCreateUserId(getCurrentUserId());
-		article.setUpdateUserId(getCurrentUserId());
-		articleService.save(article);
-		return Result.getSuccess();
-	}
-	
-	@RequestMapping("modify")
-	@ResponseBody
-	public Result modify(@Valid Article brand){
-		articleService.update(brand);
+		if(isCreate){
+			articleService.save(article);
+		}else{
+			articleService.update(article);
+		}
 		return Result.getSuccess();
 	}
 	

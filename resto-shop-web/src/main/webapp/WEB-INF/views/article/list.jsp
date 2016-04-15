@@ -20,7 +20,7 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form class="form-horizontal" role="form " action="{{m.id?'article/modify':'article/create'}}" @submit.prevent="save">
+	            	<form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
 							    <label class="col-md-3 control-label">餐品类别</label>
@@ -66,7 +66,7 @@
 							    <label class="col-md-3 control-label">供应时间</label>
 							    <div class="col-md-5">
 								    <label v-for="time in supportTimes">
-								    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="checkedTimes"> {{time.name}} &nbsp;&nbsp;
+								    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
 								    </label>
 							    </div>
 							</div>
@@ -97,7 +97,7 @@
 										<label class="article-attr-label">{{attr.name}}:</label>
 										<span class="article-units">
 											<label v-for="unit in attr.articleUnits" >
-										    	<input type="checkbox" name="hasUnitIds" :value="unit.id" v-model="attr.checkedUnit"> {{unit.name}} 
+										    	<input type="checkbox" name="hasUnitIds" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
 										    </label>
 										</span> 
 									</div>
@@ -112,18 +112,18 @@
 										<div class="flex-2">粉丝价</div>
 										<div class="flex-2">编号</div>
 									</div>
-									<div class="flex-row" v-for="u in allUnitPrice">
+									<div class="flex-row" v-for="u in unitPrices">
 										<div class="flex-1 text-right">{{u.name}}</div>
 										<div class="flex-2">
 											<input type="hidden" name="unitNames" :value="u.name"/>
-											<input type="hidden" name="unit_ids" :value="u.id"/>
-											<input type="text" class="form-control" name="unitPrices" required="required"/>
+											<input type="hidden" name="unit_ids" :value="u.unitIds"/>
+											<input type="text" class="form-control" name="unitPrices" required="required" v-model="u.price"/>
 										</div>
 										<div class="flex-2">
-											<input type="text" class="form-control" name="unitFansPrices"/>
+											<input type="text" class="form-control" name="unitFansPrices" v-model="u.fansPrice"/>
 										</div>
 										<div class="flex-2">
-											<input type="text" class="form-control" name="unitPeferences"/>
+											<input type="text" class="form-control" name="unitPeferences" v-model="u.peference"/>
 										</div>
 									</div>
 								</div>
@@ -235,9 +235,10 @@
 			data:{
 				articlefamilys:[],
 				supportTimes:[],
-				checkedTimes:[],
+				checkedUnit:[],
 				articleattrs:[],
 				articleunits:{},
+				unitPrices:[],
 			},
 			methods:{
 				uploadSuccess:function(url){
@@ -251,8 +252,18 @@
 				edit:function(model){
 					var that = this;
 					that.showform=true;
-					$.post("article/list_one",{id:model.id},function(result){
-						that.m= result.data;
+					$.post("article/list_one_full",{id:model.id},function(result){
+						var article=result.data;
+						that.m= article;
+						if(article.hasUnit&&article.hasUnit.length){
+							var unit = article.hasUnit.split(",");
+							for(var i in  unit){
+								that.checkedUnit.push(parseInt(unit[i]));
+							}
+						}else{
+							that.checkedUnit=[];
+						}
+						that.unitPrices = article.articlePrises;
 					});
 				},
 			},
@@ -262,12 +273,17 @@
 					for(var i=0;i<this.articleattrs.length;i++){
 						var attr = this.articleattrs[i];
 						var checked =[];
-						for(var j=0;j<attr.checkedUnit.length;j++){
-							var c = attr.checkedUnit[j];
-							checked.push({
-								id:c,
-								name:"("+this.articleunits[c].name+")"
-							})
+						for(var j=0;j<attr.articleUnits.length;j++){
+							var c = attr.articleUnits[j];
+							for(var n in this.checkedUnit){
+								if(c.id==this.checkedUnit[n]){
+									checked.push({
+										unitIds:c.id,
+										name:"("+c.name+")"
+									})
+									break;
+								}
+							}
 						}
 						checked.length&&result.push(checked);
 					}
@@ -303,7 +319,7 @@
 						for(var i in tree.children){
 							var c = tree.children[i];
 							c = $.extend({},c);
-							c.id = tree.id+","+c.id;
+							c.unitIds = tree.unitIds+","+c.unitIds;
 							c.name = tree.name+ c.name;
 							if(!c.children){
 								allItems.push(c);
@@ -315,7 +331,16 @@
 					} 
 					
 					var allItems = getAll(result);
-					console.log(allItems);
+					for(var i in allItems){
+						var item = allItems[i];
+						for(var i in this.unitPrices){
+							var p = this.unitPrices[i];
+							if(item.unitIds==p.unitIds){
+								item  = $.extend(item,p);
+							}
+						}
+					}
+					this.unitPrices = allItems;
 					return allItems;
 				}
 			},
@@ -335,6 +360,7 @@
    					  	var units = attr.articleUnits;
    					  	for(var i in units){
    					  		var unit = units[i];
+   					  		unit.attr=attr;
    					  		article_units[unit.id]=unit;
    					  	}
 					}

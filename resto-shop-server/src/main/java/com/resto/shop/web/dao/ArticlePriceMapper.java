@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.ArticlePrice;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
@@ -17,4 +20,6 @@ public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
     int updateByPrimaryKey(ArticlePrice record);
 
 	void deleteArticlePrices(String articleId);
+
+	List<ArticlePrice> selectByArticleId(String articleId);
 }

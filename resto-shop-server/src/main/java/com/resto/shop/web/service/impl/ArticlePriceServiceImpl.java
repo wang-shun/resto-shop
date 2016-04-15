@@ -31,6 +31,11 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
 			price.setArticleId(articleId);
 			articlepriceMapper.insertSelective(price);
 		}
+	}
+
+	@Override
+	public List<ArticlePrice> selectByArticleId(String articleId) {
+		return articlepriceMapper.selectByArticleId(articleId);
 	} 
 
 }

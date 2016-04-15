@@ -10,5 +10,7 @@ public interface SupportTimeService extends GenericService<SupportTime, Integer>
     List<SupportTime> selectList(String shopDetailId);
 
 	void saveSupportTimes(String articleId, Integer[] supportTimes);
+
+	List<Integer> selectByIdsArticleId(String articleId);
     
 }

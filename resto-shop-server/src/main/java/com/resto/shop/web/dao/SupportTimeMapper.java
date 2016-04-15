@@ -26,4 +26,6 @@ public interface SupportTimeMapper  extends GenericDao<SupportTime,Integer> {
 	void insertArticleSupportTime(@Param("articleId") String articleId, @Param("supportTimes")Integer[] supportTimes);
 
 	void deleteArticleSupportTime(String articleId);
+
+	List<Integer> selectByArticleId(String articleId);
 }

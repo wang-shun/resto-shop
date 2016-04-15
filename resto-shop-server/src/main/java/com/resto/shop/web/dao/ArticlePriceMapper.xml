@@ -56,4 +56,8 @@
   <delete id="deleteArticlePrices">
 	delete from tb_article_price where article_id=#{0}  
   </delete>
+  
+  <select id="selectByArticleId" resultType="ArticlePrice">
+  	 select * from tb_article_price where article_id=#{0}
+  </select>
 </mapper>

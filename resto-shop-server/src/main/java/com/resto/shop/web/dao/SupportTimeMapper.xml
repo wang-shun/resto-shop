@@ -62,4 +62,8 @@
   <delete id="deleteArticleSupportTime">
   	delete from tb_article_support_time where article_id=#{0}
   </delete>
+  
+  <select id="selectByArticleId" resultType="Integer">
+  	select  support_time_id from tb_article_support_time where article_id=#{0}
+  </select>
 </mapper>

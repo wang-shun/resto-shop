@@ -46,5 +46,22 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
 		return article;
 	} 
+	
+	@Override
+	public int update(Article article) {
+		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrises());
+		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
+		return super.update(article);
+	}
+
+	@Override
+	public Article selectFullById(String id) {
+		List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
+		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
+		Article article  = selectById(id);
+		article.setArticlePrises(prices);
+		article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
+		return article;
+	}
 
 }
