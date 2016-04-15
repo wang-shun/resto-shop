@@ -38,10 +38,8 @@ public class NewCustomCoupon {
     private BigDecimal couponMinMoney;
     
     @DateTimeFormat(pattern=("HH:mm"))
-    @NotEmpty(message="开始时间不能为空")
     private Date beginTime;
     
-    @NotEmpty(message="结束时间不能为空")
     @DateTimeFormat(pattern=("HH:mm"))
     private Date endTime;
     

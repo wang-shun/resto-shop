@@ -53,6 +53,7 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid NewCustomCoupon brand, HttpServletRequest request){
+	        System.out.println(brand.getBeginTime());
 	        String brandId = (String) request.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
 	        brand.setBrandId(brandId);
 	        brand.setCreateTime(new Date());

@@ -49,7 +49,7 @@
 			</div>
 			<div class="form-group">
 			    <label>最低消费额度</label>
-			    <input type="text" class="form-control" placeholder="请输入数字"  min="0" required "couponMinMoney" v-model="m.couponMinMoney">
+			    <input type="text" class="form-control" placeholder="请输入数字"  min="0" required name="couponMinMoney" v-model="m.couponMinMoney">
 			</div>
 			
 			<div class="form-group">
@@ -253,6 +253,22 @@
 								},
 								edit:function(model){
 									this.m= model;
+									//格式时间
+									var tem1 = this.m.beginTime;
+									var tem2 = this.m.endTime;
+									var begin;
+									var end;
+									begin=new Date(tem1).format("hh:mm");
+									end = new Date(tem2).format("hh:mm");
+									if(begin=='aN:aN'){
+										begin = tem1;
+									}
+									if(end=='aN:aN'){
+										end=tem2;
+									}
+									this.m.beginTime = begin;
+									this.m.endTime = end;
+									console.log(this.m.openTime);
 									this.openForm();
 									Vue.nextTick(function(){
 										vueObj.initdistributionMode();
