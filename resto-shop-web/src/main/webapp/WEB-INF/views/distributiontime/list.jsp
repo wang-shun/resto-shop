@@ -142,16 +142,25 @@
 					create:function(){
 						this.m={};
 						this.openForm();
-						Vue.nextTick(function(){
-							//vueObj.initTime();
-						})
 					},
 					edit:function(model){
 						this.m= model;
+						//格式时间
+						var tem1 = this.m.beginTime;
+						var tem2 = this.m.stopOrderTime;
+						var beginTime;
+						var stopOrderTime;
+						beginTime= new Date(tem1).format("hh:mm");
+						stopOrderTime =  new Date(tem2).format("hh:mm");
+						if(beginTime=='aN:aN'){
+							beginTime=tem1;
+						}
+						if(stopOrderTime=='aN:aN'){
+							stopOrderTime=tem2;
+						}
+						this.m.beginTime=beginTime;
+						this.m.stopOrderTime=stopOrderTime;
 						this.openForm();
-						Vue.nextTick(function(){
-							vueObj.initTime();
-						})
 					},
 					save:function(e){
 						var that = this;

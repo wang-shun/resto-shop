@@ -87,8 +87,6 @@
 
 
 <script>
-	var vueObj;
-	var C
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");

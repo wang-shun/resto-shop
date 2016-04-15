@@ -55,7 +55,7 @@
 			<div class="form-group">
 			    <label>开始时间</label>
 			    <div class="input-group">
-			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" :value="m.beginTime" @focus="initTime" readonly>
+			    <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" v-model="m.beginTime" @focus="initTime" readonly>
 			    <span class="input-group-btn">
 					<button class="btn default" type="button">
 						<i class="fa fa-clock-o"></i>
@@ -256,7 +256,6 @@
 									this.openForm();
 									Vue.nextTick(function(){
 										vueObj.initdistributionMode();
-										vueObj.initTime();
 									})
 								},
 								save:function(e){
