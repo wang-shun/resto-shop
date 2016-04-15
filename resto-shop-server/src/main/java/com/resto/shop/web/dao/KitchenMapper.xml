@@ -46,7 +46,7 @@
   
   <!-- 根据店铺ID查询信息 -->
   <select id="selectListByShopId" resultType="Kitchen">
-  	select k.id, k.name, k.remark, k.shop_detail_id, p.name printerName from tb_kitchen k LEFT JOIN tb_printer p on k.printer_id = p.id
+  	select k.id, k.name, k.remark, k.shop_detail_id, k.printer_id, p.name printerName from tb_kitchen k LEFT JOIN tb_printer p on k.printer_id = p.id
   	<if test="shopId!=null and shopId!=''">
 		where k.shop_detail_id = #{shopId} 
 	</if>

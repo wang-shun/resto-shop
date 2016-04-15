@@ -28,16 +28,17 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">打印机名称：</label>
 							    <div class="col-sm-8">
-						    		<select class="form-control" name="printerId" required v-model="m.printerId?m.printerId:selected">
+						    		<select class="form-control" name="printerId" required v-if="printerList" v-model="m.printerId?m.printerId:selected">
 						    			<option v-for="temp in printerList" v-bind:value="temp.id">
 						    				{{ temp.name }}
 						    			</option>
 						    		</select>
+						    		<input class="form-control" value="暂无可用打印机" disabled="disabled" v-else />
 							    </div>
 							</div>
 							<div class="text-center">
 								<input type="hidden" name="id" v-model="m.id" />
-								<input class="btn green"  type="submit"  value="保存"/>
+								<input class="btn green"  type="submit" value="保存"/>
 								<a class="btn default" @click="cancel" >取消</a>
 							</div>
 						</div>
@@ -110,9 +111,10 @@
 			url:"printer/list_all",
 			dataType:"json",
 			success:function(data){
-				console.log(data);
-				vueObj.$set("printerList",data);
-				vueObj.$set("selected",data[0].id);
+				if(data.length > 0){
+					vueObj.$set("printerList",data);
+					vueObj.$set("selected",data[0].id);
+				}
 			}
 		})
 	}());

@@ -26,7 +26,12 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 
 	@Override
 	public List<Kitchen> selectListByShopId(String shopId) {
-		return null;
+		return kitchenMapper.selectListByShopId(shopId);
+	}
+
+	@Override
+	public void insertSelective(Kitchen kitchen) {
+		kitchenMapper.insertSelective(kitchen);
 	} 
 
 }

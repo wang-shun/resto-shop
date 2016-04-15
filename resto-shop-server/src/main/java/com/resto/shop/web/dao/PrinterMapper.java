@@ -20,6 +20,10 @@ public interface PrinterMapper  extends GenericDao<Printer,Integer> {
 
     int updateByPrimaryKey(Printer record);
     
-  //根据店铺ID查询信息
+    /**
+     * 根据店铺ID查询信息
+     * @param currentShopId
+     * @return
+     */
     List<Printer> selectListByShopId(@Param(value = "shopId") String currentShopId);
 }

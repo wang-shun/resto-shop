@@ -1,7 +1,5 @@
 package com.resto.shop.web.model;
 
-import javax.validation.constraints.NotNull;
-
 import org.hibernate.validator.constraints.NotBlank;
 
 public class Kitchen {
@@ -12,7 +10,7 @@ public class Kitchen {
 
     private String remark;
 
-    @NotNull(message="打印机 Id 不能为空")
+    
     private Integer printerId;
 
     private String shopDetailId;
