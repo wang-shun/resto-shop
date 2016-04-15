@@ -42,7 +42,9 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">显示图片：</label>
 							    <div class="col-sm-8">
-									<input type="text" class="form-control" required name="noticeImage" v-model="m.noticeImage">
+							    	<img src="" id="noticeImage"/>
+								    <input type="hidden" name="noticeImage" v-model="m.noticeImage">
+								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -140,7 +142,21 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			methods:{
+				uploadSuccess:function(url){
+					$("[name='noticeImage']").val(url).trigger("change");
+					C.simpleMsg("上传成功");
+					$("#noticeImage").attr("src","/"+url);
+				},
+				uploadError:function(msg){
+					C.errorMsg(msg);
+				},
+			}
+		});
+		C.vue=vueObj;
 	}());
 </script>

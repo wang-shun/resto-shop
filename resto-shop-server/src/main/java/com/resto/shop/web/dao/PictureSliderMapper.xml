@@ -49,4 +49,12 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.PictureSlider">update tb_picture_slider set title = #{title,jdbcType=VARCHAR}, picture_url = #{pictureUrl,jdbcType=VARCHAR}, picture_link = #{pictureLink,jdbcType=VARCHAR}, sort = #{sort,jdbcType=TINYINT}, state = #{state,jdbcType=TINYINT}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="PictureSlider">select * from tb_picture_slider</select>
+  
+  <!-- 根据店铺ID查询信息 -->
+  <select id="selectListByShopId" resultType="PictureSlider">
+  	select * from tb_picture_slider where state = 1
+  	<if test="shopId!=null and shopId!=''">
+		and shop_detail_id = #{shopId} 
+	</if>
+  </select>
 </mapper>

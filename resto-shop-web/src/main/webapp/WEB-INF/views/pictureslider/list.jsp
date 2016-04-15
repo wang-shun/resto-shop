@@ -1,57 +1,54 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
+<%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <div id="control">
 	<div class="row form-div" v-if="showform">
-		<div class="col-md-offset-3 col-md-6" >
+		<div class="col-md-offset-3 col-md-6">
 			<div class="portlet light bordered">
-	            <div class="portlet-title">
-	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
-	                </div>
-	            </div>
-	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'pictureslider/modify':'pictureslider/create'}}" @submit.prevent="save">
+				<div class="portlet-title">
+					<div class="caption">
+						<span class="caption-subject bold font-blue-hoki">添加轮播图片</span>
+					</div>
+				</div>
+				<div class="portlet-body">
+					<form role="form" class="form-horizontal" action="{{m.id?'pictureslider/modify':'pictureslider/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>title</label>
-    <input type="text" class="form-control" name="title" v-model="m.title">
-</div>
-<div class="form-group">
-    <label>pictureUrl</label>
-    <input type="text" class="form-control" name="pictureUrl" v-model="m.pictureUrl">
-</div>
-<div class="form-group">
-    <label>pictureLink</label>
-    <input type="text" class="form-control" name="pictureLink" v-model="m.pictureLink">
-</div>
-<div class="form-group">
-    <label>sort</label>
-    <input type="text" class="form-control" name="sort" v-model="m.sort">
-</div>
-<div class="form-group">
-    <label>state</label>
-    <input type="text" class="form-control" name="state" v-model="m.state">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+								<label class="col-sm-3 control-label">标题：</label>
+								<div class="col-sm-8">
+									<input type="text" class="form-control" name="title" v-model="m.title">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">路径：</label>
+								<div class="col-sm-8">
+									<img src="" id="pictureUrl"/>
+								    <input type="hidden" name="pictureUrl" v-model="m.pictureUrl">
+								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">排序：</label>
+								<div class="col-sm-8">
+									<input type="text" class="form-control" name="sort" v-model="m.sort">
+								</div>
+							</div>
 						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
+						<div class="text-center">
+							<input type="hidden" name="id" v-model="m.id" />
+							<input class="btn green" type="submit" value="保存" />
+							<a class="btn default" @click="cancel">取消</a>
+						</div>
 					</form>
-	            </div>
-	        </div>
+				</div>
+			</div>
 		</div>
 	</div>
-	
+
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="pictureslider/add">
-			<button class="btn green pull-right" @click="create">新建</button>
+				<button class="btn green pull-right" @click="create">新建</button>
 			</s:hasPermission>
 		</div>
 		<div class="clearfix"></div>
@@ -74,30 +71,17 @@
 			},
 			columns : [
 				{                 
-	title : "title",
-	data : "title",
-},                 
-{                 
-	title : "pictureUrl",
-	data : "pictureUrl",
-},                 
-{                 
-	title : "pictureLink",
-	data : "pictureLink",
-},                 
-{                 
-	title : "sort",
-	data : "sort",
-},                 
-{                 
-	title : "state",
-	data : "state",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
+					title : "标题",
+					data : "title",
+				},                 
+				{                 
+					title : "图片路径",
+					data : "pictureUrl",
+				},                 
+				{                 
+					title : "排序",
+					data : "sort",
+				},
 				{
 					title : "操作",
 					data : "id",
@@ -115,8 +99,23 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			methods:{
+				uploadSuccess:function(url){
+					$("[name='pictureUrl']").val(url).trigger("change");
+					C.simpleMsg("上传成功");
+					$("#pictureUrl").attr("src","/"+url);
+				},
+				uploadError:function(msg){
+					C.errorMsg(msg);
+				},
+			}
+		});
+		C.vue=vueObj;
 	}());
 	
 	

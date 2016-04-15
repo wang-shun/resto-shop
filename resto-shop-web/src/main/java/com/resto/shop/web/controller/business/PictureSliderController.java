@@ -28,7 +28,7 @@ public class PictureSliderController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<PictureSlider> listData(){
-		return picturesliderService.selectList();
+		return picturesliderService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -40,8 +40,9 @@ public class PictureSliderController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid PictureSlider brand){
-		picturesliderService.insert(brand);
+	public Result create(@Valid PictureSlider pictureSlider){
+		pictureSlider.setShopDetailId(getCurrentShopId());
+		picturesliderService.insert(pictureSlider);
 		return Result.getSuccess();
 	}
 	

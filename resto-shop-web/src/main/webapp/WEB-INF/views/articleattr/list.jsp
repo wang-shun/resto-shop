@@ -126,7 +126,6 @@
 		
 		
 		var C = new Controller(null,tb);
-		var sort = 1;
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
@@ -135,10 +134,7 @@
 			},
 			methods:{
 				addUnit:function(e){
-					this.articleUnits.push({
-						name:"",
-						sort:"",
-					});
+					this.articleUnits.push({ name:"", sort:"" });
 				},
 				removeUnit:function(unit){
 					this.articleUnits.$remove(unit);
