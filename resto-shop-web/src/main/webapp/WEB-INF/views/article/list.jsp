@@ -105,7 +105,7 @@
 							</div>
 							<div class="form-group" v-if="allUnitPrice.length">
 								<label class="col-md-3 control-label">规格价格</label>
-								<div class="col-md-9">
+								<div class="col-md-5">
 									<div class="flex-row">
 										<div class="flex-1 text-right">规格</div>
 										<div class="flex-2">价格</div>

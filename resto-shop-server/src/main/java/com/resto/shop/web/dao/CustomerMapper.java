@@ -1,9 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.Customer;
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.Customer;
 
-public interface CustomerMapper  extends GenericDao<Customer,String> {
+public interface CustomerMapper extends GenericDao<Customer, String>{
     int deleteByPrimaryKey(String id);
 
     int insert(Customer record);
@@ -15,4 +15,6 @@ public interface CustomerMapper  extends GenericDao<Customer,String> {
     int updateByPrimaryKeySelective(Customer record);
 
     int updateByPrimaryKey(Customer record);
+
+	Customer selectByOpenId(String openid);
 }
