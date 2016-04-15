@@ -30,7 +30,7 @@ public class PrinterController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Printer> listData(){
-		return printerService.selectList();
+		return printerService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

@@ -30,7 +30,7 @@ public class NoticeController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Notice> listData(){
-		return noticeService.selectList();
+		return noticeService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

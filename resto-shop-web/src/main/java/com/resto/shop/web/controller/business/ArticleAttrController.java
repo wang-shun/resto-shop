@@ -3,7 +3,6 @@
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -29,6 +28,7 @@ public class ArticleAttrController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ArticleAttr> listData(){
+		System.out.println("----"+getCurrentShopId());
 		return articleattrService.selectListByShopId(getCurrentShopId());
 	}
 	

@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,11 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
     @Override
     public GenericDao<Kitchen, Integer> getDao() {
         return kitchenMapper;
-    } 
+    }
+
+	@Override
+	public List<Kitchen> selectListByShopId(String shopId) {
+		return null;
+	} 
 
 }

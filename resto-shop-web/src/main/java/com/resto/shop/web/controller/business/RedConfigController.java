@@ -29,8 +29,8 @@ public class RedConfigController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<RedConfig> listData(){
-		return redconfigService.selectList();
+	public List<RedConfig> listData(){		
+		return redconfigService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

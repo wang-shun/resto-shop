@@ -30,7 +30,7 @@ public class AdvertController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Advert> listData(){
-		return advertService.selectList();
+		return advertService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

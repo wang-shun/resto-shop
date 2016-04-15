@@ -46,4 +46,12 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.Advert">update tb_advert set slogan = #{slogan,jdbcType=VARCHAR}, state = #{state,jdbcType=TINYINT}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, description = #{description,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=INTEGER}</update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Advert">update tb_advert set slogan = #{slogan,jdbcType=VARCHAR}, state = #{state,jdbcType=TINYINT}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="Advert">select * from tb_advert</select>
+  
+  <!-- 根据店铺ID查询信息  -->
+  <select id="selectListByShopId" resultType="Advert">
+  	select * from tb_advert where state = 1
+  	<if test="shopId!=null and shopId!=''">
+		and shop_detail_id = #{shopId} 
+	</if>
+  </select>
 </mapper>

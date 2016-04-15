@@ -30,7 +30,7 @@ public class KitchenController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Kitchen> listData(){
-		return kitchenService.selectList();
+		return kitchenService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

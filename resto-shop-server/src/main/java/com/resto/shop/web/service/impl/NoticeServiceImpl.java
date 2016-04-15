@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -33,4 +34,9 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
     	notice.setCreateDate(new Date());
     	noticeMapper.insert(notice);
     }
+
+	@Override
+	public List<Notice> selectListByShopId(String shopId) {
+		return noticeMapper.selectListByShopId(shopId);
+	}
 }

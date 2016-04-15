@@ -69,4 +69,12 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.RedConfig">update tb_red_config set delay = #{delay,jdbcType=INTEGER}, min_ratio = #{minRatio,jdbcType=INTEGER}, max_ratio = #{maxRatio,jdbcType=INTEGER}, max_single_red = #{maxSingleRed,jdbcType=DECIMAL}, title = #{title,jdbcType=VARCHAR}, remark = #{remark,jdbcType=VARCHAR}, min_signle_red = #{minSignleRed,jdbcType=DECIMAL}, is_add_ratio = #{isAddRatio,jdbcType=TINYINT}, min_translate_money = #{minTranslateMoney,jdbcType=DECIMAL}, is_activity = #{isActivity,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=BIGINT}</update>
   <select id="selectList" resultType="RedConfig">select * from tb_red_config</select>
+  
+  <!-- 根据店铺ID查询信息 -->
+  <select id="selectListByShopId" resultType="RedConfig">
+  	select * from tb_red_config
+  	<if test="shopId!=null and shopId!=''">
+		where shop_detail_id = #{shopId} 
+	</if>
+  </select>
 </mapper>

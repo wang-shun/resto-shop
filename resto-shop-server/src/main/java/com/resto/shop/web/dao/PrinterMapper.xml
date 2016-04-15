@@ -41,4 +41,12 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Printer">update tb_printer set name = #{name,jdbcType=VARCHAR}, ip = #{ip,jdbcType=VARCHAR}, port = #{port,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="Printer">select * from tb_printer</select>
+  
+  <!-- 根据店铺ID查询信息 -->
+  <select id="selectListByShopId" resultType="Printer">
+  	select * from tb_printer
+  	<if test="shopId!=null and shopId!=''">
+		where shop_detail_id = #{shopId} 
+	</if>
+  </select>
 </mapper>

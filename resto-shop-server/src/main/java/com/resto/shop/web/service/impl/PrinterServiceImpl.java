@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,11 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
     @Override
     public GenericDao<Printer, Integer> getDao() {
         return printerMapper;
-    } 
+    }
+
+	@Override
+	public List<Printer> selectListByShopId(String shopId) {
+		return printerMapper.selectListByShopId(shopId);
+	} 
 
 }
