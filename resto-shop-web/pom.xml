@@ -10,6 +10,7 @@
 	<packaging>war</packaging>
 
 	<build>
+		<finalName>shop</finalName>
 		<plugins>
 			<!-- Maven插件 配置 -->
 			<plugin>
