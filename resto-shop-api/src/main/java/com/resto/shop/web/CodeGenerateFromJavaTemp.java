@@ -28,7 +28,7 @@ public class CodeGenerateFromJavaTemp {
 	final static String ServicePath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/service/";
 	final static String ServiceImpl = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
 	final static String JspPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-web/src/main/webapp/WEB-INF/views/";
-	final static String ControllerPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-web/src/main/java/com/resto/shop/web/controller/business";
+	final static String ControllerPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
 	final static String DaoMapperPath = DaoPath;
 	final static String TempPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/source-temps/";
 	final static String ModelClassName ="D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/model/";
@@ -44,7 +44,7 @@ public class CodeGenerateFromJavaTemp {
 		 * arr [classSimpleName,idType,tableName]
 		 */
 		String [][]  classPrimay = new String[][]{
-			new String[]{"ArticleAttr","Integer","tb_article_attr"},
+//			new String[]{"ShowPhoto","Integer","tb_show_photo"},
 		};
 		
 		for (String[] cp: classPrimay) {

@@ -63,7 +63,7 @@ public class CommonController {
 		r.setMenuType(MenuType.AJAX);
 		r.setPermissionName("Auto Genic Manager");
 		r.setPermissionSign("auto genic"+System.currentTimeMillis());
-		r.setId(100L);
+		r.setId(200L);
 		permissionService.insert(r);
 		Long rootId = r.getId();
 		long base = 1;
