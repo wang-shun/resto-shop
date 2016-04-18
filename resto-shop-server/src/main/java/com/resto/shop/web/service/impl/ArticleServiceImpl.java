@@ -12,6 +12,7 @@ import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.SupportTimeService;
 
+import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
 
 /**
@@ -42,14 +43,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	@Override
 	public Article save(Article article) {
 		this.insert(article);
-		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrises());
+		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
 		return article;
 	} 
 	
 	@Override
 	public int update(Article article) {
-		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrises());
+		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
 		return super.update(article);
 	}
@@ -59,9 +60,21 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
 		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
 		Article article  = selectById(id);
-		article.setArticlePrises(prices);
+		article.setArticlePrices(prices);
 		article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
 		return article;
+	}
+
+	@Override
+	public List<Article> selectListFull(String currentShopId, Integer distributionModeId) {
+		List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId,distributionModeId);
+		for (Article a: articleList) {
+			if(!StringUtil.isEmpty(a.getHasUnit())){
+				List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
+				a.setArticlePrices(prices);
+			}
+		}
+		return articleList;
 	}
 
 }

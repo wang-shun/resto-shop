@@ -82,7 +82,7 @@ public class ArticleController extends GenericController{
 				if(unitPeferences!=null&&i<unitPeferences.length&&unitPeferences[i]!=null){
 					price.setPeference(unitPeferences[i]);
 				}
-				article.getArticlePrises().add(price);
+				article.getArticlePrices().add(price);
 			}
 		}
 		if(hasUnitIds!=null&&hasUnitIds.length>0){

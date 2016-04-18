@@ -56,7 +56,7 @@ public class Article {
     
     private String hasUnit;
     
-    private List<ArticlePrice> articlePrises= new ArrayList<>();
+    private List<ArticlePrice> articlePrices= new ArrayList<>();
     private Integer [] supportTimes;
 
     public String getId() {
@@ -175,12 +175,12 @@ public class Article {
         return showSaleNumber;
     }
 
-    public List<ArticlePrice> getArticlePrises() {
-		return articlePrises;
+    public List<ArticlePrice> getArticlePrices() {
+		return articlePrices;
 	}
 
-	public void setArticlePrises(List<ArticlePrice> articlePrises) {
-		this.articlePrises = articlePrises;
+	public void setArticlePrices(List<ArticlePrice> articlePrices) {
+		this.articlePrices = articlePrices;
 	}
 
 	public void setShowSaleNumber(Long showSaleNumber) {
