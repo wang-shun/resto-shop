@@ -36,7 +36,7 @@
 								class="icon-user"></i> My Profile
 						</a></li>
 						<li class="divider"></li>
-						<li><a href="user/logout"> <i class="icon-key"></i>
+						<li><a href="branduser/logout"> <i class="icon-key"></i>
 								Log Out
 						</a></li>
 					</ul></li>
