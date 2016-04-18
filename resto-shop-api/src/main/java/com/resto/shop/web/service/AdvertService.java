@@ -11,4 +11,5 @@ public interface AdvertService extends GenericService<Advert, Integer> {
 	 * @return
 	 */
 	List<Advert> selectListByShopId(String shopId);
+
 }

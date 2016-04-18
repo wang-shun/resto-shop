@@ -62,7 +62,7 @@
   
   <!-- 根据店铺ID查询信息 -->
   <select id="selectListByShopId" resultType="Notice">
-  	select * from tb_notice
+  	select id,title,content,create_date,sort,status,notice_image,notice_type,shop_detail_id from tb_notice
   	<if test="shopId!=null and shopId!=''">
 		where shop_detail_id = #{shopId} 
 	</if>

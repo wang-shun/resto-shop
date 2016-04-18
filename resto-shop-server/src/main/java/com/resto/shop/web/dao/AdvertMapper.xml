@@ -49,7 +49,7 @@
   
   <!-- 根据店铺ID查询信息  -->
   <select id="selectListByShopId" resultType="Advert">
-  	select * from tb_advert where state = 1
+  	select id,slogan,description,state,shop_detail_id from tb_advert where state = 1
   	<if test="shopId!=null and shopId!=''">
 		and shop_detail_id = #{shopId} 
 	</if>

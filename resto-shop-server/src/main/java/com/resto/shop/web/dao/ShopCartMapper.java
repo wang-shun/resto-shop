@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.ShopCart;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
@@ -15,4 +18,10 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     int updateByPrimaryKeySelective(ShopCart record);
 
     int updateByPrimaryKey(ShopCart record);
+
+    List<ShopCart> listUserAndShop(ShopCart shopcart);
+
+    ShopCart selectShopCartItem(ShopCart shopCart);
+
+    void updateShopCartItem(ShopCart shopCartItem);
 }

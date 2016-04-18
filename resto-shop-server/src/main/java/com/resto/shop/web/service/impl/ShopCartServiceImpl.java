@@ -1,6 +1,10 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+import java.util.UUID;
+
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ShopCartMapper;
@@ -20,6 +24,39 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public GenericDao<ShopCart, Integer> getDao() {
         return shopcartMapper;
-    } 
+    }
+
+    @Override
+    public List<ShopCart> listUserAndShop(ShopCart shopcart) {
+        return shopcartMapper.listUserAndShop(shopcart);
+    }
+
+    @Override
+    public void updateShopCart(ShopCart shopCart) {
+        //先查询当前客户是否有该商品的 购物车的条目
+        Integer number = shopCart.getNumber();
+        ShopCart shopCartItem  = shopcartMapper.selectShopCartItem(shopCart);
+        if(shopCartItem==null&&number>0){
+            insertShopCart(shopCart);
+        }else if(shopCartItem!=null&&number>0){
+            shopCartItem.setNumber(number);
+            shopcartMapper.updateShopCartItem(shopCartItem);
+        }else if(shopCartItem!=null&&number<=0){
+            deleteShopCartItem(shopCartItem.getId());
+        }
+        
+        
+    }
+
+    private void deleteShopCartItem(Integer id) {
+        shopcartMapper.deleteByPrimaryKey(id);
+    }
+
+    private void insertShopCart(ShopCart shopCart) {
+        
+        shopcartMapper.insertSelective(shopCart);
+    }
+
+    
 
 }

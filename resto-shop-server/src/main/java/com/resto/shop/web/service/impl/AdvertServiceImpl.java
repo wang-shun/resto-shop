@@ -27,6 +27,8 @@ public class AdvertServiceImpl extends GenericServiceImpl<Advert, Integer> imple
 	@Override
 	public List<Advert> selectListByShopId(String shopId) {
 		return advertMapper.selectListByShopId(shopId);
-	} 
+	}
+
+    
 
 }

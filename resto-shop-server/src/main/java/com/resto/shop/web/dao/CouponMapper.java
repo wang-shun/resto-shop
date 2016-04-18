@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.Coupon;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface CouponMapper  extends GenericDao<Coupon,String> {
@@ -15,4 +18,6 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
     int updateByPrimaryKeySelective(Coupon record);
 
     int updateByPrimaryKey(Coupon record);
+
+    List<Coupon> listCoupon(Coupon coupon);
 }

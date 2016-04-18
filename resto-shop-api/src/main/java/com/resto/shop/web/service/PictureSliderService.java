@@ -11,6 +11,6 @@ public interface PictureSliderService extends GenericService<PictureSlider, Inte
 	 * @return
 	 */
 	List<PictureSlider> selectListByShopId(String shopId);
-	
+
 	
 }

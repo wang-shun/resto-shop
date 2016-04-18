@@ -81,4 +81,13 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon set name = #{name,jdbcType=VARCHAR}, value = #{value,jdbcType=DECIMAL}, min_amount = #{minAmount,jdbcType=DECIMAL}, begin_date = #{beginDate,jdbcType=DATE}, end_date = #{endDate,jdbcType=DATE}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_used = #{isUsed,jdbcType=TINYINT}, using_time = #{usingTime,jdbcType=TIMESTAMP}, coupon_source = #{couponSource,jdbcType=VARCHAR}, use_with_account = #{useWithAccount,jdbcType=TINYINT}, remark = #{remark,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Coupon">select * from tb_coupon</select>
+  
+  <!-- 查询当前用户的优惠券列表 -->
+  <select id="listCoupon" parameterType="com.resto.shop.web.model.Coupon" resultType="com.resto.shop.web.model.Coupon">
+  select id,name,value,min_amount,begin_date,end_date,begin_time,end_time,is_used,using_time,
+  coupon_source,use_with_account,remark,distribution_mode_id,customer_id
+   from tb_coupon where is_used=#{isUsed} and distribution_mode_id=#{distributionModeId} and customer_id=#{customerId}
+  </select>
+  
+  
 </mapper>
