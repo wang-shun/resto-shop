@@ -66,6 +66,15 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setAccount(account);
 		insert(customer);
 		return customer;
+	}
+
+	@Override
+	public void bindPhone(String phone, String currentCustomerId) {
+		Customer customer = new Customer();
+		customer.setIsBindPhone(true);
+		customer.setTelephone(phone);
+		customer.setId(currentCustomerId);
+		update(customer);
 	} 
 	
 

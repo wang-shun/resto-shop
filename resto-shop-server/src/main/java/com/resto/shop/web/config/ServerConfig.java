@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DatabaseConfigService;
 import com.resto.shop.web.datasource.DynamicDataSource;
 
@@ -20,7 +21,10 @@ public class ServerConfig {
 	public DatabaseConfigService databaseConfigService(){
 		return proxy.create(DatabaseConfigService.class);
 	}
-	
+	@Bean
+	public BrandService brandService(){
+		return proxy.create(BrandService.class);
+	}
 	
 	
 	@Bean

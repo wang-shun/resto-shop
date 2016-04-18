@@ -3,7 +3,9 @@ package com.resto.shop.web.model;
 import java.util.Date;
 
 public class SmsLog {
-    private Long id;
+    public static final Byte CODE = 1;//验证码短信 
+
+	private Long id;
 
     private String phone;
 
