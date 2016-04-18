@@ -69,4 +69,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item set article_name = #{articleName,jdbcType=VARCHAR}, article_designation = #{articleDesignation,jdbcType=VARCHAR}, count = #{count,jdbcType=INTEGER}, original_price = #{originalPrice,jdbcType=DECIMAL}, unit_price = #{unitPrice,jdbcType=VARCHAR}, final_price = #{finalPrice,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, status = #{status,jdbcType=INTEGER}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="OrderItem">select * from tb_order_item</select>
+  
+  <!-- 根据订单ID查询订单项 -->
+  <select id="listByOrderId" resultType="OrderItem">
+  	SELECT * from tb_order_item where order_id = #{orderId} ORDER BY sort
+  </select>
 </mapper>

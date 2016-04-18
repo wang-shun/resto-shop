@@ -55,4 +55,9 @@
   		</if>
   	</where>
   </select>
+  
+  <select id="selectListByDistributionModeId" resultType="ArticleFamily">
+  		select * from tb_article_family where shop_detail_id=#{currentShopId}
+  		 and distribution_mode_id=#{distributionModeId}
+  </select>
 </mapper>

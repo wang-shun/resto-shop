@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class Order {
     private String id;
@@ -53,6 +54,8 @@ public class Order {
     private String shopDetailId;
 
     private Integer distributionModeId;
+    
+    private List<OrderItem> orderItems;
 
     public String getId() {
         return id;
@@ -253,4 +256,14 @@ public class Order {
     public void setDistributionModeId(Integer distributionModeId) {
         this.distributionModeId = distributionModeId;
     }
+
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems == null ? null : orderItems;
+	}
+    
+    
 }
