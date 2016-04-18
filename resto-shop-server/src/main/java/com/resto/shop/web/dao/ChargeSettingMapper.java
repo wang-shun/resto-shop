@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.ChargeSetting;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
@@ -15,4 +18,6 @@ public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
     int updateByPrimaryKeySelective(ChargeSetting record);
 
     int updateByPrimaryKey(ChargeSetting record);
+
+    List<ChargeSetting> selectListByCustomerId(String currentUserId);
 }
