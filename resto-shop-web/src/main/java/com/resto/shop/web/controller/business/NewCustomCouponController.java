@@ -40,7 +40,8 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<NewCustomCoupon> listData(){
-		return newcustomcouponService.selectList();
+		return newcustomcouponService.selectListByShopId(getCurrentBrandId());
+		
 	}
 	
 	@RequestMapping("list_one")

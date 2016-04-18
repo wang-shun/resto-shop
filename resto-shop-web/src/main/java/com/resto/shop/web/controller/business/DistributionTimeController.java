@@ -30,7 +30,7 @@ public class DistributionTimeController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<DistributionTime> listData(){
-		return distributiontimeService.selectList();
+		return distributiontimeService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -42,9 +42,8 @@ public class DistributionTimeController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DistributionTime brand ,HttpServletRequest req){
-	    String shopDetailId = (String) req.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID);
-	        brand.setShopDetailId(shopDetailId);
+	public Result create(@Valid DistributionTime brand){
+	        brand.setShopDetailId(getCurrentShopId());
 		distributiontimeService.insert(brand);
 		return Result.getSuccess();
 	}

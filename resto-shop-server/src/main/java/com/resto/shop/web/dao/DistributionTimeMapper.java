@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.DistributionTime;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface DistributionTimeMapper  extends GenericDao<DistributionTime,Integer> {
@@ -15,4 +18,6 @@ public interface DistributionTimeMapper  extends GenericDao<DistributionTime,Int
     int updateByPrimaryKeySelective(DistributionTime record);
 
     int updateByPrimaryKey(DistributionTime record);
+
+    List<DistributionTime> selectListByShopId(String currentShopId);
 }

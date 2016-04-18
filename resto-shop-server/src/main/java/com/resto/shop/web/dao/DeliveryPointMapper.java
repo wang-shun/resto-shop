@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.DeliveryPoint;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface DeliveryPointMapper  extends GenericDao<DeliveryPoint,Integer> {
@@ -15,4 +18,6 @@ public interface DeliveryPointMapper  extends GenericDao<DeliveryPoint,Integer> 
     int updateByPrimaryKeySelective(DeliveryPoint record);
 
     int updateByPrimaryKey(DeliveryPoint record);
+
+    List<DeliveryPoint> selectListById(String currentShopId);
 }

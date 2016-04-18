@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.NewCustomCoupon;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long> {
@@ -15,4 +18,6 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
     int updateByPrimaryKeySelective(NewCustomCoupon record);
 
     int updateByPrimaryKey(NewCustomCoupon record);
+
+    List<NewCustomCoupon> selectListByShopId(String currentBrandId);
 }

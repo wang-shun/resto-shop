@@ -77,4 +77,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon set name = #{name,jdbcType=VARCHAR}, coupon_value = #{couponValue,jdbcType=DECIMAL}, coupon_validay = #{couponValiday,jdbcType=INTEGER}, coupon_number = #{couponNumber,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP}, use_with_account = #{useWithAccount,jdbcType=TINYINT}, coupon_name = #{couponName,jdbcType=VARCHAR}, coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_activty = #{isActivty,jdbcType=TINYINT}, brand_id = #{brandId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=BIGINT}</update>
   <select id="selectList" resultType="NewCustomCoupon">select * from tb_new_custom_coupon</select>
+  <select id="selectListByShopId" resultType="NewCustomCoupon">
+  select id,name,coupon_value,coupon_validay,coupon_number,create_time,
+  use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id
+   from tb_new_custom_coupon where brand_id=#{brandId}
+  </select>
 </mapper>

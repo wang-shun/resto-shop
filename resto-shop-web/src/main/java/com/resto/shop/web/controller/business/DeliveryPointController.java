@@ -30,7 +30,7 @@ public class DeliveryPointController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<DeliveryPoint> listData(){
-		return deliverypointService.selectList();
+		return deliverypointService.selectListById(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -42,8 +42,8 @@ public class DeliveryPointController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DeliveryPoint brand ,HttpServletRequest req){
-	        String shopDetailId = (String) req.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID);
+	public Result create(@Valid DeliveryPoint brand){
+	        String shopDetailId = getCurrentShopId();
 	        brand.setShopDetailId(shopDetailId);
 		deliverypointService.insert(brand);
 		return Result.getSuccess();

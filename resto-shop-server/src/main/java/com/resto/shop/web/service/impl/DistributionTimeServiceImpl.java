@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,11 @@ public class DistributionTimeServiceImpl extends GenericServiceImpl<Distribution
     @Override
     public GenericDao<DistributionTime, Integer> getDao() {
         return distributiontimeMapper;
+    }
+
+    @Override
+    public List<DistributionTime> selectListByShopId(String currentShopId) {
+        return distributiontimeMapper.selectListByShopId(currentShopId);
     } 
 
 }

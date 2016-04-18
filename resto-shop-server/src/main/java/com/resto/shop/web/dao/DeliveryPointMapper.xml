@@ -65,4 +65,5 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.DeliveryPoint">update tb_delivery_point set name = #{name,jdbcType=VARCHAR}, province = #{province,jdbcType=VARCHAR}, city = #{city,jdbcType=VARCHAR}, district = #{district,jdbcType=VARCHAR}, detail = #{detail,jdbcType=VARCHAR}, map_x = #{mapX,jdbcType=VARCHAR}, map_y = #{mapY,jdbcType=VARCHAR}, emp_phone = #{empPhone,jdbcType=VARCHAR}, emp_name = #{empName,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="DeliveryPoint">select * from tb_delivery_point</select>
+  <select id="selectListById" resultType="DeliveryPoint">select * from tb_delivery_point where shop_detail_id=#{shopDetailId}</select>
 </mapper>
