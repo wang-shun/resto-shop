@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Customer {
@@ -35,8 +36,8 @@ public class Customer {
 
     private String country;
     
-    private Account account;
-
+    private BigDecimal account;
+    
     public String getId() {
         return id;
     }
@@ -149,7 +150,7 @@ public class Customer {
 		return country;
 	}
 
-	public Account getAccount() {
+	public BigDecimal getAccount() {
 		return account;
 	}
 
@@ -169,7 +170,7 @@ public class Customer {
 		this.country = country;
 	}
 
-	public void setAccount(Account account) {
+	public void setAccount(BigDecimal account) {
 		this.account = account;
 	}
 }

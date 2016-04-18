@@ -46,11 +46,19 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		Customer cus = customerMapper.selectByOpenId(openid);
 		if(cus!=null){
 			Account account = accountService.selectById(cus.getAccountId());
-			cus.setAccount(account);
+			cus.setAccount(account.getRemain());
 		}
 		return cus;
 	}
-
+	
+	@Override
+	public Customer selectById(String id) {
+		Customer cus = customerMapper.selectByPrimaryKey(id);
+		Account account = accountService.selectById(cus.getAccountId());
+		cus.setAccount(account.getRemain());
+		return cus;
+	}
+	
 	@Override
 	public Customer register(Customer customer) {
 		String customerId = ApplicationUtils.randomUUID();
@@ -63,7 +71,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setIsBindPhone(false);
 		customer.setLastLoginTime(new Date());
 		customer.setRegiestTime(new Date());
-		customer.setAccount(account);
+		customer.setAccount(account.getRemain());
 		insert(customer);
 		return customer;
 	}
