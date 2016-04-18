@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Order;
@@ -16,4 +17,11 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
 	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId);
+	
+	/**
+	 * 根据订单ID查询订单状态和生产状态
+	 * @param orderId
+	 * @return
+	 */
+	public Map<String, Integer> selectOrderStatesById(String orderId);
 }

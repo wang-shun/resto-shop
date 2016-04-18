@@ -29,6 +29,16 @@ public class Appraise {
     private String articleId;
 
     private String shopDetailId;
+    
+    /**
+     * 用于保存 当前店铺 的所有评论的条数
+     */
+    private Integer APPRAISE_COUNT;
+    
+    /**
+     * 用于保存 当前店铺的 所有评论的平均分
+     */
+    private Double AVG_SCORE;
 
     public String getId() {
         return id;
@@ -133,4 +143,20 @@ public class Appraise {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public Integer getAPPRAISE_COUNT() {
+		return APPRAISE_COUNT;
+	}
+
+	public void setAPPRAISE_COUNT(Integer aPPRAISE_COUNT) {
+		APPRAISE_COUNT = aPPRAISE_COUNT;
+	}
+
+	public Double getAVG_SCORE() {
+		return AVG_SCORE;
+	}
+
+	public void setAVG_SCORE(Double aVG_SCORE) {
+		AVG_SCORE = aVG_SCORE;
+	}
 }

@@ -1,7 +1,12 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.Appraise;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.Appraise;
 
 public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     int deleteByPrimaryKey(String id);
@@ -15,4 +20,10 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     int updateByPrimaryKeySelective(Appraise record);
 
     int updateByPrimaryKey(Appraise record);
+    
+    List<Appraise> listAppraise(@Param(value = "currentShopId") String currentShopId,@Param(value = "currentPage") Integer currentPage,@Param(value = "showCount") Integer showCount,@Param(value = "maxLevel") Integer maxLevel,@Param(value = "minLevel") Integer minLevel);
+    
+    Map<String, Object> appraiseCount(@Param(value="currentShopId") String currentShopId);
+    
+    List<Map<String, Object>> appraiseMonthCount(@Param(value="currentShopId") String currentShopId);
 }
