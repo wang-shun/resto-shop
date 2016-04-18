@@ -56,6 +56,10 @@ public class Article {
     
     private String hasUnit;
     
+    private String peference;
+    
+    private String unit;
+    
     private List<ArticlePrice> articlePrices= new ArrayList<>();
     private Integer [] supportTimes;
 
@@ -273,5 +277,21 @@ public class Article {
 
 	public void setSupportTimes(Integer[] supportTimes) {
 		this.supportTimes = supportTimes;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public String getPeference() {
+		return peference;
+	}
+
+	public void setPeference(String peference) {
+		this.peference = peference;
 	}
 }

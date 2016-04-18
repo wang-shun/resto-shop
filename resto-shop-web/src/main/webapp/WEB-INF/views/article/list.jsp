@@ -47,7 +47,19 @@
 							<div class="form-group">
 							    <label class="col-md-3 control-label">粉丝价</label>
 							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="fansPrice" v-model="fansPrice">
+								    <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label class="col-md-3 control-label">餐品单位</label>
+							    <div class="col-md-5">
+								    <input type="text" class="form-control" name="unit" v-model="m.unit">
+							    </div>
+							</div>
+							<div class="form-group">
+							    <label class="col-md-3 control-label">餐品编号</label>
+							    <div class="col-md-5">
+								    <input type="text" class="form-control" name="peference" v-model="m.peference">
 							    </div>
 							</div>
 							<div class="form-group">
@@ -70,6 +82,13 @@
 								    </label>
 							    </div>
 							</div>
+							<div class="form-group">
+							    <label class="col-md-3 control-label">出餐厨房</label>
+							    <div class="col-md-5">
+								    待完成
+							    </div>
+							</div>
+							
 							<div class="form-group">
 							    <label class="col-md-3 control-label">餐品图片</label>
 							    <div class="col-md-5">

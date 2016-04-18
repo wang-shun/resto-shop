@@ -27,12 +27,14 @@
     <result column="fans_price" jdbcType="DECIMAL" property="fansPrice" />
     <result column="has_mult_price" jdbcType="BIT" property="hasMultPrice" />
     <result column="has_unit" property="hasUnit"/>
+    <result column="peference" property="peference"/>
+    <result column="unit" property="unit"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
-    fans_price, has_mult_price,has_unit
+    fans_price, has_mult_price,has_unit,peference,unit
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -52,7 +54,7 @@
       remain_number, sale_number, show_sale_number, 
       update_time, create_time, shop_detail_id, 
       article_family_id, create_user_id, update_user_id, 
-      price, fans_price, has_mult_price,has_unit
+      price, fans_price, has_mult_price,has_unit,peference,unit
       )
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
@@ -61,7 +63,7 @@
       #{remainNumber,jdbcType=INTEGER}, #{saleNumber,jdbcType=BIGINT}, #{showSaleNumber,jdbcType=BIGINT}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{shopDetailId,jdbcType=VARCHAR}, 
       #{articleFamilyId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{updateUserId,jdbcType=VARCHAR}, 
-      #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT},#{hasUnit}
+      #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT},#{hasUnit},#{peference},#{unit}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
@@ -142,6 +144,12 @@
       <if test="hasUnit != null">
         has_unit,
       </if>
+      <if test="peference!=null">
+      	peference,
+      </if>
+      <if test="unit !=null">
+      	unit,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -218,6 +226,12 @@
       </if>
       <if test="hasUnit != null">
         #{hasUnit,jdbcType=BIT},
+      </if>
+      <if test="peference">
+      	#{peference},
+      </if>
+      <if test="unit">
+      	#{unit},
       </if>
     </trim>
   </insert>
@@ -296,6 +310,12 @@
       <if test="hasUnit != null">
         has_unit = #{hasUnit,jdbcType=BIT},
       </if>
+      <if test="peference!=null">
+      	peference=#{peference},
+      </if>
+      <if test="unit!=null">
+      	unit=#{unit}
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -324,7 +344,9 @@
       price = #{price,jdbcType=DECIMAL},
       fans_price = #{fansPrice,jdbcType=DECIMAL},
       has_mult_price = #{hasMultPrice,jdbcType=BIT},
-      has_unit = #{hasUnit,jdbcType=BIT}
+      has_unit = #{hasUnit,jdbcType=BIT},
+      peference=#{peference},
+      unit=#{unit}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="Article">
@@ -340,5 +362,6 @@
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.`activated`=1
 	AND a.`shop_detail_id`=#{0}
+	ORDER BY sort
   </select>
 </mapper>
