@@ -1,4 +1,4 @@
-package com.resto.shop.web.util;
+package com.resto.shop.web.constant;
 
 /**
  * @name CouponSource
