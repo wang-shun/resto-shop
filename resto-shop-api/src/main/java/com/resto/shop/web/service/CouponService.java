@@ -14,6 +14,6 @@ public interface CouponService extends GenericService<Coupon, String> {
 
     void insertCoupon(Coupon coupon);
 
-	Coupon useCoupon(String useCoupon, BigDecimal totalMoney, Order order, Boolean useAccount) throws AppException;
+	Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException;
     
 }

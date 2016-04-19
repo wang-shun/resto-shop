@@ -17,11 +17,17 @@ public class AppException extends Exception{
 	public static final ErrorMsg COUPON_NOT_USEACCOUNT = new ErrorMsg(7,"不可以和余额一起使用");
 	public static final ErrorMsg COUPON_IS_EXPIRE = new ErrorMsg(8,"优惠卷已过期");
 	public static final ErrorMsg COUPON_TIME_ERR = new ErrorMsg(9,"优惠卷使用时间段错误");
+	public static final ErrorMsg UNSUPPORT_ITEM_TYPE = new ErrorMsg(10,"不支持的餐品类型！");
 	
 	public AppException(ErrorMsg msg) {
 		this.msg=msg;
 	}
 	
+	public AppException(ErrorMsg msg, String string) {
+		msg.setMsg(string);
+		this.msg=msg;
+	}
+
 	@Override
 	public String getMessage() {
 		return this.msg.toString();

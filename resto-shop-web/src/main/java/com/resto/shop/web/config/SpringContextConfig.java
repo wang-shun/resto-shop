@@ -70,16 +70,6 @@ public class SpringContextConfig {
 	}
 	
 	@Bean
-	public WechatTempIdService wechatTempIdService(){
-		return getProxy(WechatTempIdService.class);
-	}
-	
-	@Bean
-	public WechatTempTypeService wechatTempTypeService(){
-		return getProxy(WechatTempTypeService.class);
-	}
-	
-	@Bean
 	public UserGroupService userGroupService(){
 		return getProxy(UserGroupService.class);
 	}

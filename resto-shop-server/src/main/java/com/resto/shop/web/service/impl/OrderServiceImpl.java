@@ -85,7 +85,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public Order createOrder(Order order, String useCoupon, Boolean useAccount) throws AppException {
+	public Order createOrder(Order order) throws AppException {
 		String orderId = ApplicationUtils.randomUUID();
 		order.setId(orderId);
 		Customer customer = customerService.selectById(order.getCustomerId());
@@ -125,11 +125,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				price = p.getPrice();
 				fans_price = p.getFansPrice();
 				break;
+			default:
+				throw new AppException(AppException.UNSUPPORT_ITEM_TYPE,"不支持的餐品类型:"+item.getType());
 			}
 			item.setArticleDesignation(a.getDescription());
 			item.setArticleName(a.getName());
 			item.setOriginalPrice(org_price);
-			if(fans_price==null){
+			item.setStatus(1);
+			item.setSort(0);
+			if(fans_price!=null){
 				item.setUnitPrice(fans_price);
 			}else{
 				item.setUnitPrice(price);
@@ -143,8 +147,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		BigDecimal payMoney = totalMoney;
 		
 		//使用优惠卷
-		if(useCoupon!=null){
-			Coupon coupon = couponService.useCoupon(useCoupon,totalMoney, order,useAccount);
+		if(order.getUseCoupon()!=null){
+			Coupon coupon = couponService.useCoupon(totalMoney, order);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(orderId);
@@ -157,7 +161,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		
 		//使用余额
-		if(payMoney.doubleValue()>0&&useAccount){
+		if(payMoney.doubleValue()>0&&order.isUseAccount()){
 			Account account = accountService.selectById(customer.getAccountId());
 			BigDecimal payValue = accountService.useAccount(payMoney, account);
 			if(payValue.doubleValue()>0){

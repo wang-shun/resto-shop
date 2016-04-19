@@ -79,4 +79,13 @@
   <select id="listByOrderId" resultType="OrderItem">
   	SELECT * from tb_order_item where order_id = #{orderId} ORDER BY sort
   </select>
+  <insert id="insertBatch">
+  	insert into tb_order_item 
+  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type) 
+  	values
+  	<foreach collection="list" item="t" open="(" close=")" separator="," >
+  		#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
+  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type}
+  	</foreach>
+  </insert>
 </mapper>

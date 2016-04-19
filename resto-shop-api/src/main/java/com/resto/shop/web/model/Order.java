@@ -59,17 +59,38 @@ public class Order {
     
     private String verCode;
     
-    /**
+    private boolean useAccount;
+    
+    private String useCoupon;
+
+     /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
-    private List<String> ARTICLE_NAMES;
+    private List<String> articleNames;
     
     /**
      * 用于保存 店铺的名称
      */
     private String shopName;
+    
 
-    public String getId() {
+    public boolean isUseAccount() {
+		return useAccount;
+	}
+
+	public String getUseCoupon() {
+		return useCoupon;
+	}
+
+	public void setUseAccount(boolean useAccount) {
+		this.useAccount = useAccount;
+	}
+
+	public void setUseCoupon(String useCoupon) {
+		this.useCoupon = useCoupon;
+	}
+
+	public String getId() {
         return id;
     }
 

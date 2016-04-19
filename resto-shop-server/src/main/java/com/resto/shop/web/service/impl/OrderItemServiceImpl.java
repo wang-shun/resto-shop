@@ -31,7 +31,8 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 
 	@Override
 	public void insertItems(List<OrderItem> orderItems) {
-		throw new RuntimeException("not exit");
+		
+		orderitemMapper.insertBatch(orderItems);
 	} 
 
 }

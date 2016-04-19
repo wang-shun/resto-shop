@@ -45,8 +45,8 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     }
 
 	@Override
-	public Coupon useCoupon(String couponId,BigDecimal totalMoney, Order order,Boolean useAccount) throws AppException {
-		Coupon coupon = selectById(couponId	);
+	public Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException {
+		Coupon coupon = selectById(order.getUseCoupon());
 		//判断优惠卷是否已使用
 		if(coupon.getIsUsed()){
 			throw new AppException(AppException.COUPON_IS_USED);
@@ -75,7 +75,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 			throw new AppException(AppException.COUPON_MIN_AMOUNT_ERR);
 		}
 		//判断是否使用了余额 并且 当前优惠卷可否使用余额
-		if(useAccount&&!coupon.getUseWithAccount()){
+		if(order.isUseAccount()&&!coupon.getUseWithAccount()){
 			throw new AppException(AppException.COUPON_NOT_USEACCOUNT);
 		}
 		
