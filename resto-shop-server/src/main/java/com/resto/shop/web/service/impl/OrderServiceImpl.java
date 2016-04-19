@@ -80,7 +80,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public Map<String, Object> selectOrderStatesById(String orderId) {
+	public Order selectOrderStatesById(String orderId) {
 		return orderMapper.selectOrderStatesById(orderId);
 	}
 

@@ -1,7 +1,6 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
@@ -24,7 +23,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param orderId
 	 * @return
 	 */
-	public Map<String, Object> selectOrderStatesById(String orderId);
+	public Order selectOrderStatesById(String orderId);
 
 	public Order createOrder(Order order, String useCoupon, Boolean useAccount)throws AppException;
 	

@@ -140,7 +140,7 @@
   </select>
   
   <!-- 根据订单查询 订单状态 和 生产状态 -->
-  <select id="selectOrderStatesById" resultType="java.util.HashMap">
+  <select id="selectOrderStatesById" resultType="Order">
   	SELECT id,order_state,production_status from tb_order where id = #{orderId}
   </select>
 </mapper>

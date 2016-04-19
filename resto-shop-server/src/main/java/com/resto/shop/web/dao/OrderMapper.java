@@ -1,7 +1,6 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -36,7 +35,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @param orderId
      * @return
      */
-    Map<String, Object> selectOrderStatesById(@Param("orderId") String orderId);
+    Order selectOrderStatesById(@Param("orderId") String orderId);
     
     /**
      * 查询 订单详情
