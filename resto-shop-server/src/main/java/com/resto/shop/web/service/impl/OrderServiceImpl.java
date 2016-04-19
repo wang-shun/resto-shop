@@ -196,4 +196,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
+	@Override
+	public Order createOrder(Order order, String useCoupon, Boolean useAccount) throws AppException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
