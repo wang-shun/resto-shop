@@ -199,6 +199,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		insert(order);
 		if(order.getPaymentAmount().equals(BigDecimal.ZERO)){
 			payOrderSuccess(order);
+		}else{
+			
 		}
 		return order;
 	}

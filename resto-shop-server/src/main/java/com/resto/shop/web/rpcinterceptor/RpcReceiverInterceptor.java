@@ -19,9 +19,6 @@ public class RpcReceiverInterceptor implements ReceiverInterceptor{
 	@Override
 	public void receiver(RpcRequest request) {
 		if(request.getRequestHead()!=null){
-			System.err.println("Receiver request Head:");
-			System.err.println(request.getRequestHead());
-			
 			DataSourceContextHolder.setDataSourceName(request.getRequestHead());
 		}
 	}
