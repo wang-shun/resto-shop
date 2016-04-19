@@ -214,7 +214,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date beginDate = DateUtil.getDateBegin(new Date());
 		Integer[] orderState = new Integer[]{OrderState.SUBMIT,OrderState.PAYMENT,OrderState.CONFIRM};
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
-		if(orderId != null && order != null){
+		if((orderId == null || ("").equals(orderId.trim())) && order != null){
 			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
 			order.setOrderItems(itemList);
 		}

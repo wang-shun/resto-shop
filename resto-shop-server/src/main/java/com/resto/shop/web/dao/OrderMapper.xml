@@ -156,7 +156,7 @@
 		ORDER BY create_time DESC LIMIT 0,1
 	</if>
  	<if test="orderId != null and orderId != '' ">
-		where order_id=#{orderId}
+		where id=#{orderId}
 	</if>
   </select>
 </mapper>
