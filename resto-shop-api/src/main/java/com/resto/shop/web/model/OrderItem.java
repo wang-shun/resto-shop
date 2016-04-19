@@ -27,6 +27,8 @@ public class OrderItem {
 
     private String articleId;
 
+    private Integer type;
+    
     public String getId() {
         return id;
     }
@@ -122,4 +124,12 @@ public class OrderItem {
     public void setArticleId(String articleId) {
         this.articleId = articleId == null ? null : articleId.trim();
     }
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
 }

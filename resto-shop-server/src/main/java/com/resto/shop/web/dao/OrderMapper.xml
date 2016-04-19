@@ -28,8 +28,10 @@
     <result column="delivery_point_id" property="deliveryPointId" jdbcType="INTEGER"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+    <result column="ver_code" property="verCode" jdbcType="INTEGER"/>
+    
   </resultMap>
-  <sql id="Base_Column_List">id, table_number, customer_count, accounting_time, order_state, production_status, original_amount, reduction_amount, payment_amount, order_money, article_count, serial_number, confirm_time, print_times, allow_cancel, closed, remark, create_time, operator_id, customer_id, distribution_date, distribution_time_id, delivery_point_id, shop_detail_id, distribution_mode_id</sql>
+  <sql id="Base_Column_List">id, table_number, customer_count, accounting_time, order_state, production_status, original_amount, reduction_amount, payment_amount, order_money, article_count, serial_number, confirm_time, print_times, allow_cancel, closed, remark, create_time, operator_id, customer_id, distribution_date, distribution_time_id, delivery_point_id, shop_detail_id, distribution_mode_id,ver_code</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_order where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -62,6 +64,7 @@
       <if test="deliveryPointId != null">delivery_point_id,</if>  
       <if test="shopDetailId != null">shop_detail_id,</if>  
       <if test="distributionModeId != null">distribution_mode_id,</if> 
+      <if test="verCode != null">ver_code,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -88,7 +91,8 @@
       <if test="distributionTimeId != null">#{distributionTimeId,jdbcType=INTEGER},</if>  
       <if test="deliveryPointId != null">#{deliveryPointId,jdbcType=INTEGER},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>  
-      <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if>
+      <if test="verCode != null">#{ver_code,jdbcType=INTEGER},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">update tb_order 
@@ -117,9 +121,10 @@
       <if test="deliveryPointId != null">delivery_point_id = #{deliveryPointId,jdbcType=INTEGER},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="verCode != null">ver_code = #{verCode},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order">update tb_order set table_number = #{tableNumber,jdbcType=VARCHAR}, customer_count = #{customerCount,jdbcType=INTEGER}, accounting_time = #{accountingTime,jdbcType=DATE}, order_state = #{orderState,jdbcType=TINYINT}, production_status = #{productionStatus,jdbcType=TINYINT}, original_amount = #{originalAmount,jdbcType=DECIMAL}, reduction_amount = #{reductionAmount,jdbcType=DECIMAL}, payment_amount = #{paymentAmount,jdbcType=DECIMAL}, order_money = #{orderMoney,jdbcType=DECIMAL}, article_count = #{articleCount,jdbcType=INTEGER}, serial_number = #{serialNumber,jdbcType=VARCHAR}, confirm_time = #{confirmTime,jdbcType=TIMESTAMP}, print_times = #{printTimes,jdbcType=INTEGER}, allow_cancel = #{allowCancel,jdbcType=TINYINT}, closed = #{closed,jdbcType=TINYINT}, remark = #{remark,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, operator_id = #{operatorId,jdbcType=VARCHAR}, customer_id = #{customerId,jdbcType=VARCHAR}, distribution_date = #{distributionDate,jdbcType=DATE}, distribution_time_id = #{distributionTimeId,jdbcType=INTEGER}, delivery_point_id = #{deliveryPointId,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order">update tb_order set table_number = #{tableNumber,jdbcType=VARCHAR}, customer_count = #{customerCount,jdbcType=INTEGER}, accounting_time = #{accountingTime,jdbcType=DATE}, order_state = #{orderState,jdbcType=TINYINT}, production_status = #{productionStatus,jdbcType=TINYINT}, original_amount = #{originalAmount,jdbcType=DECIMAL}, reduction_amount = #{reductionAmount,jdbcType=DECIMAL}, payment_amount = #{paymentAmount,jdbcType=DECIMAL}, order_money = #{orderMoney,jdbcType=DECIMAL}, article_count = #{articleCount,jdbcType=INTEGER}, serial_number = #{serialNumber,jdbcType=VARCHAR}, confirm_time = #{confirmTime,jdbcType=TIMESTAMP}, print_times = #{printTimes,jdbcType=INTEGER}, allow_cancel = #{allowCancel,jdbcType=TINYINT}, closed = #{closed,jdbcType=TINYINT}, remark = #{remark,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, operator_id = #{operatorId,jdbcType=VARCHAR}, customer_id = #{customerId,jdbcType=VARCHAR}, distribution_date = #{distributionDate,jdbcType=DATE}, distribution_time_id = #{distributionTimeId,jdbcType=INTEGER}, delivery_point_id = #{deliveryPointId,jdbcType=INTEGER}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},ver_code=#{verCode} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Order">select * from tb_order</select>
   
   <!-- 根据 店铺ID 和 用户ID  分页查询订单列表 -->

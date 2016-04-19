@@ -56,6 +56,8 @@ public class Order {
     private Integer distributionModeId;
     
     private List<OrderItem> orderItems;
+    
+    private String verCode;
 
     public String getId() {
         return id;
@@ -263,6 +265,14 @@ public class Order {
 
 	public void setOrderItems(List<OrderItem> orderItems) {
 		this.orderItems = orderItems == null ? null : orderItems;
+	}
+
+	public String getVerCode() {
+		return verCode;
+	}
+
+	public void setVerCode(String verCode) {
+		this.verCode = verCode;
 	}
     
     

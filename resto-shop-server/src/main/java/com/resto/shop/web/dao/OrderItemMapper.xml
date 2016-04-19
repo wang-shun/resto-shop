@@ -15,8 +15,10 @@
     <result column="status" property="status" jdbcType="INTEGER"/>
     <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+    <result column="type" property="type" jdbcType="VARCHAR"/>
+    
   </resultMap>
-  <sql id="Base_Column_List">id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id</sql>
+  <sql id="Base_Column_List">id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_order_item where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -36,6 +38,7 @@
       <if test="status != null">status,</if>  
       <if test="orderId != null">order_id,</if>  
       <if test="articleId != null">article_id,</if> 
+      <if test="type != null">type,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -50,6 +53,7 @@
       <if test="status != null">#{status,jdbcType=INTEGER},</if>  
       <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if> 
+      <if test="type != null">#{type},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item 
@@ -65,9 +69,10 @@
       <if test="status != null">status = #{status,jdbcType=INTEGER},</if>  
       <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if> 
+      <if test="type != null">type = #{type},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item set article_name = #{articleName,jdbcType=VARCHAR}, article_designation = #{articleDesignation,jdbcType=VARCHAR}, count = #{count,jdbcType=INTEGER}, original_price = #{originalPrice,jdbcType=DECIMAL}, unit_price = #{unitPrice,jdbcType=VARCHAR}, final_price = #{finalPrice,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, status = #{status,jdbcType=INTEGER}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item set article_name = #{articleName,jdbcType=VARCHAR}, article_designation = #{articleDesignation,jdbcType=VARCHAR}, count = #{count,jdbcType=INTEGER}, original_price = #{originalPrice,jdbcType=DECIMAL}, unit_price = #{unitPrice,jdbcType=VARCHAR}, final_price = #{finalPrice,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, status = #{status,jdbcType=INTEGER}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR} ,type=#{type} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="OrderItem">select * from tb_order_item</select>
   
   <!-- 根据订单ID查询订单项 -->
