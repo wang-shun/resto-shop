@@ -5,18 +5,18 @@
   <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
     <id column="id" property="id" jdbcType="VARCHAR"/>
     <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
-    <result column="customer_count" property="customerCount" jdbcType="INT"/>
+    <result column="customer_count" property="customerCount" jdbcType="INTEGER"/>
     <result column="accounting_time" property="accountingTime" jdbcType="DATE"/>
-    <result column="order_state" property="orderState" jdbcType="INT"/>
-    <result column="production_status" property="productionStatus" jdbcType="INT"/>
+    <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+    <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
     <result column="original_amount" property="originalAmount" jdbcType="DECIMAL"/>
     <result column="reduction_amount" property="reductionAmount" jdbcType="DECIMAL"/>
     <result column="payment_amount" property="paymentAmount" jdbcType="DECIMAL"/>
     <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-    <result column="article_count" property="articleCount" jdbcType="INT"/>
+    <result column="article_count" property="articleCount" jdbcType="INTEGER"/>
     <result column="serial_number" property="serialNumber" jdbcType="VARCHAR"/>
     <result column="confirm_time" property="confirmTime" jdbcType="TIMESTAMP"/>
-    <result column="print_times" property="printTimes" jdbcType="INT"/>
+    <result column="print_times" property="printTimes" jdbcType="INTEGER"/>
     <result column="allow_cancel" property="allowCancel" jdbcType="BIT"/>
     <result column="closed" property="closed" jdbcType="BIT"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
@@ -24,10 +24,10 @@
     <result column="operator_id" property="operatorId" jdbcType="VARCHAR"/>
     <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
     <result column="distribution_date" property="distributionDate" jdbcType="DATE"/>
-    <result column="distribution_time_id" property="distributionTimeId" jdbcType="INT"/>
-    <result column="delivery_point_id" property="deliveryPointId" jdbcType="INT"/>
+    <result column="distribution_time_id" property="distributionTimeId" jdbcType="INTEGER"/>
+    <result column="delivery_point_id" property="deliveryPointId" jdbcType="INTEGER"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-    <result column="distribution_mode_id" property="distributionModeId" jdbcType="INT"/>
+    <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
     <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
     
   </resultMap>
