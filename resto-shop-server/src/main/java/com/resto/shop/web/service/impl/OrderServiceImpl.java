@@ -7,12 +7,15 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Account;
@@ -105,6 +108,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setId(orderId);
 		order.setCreateTime(new Date());
 		BigDecimal totalMoney = BigDecimal.ZERO;
+		int articleCount=0;
 		for(OrderItem item :order.getOrderItems()){
 			Article a=  null;
 			BigDecimal org_price = null;
@@ -139,8 +143,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				item.setUnitPrice(price);
 			}
 			BigDecimal finalMoney = item.getUnitPrice().multiply(new BigDecimal(item.getCount())).setScale(2, BigDecimal.ROUND_HALF_UP);
+			articleCount+=item.getCount();
 			item.setFinalPrice(finalMoney);
 			item.setOrderId(orderId);
+			item.setId(ApplicationUtils.randomUUID());
 			totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
 		orderItemService.insertItems(order.getOrderItems());
@@ -178,9 +184,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		
 
-		order.setAccountingTime(order.getCreateTime());
-		
-		
+		order.setAccountingTime(order.getCreateTime()); //财务结算时间
+		order.setAllowCancel(true); //订单是否允许取消
+		order.setArticleCount(articleCount);  //订单餐品总数
+		order.setClosed(false);  //订单是否关闭 否
+		order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); //流水号
+		order.setOriginalAmount(totalMoney);//原价
+		order.setReductionAmount(BigDecimal.ZERO);//折扣金额
+		order.setOrderMoney(totalMoney); //订单实际金额
+		order.setPaymentAmount(payMoney); //订单需要支付的金额
+		order.setPrintTimes(0);
+		order.setOrderState(OrderState.SUBMIT);
+		order.setProductionStatus(ProductionStatus.NOT_ORDER);
+		insert(order);
+		if(order.getPaymentAmount().equals(BigDecimal.ZERO)){
+			payOrderSuccess(order);
+		}
+		return order;
+	}
+
+	public Order payOrderSuccess(Order order) {
+		order.setOrderState(OrderState.PAYMENT);
+		update(order);
 		return order;
 	}
 

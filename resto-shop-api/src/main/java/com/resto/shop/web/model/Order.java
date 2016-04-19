@@ -33,9 +33,9 @@ public class Order {
 
     private Integer printTimes;
 
-    private Integer allowCancel;
+    private Boolean allowCancel;
 
-    private Integer closed;
+    private Boolean closed;
 
     private String remark;
 
@@ -202,19 +202,19 @@ public class Order {
         this.printTimes = printTimes;
     }
 
-    public Integer getAllowCancel() {
+    public Boolean getAllowCancel() {
         return allowCancel;
     }
 
-    public void setAllowCancel(Integer allowCancel) {
+    public void setAllowCancel(Boolean allowCancel) {
         this.allowCancel = allowCancel;
     }
 
-    public Integer getClosed() {
+    public Boolean getClosed() {
         return closed;
     }
 
-    public void setClosed(Integer closed) {
+    public void setClosed(Boolean closed) {
         this.closed = closed;
     }
 

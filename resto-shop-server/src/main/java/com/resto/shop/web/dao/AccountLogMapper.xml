@@ -9,14 +9,14 @@
     <result column="payment_type" property="paymentType" jdbcType="TINYINT"/>
     <result column="remain" property="remain" jdbcType="DECIMAL"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
-    <result column="tb_account_id" property="accountId" jdbcType="VARCHAR"/>
+    <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, money, create_time, payment_type, remain, remark, tb_account_id</sql>
+  <sql id="Base_Column_List">id, money, create_time, payment_type, remain, remark, account_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_account_log where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_account_log where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.AccountLog">insert into tb_account_log (id, money, create_time, payment_type, remain, remark, tb_account_id) values (#{id,jdbcType=VARCHAR}, #{money,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{paymentType,jdbcType=TINYINT}, #{remain,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.AccountLog">insert into tb_account_log (id, money, create_time, payment_type, remain, remark, account_id) values (#{id,jdbcType=VARCHAR}, #{money,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{paymentType,jdbcType=TINYINT}, #{remain,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.AccountLog">insert into tb_account_log 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -25,7 +25,7 @@
       <if test="paymentType != null">payment_type,</if>  
       <if test="remain != null">remain,</if>  
       <if test="remark != null">remark,</if>  
-      <if test="accountId != null">tb_account_id,</if> 
+      <if test="accountId != null">account_id,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -44,9 +44,9 @@
       <if test="paymentType != null">payment_type = #{paymentType,jdbcType=TINYINT},</if>  
       <if test="remain != null">remain = #{remain,jdbcType=DECIMAL},</if>  
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
-      <if test="accountId != null">tb_account_id = #{accountId,jdbcType=VARCHAR},</if> 
+      <if test="accountId != null">account_id = #{accountId,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.AccountLog">update tb_account_log set money = #{money,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, payment_type = #{paymentType,jdbcType=TINYINT}, remain = #{remain,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, tb_account_id = #{accountId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.AccountLog">update tb_account_log set money = #{money,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, payment_type = #{paymentType,jdbcType=TINYINT}, remain = #{remain,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, account_id = #{accountId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="AccountLog">select * from tb_account_log</select>
 </mapper>

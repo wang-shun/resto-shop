@@ -92,7 +92,7 @@
       <if test="deliveryPointId != null">#{deliveryPointId},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">#{distributionModeId},</if>
-      <if test="verCode != null">#{ver_code},</if>
+      <if test="verCode != null">#{verCode},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">update tb_order 
