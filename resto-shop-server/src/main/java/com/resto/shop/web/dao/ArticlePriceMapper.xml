@@ -52,7 +52,13 @@
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price set price = #{price,jdbcType=DECIMAL}, fans_price = #{fansPrice,jdbcType=DECIMAL}, name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, article_id = #{articleId,jdbcType=VARCHAR},unit_ids=#{unitIds}  where id = #{id,jdbcType=VARCHAR}</update>
-  <select id="selectList" resultType="ArticlePrice">select * from tb_article_price</select>
+  <select id="selectList" resultType="ArticlePrice">select * from tb_article_price
+	  <where>
+	  	<if test="shopId!=null">
+	  		article_id in (select id from tb_article where shop_detail_id=#{shopId})
+	  	</if>
+	  </where>
+  </select>
   <delete id="deleteArticlePrices">
 	delete from tb_article_price where article_id=#{0}  
   </delete>

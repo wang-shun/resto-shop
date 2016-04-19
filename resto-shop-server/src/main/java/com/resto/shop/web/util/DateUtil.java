@@ -259,5 +259,18 @@ public class DateUtil {
         date = DateUtil.getAfterDayDate(date, -week_index);
         return date;
     }
+
+	/**
+	 * 获得某个时间 相对于当前的 分钟数
+	 * @param time
+	 * @return
+	 */
+	public static int getMinOfDay(Date time) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(time);
+		int hourMin = c.get(Calendar.HOUR_OF_DAY)*60;
+		int min = c.get(Calendar.MINUTE);
+		return hourMin+min;
+	}
 	
 }

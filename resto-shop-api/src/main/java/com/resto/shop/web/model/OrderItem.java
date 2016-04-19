@@ -13,7 +13,7 @@ public class OrderItem {
 
     private BigDecimal originalPrice;
 
-    private String unitPrice;
+    private BigDecimal unitPrice;
 
     private BigDecimal finalPrice;
 
@@ -69,12 +69,12 @@ public class OrderItem {
         this.originalPrice = originalPrice;
     }
 
-    public String getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(String unitPrice) {
-        this.unitPrice = unitPrice == null ? null : unitPrice.trim();
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public BigDecimal getFinalPrice() {

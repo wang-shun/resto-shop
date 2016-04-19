@@ -13,4 +13,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @return
 	 */
 	public List<OrderItem> listByOrderId(String orderId);
+
+	public void insertItems(List<OrderItem> orderItems);
 }

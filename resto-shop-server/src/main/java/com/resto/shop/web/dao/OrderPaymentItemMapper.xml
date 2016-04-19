@@ -7,7 +7,7 @@
     <result column="pay_time" property="payTime" jdbcType="TIMESTAMP"/>
     <result column="pay_value" property="payValue" jdbcType="DECIMAL"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
-    <result column="payment_mode_id" property="paymentModeId" jdbcType="BIGINT"/>
+    <result column="payment_mode_id" property="paymentModeId" jdbcType="INT"/>
     <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.resto.shop.web.model.OrderPaymentItem" extends="BaseResultMap">
@@ -20,7 +20,7 @@
     <include refid="Blob_Column_List"/> from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item (id, pay_time, pay_value, remark, payment_mode_id, order_id, result_data) values (#{id,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{payValue,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{paymentModeId,jdbcType=BIGINT}, #{orderId,jdbcType=VARCHAR}, #{resultData,jdbcType=LONGVARCHAR})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item (id, pay_time, pay_value, remark, payment_mode_id, order_id, result_data) values (#{id,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{payValue,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{paymentModeId,jdbcType=INT}, #{orderId,jdbcType=VARCHAR}, #{resultData,jdbcType=LONGVARCHAR})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -36,7 +36,7 @@
       <if test="payTime != null">#{payTime,jdbcType=TIMESTAMP},</if>  
       <if test="payValue != null">#{payValue,jdbcType=DECIMAL},</if>  
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
-      <if test="paymentModeId != null">#{paymentModeId,jdbcType=BIGINT},</if>  
+      <if test="paymentModeId != null">#{paymentModeId,jdbcType=INT},</if>  
       <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>  
       <if test="resultData != null">#{resultData,jdbcType=LONGVARCHAR},</if> 
     </trim> 
@@ -46,12 +46,12 @@
       <if test="payTime != null">pay_time = #{payTime,jdbcType=TIMESTAMP},</if>  
       <if test="payValue != null">pay_value = #{payValue,jdbcType=DECIMAL},</if>  
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
-      <if test="paymentModeId != null">payment_mode_id = #{paymentModeId,jdbcType=BIGINT},</if>  
+      <if test="paymentModeId != null">payment_mode_id = #{paymentModeId,jdbcType=INT},</if>  
       <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>  
       <if test="resultData != null">result_data = #{resultData,jdbcType=LONGVARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId,jdbcType=BIGINT}, order_id = #{orderId,jdbcType=VARCHAR}, result_data = #{resultData,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId,jdbcType=BIGINT}, order_id = #{orderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId,jdbcType=INT}, order_id = #{orderId,jdbcType=VARCHAR}, result_data = #{resultData,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId,jdbcType=INT}, order_id = #{orderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="OrderPaymentItem">select * from tb_order_payment_item</select>
 </mapper>

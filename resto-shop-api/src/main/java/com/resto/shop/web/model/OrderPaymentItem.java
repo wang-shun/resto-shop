@@ -12,7 +12,7 @@ public class OrderPaymentItem {
 
     private String remark;
 
-    private Long paymentModeId;
+    private Integer paymentModeId;
 
     private String orderId;
 
@@ -50,11 +50,11 @@ public class OrderPaymentItem {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public Long getPaymentModeId() {
+    public Integer getPaymentModeId() {
         return paymentModeId;
     }
 
-    public void setPaymentModeId(Long paymentModeId) {
+    public void setPaymentModeId(Integer paymentModeId) {
         this.paymentModeId = paymentModeId;
     }
 

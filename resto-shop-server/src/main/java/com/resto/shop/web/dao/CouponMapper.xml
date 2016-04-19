@@ -11,10 +11,10 @@
     <result column="end_date" property="endDate" jdbcType="DATE"/>
     <result column="begin_time" property="beginTime" jdbcType="TIME"/>
     <result column="end_time" property="endTime" jdbcType="TIME"/>
-    <result column="is_used" property="isUsed" jdbcType="TINYINT"/>
+    <result column="is_used" property="isUsed" jdbcType="BIT"/>
     <result column="using_time" property="usingTime" jdbcType="TIMESTAMP"/>
     <result column="coupon_source" property="couponSource" jdbcType="VARCHAR"/>
-    <result column="use_with_account" property="useWithAccount" jdbcType="TINYINT"/>
+    <result column="use_with_account" property="useWithAccount" jdbcType="BIT"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
     <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
@@ -24,7 +24,7 @@
     <include refid="Base_Column_List"/> from tb_coupon where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_coupon where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.Coupon">insert into tb_coupon (id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id ) values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=DECIMAL}, #{minAmount,jdbcType=DECIMAL}, #{beginDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{beginTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, #{isUsed,jdbcType=TINYINT}, #{usingTime,jdbcType=TIMESTAMP}, #{couponSource,jdbcType=VARCHAR}, #{useWithAccount,jdbcType=TINYINT}, #{remark,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR} )</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Coupon">insert into tb_coupon (id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id ) values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=DECIMAL}, #{minAmount,jdbcType=DECIMAL}, #{beginDate,jdbcType=DATE}, #{endDate,jdbcType=DATE}, #{beginTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, #{isUsed,jdbcType=BIT}, #{usingTime,jdbcType=TIMESTAMP}, #{couponSource,jdbcType=VARCHAR}, #{useWithAccount,jdbcType=BIT}, #{remark,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR} )</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Coupon">insert into tb_coupon 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -52,10 +52,10 @@
       <if test="endDate != null">#{endDate,jdbcType=DATE},</if>  
       <if test="beginTime != null">#{beginTime,jdbcType=TIME},</if>  
       <if test="endTime != null">#{endTime,jdbcType=TIME},</if>  
-      <if test="isUsed != null">#{isUsed,jdbcType=TINYINT},</if>  
+      <if test="isUsed != null">#{isUsed,jdbcType=BIT},</if>  
       <if test="usingTime != null">#{usingTime,jdbcType=TIMESTAMP},</if>  
       <if test="couponSource != null">#{couponSource,jdbcType=VARCHAR},</if>  
-      <if test="useWithAccount != null">#{useWithAccount,jdbcType=TINYINT},</if>  
+      <if test="useWithAccount != null">#{useWithAccount,jdbcType=BIT},</if>  
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if> 
@@ -70,16 +70,16 @@
       <if test="endDate != null">end_date = #{endDate,jdbcType=DATE},</if>  
       <if test="beginTime != null">begin_time = #{beginTime,jdbcType=TIME},</if>  
       <if test="endTime != null">end_time = #{endTime,jdbcType=TIME},</if>  
-      <if test="isUsed != null">is_used = #{isUsed,jdbcType=TINYINT},</if>  
+      <if test="isUsed != null">is_used = #{isUsed,jdbcType=BIT},</if>  
       <if test="usingTime != null">using_time = #{usingTime,jdbcType=TIMESTAMP},</if>  
       <if test="couponSource != null">coupon_source = #{couponSource,jdbcType=VARCHAR},</if>  
-      <if test="useWithAccount != null">use_with_account = #{useWithAccount,jdbcType=TINYINT},</if>  
+      <if test="useWithAccount != null">use_with_account = #{useWithAccount,jdbcType=BIT},</if>  
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon set name = #{name,jdbcType=VARCHAR}, value = #{value,jdbcType=DECIMAL}, min_amount = #{minAmount,jdbcType=DECIMAL}, begin_date = #{beginDate,jdbcType=DATE}, end_date = #{endDate,jdbcType=DATE}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_used = #{isUsed,jdbcType=TINYINT}, using_time = #{usingTime,jdbcType=TIMESTAMP}, coupon_source = #{couponSource,jdbcType=VARCHAR}, use_with_account = #{useWithAccount,jdbcType=TINYINT}, remark = #{remark,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon set name = #{name,jdbcType=VARCHAR}, value = #{value,jdbcType=DECIMAL}, min_amount = #{minAmount,jdbcType=DECIMAL}, begin_date = #{beginDate,jdbcType=DATE}, end_date = #{endDate,jdbcType=DATE}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_used = #{isUsed,jdbcType=BIT}, using_time = #{usingTime,jdbcType=TIMESTAMP}, coupon_source = #{couponSource,jdbcType=VARCHAR}, use_with_account = #{useWithAccount,jdbcType=BIT}, remark = #{remark,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Coupon">select * from tb_coupon</select>
   
   <!-- 查询当前用户的优惠券列表 -->

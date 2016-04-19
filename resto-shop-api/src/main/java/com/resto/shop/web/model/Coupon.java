@@ -20,13 +20,13 @@ public class Coupon {
 
     private Date endTime;
 
-    private Byte isUsed;
+    private Boolean isUsed;
 
     private Date usingTime;
 
     private String couponSource;
 
-    private Byte useWithAccount;
+    private Boolean useWithAccount;
 
     private String remark;
 
@@ -98,11 +98,11 @@ public class Coupon {
         this.endTime = endTime;
     }
 
-    public Byte getIsUsed() {
+    public Boolean getIsUsed() {
         return isUsed;
     }
 
-    public void setIsUsed(Byte isUsed) {
+    public void setIsUsed(Boolean isUsed) {
         this.isUsed = isUsed;
     }
 
@@ -122,11 +122,11 @@ public class Coupon {
         this.couponSource = couponSource == null ? null : couponSource.trim();
     }
 
-    public Byte getUseWithAccount() {
+    public Boolean getUseWithAccount() {
         return useWithAccount;
     }
 
-    public void setUseWithAccount(Byte useWithAccount) {
+    public void setUseWithAccount(Boolean useWithAccount) {
         this.useWithAccount = useWithAccount;
     }
 

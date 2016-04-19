@@ -13,9 +13,9 @@ public class Order {
 
     private Date accountingTime;
 
-    private Byte orderState;
+    private Integer orderState;
 
-    private Byte productionStatus;
+    private Integer productionStatus;
 
     private BigDecimal originalAmount;
 
@@ -33,9 +33,9 @@ public class Order {
 
     private Integer printTimes;
 
-    private Byte allowCancel;
+    private Integer allowCancel;
 
-    private Byte closed;
+    private Integer closed;
 
     private String remark;
 
@@ -91,19 +91,19 @@ public class Order {
         this.accountingTime = accountingTime;
     }
 
-    public Byte getOrderState() {
+    public Integer getOrderState() {
         return orderState;
     }
 
-    public void setOrderState(Byte orderState) {
+    public void setOrderState(Integer orderState) {
         this.orderState = orderState;
     }
 
-    public Byte getProductionStatus() {
+    public Integer getProductionStatus() {
         return productionStatus;
     }
 
-    public void setProductionStatus(Byte productionStatus) {
+    public void setProductionStatus(Integer productionStatus) {
         this.productionStatus = productionStatus;
     }
 
@@ -171,19 +171,19 @@ public class Order {
         this.printTimes = printTimes;
     }
 
-    public Byte getAllowCancel() {
+    public Integer getAllowCancel() {
         return allowCancel;
     }
 
-    public void setAllowCancel(Byte allowCancel) {
+    public void setAllowCancel(Integer allowCancel) {
         this.allowCancel = allowCancel;
     }
 
-    public Byte getClosed() {
+    public Integer getClosed() {
         return closed;
     }
 
-    public void setClosed(Byte closed) {
+    public void setClosed(Integer closed) {
         this.closed = closed;
     }
 

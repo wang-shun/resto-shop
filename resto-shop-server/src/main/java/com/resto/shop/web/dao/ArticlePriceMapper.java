@@ -4,6 +4,8 @@ import com.resto.shop.web.model.ArticlePrice;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
@@ -22,4 +24,6 @@ public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
 	void deleteArticlePrices(String articleId);
 
 	List<ArticlePrice> selectByArticleId(String articleId);
+
+	List<ArticlePrice> selectList(@Param("shopId") String shopDetailId);
 }

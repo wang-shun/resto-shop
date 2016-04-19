@@ -6,10 +6,7 @@ import java.util.Date;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
-import org.springframework.format.annotation.NumberFormat.Style;
 
 public class NewCustomCoupon {
     private Long id;
@@ -29,7 +26,7 @@ public class NewCustomCoupon {
 
     private Date createTime;
 
-    private Byte useWithAccount;
+    private Boolean useWithAccount;
 
     private String couponName;
     
@@ -44,7 +41,7 @@ public class NewCustomCoupon {
     private Date endTime;
     
     @NotNull(message="是否启用不能为空")
-    private Byte isActivty;
+    private Boolean isActivty;
 
     private String brandId;
     
@@ -99,11 +96,11 @@ public class NewCustomCoupon {
         this.createTime = createTime;
     }
 
-    public Byte getUseWithAccount() {
+    public Boolean getUseWithAccount() {
         return useWithAccount;
     }
 
-    public void setUseWithAccount(Byte useWithAccount) {
+    public void setUseWithAccount(Boolean useWithAccount) {
         this.useWithAccount = useWithAccount;
     }
 
@@ -139,11 +136,11 @@ public class NewCustomCoupon {
         this.endTime = endTime;
     }
 
-    public Byte getIsActivty() {
+    public Boolean getIsActivty() {
         return isActivty;
     }
 
-    public void setIsActivty(Byte isActivty) {
+    public void setIsActivty(Boolean isActivty) {
         this.isActivty = isActivty;
     }
 

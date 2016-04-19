@@ -10,13 +10,13 @@ public class AccountLog {
 
     private Date createTime;
 
-    private Byte paymentType;
+    private Integer paymentType;
 
     private BigDecimal remain;
 
     private String remark;
 
-    private String tbAccountId;
+    private String accountId;
 
     public String getId() {
         return id;
@@ -42,11 +42,11 @@ public class AccountLog {
         this.createTime = createTime;
     }
 
-    public Byte getPaymentType() {
+    public Integer getPaymentType() {
         return paymentType;
     }
 
-    public void setPaymentType(Byte paymentType) {
+    public void setPaymentType(Integer paymentType) {
         this.paymentType = paymentType;
     }
 
@@ -66,11 +66,11 @@ public class AccountLog {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public String getTbAccountId() {
-        return tbAccountId;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setTbAccountId(String tbAccountId) {
-        this.tbAccountId = tbAccountId == null ? null : tbAccountId.trim();
+    public void setAccountId(String accountId) {
+        this.accountId = accountId == null ? null : accountId.trim();
     }
 }

@@ -36,6 +36,11 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
 	@Override
 	public List<ArticlePrice> selectByArticleId(String articleId) {
 		return articlepriceMapper.selectByArticleId(articleId);
+	}
+
+	@Override
+	public List<ArticlePrice> selectList(String shopDetailId) {
+		return articlepriceMapper.selectList(shopDetailId);
 	} 
 
 }

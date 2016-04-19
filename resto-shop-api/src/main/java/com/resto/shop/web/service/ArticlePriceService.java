@@ -11,5 +11,7 @@ public interface ArticlePriceService extends GenericService<ArticlePrice, String
 	void saveArticlePrices(String articleId, List<ArticlePrice> articlePrises);
 
 	List<ArticlePrice> selectByArticleId(String articleId);
+
+	List<ArticlePrice> selectList(String shopDetailId);
     
 }

@@ -27,6 +27,11 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	@Override
 	public List<OrderItem> listByOrderId(String orderId) {
 		return orderitemMapper.listByOrderId(orderId);
+	}
+
+	@Override
+	public void insertItems(List<OrderItem> orderItems) {
+		throw new RuntimeException("not exit");
 	} 
 
 }
