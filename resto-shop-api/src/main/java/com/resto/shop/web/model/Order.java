@@ -306,19 +306,19 @@ public class Order {
 		this.verCode = verCode;
 	}
 
-	public List<String> getARTICLE_NAMES() {
-		return ARTICLE_NAMES;
-	}
-
-	public void setARTICLE_NAMES(List<String> aRTICLE_NAMES) {
-		ARTICLE_NAMES = aRTICLE_NAMES;
-	}
-
 	public String getShopName() {
 		return shopName;
 	}
 
 	public void setShopName(String shopName) {
 		this.shopName = shopName;
+	}
+
+	public List<String> getArticleNames() {
+		return articleNames;
+	}
+
+	public void setArticleNames(List<String> articleNames) {
+		this.articleNames = articleNames;
 	}
 }
