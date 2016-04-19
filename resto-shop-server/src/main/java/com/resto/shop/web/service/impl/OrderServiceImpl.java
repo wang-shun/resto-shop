@@ -185,16 +185,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<Order> findCustomerNewOrder() {
-		Date TODAY = DateUtil.getDateBegin(new Date());
-		Integer[] STATES = new Integer[]{OrderState.SUBMIT,OrderState.PAYMENT,OrderState.CONFIRM};
-//		OrderMapper
-//		//PageData order = (PageData) dao.findForObject("OrderMapper.findCustomerNewOrder", custom);
-//		if(order!=null){
-//			List<PageData> items = orderItemService.selectNameAndNumber(order);
-//			order.put("ITEMS", items);
-//		}
-		return null;
+	public Order findCustomerNewOrder(String customerId,String shopId,String orderId) {
+		Date beginDate = DateUtil.getDateBegin(new Date());
+		Integer[] orderState = new Integer[]{OrderState.SUBMIT,OrderState.PAYMENT,OrderState.CONFIRM};
+		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
+		if(orderId != null && order != null){
+			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
+			order.setOrderItems(itemList);
+		}
+		return order;
 	}
 
 }

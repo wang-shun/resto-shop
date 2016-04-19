@@ -130,9 +130,9 @@
   <!-- 根据 店铺ID 和 用户ID  分页查询订单列表 -->
   <select id="orderList" resultType="Order">
   	SELECT * from tb_order where shop_detail_id = #{shopId} and customer_id = #{customerId}
-  	<if test=" ORDER_STATE != null and ORDER_STATE != '' ">
+  	<if test="orderState != null and orderState != '' ">
   		and ORDER_STATE in 
-		<foreach collection="ORDER_STATE" item="state" open="(" separator="," close=")">
+		<foreach collection="orderState" item="state" open="(" separator="," close=")">
 			#{state}
 		</foreach>
   	</if>
@@ -142,5 +142,21 @@
   <!-- 根据订单查询 订单状态 和 生产状态 -->
   <select id="selectOrderStatesById" resultType="Order">
   	SELECT id,order_state,production_status from tb_order where id = #{orderId}
+  </select>
+  
+  <!-- 查询  用户的新订单,如果 订单ID有值。则查询订单的详情 -->
+  <select id="findCustomerNewOrder" resultType="Order">
+	SELECT * from tb_order
+	<if test="orderId == null or orderId == '' ">
+		where customer_id=#{customerId} and shop_detail_id=#{shopId} and create_time > #{beginDate}
+		and order_state in  
+		<foreach collection="orderState" item="state" open="(" separator="," close=")">
+			#{state}
+		</foreach>
+		ORDER BY create_time DESC LIMIT 0,1
+	</if>
+ 	<if test="orderId != null and orderId != '' ">
+		where order_id=#{orderId}
+	</if>
   </select>
 </mapper>

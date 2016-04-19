@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -28,7 +29,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @param customerId
      * @return
      */
-    List<Order> orderList(@Param("start") Integer start,@Param("datalength") Integer datalength,@Param("shopId") String shopId,@Param("customerId") String customerId,@Param("ORDER_STATE") String[] ORDER_STATE);
+    List<Order> orderList(@Param("start") Integer start,@Param("datalength") Integer datalength,@Param("shopId") String shopId,@Param("customerId") String customerId,@Param("orderState") String[] orderState);
     
     /**
      * 根据订单查询 订单状态 和 生产状态
@@ -38,8 +39,12 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     Order selectOrderStatesById(@Param("orderId") String orderId);
     
     /**
-     * 查询 订单详情
+     * 查询  用户的新订单,如果 订单ID有值。则查询订单的详情
+     * @param beginDate		当天的开始时间
+     * @param customerId	当前用户ID
+     * @param shopId		当前店铺ID
+     * @param orderId		订单ID
      * @return
      */
-    List<Order> findCustomerNewOrder();
+    Order findCustomerNewOrder(@Param("beginDate") Date beginDate,@Param("customerId") String customerId,@Param("shopId") String shopId,@Param("orderState") Integer[] orderState,@Param("orderId") String orderId);
 }

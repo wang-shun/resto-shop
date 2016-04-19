@@ -29,4 +29,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> findCustomerNewOrder();
 
+	public Order createOrder(Order order, String useCoupon, Boolean useAccount)throws AppException;
+	
+	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
+
 }
