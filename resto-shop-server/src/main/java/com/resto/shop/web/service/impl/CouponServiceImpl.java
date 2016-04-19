@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
@@ -27,6 +28,15 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     @Override
     public List<Coupon> listCoupon(Coupon coupon) {
         return couponMapper.listCoupon(coupon);
+    }
+
+    @Override
+    public void insertCoupon(Coupon coupon) {
+        coupon.setId(UUID.randomUUID().toString());
+        coupon.setUsingTime(null);
+        byte a = 0;
+        coupon.setIsUsed(a);
+        couponMapper.insertSelective(coupon);
     } 
 
 }

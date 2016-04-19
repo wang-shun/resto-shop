@@ -20,4 +20,5 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
     int updateByPrimaryKey(Coupon record);
 
     List<Coupon> listCoupon(Coupon coupon);
+
 }

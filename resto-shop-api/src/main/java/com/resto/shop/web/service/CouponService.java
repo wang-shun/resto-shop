@@ -8,5 +8,7 @@ import com.resto.shop.web.model.Coupon;
 public interface CouponService extends GenericService<Coupon, String> {
 
     List<Coupon> listCoupon(Coupon coupon);
+
+    void insertCoupon(Coupon coupon);
     
 }
