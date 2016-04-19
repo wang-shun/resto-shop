@@ -11,6 +11,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.constant.OrderItemType;
+import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
@@ -30,6 +31,8 @@ import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.util.DateUtil;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**
@@ -68,12 +71,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 	@Override
-	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId) {
-		return orderMapper.orderList(start, datalength, shopId, customerId);
+	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId,String ORDER_STATE) {
+		String[] states = null;
+		if(	ORDER_STATE != null){
+			states = ORDER_STATE.split(",");
+		}
+		return orderMapper.orderList(start, datalength, shopId, customerId,states);
 	}
 
 	@Override
-	public Map<String, Integer> selectOrderStatesById(String orderId) {
+	public Map<String, Object> selectOrderStatesById(String orderId) {
 		return orderMapper.selectOrderStatesById(orderId);
 	}
 
@@ -171,6 +178,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		
 		return order;
+	}
+
+	@Override
+	public List<Order> findCustomerNewOrder() {
+		Date TODAY = DateUtil.getDateBegin(new Date());
+		Integer[] STATES = new Integer[]{OrderState.SUBMIT,OrderState.PAYMENT,OrderState.CONFIRM};
+//		OrderMapper
+//		//PageData order = (PageData) dao.findForObject("OrderMapper.findCustomerNewOrder", custom);
+//		if(order!=null){
+//			List<PageData> items = orderItemService.selectNameAndNumber(order);
+//			order.put("ITEMS", items);
+//		}
+		return null;
 	}
 
 }

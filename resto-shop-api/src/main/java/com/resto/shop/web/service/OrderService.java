@@ -17,14 +17,17 @@ public interface OrderService extends GenericService<Order, String> {
      * @param customerId
      * @return
      */
-	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId);
+	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId,String ORDER_STATE);
 	
 	/**
 	 * 根据订单ID查询订单状态和生产状态
 	 * @param orderId
 	 * @return
 	 */
-	public Map<String, Integer> selectOrderStatesById(String orderId);
+	public Map<String, Object> selectOrderStatesById(String orderId);
 
 	public Order createOrder(Order order, String useCoupon, Boolean useAccount)throws AppException;
+	
+	public List<Order> findCustomerNewOrder();
+	
 }

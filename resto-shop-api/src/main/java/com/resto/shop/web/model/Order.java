@@ -58,6 +58,16 @@ public class Order {
     private List<OrderItem> orderItems;
     
     private String verCode;
+    
+    /**
+     * 用于保存 订单的 菜品名称（查询时使用）
+     */
+    private List<String> ARTICLE_NAMES;
+    
+    /**
+     * 用于保存 店铺的名称
+     */
+    private String shopName;
 
     public String getId() {
         return id;
@@ -274,6 +284,20 @@ public class Order {
 	public void setVerCode(String verCode) {
 		this.verCode = verCode;
 	}
-    
-    
+
+	public List<String> getARTICLE_NAMES() {
+		return ARTICLE_NAMES;
+	}
+
+	public void setARTICLE_NAMES(List<String> aRTICLE_NAMES) {
+		ARTICLE_NAMES = aRTICLE_NAMES;
+	}
+
+	public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
+	}
 }
