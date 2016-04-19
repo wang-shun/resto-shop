@@ -31,14 +31,14 @@ public class Appraise {
     private String shopDetailId;
     
     /**
-     * 用于保存 当前店铺 的所有评论的条数
+     * 评论者昵称
      */
-    private Integer APPRAISE_COUNT;
+    private String nickName;
     
     /**
-     * 用于保存 当前店铺的 所有评论的平均分
+     * 评论者照片
      */
-    private Double AVG_SCORE;
+    private String headPhoto;
 
     public String getId() {
         return id;
@@ -144,19 +144,19 @@ public class Appraise {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
 
-	public Integer getAPPRAISE_COUNT() {
-		return APPRAISE_COUNT;
+	public String getNickName() {
+		return nickName;
 	}
 
-	public void setAPPRAISE_COUNT(Integer aPPRAISE_COUNT) {
-		APPRAISE_COUNT = aPPRAISE_COUNT;
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
-	public Double getAVG_SCORE() {
-		return AVG_SCORE;
+	public String getHeadPhoto() {
+		return headPhoto;
 	}
 
-	public void setAVG_SCORE(Double aVG_SCORE) {
-		AVG_SCORE = aVG_SCORE;
+	public void setHeadPhoto(String headPhoto) {
+		this.headPhoto = headPhoto;
 	}
 }
