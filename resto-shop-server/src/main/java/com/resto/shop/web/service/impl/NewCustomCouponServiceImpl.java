@@ -65,7 +65,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	        coupon.setUseWithAccount(cfg.getUseWithAccount());
 	        coupon.setDistributionModeId(cfg.getDistributionModeId());
 	        coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
-	        
+	        coupon.setCustomerId(cus.getId());
 	        for(int i=0;i<cfg.getCouponNumber();i++){
 	            couponService.insertCoupon(coupon);
 	        }
