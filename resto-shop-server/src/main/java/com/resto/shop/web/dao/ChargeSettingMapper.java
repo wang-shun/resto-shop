@@ -4,6 +4,8 @@ import com.resto.shop.web.model.ChargeSetting;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
@@ -19,5 +21,5 @@ public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
 
     int updateByPrimaryKey(ChargeSetting record);
 
-    List<ChargeSetting> selectListByCustomerId(String currentUserId);
+    List<ChargeSetting> selectListByBrandId(@Param("currentBrandId") String currentBrandId);
 }

@@ -57,8 +57,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeSetting">update tb_charge_setting set charge_money = #{chargeMoney,jdbcType=DECIMAL}, reward_money = #{rewardMoney,jdbcType=DECIMAL}, show_in = #{showIn,jdbcType=TINYINT}, label_text = #{labelText,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, state = #{state,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, brand_id = #{brandId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ChargeSetting">select * from tb_charge_setting</select>
-  <select id="selectListByCustomerId" resultType="ChargeSetting">
+  <select id="selectListByBrandId" resultType="ChargeSetting">
   select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id from tb_charge_setting
-  where brand_id=#{brandId} and state=1
+  where brand_id=#{currentBrandId} and state=1 ORDER BY sort DESC
   </select>
 </mapper>
