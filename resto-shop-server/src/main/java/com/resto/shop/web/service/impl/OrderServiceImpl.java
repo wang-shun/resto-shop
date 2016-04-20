@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -216,7 +217,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date beginDate = DateUtil.getDateBegin(new Date());
 		Integer[] orderState = new Integer[]{OrderState.SUBMIT,OrderState.PAYMENT,OrderState.CONFIRM};
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
-		if((orderId == null || ("").equals(orderId.trim())) && order != null){
+		if(!StringUtils.isBlank(orderId) && order != null){
 			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
 			order.setOrderItems(itemList);
 		}
