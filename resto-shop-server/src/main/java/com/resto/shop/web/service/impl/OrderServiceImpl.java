@@ -207,13 +207,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setOriginalAmount(totalMoney);//原价
 		order.setReductionAmount(BigDecimal.ZERO);//折扣金额
 		order.setOrderMoney(totalMoney); //订单实际金额
-		order.setPaymentAmount(payMoney); //订单需要支付的金额
+		order.setPaymentAmount(payMoney); //订单剩余需要维修支付的金额
 		order.setPrintTimes(0);
 		order.setOrderState(OrderState.SUBMIT);
 		order.setProductionStatus(ProductionStatus.NOT_ORDER);
 		insert(order);
 		
-		if(order.getPaymentAmount().equals(BigDecimal.ZERO)){
+		if(order.getPaymentAmount().doubleValue()==0){
 			payOrderSuccess(order);
 		}
 		return order;
@@ -238,17 +238,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public void cancelOrder(String orderId) {
+	public boolean cancelOrder(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getOrderState().equals(OrderState.SUBMIT)){
+		if(order.getOrderState().equals(OrderState.SUBMIT)||order.getOrderState().equals(OrderState.PAYMENT)){
 			order.setAllowCancel(false);
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
 			log.info("取消订单成功:"+order.getId());
+			return true;
 		}else{
 			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false");
+			return false;
 		}
 	}
 
@@ -262,16 +264,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				break;
 			case PayMode.ACCOUNT_PAY:
 				accountService.addAccount(item.getPayValue(),item.getResultData(),"取消订单返还");
+				break;
 			case PayMode.WEIXIN_PAY:
 				WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 				JSONObject obj = new JSONObject(item.getResultData());
 				Map<String,String> result = WeChatPayUtils.refund(newPayItemId,obj.getString("transaction_id"), obj.getInt("total_fee"), obj.getInt("refund_fee"), config.getAppid(), config.getMchid(), config.getMchkey(),config.getPayCertPath());
 				item.setResultData(new JSONObject(result).toString());
+				break;
 			}
 			item.setId(newPayItemId);
 			item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 			orderPaymentItemService.insert(item);
 		}
+	}
+
+	@Override
+	public Order orderWxPaySuccess(OrderPaymentItem item) {
+		Order order = selectById(item.getOrderId());
+		if(order.getOrderState().equals(OrderState.SUBMIT)){
+			orderPaymentItemService.insert(item);
+			return payOrderSuccess(order);
+		}
+		return null;
+	}
+
+	@Override
+	public void pushOrder(String orderId) {
+		Order order = selectById(orderId);
+		if(OrderState.PAYMENT==order.getOrderState()&&ProductionStatus.NOT_ORDER==order.getProductionStatus()){
+			order.setProductionStatus(ProductionStatus.HAS_ORDER);
+			
+		}
+		
 	}
 
 }

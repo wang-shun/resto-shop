@@ -4,8 +4,6 @@ import com.resto.shop.web.model.ShopCart;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.resto.brand.core.generic.GenericDao;
 
 public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {

@@ -5,6 +5,7 @@ import java.util.List;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderService extends GenericService<Order, String> {
     
@@ -29,6 +30,10 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
 
-	public void cancelOrder(String string);
+	public boolean cancelOrder(String string);
+
+	public Order orderWxPaySuccess(OrderPaymentItem item);
+
+	public void pushOrder(String orderId);
 
 }

@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
@@ -39,7 +40,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Override
     public void insertCoupon(Coupon coupon) {
-        coupon.setId(UUID.randomUUID().toString());
+        coupon.setId(ApplicationUtils.randomUUID());
         coupon.setUsingTime(null);
         coupon.setIsUsed(false);
         couponMapper.insertSelective(coupon);
@@ -63,7 +64,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		int beginMin = DateUtil.getMinOfDay(coupon.getBeginTime());
 		int endMin = DateUtil.getMinOfDay(coupon.getEndTime());
 		int nowMin = DateUtil.getMinOfDay(now);
-		if(beginMin<nowMin||endMin>nowMin){
+		if(beginMin>nowMin||endMin<nowMin){
 			throw new AppException(AppException.COUPON_TIME_ERR);
 		}
 		
@@ -72,7 +73,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 			throw new AppException(AppException.COUPON_MODE_ERR);
 		}
 		//判断优惠卷订单金额是否大于优惠卷可用金额
-		if(totalMoney.compareTo(order.getOriginalAmount())<0){
+		if(totalMoney.compareTo(totalMoney)<0){
 			throw new AppException(AppException.COUPON_MIN_AMOUNT_ERR);
 		}
 		//判断是否使用了余额 并且 当前优惠卷可否使用余额
