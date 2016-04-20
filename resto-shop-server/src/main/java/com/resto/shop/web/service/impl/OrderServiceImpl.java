@@ -237,6 +237,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
+			//TODO 添加退款信息
+			log.info("取消订单成功:"+order.getId());
 		}else{
 			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false");
 		}
