@@ -93,6 +93,8 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		coupon.setRemark("退还优惠卷");
 		update(coupon);
 	}
+
+	@Override
 	public List<Coupon> listCouponByStatus(String status, String customerId) {
 		String IS_EXPIRE = null;
 		String NOT_EXPIRE = null;
@@ -105,6 +107,5 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		}
 		return couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId);
 	}
-
 
 }
