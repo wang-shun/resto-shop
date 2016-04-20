@@ -225,9 +225,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public Order createOrder(Order order, String useCoupon, Boolean useAccount) throws AppException {
-		// TODO Auto-generated method stub
-		return null;
+	public void cancelOrder(String string) {
+		
 	}
 
 }

@@ -6,7 +6,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 
-
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://42.96.203.79:8081/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
 	<parent>
 		<groupId>cn.restoplus</groupId>
 		<artifactId>resto</artifactId>
@@ -14,7 +19,7 @@
 	</parent>
 	<artifactId>resto-shop</artifactId>
 	<packaging>pom</packaging>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -29,9 +34,9 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<modules>
-		<module>resto-shop-web</module>
+<!-- 		<module>resto-shop-web</module> -->
 		<module>resto-shop-server</module>
 		<module>resto-shop-api</module>
 	</modules>

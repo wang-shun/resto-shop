@@ -31,4 +31,6 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
 
+	public void cancelOrder(String string);
+
 }

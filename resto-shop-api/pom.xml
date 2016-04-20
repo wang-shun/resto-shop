@@ -13,7 +13,6 @@
 		<dependency>
 			<groupId>cn.restoplus</groupId>
 			<artifactId>resto-brand-core</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
