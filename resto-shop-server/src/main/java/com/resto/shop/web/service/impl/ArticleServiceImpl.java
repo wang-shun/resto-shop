@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import java.util.List;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ArticleMapper;
@@ -10,6 +11,7 @@ import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
+import com.resto.shop.web.service.KitchenService;
 import com.resto.shop.web.service.SupportTimeService;
 
 import cn.restoplus.rpc.common.util.StringUtil;
@@ -30,6 +32,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Resource
     private SupportTimeService supportTimeService;
     
+    @Resource
+    private KitchenService kitchenService;
+    
     @Override
     public GenericDao<Article, String> getDao() {
         return articleMapper;
@@ -45,6 +50,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		this.insert(article);
 		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
+		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		return article;
 	} 
 	
@@ -52,6 +58,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public int update(Article article) {
 		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
+		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		return super.update(article);
 	}
 
@@ -59,9 +66,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public Article selectFullById(String id) {
 		List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
 		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
+		List<Integer> kitchenList = kitchenService.selectByIdsArticleId(id);
 		Article article  = selectById(id);
 		article.setArticlePrices(prices);
 		article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
+		article.setKitchenList(kitchenList.toArray(new Integer[0]));
 		return article;
 	}
 

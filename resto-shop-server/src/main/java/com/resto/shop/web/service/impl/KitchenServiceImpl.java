@@ -32,6 +32,17 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	@Override
 	public void insertSelective(Kitchen kitchen) {
 		kitchenMapper.insertSelective(kitchen);
+	}
+
+	@Override
+	public void saveArticleKitchen(String articleId, Integer[] kitchenList) {
+		kitchenMapper.deleteArticleKitchen(articleId);
+		kitchenMapper.insertArticleKitchen(articleId, kitchenList);;
+	}
+
+	@Override
+	public List<Integer> selectByIdsArticleId(String articleId) {
+		return kitchenMapper.selectByArticleId(articleId);
 	} 
 
 }

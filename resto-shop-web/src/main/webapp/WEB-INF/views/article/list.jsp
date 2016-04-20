@@ -85,7 +85,9 @@
 							<div class="form-group">
 							    <label class="col-md-3 control-label">出餐厨房</label>
 							    <div class="col-md-5">
-								    待完成
+								    <label v-for="kitchen in kitchenList">
+								    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
+								    </label>
 							    </div>
 							</div>
 							
@@ -254,12 +256,21 @@
 			data:{
 				articlefamilys:[],
 				supportTimes:[],
+				kitchenList:[],
 				checkedUnit:[],
 				articleattrs:[],
 				articleunits:{},
 				unitPrices:[],
 			},
 			methods:{
+				create:function(){
+					this.m= {
+						supportTimes:[],
+						kitchenList:[],
+					};
+					this.checkedUnit=[];
+					this.showform=true;
+				},
 				uploadSuccess:function(url){
 					$("[name='photoSmall']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
@@ -369,7 +380,10 @@
 					that.articlefamilys = data;
 				});
 				$.post("supporttime/list_all",null,function(data){
-					that.supportTimes=data;
+					that.supportTimes = data;
+				});
+				$.post("kitchen/list_all",null,function(data){
+					that.kitchenList = data;
 				});
 				$.post("articleattr/list_all",null,function(data){
 					var article_units = {};

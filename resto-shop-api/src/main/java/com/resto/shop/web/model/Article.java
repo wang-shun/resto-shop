@@ -62,6 +62,7 @@ public class Article {
     
     private List<ArticlePrice> articlePrices= new ArrayList<>();
     private Integer [] supportTimes;
+    private Integer [] kitchenList;
 
     public String getId() {
         return id;
@@ -294,4 +295,13 @@ public class Article {
 	public void setPeference(String peference) {
 		this.peference = peference;
 	}
+
+	public Integer[] getKitchenList() {
+		return kitchenList;
+	}
+
+	public void setKitchenList(Integer[] kitchenList) {
+		this.kitchenList = kitchenList;
+	}
+	
 }

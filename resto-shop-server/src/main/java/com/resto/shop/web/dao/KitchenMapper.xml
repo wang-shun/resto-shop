@@ -51,4 +51,21 @@
 		where k.shop_detail_id = #{shopId} 
 	</if>
   </select>
+  
+  <!-- 删除 菜品和厨房的关联信息 -->
+  <delete id="deleteArticleKitchen">
+	DELETE from tb_article_kitchen where article_id = #{articleId}
+  </delete>
+  
+  <!-- 添加 菜品和厨房的关联信息 -->
+  <insert id="insertArticleKitchen">
+  	insert tb_article_kitchen(article_id,kitchen_id) values
+  	<foreach collection="kitchenList" separator="," item="kitchenId">
+		(#{articleId},#{kitchenId})
+	</foreach>
+  </insert>
+  
+  <select id="selectByArticleId" resultType="Integer">
+  	SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId}
+  </select>
 </mapper>

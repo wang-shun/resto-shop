@@ -14,4 +14,8 @@ public interface KitchenService extends GenericService<Kitchen, Integer> {
 	
 	
 	void insertSelective(Kitchen kitchen);
+	
+	void saveArticleKitchen(String articleId,Integer[] kitchenList);
+	
+	List<Integer> selectByIdsArticleId(String articleId);
 }
