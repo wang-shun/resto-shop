@@ -289,13 +289,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public void pushOrder(String orderId) {
+	public Order pushOrder(String orderId) {
 		Order order = selectById(orderId);
 		if(OrderState.PAYMENT==order.getOrderState()&&ProductionStatus.NOT_ORDER==order.getProductionStatus()){
 			order.setProductionStatus(ProductionStatus.HAS_ORDER);
-			
+			order.setPushOrderTime(new Date());
+			update(order);
+			return order;
 		}
+		return null;
+	}
+
+	@Override
+	public Order callNumber(String orderId) {
+		Order order = selectById(orderId);
+		order.setProductionStatus(ProductionStatus.HAS_CALL);
+		order.setCallNumberTime(new Date());
+		update(order);
+		return order;
+	}
+
+	@Override
+	public List<Map<String, Object>> getPrintData(String orderId) {
 		
+		
+		
+		return null;
+	}
+
+	@Override
+	public Order printSuccess(String orderId) {
+		Order order = selectById(orderId);
+		order.setProductionStatus(ProductionStatus.PRINTED);
+		order.setPrintOrderTime(new Date());
+		update(order);
+		return order;
 	}
 
 }

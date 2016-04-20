@@ -12,6 +12,7 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.shop.web.model.Order;
 
 
 public class MQMessageProducer {
@@ -39,5 +40,27 @@ public class MQMessageProducer {
 			}
 		}).start();
 	}
+
+	/**
+	 * 生产 订单状态改变 消息
+	 * @param order
+	 * @param brandId
+	 */
+	public static void sendOrderProessMessage(final Order order, final String brandId) {
+		new Thread(new Runnable() {
+			public void run() {
+				JSONObject obj = new JSONObject();
+				obj.put("verCode", order.getVerCode());
+				obj.put("orderId", order.getId());
+				obj.put("shopDetailId", order.getShopDetailId());
+				obj.put("brandId", brandId);
+				obj.put("productionState", order.getProductionStatus());
+				Message msg = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_PRODUCTION_STATE_CHANGE,obj.toJSONString().getBytes());
+				SendResult result = producer.send(msg);
+				log.info("发送订单状态改变消息:"+msg+" 成功:"+result);
+			}
+		}).start();
+	}
+
 
 }

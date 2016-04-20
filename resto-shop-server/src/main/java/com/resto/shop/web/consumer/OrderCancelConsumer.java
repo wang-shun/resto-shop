@@ -26,7 +26,7 @@ import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.service.OrderService;
 
 @Component
-public class OrderConsumer implements ApplicationContextAware{
+public class OrderCancelConsumer implements ApplicationContextAware{
 	Logger log = LoggerFactory.getLogger(getClass());
 	Consumer consumer =  null;
 	
@@ -38,7 +38,7 @@ public class OrderConsumer implements ApplicationContextAware{
 		Properties pro= MQSetting.getPropertiesWithAccessSecret();
 		pro.setProperty(PropertyKeyConst.ConsumerId, MQSetting.CID_SHOP);
 		consumer = ONSFactory.createConsumer(pro);
-		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_ALL, new MessageListener() {
+		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_CANCEL_ORDER, new MessageListener() {
 			@Override
 			public Action consume(Message message, ConsumeContext context) {
 				log.info("接收到队列消息:"+message);

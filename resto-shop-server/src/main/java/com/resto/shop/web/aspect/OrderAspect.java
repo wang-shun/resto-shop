@@ -13,6 +13,7 @@ import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
@@ -70,7 +71,26 @@ public class OrderAspect {
 		}
 	}
 	
+	@Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
+	public void pushOrder(){};
 	
+	@AfterReturning(value="pushOrder",returning="order")
+	public void pushOrderAfter(Order order){
+		if(order!=null&&ProductionStatus.HAS_ORDER==order.getProductionStatus()){
+			MQMessageProducer.sendOrderProessMessage(order,DataSourceContextHolder.getDataSourceName());
+			sendVerCodeMsg(order);
+		}
+	}
+
+	private void sendVerCodeMsg(Order order) {
+		Customer customer = customerService.selectById(order.getCustomerId());
+		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
+		StringBuffer msg = new StringBuffer();
+		msg.append("取餐码:"+order.getVerCode()+"\n");
+		msg.append("请留意餐厅叫号信息");
+		String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+		log.info("发送取餐信息成功:"+result);
+	}
 	
 	
 }

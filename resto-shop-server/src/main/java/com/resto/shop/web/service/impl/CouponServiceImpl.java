@@ -3,8 +3,6 @@ package com.resto.shop.web.service.impl;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
 import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;

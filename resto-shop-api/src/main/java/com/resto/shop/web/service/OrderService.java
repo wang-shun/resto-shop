@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
@@ -34,6 +35,14 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
-	public void pushOrder(String orderId);
+	public Order pushOrder(String orderId);
+	
+	public Order callNumber(String orderId);
+	
+	public List<Map<String,Object>> getPrintData(String order);
+	
+	public Order printSuccess(String orderId);
+	
+	 
 
 }

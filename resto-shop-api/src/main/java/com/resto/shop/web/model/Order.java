@@ -62,7 +62,12 @@ public class Order {
     private boolean useAccount;
     
     private String useCoupon;
+    
+    private Date pushOrderTime;
 
+    private Date printOrderTime;
+
+    private Date callNumberTime;
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
@@ -320,5 +325,29 @@ public class Order {
 
 	public void setArticleNames(List<String> articleNames) {
 		this.articleNames = articleNames;
+	}
+
+	public Date getPushOrderTime() {
+		return pushOrderTime;
+	}
+
+	public Date getPrintOrderTime() {
+		return printOrderTime;
+	}
+
+	public Date getCallNumberTime() {
+		return callNumberTime;
+	}
+
+	public void setPushOrderTime(Date pushOrderTime) {
+		this.pushOrderTime = pushOrderTime;
+	}
+
+	public void setPrintOrderTime(Date printOrderTime) {
+		this.printOrderTime = printOrderTime;
+	}
+
+	public void setCallNumberTime(Date callNumberTime) {
+		this.callNumberTime = callNumberTime;
 	}
 }
