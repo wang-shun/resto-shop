@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -20,6 +22,11 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
     @Override
     public GenericDao<AccountLog, String> getDao() {
         return accountlogMapper;
-    } 
+    }
+
+	@Override
+	public List<AccountLog> selectLogsByAccountId(String accountId) {
+		return accountlogMapper.selectLogsByAccountId(accountId);
+	} 
 
 }

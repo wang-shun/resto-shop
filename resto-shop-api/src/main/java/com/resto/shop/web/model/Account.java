@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Account {
     private String id;
@@ -8,6 +9,11 @@ public class Account {
     private BigDecimal remain;
 
     private Byte status;
+    
+    /**
+     * 用于保存 用户的交易明细
+     */
+    List<AccountLog> accountLogs;
 
     public String getId() {
         return id;
@@ -32,4 +38,12 @@ public class Account {
     public void setStatus(Byte status) {
         this.status = status;
     }
+
+	public List<AccountLog> getAccountLogs() {
+		return accountLogs;
+	}
+
+	public void setAccountLogs(List<AccountLog> accountLogs) {
+		this.accountLogs = accountLogs == null ? null : accountLogs;
+	}
 }

@@ -1,7 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.Account;
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.Account;
 
 public interface AccountMapper  extends GenericDao<Account,String> {
     int deleteByPrimaryKey(String id);
@@ -15,4 +17,6 @@ public interface AccountMapper  extends GenericDao<Account,String> {
     int updateByPrimaryKeySelective(Account record);
 
     int updateByPrimaryKey(Account record);
+    
+    Account selectAccountByCustomerId(@Param("customerId") String customerId);
 }

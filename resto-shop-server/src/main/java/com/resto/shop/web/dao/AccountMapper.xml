@@ -33,4 +33,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Account">update tb_account set remain = #{remain,jdbcType=DECIMAL}, status = #{status,jdbcType=TINYINT} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Account">select * from tb_account</select>
+  
+  <!-- 根据用户ID查询账户余额 -->
+  <select id="selectAccountByCustomerId" resultType="Account">
+	SELECT a.* from tb_account a LEFT JOIN tb_customer c on a.id = c.account_id where c.id = #{customerId}
+  </select>
 </mapper>

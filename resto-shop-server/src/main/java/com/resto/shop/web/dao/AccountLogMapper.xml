@@ -49,4 +49,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.AccountLog">update tb_account_log set money = #{money,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, payment_type = #{paymentType,jdbcType=TINYINT}, remain = #{remain,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, account_id = #{accountId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="AccountLog">select * from tb_account_log</select>
+  
+  <!-- 根据 账户ID 查询 账户交易明细 -->
+  <select id="selectLogsByAccountId" resultType="AccountLog">
+  	SELECT * from tb_account_log where account_id = #{accountId}
+  </select>
 </mapper>

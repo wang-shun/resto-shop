@@ -2,8 +2,10 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -13,6 +15,7 @@ import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.service.AccountLogService;
 import com.resto.shop.web.service.AccountService;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**
@@ -56,6 +59,17 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		accountLogService.insert(acclog);
 		update(account);
 		return useAccountValue;
+	}
+
+	@Override
+	public Account selectAccountAndLogByCustomerId(String customerId) {
+		System.out.println(customerId);
+		Account account = accountMapper.selectAccountByCustomerId(customerId);
+		if(account!=null){
+			List<AccountLog> accountLogs = accountLogService.selectLogsByAccountId(account.getId());
+			account.setAccountLogs(accountLogs);
+		}
+		return account;
 	} 
 
 }
