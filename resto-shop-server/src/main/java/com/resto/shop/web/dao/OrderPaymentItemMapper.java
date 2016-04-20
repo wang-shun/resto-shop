@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.OrderPaymentItem;
+
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,String> {
@@ -17,4 +20,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     int updateByPrimaryKeyWithBLOBs(OrderPaymentItem record);
 
     int updateByPrimaryKey(OrderPaymentItem record);
+
+	List<OrderPaymentItem> selectByOrderId(String orderId);
 }

@@ -85,5 +85,13 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		return coupon;
 	}
 
+	@Override
+	public void refundCoupon(String id) {
+		Coupon coupon = selectById(id);
+		coupon.setIsUsed(false);
+		coupon.setRemark("退还优惠卷");
+		update(coupon);
+	}
+
 
 }

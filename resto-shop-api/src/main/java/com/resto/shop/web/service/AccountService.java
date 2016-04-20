@@ -13,6 +13,8 @@ public interface AccountService extends GenericService<Account, String> {
 	 * @return
 	 */
 	BigDecimal useAccount(BigDecimal maxUseAccount, Account account);
+
+	void addAccount(BigDecimal value, String accountId, String remark);
     
 	/**
 	 * 根据用户查询 余额 和 交易明细

@@ -48,17 +48,30 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			useAccountValue = payMoney;
 		}
 		account.setRemain(account.getRemain().subtract(useAccountValue));
+		String remark= "使用余额:"+useAccountValue+"元";
+		addLog(useAccountValue, account, remark, AccountLogType.PAY);
+		update(account);
+		return useAccountValue;
+	}
+
+	@Override
+	public void addAccount(BigDecimal value, String accountId, String remark) {
+		Account account = selectById(accountId);
+		account.setRemain(account.getRemain().add(value));
+		addLog(value, account, remark, AccountLogType.INCOME);
+		update(account);
+	} 
+
+	private void addLog(BigDecimal money,Account account,String remark,int type){
 		AccountLog acclog = new AccountLog();
 		acclog.setCreateTime(new Date());
 		acclog.setId(ApplicationUtils.randomUUID());
-		acclog.setMoney(useAccountValue);
+		acclog.setMoney(money);
 		acclog.setRemain(account.getRemain());
-		acclog.setPaymentType(AccountLogType.PAY);
-		acclog.setRemark("使用余额:"+acclog.getMoney()+"元");
+		acclog.setPaymentType(type);
+		acclog.setRemark(remark);
 		acclog.setAccountId(account.getId());
 		accountLogService.insert(acclog);
-		update(account);
-		return useAccountValue;
 	}
 
 	@Override
@@ -71,5 +84,4 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		}
 		return account;
 	} 
-
 }

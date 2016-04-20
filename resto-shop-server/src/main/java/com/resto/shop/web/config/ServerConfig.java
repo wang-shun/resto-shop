@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ImportResource;
 
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DatabaseConfigService;
+import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.datasource.DynamicDataSource;
 
 import cn.restoplus.rpc.client.RpcProxy;
@@ -26,6 +27,10 @@ public class ServerConfig {
 		return proxy.create(BrandService.class);
 	}
 	
+	@Bean
+	public WechatConfigService wechatConfigService(){
+		return proxy.create(WechatConfigService.class);
+	}
 	
 	@Bean
 	public DynamicDataSource dataSource(){

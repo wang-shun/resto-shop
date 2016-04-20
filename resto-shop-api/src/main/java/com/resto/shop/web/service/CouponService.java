@@ -15,5 +15,7 @@ public interface CouponService extends GenericService<Coupon, String> {
     void insertCoupon(Coupon coupon);
 
 	Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException;
+
+	void refundCoupon(String id);
     
 }

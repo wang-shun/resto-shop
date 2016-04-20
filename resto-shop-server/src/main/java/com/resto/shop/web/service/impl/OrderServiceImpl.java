@@ -9,10 +9,14 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.json.JSONObject;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
@@ -28,7 +32,6 @@ import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
@@ -74,6 +77,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     ShopCartService shopCartService;
+    
+    @Resource
+    WechatConfigService wechatConfigService;
     
     @Override
     public GenericDao<Order, String> getDao() {
@@ -169,6 +175,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			item.setPayTime(order.getCreateTime());
 			item.setPayValue(coupon.getValue());
 			item.setRemark("优惠卷支付:"+item.getPayValue());
+			item.setResultData(coupon.getId());
 			orderPaymentItemService.insert(item);
 			payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
@@ -185,6 +192,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				item.setPayTime(order.getCreateTime());
 				item.setPayValue(payValue);
 				item.setRemark("余额支付:"+item.getPayValue());
+				item.setResultData(account.getId());
 				orderPaymentItemService.insert(item);
 				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
@@ -232,15 +240,37 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public void cancelOrder(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getAllowCancel()&&order.getOrderState().equals(OrderState.SUBMIT)){
+		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			order.setAllowCancel(false);
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
-			//TODO 添加退款信息
+			refundOrder(order);
 			log.info("取消订单成功:"+order.getId());
 		}else{
 			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false");
+		}
+	}
+
+	private void refundOrder(Order order) {
+		List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+		for (OrderPaymentItem item : payItemsList) {
+			String newPayItemId = ApplicationUtils.randomUUID();
+			switch (item.getPaymentModeId()) {
+			case PayMode.COUPON_PAY:
+				couponService.refundCoupon(item.getResultData());
+				break;
+			case PayMode.ACCOUNT_PAY:
+				accountService.addAccount(item.getPayValue(),item.getResultData(),"取消订单返还");
+			case PayMode.WEIXIN_PAY:
+				WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+				JSONObject obj = new JSONObject(item.getResultData());
+				Map<String,String> result = WeChatPayUtils.refund(newPayItemId,obj.getString("transaction_id"), obj.getInt("total_fee"), obj.getInt("refund_fee"), config.getAppid(), config.getMchid(), config.getMchkey(),config.getPayCertPath());
+				item.setResultData(new JSONObject(result).toString());
+			}
+			item.setId(newPayItemId);
+			item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+			orderPaymentItemService.insert(item);
 		}
 	}
 
