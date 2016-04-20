@@ -76,7 +76,6 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 
 	@Override
 	public Account selectAccountAndLogByCustomerId(String customerId) {
-		System.out.println(customerId);
 		Account account = accountMapper.selectAccountByCustomerId(customerId);
 		if(account!=null){
 			List<AccountLog> accountLogs = accountLogService.selectLogsByAccountId(account.getId());

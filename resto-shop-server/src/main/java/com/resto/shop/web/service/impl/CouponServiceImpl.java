@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.CouponMapper;
@@ -91,6 +92,18 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		coupon.setIsUsed(false);
 		coupon.setRemark("退还优惠卷");
 		update(coupon);
+	}
+	public List<Coupon> listCouponByStatus(String status, String customerId) {
+		String IS_EXPIRE = null;
+		String NOT_EXPIRE = null;
+		if("2".equals(status)){
+			IS_EXPIRE = "IS_EXPIRE";
+			status = null;
+		}
+		if("0".equals(status)){
+			NOT_EXPIRE = "NOT_EXPIRE";
+		}
+		return couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId);
 	}
 
 

@@ -18,4 +18,10 @@ public interface CouponService extends GenericService<Coupon, String> {
 
 	void refundCoupon(String id);
     
+	/**
+	 * 根据 状态 查询 优惠劵列表
+	 * @param status
+	 * @return
+	 */
+	List<Coupon> listCouponByStatus(String status,String customerId);
 }
