@@ -15,8 +15,18 @@ public class Printer {
     private String port;
 
     private String shopDetailId;
+    
+    private Integer printType;
+    
+    public Integer getPrintType() {
+		return printType;
+	}
 
-    public Integer getId() {
+	public void setPrintType(Integer printType) {
+		this.printType = printType;
+	}
+
+	public Integer getId() {
         return id;
     }
 

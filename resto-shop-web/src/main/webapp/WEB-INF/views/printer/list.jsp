@@ -28,8 +28,19 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">端&nbsp;口&nbsp;号：</label>
 							    <div class="col-sm-8">
-							    	<input type="number" class="form-control" required placeholder="请输入数字!" name="port" v-model="m.port">
+<!-- 							    	<input type="number" class="form-control" required placeholder="请输入数字!" name="port" v-model="m.port"> -->
+							    	<input type="text" class="form-control" required  name="port" v-model="m.port">
 							    </div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-3 control-label">打印机类型：</div>
+							    <input type="radio"  name="printType" v-model="m.printType" value=1 checked="checked">
+							    <label for="printType">厨房</label>
+							    <input type="radio"  name="printType" v-model="m.printType" value=2> 
+							    <label for="printType">前台</label>
+							    <input type="radio"  name="printType" v-model="m.printType" value=3> 
+							    <label for="printType">打包</label>
 							</div>
 						</div>
 						<div class="text-center">
@@ -79,6 +90,25 @@
 				{                 
 					title : "端口号",
 					data : "port",
+				},
+				{                 
+					title : "打印机类型",
+					data : "printType",
+					createdCell:function(td,tdData,rowData,row){
+						switch(tdData){
+						case 1:
+							$(td).html('厨房');
+						break;
+						case 2:
+							$(td).html('前台');
+						break;
+						case 3:
+							$(td).html('打包');
+						break;
+						default:
+							$(td).html('未知');
+						}
+					}
 				},
 				{
 					title : "操作",
