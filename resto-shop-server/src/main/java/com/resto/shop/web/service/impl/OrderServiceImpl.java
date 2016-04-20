@@ -18,6 +18,7 @@ import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Article;
@@ -27,6 +28,7 @@ import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
@@ -35,6 +37,7 @@ import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.ShopCartService;
 import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
@@ -68,6 +71,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     OrderItemService orderItemService;
+    
+    @Resource
+    ShopCartService shopCartService;
     
     @Override
     public GenericDao<Order, String> getDao() {
@@ -198,10 +204,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setOrderState(OrderState.SUBMIT);
 		order.setProductionStatus(ProductionStatus.NOT_ORDER);
 		insert(order);
+		
 		if(order.getPaymentAmount().equals(BigDecimal.ZERO)){
 			payOrderSuccess(order);
-		}else{
-			
 		}
 		return order;
 	}
@@ -225,8 +230,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public void cancelOrder(String string) {
-		
+	public void cancelOrder(String orderId) {
+		Order order = selectById(orderId);
+		if(order.getAllowCancel()&&order.getOrderState().equals(OrderState.SUBMIT)){
+			order.setAllowCancel(false);
+			order.setClosed(true);
+			order.setOrderState(OrderState.CANCEL);
+			update(order);
+		}else{
+			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false");
+		}
 	}
 
 }

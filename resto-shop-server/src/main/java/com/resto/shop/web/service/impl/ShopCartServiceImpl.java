@@ -55,6 +55,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         shopcartMapper.insertSelective(shopCart);
     }
 
+	@Override
+	public void clearShopCart(String customerId, Integer distributionModeId, String shopDetailId) {
+		//TODO clear shop cart
+	}
+
     
 
 }

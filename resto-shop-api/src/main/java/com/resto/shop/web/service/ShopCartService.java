@@ -10,5 +10,7 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     List<ShopCart> listUserAndShop(ShopCart shopcart);
 
     void updateShopCart(ShopCart shopCart);
+
+	void clearShopCart(String customerId, Integer distributionModeId, String shopDetailId);
     
 }
