@@ -71,6 +71,10 @@
       <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
-	
+  
+  
+	 <delete id="deleteById">
+	 delete from tb_shop_cart where customer_id = #{0} and distribution_mode_id = #{1} and  shop_detail_id = #{2}
+	 </delete>
 	
 </mapper>
