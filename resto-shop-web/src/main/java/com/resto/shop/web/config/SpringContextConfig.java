@@ -199,6 +199,11 @@ public class SpringContextConfig {
 	public ShowPhotoService showPhotoService(){
 		return getProxy(ShowPhotoService.class);
 	}
+	
+	@Bean
+	public BrandSettingService brandSettingService(){
+		return getProxy(BrandSettingService.class);
+	}
 
 	
 	public <T> T getProxy(Class<T> clazz){
