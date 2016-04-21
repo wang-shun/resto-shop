@@ -89,9 +89,9 @@
   	</foreach>
   </insert>
   
-  <select id="selectOrderArticleList" resultType="java.util.HashMap">
+  <select id="selectOrderArticleList" resultType="OrderItem">
   	SELECT
-		left(o.article_id,32) article_id,o.article_name	name,o.count,o.original_price
+		left(o.article_id,32) article_id,o.article_name,o.count,o.original_price
 		FROM
 		tb_order_item o
 		LEFT JOIN tb_article a ON  left(o.article_id,32)=a.id

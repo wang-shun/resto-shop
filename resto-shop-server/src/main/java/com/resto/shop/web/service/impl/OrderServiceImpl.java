@@ -396,15 +396,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	
 	
 	@Override
-	public List<Map<String, Object>> printKitchen(Order order, List<Map<String, Object>> articleList) {
-		Map<String,List<Map<String,Object>>> kitchenArticleMap = new HashMap<String, List<Map<String,Object>>>();
+	public List<Map<String, Object>> printKitchen(Order order, List<OrderItem> articleList) {
+		Map<String,List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
 		Map<String,Kitchen> kitchenMap = new HashMap<String, Kitchen>();
 		
 		//得到 需要打印的菜品信息和厨房信息
-		for(Map<String,Object> articleMap : articleList){
-			System.out.println(articleMap.get("article_id").toString());
+		for(OrderItem article : articleList){
 			//得到 当前菜品 对应的厨房信息
-			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleMap.get("article_id").toString());
+			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(article.getArticleId());
 			if(kitchenList!=null){
 				for(Kitchen kitchen : kitchenList){
 					String kitchenId = kitchen.getId().toString();
@@ -412,11 +411,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					//判断 厨房集合中 是否已经包含当前厨房信息
 					if(kitchenArticleMap.containsKey(kitchenId)){
 						//如果有  则直接 把需要制作的 菜品信息 放入
-						kitchenArticleMap.get(kitchenId).add(articleMap);
+						kitchenArticleMap.get(kitchenId).add(article);
 					}else{
 						//如果没有 则新建
-						kitchenArticleMap.put(kitchenId, new ArrayList<Map<String,Object>>());
-						kitchenArticleMap.get(kitchenId).add(articleMap);
+						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+						kitchenArticleMap.get(kitchenId).add(article);
 					}
 				}
 			}
@@ -432,12 +431,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//厨房 循环
 		for(String kitchenId : kitchenArticleMap.keySet()){
 			//生成厨房小票
-			for(Map<String,Object> articleMap : kitchenArticleMap.get(kitchenId)){
+			for(OrderItem article : kitchenArticleMap.get(kitchenId)){
 				//保存 菜品的名称和数量
 				List<Map<String,Object>> items = new ArrayList<Map<String,Object>>();
 				Map<String,Object> item = new HashMap<String,Object>();
-				item.put("ARTICLE_NAME", articleMap.get("name"));
-				item.put("ARTICLE_COUNT",articleMap.get("count"));
+				item.put("ARTICLE_NAME", article.getArticleName());
+				item.put("ARTICLE_COUNT",article.getCount());
 				items.add(item);
 				//得到厨房 信息
 				Kitchen kitchen = kitchenMap.get(kitchenId);
@@ -472,10 +471,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//如果是外带，添加一张外带小票
 		if(order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){
 			List<Map<String,Object>> items = new ArrayList<Map<String,Object>>();
-			for(Map<String,Object> articleMap:articleList){
+			for(OrderItem article: articleList){
 				Map<String,Object> item = new HashMap<String,Object>();
-				item.put("ARTICLE_NAME", articleMap.get("NAME"));
-				item.put("ARTICLE_COUNT", articleMap.get("COUNT"));
+				item.put("ARTICLE_NAME", article.getArticleName());
+				item.put("ARTICLE_COUNT", article.getCount());
 				items.add(item);
 			}
 			Map<String,Object> data = new HashMap<String,Object>();
@@ -504,25 +503,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
   
 	@Override
-	public Map<String, Object> printReceipt(String orderId, Map<String, Object> shopDetail) {
+	public Map<String, Object> printReceipt(String orderId, String shopId) {
 		// 根据id查询订单
 		Order order = selectById(orderId);
+		//查询店铺
+		ShopDetail shopDetail = shopDetailService.selectById(shopId);
 		// 查询订单菜品
-		List<Map<String, Object>> articleList = orderItemService.selectOrderArticleList(orderId);
+		List<OrderItem> articleList = orderItemService.selectOrderArticleList(orderId);
 		return printTicket(order, articleList, shopDetail);
 	}
 
  
 
-	public Map<String, Object> printTicket(Order order, List<Map<String, Object>> articleList, Map<String, Object> shopDetail) {
+	public Map<String, Object> printTicket(Order order, List<OrderItem> articleList , ShopDetail shopDetail) {
 		List<Map<String, Object>> items = new ArrayList<>();
-		for (Map<String, Object> article : articleList) {
+		for (OrderItem article : articleList) {
 			Map<String, Object> item = new HashMap<>();
-			item.put("ARTICLE_NAME", article.get("name"));
-			item.put("ARTICLE_COUNT", article.get("count"));
-			BigDecimal money = (BigDecimal) article.get("original_price");
+			item.put("ARTICLE_NAME", article.getArticleName());
+			item.put("ARTICLE_COUNT", article.getCount());
+			BigDecimal money = (BigDecimal) article.getOriginalPrice();
 			Float a =money.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue() ;
-			Integer b = (Integer) article.get("count");
+			Integer b = (Integer) article.getCount();
 			item.put("SUBTOTAL", a * b);
 			items.add(item);
 		}
@@ -531,10 +532,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		String modeText = DistributionType.getModeText(order.getDistributionModeId());
 		data.put("DISTRIBUTION_MODE", modeText);
 		data.put("ARTICLE_COUNT", order.getArticleCount());
-		data.put("RESTAURANT_NAME", shopDetail.get("name"));
+		data.put("RESTAURANT_NAME", shopDetail.getName());
 
-		data.put("RESTAURANT_ADDRESS", shopDetail.get("address"));
-		data.put("RESTAURANT_TEL", shopDetail.get("phone"));
+		data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+		data.put("RESTAURANT_TEL", shopDetail.getPhone());
 		data.put("TABLE_NUMBER", order.getTableNumber());
 		data.put("ORDER_ID", order.getSerialNumber());
 		data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -544,7 +545,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
 
 		// 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
-		Printer printer = printerService.selectByShopAndType(shopDetail.get("id").toString(), PrinterType.RECEPTION);
+		Printer printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
 		if (printer == null) {
 			return null;
 		}
@@ -554,7 +555,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		print.put("STATUS", 0);
 		print.put("ORDER_ID", order.getSerialNumber());
 
-		print.put("KITCHEN_NAME", PrinterType.getPrintType(PrinterType.RECEPTION));
+		print.put("KITCHEN_NAME", printer.getName());
 		print.put("DATA", data);
 		print.put("TABLE_NO", order.getTableNumber());
 		print.put("IP", printer.getIp());
@@ -587,7 +588,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		// 根据id查询订单
 		Order order = selectById(orderId);
 		// 查询订单菜品
-		List<Map<String, Object>> articleList = orderItemService.selectOrderArticleList(orderId);
+		List<OrderItem> articleList = orderItemService.selectOrderArticleList(orderId);
 		return printKitchen(order,articleList);
 	}
 

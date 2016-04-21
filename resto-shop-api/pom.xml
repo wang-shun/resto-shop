@@ -12,6 +12,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>cn.restoplus</groupId>
+			<artifactId>resto-brand-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cn.restoplus</groupId>
 			<artifactId>resto-brand-core</artifactId>
 		</dependency>
 		<dependency>

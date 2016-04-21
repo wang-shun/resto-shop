@@ -58,13 +58,8 @@ public class OrderController extends GenericController{
 	@RequestMapping("/printReceipt")
 	public Map<String,Object> printReceipt(String orderId){
 		Map<String,Object> printTask = new HashMap<>();
-		ShopDetail shopDetail2 = shopDetailService.selectById(getCurrentShopId());
-		Map<String,Object> shopDetail = new HashMap<>();
-		shopDetail.put("name", shopDetail2.getName());
-		shopDetail.put("address", shopDetail2.getAddress());
-		shopDetail.put("phone", shopDetail2.getPhone());
-		shopDetail.put("id", shopDetail2.getId());
-		printTask = orderService.printReceipt(orderId,shopDetail);
+		String shopDetailId = getCurrentShopId();
+		printTask = orderService.printReceipt(orderId,shopDetailId);
 		return printTask;
 	}
 	

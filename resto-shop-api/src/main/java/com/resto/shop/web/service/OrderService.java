@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderService extends GenericService<Order, String> {
@@ -56,7 +58,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectCallOrder(String currentBrandId);
 
-	public Map<String, Object> printReceipt(String orderId, Map<String, Object> shopDetail);
+	public Map<String, Object> printReceipt(String orderId, String shopDetail);
 
 	/**
 	 * 打印厨房的小票
@@ -64,7 +66,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param articleList	订单菜品集合
 	 * @return
 	 */
-	public List<Map<String,Object>> printKitchen(Order order,List<Map<String,Object>> articleList);
+	public List<Map<String,Object>> printKitchen(Order order, List<OrderItem> articleList);
 
 	 
 	public Order confirmOrder(Order order);
