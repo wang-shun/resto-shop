@@ -1,6 +1,8 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -48,4 +50,14 @@ public class OrderController extends GenericController{
 		return getSuccessResult();
 	}
 	
+
+	
+	@RequestMapping("/printReceipt")
+	public Map<String,Object> printReceipt(String orderId){
+		Map<String,Object> pd = new HashMap<>();
+		Map<String,Object> printTask = new HashMap<>();
+		printTask = orderService.printReceipt(orderId);
+		
+		return printTask;
+	}
 }

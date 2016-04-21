@@ -88,4 +88,17 @@
   		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type} )
   	</foreach>
   </insert>
+  
+  <select id="selectOrderArticleList">
+  	SELECT
+		left(o.article_id,32) article_id,o.article_designation	name,o.count,o.original_price,ch.kitchen_id
+		FROM
+		tb_order_item o
+		LEFT JOIN tb_article a ON  left(o.article_id,32)=a.id
+		LEFT JOIN tb_article_kitchen ch ON  left(o.article_id,32)=ch.article_id
+		WHERE
+		o.ORDER_ID=#{order_id}
+  </select>
+  
+  
 </mapper>

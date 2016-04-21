@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.OrderItem;
@@ -15,4 +16,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	public List<OrderItem> listByOrderId(String orderId);
 
 	public void insertItems(List<OrderItem> orderItems);
+
+	public List<Map<String,Object>> selectOrderArticleList();
 }

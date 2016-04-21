@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,8 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     List<OrderItem> listByOrderId(@Param("orderId") String orderId);
 
 	void insertBatch(List<OrderItem> orderItems);
+
+	List<Map<String, Object>> selectOrderArticleList();
+	
+	
 }

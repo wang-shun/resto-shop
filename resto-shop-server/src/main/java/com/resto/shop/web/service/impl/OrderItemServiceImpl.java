@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
@@ -33,6 +34,12 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	public void insertItems(List<OrderItem> orderItems) {
 		
 		orderitemMapper.insertBatch(orderItems);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectOrderArticleList() {
+		
+		return orderitemMapper.selectOrderArticleList();
 	} 
 
 }
