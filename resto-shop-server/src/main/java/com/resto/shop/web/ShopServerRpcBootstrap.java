@@ -1,6 +1,5 @@
 package com.resto.shop.web;
 
-import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ public class ShopServerRpcBootstrap {
         	}
         }
         
-        ApplicationContext context = new AnnotationConfigApplicationContext(ServerConfig.class);
+        @SuppressWarnings("unused")
+		ApplicationContext context = new AnnotationConfigApplicationContext(ServerConfig.class);
     }
 }
