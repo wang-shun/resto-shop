@@ -89,7 +89,7 @@
   	</foreach>
   </insert>
   
-  <select id="selectOrderArticleList">
+  <select id="selectOrderArticleList" resultType="java.util.HashMap">
   	SELECT
 		left(o.article_id,32) article_id,o.article_designation	name,o.count,o.original_price,ch.kitchen_id
 		FROM

@@ -46,5 +46,10 @@ public interface KitchenMapper  extends GenericDao<Kitchen,Integer> {
     List<Integer> selectIdsByArticleId(@Param("articleId") String articleId);
     
     
+    /**
+     * 根据 菜品Id 查询出和菜品相关厨房的信息
+     * @param articleId
+     * @return
+     */
     List<Kitchen> selectInfoByArticleId(@Param("articleId") String articleId);
 }

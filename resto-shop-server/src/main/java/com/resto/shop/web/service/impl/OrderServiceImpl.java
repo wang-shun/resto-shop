@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +19,12 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.constant.TicketType;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
@@ -31,17 +34,21 @@ import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.model.Printer;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.KitchenService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.PrinterService;
 import com.resto.shop.web.service.ShopCartService;
 import com.resto.shop.web.util.DateUtil;
 
@@ -85,6 +92,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     OrderProductionStateContainer orderProductionStateContainer;
+    
+    @Resource	
+    KitchenService kitchenService;
+    
+    @Resource
+    PrinterService printerService;
     
     @Override
     public GenericDao<Order, String> getDao() {
@@ -368,7 +381,124 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//查询订单菜品
 		List<Map<String,Object>> articleList = orderItemService.selectOrderArticleList();
 		
+		
+		
 		return null;
+	}
+
+	
+	
+	@Override
+	public List<Map<String, Object>> printKitchen(Order order, List<Map<String, Object>> articleList) {
+		Map<String,List<Map<String,Object>>> kitchenArticleMap = new HashMap<String, List<Map<String,Object>>>();
+		Map<String,Kitchen> kitchenMap = new HashMap<String, Kitchen>();
+		
+		//得到 需要打印的菜品信息和厨房信息
+		for(Map<String,Object> articleMap : articleList){
+			//得到 当前菜品 对应的厨房信息
+			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleMap.get("articleId").toString());
+			for(Kitchen kitchen : kitchenList){
+				String kitchenId = kitchen.getId().toString();
+				kitchenMap.put(kitchenId, kitchen);
+				//判断 厨房集合中 是否已经包含当前厨房信息
+				if(kitchenArticleMap.containsKey(kitchenId)){
+					//如果有  则直接 把需要制作的 菜品信息 放入
+					kitchenArticleMap.get(kitchenId).add(articleMap);
+				}else{
+					//如果没有 则新建
+					kitchenArticleMap.put(kitchenId, new ArrayList<Map<String,Object>>());
+					kitchenArticleMap.get(kitchenId).add(articleMap);
+				}
+			}
+		}
+		
+		String tableNumber = order.getTableNumber();
+		
+		List<Map<String,Object>> printTask = new ArrayList<Map<String,Object>>();
+		String modeText = DistributionType.getModeText(order.getDistributionModeId());
+		String serialNumber = order.getSerialNumber();//原来写的是流水号。。。
+		
+		//厨房 循环
+		for(String kitchenId : kitchenArticleMap.keySet()){
+			//生成厨房小票
+			for(Map<String,Object> articleMap : kitchenArticleMap.get(kitchenId)){
+				//保存 菜品的名称和数量
+				List<Map<String,Object>> items = new ArrayList<Map<String,Object>>();
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("ARTICLE_NAME", articleMap.get("name"));
+				item.put("ARTICLE_COUNT",articleMap.get("count"));
+				items.add(item);
+				//得到厨房 信息
+				Kitchen kitchen = kitchenMap.get(kitchenId);
+				//得到打印机信息
+				Printer printer = printerService.selectById(kitchen.getPrinterId());
+				
+				Map<String,Object> data = new HashMap<String,Object>();
+				data.put("KITCHEN_NAME",kitchen.getName());
+				data.put("DISTRIBUTION_MODE",modeText);
+				data.put("TABLE_NUMBER", tableNumber);
+				data.put("ORDER_ID", serialNumber);
+				data.put("DATETIME",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+				data.put("ITEMS", items);
+				
+				Map<String,Object> print = new HashMap<String,Object>();
+				String print_id = ApplicationUtils.randomUUID();
+				print.put("PRINT_TASK_ID", print_id);
+				print.put("STATUS",0);
+				print.put("ORDER_ID", serialNumber);
+				print.put("KITCHEN_NAME", kitchen.getName());
+				print.put("DATA", data);
+				print.put("TABLE_NO", tableNumber);
+				print.put("IP", printer.getIp());
+				print.put("PORT", printer.getPort());
+				print.put("ADD_TIME", new Date());
+				print.put("TICKET_TYPE", TicketType.KITCHEN);
+				printTask.add(print);
+			}
+		}
+		
+		//如果是外带，添加一张外带小票
+		if(order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){
+			List<Map<String,Object>> items = new ArrayList<Map<String,Object>>();
+			for(Map<String,Object> articleMap:articleList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("ARTICLE_NAME", articleMap.get("NAME"));
+				item.put("ARTICLE_COUNT", articleMap.get("COUNT"));
+				items.add(item);
+			}
+			Map<String,Object> data = new HashMap<String,Object>();
+			data.put("ARTICLE_COUNT",order.getArticleCount());
+			data.put("DISTRIBUTION_MODE","外带");
+			data.put("TABLE_NUMBER",tableNumber);
+			data.put("ORDER_ID", serialNumber);
+			data.put("DATETIME",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
+			data.put("ITEMS", items);
+			
+			Printer printer = printerService.selectById(1);//查找外包的打印机
+			Map<String,Object> print = new HashMap<String,Object>();
+			print.put("ORDER_ID", serialNumber);
+			print.put("KITCHEN_NAME", "打包处");
+			print.put("DATA", data);
+			print.put("TABLE_NO", tableNumber);
+			print.put("IP", printer.getIp());
+			print.put("PORT", printer.getPort());
+			print.put("ADD_TIME", new Date());
+			print.put("TICKET_TYPE", TicketType.PACKAGE);
+			printTask.add(print);
+		}
+				
+		return printTask;
+	}
+
+	@Override
+	public List<Map<String, Object>> testKitchen(String orderId) {
+		// 根据id查询订单
+		Order order = selectById(orderId);
+		//查询订单菜品
+		List<Map<String,Object>> articleList = orderItemService.selectOrderArticleList();
+		//测试厨房打印
+		List<Map<String, Object>> test = printKitchen(order,articleList);
+		return test;
 	}
 
 

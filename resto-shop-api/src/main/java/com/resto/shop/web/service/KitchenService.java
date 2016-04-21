@@ -17,8 +17,19 @@ public interface KitchenService extends GenericService<Kitchen, Integer> {
 	
 	void saveArticleKitchen(String articleId,Integer[] kitchenList);
 	
+	
+	/**
+     * 根据 菜品Id 查询出和菜品关联的厨房Id
+     * @param articleId
+     * @return
+     */
 	List<Integer> selectIdsByArticleId(String articleId);
 	
 	
-	//List<Kitchen> selectByArticleId(String art);
+	/**
+	 * 根据 菜品Id 查询出和菜品关联的厨房信息
+	 * @param articleId
+	 * @return
+	 */
+	List<Kitchen> selectInfoByArticleId(String articleId);
 }

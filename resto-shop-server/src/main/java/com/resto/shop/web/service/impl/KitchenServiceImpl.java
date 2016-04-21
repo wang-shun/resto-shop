@@ -43,6 +43,11 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	@Override
 	public List<Integer> selectIdsByArticleId(String articleId) {
 		return kitchenMapper.selectIdsByArticleId(articleId);
+	}
+
+	@Override
+	public List<Kitchen> selectInfoByArticleId(String articleId) {
+		return kitchenMapper.selectInfoByArticleId(articleId);
 	} 
 
 }
