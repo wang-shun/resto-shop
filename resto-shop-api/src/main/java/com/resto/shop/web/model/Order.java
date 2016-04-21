@@ -68,6 +68,8 @@ public class Order {
     private Date printOrderTime;
 
     private Date callNumberTime;
+    
+    private Integer orderMode;
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
@@ -349,5 +351,13 @@ public class Order {
 
 	public void setCallNumberTime(Date callNumberTime) {
 		this.callNumberTime = callNumberTime;
+	}
+
+	public Integer getOrderMode() {
+		return orderMode;
+	}
+
+	public void setOrderMode(Integer orderMode) {
+		this.orderMode = orderMode;
 	}
 }
