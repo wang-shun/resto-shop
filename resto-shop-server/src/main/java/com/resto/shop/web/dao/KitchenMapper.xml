@@ -70,6 +70,6 @@
   </select>
   
   <select id="selectInfoByArticleId" resultType="Kitchen">
-  	SELECT * from tb_kitchen where id in (SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId}
+  	SELECT * from tb_kitchen where id in (SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId})
   </select>
 </mapper>

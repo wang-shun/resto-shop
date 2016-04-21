@@ -402,21 +402,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		//得到 需要打印的菜品信息和厨房信息
 		for(Map<String,Object> articleMap : articleList){
+			System.out.println(articleMap.get("article_id").toString());
 			//得到 当前菜品 对应的厨房信息
-			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleMap.get("articleId").toString());
-			for(Kitchen kitchen : kitchenList){
-				String kitchenId = kitchen.getId().toString();
-				kitchenMap.put(kitchenId, kitchen);
-				//判断 厨房集合中 是否已经包含当前厨房信息
-				if(kitchenArticleMap.containsKey(kitchenId)){
-					//如果有  则直接 把需要制作的 菜品信息 放入
-					kitchenArticleMap.get(kitchenId).add(articleMap);
-				}else{
-					//如果没有 则新建
-					kitchenArticleMap.put(kitchenId, new ArrayList<Map<String,Object>>());
-					kitchenArticleMap.get(kitchenId).add(articleMap);
+			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleMap.get("article_id").toString());
+			if(kitchenList!=null){
+				for(Kitchen kitchen : kitchenList){
+					String kitchenId = kitchen.getId().toString();
+					kitchenMap.put(kitchenId, kitchen);
+					//判断 厨房集合中 是否已经包含当前厨房信息
+					if(kitchenArticleMap.containsKey(kitchenId)){
+						//如果有  则直接 把需要制作的 菜品信息 放入
+						kitchenArticleMap.get(kitchenId).add(articleMap);
+					}else{
+						//如果没有 则新建
+						kitchenArticleMap.put(kitchenId, new ArrayList<Map<String,Object>>());
+						kitchenArticleMap.get(kitchenId).add(articleMap);
+					}
 				}
 			}
+			
 		}
 		
 		String tableNumber = order.getTableNumber();
@@ -461,6 +465,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				print.put("ADD_TIME", new Date());
 				print.put("TICKET_TYPE", TicketType.KITCHEN);
 				printTask.add(print);
+				
 			}
 		}
 		
@@ -575,6 +580,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			return order;
 		}
 		return null;
+	}
+
+	@Override
+	public List<Map<String, Object>> kitchenTest(String orderId) {
+		// 根据id查询订单
+		Order order = selectById(orderId);
+		// 查询订单菜品
+		List<Map<String, Object>> articleList = orderItemService.selectOrderArticleList(orderId);
+		return printKitchen(order,articleList);
 	}
 
 

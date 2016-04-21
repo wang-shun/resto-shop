@@ -68,4 +68,10 @@ public class OrderController extends GenericController{
 		return printTask;
 	}
 	
+	
+	@RequestMapping("testKitchen")
+	@ResponseBody
+	public Result testKitchen(String orderId){
+		return getSuccessResult(orderService.kitchenTest(orderId));
+	}
 }

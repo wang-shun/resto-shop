@@ -69,4 +69,6 @@ public interface OrderService extends GenericService<Order, String> {
 	 
 	public Order confirmOrder(Order order);
 
+	
+	public List<Map<String,Object>> kitchenTest(String orderId);
 }
