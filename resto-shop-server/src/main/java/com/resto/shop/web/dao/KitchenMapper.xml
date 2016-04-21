@@ -65,7 +65,9 @@
 	</foreach>
   </insert>
   
-  <select id="selectByArticleId" resultType="Integer">
+  <select id="selectIdsByArticleId" resultType="Integer">
   	SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId}
   </select>
+  
+  
 </mapper>

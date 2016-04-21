@@ -66,7 +66,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public Article selectFullById(String id) {
 		List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
 		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
-		List<Integer> kitchenList = kitchenService.selectByIdsArticleId(id);
+		List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
 		Article article  = selectById(id);
 		article.setArticlePrices(prices);
 		article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
