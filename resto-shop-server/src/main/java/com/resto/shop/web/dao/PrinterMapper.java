@@ -26,4 +26,13 @@ public interface PrinterMapper  extends GenericDao<Printer,Integer> {
      * @return
      */
     List<Printer> selectListByShopId(@Param(value = "shopId") String currentShopId);
+    
+    /**
+     * 根据店铺Id和打印机类型查询
+     * @param id
+     * @param reception
+     * @return
+     */
+
+	Printer selectByShopAndType(@Param(value = "shopDetailId")String id,@Param(value = "printType") int reception);
 }

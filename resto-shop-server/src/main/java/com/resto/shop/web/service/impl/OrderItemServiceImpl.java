@@ -37,9 +37,9 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	}
 
 	@Override
-	public List<Map<String, Object>> selectOrderArticleList() {
+	public List<Map<String, Object>> selectOrderArticleList(String orderId) {
 		
-		return orderitemMapper.selectOrderArticleList();
+		return orderitemMapper.selectOrderArticleList(orderId);
 	} 
 
 }

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -17,12 +18,15 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.web.model.DistributionMode;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.constant.PrinterType;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.constant.TicketType;
 import com.resto.shop.web.container.OrderProductionStateContainer;
@@ -325,7 +329,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order callNumber(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getCallNumberTime()==null){
+		if (order.getCallNumberTime() == null) {
 			order.setProductionStatus(ProductionStatus.HAS_CALL);
 			order.setCallNumberTime(new Date());
 			update(order);
@@ -342,7 +346,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order printSuccess(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getPrintOrderTime()==null){
+		if (order.getPrintOrderTime() == null) {
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
 			update(order);
@@ -350,11 +354,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
-
 	@Override
 	public List<Order> selectTodayOrder(String shopId, int[] proStatus) {
 		Date date = DateUtil.getDateBegin(new Date());
-		List<Order> orderList = orderMapper.selectShopOrderByDateAndProductionStates(shopId,date,proStatus);
+		List<Order> orderList = orderMapper.selectShopOrderByDateAndProductionStates(shopId, date, proStatus);
 		return orderList;
 	}
 
@@ -363,7 +366,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		List<Order> order = orderProductionStateContainer.getReadyOrderList(currentShopId);
 		return order;
 	}
-	
+
 	@Override
 	public List<Order> selectPushOrder(String currentShopId) {
 		return orderProductionStateContainer.getPushOrderList(currentShopId);
@@ -374,17 +377,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderProductionStateContainer.getCallNowList(currentBrandId);
 	}
 
-	@Override
-	public Map<String, Object> printReceipt(String orderId) {
-		// 根据id查询订单
-		Order order = selectById(orderId);
-		//查询订单菜品
-		List<Map<String,Object>> articleList = orderItemService.selectOrderArticleList();
-		
-		
-		
-		return null;
-	}
+
 
 	
 	
@@ -490,15 +483,67 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return printTask;
 	}
 
+  
 	@Override
-	public List<Map<String, Object>> testKitchen(String orderId) {
+	public Map<String, Object> printReceipt(String orderId, Map<String, Object> shopDetail) {
 		// 根据id查询订单
 		Order order = selectById(orderId);
-		//查询订单菜品
-		List<Map<String,Object>> articleList = orderItemService.selectOrderArticleList();
-		//测试厨房打印
-		List<Map<String, Object>> test = printKitchen(order,articleList);
-		return test;
+		// 查询订单菜品
+		List<Map<String, Object>> articleList = orderItemService.selectOrderArticleList(orderId);
+		return printTicket(order, articleList, shopDetail);
+	}
+
+ 
+
+	public Map<String, Object> printTicket(Order order, List<Map<String, Object>> articleList, Map<String, Object> shopDetail) {
+		List<Map<String, Object>> items = new ArrayList<>();
+		for (Map<String, Object> article : articleList) {
+			Map<String, Object> item = new HashMap<>();
+			item.put("ARTICLE_NAME", article.get("name"));
+			item.put("ARTICLE_COUNT", article.get("count"));
+			BigDecimal money = (BigDecimal) article.get("original_price");
+			Float a =money.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue() ;
+			Integer b = (Integer) article.get("count");
+			item.put("SUBTOTAL", a * b);
+			items.add(item);
+		}
+
+		Map<String, Object> data = new HashMap<>();
+		String modeText = DistributionType.getModeText(order.getDistributionModeId());
+		data.put("DISTRIBUTION_MODE", modeText);
+		data.put("ARTICLE_COUNT", order.getArticleCount());
+		data.put("RESTAURANT_NAME", shopDetail.get("name"));
+
+		data.put("RESTAURANT_ADDRESS", shopDetail.get("address"));
+		data.put("RESTAURANT_TEL", shopDetail.get("phone"));
+		data.put("TABLE_NUMBER", order.getTableNumber());
+		data.put("ORDER_ID", order.getSerialNumber());
+		data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+		data.put("ITEMS", items);
+		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
+		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+
+		// 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
+		Printer printer = printerService.selectByShopAndType(shopDetail.get("id").toString(), PrinterType.RECEPTION);
+		if (printer == null) {
+			return null;
+		}
+		Map<String, Object> print = new HashMap<>();
+		String print_id = UUID.randomUUID().toString();
+		print.put("PRINT_TASK_ID", print_id);
+		print.put("STATUS", 0);
+		print.put("ORDER_ID", order.getSerialNumber());
+
+		print.put("KITCHEN_NAME", PrinterType.getPrintType(PrinterType.RECEPTION));
+		print.put("DATA", data);
+		print.put("TABLE_NO", order.getTableNumber());
+		print.put("IP", printer.getIp());
+		print.put("PORT", printer.getPort());
+		print.put("ADD_TIME", new Date());
+		print.put("TICKET_TYPE", TicketType.RECEIPT);
+		return print;
+
 	}
 
 

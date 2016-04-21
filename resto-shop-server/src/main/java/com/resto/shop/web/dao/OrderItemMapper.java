@@ -26,7 +26,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 
 	void insertBatch(List<OrderItem> orderItems);
 
-	List<Map<String, Object>> selectOrderArticleList();
+	List<Map<String, Object>> selectOrderArticleList(String orderId);
 	
 	
 }

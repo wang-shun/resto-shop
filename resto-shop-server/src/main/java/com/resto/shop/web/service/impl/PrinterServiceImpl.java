@@ -27,6 +27,13 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
 	@Override
 	public List<Printer> selectListByShopId(String shopId) {
 		return printerMapper.selectListByShopId(shopId);
+	}
+
+
+
+	@Override
+	public Printer selectByShopAndType(String orderId, int reception) {
+		return printerMapper.selectByShopAndType(orderId,reception);
 	} 
 
 }

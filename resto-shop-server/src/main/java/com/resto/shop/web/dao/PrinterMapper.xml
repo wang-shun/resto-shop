@@ -55,4 +55,11 @@
 		where shop_detail_id = #{shopId} 
 	</if>
   </select>
+  
+  <select id="selectByShopAndType" resultType="Printer">
+  	select * from tb_printer
+		where shop_detail_id = #{shopDetailId} and print_type=#{printType}
+  </select>
+  
+  
 </mapper>
