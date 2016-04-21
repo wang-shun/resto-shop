@@ -19,8 +19,11 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.DistributionMode;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderItemType;
@@ -97,6 +100,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     OrderProductionStateContainer orderProductionStateContainer;
     
+    @Resource
+    BrandSettingService brandSettingService;
+    
+    @Resource
+    ShopDetailService shopDetailService;
+
     @Resource	
     KitchenService kitchenService;
     
@@ -222,9 +231,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 		}
-
+		
+		if(payMoney.doubleValue()<0){
+			payMoney = BigDecimal.ZERO;
+		}
 		order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 		order.setAllowCancel(true); // 订单是否允许取消
+		order.setAllowAppraise(false);
 		order.setArticleCount(articleCount); // 订单餐品总数
 		order.setClosed(false); // 订单是否关闭 否
 		order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
@@ -235,8 +248,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setPrintTimes(0);
 		order.setOrderState(OrderState.SUBMIT);
 		order.setProductionStatus(ProductionStatus.NOT_ORDER);
+		ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
+		order.setOrderMode(detail.getShopMode());
 		insert(order);
-
 		if (order.getPaymentAmount().doubleValue() == 0) {
 			payOrderSuccess(order);
 		}
@@ -544,6 +558,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		print.put("TICKET_TYPE", TicketType.RECEIPT);
 		return print;
 
+	}
+
+	@Override
+	public Order confirmOrder(Order order) {
+		order = selectById(order.getId());
+		if(order.getConfirmTime()==null){
+			order.setOrderState(OrderState.CONFIRM);
+			order.setConfirmTime(new Date());
+			order.setAllowCancel(false);
+			BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+			if(setting.getAppraiseMinMoney().compareTo(order.getOrderMoney())<=0){ //如果订单金额大于 评论金额 则允许评论
+				order.setAllowAppraise(true);
+			}
+			update(order);
+			return order;
+		}
+		return null;
 	}
 
 

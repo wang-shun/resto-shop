@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.openservices.ons.api.Action;
 import com.aliyun.openservices.ons.api.ConsumeContext;
@@ -23,10 +24,11 @@ import com.aliyun.openservices.ons.api.ONSFactory;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.OrderService;
 
 @Component
-public class OrderCancelConsumer implements ApplicationContextAware{
+public class OrderConsumer implements ApplicationContextAware{
 	Logger log = LoggerFactory.getLogger(getClass());
 	Consumer consumer =  null;
 	
@@ -38,7 +40,7 @@ public class OrderCancelConsumer implements ApplicationContextAware{
 		Properties pro= MQSetting.getPropertiesWithAccessSecret();
 		pro.setProperty(PropertyKeyConst.ConsumerId, MQSetting.CID_SHOP);
 		consumer = ONSFactory.createConsumer(pro);
-		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_CANCEL_ORDER, new MessageListener() {
+		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_CANCEL_ORDER+"||"+MQSetting.TAG_AUTO_CONFIRM_ORDER, new MessageListener() {
 			@Override
 			public Action consume(Message message, ConsumeContext context) {
 				log.info("接收到队列消息:"+message);
@@ -59,7 +61,17 @@ public class OrderCancelConsumer implements ApplicationContextAware{
 		String tag = message.getTag();
 		if(tag.equals(MQSetting.TAG_CANCEL_ORDER)){ //取消订单消息
 			return executeCancelOrder(message);
+		}else if(tag.equals(MQSetting.TAG_AUTO_CONFIRM_ORDER)){
+			return executeAutoConfirmOrder(message);
 		}
+		return Action.CommitMessage;
+	}
+
+	private Action executeAutoConfirmOrder(Message message) throws UnsupportedEncodingException {
+		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
+		Order order = JSON.parseObject(msg, Order.class);
+		DataSourceContextHolder.setDataSourceName(order.getBrandId());
+		orderService.confirmOrder(order);
 		return Action.CommitMessage;
 	}
 

@@ -15,4 +15,6 @@ public interface FreeDayMapper extends GenericDao<FreeDay, String> {
     List<FreeDay> selectList(FreeDay day);
 
     int deleteByDateAndId(FreeDay day);
+
+	FreeDay selectByDate(String format, String shopId);
 }

@@ -23,4 +23,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	List<Article> selectList(@Param(value = "shopId") String currentShopId);
 
 	List<Article> selectListByShopIdAndDistributionId(String currentShopId, Integer distributionModeId);
+
+	List<Article> selectBySupportTimeId(@Param("times") List<Integer> supportTimes,@Param("shopId") String currentShopId);
 }

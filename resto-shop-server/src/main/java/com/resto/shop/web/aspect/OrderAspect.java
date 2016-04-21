@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -34,7 +36,8 @@ public class OrderAspect {
 	CustomerService customerService;
 	@Resource
 	WechatConfigService wechatConfigService;
-	
+	@Resource
+	BrandSettingService brandSettingService;
 	@Resource
 	OrderProductionStateContainer orderProductionStateContainer;
 	
@@ -46,7 +49,7 @@ public class OrderAspect {
 		shopCartService.clearShopCart(order.getCustomerId(),order.getDistributionModeId(),order.getShopDetailId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			long delay = 1000*60*5;//
-			MQMessageProducer.sendAutoCloseMsg(order.getId(),DataSourceContextHolder.getDataSourceName(),delay);
+			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
 		}else if(order.getOrderState().equals((OrderState.PAYMENT))){
 			sendPaySuccessMsg(order);
 		}
@@ -55,7 +58,7 @@ public class OrderAspect {
 	private void sendPaySuccessMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
-		StringBuffer msg = new StringBuffer("test");
+		StringBuffer msg = new StringBuffer("发送订单详情通知：（待完成）");
 		//TODO 订单完成后 msg 的填充
 		try {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
@@ -88,12 +91,31 @@ public class OrderAspect {
 		if(order!=null){
 			orderProductionStateContainer.addOrder(order);
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
-				sendVerCodeMsg(order);
+				if(order.getOrderMode()==ShopMode.CALL_NUMBER){
+					sendVerCodeMsg(order);
+				}
+			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
+				log.info("打印成功后，发送自动确认订单通知！");
+				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}
 		}
 	}
 
+	@Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmOrder(..))")
+	public void confirmOrder(){};
 	
+	@AfterReturning(value="confirmOrder()",returning="order")
+	public void confirmOrderAfter(Order order){
+		if(order.getAllowAppraise()){
+			Customer customer = customerService.selectById(order.getCustomerId());
+			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+			StringBuffer msg = new StringBuffer();
+			msg.append("评论订单通知:(待完成)");
+			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+			log.info("发送评论通知成功:"+result);
+		}
+	}
 	
 	
 	

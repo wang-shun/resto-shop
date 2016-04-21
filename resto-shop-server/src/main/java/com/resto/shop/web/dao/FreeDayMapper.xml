@@ -48,4 +48,9 @@
     where free_day = #{freeDay} and shop_detail_id=#{shopDetailId}
   </delete>
   
+  <select id="selectByDate" resultType="FreeDay">
+  	select * from tb_free_day
+  	where free_day=#{0} and shop_detail_id=#{1}
+  </select>
+  
 </mapper>

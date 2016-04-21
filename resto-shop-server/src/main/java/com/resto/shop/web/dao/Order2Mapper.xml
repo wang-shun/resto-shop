@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace="com.resto.shop.web.dao.OrderMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order" >
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.resto.shop.web.dao.Order2Mapper" >
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order2" >
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="table_number" property="tableNumber" jdbcType="VARCHAR" />
     <result column="customer_count" property="customerCount" jdbcType="INTEGER" />
@@ -54,7 +53,7 @@
     delete from tb_order
     where id = #{id,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.Order" >
+  <insert id="insert" parameterType="com.resto.shop.web.model.Order2" >
     insert into tb_order (id, table_number, customer_count, 
       accounting_time, order_state, production_status, 
       original_amount, reduction_amount, payment_amount, 
@@ -78,7 +77,7 @@
       #{pushOrderTime,jdbcType=TIMESTAMP}, #{printOrderTime,jdbcType=TIMESTAMP}, #{callNumberTime,jdbcType=TIMESTAMP}, 
       #{orderMode,jdbcType=INTEGER}, #{brandId,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order" >
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order2" >
     insert into tb_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -277,7 +276,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order2" >
     update tb_order
     <set >
       <if test="tableNumber != null" >
@@ -376,7 +375,7 @@
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order" >
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order2" >
     update tb_order
     set table_number = #{tableNumber,jdbcType=VARCHAR},
       customer_count = #{customerCount,jdbcType=INTEGER},
@@ -411,47 +410,4 @@
       brand_id = #{brandId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  
-  
-  <select id="selectList" resultType="Order">select * from tb_order</select>
-  
-  <!-- 根据 店铺ID 和 用户ID  分页查询订单列表 -->
-  <select id="orderList" resultType="Order">
-  	SELECT * from tb_order where shop_detail_id = #{shopId} and customer_id = #{customerId}
-  	<if test="orderState != null and orderState != '' ">
-  		and ORDER_STATE in 
-		<foreach collection="orderState" item="state" open="(" separator="," close=")">
-			#{state}
-		</foreach>
-  	</if>
-  	 ORDER BY create_time DESC LIMIT #{start},#{datalength}
-  </select>
-  
-  <!-- 根据订单查询 订单状态 和 生产状态 -->
-  <select id="selectOrderStatesById" resultType="Order">
-  	SELECT id,order_state,production_status from tb_order where id = #{orderId}
-  </select>
-  
-  <!-- 查询  用户的新订单,如果 订单ID有值。则查询订单的详情 -->
-  <select id="findCustomerNewOrder" resultType="Order">
-	SELECT * from tb_order
-	<if test="orderId == null or orderId == '' ">
-		where customer_id=#{customerId} and shop_detail_id=#{shopId} and create_time > #{beginDate}
-		and order_state in  
-		<foreach collection="orderState" item="state" open="(" separator="," close=")">
-			#{state}
-		</foreach>
-		ORDER BY create_time DESC LIMIT 0,1
-	</if>
- 	<if test="orderId != null and orderId != '' ">
-		where id=#{orderId}
-	</if>
-  </select>
-  <select id="selectShopOrderByDateAndProductionStates" resultType="Order">
-  	select * from tb_order
-  	where shop_detail_id=#{shopId} and create_time>#{date} and production_status in
-  	<foreach collection="proStatus" item="state" open="(" separator="," close=")">
-  		#{state}
-  	</foreach>
-  </select>
 </mapper>

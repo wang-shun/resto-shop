@@ -34,6 +34,8 @@ public class Order {
     private Integer printTimes;
 
     private Boolean allowCancel;
+    
+    private Boolean allowAppraise;
 
     private Boolean closed;
 
@@ -70,6 +72,8 @@ public class Order {
     private Date callNumberTime;
     
     private Integer orderMode;
+    
+    private String brandId;
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
@@ -359,5 +363,21 @@ public class Order {
 
 	public void setOrderMode(Integer orderMode) {
 		this.orderMode = orderMode;
+	}
+
+	public String getBrandId() {
+		return brandId;
+	}
+
+	public void setBrandId(String brandId) {
+		this.brandId = brandId;
+	}
+
+	public Boolean getAllowAppraise() {
+		return allowAppraise;
+	}
+
+	public void setAllowAppraise(Boolean allowAppraise) {
+		this.allowAppraise = allowAppraise;
 	}
 }

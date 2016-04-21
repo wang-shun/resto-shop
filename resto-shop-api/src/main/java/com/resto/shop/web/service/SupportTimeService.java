@@ -12,5 +12,12 @@ public interface SupportTimeService extends GenericService<SupportTime, Integer>
 	void saveSupportTimes(String articleId, Integer[] supportTimes);
 
 	List<Integer> selectByIdsArticleId(String articleId);
+
+	/**
+	 * 获取当前符合条件的供应时间
+	 * @param currentShopId
+	 * @return
+	 */
+	List<SupportTime> selectNowSopport(String currentShopId);
     
 }

@@ -1,14 +1,19 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
+import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.KitchenService;
@@ -77,13 +82,28 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	@Override
 	public List<Article> selectListFull(String currentShopId, Integer distributionModeId) {
 		List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId,distributionModeId);
+		Map<String,Article> articleMap = selectAllSupportArticle(currentShopId);
 		for (Article a: articleList) {
 			if(!StringUtil.isEmpty(a.getHasUnit())){
 				List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
 				a.setArticlePrices(prices);
 			}
+			if(!articleMap.containsKey(a.getId())){
+				a.setIsEmpty(true);
+			}
 		}
 		return articleList;
+	}
+
+	private Map<String, Article> selectAllSupportArticle(String currentShopId) {
+		List<SupportTime> supportTime = supportTimeService.selectNowSopport(currentShopId);
+		if(supportTime.isEmpty()){
+			return new HashMap<>();
+		}
+		List<Integer> list = new ArrayList<>(ApplicationUtils.convertCollectionToMap(Integer.class, supportTime).keySet());
+		List<Article> article = articleMapper.selectBySupportTimeId(list,currentShopId);
+		Map<String,Article> articleMap = ApplicationUtils.convertCollectionToMap(String.class, article);
+		return articleMap;
 	}
 
 }

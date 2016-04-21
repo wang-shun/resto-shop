@@ -37,7 +37,9 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	@Override
 	public void saveArticleKitchen(String articleId, Integer[] kitchenList) {
 		kitchenMapper.deleteArticleKitchen(articleId);
-		kitchenMapper.insertArticleKitchen(articleId, kitchenList);;
+		if(kitchenList!=null&&kitchenList.length>0){
+			kitchenMapper.insertArticleKitchen(articleId, kitchenList);;
+		}
 	}
 
 	@Override

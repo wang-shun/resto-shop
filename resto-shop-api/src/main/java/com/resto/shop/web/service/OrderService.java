@@ -65,6 +65,8 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public List<Map<String,Object>> printKitchen(Order order,List<Map<String,Object>> articleList);
+
 	 
+	public Order confirmOrder(Order order);
 
 }
