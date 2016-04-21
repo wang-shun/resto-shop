@@ -56,11 +56,10 @@ public class OrderController extends GenericController{
 	}
 	
 	@RequestMapping("/printReceipt")
+	@ResponseBody
 	public Map<String,Object> printReceipt(String orderId){
-		Map<String,Object> printTask = new HashMap<>();
 		String shopDetailId = getCurrentShopId();
-		printTask = orderService.printReceipt(orderId,shopDetailId);
-		return printTask;
+		return orderService.printReceipt(orderId,shopDetailId);
 	}
 	
 	
