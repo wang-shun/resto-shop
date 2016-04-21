@@ -14,6 +14,7 @@ import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
@@ -33,6 +34,9 @@ public class OrderAspect {
 	CustomerService customerService;
 	@Resource
 	WechatConfigService wechatConfigService;
+	
+	@Resource
+	OrderProductionStateContainer orderProductionStateContainer;
 	
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
@@ -82,7 +86,7 @@ public class OrderAspect {
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter(Order order){
 		if(order!=null){
-			MQMessageProducer.sendOrderProessMessage(order,DataSourceContextHolder.getDataSourceName());
+			orderProductionStateContainer.addOrder(order);
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
 				sendVerCodeMsg(order);
 			}

@@ -45,26 +45,31 @@ public class OrderCancelConsumer implements ApplicationContextAware{
 				try {
 					return executeMessage(message);
 				} catch (UnsupportedEncodingException e) {
-					log.error("字符编码转换错误:"+message.toString());
-					log.error(e.getMessage());
+					e.printStackTrace();
+					log.error("字符编码转换错误:"+e.getMessage());
 				}
-				return Action.ReconsumeLater;
+				return Action.CommitMessage;
 			}
 		});
 		consumer.start();
 		log.info("启动消费者接受消息！");
 	}
 	
-	public Action executeMessage(Message message) throws UnsupportedEncodingException {
+	public Action executeMessage(Message message) throws UnsupportedEncodingException{
 		String tag = message.getTag();
 		if(tag.equals(MQSetting.TAG_CANCEL_ORDER)){ //取消订单消息
-			String msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
-			JSONObject object =JSONObject.parseObject(msg);
-			String brandId = object.getString("brandId");
-			DataSourceContextHolder.setDataSourceName(brandId);
-			orderService.cancelOrder(object.getString("orderId"));
-			log.info("自动取消订单:"+object.getString("orderId"));
+			return executeCancelOrder(message);
 		}
+		return Action.CommitMessage;
+	}
+
+	private Action executeCancelOrder(Message message) throws UnsupportedEncodingException {
+		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
+		JSONObject obj =JSONObject.parseObject(msg);
+		String brandId = obj.getString("brandId");
+		DataSourceContextHolder.setDataSourceName(brandId);
+		orderService.cancelOrder(obj.getString("orderId"));
+		log.info("自动取消订单:"+obj.getString("orderId"));
 		return Action.CommitMessage;
 	}
 

@@ -47,4 +47,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     Order findCustomerNewOrder(@Param("beginDate") Date beginDate,@Param("customerId") String customerId,@Param("shopId") String shopId,@Param("orderState") Integer[] orderState,@Param("orderId") String orderId);
+
+    /**
+     * 查询某个店铺某天，某个状态的订单
+     * @param shopId
+     * @param date
+     * @param productionState
+     * @return
+     */
+	List<Order> selectShopOrderByDateAndProductionState(String shopId, Date date, int productionState);
 }

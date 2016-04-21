@@ -42,6 +42,13 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Map<String,Object>> getPrintData(String order);
 	
 	public Order printSuccess(String orderId);
+
+	/**
+	 * 查询当天准备中的订单
+	 * @param shopId
+	 * @return
+	 */
+	public List<Order> selectTodayReadyOrder(String shopId);
 	
 	 
 

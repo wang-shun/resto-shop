@@ -1,0 +1,77 @@
+package com.resto.shop.web.container;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
+import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.service.OrderService;
+
+
+/**
+ * 订单生产状态容器
+ * @author Diamond
+ * @date 2016年4月21日
+ */
+@Component
+public class OrderProductionStateContainer {
+	private static final Map<String,Map<String,Order>> READY_ORDER_MAP = new HashMap<>();  //准备中的队列
+	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new HashMap<>();     //正在叫号的队列
+	private static final Map<String,Boolean> INIT_SHOP = new HashMap<>();
+	
+	@Resource
+	OrderService orderService;
+	
+	public List<Order> getReadyOrderList(String shopId){
+		initShop(shopId);
+		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
+		return new ArrayList<>(orderMap.values());
+	}
+	
+	public List<Order> getCallNowList(String shopId){
+		Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
+		return new ArrayList<>(orderMap.values());
+	}
+	
+	public void addOrder(Order order){
+		String shopId = order.getShopDetailId();
+		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){
+			Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP,shopId);
+			orderMap.put(order.getId(), order);
+		}else if(order.getProductionStatus()==ProductionStatus.HAS_CALL){
+			Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
+			orderMap.put(order.getId(), order);
+			Map<String,Order> readyOrder = getOrderMap(READY_ORDER_MAP, shopId);
+			if(readyOrder.containsKey(order.getId())){ //如果准备中的队列中有该订单，则删除该订单
+				readyOrder.remove(order.getId());
+			}
+		}
+	}
+
+
+	private void initShop(String shopId) {
+		if(!INIT_SHOP.containsKey(shopId)){
+			INIT_SHOP.put(shopId, true);
+			List<Order> order = orderService.selectTodayReadyOrder(shopId);
+			for (Order o: order) {
+				addOrder(o);
+			}
+		}
+	}
+
+	private Map<String, Order> getOrderMap(Map<String, Map<String, Order>> map, String shopId) {
+		Map<String,Order> ordermap =map.get(shopId);
+		if(ordermap==null){
+			ordermap = new LinkedHashMap<>();
+			map.put(shopId, ordermap);
+		}
+		return ordermap;
+	}
+}

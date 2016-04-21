@@ -326,4 +326,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
+	@Override
+	public List<Order> selectTodayReadyOrder(String shopId) {
+		Date date = DateUtil.getDateBegin(new Date());
+		List<Order> orderList = orderMapper.selectShopOrderByDateAndProductionState(shopId,date,ProductionStatus.PRINTED);
+		return orderList;
+	}
+
 }

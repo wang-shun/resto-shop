@@ -411,4 +411,8 @@
 		where id=#{orderId}
 	</if>
   </select>
+  <select id="selectShopOrderByDateAndProductionState" resultType="Order">
+  	select * from tb_order
+  	where shop_detail_id=#{0} and create_time>#{1} and production_status=#{2}
+  </select>
 </mapper>
