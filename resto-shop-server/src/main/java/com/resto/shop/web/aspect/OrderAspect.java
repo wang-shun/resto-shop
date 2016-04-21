@@ -73,15 +73,26 @@ public class OrderAspect {
 	
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
 	public void pushOrder(){};
+	@Pointcut("execution(* com.resto.shop.web.service.OrderService.callNumber(..))")
+	public void callNumber(){};
+	@Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
+	public void printSuccess(){};
 	
-	@AfterReturning(value="pushOrder",returning="order")
+	
+	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter(Order order){
-		if(order!=null&&ProductionStatus.HAS_ORDER==order.getProductionStatus()){
+		if(order!=null){
 			MQMessageProducer.sendOrderProessMessage(order,DataSourceContextHolder.getDataSourceName());
-			sendVerCodeMsg(order);
+			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
+				sendVerCodeMsg(order);
+			}
 		}
 	}
 
+	
+	
+	
+	
 	private void sendVerCodeMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());

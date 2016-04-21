@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order2" >
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order" >
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="table_number" property="tableNumber" jdbcType="VARCHAR" />
     <result column="customer_count" property="customerCount" jdbcType="INTEGER" />
@@ -50,7 +50,7 @@
     delete from tb_order
     where id = #{id,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.Order2" >
+  <insert id="insert" parameterType="com.resto.shop.web.model.Order" >
     insert into tb_order (id, table_number, customer_count, 
       accounting_time, order_state, production_status, 
       original_amount, reduction_amount, payment_amount, 
@@ -72,7 +72,7 @@
       #{distributionModeId,jdbcType=INTEGER}, #{verCode,jdbcType=VARCHAR}, #{pushOrderTime,jdbcType=TIMESTAMP}, 
       #{printOrderTime,jdbcType=TIMESTAMP}, #{callNumberTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order2" >
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order" >
     insert into tb_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -253,7 +253,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order2" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order" >
     update tb_order
     <set >
       <if test="tableNumber != null" >
@@ -343,7 +343,7 @@
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order2" >
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order" >
     update tb_order
     set table_number = #{tableNumber,jdbcType=VARCHAR},
       customer_count = #{customerCount,jdbcType=INTEGER},
