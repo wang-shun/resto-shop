@@ -429,10 +429,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		//编列 厨房菜品 集合
 		for(String kitchenId : kitchenArticleMap.keySet()){
-			//得到厨房 信息
-			Kitchen kitchen = kitchenMap.get(kitchenId);
-			//得到打印机信息
-			Printer printer = printerService.selectById(kitchen.getPrinterId());
+			Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
+			Printer printer = printerService.selectById(kitchen.getPrinterId());//得到打印机信息
 			//生成厨房小票
 			for(OrderItem article : kitchenArticleMap.get(kitchenId)){
 				//保存 菜品的名称和数量
