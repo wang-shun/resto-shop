@@ -22,12 +22,20 @@ import com.resto.shop.web.service.OrderService;
  */
 @Component
 public class OrderProductionStateContainer {
+	private static final Map<String,Map<String,Order>> PUSH_ORDER_MAP=new HashMap<>(); //已下单的队列
 	private static final Map<String,Map<String,Order>> READY_ORDER_MAP = new HashMap<>();  //准备中的队列
 	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new HashMap<>();     //正在叫号的队列
 	private static final Map<String,Boolean> INIT_SHOP = new HashMap<>();
 	
 	@Resource
 	OrderService orderService;
+	
+	
+	public List<Order> getPushOrderList(String shopId){
+		initShop(shopId);
+		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
+		return new ArrayList<>(orderMap.values());
+	}
 	
 	public List<Order> getReadyOrderList(String shopId){
 		initShop(shopId);
@@ -43,7 +51,7 @@ public class OrderProductionStateContainer {
 	public void addOrder(Order order){
 		String shopId = order.getShopDetailId();
 		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){
-			Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP,shopId);
+			Map<String,Order> orderMap = getOrderMap(PUSH_ORDER_MAP,shopId);
 			orderMap.put(order.getId(), order);
 		}else if(order.getProductionStatus()==ProductionStatus.HAS_CALL){
 			Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
@@ -52,6 +60,13 @@ public class OrderProductionStateContainer {
 			if(readyOrder.containsKey(order.getId())){ //如果准备中的队列中有该订单，则删除该订单
 				readyOrder.remove(order.getId());
 			}
+		}else if(order.getProductionStatus()==ProductionStatus.PRINTED){
+			Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP,shopId);
+			orderMap.put(order.getId(), order);
+			Map<String,Order> pushOrderMap = getOrderMap(PUSH_ORDER_MAP, shopId);
+			if(pushOrderMap.containsKey(order.getId())){
+				pushOrderMap.remove(order.getId());
+			}
 		}
 	}
 
@@ -59,7 +74,7 @@ public class OrderProductionStateContainer {
 	private void initShop(String shopId) {
 		if(!INIT_SHOP.containsKey(shopId)){
 			INIT_SHOP.put(shopId, true);
-			List<Order> order = orderService.selectTodayReadyOrder(shopId);
+			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
 			for (Order o: order) {
 				addOrder(o);
 			}

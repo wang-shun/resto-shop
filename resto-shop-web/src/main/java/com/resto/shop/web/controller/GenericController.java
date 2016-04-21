@@ -29,6 +29,11 @@ public abstract class GenericController{
 	
 	protected Logger log = LoggerFactory.getLogger(getClass());
 	
+
+	public Result getSuccessResult() {
+		return getSuccessResult(null);
+	}
+	
 	public Result getSuccessResult(Object data){
 		if(data==null){
 			return new Result(true);

@@ -3,7 +3,6 @@
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,41 +20,32 @@ public class OrderController extends GenericController{
 	@Resource
 	OrderService orderService;
 	
-	@RequestMapping("/list")
-    public void list(){
-    }
-
-	@RequestMapping("/list_all")
+	@RequestMapping("list_push")
 	@ResponseBody
-	public List<Order> listData(){
-		return orderService.selectList();
-	}
-	
-	@RequestMapping("list_one")
-	@ResponseBody
-	public Result list_one(String id){
-		Order order = orderService.selectById(id);
+	public Result list_push(){
+		List<Order> order = orderService.selectPushOrder(getCurrentShopId());
 		return getSuccessResult(order);
 	}
 	
-	@RequestMapping("create")
+	@RequestMapping("list_ready")
 	@ResponseBody
-	public Result create(@Valid Order brand){
-		orderService.insert(brand);
-		return Result.getSuccess();
+	public Result list_ready(){
+		List<Order> order= orderService.selectReadyOrder(getCurrentShopId());
+		return getSuccessResult(order);
 	}
 	
-	@RequestMapping("modify")
+	@RequestMapping("list_call")
 	@ResponseBody
-	public Result modify(@Valid Order brand){
-		orderService.update(brand);
-		return Result.getSuccess();
+	public Result list_call(){
+		List<Order> order = orderService.selectCallOrder(getCurrentBrandId());
+		return getSuccessResult(order);
 	}
 	
-	@RequestMapping("delete")
+	@RequestMapping("callNumber")
 	@ResponseBody
-	public Result delete(String id){
-		orderService.delete(id);
-		return Result.getSuccess();
+	public Result callOrder(String orderId){
+		orderService.callNumber(orderId);
+		return getSuccessResult();
 	}
+	
 }

@@ -44,11 +44,18 @@ public interface OrderService extends GenericService<Order, String> {
 	public Order printSuccess(String orderId);
 
 	/**
-	 * 查询当天准备中的订单
+	 * 查询当天某些状态的订单
 	 * @param shopId
 	 * @return
 	 */
-	public List<Order> selectTodayReadyOrder(String shopId);
+	public List<Order> selectTodayOrder(String shopId, int[] is);
+
+	public List<Order> selectReadyOrder(String currentShopId);
+
+	public List<Order> selectPushOrder(String currentShopId);
+
+	public List<Order> selectCallOrder(String currentBrandId);
+
 	
 	 
 

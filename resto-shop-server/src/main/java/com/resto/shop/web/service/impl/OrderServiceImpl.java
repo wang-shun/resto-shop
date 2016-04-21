@@ -21,6 +21,7 @@ import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
@@ -80,6 +81,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     WechatConfigService wechatConfigService;
+    
+    @Resource
+    OrderProductionStateContainer orderProductionStateContainer;
     
     @Override
     public GenericDao<Order, String> getDao() {
@@ -303,9 +307,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order callNumber(String orderId) {
 		Order order = selectById(orderId);
-		order.setProductionStatus(ProductionStatus.HAS_CALL);
-		order.setCallNumberTime(new Date());
-		update(order);
+		if(order.getCallNumberTime()==null){
+			order.setProductionStatus(ProductionStatus.HAS_CALL);
+			order.setCallNumberTime(new Date());
+			update(order);
+		}
 		return order;
 	}
 
@@ -320,17 +326,37 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order printSuccess(String orderId) {
 		Order order = selectById(orderId);
-		order.setProductionStatus(ProductionStatus.PRINTED);
-		order.setPrintOrderTime(new Date());
-		update(order);
+		if(order.getPrintOrderTime()==null){
+			order.setProductionStatus(ProductionStatus.PRINTED);
+			order.setPrintOrderTime(new Date());
+			update(order);
+		}
 		return order;
 	}
 
+	
+
 	@Override
-	public List<Order> selectTodayReadyOrder(String shopId) {
+	public List<Order> selectTodayOrder(String shopId, int[] proStatus) {
 		Date date = DateUtil.getDateBegin(new Date());
-		List<Order> orderList = orderMapper.selectShopOrderByDateAndProductionState(shopId,date,ProductionStatus.PRINTED);
+		List<Order> orderList = orderMapper.selectShopOrderByDateAndProductionStates(shopId,date,proStatus);
 		return orderList;
+	}
+
+	@Override
+	public List<Order> selectReadyOrder(String currentShopId) {
+		List<Order> order = orderProductionStateContainer.getReadyOrderList(currentShopId);
+		return order;
+	}
+	
+	@Override
+	public List<Order> selectPushOrder(String currentShopId) {
+		return orderProductionStateContainer.getPushOrderList(currentShopId);
+	}
+
+	@Override
+	public List<Order> selectCallOrder(String currentBrandId) {
+		return orderProductionStateContainer.getCallNowList(currentBrandId);
 	}
 
 }

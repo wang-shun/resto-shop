@@ -55,5 +55,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @param productionState
      * @return
      */
-	List<Order> selectShopOrderByDateAndProductionState(String shopId, Date date, int productionState);
+	List<Order> selectShopOrderByDateAndProductionStates(@Param("shopId")String shopId,@Param("date") Date date,@Param("proStatus") int[] proStatus);
 }

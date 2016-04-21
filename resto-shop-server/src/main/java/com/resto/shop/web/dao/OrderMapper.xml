@@ -411,8 +411,11 @@
 		where id=#{orderId}
 	</if>
   </select>
-  <select id="selectShopOrderByDateAndProductionState" resultType="Order">
+  <select id="selectShopOrderByDateAndProductionStates" resultType="Order">
   	select * from tb_order
-  	where shop_detail_id=#{0} and create_time>#{1} and production_status=#{2}
+  	where shop_detail_id=#{shopId} and create_time>#{date} and production_status in
+  	<foreach collection="proStatus" item="state" open="(" separator="," close=")">
+  		#{state}
+  	</foreach>
   </select>
 </mapper>
