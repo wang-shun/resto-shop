@@ -41,12 +41,12 @@ public class BrandUserController extends GenericController{
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request) {
+    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect) {
         try {
             Subject subject = SecurityUtils.getSubject(); //获取shiro管理的用户对象 主要储存了用户的角色和用户的权限
             // 已登陆则 跳到首页
             if (subject.isAuthenticated()) {
-                return "redirect:/";
+                return "redirect:/"+redirect;
             }
             if (result.hasErrors()) {
                 model.addAttribute("error", "参数错误！");
@@ -65,7 +65,7 @@ public class BrandUserController extends GenericController{
             model.addAttribute("error", e.getMessage());
             return "login";
         }
-        return "redirect:/";
+        return "redirect:/"+redirect;
     }
 
     /**
