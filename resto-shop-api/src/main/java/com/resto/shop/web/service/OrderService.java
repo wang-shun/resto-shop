@@ -56,7 +56,11 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectCallOrder(String currentBrandId);
 
-	public Map<String, Object> printReceipt(String orderId);
+	public Map<String, Object> printReceipt(String orderId, Map<String, Object> shopDetail);
+
+
+
+
 
 	
 	public List<Map<String, Object>> testKitchen(String orderId);

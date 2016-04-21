@@ -17,5 +17,5 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 
 	public void insertItems(List<OrderItem> orderItems);
 
-	public List<Map<String,Object>> selectOrderArticleList();
+	public List<Map<String,Object>> selectOrderArticleList(String orderId);
 }
