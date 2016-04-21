@@ -56,6 +56,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectCallOrder(String currentBrandId);
 
+	public Map<String, Object> printReceipt(String orderId);
+
 	
 	 
 
