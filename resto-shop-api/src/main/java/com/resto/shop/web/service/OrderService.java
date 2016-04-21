@@ -58,13 +58,6 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Map<String, Object> printReceipt(String orderId, Map<String, Object> shopDetail);
 
-
-
-
-
-	
-	public List<Map<String, Object>> testKitchen(String orderId);
-	
 	/**
 	 * 打印厨房的小票
 	 * @param order			订单信息
