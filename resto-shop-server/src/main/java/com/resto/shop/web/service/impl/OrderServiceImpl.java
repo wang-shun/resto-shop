@@ -18,7 +18,6 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
@@ -397,39 +396,43 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	
 	@Override
 	public List<Map<String, Object>> printKitchen(Order order, List<OrderItem> articleList) {
+		//每个厨房 所需制作的   菜品信息
 		Map<String,List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
+		//厨房信息
 		Map<String,Kitchen> kitchenMap = new HashMap<String, Kitchen>();
-		
-		//得到 需要打印的菜品信息和厨房信息
+		//遍历 订单集合 
 		for(OrderItem article : articleList){
-			//得到 当前菜品 对应的厨房信息
+			//得到当前菜品 所关联的厨房信息
 			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(article.getArticleId());
-			if(kitchenList!=null){
-				for(Kitchen kitchen : kitchenList){
-					String kitchenId = kitchen.getId().toString();
-					kitchenMap.put(kitchenId, kitchen);
-					//判断 厨房集合中 是否已经包含当前厨房信息
-					if(kitchenArticleMap.containsKey(kitchenId)){
-						//如果有  则直接 把需要制作的 菜品信息 放入
-						kitchenArticleMap.get(kitchenId).add(article);
-					}else{
-						//如果没有 则新建
-						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
-						kitchenArticleMap.get(kitchenId).add(article);
-					}
+			for(Kitchen kitchen : kitchenList){
+				String kitchenId = kitchen.getId().toString();
+				kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+				//判断 厨房集合中 是否已经包含当前厨房信息
+				if(kitchenArticleMap.containsKey(kitchenId)){
+					//如果有  则直接 把需要制作的 菜品信息 放入
+					kitchenArticleMap.get(kitchenId).add(article);
+				}else{
+					//如果没有 则新建
+					kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+					kitchenArticleMap.get(kitchenId).add(article);
 				}
 			}
-			
 		}
 		
-		String tableNumber = order.getTableNumber();
-		
+		//桌号
+		String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "" ;
+		//打印线程集合
 		List<Map<String,Object>> printTask = new ArrayList<Map<String,Object>>();
-		String modeText = DistributionType.getModeText(order.getDistributionModeId());
-		String serialNumber = order.getSerialNumber();//原来写的是流水号。。。
 		
-		//厨房 循环
+		String modeText = DistributionType.getModeText(order.getDistributionModeId());//就餐模式
+		String serialNumber = order.getSerialNumber();//序列号
+		
+		//编列 厨房菜品 集合
 		for(String kitchenId : kitchenArticleMap.keySet()){
+			//得到厨房 信息
+			Kitchen kitchen = kitchenMap.get(kitchenId);
+			//得到打印机信息
+			Printer printer = printerService.selectById(kitchen.getPrinterId());
 			//生成厨房小票
 			for(OrderItem article : kitchenArticleMap.get(kitchenId)){
 				//保存 菜品的名称和数量
@@ -438,11 +441,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				item.put("ARTICLE_NAME", article.getArticleName());
 				item.put("ARTICLE_COUNT",article.getCount());
 				items.add(item);
-				//得到厨房 信息
-				Kitchen kitchen = kitchenMap.get(kitchenId);
-				//得到打印机信息
-				Printer printer = printerService.selectById(kitchen.getPrinterId());
-				
+				//保存基本信息
 				Map<String,Object> data = new HashMap<String,Object>();
 				data.put("KITCHEN_NAME",kitchen.getName());
 				data.put("DISTRIBUTION_MODE",modeText);
@@ -450,7 +449,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				data.put("ORDER_ID", serialNumber);
 				data.put("DATETIME",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
 				data.put("ITEMS", items);
-				
+				//保存打印配置信息
 				Map<String,Object> print = new HashMap<String,Object>();
 				String print_id = ApplicationUtils.randomUUID();
 				print.put("PRINT_TASK_ID", print_id);
@@ -463,8 +462,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				print.put("PORT", printer.getPort());
 				print.put("ADD_TIME", new Date());
 				print.put("TICKET_TYPE", TicketType.KITCHEN);
+				//添加到 打印集合
 				printTask.add(print);
-				
 			}
 		}
 		
@@ -485,10 +484,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			data.put("DATETIME",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
 			data.put("ITEMS", items);
 			
-			Printer printer = printerService.selectById(1);//查找外包的打印机
+			Printer printer = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
 			Map<String,Object> print = new HashMap<String,Object>();
 			print.put("ORDER_ID", serialNumber);
-			print.put("KITCHEN_NAME", "打包处");
+			print.put("KITCHEN_NAME", printer.getName());
 			print.put("DATA", data);
 			print.put("TABLE_NO", tableNumber);
 			print.put("IP", printer.getIp());
@@ -497,7 +496,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			print.put("TICKET_TYPE", TicketType.PACKAGE);
 			printTask.add(print);
 		}
-				
+		
 		return printTask;
 	}
 
