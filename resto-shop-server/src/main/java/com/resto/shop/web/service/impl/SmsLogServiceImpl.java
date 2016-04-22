@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -50,6 +51,11 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			log.error("发送短信失败:"+e.getMessage());
 		}
 		return string;
+	}
+
+	@Override
+	public List<SmsLog> selectListByShopId(String shopId) {
+		return smslogMapper.selectListByShopId(shopId);
 	} 
 
 }

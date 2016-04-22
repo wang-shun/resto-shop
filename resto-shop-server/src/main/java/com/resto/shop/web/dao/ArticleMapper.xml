@@ -374,4 +374,14 @@
 		</foreach>
   	) and a.shop_detail_id=#{shopId}
   </select>
+  
+  <!-- 根据是否谷清查询菜品信息 -->
+  <select id="selectListByIsEmpty" resultType="Article">
+	SELECT * from tb_article where is_empty = #{isEmpty} and shop_detail_id = #{shopId}
+  </select>
+  
+  <!-- 根据菜品Id 设置谷清 -->
+  <update id="setEmpty">
+	update tb_article set is_empty = #{isEmpty} where id = #{articleId}
+  </update>
 </mapper>

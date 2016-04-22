@@ -106,4 +106,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		return articleMap;
 	}
 
+	@Override
+	public List<Article> selectListByIsEmpty(Integer isEmpty,String shopId) {
+		return articleMapper.selectListByIsEmpty(isEmpty,shopId);
+	}
+
+	@Override
+	public void setEmpty(Integer isEmpty,String articleId) {
+		articleMapper.setEmpty(isEmpty, articleId);
+	}
+
 }

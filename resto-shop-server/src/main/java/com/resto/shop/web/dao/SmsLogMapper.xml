@@ -53,4 +53,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.SmsLog">update tb_sms_log set phone = #{phone,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, sms_type = #{smsType,jdbcType=TINYINT}, sms_result = #{smsResult,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR} where id = #{id,jdbcType=BIGINT}</update>
   <select id="selectList" resultType="SmsLog">select * from tb_sms_log</select>
+  <!-- 根据店铺ID查询短信记录 -->
+  <select id="selectListByShopId" resultType="SmsLog">
+  	SELECT * from tb_sms_log where shop_detail_id = @{shopId}
+  </select>
 </mapper>
