@@ -34,19 +34,48 @@ public class OrderProductionStateContainer {
 	public List<Order> getPushOrderList(String shopId,Long lastTime){
 		initShop(shopId);
 		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
-		
-		return new ArrayList<>(orderMap.values());
+		List<Order> orderList = new ArrayList<>(orderMap.values());
+		if(lastTime==null){
+			return orderList;
+		}
+		List<Order> newList = new ArrayList<>();
+		for(Order order:orderList){
+			if(order.getPushOrderTime().getTime()>lastTime){
+				newList.add(order);
+			}
+		}
+		return newList;
 	}
 	
 	public List<Order> getReadyOrderList(String shopId,Long lastTime){
 		initShop(shopId);
 		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
-		return new ArrayList<>(orderMap.values());
+		List<Order> orderList = new ArrayList<>(orderMap.values());
+		if(lastTime==null){
+			return orderList;
+		}
+		List<Order> newList = new ArrayList<>();
+		for(Order order:orderList){
+			if(order.getPrintOrderTime().getTime()>lastTime){
+				newList.add(order);
+			}
+		}
+		return newList;
 	}
 	
 	public List<Order> getCallNowList(String shopId, Long lastTime){
 		Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
-		return new ArrayList<>(orderMap.values());
+		List<Order> orderList = new ArrayList<>(orderMap.values());
+		if(lastTime==null){
+			return orderList;
+		}
+		List<Order> newList = new ArrayList<>();
+		for(Order order:orderList){
+			if(order.getCallNumberTime().getTime()>lastTime){
+				newList.add(order);
+			}
+		}
+		return newList;
 	}
 	
 	public void addOrder(Order order){
