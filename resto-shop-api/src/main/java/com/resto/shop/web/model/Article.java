@@ -60,6 +60,11 @@ public class Article {
     
     private String unit;
     
+    /**
+     * 用于保存 类型名称
+     */
+    private String articleFamilyName;
+    
     private List<ArticlePrice> articlePrices= new ArrayList<>();
     private Integer [] supportTimes;
     private Integer [] kitchenList;
@@ -303,5 +308,14 @@ public class Article {
 	public void setKitchenList(Integer[] kitchenList) {
 		this.kitchenList = kitchenList;
 	}
+
+	public String getArticleFamilyName() {
+		return articleFamilyName;
+	}
+
+	public void setArticleFamilyName(String articleFamilyName) {
+		this.articleFamilyName = articleFamilyName;
+	}
+	
 	
 }

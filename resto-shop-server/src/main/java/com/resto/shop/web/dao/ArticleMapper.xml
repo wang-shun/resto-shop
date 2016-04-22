@@ -377,7 +377,8 @@
   
   <!-- 根据是否谷清查询菜品信息 -->
   <select id="selectListByIsEmpty" resultType="Article">
-	SELECT * from tb_article where is_empty = #{isEmpty} and shop_detail_id = #{shopId}
+  	SELECT a.id,a.peference,a.name,a.is_empty,f.name articleFamilyName from tb_article a LEFT JOIN tb_article_family f on
+  	 a.article_family_id = f.id where a.activated = 1 and a.is_empty = #{isEmpty} and a.shop_detail_id = #{shopId}
   </select>
   
   <!-- 根据菜品Id 设置谷清 -->
