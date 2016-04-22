@@ -454,4 +454,28 @@
   		#{state}
   	</foreach>
   </select>
+  
+  <select id="selectHistoryOrderList" resultType="Order">
+  	SELECT
+		o.push_order_time,
+		o.id,
+		o.ver_code,
+		(
+		SELECT
+		SUM(COUNT)
+		FROM
+		tb_order_item oi
+		WHERE
+		oi.id = o.id
+		) AS OICount
+		FROM
+		tb_order o
+		WHERE
+		o.shop_detail_id=#{shopId}
+		AND
+		<![CDATA[ o.push_order_time>#{dateBegin} AND o.push_order_time<#{dateEnd}]]>
+		order by o.push_order_time DESC;
+  
+  </select>
+  
 </mapper>

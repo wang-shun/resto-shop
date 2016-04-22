@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class Order {
     private String id;
 
@@ -74,6 +76,7 @@ public class Order {
     private Integer orderMode;
     
     private String brandId;
+    
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */

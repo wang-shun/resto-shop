@@ -1,8 +1,10 @@
 package com.resto.shop.web.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
@@ -69,5 +71,11 @@ public interface OrderService extends GenericService<Order, String> {
 
 	 
 	public Order confirmOrder(Order order);
+
+	public Order getOrderInfo(String orderId);
+
+	public List<Order> selectHistoryOrderList(String currentShopId, Date date);
+
+	public Boolean cancelOrderPos(String orderId);
 
 }
