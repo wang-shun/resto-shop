@@ -52,11 +52,11 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<Order> selectTodayOrder(String shopId, int[] is);
 
-	public List<Order> selectReadyOrder(String currentShopId);
+	public List<Order> selectReadyOrder(String currentShopId,Long lastTime);
 
-	public List<Order> selectPushOrder(String currentShopId);
+	public List<Order> selectPushOrder(String currentShopId,Long lastTime);
 
-	public List<Order> selectCallOrder(String currentBrandId);
+	public List<Order> selectCallOrder(String currentBrandId,Long lastTime);
 
 	public Map<String, Object> printReceipt(String orderId, String shopDetail);
 

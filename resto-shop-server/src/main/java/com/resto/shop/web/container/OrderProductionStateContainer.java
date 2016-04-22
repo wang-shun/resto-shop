@@ -31,19 +31,20 @@ public class OrderProductionStateContainer {
 	OrderService orderService;
 	
 	
-	public List<Order> getPushOrderList(String shopId){
+	public List<Order> getPushOrderList(String shopId,Long lastTime){
+		initShop(shopId);
+		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
+		
+		return new ArrayList<>(orderMap.values());
+	}
+	
+	public List<Order> getReadyOrderList(String shopId,Long lastTime){
 		initShop(shopId);
 		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
 		return new ArrayList<>(orderMap.values());
 	}
 	
-	public List<Order> getReadyOrderList(String shopId){
-		initShop(shopId);
-		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
-		return new ArrayList<>(orderMap.values());
-	}
-	
-	public List<Order> getCallNowList(String shopId){
+	public List<Order> getCallNowList(String shopId, Long lastTime){
 		Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
 		return new ArrayList<>(orderMap.values());
 	}

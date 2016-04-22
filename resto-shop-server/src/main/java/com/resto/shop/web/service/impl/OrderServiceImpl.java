@@ -375,19 +375,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<Order> selectReadyOrder(String currentShopId) {
-		List<Order> order = orderProductionStateContainer.getReadyOrderList(currentShopId);
+	public List<Order> selectReadyOrder(String currentShopId,Long lastTime) {
+		List<Order> order = orderProductionStateContainer.getReadyOrderList(currentShopId,lastTime);
 		return order;
 	}
 
 	@Override
-	public List<Order> selectPushOrder(String currentShopId) {
-		return orderProductionStateContainer.getPushOrderList(currentShopId);
+	public List<Order> selectPushOrder(String currentShopId,Long lastTime) {
+		return orderProductionStateContainer.getPushOrderList(currentShopId,lastTime);
 	}
 
 	@Override
-	public List<Order> selectCallOrder(String currentBrandId) {
-		return orderProductionStateContainer.getCallNowList(currentBrandId);
+	public List<Order> selectCallOrder(String currentBrandId,Long lastTime) {
+		return orderProductionStateContainer.getCallNowList(currentBrandId,lastTime);
 	}
 
 

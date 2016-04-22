@@ -29,22 +29,22 @@ public class OrderController extends GenericController{
 	
 	@RequestMapping("list_push")
 	@ResponseBody
-	public Result list_push(){
-		List<Order> order = orderService.selectPushOrder(getCurrentShopId());
+	public Result list_push(Long lastTime){
+		List<Order> order = orderService.selectPushOrder(getCurrentShopId(),lastTime);
 		return getSuccessResult(order);
 	}
 	
 	@RequestMapping("list_ready")
 	@ResponseBody
-	public Result list_ready(){
-		List<Order> order= orderService.selectReadyOrder(getCurrentShopId());
+	public Result list_ready(Long lastTime){
+		List<Order> order= orderService.selectReadyOrder(getCurrentShopId(),lastTime);
 		return getSuccessResult(order);
 	}
 	
 	@RequestMapping("list_call")
 	@ResponseBody
-	public Result list_call(){
-		List<Order> order = orderService.selectCallOrder(getCurrentBrandId());
+	public Result list_call(Long lastTime){
+		List<Order> order = orderService.selectCallOrder(getCurrentBrandId(),lastTime);
 		return getSuccessResult(order);
 	}
 	
