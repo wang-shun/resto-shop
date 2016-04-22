@@ -57,4 +57,25 @@
   <select id="selectByOrderId" resultType="OrderPaymentItem">
   	select * from tb_order_payment_item where order_id=#{0}
   </select>
+  
+  <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
+  SELECT
+	SUM(pay_value) payValue,
+	payment_mode_id payType
+FROM
+	tb_order_payment_item
+WHERE
+	order_id IN (
+		SELECT
+			id
+		FROM
+			tb_order o
+		WHERE
+			o.order_state NOT IN (1, 9)
+		AND o.shop_detail_id = #{shopId}
+		AND <![CDATA[ o.push_order_time>#{dateBegin} AND o.push_order_time<#{dateEnd}]]>
+	)
+GROUP BY
+	payment_mode_id
+  </select>
 </mapper>
