@@ -580,14 +580,4 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return null;
 	}
 
-	@Override
-	public List<Map<String, Object>> kitchenTest(String orderId) {
-		// 根据id查询订单
-		Order order = selectById(orderId);
-		// 查询订单菜品
-		List<OrderItem> articleList = orderItemService.selectOrderArticleList(orderId);
-		return printKitchen(order,articleList);
-	}
-
-
 }
