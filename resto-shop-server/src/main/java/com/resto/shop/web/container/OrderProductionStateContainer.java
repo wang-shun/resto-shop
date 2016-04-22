@@ -33,7 +33,7 @@ public class OrderProductionStateContainer {
 	
 	public List<Order> getPushOrderList(String shopId,Long lastTime){
 		initShop(shopId);
-		Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP, shopId);
+		Map<String,Order> orderMap = getOrderMap(PUSH_ORDER_MAP, shopId);
 		List<Order> orderList = new ArrayList<>(orderMap.values());
 		if(lastTime==null){
 			return orderList;
