@@ -67,6 +67,7 @@ public class Order {
     
     private String useCoupon;
     
+    //@DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     private Date pushOrderTime;
 
     private Date printOrderTime;
