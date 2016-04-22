@@ -61,7 +61,7 @@
   <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
   SELECT
 	SUM(pay_value) payValue,
-	payment_mode_id payType
+	payment_mode_id 
 FROM
 	tb_order_payment_item
 WHERE

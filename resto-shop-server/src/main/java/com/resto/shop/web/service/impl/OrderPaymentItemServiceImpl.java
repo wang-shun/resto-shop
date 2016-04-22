@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.OrderPaymentItemMapper;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.OrderPaymentItemService;
@@ -34,15 +35,25 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 
 
 	@Override
-	public List<OrderPaymentItem> selectpaymentByPaymentMode(String beginDate, String endDate, String shopId) {
-		if(beginDate==null || ("").equals(beginDate)){
-			beginDate=DateUtil.getDateBegin(new Date()).toString();
+	public List<OrderPaymentItem> selectpaymentByPaymentMode(String shopId, String beginDate, String endDate) {
+		Date begin = null;
+		Date end = null;
+		
+		System.out.println(DateUtil.getDateBegin(new Date()) );
+		if(beginDate==null || ("").equals(beginDate.trim())){
+			begin=DateUtil.getDateBegin(new Date());
+		}else{
+			System.out.println("222");
 		}
-		if(endDate==null || ("").equals(endDate)){
-			endDate=DateUtil.getDateEnd(new Date()).toString();
+		begin = DateUtil.getDateBegin(new Date());
+		if(endDate==null || ("").equals(endDate.trim())){
+			end=DateUtil.getDateEnd(new Date());
 		}
-		System.out.println(beginDate+"---"+endDate);
-		return orderpaymentitemMapper.selectpaymentByPaymentMode(beginDate,endDate,shopId);
+		List<OrderPaymentItem> list = orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
+		for(OrderPaymentItem item : list){
+			item.setPaymentModeVal(PayMode.getPayModeName(item.getPaymentModeId()));
+		}
+		return orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
 	}
 
 

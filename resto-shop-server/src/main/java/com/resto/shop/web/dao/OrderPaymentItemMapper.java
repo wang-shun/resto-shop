@@ -1,12 +1,12 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.OrderPaymentItem;
-
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,String> {
     int deleteByPrimaryKey(String id);
@@ -25,5 +25,5 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
 	List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("dateBegin")String beginDate, @Param("dateEnd")String endDate, @Param("shopId")String shopId);
+	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("shopId")String shopId,@Param("dateBegin")Date beginDate, @Param("dateEnd")Date endDate);
 }

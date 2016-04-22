@@ -9,6 +9,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
 
 	List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(String beginDate, String endDate, String currentShopId);
+	List<OrderPaymentItem> selectpaymentByPaymentMode(String ShopId, String beginDate, String endDate);
 
 }

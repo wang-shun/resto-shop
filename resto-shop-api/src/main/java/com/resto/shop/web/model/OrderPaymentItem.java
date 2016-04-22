@@ -13,6 +13,11 @@ public class OrderPaymentItem {
     private String remark;
 
     private Integer paymentModeId;
+    
+    /**
+     * 用于保存支付方式
+     */
+    private String paymentModeVal;
 
     private String orderId;
 
@@ -73,4 +78,14 @@ public class OrderPaymentItem {
     public void setResultData(String resultData) {
         this.resultData = resultData == null ? null : resultData.trim();
     }
+
+	public String getPaymentModeVal() {
+		return paymentModeVal;
+	}
+
+	public void setPaymentModeVal(String paymentModeVal) {
+		this.paymentModeVal = paymentModeVal;
+	}
+    
+    
 }
