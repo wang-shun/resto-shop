@@ -2,7 +2,6 @@ package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.OrderPaymentItem;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
