@@ -26,5 +26,5 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
 	List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("dateBegin")Date beginDate, @Param("dateEnd") Date endDate, @Param("shopId")String shopId);
+	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("dateBegin")String beginDate, @Param("dateEnd")String endDate, @Param("shopId")String shopId);
 }

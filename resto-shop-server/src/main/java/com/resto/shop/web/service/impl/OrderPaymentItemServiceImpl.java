@@ -34,13 +34,11 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 
 
 	@Override
-	public List<OrderPaymentItem> selectpaymentByPaymentMode(Date beginDate, Date endDate, String shopId) {
+	public List<OrderPaymentItem> selectpaymentByPaymentMode(String beginDate, String endDate, String shopId) {
 		if(beginDate==null&&endDate==null){
-			beginDate=DateUtil.getDateBegin(new Date());
-			endDate=DateUtil.getDateEnd(new Date());
+			beginDate=DateUtil.getDateBegin(new Date()).toString();
+			endDate=DateUtil.getDateEnd(new Date()).toString();
 		}
-		System.out.println(beginDate);
-		System.out.println(endDate);
 		
 		return orderpaymentitemMapper.selectpaymentByPaymentMode(beginDate,endDate,shopId);
 	}

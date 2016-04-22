@@ -1,6 +1,5 @@
 package com.resto.shop.web.service;
 
-import java.util.Date;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
@@ -10,6 +9,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
 
 	List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(Date beginDate, Date endDate, String currentShopId);
+	List<OrderPaymentItem> selectpaymentByPaymentMode(String beginDate, String endDate, String currentShopId);
 
 }
