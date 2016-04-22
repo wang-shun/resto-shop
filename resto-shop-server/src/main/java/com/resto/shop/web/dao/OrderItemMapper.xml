@@ -102,8 +102,8 @@
   <!-- 根据时间查询 当前店铺的 菜品销售记录 -->
   <select id="selectSaleArticleByDate" resultType="OrderItem">
   	SELECT article_name,SUM(count) articleSum from tb_order_item where order_id in
-  	 (SELECT id from tb_order where order_state not in(1,9) and shop_detail_id = #{shopId} and push_order_time >=#{beginDate}
-  	  and push_order_time <=#{endDate} )
+  	 (SELECT id from tb_order where order_state not in(1,9) and shop_detail_id = #{shopId} and push_order_time &gt;=#{beginDate}
+  	  and push_order_time &gl;=#{endDate} )
   	  GROUP BY article_id
   </select>
 </mapper>
