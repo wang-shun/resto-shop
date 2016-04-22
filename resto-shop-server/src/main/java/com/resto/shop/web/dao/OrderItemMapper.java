@@ -2,7 +2,6 @@ package com.resto.shop.web.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -35,5 +34,5 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 	 * @param shopId
 	 * @return
 	 */
-	public List<OrderItem> selectSaleArticleByDate(Date beginDate,Date endDate,String shopId);
+	public List<OrderItem> selectSaleArticleByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId);
 }

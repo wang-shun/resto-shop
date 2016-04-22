@@ -29,6 +29,11 @@ public class OrderItem {
 
     private Integer type;
     
+    /**
+     * 用于保存 菜品总数
+     */
+    private Integer articleSum;
+    
     public String getId() {
         return id;
     }
@@ -132,4 +137,13 @@ public class OrderItem {
 	public void setType(Integer type) {
 		this.type = type;
 	}
+
+	public Integer getArticleSum() {
+		return articleSum;
+	}
+
+	public void setArticleSum(Integer articleSum) {
+		this.articleSum = articleSum;
+	}
+	
 }

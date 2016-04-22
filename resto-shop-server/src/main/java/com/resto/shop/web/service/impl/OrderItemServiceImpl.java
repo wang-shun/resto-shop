@@ -45,10 +45,23 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	}
 
 	@Override
-	public List<OrderItem> selectSaleArticleByDate(Date beginDate, Date endDate, String shopId) {
-		beginDate = DateUtil.getDateBegin(beginDate);
-		endDate = DateUtil.getDateEnd(endDate);
-		return orderitemMapper.selectSaleArticleByDate(beginDate, endDate, shopId);
+	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate) {
+		Date begin = null;
+		Date end = null;
+		if(beginDate==null || ("").equals(beginDate.trim())){
+			begin=DateUtil.getDateBegin(new Date());
+		}else{
+			begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+		}
+		if(endDate==null || ("").equals(endDate.trim())){
+			end=DateUtil.getDateEnd(new Date());
+		}else{
+			end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+		}
+		System.out.println(begin);
+		System.out.println(end);
+		System.out.println(shopId);
+		return orderitemMapper.selectSaleArticleByDate(begin, end, shopId);
 	} 
 
 }

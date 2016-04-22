@@ -1,6 +1,5 @@
 package com.resto.shop.web.service;
 
-import java.util.Date;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
@@ -26,5 +25,5 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @param shopId
 	 * @return
 	 */
-	public List<OrderItem> selectSaleArticleByDate(Date beginDate,Date endDate,String shopId);
+	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate);
 }
