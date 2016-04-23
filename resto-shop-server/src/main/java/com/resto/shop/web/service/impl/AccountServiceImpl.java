@@ -13,8 +13,10 @@ import com.resto.shop.web.constant.AccountLogType;
 import com.resto.shop.web.dao.AccountMapper;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
+import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.AccountLogService;
 import com.resto.shop.web.service.AccountService;
+import com.resto.shop.web.service.CustomerService;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -27,6 +29,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     @Resource
     private AccountMapper accountMapper;
 
+    @Resource
+    CustomerService customerService;
+    
     @Resource
     AccountLogService accountLogService;
     
@@ -82,5 +87,16 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			account.setAccountLogs(accountLogs);
 		}
 		return account;
+	}
+
+	@Override
+	public Account createCustomerAccount(Customer cus) {
+		Account acc =new Account();
+		acc.setId(ApplicationUtils.randomUUID());
+		acc.setRemain(BigDecimal.ZERO);
+		insert(acc);
+		cus.setAccountId(acc.getId());
+		customerService.update(cus);
+		return acc;
 	} 
 }

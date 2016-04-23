@@ -76,6 +76,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectHistoryOrderList(String currentShopId, Date date);
 
-	public Boolean cancelOrderPos(String orderId);
+	public boolean cancelOrderPos(String orderId);
+
+	public void changePushOrder(Order order);
 
 }

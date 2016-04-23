@@ -55,6 +55,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public Customer selectById(String id) {
 		Customer cus = customerMapper.selectByPrimaryKey(id);
 		Account account = accountService.selectById(cus.getAccountId());
+		if(account==null){
+			account = accountService.createCustomerAccount(cus);
+		}
 		cus.setAccount(account.getRemain());
 		return cus;
 	}

@@ -43,6 +43,7 @@ public class Order {
 
     private String remark;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     private String operatorId;
@@ -67,7 +68,6 @@ public class Order {
     
     private String useCoupon;
     
-    //@DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     private Date pushOrderTime;
 
     private Date printOrderTime;
@@ -77,6 +77,8 @@ public class Order {
     private Integer orderMode;
     
     private String brandId;
+    
+    private Customer customer;
     
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
@@ -383,5 +385,13 @@ public class Order {
 
 	public void setAllowAppraise(Boolean allowAppraise) {
 		this.allowAppraise = allowAppraise;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 }

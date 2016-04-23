@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Account;
+import com.resto.shop.web.model.Customer;
 
 public interface AccountService extends GenericService<Account, String> {
 
@@ -22,4 +23,6 @@ public interface AccountService extends GenericService<Account, String> {
 	 * @return
 	 */
 	Account selectAccountAndLogByCustomerId(String customerId);
+
+	Account createCustomerAccount(Customer cus);
 }

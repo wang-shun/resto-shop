@@ -453,29 +453,27 @@
   	<foreach collection="proStatus" item="state" open="(" separator="," close=")">
   		#{state}
   	</foreach>
+  	and closed=0
   </select>
   
   <select id="selectHistoryOrderList" resultType="Order">
   	SELECT
-		o.push_order_time,
-		o.id,
-		o.ver_code,
-		(
-		SELECT
-		SUM(COUNT)
+		push_order_time,
+		id,
+		ver_code,
+		article_count
 		FROM
-		tb_order_item oi
+		tb_order 
 		WHERE
-		oi.id = o.id
-		) AS OICount
-		FROM
-		tb_order o
-		WHERE
-		o.shop_detail_id=#{shopId}
+		shop_detail_id=#{shopId}
 		AND
-		<![CDATA[ o.push_order_time>#{dateBegin} AND o.push_order_time<#{dateEnd}]]>
-		order by o.push_order_time DESC;
-  
+		<![CDATA[ push_order_time>#{dateBegin} AND push_order_time<#{dateEnd}]]>
+		and closed=0
+		order by push_order_time DESC;
   </select>
+  
+  <update id="clearPushOrder" >
+  	update tb_order set push_order_time=(NULL),production_status =#{1} where id=#{0} 
+  </update>
   
 </mapper>

@@ -17,4 +17,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
     int updateByPrimaryKey(Customer record);
 
 	Customer selectByOpenId(String openid);
+
+	void bindAccount(String accountId, String customerId);
 }

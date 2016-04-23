@@ -40,7 +40,7 @@ public class OrderConsumer implements ApplicationContextAware{
 		Properties pro= MQSetting.getPropertiesWithAccessSecret();
 		pro.setProperty(PropertyKeyConst.ConsumerId, MQSetting.CID_SHOP);
 		consumer = ONSFactory.createConsumer(pro);
-		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_CANCEL_ORDER+"||"+MQSetting.TAG_AUTO_CONFIRM_ORDER, new MessageListener() {
+		consumer.subscribe(MQSetting.TOPIC_RESTO_SHOP, MQSetting.TAG_ALL, new MessageListener() {
 			@Override
 			public Action consume(Message message, ConsumeContext context) {
 				log.info("接收到队列消息:"+message);
@@ -63,7 +63,17 @@ public class OrderConsumer implements ApplicationContextAware{
 			return executeCancelOrder(message);
 		}else if(tag.equals(MQSetting.TAG_AUTO_CONFIRM_ORDER)){
 			return executeAutoConfirmOrder(message);
+		}else if(tag.equals(MQSetting.TAG_NOT_PRINT_ORDER)){
+			return executeChangeProductionState(message);
 		}
+		return Action.CommitMessage;
+	}
+
+	private Action executeChangeProductionState(Message message) throws UnsupportedEncodingException {
+		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
+		Order order = JSON.parseObject(msg, Order.class);
+		DataSourceContextHolder.setDataSourceName(order.getBrandId());
+		orderService.changePushOrder(order);
 		return Action.CommitMessage;
 	}
 

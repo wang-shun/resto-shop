@@ -12,7 +12,6 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.model.Order;
 
 
@@ -56,6 +55,22 @@ public class MQMessageProducer {
 				log.info("发送自动确认订单消息:"+delayTime+"ms 后执行"+order.getId()+"@"+order.getBrandId()+"@"+ result);
 			}
 		}).start();
+	}
+
+	public static void sendNotPrintedMessage(final Order order, final long delayTime) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				JSONObject obj = new JSONObject();
+				obj.put("brandId", order.getBrandId());
+				obj.put("id", order.getId());
+				Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_PRINT_ORDER,obj.toJSONString().getBytes());
+				message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+				SendResult result = producer.send(message);
+				log.info("发送超时未打印订单消息:"+result);
+				
+			}
+		});
 	}
 
 }

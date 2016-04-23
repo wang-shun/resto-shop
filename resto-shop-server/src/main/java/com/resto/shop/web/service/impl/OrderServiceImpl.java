@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -33,7 +32,6 @@ import com.resto.shop.web.constant.PrinterType;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.constant.TicketType;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.dao.OrderItemMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
@@ -285,6 +283,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
+			orderProductionStateContainer.removePushOrder(order);
 			log.info("取消订单成功:" + order.getId());
 			return true;
 		} else {
@@ -587,33 +586,43 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Order order = orderMapper.selectByPrimaryKey(orderId);
 		List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
 		order.setOrderItems(orderItems);
+		Customer cus = customerService.selectById(order.getCustomerId());
+		order.setCustomer(cus);
 		return order;
 	}
 
 	@Override
 	public List<Order> selectHistoryOrderList(String currentShopId, Date date) {
-		System.out.println(DateUtil.getDateBegin(date));
-		System.out.println(DateUtil.getDateEnd(date));
-	 return  orderMapper.selectHistoryOrderList(currentShopId,DateUtil.getDateBegin(date),DateUtil.getDateEnd(date));
+		Date begin = DateUtil.getDateBegin(date);
+		Date end  = DateUtil.getDateEnd(date);
+	 return  orderMapper.selectHistoryOrderList(currentShopId,begin,end);
 		
 	}
 
 	@Override
-	public Boolean cancelOrderPos(String orderId) {
+	public boolean cancelOrderPos(String orderId) {
 		Order order = selectById(orderId);
-		
 		if(order.getClosed()){
 			log.info("该订单已经是取消状态");
-			return true;
+			return false;
 		}else{
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
 			log.info("取消订单成功:" + order.getId());
+			orderProductionStateContainer.removePushOrder(order);
 			return true;
 		}
-		
+	}
+
+	@Override
+	public void changePushOrder(Order order) {
+		order = selectById(order.getId());
+		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){ //如果还是已下单状态，则将订单状态改为未下单
+			orderMapper.clearPushOrder(order.getId(),ProductionStatus.NOT_ORDER);
+			orderProductionStateContainer.removePushOrder(order);
+		}
 	}
 
 }

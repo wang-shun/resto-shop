@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.WechatConfigService;
@@ -91,11 +90,10 @@ public class OrderAspect {
 		if(order!=null){
 			orderProductionStateContainer.addOrder(order);
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
-				if(order.getOrderMode()==ShopMode.CALL_NUMBER){
-					sendVerCodeMsg(order);
-				}
+				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
 				log.info("打印成功后，发送自动确认订单通知！");
+				sendVerCodeMsg(order);
 				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}
@@ -116,8 +114,6 @@ public class OrderAspect {
 			log.info("发送评论通知成功:"+result);
 		}
 	}
-	
-	
 	
 	private void sendVerCodeMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());

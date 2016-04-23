@@ -119,4 +119,16 @@ public class OrderProductionStateContainer {
 		}
 		return ordermap;
 	}
+
+	public void removeOrder(Order order) {
+		
+		
+	}
+
+	public void removePushOrder(Order order) {
+		getOrderMap(PUSH_ORDER_MAP, order.getShopDetailId()).remove(order.getId());
+	}
+	
+	
+
 }
