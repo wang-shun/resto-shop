@@ -1,7 +1,5 @@
 package com.resto.shop.web.service.impl;
 
-<<<<<<< 3fdbfb1f18c64b5648254368dc10a6033cedf088
-
 import java.math.BigDecimal;
 
 import java.util.Date;
@@ -13,17 +11,13 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 
 import com.resto.brand.core.util.ApplicationUtils;
 
-import com.resto.shop.web.constant.OrderState;
-
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
 import com.resto.shop.web.model.ChargeOrder;
 
 import com.resto.shop.web.model.ChargeSetting;
-import com.re
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.ChargePaymentService;
