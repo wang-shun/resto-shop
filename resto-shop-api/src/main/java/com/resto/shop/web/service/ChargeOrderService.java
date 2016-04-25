@@ -2,8 +2,10 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.ChargeOrder;
+import com.resto.shop.web.model.ChargePayment;
 
 public interface ChargeOrderService extends GenericService<ChargeOrder, String> {
+
 	
 	/**
 	 * 创建微信充值订单
@@ -12,4 +14,10 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 * @return
 	 */
 	ChargeOrder createChargeOrder(String settingId,String customerId,String shopId,String brandId);
+
+
+	void chargeorderWxPaySuccess(ChargePayment cp);
+
+	
+
 }

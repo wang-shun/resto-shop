@@ -98,5 +98,6 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		cus.setAccountId(acc.getId());
 		customerService.update(cus);
 		return acc;
-	} 
+	}
+
 }

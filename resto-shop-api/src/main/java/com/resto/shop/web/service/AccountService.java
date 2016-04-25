@@ -25,4 +25,5 @@ public interface AccountService extends GenericService<Account, String> {
 	Account selectAccountAndLogByCustomerId(String customerId);
 
 	Account createCustomerAccount(Customer cus);
+
 }
