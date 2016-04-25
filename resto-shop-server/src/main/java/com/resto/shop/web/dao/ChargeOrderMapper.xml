@@ -9,15 +9,20 @@
     <result column="order_state" property="orderState" jdbcType="TINYINT"/>
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP"/>
-    <result column="tb_customer_id" property="tbCustomerId" jdbcType="VARCHAR"/>
+    <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, charge_money, reward_money, order_state, create_time, finish_time, tb_customer_id, shop_detail_id</sql>
+  <sql id="Base_Column_List">id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, shop_detail_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_charge_order where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_charge_order where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder">insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, tb_customer_id, shop_detail_id) values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL}, #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, #{tbCustomerId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder">
+  	insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, customer_id,
+  	 shop_detail_id,brand_id) values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL},
+  	  #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP},
+  	   #{customerId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR},#{brandId,jdbcType=VARCHAR})
+  </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.ChargeOrder">insert into tb_charge_order 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -26,8 +31,9 @@
       <if test="orderState != null">order_state,</if>  
       <if test="createTime != null">create_time,</if>  
       <if test="finishTime != null">finish_time,</if>  
-      <if test="tbCustomerId != null">tb_customer_id,</if>  
+      <if test="customerId != null">customer_id,</if>  
       <if test="shopDetailId != null">shop_detail_id,</if> 
+      <if test="brandId != null">brand_id,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -36,8 +42,9 @@
       <if test="orderState != null">#{orderState,jdbcType=TINYINT},</if>  
       <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>  
       <if test="finishTime != null">#{finishTime,jdbcType=TIMESTAMP},</if>  
-      <if test="tbCustomerId != null">#{tbCustomerId,jdbcType=VARCHAR},</if>  
+      <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ChargeOrder">update tb_charge_order 
@@ -47,10 +54,11 @@
       <if test="orderState != null">order_state = #{orderState,jdbcType=TINYINT},</if>  
       <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>  
       <if test="finishTime != null">finish_time = #{finishTime,jdbcType=TIMESTAMP},</if>  
-      <if test="tbCustomerId != null">tb_customer_id = #{tbCustomerId,jdbcType=VARCHAR},</if>  
+      <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeOrder">update tb_charge_order set charge_money = #{chargeMoney,jdbcType=DECIMAL}, reward_money = #{rewardMoney,jdbcType=DECIMAL}, order_state = #{orderState,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, finish_time = #{finishTime,jdbcType=TIMESTAMP}, tb_customer_id = #{tbCustomerId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeOrder">update tb_charge_order set charge_money = #{chargeMoney,jdbcType=DECIMAL}, reward_money = #{rewardMoney,jdbcType=DECIMAL}, order_state = #{orderState,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, finish_time = #{finishTime,jdbcType=TIMESTAMP}, customer_id = #{customerId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ChargeOrder">select * from tb_charge_order</select>
 </mapper>

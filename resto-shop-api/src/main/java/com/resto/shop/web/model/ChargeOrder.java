@@ -21,8 +21,29 @@ public class ChargeOrder {
     private String shopDetailId;
     
     private String brandId;
+    
+	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
+			String customerId, String shopDetailId, String brandId) {
+		super();
+		this.id = id;
+		this.chargeMoney = chargeMoney;
+		this.rewardMoney = rewardMoney;
+		this.orderState = orderState;
+		this.createTime = createTime;
+		this.customerId = customerId;
+		this.shopDetailId = shopDetailId;
+		this.brandId = brandId;
+	}
 
-    public String getId() {
+
+
+	public ChargeOrder() {
+		super();
+	}
+
+
+
+	public String getId() {
         return id;
     }
 

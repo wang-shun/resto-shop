@@ -2,9 +2,9 @@ package com.resto.shop.web.service.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.OrderItemMapper;
@@ -58,9 +58,6 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 		}else{
 			end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
 		}
-		System.out.println(begin);
-		System.out.println(end);
-		System.out.println(shopId);
 		return orderitemMapper.selectSaleArticleByDate(begin, end, shopId);
 	} 
 

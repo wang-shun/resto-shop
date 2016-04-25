@@ -1,5 +1,7 @@
 package com.resto.shop.web.aspect;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.aspectj.lang.annotation.AfterReturning;
@@ -13,14 +15,17 @@ import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.ShopCartService;
 
 @Component
@@ -39,6 +44,10 @@ public class OrderAspect {
 	BrandSettingService brandSettingService;
 	@Resource
 	OrderProductionStateContainer orderProductionStateContainer;
+	@Resource
+	OrderItemService orderItemService;
+	@Resource
+	ShopDetailService shopDetailService;
 	
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
@@ -57,8 +66,18 @@ public class OrderAspect {
 	private void sendPaySuccessMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
-		StringBuffer msg = new StringBuffer("发送订单详情通知：（待完成）");
-		//TODO 订单完成后 msg 的填充
+		StringBuffer msg = new StringBuffer("取餐码："+order.getVerCode()+"\n");
+		if( order.getShopName()==null||"".equals(order.getShopName())){
+			order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+		}
+		msg.append("取餐店铺："+order.getShopName()+"\n");
+		msg.append("订单时间："+order.getPushOrderTime()+"\n");
+		msg.append("订单明细：\n");
+		List<OrderItem> orderItem  = orderItemService.selectOrderArticleList(order.getId());
+		for(OrderItem item : orderItem){
+			msg.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+		}
+		msg.append("订单金额："+order.getOrderMoney()+"\n");
 		try {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
 			log.info("订单支付完成后，发送客服消息:"+result);
