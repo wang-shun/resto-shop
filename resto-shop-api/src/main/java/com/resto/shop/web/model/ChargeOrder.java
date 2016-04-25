@@ -16,9 +16,11 @@ public class ChargeOrder {
 
     private Date finishTime;
 
-    private String tbCustomerId;
+    private String customerId;
 
     private String shopDetailId;
+    
+    private String brandId;
 
     public String getId() {
         return id;
@@ -68,12 +70,12 @@ public class ChargeOrder {
         this.finishTime = finishTime;
     }
 
-    public String getTbCustomerId() {
-        return tbCustomerId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setTbCustomerId(String tbCustomerId) {
-        this.tbCustomerId = tbCustomerId == null ? null : tbCustomerId.trim();
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId == null ? null : customerId.trim();
     }
 
     public String getShopDetailId() {
@@ -83,4 +85,12 @@ public class ChargeOrder {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public String getBrandId() {
+		return brandId;
+	}
+
+	public void setBrandId(String brandId) {
+		this.brandId = brandId;
+	}
 }
