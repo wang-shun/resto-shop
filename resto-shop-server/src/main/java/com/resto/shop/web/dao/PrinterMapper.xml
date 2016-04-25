@@ -58,7 +58,7 @@
   
   <select id="selectByShopAndType" resultType="Printer">
   	select * from tb_printer
-		where shop_detail_id = #{0} and print_type=#{1}
+		where shop_detail_id = #{shopDetailId} and print_type=#{printType}
   </select>
   
   
