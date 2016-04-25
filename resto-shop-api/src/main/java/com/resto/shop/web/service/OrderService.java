@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
@@ -83,5 +82,19 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Map<String, Object>> printOrderAll(String orderId);
 
 	public void setTableNumber(String orderId, String tableNumber);
+	
+	/**
+	 * 根据取餐码查询店铺中已支付的订单
+	 * @param vercode
+	 * @return
+	 */
+	public List<Order> selectOrderByVercode(String vercode,String shopId);
+	
+	/**
+	 * 根据桌号查询店铺中已支付的订单
+	 * @param tableNumber
+	 * @return
+	 */
+	public List<Order> selectOrderByTableNumber(String tableNumber,String shopId);
 
 }

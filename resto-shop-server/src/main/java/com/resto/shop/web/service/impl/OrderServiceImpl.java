@@ -654,4 +654,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		orderMapper.setOrderNumber(orderId,tableNumber);
 	}
 
+	@Override
+	public List<Order> selectOrderByVercode(String vercode,String shopId) {
+		return orderMapper.selectOrderByVercode(vercode,shopId);
+	}
+
+	@Override
+	public List<Order> selectOrderByTableNumber(String tableNumber, String shopId) {
+		return orderMapper.selectOrderByTableNumber(tableNumber, shopId);
+	}
+
 }

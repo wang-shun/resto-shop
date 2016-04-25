@@ -478,4 +478,14 @@
   <update id="setOrderNumber" >
   	update tb_order set table_number=#{1} where id=#{0}
   </update>
+  
+  <!-- 根据取餐码查询已支付的订单 -->
+  <select id="selectOrderByVercode" resultType="Order">
+  	SELECT * from tb_order where order_state = 2 and shop_detail_id = #{shopId} and ver_code = #{vercode} 
+  </select>
+  
+  <!-- 根据桌号查询已支付的订单 -->
+  <select id="selectOrderByTableNumber" resultType="Order">
+  	SELECT * from tb_order where order_state = 2 and shop_detail_id = #{shopId} and table_number = #{tableNumber} 
+  </select>
 </mapper>

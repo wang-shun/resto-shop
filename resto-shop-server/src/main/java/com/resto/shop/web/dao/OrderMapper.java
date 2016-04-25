@@ -69,4 +69,18 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	void clearPushOrder(String id, int notOrder);
 
 	void setOrderNumber(String orderId, String tableNumber);
+	
+	/**
+	 * 根据取餐码查询已支付的订单
+	 * @param vercode
+	 * @return
+	 */
+	List<Order> selectOrderByVercode(@Param("vercode")String vercode,@Param("shopId")String shopId);
+	
+	/**
+	 * 根据桌号查询店铺已支付的订单
+	 * @param tableNumber
+	 * @return
+	 */
+	List<Order> selectOrderByTableNumber(@Param("tableNumber")String tableNumber,@Param("shopId")String shopId);
 }
