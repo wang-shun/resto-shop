@@ -90,6 +90,7 @@ public class OrderAspect {
 		if(order!=null){
 			orderProductionStateContainer.addOrder(order);
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
+				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
 				log.info("打印成功后，发送自动确认订单通知！");

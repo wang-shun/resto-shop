@@ -38,7 +38,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
-	public Order pushOrder(String orderId);
+	public Order pushOrder(String orderId) throws AppException;
 	
 	public Order callNumber(String orderId);
 	
@@ -59,7 +59,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectCallOrder(String currentBrandId,Long lastTime);
 
-	public Map<String, Object> printReceipt(String orderId, String shopDetail);
+	public Map<String, Object> printReceipt(String orderId);
 
 	/**
 	 * 打印厨房的小票
@@ -79,5 +79,9 @@ public interface OrderService extends GenericService<Order, String> {
 	public boolean cancelOrderPos(String orderId);
 
 	public void changePushOrder(Order order);
+
+	public List<Map<String, Object>> printOrderAll(String orderId);
+
+	public void setTableNumber(String orderId, String tableNumber);
 
 }

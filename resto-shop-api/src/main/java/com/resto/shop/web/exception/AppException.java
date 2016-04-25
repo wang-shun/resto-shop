@@ -1,7 +1,5 @@
 package com.resto.shop.web.exception;
 
-import com.resto.shop.web.exception.AppException.ErrorMsg;
-
 public class AppException extends Exception{
 	/**
 	 * 
@@ -18,14 +16,16 @@ public class AppException extends Exception{
 	public static final ErrorMsg COUPON_IS_EXPIRE = new ErrorMsg(8,"优惠卷已过期");
 	public static final ErrorMsg COUPON_TIME_ERR = new ErrorMsg(9,"优惠卷使用时间段错误");
 	public static final ErrorMsg UNSUPPORT_ITEM_TYPE = new ErrorMsg(10,"不支持的餐品类型！");
+	public static final ErrorMsg ORDER_STATE_ERR = new ErrorMsg(11, "订单状态异常");
+	public static final ErrorMsg ORDER_MODE_CHECK = new ErrorMsg(12, "");
+	
 	
 	public AppException(ErrorMsg msg) {
 		this.msg=msg;
 	}
 	
 	public AppException(ErrorMsg msg, String string) {
-		msg.setMsg(string);
-		this.msg=msg;
+		this.msg = new ErrorMsg(msg.getCode(), string);
 	}
 
 	@Override
@@ -35,8 +35,8 @@ public class AppException extends Exception{
 	
 	
 	static class ErrorMsg{
-		private int code;
-		private String msg;
+		private final int code;
+		private final String msg;
 		ErrorMsg(int code, String msg){
 			this.code=code;
 			this.msg=msg;
@@ -46,12 +46,6 @@ public class AppException extends Exception{
 		}
 		public String getMsg() {
 			return msg;
-		}
-		public void setCode(int code) {
-			this.code = code;
-		}
-		public void setMsg(String msg) {
-			this.msg = msg;
 		}
 		@Override
 		public String toString() {

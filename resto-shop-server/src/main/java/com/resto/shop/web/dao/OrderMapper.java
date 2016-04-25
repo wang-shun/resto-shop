@@ -67,4 +67,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectHistoryOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
 	void clearPushOrder(String id, int notOrder);
+
+	void setOrderNumber(String orderId, String tableNumber);
 }

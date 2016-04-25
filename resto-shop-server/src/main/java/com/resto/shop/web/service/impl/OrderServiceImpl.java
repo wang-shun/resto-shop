@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 
@@ -267,7 +266,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date beginDate = DateUtil.getDateBegin(new Date());
 		Integer[] orderState = new Integer[] { OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM };
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
-		if (!StringUtils.isBlank(orderId) && order != null) {
+		if (order != null) {
 			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
 			order.setOrderItems(itemList);
 		}
@@ -329,15 +328,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public Order pushOrder(String orderId) {
+	public Order pushOrder(String orderId) throws AppException {
 		Order order = selectById(orderId);
-		if (OrderState.PAYMENT == order.getOrderState() && ProductionStatus.NOT_ORDER == order.getProductionStatus()) {
+		if (validOrderCanPush(order)) {
 			order.setProductionStatus(ProductionStatus.HAS_ORDER);
 			order.setPushOrderTime(new Date());
 			update(order);
 			return order;
 		}
 		return null;
+	}
+
+	private boolean validOrderCanPush(Order order) throws AppException {
+		if(order.getOrderState()!=OrderState.PAYMENT||ProductionStatus.NOT_ORDER!=order.getProductionStatus()){
+			throw new AppException(AppException.ORDER_STATE_ERR);
+		}
+		switch(order.getOrderMode()){
+		case 1:
+			if(order.getTableNumber()==null){
+				throw new AppException(AppException.ORDER_MODE_CHECK,"桌号不得为空");
+			}
+			break;
+		}
+		return true;
 	}
 
 	@Override
@@ -391,9 +404,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderProductionStateContainer.getCallNowList(currentBrandId,lastTime);
 	}
 
-
-
-	
 	
 	@Override
 	public List<Map<String, Object>> printKitchen(Order order, List<OrderItem> articleList) {
@@ -409,14 +419,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				String kitchenId = kitchen.getId().toString();
 				kitchenMap.put(kitchenId, kitchen);//保存厨房信息
 				//判断 厨房集合中 是否已经包含当前厨房信息
-				if(kitchenArticleMap.containsKey(kitchenId)){
-					//如果有  则直接 把需要制作的 菜品信息 放入
-					kitchenArticleMap.get(kitchenId).add(article);
-				}else{
+				if(!kitchenArticleMap.containsKey(kitchenId)){
 					//如果没有 则新建
 					kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
-					kitchenArticleMap.get(kitchenId).add(article);
 				}
+				kitchenArticleMap.get(kitchenId).add(article);
 			}
 		}
 		
@@ -501,11 +508,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
   
 	@Override
-	public Map<String, Object> printReceipt(String orderId, String shopId) {
+	public Map<String, Object> printReceipt(String orderId) {
 		// 根据id查询订单
 		Order order = selectById(orderId);
 		//查询店铺
-		ShopDetail shopDetail = shopDetailService.selectById(shopId);
+		ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 		// 查询订单菜品
 		List<OrderItem> articleList = orderItemService.selectOrderArticleList(orderId);
 		return printTicket(order, articleList, shopDetail);
@@ -623,6 +630,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			orderMapper.clearPushOrder(order.getId(),ProductionStatus.NOT_ORDER);
 			orderProductionStateContainer.removePushOrder(order);
 		}
+	}
+
+	@Override
+	public List<Map<String, Object>> printOrderAll(String orderId) {
+		Order order = selectById(orderId);
+		ShopDetail shop= shopDetailService.selectById(order.getShopDetailId());
+		List<OrderItem> items = orderItemService.selectOrderArticleList(orderId);
+		List<Map<String,Object>> printTask = new ArrayList<>();
+		Map<String,Object> ticket = printTicket(order, items,shop);
+		List<Map<String,Object>> kitchenTicket = printKitchen(order, items);
+		if(ticket!=null){
+			printTask.add(ticket);
+		}
+		if(!kitchenTicket.isEmpty()){
+			printTask.addAll(kitchenTicket);
+		}
+		return printTask;
+	}
+
+	@Override
+	public void setTableNumber(String orderId, String tableNumber) {
+		orderMapper.setOrderNumber(orderId,tableNumber);
 	}
 
 }

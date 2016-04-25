@@ -27,50 +27,43 @@ public class MQMessageProducer {
 	}
 	
 	public static void sendAutoCloseMsg(final String orderId, final String brandId,final long delay) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				JSONObject obj = new JSONObject();
-				obj.put("orderId", orderId);
-				obj.put("brandId", brandId);
-				Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER, obj.toJSONString().getBytes());				
-				message.setStartDeliverTime(System.currentTimeMillis()+delay);
-				SendResult result =  producer.send(message);
-				log.info("发送自动取消订单消息 :"+message+" 成功:"+result);
-			}
-		}).start();
+		JSONObject obj = new JSONObject();
+		obj.put("orderId", orderId);
+		obj.put("brandId", brandId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER, obj.toJSONString().getBytes());				
+		message.setStartDeliverTime(System.currentTimeMillis()+delay);
+		sendMessageASync(message);
 	}
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_CONFIRM_ORDER,obj.toJSONString().getBytes());
+		long delay = System.currentTimeMillis()+delayTime;
+		message.setStartDeliverTime(delay);
+		sendMessageASync(message);
+	}
+
+	public static void sendNotPrintedMessage(final Order order, final long delayTime) {
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_PRINT_ORDER,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+
+	public static void sendMessageASync(final Message message) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				JSONObject obj = new JSONObject();
-				obj.put("brandId", order.getBrandId());
-				obj.put("id", order.getId());
-				Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_CONFIRM_ORDER,obj.toJSONString().getBytes());
-				long delay = System.currentTimeMillis()+delayTime;
-				message.setStartDeliverTime(delay);
 				SendResult result = producer.send(message);
-				log.info("发送自动确认订单消息:"+delayTime+"ms 后执行"+order.getId()+"@"+order.getBrandId()+"@"+ result);
+				log.info("["+message.getTag()+"]"+"发送消息成功:"+result);
 			}
 		}).start();
 	}
 
-	public static void sendNotPrintedMessage(final Order order, final long delayTime) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				JSONObject obj = new JSONObject();
-				obj.put("brandId", order.getBrandId());
-				obj.put("id", order.getId());
-				Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_PRINT_ORDER,obj.toJSONString().getBytes());
-				message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
-				SendResult result = producer.send(message);
-				log.info("发送超时未打印订单消息:"+result);
-				
-			}
-		});
-	}
-
+	
+	
 }
