@@ -674,4 +674,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderList;
 	}
 
+	@Override
+	public void updateDistributionMode(Integer modeId, String orderId){
+		Order order = selectById(orderId);
+		order.setDistributionModeId(modeId);
+		 orderMapper.updateByPrimaryKeySelective(order);
+	}
+
 }

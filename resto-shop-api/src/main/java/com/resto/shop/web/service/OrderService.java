@@ -96,5 +96,12 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public List<Order> selectOrderByTableNumber(String tableNumber,String shopId);
-
+	
+	/**
+	 * 修改就餐模式
+	 * @param modeId
+	 * @param currentShopId
+	 */
+	public void updateDistributionMode(Integer modeId, String orderId);
+	
 }

@@ -492,4 +492,9 @@
   	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and table_number = #{tableNumber}
   	 ORDER BY push_order_time DESC
   </select>
+  
 </mapper>
+
+
+
+
