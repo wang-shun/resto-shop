@@ -18,11 +18,15 @@
 			    <label>活动名称</label>
 			    <input type="text" class="form-control"  name="name" v-model="m.name">
 			</div>
-			
 			<div class="form-group">
-			    <label>优惠券的价值</label>
-			    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" placeholder="请输入数字" required  min="0">
-			    <span class="glyphicon glyphicon-yen" aria-hidden="true"></span>
+			    <label>优惠券价值</label>
+			    	<div class="input-group">
+			    		 <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" placeholder="请输入数字" required  min="0">
+			    		 <div class="input-group-addon">
+			    		 	<span class="glyphicon glyphicon-yen" aria-hidden="true"></span>
+			    		 </div>
+			    </div>
+			   
 			</div>
 			<div class="form-group">
 			    <label>优惠券有效日期</label>
