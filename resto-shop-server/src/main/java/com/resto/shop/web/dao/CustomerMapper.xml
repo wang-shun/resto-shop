@@ -226,4 +226,7 @@
   <select id="selectByOpenId" resultType="Customer">
   		select * from tb_customer where wechat_id=#{0}
   </select>
+  <select id="selectNickNameAndTelephone" resultType="Customer">
+  	SELECT id,nickname,telephone from tb_customer where id=#{customerId}
+  </select>
 </mapper>

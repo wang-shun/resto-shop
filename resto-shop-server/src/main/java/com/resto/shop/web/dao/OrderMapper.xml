@@ -36,6 +36,9 @@
     <result column="order_mode" property="orderMode" jdbcType="INTEGER" />
     <result column="brand_id" property="brandId" jdbcType="VARCHAR" />
   </resultMap>
+  
+  
+  
   <sql id="Base_Column_List" >
     id, table_number, customer_count, accounting_time, order_state, production_status, 
     original_amount, reduction_amount, payment_amount, order_money, article_count, serial_number, 
@@ -479,16 +482,35 @@
   	update tb_order set table_number=#{1} where id=#{0}
   </update>
   
+  
+  <!-- 关联查询    订单表和客户信息表 -->
+  <resultMap id="OrderCustomerMap" type="com.resto.shop.web.model.Order">
+  	<id column="id" property="id" jdbcType="VARCHAR" />
+  	<result column="order_state" property="orderState" jdbcType="INTEGER" />
+  	<result column="production_status" property="productionStatus" jdbcType="INTEGER" />
+  	<result column="article_count" property="articleCount" jdbcType="INTEGER" />
+  	<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  	<result column="serial_number" property="serialNumber" jdbcType="VARCHAR" />
+  	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
+  	<association property="customer" javaType="com.resto.shop.web.model.Customer">  
+  		<id column="customer_id" property="id"/>
+		<result column="nickname" property="nickname" />
+		<result column="telephone" property="telephone" />
+  	</association>
+  </resultMap>
+  
   <!-- 根据取餐码查询已支付的订单 -->
-  <select id="selectOrderByVercode" resultType="Order">
-  	SELECT id,order_state,production_status,article_count,create_time,serial_number,order_money from tb_order 
+  <select id="selectOrderByVercode" resultMap="OrderCustomerMap">
+  	SELECT o.id,o.order_state,o.production_status,o.article_count,o.create_time,o.serial_number,o.order_money,c.nickname,c.telephone,c.id customer_id
+  	from tb_order o LEFT JOIN tb_customer c on o.customer_id = c.id 
   	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and ver_code = #{vercode}
   	 ORDER BY push_order_time DESC
   </select>
   
   <!-- 根据桌号查询已支付的订单 -->
-  <select id="selectOrderByTableNumber" resultType="Order">
-  	SELECT id,order_state,production_status,article_count,create_time,serial_number,order_money from tb_order 
+  <select id="selectOrderByTableNumber" resultMap="OrderCustomerMap">
+  	SELECT o.id,o.order_state,o.production_status,o.article_count,o.create_time,o.serial_number,o.order_money,c.nickname,c.telephone,o.customer_id
+  	from tb_order o LEFT JOIN tb_customer c on o.customer_id = c.id 
   	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and table_number = #{tableNumber}
   	 ORDER BY push_order_time DESC
   </select>

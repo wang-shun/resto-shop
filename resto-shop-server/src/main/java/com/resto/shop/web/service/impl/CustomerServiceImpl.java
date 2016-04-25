@@ -86,6 +86,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setTelephone(phone);
 		customer.setId(currentCustomerId);
 		update(customer);
+	}
+
+	@Override
+	public Customer selectNickNameAndTelephone(String customerId) {
+		return customerMapper.selectNickNameAndTelephone(customerId);
 	} 
 	
 

@@ -1,5 +1,7 @@
 package com.resto.shop.web.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.Customer;
 
@@ -19,4 +21,11 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	Customer selectByOpenId(String openid);
 
 	void bindAccount(String accountId, String customerId);
+	
+	/**
+	 * 根据ID才查询用户昵称和手机号码
+	 * @param customerId
+	 * @return
+	 */
+	Customer selectNickNameAndTelephone(@Param("customerId")String customerId);
 }
