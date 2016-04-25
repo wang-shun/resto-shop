@@ -482,12 +482,14 @@
   <!-- 根据取餐码查询已支付的订单 -->
   <select id="selectOrderByVercode" resultType="Order">
   	SELECT id,order_state,production_status,article_count,create_time,serial_number,order_money from tb_order 
-  	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and ver_code = #{vercode} 
+  	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and ver_code = #{vercode}
+  	 ORDER BY push_order_time DESC
   </select>
   
   <!-- 根据桌号查询已支付的订单 -->
   <select id="selectOrderByTableNumber" resultType="Order">
   	SELECT id,order_state,production_status,article_count,create_time,serial_number,order_money from tb_order 
-  	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and table_number = #{tableNumber} 
+  	where order_state = 2 and production_status=0 and shop_detail_id = #{shopId} and table_number = #{tableNumber}
+  	 ORDER BY push_order_time DESC
   </select>
 </mapper>

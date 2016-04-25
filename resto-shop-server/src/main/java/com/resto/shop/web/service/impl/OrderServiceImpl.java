@@ -656,12 +656,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
 	public List<Order> selectOrderByVercode(String vercode,String shopId) {
-		return orderMapper.selectOrderByVercode(vercode,shopId);
+		List<Order> orderList = orderMapper.selectOrderByVercode(vercode,shopId);
+		for(Order order : orderList){
+			Customer customer = customerService.selectById(order.getCustomerId());
+			order.setCustomer(customer);
+		}
+		return orderList;
 	}
 
 	@Override
 	public List<Order> selectOrderByTableNumber(String tableNumber, String shopId) {
-		return orderMapper.selectOrderByTableNumber(tableNumber, shopId);
+		List<Order> orderList = orderMapper.selectOrderByTableNumber(tableNumber, shopId);
+		for(Order order : orderList){
+			Customer customer = customerService.selectById(order.getCustomerId());
+			order.setCustomer(customer);
+		}
+		return orderList;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.business;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class UploadController {
 		int lastR = systemPath.lastIndexOf("/");
 		systemPath = systemPath.substring(0,lastR)+"/";
 		String filePath = "upload/files/"+DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		String fileName = FileUpload.fileUp(file, systemPath+filePath,UUID.randomUUID().toString());
-		return filePath+"/"+fileName;
+		File finalFile = FileUpload.fileUp(file, systemPath+filePath,UUID.randomUUID().toString());
+		return filePath+"/"+finalFile.getName();
 	}
 }
