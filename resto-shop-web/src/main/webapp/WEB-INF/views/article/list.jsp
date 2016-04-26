@@ -211,6 +211,9 @@
 				{                 
 					title : "餐品图片",
 					data : "photoSmall",
+					createdCell:function(td,tdData){
+						$(td).html("<img src='"+tdData+"' height='80' width='80'/>")
+					}
 				},                 
 				{                 
 					title : "餐品描述",
