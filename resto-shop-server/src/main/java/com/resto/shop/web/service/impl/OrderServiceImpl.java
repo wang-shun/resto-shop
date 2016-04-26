@@ -306,7 +306,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 				JSONObject obj = new JSONObject(item.getResultData());
 				Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-						obj.getInt("total_fee"), obj.getInt("refund_fee"), config.getAppid(), config.getMchid(),
+						obj.getInt("total_fee"), obj.getInt("total_fee"), config.getAppid(), config.getMchid(),
 						config.getMchkey(), config.getPayCertPath());
 				item.setResultData(new JSONObject(result).toString());
 				break;
