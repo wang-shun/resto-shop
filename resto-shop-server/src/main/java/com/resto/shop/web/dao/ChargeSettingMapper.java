@@ -21,5 +21,5 @@ public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
 
     int updateByPrimaryKey(ChargeSetting record);
 
-    List<ChargeSetting> selectListByBrandId(@Param("currentBrandId") String currentBrandId);
+    List<ChargeSetting> selectListByShopId(@Param("shopId") String shopId);
 }

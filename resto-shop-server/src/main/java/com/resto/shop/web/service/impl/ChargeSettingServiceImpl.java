@@ -25,8 +25,8 @@ public class ChargeSettingServiceImpl extends GenericServiceImpl<ChargeSetting, 
     }
 
     @Override
-    public List<ChargeSetting> selectListByBrandId(String currentBrandId) {
-        return chargesettingMapper.selectListByBrandId(currentBrandId);
+    public List<ChargeSetting> selectListByShopId(String shopId) {
+        return chargesettingMapper.selectListByShopId(shopId);
     } 
 
 }

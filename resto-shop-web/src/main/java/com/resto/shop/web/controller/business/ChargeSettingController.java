@@ -32,7 +32,7 @@ public class ChargeSettingController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ChargeSetting> listData(){
-		return chargesettingService.selectListByBrandId(getCurrentBrandId());
+		return chargesettingService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")
@@ -44,9 +44,9 @@ public class ChargeSettingController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid ChargeSetting brand ,HttpServletRequest req){
-	       String brandId= (String) req.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
-	       brand.setBrandId(brandId);
+	public Result create(@Valid ChargeSetting brand){
+		   brand.setShopDetailId(getCurrentShopId());
+		   brand.setBrandId(getCurrentBrandId());
 	       brand.setCreateTime(new Date());
 	       brand.setId(UUID.randomUUID().toString());
 		chargesettingService.insert(brand);

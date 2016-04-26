@@ -33,8 +33,18 @@ public class ChargeSetting {
     private Date createTime;
 
     private String brandId;
+    
+    private String shopDetailId;
+    
+    public String getShopDetailId() {
+		return shopDetailId;
+	}
 
-    public String getId() {
+	public void setShopDetailId(String shopDetailId) {
+		this.shopDetailId = shopDetailId;
+	}
+
+	public String getId() {
         return id;
     }
 
