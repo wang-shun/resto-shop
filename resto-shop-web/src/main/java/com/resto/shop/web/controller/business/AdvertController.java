@@ -3,6 +3,7 @@
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -10,9 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baidu.ueditor.ActionEnter;
+import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.Advert;
 import com.resto.shop.web.service.AdvertService;
 
@@ -64,7 +66,10 @@ public class AdvertController extends GenericController{
 	
 	@RequestMapping("uetest")
 	@ResponseBody
-	public Result uetest(){
+	public Result uetest(HttpServletRequest request,ServletContext application){
+		//C:\Users\Administrator\.m2\repository\org\mybatis\mybatis\3.2.2\mybatis-3.2.2.jar
+		String rootPath = application.getRealPath( "/" );
+		new ActionEnter( request, rootPath ).exec();
 		System.out.println("----到测试方法了");
 		return null;
 	}

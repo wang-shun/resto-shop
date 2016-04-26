@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <div id="control">
 	<div class="row form-div" v-if="showform">
-		<div class="col-md-offset-3 col-md-6">
+		<div class="col-md-12">
 			<div class="portlet light bordered">
 				<div class="portlet-title">
 					<div class="caption">
@@ -14,19 +14,19 @@
 					<form role="form" class="form-horizontal" action="{{m.id?'advert/modify':'advert/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-			           			<label class="col-sm-3 control-label">标题：</label>
+			           			<label class="col-sm-2 control-label">标题：</label>
 							    <div class="col-sm-8">
 									<input type="text" class="form-control" required name="slogan" v-model="m.slogan">
 							    </div>
 							</div>
 							<div class="form-group">
-			           			<label class="col-sm-3 control-label">描述：</label>
+			           			<label class="col-sm-2 control-label">描述：</label>
 							    <div class="col-sm-8">
-							    	<textarea class="form-control" required name="description" v-model="m.description"></textarea>
+							    	<script id="container" name="content" type="text/plain"></script>
 							    </div>
 							</div>
 							<div class="form-group">
-			           			<label class="col-sm-3 control-label">状态：</label>
+			           			<label class="col-sm-2 control-label">状态：</label>
 							    <div class="col-sm-8">
 									<input type="text" class="form-control" required name="state" v-model="m.state">
 							    </div>
@@ -58,8 +58,14 @@
 </div>
 
 
+
 <script>
 	(function(){
+		
+		$("[name='content']").attr("id",new Date().getTime());
+		
+		var ue = UE.getEditor($("[name='content']").attr("id"));
+		
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
@@ -75,6 +81,9 @@
 				{                 
 					title : "详情",
 					data : "description",
+					createdCell:function(td,tdData){
+						$(td).html("详情");
+					}
 				},                  
 				{                 
 					title : "状态",
@@ -96,11 +105,50 @@
 					}
 				}],
 		});
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		
+		
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			methods:{
+				openForm:function(){
+					this.showform = true;
+					ue.setContent("");
+				},
+				closeForm:function(){
+					this.m={};
+					this.showform = false;
+					ue.setContent("");
+				},
+				cancel:function(){
+					this.m={};
+					this.closeForm();
+					ue.setContent("");
+				},
+				create:function(){
+					this.m={};
+					this.openForm();
+					ue.setContent("");
+				},
+				edit:function(model){
+					this.m= model;
+					this.openForm();
+					ue.setContent(model.description);
+				},
+				save:function(e){
+					var that = this;
+					var formDom = e.target;
+					_C.ajaxFormEx(formDom,function(){
+						that.cancel();
+						tb.ajax.reload();
+					});
+				}
+			}
+		});
+		C.vue=vueObj;
+		
+// 		var C = new Controller(cid,tb);
+// 		var vueObj = C.vueObj();
 	}());
-	
-	
-
-	
 </script>

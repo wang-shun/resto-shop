@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -71,7 +72,7 @@ public class OrderAspect {
 			order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
 		}
 		msg.append("取餐店铺："+order.getShopName()+"\n");
-		msg.append("订单时间："+order.getPushOrderTime()+"\n");
+		msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")+"\n");
 		msg.append("订单明细：\n");
 		List<OrderItem> orderItem  = orderItemService.selectOrderArticleList(order.getId());
 		for(OrderItem item : orderItem){

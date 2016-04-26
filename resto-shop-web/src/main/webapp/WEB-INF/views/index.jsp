@@ -149,6 +149,13 @@
 		<script src="<%=resourcePath%>/assets/customer/utils.js" type="text/javascript" charset="utf-8"></script>
         <script src="<%=resourcePath%>/assets/customer/vue-components.js" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/controller.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- 百度编辑器 -->
+	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.config.js"></script><!-- 配置文件 -->
+	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.all.min.js"></script><!-- 编辑器源码文件 -->
+	    
+<%-- 	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ckeditor/ckeditor.js"></script><!-- --> --%>
+<%-- 	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ckeditor/sample.js"></script><!-- --> --%>
         <!-- END THEME LAYOUT SCRIPTS -->
     </body>
 
