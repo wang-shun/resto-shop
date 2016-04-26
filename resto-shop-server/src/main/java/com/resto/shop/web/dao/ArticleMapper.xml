@@ -30,6 +30,14 @@
     <result column="peference" property="peference"/>
     <result column="unit" property="unit"/>
   </resultMap>
+  
+  <resultMap type="com.resto.shop.web.model.Article" id="selectResultMap" autoMapping="true">
+  	<id column="id" jdbcType="VARCHAR" property="id" />
+  	<association property="articleFamily" javaType="com.resto.shop.web.model.ArticleFamily">
+  		<result column="articleFamilyName" property="name"/>
+  	</association>
+  </resultMap>
+  
   <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
@@ -349,11 +357,11 @@
       unit=#{unit}
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  <select id="selectList" resultType="Article">
-      select * from tb_article
+  <select id="selectList" resultMap="selectResultMap">
+      select ar.*,arf.name as articleFamilyName from tb_article ar  left join tb_article_family arf on ar.article_family_id=arf.id
 	  <where>
 	  	<if test="shopId!=null and shopId!=''">
-	  		shop_detail_id = #{shopId} 
+	  		ar.shop_detail_id = #{shopId} 
 	  	</if>
 	  </where>
   </select>

@@ -60,7 +60,17 @@ public class Article {
     
     private String unit;
     
-    /**
+    private ArticleFamily articleFamily;
+    
+    public ArticleFamily getArticleFamily() {
+		return articleFamily;
+	}
+
+	public void setArticleFamily(ArticleFamily articleFamily) {
+		this.articleFamily = articleFamily;
+	}
+
+	/**
      * 用于保存 类型名称
      */
     private String articleFamilyName;

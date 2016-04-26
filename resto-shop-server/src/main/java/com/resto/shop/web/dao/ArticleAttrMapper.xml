@@ -78,7 +78,9 @@
       shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update> 
-  <select id="selectList" resultType="ArticleAttr">select * from tb_article_attr</select>
+  <select id="selectList" resultType="ArticleAttr">
+  	select * from tb_article_attr
+  </select>
   
   <!-- 添加信息,并给此实体的 ID 赋值 -->
   <insert id="insertInfo" parameterType="com.resto.shop.web.model.ArticleAttr" useGeneratedKeys="true" keyProperty="id">

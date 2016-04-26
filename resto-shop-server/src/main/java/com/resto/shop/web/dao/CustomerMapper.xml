@@ -229,4 +229,8 @@
   <select id="selectNickNameAndTelephone" resultType="Customer">
   	SELECT id,nickname,telephone from tb_customer where id=#{customerId}
   </select>
+  
+  <select id="selectListByBrandId" resultType="Customer">
+  	select  wechat_id ,nickname,telephone from tb_customer where brand_id=#{brandId}
+  </select>
 </mapper>

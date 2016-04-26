@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.ShowPhoto;
 import com.resto.shop.web.service.ShowPhotoService;
 
@@ -27,7 +28,7 @@ public class ShowPhotoController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ShowPhoto> listData(){
-		return showphotoService.selectList();
+		return showphotoService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

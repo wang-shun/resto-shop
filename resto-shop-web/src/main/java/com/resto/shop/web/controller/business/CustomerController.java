@@ -28,7 +28,7 @@ public class CustomerController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Customer> listData(){
-		return customerService.selectList();
+		return customerService.selectListByBrandId(getCurrentBrandId());
 	}
 	
 	@RequestMapping("list_one")

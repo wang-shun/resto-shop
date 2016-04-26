@@ -14,22 +14,17 @@
 	            	<form role="form" action="{{m.id?'showphoto/modify':'showphoto/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>showType</label>
-    <input type="text" class="form-control" name="showType" v-model="m.showType">
-</div>
-<div class="form-group">
-    <label>title</label>
-    <input type="text" class="form-control" name="title" v-model="m.title">
-</div>
-<div class="form-group">
-    <label>picUrl</label>
-    <input type="text" class="form-control" name="picUrl" v-model="m.picUrl">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-
+						    <label>图片的类型</label>
+						    <input type="text" class="form-control" name="showType" v-model="m.showType">
+						</div>
+						<div class="form-group">
+						    <label>主题</label>
+						    <input type="text" class="form-control" name="title" v-model="m.title">
+						</div>
+						<div class="form-group">
+						    <label>图片地址</label>
+						    <input type="text" class="form-control" name="picUrl" v-model="m.picUrl">
+						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -65,23 +60,30 @@
 				dataSrc : ""
 			},
 			columns : [
+								{                 
+					title : "展示类型",
+					data : "showType",
+					createdCell:function(td,tdData,rowData,row){
+						console.log(tdData);
+						var typeName;
+						if(tdData==1){
+							typeName='餐品图片';
+						}else if(tdData==2){
+							typeName='展示的图片';
+						}else if(tdData==4){
+							typeName='差评';
+						}
+						$(td).html(typeName);
+					}
+				},                 
 				{                 
-	title : "showType",
-	data : "showType",
-},                 
-{                 
-	title : "title",
-	data : "title",
-},                 
-{                 
-	title : "picUrl",
-	data : "picUrl",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-
+					title : "主题",
+					data : "title",
+				},                 
+				{                 
+					title : "图片地址",
+					data : "picUrl",
+				},                 
 				{
 					title : "操作",
 					data : "id",
@@ -102,8 +104,5 @@
 		var C = new Controller(cid,tb);
 		var vueObj = C.vueObj();
 	}());
-	
-	
-
 	
 </script>

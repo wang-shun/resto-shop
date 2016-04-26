@@ -1,5 +1,7 @@
 package com.resto.shop.web.service;
 
+import java.util.List;
+
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Customer;
 
@@ -17,4 +19,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	 * @return
 	 */
 	Customer selectNickNameAndTelephone(String customerId);
+
+	List<Customer> selectListByBrandId(String currentBrandId);
 }

@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
@@ -91,6 +92,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public Customer selectNickNameAndTelephone(String customerId) {
 		return customerMapper.selectNickNameAndTelephone(customerId);
+	}
+
+	@Override
+	public List<Customer> selectListByBrandId(String currentBrandId) {
+		return customerMapper.selectListByBrandId(currentBrandId);
 	} 
 	
 

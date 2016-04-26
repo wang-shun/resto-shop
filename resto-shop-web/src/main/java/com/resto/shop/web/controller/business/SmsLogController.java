@@ -28,7 +28,7 @@ public class SmsLogController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<SmsLog> listData(){
-		return smslogService.selectList();
+		return smslogService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

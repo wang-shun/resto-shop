@@ -194,7 +194,7 @@
 			columns : [
 			    {
 			    	title:"餐品类别",
-			    	data:"articleFamilyId",
+			    	data:"articleFamilyName",
 			    },
 				{                 
 					title : "餐品名称",
@@ -226,10 +226,6 @@
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
-				},                 
-				{                 
-					title : "所属店铺",
-					data : "shopDetailId",
 				},                 
 				{
 					title : "操作",
