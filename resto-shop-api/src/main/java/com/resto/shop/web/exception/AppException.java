@@ -1,5 +1,7 @@
 package com.resto.shop.web.exception;
 
+import com.resto.shop.web.exception.AppException.ErrorMsg;
+
 public class AppException extends Exception{
 	/**
 	 * 
@@ -18,6 +20,7 @@ public class AppException extends Exception{
 	public static final ErrorMsg UNSUPPORT_ITEM_TYPE = new ErrorMsg(10,"不支持的餐品类型！");
 	public static final ErrorMsg ORDER_STATE_ERR = new ErrorMsg(11, "订单状态异常");
 	public static final ErrorMsg ORDER_MODE_CHECK = new ErrorMsg(12, "");
+	public static final ErrorMsg ORDER_NOT_ALL_APPRAISE = new ErrorMsg(13, "该订单不允许评论");;
 	
 	
 	public AppException(ErrorMsg msg) {

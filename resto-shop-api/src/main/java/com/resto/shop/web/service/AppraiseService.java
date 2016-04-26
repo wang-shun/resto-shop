@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Appraise;
 
 public interface AppraiseService extends GenericService<Appraise, String> {
@@ -31,4 +32,6 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 * @return
 	 */
 	List<Map<String, Object>> appraiseMonthCount(String surrentShopId);
+
+	Appraise saveAppraise(Appraise appraise) throws AppException;
 }

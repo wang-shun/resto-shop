@@ -191,6 +191,7 @@
 				url : "article/list_all",
 				dataSrc : ""
 			},
+			deferRender:true,
 			columns : [
 			    {
 			    	title:"餐品类别",
@@ -212,12 +213,18 @@
 					title : "餐品图片",
 					data : "photoSmall",
 					createdCell:function(td,tdData){
-						$(td).html("<img src='"+tdData+"' height='80' width='80'/>")
+						$(td).html("<img src='"+tdData+"' style='height:40px;width:80px;'/>")
 					}
 				},                 
 				{                 
 					title : "餐品描述",
 					data : "description",
+					createdCell:function(td,tdData){
+						if(tdData.length>10){
+							tdData = tdData.substring(0,10);
+							$(td).html(tdData+"...");
+						}
+					}
 				},                 
 				{                 
 					title : "餐品排序",

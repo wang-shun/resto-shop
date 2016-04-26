@@ -3,6 +3,10 @@ package com.resto.shop.web.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_EMPTY)
 public class Appraise {
     private String id;
 
@@ -40,6 +44,12 @@ public class Appraise {
      */
     private String headPhoto;
 
+    /**
+     * 菜品名称
+     */
+    private String articleName;
+    
+    
     public String getId() {
         return id;
     }
@@ -158,5 +168,13 @@ public class Appraise {
 
 	public void setHeadPhoto(String headPhoto) {
 		this.headPhoto = headPhoto;
+	}
+
+	public String getArticleName() {
+		return articleName;
+	}
+
+	public void setArticleName(String articleName) {
+		this.articleName = articleName;
 	}
 }
