@@ -129,8 +129,10 @@ public class OrderAspect {
 		if(order.getAllowAppraise()){
 			Customer customer = customerService.selectById(order.getCustomerId());
 			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+			BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
-			msg.append("评论订单通知:(待完成)");
+			msg.append("您有一个红包未领取\n");
+			msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&&dialog=redpackage&&orderId="+order.getId()+"'>点击领取</a>");
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+result);
 		}
