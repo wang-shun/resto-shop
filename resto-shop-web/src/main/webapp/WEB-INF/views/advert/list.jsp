@@ -82,7 +82,7 @@
 					title : "详情",
 					data : "description",
 					createdCell:function(td,tdData){
-						$(td).html("详情");
+						$(td).html("<button  class='btn green'>详情</button>");
 					}
 				},                  
 				{                 
