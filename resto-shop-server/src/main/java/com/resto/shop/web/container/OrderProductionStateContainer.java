@@ -1,10 +1,10 @@
 package com.resto.shop.web.container;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -22,10 +22,10 @@ import com.resto.shop.web.service.OrderService;
  */
 @Component
 public class OrderProductionStateContainer {
-	private static final Map<String,Map<String,Order>> PUSH_ORDER_MAP=new HashMap<>(); //已下单的队列
-	private static final Map<String,Map<String,Order>> READY_ORDER_MAP = new HashMap<>();  //准备中的队列
-	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new HashMap<>();     //正在叫号的队列
-	private static final Map<String,Boolean> INIT_SHOP = new HashMap<>();
+	private static final Map<String,Map<String,Order>> PUSH_ORDER_MAP=new ConcurrentHashMap<>(); //已下单的队列
+	private static final Map<String,Map<String,Order>> READY_ORDER_MAP = new ConcurrentHashMap<>();  //准备中的队列
+	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new ConcurrentHashMap<>();     //正在叫号的队列
+	private static final Map<String,Boolean> INIT_SHOP = new ConcurrentHashMap<>();
 	
 	@Resource
 	OrderService orderService;

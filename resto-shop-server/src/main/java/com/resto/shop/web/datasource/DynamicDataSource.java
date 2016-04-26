@@ -1,7 +1,7 @@
 package com.resto.shop.web.datasource;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -17,7 +17,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Init
 	@Resource
 	DatabaseConfigService databaseConfigService;
 	
-	public static final Map<Object,Object> dataSourceMap = new HashMap<>();
+	public static final Map<Object,Object> dataSourceMap = new ConcurrentHashMap<>();
 	
 	public DynamicDataSource() {
 		this.setTargetDataSources(dataSourceMap);	
@@ -33,6 +33,12 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Init
 			druidDataSource.setUsername(config.getUsername());
 			druidDataSource.setPassword(config.getPassword());
 			druidDataSource.setDriverClassName(config.getDriverClassName());
+			druidDataSource.setInitialSize(1);
+			druidDataSource.setMinIdle(1);
+			druidDataSource.setMaxActive(20);
+			druidDataSource.setMaxWait(60000);
+			druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
+			druidDataSource.setMinEvictableIdleTimeMillis(300000);
 			dataSourceMap.put(dataconfigId, druidDataSource);
 			super.setTargetDataSources(dataSourceMap);
 			super.afterPropertiesSet();
