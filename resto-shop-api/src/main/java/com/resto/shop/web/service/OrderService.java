@@ -103,5 +103,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param currentShopId
 	 */
 	public void updateDistributionMode(Integer modeId, String orderId);
+
+	public List<Map<String, Object>> printOrderAllAndSuccess(String orderId);
 	
 }
