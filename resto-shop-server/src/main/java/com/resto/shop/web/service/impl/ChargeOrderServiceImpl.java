@@ -62,7 +62,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Override
 	public void chargeorderWxPaySuccess(ChargePayment cp) {
-		ChargeOrder chargeOrder = selectById(cp.getTbChargeOrderId());
+		ChargeOrder chargeOrder = selectById(cp.getChargeOrderId());
 		if (chargeOrder != null && chargeOrder.getOrderState() == 0) {
 			// 开始充值余额
 			BigDecimal reward = chargeOrder.getRewardMoney();
