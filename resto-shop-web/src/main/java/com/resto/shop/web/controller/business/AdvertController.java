@@ -61,4 +61,11 @@ public class AdvertController extends GenericController{
 		advertService.delete(id);
 		return Result.getSuccess();
 	}
+	
+	@RequestMapping("uetest")
+	@ResponseBody
+	public Result uetest(){
+		System.out.println("----到测试方法了");
+		return null;
+	}
 }
