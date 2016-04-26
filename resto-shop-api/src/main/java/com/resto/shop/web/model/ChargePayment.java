@@ -10,7 +10,7 @@ public class ChargePayment {
 
     private Date createTime;
 
-    private String tbChargeOrderId;
+    private String chargeOrderId;
 
     private String payData;
 
@@ -38,12 +38,12 @@ public class ChargePayment {
         this.createTime = createTime;
     }
 
-    public String getTbChargeOrderId() {
-        return tbChargeOrderId;
+    public String getChargeOrderId() {
+        return chargeOrderId;
     }
 
-    public void setTbChargeOrderId(String tbChargeOrderId) {
-        this.tbChargeOrderId = tbChargeOrderId == null ? null : tbChargeOrderId.trim();
+    public void setChargeOrderId(String chargeOrderId) {
+        this.chargeOrderId = chargeOrderId == null ? null : chargeOrderId.trim();
     }
 
     public String getPayData() {
