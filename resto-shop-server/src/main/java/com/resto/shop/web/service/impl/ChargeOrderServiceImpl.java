@@ -64,14 +64,14 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public void chargeorderWxPaySuccess(ChargePayment cp) {
 		ChargeOrder chargeOrder = selectById(cp.getChargeOrderId());
 		if (chargeOrder != null && chargeOrder.getOrderState() == 0) {
-			// 开始充值余额
-			BigDecimal reward = chargeOrder.getRewardMoney();
-			BigDecimal chargeMoney = chargeOrder.getChargeMoney();
-			BigDecimal value = chargeMoney.add(reward).divide(new BigDecimal(100));
-			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
-			accountService.addAccount(value, customer.getAccountId(), "自助充值");
-			// 添加充值记录
 			chargePaymentService.insert(cp);
+			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
+			BigDecimal chargeMoney = chargeOrder.getChargeMoney();
+			BigDecimal reward = chargeOrder.getRewardMoney();
+			// 开始充值余额
+			accountService.addAccount(chargeMoney, customer.getAccountId(), "自助充值");
+			accountService.addAccount(reward, customer.getAccountId(), "充值赠送");
+			// 添加充值记录
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
 			update(chargeOrder);// 只能更新状态和结束时间
