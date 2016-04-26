@@ -5,15 +5,17 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.SmsLogService;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**
@@ -28,6 +30,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     @Resource
     BrandService brandService;
     
+    @Resource
+    BrandSettingService brandSettingService;
+    
     @Override
     public GenericDao<SmsLog, Long> getDao() {
         return smslogMapper;
@@ -36,7 +41,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	@Override
 	public String sendCode(String phone, String code, String brandId,String shopId) {
 		Brand b = brandService.selectById(brandId);
-		String string = SMSUtils.sendCode(b.getBrandName(), b.getBrandName(), code, phone);
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
+		String string = SMSUtils.sendCode(brandSetting.getSmsSign(), b.getBrandName(), code, phone);
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);

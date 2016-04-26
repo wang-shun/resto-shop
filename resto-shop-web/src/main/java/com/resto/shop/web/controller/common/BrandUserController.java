@@ -43,6 +43,9 @@ public class BrandUserController extends GenericController{
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect) {
         try {
+        	if(redirect == null){
+        		redirect = "";
+        	}
             Subject subject = SecurityUtils.getSubject(); //获取shiro管理的用户对象 主要储存了用户的角色和用户的权限
             // 已登陆则 跳到首页
             if (subject.isAuthenticated()) {
