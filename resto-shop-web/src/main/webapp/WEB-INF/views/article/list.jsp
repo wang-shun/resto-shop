@@ -110,7 +110,7 @@
 					<div class="form-group col-md-4">
 				        <label class="col-md-5 control-label">按钮颜色</label>
 				        <div class="col-md-2">
-				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" :value="m.controlColor" > 
+				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" :value="m.controlColor||'#ffffff'" > 
 				        </div>
 				        <div class="col-md-5">
 				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
