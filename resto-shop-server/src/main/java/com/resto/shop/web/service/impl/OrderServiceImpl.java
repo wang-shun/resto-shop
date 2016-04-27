@@ -376,6 +376,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if (order.getPrintOrderTime() == null) {
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
+			if(order.getOrderMode()==3){
+				order.setAllowCancel(false);
+			}
 			update(order);
 		}
 		return order;
