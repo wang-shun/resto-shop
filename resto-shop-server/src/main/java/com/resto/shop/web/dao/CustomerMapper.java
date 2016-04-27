@@ -32,4 +32,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	Customer selectNickNameAndTelephone(@Param("customerId")String customerId);
 
 	List<Customer> selectListByBrandId(String brandId);
+
+	Customer selectByPhone(String phone);
 }

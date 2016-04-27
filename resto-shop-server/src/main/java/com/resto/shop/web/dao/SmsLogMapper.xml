@@ -55,6 +55,6 @@
   <select id="selectList" resultType="SmsLog">select * from tb_sms_log</select>
   <!-- 根据店铺ID查询短信记录 -->
   <select id="selectListByShopId" resultType="SmsLog">
-  	SELECT phone,content,sms_Result from tb_sms_log where shop_detail_id = #{shopId}
+  	SELECT create_time,phone,content,sms_result from tb_sms_log where shop_detail_id = #{shopId}
   </select>
 </mapper>

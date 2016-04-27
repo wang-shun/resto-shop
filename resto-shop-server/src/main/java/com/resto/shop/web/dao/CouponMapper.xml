@@ -87,7 +87,8 @@
   select id,name,value,min_amount,begin_date,end_date,begin_time,end_time,is_used,using_time,
   coupon_source,use_with_account,remark,distribution_mode_id,customer_id
    from tb_coupon where is_used=#{isUsed} and distribution_mode_id=#{distributionModeId} and customer_id=#{customerId}
-   <![CDATA[AND (begin_date<NOW() AND end_date >NOW())]]> order by value DESC
+   <![CDATA[AND begin_date<NOW() AND end_date >NOW() AND begin_time<NOW() AND end_time>NOW()]]>
+   order by value DESC
   </select>
   
   <!-- 根据状态查询 客户的优惠劵 -->

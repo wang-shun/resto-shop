@@ -53,5 +53,6 @@
   <!-- 根据 账户ID 查询 账户交易明细 -->
   <select id="selectLogsByAccountId" resultType="AccountLog">
   	SELECT * from tb_account_log where account_id = #{accountId}
+  	ORDER BY create_time DESC
   </select>
 </mapper>

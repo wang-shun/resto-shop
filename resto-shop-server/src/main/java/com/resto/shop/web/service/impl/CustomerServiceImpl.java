@@ -9,6 +9,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.CustomerMapper;
+import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.AccountService;
@@ -81,8 +82,12 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public void bindPhone(String phone, String currentCustomerId) {
-		Customer customer = new Customer();
+	public void bindPhone(String phone, String currentCustomerId) throws AppException {
+		Customer customer = customerMapper.selectByPhone(phone);
+		if(customer!=null){
+			throw new AppException(AppException.PHONE_IS_BIND);
+		}
+		customer = new Customer();
 		customer.setIsBindPhone(true);
 		customer.setTelephone(phone);
 		customer.setId(currentCustomerId);
