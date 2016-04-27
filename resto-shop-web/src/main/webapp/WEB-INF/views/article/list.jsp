@@ -110,7 +110,7 @@
 					<div class="form-group col-md-4">
 				        <label class="col-md-5 control-label">按钮颜色</label>
 				        <div class="col-md-2">
-				            <input type="text"  class="form-control color-mini" data-position="bottom left" value="#000000"> 
+				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" :value="m.controlColor" > 
 				        </div>
 				        <div class="col-md-5">
 				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
@@ -496,7 +496,12 @@
 						$("#article-dialog").modal("hide");
 						$(".modal-backdrop.fade.in").remove();
 					}
-				})
+				});
+				this.$watch("m",function(){
+					if(this.m.id){
+						$('.color-mini').minicolors("value",this.m.controlColor);
+					}
+				});
 				
 				$.post("articlefamily/list_all",null,function(data){
 					that.articlefamilys = data;
