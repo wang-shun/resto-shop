@@ -277,7 +277,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public boolean cancelOrder(String orderId) {
 		Order order = selectById(orderId);
-		if (order.getAllowCancel()&&(order.getOrderState().equals(OrderState.SUBMIT))) {
+		if (order.getAllowCancel()&&(order.getOrderState().equals(OrderState.SUBMIT)||order.getOrderState()==OrderState.PAYMENT)) {
 			order.setAllowCancel(false);
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
@@ -287,7 +287,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			log.info("取消订单成功:" + order.getId());
 			return true;
 		} else {
-			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false");
+			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false"+order.getId());
 			return false;
 		}
 	}
@@ -682,5 +682,4 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setDistributionModeId(modeId);
 		 orderMapper.updateByPrimaryKeySelective(order);
 	}
-
 }
