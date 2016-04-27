@@ -16,6 +16,7 @@ import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.dao.AppraiseMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.ShowPhoto;
@@ -62,9 +63,33 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
     }
 
 	@Override
-	public List<Appraise> listAppraise(String currentShopId, Integer currentPage, Integer showCount, Integer maxLevel,
+	public List<Appraise> updateAndListAppraise(String currentShopId, Integer currentPage, Integer showCount, Integer maxLevel,
 			Integer minLevel) {
-		return appraiseMapper.listAppraise(currentShopId, currentPage, showCount, maxLevel, minLevel);
+		List<Appraise> appraiseList = appraiseMapper.listAppraise(currentShopId, currentPage, showCount, maxLevel, minLevel);
+		for (Appraise appraise : appraiseList) {
+			if(StringUtils.isBlank(appraise.getFeedback())){
+				String text = getFeedBackText(appraise);
+				appraise.setFeedback(text);
+				update(appraise);
+			}
+		}
+		return appraiseList;
+	}
+
+	private String getFeedBackText(Appraise appraise) {
+		String articleId = appraise.getArticleId();
+		if(appraise.getType()==1){
+			Article art = articleService.selectById(articleId);
+			if(art!=null){
+				return art.getName();
+			}
+		}else if(appraise.getType()==2&&StringUtils.isNumeric(articleId)){
+			ShowPhoto sp = showPhotoService.selectById(Integer.parseInt(articleId));
+			if(sp!=null){
+				return sp.getTitle();
+			}
+		}
+		return "";
 	}
 
 	@Override

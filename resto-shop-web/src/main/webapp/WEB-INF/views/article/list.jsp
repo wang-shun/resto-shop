@@ -213,7 +213,7 @@
 					title : "餐品图片",
 					data : "photoSmall",
 					createdCell:function(td,tdData){
-						$(td).html("<img src='"+tdData+"' style='height:40px;width:80px;'/>")
+						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
 					}
 				},                 
 				{                 
