@@ -15,6 +15,7 @@ import com.aliyun.openservices.ons.api.ConsumeContext;
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.OrderService;
@@ -64,6 +65,7 @@ public class OrderMessageListener implements MessageListener{
 		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
 		Order order = JSON.parseObject(msg, Order.class);
 		DataSourceContextHolder.setDataSourceName(order.getBrandId());
+		log.info("执行自动确认逻辑");
 		orderService.confirmOrder(order);
 		return Action.CommitMessage;
 	}
@@ -73,8 +75,13 @@ public class OrderMessageListener implements MessageListener{
 		JSONObject obj =JSONObject.parseObject(msg);
 		String brandId = obj.getString("brandId");
 		DataSourceContextHolder.setDataSourceName(brandId);
-		orderService.cancelOrder(obj.getString("orderId"));
-		log.info("自动取消订单:"+obj.getString("orderId"));
+		Order order = orderService.selectById(obj.getString("orderId"));
+		if(order.getOrderState()==OrderState.SUBMIT){
+			log.info("自动取消订单:"+obj.getString("orderId"));
+			orderService.cancelOrder(obj.getString("orderId"));
+		}else{
+			log.info("自动取消订单失败，订单状态不是已提交");
+		}
 		return Action.CommitMessage;
 	}
 }
