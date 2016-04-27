@@ -98,6 +98,9 @@ public class ArticleController extends GenericController{
 				article.setHasMultPrice(false);
 				article.setHasUnit(" ");
 			}
+		}else{
+			article.setHasMultPrice(false);
+			article.setHasUnit(" ");
 		}
 		if(isCreate){
 			articleService.save(article);

@@ -9,164 +9,221 @@
 		display: inline-block;
 		min-width: 70px;
 	}
+	.dialog-form{
+		position: fixed;
+		z-index: 9999;
+		left: 0;
+		width: 100%;
+		right: 0;
+		height: 100%;
+		top: 0px;
+		padding-top: 30px;
+		background-color: rgba(0, 0, 0, 0.53);
+	}
 </style>
 <div id="control">
-	<div class="row form-div" v-if="showform">
-		<div class="col-md-12" >
-			<div class="portlet light bordered">
-	            <div class="portlet-title">
-	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
-	                </div>
-	            </div>
-	            <div class="portlet-body">
-	            	<form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-							    <label class="col-md-3 control-label">餐品类别</label>
-							    <div class="col-md-5">
-								    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
-								    	<option :value="f.id" v-for="f in articlefamilys">
-								    		{{f.name}}
-								    	</option>
-								    </select>
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">餐品名称</label>
-							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="name" v-model="m.name" required="required">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">价格</label>
-							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="price" v-model="m.price" required="required">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">粉丝价</label>
-							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">餐品单位</label>
-							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="unit" v-model="m.unit">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">餐品编号</label>
-							    <div class="col-md-5">
-								    <input type="text" class="form-control" name="peference" v-model="m.peference">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">描述</label>
-							    <div class="col-md-5">
-								    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">排序</label>
-							    <div class="col-md-5">
-								    <input type="number" class="form-control" name="sort" v-model="m.sort">
-							    </div>
-							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">供应时间</label>
-							    <div class="col-md-5">
-								    <label v-for="time in supportTimes">
-								    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
+	<div class="modal fade" id="article-dialog" v-if="showform">
+	  <div class="modal-dialog " style="width:90%;">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">表单</h4>
+	      </div>
+	      <div class="modal-body">
+	             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
+				<div class="form-body">
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品类别</label>
+					    <div class="col-md-7">
+						    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+						    	<option :value="f.id" v-for="f in articlefamilys">
+						    		{{f.name}}
+						    	</option>
+						    </select>
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品名称</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="name" v-model="m.name" required="required">
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品单位</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="unit" v-model="m.unit">
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">价格</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="price" v-model="m.price" required="required">
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">粉丝价</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">排序</label>
+					    <div class="col-md-7">
+						    <input type="number" class="form-control" name="sort" v-model="m.sort">
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+					 	<label class="col-md-5 control-label">是否上架</label>
+					    <div class="col-md-7">
+					    	<label class="">
+						    	<input type="radio" name="activated" value="1"  v-model="m.activated">是
+						    </label>
+						    <label class="">
+						    	 <input type="radio" name="activated" value="0"  v-model="m.activated">否
+					    	</label>
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+					 	<label class="col-md-5 control-label">是否沽清</label>
+					    <div class="col-md-7">
+					    	<label class="">
+						    	<input type="radio" name="isEmpty" value="1"  v-model="m.isEmpty">是
+						    </label>
+						    <label class="">
+						    	 <input type="radio" name="isEmpty" value="0"  v-model="m.isEmpty">否
+					    	</label>
+					    </div>
+					</div>
+					<div class="form-group col-md-4">
+					 	<label class="col-md-5 control-label">显示大图</label>
+					    <div class="col-md-7">
+					    	<label class="">
+						    	<input type="radio" name="showBig" value="1"  v-model="m.showBig">是
+						    </label>
+						    <label class="">
+						    	 <input type="radio" name="showBig" value="0"  v-model="m.showBig">否
+					    	</label>
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+				        <label class="col-md-5 control-label">按钮颜色</label>
+				        <div class="col-md-2">
+				            <input type="text"  class="form-control color-mini" data-position="bottom left" value="#000000"> 
+				        </div>
+				        <div class="col-md-5">
+				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
+				            <span class="btn btn-default" @click="changeColor('#fff')">白</span>
+				        </div>
+				    </div>
+					
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品编号</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="peference" v-model="m.peference">
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品图片</label>
+					    <div class="col-md-7">
+	<!-- 							   	 	<img src="" id="photoSmall"/> -->
+						    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
+						    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">餐品编号</label>
+					    <div class="col-md-7">
+						    <input type="text" class="form-control" name="peference" v-model="m.peference">
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-8">
+					    <label class="col-md-2 control-label">描述</label>
+					    <div class="col-md-10">
+						    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
+					    </div>
+					</div>
+					<div class="clearfix"></div>
+					
+					<div class="form-group">
+					    <label class="col-md-3 control-label">出餐厨房</label>
+					    <div class="col-md-9">
+						    <label v-for="kitchen in kitchenList">
+						    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
+						    </label>
+					    </div>
+					</div>
+					<div class="form-group">
+					    <label class="col-md-3 control-label">供应时间</label>
+					    <div class="col-md-9">
+						    <label v-for="time in supportTimes">
+						    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
+						    </label>
+						    <label>
+							    <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
+						    </label>
+					    </div>
+					</div>
+					
+					
+					<div class="form-group">
+						<label class="col-md-3 control-label">餐品规格</label>
+						<div class="col-md-9">
+							<div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
+								<label class="article-attr-label">{{attr.name}}:</label>
+								<span class="article-units">
+									<label v-for="unit in attr.articleUnits" >
+								    	<input type="checkbox" name="hasUnitIds" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
 								    </label>
-							    </div>
+								</span> 
 							</div>
-							<div class="form-group">
-							    <label class="col-md-3 control-label">出餐厨房</label>
-							    <div class="col-md-5">
-								    <label v-for="kitchen in kitchenList">
-								    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
-								    </label>
-							    </div>
-							</div>
-							
-							<div class="form-group">
-							    <label class="col-md-3 control-label">餐品图片</label>
-							    <div class="col-md-5">
-							   	 	<img src="" id="photoSmall"/>
-								    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
-								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
-							    </div>
-							</div>
-							
-							<div class="form-group">
-							 	<label class="col-md-3 control-label">是否上架</label>
-							    <div class="col-md-5">
-							    	<label class="radio-inline">
-								    	<input type="radio" name="activated" value="1"  v-model="m.activated">是
-								    </label>
-								    <label class="radio-inline">
-								    	 <input type="radio" name="activated" value="0"  v-model="m.activated">否
-							    	</label>
-							    </div>
-							</div>
-							<div class="form-group">
-								<label class="col-md-3 control-label">餐品规格</label>
-								<div class="col-md-5">
-									<div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
-										<label class="article-attr-label">{{attr.name}}:</label>
-										<span class="article-units">
-											<label v-for="unit in attr.articleUnits" >
-										    	<input type="checkbox" name="hasUnitIds" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
-										    </label>
-										</span> 
-									</div>
-								</div>
-							</div>
-							<div class="form-group" v-if="allUnitPrice.length">
-								<label class="col-md-3 control-label">规格价格</label>
-								<div class="col-md-5">
-									<div class="flex-row">
-										<div class="flex-1 text-right">规格</div>
-										<div class="flex-2">价格</div>
-										<div class="flex-2">粉丝价</div>
-										<div class="flex-2">编号</div>
-									</div>
-									<div class="flex-row" v-for="u in unitPrices">
-										<div class="flex-1 text-right">{{u.name}}</div>
-										<div class="flex-2">
-											<input type="hidden" name="unitNames" :value="u.name"/>
-											<input type="hidden" name="unit_ids" :value="u.unitIds"/>
-											<input type="text" class="form-control" name="unitPrices" required="required" v-model="u.price"/>
-										</div>
-										<div class="flex-2">
-											<input type="text" class="form-control" name="unitFansPrices" v-model="u.fansPrice"/>
-										</div>
-										<div class="flex-2">
-											<input type="text" class="form-control" name="unitPeferences" v-model="u.peference"/>
-										</div>
-									</div>
-								</div>
-							</div>
-							
 						</div>
-						<div class="form-actions">
-                             <div class="row">
-                                 <div class="col-md-offset-3 col-md-5">
-                                     <input type="hidden" name="id" v-model="m.id" />
-									 <input class="btn green"  type="submit"  value="保存"/>
-									 <a class="btn default" @click="cancel" >取消</a>
-                                 </div>
-                             </div>
-                         </div>
-						
-					</form>
-	            </div>
-	        </div>
-		</div>
+					</div>
+					<div class="form-group" v-if="allUnitPrice.length">
+						<label class="col-md-3 control-label">规格价格</label>
+						<div class="col-md-8">
+							<div class="flex-row">
+								<div class="flex-1 text-right">规格</div>
+								<div class="flex-2">价格</div>
+								<div class="flex-2">粉丝价</div>
+								<div class="flex-2">编号</div>
+							</div>
+							<div class="flex-row" v-for="u in unitPrices">
+								<div class="flex-1 text-right">{{u.name}}</div>
+								<div class="flex-2">
+									<input type="hidden" name="unitNames" :value="u.name"/>
+									<input type="hidden" name="unit_ids" :value="u.unitIds"/>
+									<input type="text" class="form-control" name="unitPrices" required="required" :value="u.price" v-model="u.price"/>
+								</div>
+								<div class="flex-2">
+									<input type="text" class="form-control" name="unitFansPrices" v-model="u.fansPrice"/>
+								</div>
+								<div class="flex-2">
+									<input type="text" class="form-control" name="unitPeferences" v-model="u.peference"/>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+				<div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-3 col-md-5">
+                            <input type="hidden" name="id" v-model="m.id" />
+						    <input class="btn green"  type="submit"  value="保存"/>
+						    <a class="btn default" @click="cancel" >取消</a>
+                        </div>
+                     </div>
+                 </div>
+			</form>
+	      </div>
+	    </div>
+	  </div>
 	</div>
-	
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="article/add">
@@ -174,7 +231,17 @@
 			</s:hasPermission>
 		</div>
 		<div class="clearfix"></div>
-		<div class="table-filter">&nbsp;</div>
+		<div class="table-filter">
+			<div class="form-group">
+			    <label class="col-md-1 control-label">菜品类别:</label>
+			    <div class="col-md-3">
+			    	<select class="form-control" @change="filterTable">
+			    		<option value="-1">全部</option>
+			    		<option :value="af.name" v-for="af in articlefamilys">{{af.name}}</option>
+			    	</select>
+			    </div>
+			</div>
+		</div>
 		<div class="table-body">
 			<table class="table table-striped table-hover table-bordered "></table>
 		</div>
@@ -191,6 +258,7 @@
 				url : "article/list_all",
 				dataSrc : ""
 			},
+			stateSave:true,
 			deferRender:true,
 			columns : [
 			    {
@@ -252,6 +320,9 @@
 						$(td).html(operator);
 					}
 				}],
+				initComplete:function(){
+					
+				}
 		});
 		
 		var C = new Controller(null,tb);
@@ -269,6 +340,17 @@
 				unitPrices:[],
 			},
 			methods:{
+				selectAllTimes:function(m,e){
+					var isCheck = $(e.target).is(":checked");
+					if(isCheck){
+						for(var i=0;i<this.supportTimes.length;i++){
+							var t = this.supportTimes[i];
+							m.supportTimes.push(t.id);
+						}
+					}else{
+						m.supportTimes=[];
+					}
+				},
 				create:function(){
 					this.m= {
 						supportTimes:[],
@@ -299,9 +381,21 @@
 						}else{
 							that.checkedUnit=[];
 						}
-						that.unitPrices = article.articlePrises;
+						that.unitPrices = article.articlePrices;
 					});
 				},
+				filterTable:function(e){
+					var s  = $(e.target);
+					var val = s.val();
+					if(val=="-1"){
+						tb.search("").draw();
+						return;
+					}
+					tb.search(val).draw();
+				},
+				changeColor:function(val){
+					$(".color-mini").minicolors("value",val);
+				}
 			},
 			computed:{
 				allUnitPrice:function(){
@@ -381,7 +475,29 @@
 				}
 			},
 			created:function(){
+				tb.search("").draw();
 				var that = this;
+				$("#article-dialog").on("hidden.bs.modal",function(){
+					that.showform=false;
+				})
+				this.$watch("showform",function(){
+					if(this.showform){
+						$("#article-dialog").modal("show");
+						var n=$('.color-mini').minicolors({
+				            change: function(hex, opacity) {
+				                if (!hex) return;
+				                if (typeof console === 'object') {
+				                    $(this).attr("value",hex);
+				                }
+				            },
+				            theme: 'bootstrap'
+				        });
+					}else{
+						$("#article-dialog").modal("hide");
+						$(".modal-backdrop.fade.in").remove();
+					}
+				})
+				
 				$.post("articlefamily/list_all",null,function(data){
 					that.articlefamilys = data;
 				});

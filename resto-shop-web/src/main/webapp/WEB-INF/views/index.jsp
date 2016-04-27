@@ -31,6 +31,8 @@
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css"/>
 		<link rel="stylesheet" type="text/css" href="<%=resourcePath%>/assets/global/plugins/bootstrap-toastr/toastr.min.css">
+		<link href="<%=resourcePath%>/assets/global/plugins/bootstrap-colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+        <link href="<%=resourcePath%>/assets/global/plugins/jquery-minicolors/jquery.minicolors.css" rel="stylesheet" type="text/css" />
 		
 		<link href="<%=resourcePath%>/assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
         <link href="<%=resourcePath%>/assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -134,6 +136,8 @@
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
 		<script src="<%=resourcePath%>/assets/global/plugins/jquery-validation/js/localization/messages_zh.js" type="text/javascript" charset="utf-8"></script>
+		  <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js" type="text/javascript"></script>
+        <script src="<%=resourcePath%>/assets/global/plugins/jquery-minicolors/jquery.minicolors.min.js" type="text/javascript"></script>
         <!-- END PAGE LEVEL PLUGINS -->
         
         <!-- BEGIN THEME GLOBAL SCRIPTS -->

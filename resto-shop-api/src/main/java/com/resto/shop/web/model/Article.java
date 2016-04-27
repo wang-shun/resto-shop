@@ -62,6 +62,10 @@ public class Article {
     
     private ArticleFamily articleFamily;
     
+    private Boolean showBig;
+
+    private String controlColor;
+    
     public ArticleFamily getArticleFamily() {
 		return articleFamily;
 	}
@@ -325,6 +329,22 @@ public class Article {
 
 	public void setArticleFamilyName(String articleFamilyName) {
 		this.articleFamilyName = articleFamilyName;
+	}
+
+	public Boolean getShowBig() {
+		return showBig;
+	}
+
+	public String getControlColor() {
+		return controlColor;
+	}
+
+	public void setShowBig(Boolean showBig) {
+		this.showBig = showBig;
+	}
+
+	public void setControlColor(String controlColor) {
+		this.controlColor = controlColor;
 	}
 	
 	

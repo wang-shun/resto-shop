@@ -41,6 +41,6 @@
 
         <!--对应数据库表名 mybatis-generator:generate -->
 
-       <table tableName="tb_order" domainObjectName="Order2" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table> 
+<!--        <table tableName="tb_article" domainObjectName="Article2" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>  -->
     </context>
 </generatorConfiguration>
