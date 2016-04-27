@@ -277,7 +277,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public boolean cancelOrder(String orderId) {
 		Order order = selectById(orderId);
-		if (order.getOrderState().equals(OrderState.SUBMIT) || order.getOrderState().equals(OrderState.PAYMENT)) {
+		if (order.getAllowCancel()&&(order.getOrderState().equals(OrderState.SUBMIT))) {
 			order.setAllowCancel(false);
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
