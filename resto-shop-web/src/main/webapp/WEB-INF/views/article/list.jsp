@@ -258,6 +258,7 @@
 				{                 
 					title : "粉丝价",
 					data : "fansPrice",
+					defaultContent:"",
 				},                 
 				{                 
 					title : "餐品图片",

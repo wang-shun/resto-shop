@@ -39,8 +39,6 @@ public class RedConfig {
     @NotNull(message="{是否可以叠加   不能为空}")
     private Byte isAddRatio;
 
-    @NotNull(message="{最低消费额度   不能为空}")
-    @Range(min=0,message="{最低消费额度   不能小于 0}")
     private BigDecimal minTranslateMoney;
 
     @NotNull(message="{是否启用   不能为空}")
