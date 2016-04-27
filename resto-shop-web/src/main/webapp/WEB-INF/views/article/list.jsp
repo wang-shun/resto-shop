@@ -9,17 +9,6 @@
 		display: inline-block;
 		min-width: 70px;
 	}
-	.dialog-form{
-		position: fixed;
-		z-index: 9999;
-		left: 0;
-		width: 100%;
-		right: 0;
-		height: 100%;
-		top: 0px;
-		padding-top: 30px;
-		background-color: rgba(0, 0, 0, 0.53);
-	}
 </style>
 <div id="control">
 	<div class="modal fade" id="article-dialog" v-if="showform">
@@ -131,13 +120,6 @@
 	<!-- 							   	 	<img src="" id="photoSmall"/> -->
 						    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
 						    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品编号</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="peference" v-model="m.peference">
 					    </div>
 					</div>
 					

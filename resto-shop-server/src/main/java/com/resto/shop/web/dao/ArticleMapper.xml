@@ -323,18 +323,14 @@
       <if test="price != null" >
         price = #{price,jdbcType=DECIMAL},
       </if>
-      <if test="fansPrice != null" >
         fans_price = #{fansPrice,jdbcType=DECIMAL},
-      </if>
       <if test="hasMultPrice != null" >
         has_mult_price = #{hasMultPrice,jdbcType=BIT},
       </if>
       <if test="hasUnit != null" >
         has_unit = #{hasUnit,jdbcType=VARCHAR},
       </if>
-      <if test="peference != null" >
         peference = #{peference,jdbcType=VARCHAR},
-      </if>
       <if test="unit != null" >
         unit = #{unit,jdbcType=VARCHAR},
       </if>

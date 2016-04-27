@@ -115,5 +115,5 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public void setEmpty(Integer isEmpty,String articleId) {
 		articleMapper.setEmpty(isEmpty, articleId);
 	}
-
+	
 }

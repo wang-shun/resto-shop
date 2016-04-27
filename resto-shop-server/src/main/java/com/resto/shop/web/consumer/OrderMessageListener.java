@@ -65,7 +65,7 @@ public class OrderMessageListener implements MessageListener{
 		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
 		Order order = JSON.parseObject(msg, Order.class);
 		DataSourceContextHolder.setDataSourceName(order.getBrandId());
-		log.info("执行自动确认逻辑");
+		log.info("执行自动确认逻辑"+order.getId());
 		orderService.confirmOrder(order);
 		return Action.CommitMessage;
 	}
