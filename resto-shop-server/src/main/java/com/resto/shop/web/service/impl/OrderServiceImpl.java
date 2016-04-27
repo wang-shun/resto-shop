@@ -683,11 +683,4 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		 orderMapper.updateByPrimaryKeySelective(order);
 	}
 
-	@Override
-	public List<Map<String, Object>> printOrderAllAndSuccess(String orderId) {
-		List<Map<String,Object>> printer = printOrderAll(orderId);
-		printSuccess(orderId);
-		return printer;
-	}
-
 }
