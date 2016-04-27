@@ -388,7 +388,7 @@
 	  </where>
   </select>
   <select id="selectListByShopIdAndDistributionId" resultType="Article">
-  	SELECT a.id,a.name,a.description,a.photo_small,a.is_empty,a.sort,a.remain_number,a.`article_family_id`,a.`price`,a.`fans_price`,a.`has_unit`,a.`unit`
+  	SELECT a.id,a.name,a.control_color,a.show_big,a.description,a.photo_small,a.is_empty,a.sort,a.remain_number,a.`article_family_id`,a.`price`,a.`fans_price`,a.`has_unit`,a.`unit`
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.`activated`=1
 	AND a.`shop_detail_id`=#{0}
