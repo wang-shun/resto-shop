@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 public class Advert {
@@ -11,7 +13,7 @@ public class Advert {
     @NotBlank(message="{描述不能为空}")
     private String description;
     
-    @NotBlank(message="{状态不能为空}")
+    @NotNull(message="{状态不能为空}")
     private Byte state;
 
     private String shopDetailId;

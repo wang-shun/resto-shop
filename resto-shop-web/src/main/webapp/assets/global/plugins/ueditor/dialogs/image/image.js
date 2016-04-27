@@ -773,7 +773,7 @@
             for (i = 0; i < this.imageList.length; i++) {
                 data = this.imageList[i];
                 list.push({
-                    src: prefix + data.url,
+                    src: prefix + data.url.substring(1,data.url.length),//此处修改了后台返回的路径，截取了路径中的第一个 " / " 符号
                     _src: prefix + data.url,
                     title: data.title,
                     alt: data.original,
