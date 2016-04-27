@@ -162,6 +162,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			case OrderItemType.ARTICLE:
 				// 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
 				a = articleMap.get(item.getArticleId());
+				item.setArticleName(a.getName());
 				org_price = a.getPrice();
 				price = a.getPrice();
 				fans_price = a.getFansPrice();
@@ -169,6 +170,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			case OrderItemType.UNITPRICE:
 				ArticlePrice p = articlePriceMap.get(item.getArticleId());
 				a = articleMap.get(p.getArticleId());
+				item.setArticleName(a.getName()+p.getName());
 				org_price = p.getPrice();
 				price = p.getPrice();
 				fans_price = p.getFansPrice();
@@ -177,7 +179,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
 			}
 			item.setArticleDesignation(a.getDescription());
-			item.setArticleName(a.getName());
 			item.setOriginalPrice(org_price);
 			item.setStatus(1);
 			item.setSort(0);
@@ -415,9 +416,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//厨房信息
 		Map<String,Kitchen> kitchenMap = new HashMap<String, Kitchen>();
 		//遍历 订单集合 
-		for(OrderItem article : articleList){
+		for(OrderItem item : articleList){
 			//得到当前菜品 所关联的厨房信息
-			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(article.getArticleId());
+			String articleId = item.getArticleId();
+			if(item.getType()==OrderItemType.UNITPRICE){
+				if(articleId.length()>32){
+					articleId = item.getArticleId().substring(0,32);
+				}
+			}
+			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 			for(Kitchen kitchen : kitchenList){
 				String kitchenId = kitchen.getId().toString();
 				kitchenMap.put(kitchenId, kitchen);//保存厨房信息
@@ -426,7 +433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					//如果没有 则新建
 					kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
 				}
-				kitchenArticleMap.get(kitchenId).add(article);
+				kitchenArticleMap.get(kitchenId).add(item);
 			}
 		}
 		

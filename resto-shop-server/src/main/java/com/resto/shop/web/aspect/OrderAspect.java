@@ -114,7 +114,9 @@ public class OrderAspect {
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
 				log.info("打印成功后，发送自动确认订单通知！");
-				sendVerCodeMsg(order);
+				if(order.getOrderMode()==1||order.getOrderMode()==2){
+					sendVerCodeMsg(order);
+				}
 				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}
