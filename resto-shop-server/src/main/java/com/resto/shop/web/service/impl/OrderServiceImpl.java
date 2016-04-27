@@ -536,10 +536,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			Map<String, Object> item = new HashMap<>();
 			item.put("ARTICLE_NAME", article.getArticleName());
 			item.put("ARTICLE_COUNT", article.getCount());
-			BigDecimal money = article.getOriginalPrice();
-			Float a =money.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue() ;
-			Integer b = article.getCount();
-			item.put("SUBTOTAL", a * b);
+			item.put("SUBTOTAL", article.getFinalPrice());
 			items.add(item);
 		}
 
