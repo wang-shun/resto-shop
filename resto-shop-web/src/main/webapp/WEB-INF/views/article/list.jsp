@@ -63,11 +63,11 @@
 					
 					<div class="form-group col-md-4">
 					 	<label class="col-md-5 control-label">是否上架</label>
-					    <div class="col-md-7">
-					    	<label class="">
+					    <div class="col-md-7 radio-list">
+					    	<label class="radio-inline">
 						    	<input type="radio" name="activated" value="1"  v-model="m.activated">是
 						    </label>
-						    <label class="">
+						    <label class="radio-inline">
 						    	 <input type="radio" name="activated" value="0"  v-model="m.activated">否
 					    	</label>
 					    </div>
@@ -75,23 +75,49 @@
 					
 					<div class="form-group col-md-4">
 					 	<label class="col-md-5 control-label">是否沽清</label>
-					    <div class="col-md-7">
-					    	<label class="">
+					    <div class="col-md-7 radio-list">
+					    	<label class="radio-inline">
 						    	<input type="radio" name="isEmpty" value="1"  v-model="m.isEmpty">是
 						    </label>
-						    <label class="">
+						    <label class="radio-inline">
 						    	 <input type="radio" name="isEmpty" value="0"  v-model="m.isEmpty">否
 					    	</label>
 					    </div>
 					</div>
+					
+					<div class="form-group col-md-4">
+					 	<label class="col-md-5 control-label">未点提示</label>
+					    <div class="col-md-7 radio-list">
+					    	<label class="radio-inline">
+						    	<input type="radio" name="isRemind" value="1"  v-model="m.isRemind">是
+						    </label>
+						    <label class="radio-inline">
+						    	 <input type="radio" name="isRemind" value="0"  v-model="m.isRemind">否
+					    	</label>
+					    </div>
+					</div>
+					
 					<div class="form-group col-md-4">
 					 	<label class="col-md-5 control-label">显示大图</label>
-					    <div class="col-md-7">
-					    	<label class="">
+					    <div class="col-md-7 radio-list">
+					    	<label class="radio-inline">
 						    	<input type="radio" name="showBig" value="1"  v-model="m.showBig">是
 						    </label>
-						    <label class="">
+						    <label class="radio-inline">
 						    	 <input type="radio" name="showBig" value="0"  v-model="m.showBig">否
+					    	</label>
+					    </div>
+					</div>
+					
+					<div class="form-group col-md-4">
+					 	<label class="col-md-5 control-label">显示描述</label>
+					    <div class="col-md-7 radio-list">
+					    
+					    	<label class="radio-inline">
+						    	<input type="radio" name="showDesc" value="1"  v-model="m.showDesc">是
+						    </label>
+						    <label class="radio-inline">
+						    	 <input type="radio" name="showDesc" value="0"  v-model="m.showDesc">否
 					    	</label>
 					    </div>
 					</div>
@@ -117,15 +143,14 @@
 					<div class="form-group col-md-4">
 					    <label class="col-md-5 control-label">餐品图片</label>
 					    <div class="col-md-7">
-	<!-- 							   	 	<img src="" id="photoSmall"/> -->
 						    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
 						    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 					    </div>
 					</div>
 					
-					<div class="form-group col-md-8">
-					    <label class="col-md-2 control-label">描述</label>
-					    <div class="col-md-10">
+					<div class="form-group col-md-4">
+					    <label class="col-md-5 control-label">描述</label>
+					    <div class="col-md-7">
 						    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
 					    </div>
 					</div>
@@ -267,27 +292,34 @@
 						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
 					}
 				},                 
-				{                 
-					title : "餐品描述",
-					data : "description",
-					createdCell:function(td,tdData){
-						if(tdData.length>10){
-							tdData = tdData.substring(0,10);
-							$(td).html(tdData+"...");
-						}
-					}
-				},                 
+// 				{                 
+// 					title : "餐品描述",
+// 					data : "description",
+// 					createdCell:function(td,tdData){
+// 						if(tdData.length>10){
+// 							tdData = tdData.substring(0,10);
+// 							$(td).html(tdData+"...");
+// 						}
+// 					}
+// 				},                 
 				{                 
 					title : "餐品排序",
 					data : "sort",
 				},                 
 				{                 
-					title : "是否上架",
+					title : "上架",
 					data : "activated",
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
-				},                 
+				},           
+				{
+					title:"沽清",
+					data:"isEmpty",
+					createdCell:function(td,tdData){
+						$(td).html(tdData?"是":"否");
+					}
+				},
 				{
 					title : "操作",
 					data : "id",
@@ -333,11 +365,20 @@
 					}else{
 						m.supportTimes=[];
 					}
+					Vue.nextTick(function(){
+						App.updateUniform();
+					});
 				},
 				create:function(){
 					this.m= {
 						supportTimes:[],
 						kitchenList:[],
+						isRemind:false,
+						activated:true,
+						showDesc:true,
+						showBig:true,
+						isEmpty:false,
+						sort:0,
 					};
 					this.checkedUnit=[];
 					this.showform=true;
@@ -460,9 +501,6 @@
 			created:function(){
 				tb.search("").draw();
 				var that = this;
-				$("#article-dialog").on("hidden.bs.modal",function(){
-					that.showform=false;
-				})
 				this.$watch("showform",function(){
 					if(this.showform){
 						$("#article-dialog").modal("show");
@@ -475,6 +513,9 @@
 				            },
 				            theme: 'bootstrap'
 				        });
+						$("#article-dialog").on("hidden.bs.modal",function(){
+							that.showform=false;
+						});
 					}else{
 						$("#article-dialog").modal("hide");
 						$(".modal-backdrop.fade.in").remove();

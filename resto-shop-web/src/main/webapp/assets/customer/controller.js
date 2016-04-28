@@ -17,6 +17,18 @@ toastr.options = {
   "hideMethod": "fadeOut"
 }
 
+
+$(document).on("ajaxError",function(event,xhr,options){
+//	showMessage("服务器错误！",1000);
+	console.error("send ajax error",xhr,options)
+});
+
+$(document).on("ajaxComplete",function(){
+	Vue.nextTick(function(){
+		App.updateUniform();
+	});
+});
+
 /**
  * option{
  * 	el: vue控制的el标签
@@ -434,6 +446,13 @@ var Controller = function(controlId,datatable){
 				m:{},
 				showform:false
 			}
+		},
+		created:function(){
+			this.$watch("showform",function(){
+				if(this.showform){
+					App.initUniform();
+				}
+			});
 		},
 		methods:{
 			openForm:function(){

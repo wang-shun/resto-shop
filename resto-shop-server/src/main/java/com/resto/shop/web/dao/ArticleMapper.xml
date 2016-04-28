@@ -1,7 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.resto.shop.web.dao.ArticleMapper">
- 
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Article" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="name_alias" property="nameAlias" jdbcType="VARCHAR" />
+    <result column="name_short" property="nameShort" jdbcType="VARCHAR" />
+    <result column="photo_big" property="photoBig" jdbcType="VARCHAR" />
+    <result column="photo_small" property="photoSmall" jdbcType="VARCHAR" />
+    <result column="ingredients" property="ingredients" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="is_empty" property="isEmpty" jdbcType="BIT" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="activated" property="activated" jdbcType="TINYINT" />
+    <result column="state" property="state" jdbcType="BIT" />
+    <result column="remain_number" property="remainNumber" jdbcType="INTEGER" />
+    <result column="sale_number" property="saleNumber" jdbcType="BIGINT" />
+    <result column="show_sale_number" property="showSaleNumber" jdbcType="BIGINT" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+    <result column="article_family_id" property="articleFamilyId" jdbcType="VARCHAR" />
+    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
+    <result column="update_user_id" property="updateUserId" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="fans_price" property="fansPrice" jdbcType="DECIMAL" />
+    <result column="has_mult_price" property="hasMultPrice" jdbcType="BIT" />
+    <result column="has_unit" property="hasUnit" jdbcType="VARCHAR" />
+    <result column="peference" property="peference" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
+    <result column="show_big" property="showBig" jdbcType="BIT" />
+    <result column="control_color" property="controlColor" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
+    is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
+    create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
+    fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
+      is_remind
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_article
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_article
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.Article" >
     insert into tb_article (id, name, name_alias, 
       name_short, photo_big, photo_small, 

@@ -82,11 +82,6 @@ function showDialogMessage(msg,time){
 	}
 	return messageDom;
 }
-
-$(document).on("ajaxError",function(event,xhr,options){
-//	showMessage("服务器错误！",1000);
-	console.error("send ajax error",xhr,options)
-});
 function toTop(){
 	$("body").scrollTop(0);
 }
