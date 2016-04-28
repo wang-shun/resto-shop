@@ -68,6 +68,10 @@ public class Article {
     
     private Boolean showBig;
 
+    private Boolean showDesc;
+    
+    private Boolean isRemind;
+    
     private String controlColor;
     
     public ArticleFamily getArticleFamily() {
@@ -349,6 +353,22 @@ public class Article {
 
 	public void setControlColor(String controlColor) {
 		this.controlColor = controlColor;
+	}
+
+	public Boolean getShowDesc() {
+		return showDesc;
+	}
+
+	public Boolean getIsRemind() {
+		return isRemind;
+	}
+
+	public void setShowDesc(Boolean showDesc) {
+		this.showDesc = showDesc;
+	}
+
+	public void setIsRemind(Boolean isRemind) {
+		this.isRemind = isRemind;
 	}
 	
 	

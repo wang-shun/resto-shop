@@ -1,59 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.resto.shop.web.dao.ArticleMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Article" >
-    <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="name_alias" property="nameAlias" jdbcType="VARCHAR" />
-    <result column="name_short" property="nameShort" jdbcType="VARCHAR" />
-    <result column="photo_big" property="photoBig" jdbcType="VARCHAR" />
-    <result column="photo_small" property="photoSmall" jdbcType="VARCHAR" />
-    <result column="ingredients" property="ingredients" jdbcType="VARCHAR" />
-    <result column="description" property="description" jdbcType="VARCHAR" />
-    <result column="is_empty" property="isEmpty" jdbcType="BIT" />
-    <result column="sort" property="sort" jdbcType="INTEGER" />
-    <result column="activated" property="activated" jdbcType="TINYINT" />
-    <result column="state" property="state" jdbcType="BIT" />
-    <result column="remain_number" property="remainNumber" jdbcType="INTEGER" />
-    <result column="sale_number" property="saleNumber" jdbcType="BIGINT" />
-    <result column="show_sale_number" property="showSaleNumber" jdbcType="BIGINT" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
-    <result column="article_family_id" property="articleFamilyId" jdbcType="VARCHAR" />
-    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
-    <result column="update_user_id" property="updateUserId" jdbcType="VARCHAR" />
-    <result column="price" property="price" jdbcType="DECIMAL" />
-    <result column="fans_price" property="fansPrice" jdbcType="DECIMAL" />
-    <result column="has_mult_price" property="hasMultPrice" jdbcType="BIT" />
-    <result column="has_unit" property="hasUnit" jdbcType="VARCHAR" />
-    <result column="peference" property="peference" jdbcType="VARCHAR" />
-    <result column="unit" property="unit" jdbcType="VARCHAR" />
-    <result column="show_big" property="showBig" jdbcType="BIT" />
-    <result column="control_color" property="controlColor" jdbcType="VARCHAR" />
-  </resultMap>
-  <resultMap type="com.resto.shop.web.model.Article" id="selectResultMap" autoMapping="true">
-  	<id column="id" jdbcType="VARCHAR" property="id" />
-  	<association property="articleFamily" javaType="com.resto.shop.web.model.ArticleFamily">
-  		<result column="articleFamilyName" property="name"/>
-  	</association>
-  </resultMap>
-  <sql id="Base_Column_List" >
-    id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
-    is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
-    create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
-    fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color
-  </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    <include refid="Base_Column_List" />
-    from tb_article
-    where id = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
-    delete from tb_article
-    where id = #{id,jdbcType=VARCHAR}
-  </delete>
+ 
   <insert id="insert" parameterType="com.resto.shop.web.model.Article" >
     insert into tb_article (id, name, name_alias, 
       name_short, photo_big, photo_small, 
@@ -64,7 +12,8 @@
       article_family_id, create_user_id, update_user_id, 
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
-      show_big, control_color)
+      show_big, control_color, show_desc, 
+      is_remind)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -74,7 +23,8 @@
       #{articleFamilyId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{updateUserId,jdbcType=VARCHAR}, 
       #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT}, 
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
-      #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR})
+      #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
+      #{isRemind,jdbcType=BIT})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article" >
     insert into tb_article
@@ -166,6 +116,12 @@
       <if test="controlColor != null" >
         control_color,
       </if>
+      <if test="showDesc != null" >
+        show_desc,
+      </if>
+      <if test="isRemind != null" >
+        is_remind,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -255,6 +211,12 @@
       <if test="controlColor != null" >
         #{controlColor,jdbcType=VARCHAR},
       </if>
+      <if test="showDesc != null" >
+        #{showDesc,jdbcType=BIT},
+      </if>
+      <if test="isRemind != null" >
+        #{isRemind,jdbcType=BIT},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article" >
@@ -340,6 +302,12 @@
       <if test="controlColor != null" >
         control_color = #{controlColor,jdbcType=VARCHAR},
       </if>
+      <if test="showDesc != null" >
+        show_desc = #{showDesc,jdbcType=BIT},
+      </if>
+      <if test="isRemind != null" >
+        is_remind = #{isRemind,jdbcType=BIT},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -372,9 +340,19 @@
       peference = #{peference,jdbcType=VARCHAR},
       unit = #{unit,jdbcType=VARCHAR},
       show_big = #{showBig,jdbcType=BIT},
-      control_color = #{controlColor,jdbcType=VARCHAR}
+      control_color = #{controlColor,jdbcType=VARCHAR},
+      show_desc = #{showDesc,jdbcType=BIT},
+      is_remind = #{isRemind,jdbcType=BIT}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  
+  <resultMap type="com.resto.shop.web.model.Article" id="selectResultMap" autoMapping="true">
+  	<id column="id" jdbcType="VARCHAR" property="id" />
+  	<association property="articleFamily" javaType="com.resto.shop.web.model.ArticleFamily">
+  		<result column="articleFamilyName" property="name"/>
+  	</association>
+  </resultMap>
+  
   <select id="selectList" resultMap="selectResultMap">
       select ar.*,arf.name as articleFamilyName from tb_article ar  left join tb_article_family arf on ar.article_family_id=arf.id
 	  <where>
@@ -384,10 +362,13 @@
 	  </where>
   </select>
   <select id="selectListByShopIdAndDistributionId" resultType="Article">
-  	SELECT a.id,a.name,a.control_color,a.show_big,a.description,a.photo_small,a.is_empty,a.sort,a.remain_number,a.`article_family_id`,a.`price`,a.`fans_price`,a.`has_unit`,a.`unit`
+  	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
+  	a.show_big,	a.description,a.photo_small,a.is_empty,
+  	a.sort,a.remain_number,a.article_family_id,a.price,
+  	a.fans_price,a.has_unit,a.unit
 	 FROM tb_article a,tb_article_family f
-	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.`activated`=1
-	AND a.`shop_detail_id`=#{0}
+	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
+	AND a.shop_detail_id=#{0}
 	ORDER BY sort
   </select>
   <select id="selectBySupportTimeId" resultType="Article">
