@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -26,4 +27,6 @@ public interface SmsLogMapper  extends GenericDao<SmsLog,Long> {
      * @return
      */
     List<SmsLog> selectListByShopId(@Param("shopId") String shopId);
+
+	List<SmsLog> selectListByShopIdAndDate(@Param("shopId") String shopId,@Param("begin") Date begin);
 }

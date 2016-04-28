@@ -1,5 +1,7 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
@@ -39,6 +41,11 @@ public class ShopDetailController extends GenericController{
 	    return Result.getSuccess();
 	}
 	
-	
+	@RequestMapping("list_all")
+	@ResponseBody
+	public Result listAll(){
+	    List<ShopDetail> lists = shopDetailService.selectByBrandId(getCurrentBrandId());
+	    return getSuccessResult(lists);
+	}
 	
 }

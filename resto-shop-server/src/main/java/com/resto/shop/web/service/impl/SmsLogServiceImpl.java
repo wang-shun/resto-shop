@@ -15,6 +15,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.SmsLogService;
+import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -61,7 +62,15 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
 	@Override
 	public List<SmsLog> selectListByShopId(String shopId) {
+		
 		return smslogMapper.selectListByShopId(shopId);
+	}
+
+	@Override
+	public List<SmsLog> selectListByShopIdAndDate(String ShopId) {
+		System.out.println(DateUtil.getAfterDayDate(new Date(), -2));
+		Date begin = DateUtil.getDateBegin(DateUtil.getAfterDayDate(new Date(), -2));
+		return smslogMapper.selectListByShopIdAndDate(ShopId,begin);
 	} 
 
 }

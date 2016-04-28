@@ -204,7 +204,6 @@ public class SpringContextConfig {
 	public BrandSettingService brandSettingService(){
 		return getProxy(BrandSettingService.class);
 	}
-
 	
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);

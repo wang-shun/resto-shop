@@ -1,5 +1,7 @@
 package com.resto.shop.web.controller.common;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -102,6 +104,7 @@ public class BrandUserController extends GenericController{
         return "login";
     }
     
+
     /**
      * 显示修改用户信息页面
      */
@@ -115,4 +118,23 @@ public class BrandUserController extends GenericController{
     	brandUserService.updatePwd(getCurrentUserId(), password);
     	return getSuccessResult();
     }
+
+    @RequestMapping("/list")
+    public void list(){
+    }
+
+	@RequestMapping("/list_all")
+	@ResponseBody
+	public List<BrandUser> listData(){
+		return brandUserService.selectListBybrandId(getCurrentBrandId());
+	}
+	
+	
+	@RequestMapping("/create")
+	@ResponseBody
+	public Result create(@Valid BrandUser brandUser){
+		brandUserService.creatBrandUser(brandUser);
+		return Result.getSuccess();
+	}
+
 }

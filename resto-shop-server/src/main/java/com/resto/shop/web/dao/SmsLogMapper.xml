@@ -57,4 +57,10 @@
   <select id="selectListByShopId" resultType="SmsLog">
   	SELECT create_time,phone,content,sms_result from tb_sms_log where shop_detail_id = #{shopId}
   </select>
+  
+  <!-- 根据店铺id查询近两天的的短信记录 -->
+  <select id="selectListByShopIdAndDate" resultType="SmsLog">
+  	SELECT create_time,phone,content,sms_result from tb_sms_log where shop_detail_id = #{shopId}
+  	AND <![CDATA[ create_time>=#{begin}]]>
+  </select>
 </mapper>
