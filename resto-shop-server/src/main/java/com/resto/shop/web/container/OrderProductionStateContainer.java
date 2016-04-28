@@ -1,18 +1,27 @@
 package com.resto.shop.web.container;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.util.DateUtil;
 
 
 /**
@@ -27,8 +36,28 @@ public class OrderProductionStateContainer {
 	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new ConcurrentHashMap<>();     //正在叫号的队列
 	private static final Map<String,Boolean> INIT_SHOP = new ConcurrentHashMap<>();
 	
+	static {
+		Date date = DateUtil.getDateBegin(new Date());
+	    long daySpan = 24 * 60 * 60 * 1000;
+	    Timer t = new Timer();
+	    t.schedule(new TimerTask() {
+	    	Logger log = LoggerFactory.getLogger(getClass());
+			@Override
+			public void run() {
+				log.info("清理订单容器定时器开始执行，清空所有缓存信息");
+				PUSH_ORDER_MAP.clear();
+				READY_ORDER_MAP.clear();
+				CALL_NOW_MAP.clear();
+				INIT_SHOP.clear();
+				log.info("清理订单状态容器成功！");
+			}
+		}, date.getTime(),daySpan);
+	}
+	
 	@Resource
 	OrderService orderService;
+	@Resource
+	CustomerService customerService;
 	
 	
 	public List<Order> getPushOrderList(String shopId,Long lastTime){
@@ -86,6 +115,10 @@ public class OrderProductionStateContainer {
 		}else if(order.getProductionStatus()==ProductionStatus.HAS_CALL){
 			Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
 			orderMap.put(order.getId(), order);
+			if(order.getCustomer()==null){
+				Customer cus = customerService.selectById(order.getCustomerId());
+				order.setCustomer(cus);
+			}
 			Map<String,Order> readyOrder = getOrderMap(READY_ORDER_MAP, shopId);
 			if(readyOrder.containsKey(order.getId())){ //如果准备中的队列中有该订单，则删除该订单
 				readyOrder.remove(order.getId());
@@ -118,11 +151,6 @@ public class OrderProductionStateContainer {
 			map.put(shopId, ordermap);
 		}
 		return ordermap;
-	}
-
-	public void removeOrder(Order order) {
-		
-		
 	}
 
 	public void removePushOrder(Order order) {
