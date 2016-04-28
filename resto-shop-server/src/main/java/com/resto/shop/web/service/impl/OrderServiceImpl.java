@@ -501,16 +501,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			data.put("ITEMS", items);
 			
 			Printer printer = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
-			Map<String,Object> print = new HashMap<String,Object>();
-			print.put("ORDER_ID", serialNumber);
-			print.put("KITCHEN_NAME", printer.getName());
-			print.put("DATA", data);
-			print.put("TABLE_NO", tableNumber);
-			print.put("IP", printer.getIp());
-			print.put("PORT", printer.getPort());
-			print.put("ADD_TIME", new Date());
-			print.put("TICKET_TYPE", TicketType.PACKAGE);
-			printTask.add(print);
+			if(printer!=null){
+				Map<String,Object> print = new HashMap<String,Object>();
+				print.put("ORDER_ID", serialNumber);
+				print.put("KITCHEN_NAME", printer.getName());
+				print.put("DATA", data);
+				print.put("TABLE_NO", tableNumber);
+				print.put("IP", printer.getIp());
+				print.put("PORT", printer.getPort());
+				print.put("ADD_TIME", new Date());
+				print.put("TICKET_TYPE", TicketType.PACKAGE);
+				printTask.add(print);
+			}
 		}
 		
 		return printTask;
