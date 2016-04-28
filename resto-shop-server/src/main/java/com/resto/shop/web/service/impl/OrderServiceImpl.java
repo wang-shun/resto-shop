@@ -463,7 +463,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				data.put("DISTRIBUTION_MODE",modeText);
 				data.put("TABLE_NUMBER", tableNumber);
 				data.put("ORDER_ID", serialNumber);
-				data.put("DATETIME",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+				data.put("DATE",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
 				data.put("ITEMS", items);
 				//保存打印配置信息
 				Map<String,Object> print = new HashMap<String,Object>();
@@ -550,7 +550,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("RESTAURANT_TEL", shopDetail.getPhone());
 		data.put("TABLE_NUMBER", order.getTableNumber());
 		data.put("ORDER_ID", order.getSerialNumber());
-		data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+		data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
 		data.put("ITEMS", items);
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
