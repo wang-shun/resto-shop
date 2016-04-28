@@ -590,6 +590,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 			if(setting.getAppraiseMinMoney().compareTo(order.getOrderMoney())<=0){ //如果订单金额大于 评论金额 则允许评论
 				order.setAllowAppraise(true);
+			}else{
+				order.setAllowAppraise(false);
 			}
 			update(order);
 			return order;

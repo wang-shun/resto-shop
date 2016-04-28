@@ -120,6 +120,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			order.setAllowCancel(false);
 			orderService.update(order);
 		}else{
+			log.error("订单不允许评论:	"+order.getId());
 			throw new AppException(AppException.ORDER_NOT_ALL_APPRAISE);
 		}
 		return appraise;

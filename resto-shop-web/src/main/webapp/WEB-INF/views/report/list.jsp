@@ -127,7 +127,7 @@ var tb2 = $("#articleSaleTable").DataTable({
 		{ title : "菜品销量", data : "articleSum",
 			createdCell:function(td,tdData,rowData){
 				orderArticleItemsCount += tdData;
-				$("#report-preview > .col-md-8:last").append("<p>"+rowData.articleName+"："+tdData+" 份</p>");
+				$("#report-preview > .col-md-8:last").append(""+rowData.articleName+"："+tdData+"<br/>");
 			}	
 		}
 	],
