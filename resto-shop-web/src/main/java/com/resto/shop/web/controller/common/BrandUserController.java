@@ -105,8 +105,8 @@ public class BrandUserController extends GenericController{
     /**
      * 显示修改用户信息页面
      */
-    @RequestMapping("/list")
-    public void list(){
+    @RequestMapping("/updatepage")
+    public void updatepage(){
     }
     
     @RequestMapping("/updatePwd")

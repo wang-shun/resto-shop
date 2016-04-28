@@ -163,7 +163,7 @@
 	
 	<script type="text/javascript">
 		$("#updateUserInfo").click(function(){
-			$.post("branduser/list",function(result){
+			$.post("branduser/updatepage",function(result){
 				var contentBody = $(".page-content .page-content-body");
 				contentBody.html(result);
 				App.initAjax();
