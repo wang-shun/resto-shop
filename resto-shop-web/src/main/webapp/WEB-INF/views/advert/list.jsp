@@ -22,8 +22,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-2 control-label">描述：</label>
 							    <div class="col-sm-8">
-							    	<input type="hidden" name="description" id="description">
-							    	<script id="container" name="content" type="text/plain"></script>
+							    	<textarea :id="randomId" name="description" v-model="m.description"></textarea>
 							    </div>
 							</div>
 							<div class="validataMsg"></div>
@@ -76,13 +75,7 @@
 </div>
 <script>
 
-	//用于保存介绍详情集合
-	var descriptionMap = new HashMap();
-	
 	(function(){
-		//实例化  UEditor 编辑器
-		$("[name='content']").attr("id",new Date().getTime());
-		var ue = UE.getEditor($("[name='content']").attr("id"));
 		
 		var cid="#control";
 		var $table = $(".table-body>table");
@@ -98,10 +91,13 @@
 				},             
 				{                 
 					title : "详情",
-					data : "description",
+					defaultContent:"",
 					createdCell:function(td,tdData,rowData){
-						descriptionMap.put(rowData.slogan,tdData);
-						$(td).html("<button class='btn green' onclick='showDetails(\""+rowData.slogan+"\")'>详情</button>");
+						var button = $("<button class='btn green'>详情</button>");
+						button.click(function(){
+							showDetails(rowData);
+						})
+						$(td).html(button);
 					}
 				},                  
 				{                 
@@ -125,16 +121,27 @@
 				}],
 		});
 		
-		
+		var ue=null;
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
+			data:function(){
+				return{
+					randomId:"ueditor",
+				}
+			},
 			methods:{
 				openForm:function(){
 					this.showform = true;
-					ue.setContent("");
-					$(".validataMsg").html("");
+					var that = this;
+					this.randomId = new Date().getTime()+"-ueditor";
+					Vue.nextTick(function(){
+						var ta = $(that.$el).find("textarea");
+						var id = ta.attr("id");
+						ue = UE.getEditor(id);
+						$(".validataMsg").html("");
+					});
 				},
 				closeForm:function(){
 					this.m={};
@@ -157,8 +164,13 @@
 				edit:function(model){
 					this.m= model;
 					this.openForm();
-					ue.setContent(model.description);
 					$(".validataMsg").html("");
+					this.randomId = new Date().getTime()+"-ueditor";
+					Vue.nextTick(function(){
+						var ta = $(that.$el).find("textarea");
+						var id = ta.attr("id");
+						ue = UE.getEditor(id);
+					});
 				},
 				save:function(e){
 					if(ue.getContent().length<=0){
@@ -167,7 +179,7 @@
 						}
 						return;
 					}
-					$("[name='description']").val(ue.getContent());
+// 					$("[name='description']").val(ue.getContent());
 					var that = this;
 					var formDom = e.target;
 					C.ajaxFormEx(formDom,function(){
@@ -181,9 +193,9 @@
 	}());
 	
 	//用于显示描述详情
-	function showDetails(slogan){
- 		$(".modal-title > strong").html(slogan);
- 		$(".modal-body").html(descriptionMap.get(slogan));
+	function showDetails(obj){
+ 		$(".modal-title > strong").html(obj.slogan);
+ 		$(".modal-body").html(obj.description);
 		$(".modal").modal();
 	}
 	
