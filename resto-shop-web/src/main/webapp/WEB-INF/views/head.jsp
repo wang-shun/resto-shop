@@ -28,16 +28,16 @@
 				<li class="dropdown dropdown-user"><a href="javascript:;"
 					class="dropdown-toggle" data-toggle="dropdown"
 					data-hover="dropdown" data-close-others="true"> <span
-						class="username username-hide-on-mobile"><span>登录用户</span>
-							<span class="namespan">${userinfo.username } </span></span> <i class="fa fa-angle-down"></i>
+						class="username username-hide-on-mobile"><span>${current_shop_name }：</span>
+							<span class="namespan">${USER_INFO.username } </span></span> <i class="fa fa-angle-down"></i>
 				</a>
 					<ul class="dropdown-menu dropdown-menu-default">
 						<li><a href="javascript:;"> <i
-								class="icon-user"></i> My Profile
+								class="icon-user"></i>个人信息
 						</a></li>
 						<li class="divider"></li>
 						<li><a href="branduser/logout"> <i class="icon-key"></i>
-								Log Out
+								退出
 						</a></li>
 					</ul></li>
 				<!-- END USER LOGIN DROPDOWN -->
