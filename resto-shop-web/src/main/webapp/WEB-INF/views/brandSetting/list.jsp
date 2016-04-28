@@ -31,16 +31,17 @@
 				    <input type="hidden" name="wechatWelcomeImg" v-model="m.wechatWelcomeImg">
 					<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 				</div>
+				<div class="form-group">
+				    <label>红包Logo</label>
+				    <input type="hidden" name="redPackageLogo" v-model="m.redPackageLogo">
+					<img-file-upload  class="form-control" @success="setRedPackage" @error="uploadError"></img-file-upload>
+				</div>
 				
 				<div class="form-group">
 				    <label>微信欢迎标题</label>
 				    <input type="text" class="form-control" name="wechatWelcomeTitle" v-model="m.wechatWelcomeTitle">
 				</div>
 				
-				<div class="form-group">
-				    <label>红包Logo</label>
-				    <input type="text" class="form-control" name="redPackageLogo" v-model="m.redPackageLogo">
-				</div>
 				<div class="form-group">
 				    <label>微信欢迎地址</label>
 				    <input type="text" class="form-control" name="wechatWelcomeUrl" v-model="m.wechatWelcomeUrl">
@@ -136,6 +137,10 @@
 				uploadSuccess:function(url){
 					$("[name='wechatWelcomeImg']").val(url).trigger("change");
 					toastr.success("上传成功！");
+				},
+				setRedPackage:function(url){
+					$("[name='redPackageLogo']").val(url).trigger("change");
+					toastr.success("上传logo成功！");
 				},
 				uploadError:function(msg){
 					toastr.error("上传失败");
