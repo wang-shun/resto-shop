@@ -31,9 +31,15 @@
 				    <input type="hidden" name="wechatWelcomeImg" v-model="m.wechatWelcomeImg">
 					<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 				</div>
+				
 				<div class="form-group">
 				    <label>微信欢迎标题</label>
 				    <input type="text" class="form-control" name="wechatWelcomeTitle" v-model="m.wechatWelcomeTitle">
+				</div>
+				
+				<div class="form-group">
+				    <label>红包Logo</label>
+				    <input type="text" class="form-control" name="redPackageLogo" v-model="m.redPackageLogo">
 				</div>
 				<div class="form-group">
 				    <label>微信欢迎地址</label>

@@ -28,15 +28,17 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">排序方式：</label>
 							    <div class="col-sm-8">
-									<select  class="form-control" name="sort" required  v-model="m.sort">
-										<option value="1" selected="selected">1</option>
-									</select>
+									<input type="text" class="form-control" required  name="sort" v-model="m.sort">
 							    </div>
 							</div>
+							
 			           		<div class="form-group">
-			           			<label class="col-sm-3 control-label">通知状态：</label>
+			           			<label class="col-sm-3 control-label">选择通知状态：</label>
 							    <div class="col-sm-8"> 
-									<input type="number" class="form-control" required placeholder="请输入数字！" name="status" v-model="m.status">
+									<input type="radio" name="status" v-model="m.status" value=0 checked="checked">
+									<label for="status">禁用</label>
+									<input type="radio" name="status" v-model="m.status" value=1>
+									<label for="status">启用</label>
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -48,11 +50,13 @@
 							    </div>
 							</div>
 			           		<div class="form-group">
-			           			<label class="col-sm-3 control-label">通知类型：</label>
+			           			<label class="col-sm-3 control-label">选择通知类型：</label>
 							    <div class="col-sm-8">
-									<select class="form-control" name="noticeType" required v-model="m.noticeType">
-										<option value="1" selected="selected">1</option>
-									</select>
+									<input type="radio" name="noticeType" v-model="m.noticeType" value=1 checked="checked">
+									<label for="noticeType">普通</label>
+									<input type="radio" name="noticeType" v-model="m.noticeType" value=2>
+									<label for="noticeType">注册提醒</label>
+									
 							    </div>
 							</div>
 						</div>
