@@ -1,9 +1,7 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
-
-<link rel="stylesheet" href="assets/global/plugins/bootstrap-daterangepicker/daterangepicker.css" />
-<!-- <link href="//cdn.bootcss.com/bootstrap-daterangepicker/2.1.18/daterangepicker.css" rel="stylesheet"> -->
+<link rel="stylesheet" type="text/css" href="assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
 
 <h2 class="text-center"><strong>结算报表</strong></h2><br/>
 <div class="row" id="searchTools">
@@ -64,15 +62,11 @@
 </div>
 
 <!-- <!-- 日期框 --> 
-<%-- <script type="text/javascript" src="assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js"></script> --%>
-<%-- <script type="text/javascript" src="assets/js/datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script> --%>
-
-<script src="//cdn.bootcss.com/smalot-bootstrap-datetimepicker/2.3.8/js/bootstrap-datetimepicker.js"></script>
-<script src="//cdn.bootcss.com/smalot-bootstrap-datetimepicker/2.3.8/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="assets/global/plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 
 
 <script>
-
 //时间插件
 $('.form_datetime').datetimepicker({
 		endDate:new Date(),
@@ -91,7 +85,6 @@ $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 var isFirst = true;
 var orderPaymentItemsCount = 0;//用于统计总量，预览时使用
 var tb1 = $("#dayReportTable").DataTable({
-	language:language,
 	ajax : {
 		url : "report/orderPaymentItems",
 		dataSrc : "data",
@@ -120,7 +113,6 @@ var tb1 = $("#dayReportTable").DataTable({
 
 var orderArticleItemsCount = 0;
 var tb2 = $("#articleSaleTable").DataTable({
-	language:language,
 	ajax : {
 		url : "report/orderArticleItems",
 		dataSrc : "data",
