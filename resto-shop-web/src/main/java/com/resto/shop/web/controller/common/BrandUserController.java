@@ -14,7 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.ShopDetail;
@@ -99,5 +101,18 @@ public class BrandUserController extends GenericController{
         subject.logout();
         return "login";
     }
-
+    
+    /**
+     * 显示修改用户信息页面
+     */
+    @RequestMapping("/list")
+    public void list(){
+    }
+    
+    @RequestMapping("/updatePwd")
+    @ResponseBody
+    public Result updatePwd(String password){
+    	brandUserService.updatePwd(getCurrentUserId(), password);
+    	return getSuccessResult();
+    }
 }

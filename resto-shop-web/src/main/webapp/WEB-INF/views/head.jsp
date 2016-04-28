@@ -32,7 +32,7 @@
 							<span class="namespan">${USER_INFO.username } </span></span> <i class="fa fa-angle-down"></i>
 				</a>
 					<ul class="dropdown-menu dropdown-menu-default">
-						<li><a href="javascript:;"> <i
+						<li id="updateUserInfo"><a href="javascript:;"> <i
 								class="icon-user"></i>个人信息
 						</a></li>
 						<li class="divider"></li>

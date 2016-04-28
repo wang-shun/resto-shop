@@ -160,5 +160,14 @@
 	    
         <!-- END THEME LAYOUT SCRIPTS -->
     </body>
-
+	
+	<script type="text/javascript">
+		$("#updateUserInfo").click(function(){
+			$.post("branduser/list",function(result){
+				var contentBody = $(".page-content .page-content-body");
+				contentBody.html(result);
+				App.initAjax();
+			})
+		})
+	</script>
 </html>
