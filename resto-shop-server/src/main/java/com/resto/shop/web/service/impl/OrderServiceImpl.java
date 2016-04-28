@@ -564,7 +564,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			return null;
 		}
 		Map<String, Object> print = new HashMap<>();
-		String print_id = UUID.randomUUID().toString();
+		String print_id = ApplicationUtils.randomUUID();
 		print.put("PRINT_TASK_ID", print_id);
 		print.put("STATUS", 0);
 		print.put("ORDER_ID", order.getSerialNumber());
