@@ -8,12 +8,12 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 

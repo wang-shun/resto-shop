@@ -453,6 +453,13 @@ var Controller = function(controlId,datatable){
 					App.initUniform();
 				}
 			});
+			this.$watch("m",function(){
+				if(this.showform){
+					App.updateUniform();
+				}
+			},{
+				deep:true
+			});
 		},
 		methods:{
 			openForm:function(){

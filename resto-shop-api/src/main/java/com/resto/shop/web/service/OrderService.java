@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
@@ -103,5 +104,11 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param currentShopId
 	 */
 	public void updateDistributionMode(Integer modeId, String orderId);
+
+	/**
+	 * 清除所有订单状态信息
+	 * @param currentShopId
+	 */
+	public void clearNumber(String currentShopId);
 
 }

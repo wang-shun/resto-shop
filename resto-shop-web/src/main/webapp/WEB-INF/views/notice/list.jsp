@@ -26,7 +26,7 @@
 							    </div>
 							</div>
 			           		<div class="form-group">
-			           			<label class="col-sm-3 control-label">排序方式：</label>
+			           			<label class="col-sm-3 control-label">排序：</label>
 							    <div class="col-sm-8">
 									<input type="text" class="form-control" required  name="sort" v-model="m.sort">
 							    </div>
@@ -34,11 +34,14 @@
 							
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">选择通知状态：</label>
-							    <div class="col-sm-8"> 
-									<input type="radio" name="status" v-model="m.status" value=0 checked="checked">
-									<label for="status">禁用</label>
-									<input type="radio" name="status" v-model="m.status" value=1>
-									<label for="status">启用</label>
+							    <div class="col-sm-8 radio-list"> 
+									<label class="radio-inline">
+										<input type="radio" name="status" v-model="m.status" value=0 >
+										禁用
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="status" v-model="m.status" value=1>
+									启用</label>
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -51,11 +54,13 @@
 							</div>
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">选择通知类型：</label>
-							    <div class="col-sm-8">
-									<input type="radio" name="noticeType" v-model="m.noticeType" value=1 checked="checked">
-									<label for="noticeType">普通</label>
-									<input type="radio" name="noticeType" v-model="m.noticeType" value=2>
-									<label for="noticeType">注册提醒</label>
+							    <div class="col-sm-8 radio-list">
+									<label class="radio-inline">
+										<input type="radio" name="noticeType" v-model="m.noticeType" value="1">普通
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="noticeType" v-model="m.noticeType" value="2">注册提醒
+									</label>
 									
 							    </div>
 							</div>
@@ -117,10 +122,11 @@
 					title : "排序方式",
 					data : "sort",
 				},                 
-				{                 
-					title : "通知状态",
-					data : "status",
-				},                 
+// 				{                 
+// 					title : "通知状态",
+// 					data : "status",
+					
+// 				},                 
 				{                 
 					title : "图片",
 					data : "noticeImage",
@@ -128,6 +134,13 @@
 				{                 
 					title : "通知类型",
 					data : "noticeType",
+					createdCell:function(td,data){
+						var text = {
+							1:"普通通知",
+							2:"注册通知"
+						}
+						$(td).html(text[data]);
+					}
 				},
 				{
 					title : "操作",

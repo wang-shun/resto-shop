@@ -16,12 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderService;
-import com.resto.shop.web.util.DateUtil;
 
 
 /**
@@ -155,6 +155,13 @@ public class OrderProductionStateContainer {
 
 	public void removePushOrder(Order order) {
 		getOrderMap(PUSH_ORDER_MAP, order.getShopDetailId()).remove(order.getId());
+	}
+
+	public void clearMap(String currentShopId) {
+		PUSH_ORDER_MAP.remove(currentShopId);
+		READY_ORDER_MAP.remove(currentShopId);
+		CALL_NOW_MAP.remove(currentShopId);
+		INIT_SHOP.remove(currentShopId);
 	}
 	
 	

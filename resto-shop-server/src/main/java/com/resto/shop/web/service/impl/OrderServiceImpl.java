@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -53,7 +54,6 @@ import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.PrinterService;
 import com.resto.shop.web.service.ShopCartService;
-import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -681,5 +681,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Order order = selectById(orderId);
 		order.setDistributionModeId(modeId);
 		 orderMapper.updateByPrimaryKeySelective(order);
+	}
+
+	@Override
+	public void clearNumber(String currentShopId) {
+		orderProductionStateContainer.clearMap(currentShopId);
+		
 	}
 }

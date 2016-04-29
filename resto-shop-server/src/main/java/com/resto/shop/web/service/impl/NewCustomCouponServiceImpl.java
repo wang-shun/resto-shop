@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.CouponSource;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.model.Coupon;
@@ -13,7 +14,6 @@ import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.NewCustomCouponService;
-import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 

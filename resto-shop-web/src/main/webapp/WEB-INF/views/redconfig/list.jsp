@@ -22,43 +22,45 @@
 		           			<label class="col-sm-3 control-label"><strong>红包提醒备注：</strong></label>
 						    <div class="col-sm-8">
 								<textarea class="form-control" required name="remark" v-model="m.remark"></textarea>
+								<input type="hidden" name="delay" value="900" />
 						    </div>
 						</div>
+<!-- 						<div class="form-group"> -->
+<%-- 		           			<label class="col-sm-3 control-label"><strong>延迟发送时间：</strong></label> --%>
+<!-- 						    <div class="col-sm-8"> -->
+<!-- 						    	<div class="input-group"> -->
+						    		
+<!-- 							    	<input type="number" class="form-control" required min="0" placeholder="" name="delay" v-model="m.delay"/> -->
+<!-- 									<div class="input-group-addon">秒</div> -->
+<!-- 						    	</div> -->
+<!-- 						    </div> -->
+<!-- 						</div> -->
 						<div class="form-group">
-		           			<label class="col-sm-3 control-label"><strong>延迟发送时间：</strong></label>
+		           			<label class="col-sm-3 control-label"><strong>最小比例：</strong></label>
 						    <div class="col-sm-8">
-						    	<div class="input-group">
-							    	<input type="number" class="form-control" required min="0" placeholder="请输入数字！" name="delay" v-model="m.delay"/>
-									<div class="input-group-addon">秒</div>
-						    	</div>
+						    	<input type="text" class="form-control" required min="0" placeholder="" name="minRatio" v-model="m.minRatio"/>
 						    </div>
 						</div>
 						<div class="form-group">
-		           			<label class="col-sm-3 control-label"><strong>单个最小比例：</strong></label>
+		           			<label class="col-sm-3 control-label"><strong>最大比例：</strong></label>
 						    <div class="col-sm-8">
-						    	<input type="text" class="form-control" required min="0" placeholder="请输入数字！" name="minRatio" v-model="m.minRatio"/>
+								<input type="text" class="form-control" required min="0" placeholder="" name="maxRatio" v-model="m.maxRatio">
 						    </div>
 						</div>
 						<div class="form-group">
-		           			<label class="col-sm-3 control-label"><strong>单个最大比例：</strong></label>
-						    <div class="col-sm-8">
-								<input type="text" class="form-control" required min="0" placeholder="请输入数字！" name="maxRatio" v-model="m.maxRatio">
-						    </div>
-						</div>
-						<div class="form-group">
-		           			<label class="col-sm-3 control-label"><strong>单个最大红包：</strong></label>
+		           			<label class="col-sm-3 control-label"><strong>最大红包：</strong></label>
 						    <div class="col-sm-8">
 							    <div class="input-group">
-							    	<input type="text" class="form-control" required min="0" placeholder="请输入数字！" name="maxSingleRed" v-model="m.maxSingleRed">
+							    	<input type="text" class="form-control" required min="0" placeholder="" name="maxSingleRed" v-model="m.maxSingleRed">
 									<div class="input-group-addon"><span class="glyphicon glyphicon-yen" aria-hidden="true"></span></div>
 						    	</div>
 						    </div>
 						</div>
 						<div class="form-group">
-		           			<label class="col-sm-3 control-label"><strong>单个最小红包：</strong></label>
+		           			<label class="col-sm-3 control-label"><strong>最小红包：</strong></label>
 						    <div class="col-sm-8">
 								<div class="input-group">
-							    	<input type="text" class="form-control" required min="0" placeholder="请输入数字！" name="minSignleRed" v-model="m.minSignleRed">
+							    	<input type="text" class="form-control" required min="0" placeholder="" name="minSignleRed" v-model="m.minSignleRed">
 									<div class="input-group-addon"><span class="glyphicon glyphicon-yen" aria-hidden="true"></span></div>
 						    	</div>
 						    </div>
@@ -93,7 +95,7 @@
 <%-- 		           			<label class="col-sm-3 control-label"><strong>最小消费额度：</strong></label> --%>
 <!-- 						    <div class="col-sm-8"> -->
 <!-- 								<div class="input-group"> -->
-<!-- 							    	<input type="number" class="form-control" required min="0" placeholder="请输入数字！" name="minTranslateMoney" v-model="m.minTranslateMoney"> -->
+<!-- 							    	<input type="number" class="form-control" required min="0" placeholder="" name="minTranslateMoney" v-model="m.minTranslateMoney"> -->
 <%-- 									<div class="input-group-addon"><span class="glyphicon glyphicon-yen" aria-hidden="true"></span></div> --%>
 <!-- 						    	</div> -->
 <!-- 						    </div> -->
@@ -165,24 +167,24 @@
 					title : "红包备注",
 					data : "remark",
 				},
+// 				{                 
+// 					title : "发送延迟时间",
+// 					data : "delay",
+// 				},                 
 				{                 
-					title : "发送延迟时间",
-					data : "delay",
-				},                 
-				{                 
-					title : "单个最小比例",
+					title : "最小比例",
 					data : "minRatio",
 				},                 
 				{                 
-					title : "单个最大比例",
+					title : "最大比例",
 					data : "maxRatio",
 				},                 
 				{                 
-					title : "单个最大红包",
+					title : "最大红包",
 					data : "maxSingleRed",
 				},                 
 				{                 
-					title : "最小单个红包",
+					title : "最小红包",
 					data : "minSignleRed",
 				},                 
 				{                 

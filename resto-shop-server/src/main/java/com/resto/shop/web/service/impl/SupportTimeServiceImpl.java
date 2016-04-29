@@ -12,11 +12,11 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.dao.SupportTimeMapper;
 import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.service.FreedayService;
 import com.resto.shop.web.service.SupportTimeService;
-import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 

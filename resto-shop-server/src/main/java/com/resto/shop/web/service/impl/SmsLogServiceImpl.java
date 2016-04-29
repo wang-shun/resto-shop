@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -15,7 +16,6 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.SmsLogService;
-import com.resto.shop.web.util.DateUtil;
 
 import cn.restoplus.rpc.server.RpcService;
 

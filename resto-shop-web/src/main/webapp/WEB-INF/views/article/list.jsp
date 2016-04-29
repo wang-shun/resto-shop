@@ -365,9 +365,6 @@
 					}else{
 						m.supportTimes=[];
 					}
-					Vue.nextTick(function(){
-						App.updateUniform();
-					});
 				},
 				create:function(){
 					this.m= {
