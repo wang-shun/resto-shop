@@ -154,6 +154,9 @@
 									toastr.error("用户名已经存在请重新输入");
 									//disabled="disabled"
 									$("#saveBrandUser").attr("disabled","disabled");
+								}else{
+									$("#saveBrandUser").removeAttr("disabled");
+									
 								}
 								
 							}
