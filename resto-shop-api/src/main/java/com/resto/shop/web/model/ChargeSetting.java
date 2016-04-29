@@ -6,8 +6,6 @@ import java.util.Date;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 public class ChargeSetting {
     private String id;
     
