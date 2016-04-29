@@ -25,5 +25,16 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
 	List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("shopId")String shopId,@Param("dateBegin")Date beginDate, @Param("dateEnd")Date endDate);
+	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("shopId")String shopId,@Param("beginDate")Date beginDate, @Param("endDate")Date endDate);
+	
+	/**
+	 * 根据时间查询  【充值订单 】状态为 1 的信息，用于报表统计时使用
+	 * @param shopId
+	 * @param beginDate
+	 * @param endDate
+	 * @author lmx
+	 * @return
+	 */
+	OrderPaymentItem selectChargeOrderByDate(@Param("shopId")String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);;
+	
 }

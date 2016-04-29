@@ -105,7 +105,8 @@ var tb1 = $("#dayReportTable").DataTable({
 	],
 	fnFooterCallback: function() {
 		if(!isFirst){
-			$("#report-preview > .col-md-4:first").append("---------------------<br/><strong>统计实收："+orderPaymentItemsCount+" </strong><br/>");
+			$("#report-preview > .col-md-4:first").append("---------------------<br/>");
+			$("#report-preview > .col-md-4:first").append("<strong>统计实收："+orderPaymentItemsCount.toFixed(2)+" </strong><br/>");
 			orderPaymentItemsCount = 0 ;//初始化
 		}
 	} 
@@ -133,10 +134,11 @@ var tb2 = $("#articleSaleTable").DataTable({
 	],
 	fnFooterCallback: function() {
 		if(!isFirst){
-			$("#report-preview > .col-md-8:last").append("---------------------<br/><strong>统计实收："+orderArticleItemsCount+"  份</strong><br/>");
+			$("#report-preview > .col-md-8:last").append("---------------------<br/>");
+			$("#report-preview > .col-md-8:last").append("<strong>统计实收："+orderArticleItemsCount.toFixed(2)+"  份</strong><br/>");
 			orderArticleItemsCount = 0;//初始化
 		}
-		isFirst = false;
+		isFirst = false;//用于判断是否为第一次加载
 	} 
 });
 

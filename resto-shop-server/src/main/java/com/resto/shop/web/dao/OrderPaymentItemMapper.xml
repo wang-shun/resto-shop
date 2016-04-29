@@ -59,23 +59,17 @@
   </select>
   
   <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
-  SELECT
-	SUM(pay_value) payValue,
-	payment_mode_id 
-	FROM
-	tb_order_payment_item
-	WHERE
-	order_id IN (
-		SELECT
-			id
-		FROM
-			tb_order o
-		WHERE
-			o.order_state NOT IN (1, 9)
-		AND o.shop_detail_id = #{shopId}
-		AND <![CDATA[ o.create_time>#{dateBegin} AND o.create_time<#{dateEnd}]]>
+  SELECT SUM(pay_value) payValue, payment_mode_id  FROM tb_order_payment_item
+	WHERE order_id IN (
+		SELECT id FROM tb_order o WHERE o.order_state NOT IN (1, 9) AND o.shop_detail_id = #{shopId} 
+		AND <![CDATA[ o.create_time>#{beginDate} AND o.create_time<#{endDate}]]>
 	)
-	GROUP BY
-	payment_mode_id
+	GROUP BY payment_mode_id
+  </select>
+  
+  <!-- 根据时间查询 订单充值记录，用于报表统计时使用 -->
+  <select id="selectChargeOrderByDate" resultType="OrderPaymentItem">
+  	SELECT SUM(charge_money) payValue from tb_charge_order where order_state = 1 and shop_detail_id = #{shopId} and 
+  	<![CDATA[ create_time >= #{beginDate} AND create_time < #{endDate} ]]>
   </select>
 </mapper>

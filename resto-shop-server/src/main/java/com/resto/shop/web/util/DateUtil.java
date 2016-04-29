@@ -272,4 +272,35 @@ public class DateUtil {
 		return hourMin+min;
 	}
 	
+	/**
+	 * 格式化时间，并且返回格式化后的当天开始时间
+	 * 如何传入的值为空，则返回当天的开始时间
+	 * @param date 需要格式化的时间
+	 * @return	返回的时间格式为 yyyy-MM-dd
+	 */
+	public static Date getformatBeginDate(String beginDate){
+		Date date;
+		if(beginDate==null || ("").equals(beginDate.trim())){
+			date = getDateBegin(new Date());
+		}else{
+			date = getDateBegin(DateUtil.fomatDate(beginDate));
+		}
+		return date;
+	}
+	
+	/**
+	 * 格式化时间，并且返回格式化后的当天的结束时间
+	 * 如何传入的值为空，则返回当天的结束时间
+	 * @param date 需要格式化的时间
+	 * @return	返回的时间格式为 yyyy-MM-dd
+	 */
+	public static Date getformatEndDate(String endDate){
+		Date date;
+		if(endDate==null || ("").equals(endDate.trim())){
+			date = getDateBegin(new Date());
+		}else{
+			date = getDateBegin(DateUtil.fomatDate(endDate));
+		}
+		return date;
+	}
 }
