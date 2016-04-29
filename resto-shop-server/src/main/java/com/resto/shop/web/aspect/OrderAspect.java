@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -72,7 +73,7 @@ public class OrderAspect {
 			order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
 		}
 		msg.append("取餐店铺："+order.getShopName()+"\n");
-		msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")+"\n");
+		msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
 		msg.append("订单明细：\n");
 		List<OrderItem> orderItem  = orderItemService.selectOrderArticleList(order.getId());
 		for(OrderItem item : orderItem){
@@ -81,7 +82,7 @@ public class OrderAspect {
 		msg.append("订单金额："+order.getOrderMoney()+"\n");
 		try {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
-			log.info("订单支付完成后，发送客服消息:"+result);
+			log.info("订单支付完成后，发送客服消息:"+order.getId()+" -- "+result);
 		} catch (Exception e) {
 			log.error("发送客服消息失败:"+e.getMessage());
 		}
@@ -113,10 +114,18 @@ public class OrderAspect {
 				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
-				log.info("打印成功后，发送自动确认订单通知！");
-				if(order.getOrderMode()==1||order.getOrderMode()==2){
-					sendVerCodeMsg(order);
+				if(order.getOrderMode()!=null){
+					switch (order.getOrderMode()) {
+					case ShopMode.CALL_NUMBER:
+						log.info("叫号模式,发送取餐码信息:"+order.getId());
+						sendVerCodeMsg(order);
+						break;
+					default:
+						break;
+					}
 				}
+				
+				log.info("打印成功后，发送自动确认订单通知！");
 				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}
@@ -145,7 +154,7 @@ public class OrderAspect {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
 		StringBuffer msg = new StringBuffer();
-		msg.append("取餐码:"+order.getVerCode()+"\n");
+		msg.append("交易码:"+order.getVerCode()+"\n");
 		msg.append("请留意餐厅叫号信息");
 		String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 		log.info("发送取餐信息成功:"+result);
