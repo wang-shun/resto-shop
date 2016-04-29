@@ -65,7 +65,6 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		ChargeOrder chargeOrder = selectById(cp.getChargeOrderId());
 		if (chargeOrder != null && chargeOrder.getOrderState() == 0) {
 			log.info("充值金额成功chargeId:"+chargeOrder.getId()+" paymentId:"+cp.getId());
-			chargePaymentService.insert(cp);
 			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 			BigDecimal chargeMoney = chargeOrder.getChargeMoney();
 			BigDecimal reward = chargeOrder.getRewardMoney();
@@ -75,6 +74,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			// 添加充值记录
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
+			chargePaymentService.insert(cp);
 			update(chargeOrder);// 只能更新状态和结束时间
 		}
 

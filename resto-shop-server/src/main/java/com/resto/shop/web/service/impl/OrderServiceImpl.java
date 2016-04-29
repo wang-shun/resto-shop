@@ -461,7 +461,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				data.put("DISTRIBUTION_MODE",modeText);
 				data.put("TABLE_NUMBER", tableNumber);
 				data.put("ORDER_ID", serialNumber);
-				data.put("DATE",DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
+				data.put("DATE",DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
 				data.put("ITEMS", items);
 				//保存打印配置信息
 				Map<String,Object> print = new HashMap<String,Object>();
