@@ -643,6 +643,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
 	public List<Map<String, Object>> printOrderAll(String orderId) {
+		log.info("打印订单全部:"+orderId);
 		Order order = selectById(orderId);
 		ShopDetail shop= shopDetailService.selectById(order.getShopDetailId());
 		List<OrderItem> items = orderItemService.selectOrderArticleList(orderId);
