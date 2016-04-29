@@ -42,6 +42,7 @@ public class BrandSettingController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid BrandSetting brandSetting){
+		
 		brandSettingService.update(brandSetting);
 		return Result.getSuccess();
 	}

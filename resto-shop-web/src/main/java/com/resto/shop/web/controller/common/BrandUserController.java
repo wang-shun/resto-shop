@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.common;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -133,8 +134,18 @@ public class BrandUserController extends GenericController{
 	@RequestMapping("/create")
 	@ResponseBody
 	public Result create(@Valid BrandUser brandUser){
+		brandUser.setBrandId(getCurrentBrandId());
 		brandUserService.creatBrandUser(brandUser);
 		return Result.getSuccess();
 	}
+	
+	
+	@RequestMapping("/checkusername")
+	@ResponseBody
+	public Result checkUserName(String userName){
+		BrandUser user = brandUserService.selectByUsername(userName);
+		return  getSuccessResult(user);
+	}
+	
 
 }

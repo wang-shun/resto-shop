@@ -15,46 +15,37 @@
 						<div class="form-body">
 							<div class="form-group">
 						    <label>用户名</label>
-						    <input type="text" class="form-control" name="username" v-model="m.username">
+						    <input type="text" class="form-control" name="username" v-model="m.username" @blur="checkname(m.username)" required="required">
 						</div>
 						<div class="form-group">
 						    <label>密码</label>
-						    <input type="password" class="form-control" name="password" v-model="m.password">
+						    <input type="password" class="form-control" name="password" v-model="m.password" required="required">
 						</div>
 						
-						<%-- <div class="form-group">
-			           			<label class="col-sm-3 control-label">打印机名称：</label>
-							    <div class="col-sm-8">
-						    		<select class="form-control" name="printerId" required v-if="printerList" v-model="m.printerId?m.printerId:selected">
-						    			<option v-for="temp in printerList" v-bind:value="temp.id">
-						    				{{ temp.name }}
-						    			</option>
-						    		</select>
-						    		<input class="form-control" value="暂无可用打印机" disabled="disabled" v-else />
-							    </div>
-							</div> --%>
-						
 						<div class="form-group">
-							<div label for="shopName" class="control-label">选择店铺</div>
+							<div label for="shopDetailId" class="control-label">选择店铺</div>
 							<div>
-								<select class="form-control" name="shopName" v-if="shops">
+								<select class="form-control" name="shopDetailId" :value="shop.id">
 									<option v-for="shop in  shops" :value="shop.id">
-										{{shop.name}}</option>
+										{{shop.name}}
+									</option>
 								</select>
 							</div>
 						</div>
+						
 						<div class="form-group">
-							<div label for="roleName" class="control-label">选择角色</div>
+							<div label for="roleId" class="control-label">选择角色</div>
 							<div>
-								<select class="form-control" name="roleName">
+								<select class="form-control" name="roleId" :value="role.id">
 									<option v-for="role in  roles" :value="role.id">
-										{{role.name}}</option>
+										{{role.name}}
+									</option>
 								</select>
 							</div>
 						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
+						<input class="btn green"  type="submit"  value="保存" id="saveBrandUser" >
 						<a class="btn default" @click="cancel" >取消</a>
 					</form>
 	            </div>
@@ -100,35 +91,15 @@
 				data : "roleName",
 			}, 
 			
-				{
-					title : "操作",
-					data : "id",
-					createdCell:function(td,tdData,rowData,row){
-						var operator=[
-							<s:hasPermission name="account/delete">
-							C.createDelBtn(tdData,"account/delete"),
-							</s:hasPermission>
-							<s:hasPermission name="account/edit">
-							C.createEditBtn(rowData),
-							</s:hasPermission>
-						];
-						$(td).html(operator);
-					}
-				}
-			
 			],
 		});
 		
-		
- 		/* var C = new Controller(cid,tb);
- 		var vueObj = C.vueObj(); */
-
 	 var C = new Controller(null,tb);
 		 var vueObj = new Vue({
 			el:"#control",
 			data:{
-				shops:[],
-				roles:[],
+				shops:{},
+				roles:{},
 			},
 			mixins:[C.formVueMix],
 			methods:{
@@ -136,25 +107,21 @@
 					this.m={};
 					this.openForm();
 					Vue.nextTick(function(){
-						 alert();
 						vueObj.initShopName();
 						vueObj.initRoleName();
 					}) 
 				}, 
 				initShopName:function(){
 					$.ajax({
-						//url:"usergroup/list_all",
 						url:"shopDetail/list_all",
 						success:function(result){
-							console.log(result)
 							if(result.success==true){
 								var data = result.data;
-								var shops = [];
+								var temps=[];
 								for(var i=0;i<data.length;i++){
-									shops[i]={"id":data[i].id,"name":data[i].name};
+									temps[i]={"id":data[i].id,"name":data[i].name};
 								}
-// 								vueObj.$set("shops",shops);
-								vueObj.shops = shops;
+ 								vueObj.$set("shops",temps);
 							}
 						}
 					});
@@ -165,15 +132,33 @@
 						success:function(result){
 							if(result.success==true){
 								var data = result.data;
-								var roles = [];
+								var temps = [];
 								for(var i=0;i<data.length;i++){
-									roles[i]={"id":data[i].id,"name":data[i].roleName}
+									temps[i]={"id":data[i].id,"name":data[i].roleName}
 								}
-								vueObj.$set("roles",roles)
+								vueObj.$set("roles",temps);
 							}
 						}
 						
 					});
+				},
+				
+				checkname:function(username){
+					Vue.nextTick(function(){
+						$.ajax({
+							url:"branduser/checkusername",
+							data:{"userName":username},
+							success:function(result){
+								if(result.data!=null){
+									toastr.clear();
+									toastr.error("用户名已经存在请重新输入");
+									//disabled="disabled"
+									$("#saveBrandUser").attr("disabled","disabled");
+								}
+								
+							}
+						})
+					}) 
 				}
 			}
 			
