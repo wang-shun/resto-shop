@@ -688,4 +688,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		orderProductionStateContainer.clearMap(currentShopId);
 		
 	}
+
+	@Override
+	public List<Order> listOrderByStatus(String currentShopId, Date begin, Date end, int[] productionStatus,
+			int[] orderState) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
