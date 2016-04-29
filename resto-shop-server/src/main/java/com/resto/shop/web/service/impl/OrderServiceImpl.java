@@ -549,8 +549,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
 		data.put("RESTAURANT_TEL", shopDetail.getPhone());
 		data.put("TABLE_NUMBER", order.getTableNumber());
-		data.put("ORDER_ID", order.getSerialNumber());
-		data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm"));
+		data.put("ORDER_ID", order.getSerialNumber()+"-"+order.getVerCode());
+		data.put("DATE", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
 		data.put("ITEMS", items);
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
