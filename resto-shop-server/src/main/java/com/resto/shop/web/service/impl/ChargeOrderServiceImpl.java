@@ -64,6 +64,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public void chargeorderWxPaySuccess(ChargePayment cp) {
 		ChargeOrder chargeOrder = selectById(cp.getChargeOrderId());
 		if (chargeOrder != null && chargeOrder.getOrderState() == 0) {
+			log.info("充值金额成功chargeId:"+chargeOrder.getId()+" paymentId:"+cp.getId());
 			chargePaymentService.insert(cp);
 			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 			BigDecimal chargeMoney = chargeOrder.getChargeMoney();
