@@ -616,11 +616,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public boolean cancelOrderPos(String orderId) {
+	public Order cancelOrderPos(String orderId) throws AppException {
 		Order order = selectById(orderId);
 		if(order.getClosed()){
-			log.info("该订单已经是取消状态");
-			return false;
+			throw new AppException(AppException.ORDER_IS_CLOSED);
 		}else{
 			order.setClosed(true);
 			order.setOrderState(OrderState.CANCEL);
@@ -628,8 +627,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			refundOrder(order);
 			log.info("取消订单成功:" + order.getId());
 			orderProductionStateContainer.removePushOrder(order);
-			return true;
 		}
+		return order;
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopMode;
@@ -147,6 +148,21 @@ public class OrderAspect {
 			
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+msg+result);
+		}
+	}
+	
+	@Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
+	public void cancelOrderPos(){};
+	
+	@AfterReturning(value="cancelOrderPos()",returning="order")
+	public void cancelOrderPosAfter(Order order){
+		if(order!=null){
+			Customer customer = customerService.selectById(order.getCustomerId());
+			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+			StringBuffer msg = new StringBuffer();
+			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消");
+			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+			log.info("发送订单取消通知成功:"+msg+result);
 		}
 	}
 	

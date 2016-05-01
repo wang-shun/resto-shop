@@ -1,5 +1,7 @@
 package com.resto.shop.web.exception;
 
+import com.resto.shop.web.exception.AppException.ErrorMsg;
+
 public class AppException extends Exception{
 	/**
 	 * 
@@ -20,6 +22,7 @@ public class AppException extends Exception{
 	public static final ErrorMsg ORDER_MODE_CHECK = new ErrorMsg(12, "");
 	public static final ErrorMsg ORDER_NOT_ALL_APPRAISE = new ErrorMsg(13, "该订单不允许评论");
 	public static final ErrorMsg PHONE_IS_BIND = new ErrorMsg(14, "该手机号已被绑定！");
+	public static final ErrorMsg ORDER_IS_CLOSED = new ErrorMsg(15, "订单已经被取消!");
 	
 	
 	public AppException(ErrorMsg msg) {
