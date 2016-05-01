@@ -475,6 +475,27 @@
 		order by push_order_time DESC;
   </select>
   
+  <select id="listOrderByStatus" resultType="Order">
+  	SELECT
+		push_order_time,
+		id,
+		ver_code,
+		article_count
+		FROM
+		tb_order 
+		WHERE
+		shop_detail_id=#{shopId}
+		AND
+		<![CDATA[ create_time>=#{begin} AND create_time<=#{end}]]>
+		and order_state in <foreach collection="o_state" open="(" close=")" separator="," item="orderState">
+			#{orderState}
+		</foreach>
+		and production_status in <foreach collection="p_status" open="(" close=")" separator=","  item="productionStatus">
+			#{productionStatus}
+		</foreach>
+		order by create_time DESC;
+  </select>
+  
   <update id="clearPushOrder" >
   	update tb_order set push_order_time=(NULL),production_status =#{1} where id=#{0} 
   </update>

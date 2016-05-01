@@ -83,5 +83,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectOrderByTableNumber(@Param("tableNumber")String tableNumber,@Param("shopId")String shopId);
+
+	List<Order> listOrderByStatus(@Param("shopId")String currentShopId,@Param("begin") Date begin, 
+			@Param("end")Date end, @Param("p_status")int[] productionStatus, 
+			@Param("o_state")int[] orderState);
 	
 }

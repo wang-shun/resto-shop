@@ -688,7 +688,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public List<Order> listOrderByStatus(String currentShopId, Date begin, Date end, int[] productionStatus,
 			int[] orderState) {
-		// TODO Auto-generated method stub
-		return null;
+		return orderMapper.listOrderByStatus(currentShopId,begin,end,productionStatus,orderState);
 	}
 }

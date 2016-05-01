@@ -59,7 +59,7 @@ public class OrderAspect {
 	public void createOrderAround(Order order) throws Throwable{
 		shopCartService.clearShopCart(order.getCustomerId(),order.getDistributionModeId(),order.getShopDetailId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
-			long delay = 1000*60*5;//
+			long delay = 1000*60*15;//15分钟后自动取消订单
 			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
 		}else if(order.getOrderState().equals((OrderState.PAYMENT))){
 			sendPaySuccessMsg(order);
