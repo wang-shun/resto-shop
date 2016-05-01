@@ -319,11 +319,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order orderWxPaySuccess(OrderPaymentItem item) {
 		Order order = selectById(item.getOrderId());
-		if (order.getOrderState().equals(OrderState.SUBMIT)) {
-			orderPaymentItemService.insert(item);
-			return payOrderSuccess(order);
-		}
-		return null;
+		orderPaymentItemService.insert(item);
+		return payOrderSuccess(order);
 	}
 
 	@Override
