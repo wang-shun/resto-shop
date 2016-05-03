@@ -11,18 +11,32 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'mealtemp/modify':'mealtemp/create'}}" @submit.prevent="save">
+	            	<form role="form" class="form-horizontal" action="{{m.id?'mealtemp/modify':'mealtemp/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>brandId</label>
-    <input type="text" class="form-control" name="brandId" v-model="m.brandId">
-</div>
-
+							    <label class="col-md-2 control-label">模板名称</label>
+							    <div class="col-md-10">
+							    	<input type="text" class="form-control" v-model="m.name">
+							    </div>
+							</div>
+							<div class="form-group" v-for="attr in m.attrs">
+								<label class="col-md-2 control-label">套餐项{{$index+1}}:</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" v-model="attr.name" required>
+								</div>
+								<label class="col-md-2 control-label">排序：</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" v-model="attr.sort">
+								</div>
+								<div class="col-md-2">
+									<a class="btn red btn-block" @click="removeAttr(attr)">移除</a>
+								</div>
+							</div>
+							<div class="form-group">
+						  		<a class="btn blue btn-block" @click="addAttr">添加套餐项</a>
+							</div>
 						</div>
+						
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
 						<a class="btn default" @click="cancel" >取消</a>
@@ -58,13 +72,21 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "brandId",
-	data : "brandId",
-},                 
+					title : "模板名称",
+					data : "name",
+				},                 
+				{                 
+					title : "模板项",
+					data : "attrs",
+					defaultContent:"",
+					createdCell:function(td,tdData){
+						$(td).html('');
+						for(var i in tdData){
+							var span = $("<span class='btn blue btn-xs'></span>");
+							$(td).append(span.html(tdData[i].name));
+						}
+					}
+				},                 
 
 				{
 					title : "操作",
@@ -83,8 +105,55 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			methods:{
+				removeAttr:function(attr){
+					this.m.attrs.$remove(attr);
+				},
+				edit:function(model){
+					var that = this;
+					$.post("mealtemp/list_one_full",{id:model.id},function(result){
+						that.m = result.data;
+						that.showform=true;
+					});
+				},
+				addAttr:function(){
+					if(!this.m.attrs){
+						this.$set("m.attrs",[]);
+					}
+					this.m.attrs.push({name:"",sort:this.m.attrs.length+1});
+				},
+				save:function(e){
+					var action = $(e.target).attr("action");
+					var jsondata = JSON.stringify(this.m);
+					var that = this;
+					$.ajax({
+						contentType : "application/json",
+						type : "post",
+						url : action,
+						data:jsondata,
+						success:function(result){
+							if(result.success){
+								that.showform=false;
+								that.m={};
+								C.simpleMsg("保存成功");
+								tb.ajax.reload();
+							}else{
+								C.errorMsg(result.message);
+							}
+						},
+						error:function(xhr,msg,e){
+							var errorText = xhr.status+" "+xhr.statusText+":"+action;
+							C.errorMsg(errorText);
+						}
+					});
+				}
+			}
+		});
+		C.vue=vueObj;
 	}());
 	
 	

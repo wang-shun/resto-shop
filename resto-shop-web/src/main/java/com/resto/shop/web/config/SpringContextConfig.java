@@ -205,6 +205,16 @@ public class SpringContextConfig {
 		return getProxy(BrandSettingService.class);
 	}
 	
+	@Bean 
+	public MealTempService mealTempService(){
+		return getProxy(MealTempService.class);
+	}
+	
+	@Bean 
+	public MealTempAttrService mealTempAttrService(){
+		return getProxy(MealTempAttrService.class);
+	}
+	
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}

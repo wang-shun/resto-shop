@@ -13,7 +13,8 @@
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from tb_meal_temp where id = #{id,jdbcType=INTEGER}</delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.MealTemp">insert into tb_meal_temp (id, name, brand_id ) values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR} )</insert>
-  <insert id="insertSelective" parameterType="com.resto.shop.web.model.MealTemp">insert into tb_meal_temp 
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.MealTemp"  useGeneratedKeys="true" keyProperty="id" >
+  	insert into tb_meal_temp 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
       <if test="name != null">name,</if>  
@@ -32,5 +33,12 @@
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.MealTemp">update tb_meal_temp set name = #{name,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
-  <select id="selectList" resultType="MealTemp">select * from tb_meal_temp</select>
+  <select id="selectList" resultType="MealTemp">select * from tb_meal_temp
+  	<where>
+	  	<if test="brandId!=null and brandId!=''">
+	  		brand_id=#{brandId}
+	  	</if>
+  	</where>
+  </select>
+  
 </mapper>

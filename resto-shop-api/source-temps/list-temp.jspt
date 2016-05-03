@@ -67,8 +67,12 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix]
+		});
+		C.vue=vueObj;
 	}());
 	
 	

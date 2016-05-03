@@ -1,6 +1,11 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.MealTempAttr;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 
 public interface MealTempAttrMapper  extends GenericDao<MealTempAttr,Integer> {
@@ -15,4 +20,10 @@ public interface MealTempAttrMapper  extends GenericDao<MealTempAttr,Integer> {
     int updateByPrimaryKeySelective(MealTempAttr record);
 
     int updateByPrimaryKey(MealTempAttr record);
+
+	void deleteByTempId(Integer tempId);
+
+	void insertBatch(@Param("attrs") List<MealTempAttr> attrs, @Param("tempId")Integer mealTempId);
+
+	List<MealTempAttr> selectByTempId(Integer id);
 }

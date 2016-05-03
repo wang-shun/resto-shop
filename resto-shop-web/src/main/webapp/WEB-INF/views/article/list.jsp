@@ -292,16 +292,6 @@
 						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
 					}
 				},                 
-// 				{                 
-// 					title : "餐品描述",
-// 					data : "description",
-// 					createdCell:function(td,tdData){
-// 						if(tdData.length>10){
-// 							tdData = tdData.substring(0,10);
-// 							$(td).html(tdData+"...");
-// 						}
-// 					}
-// 				},                 
 				{                 
 					title : "餐品排序",
 					data : "sort",
@@ -416,6 +406,34 @@
 				},
 				changeColor:function(val){
 					$(".color-mini").minicolors("value",val);
+				},
+				save:function(e){
+					var that = this;
+					var action = $(e.target).attr("action");
+					this.m.articlePrices = this.unitPrices;
+					this.m.hasUnit = this.checkedUnit.join()||" ";
+					var jsonData =JSON.stringify(this.m);
+					$.ajax({
+						contentType : "application/json",
+						type : "post",
+						url : action,
+						data:jsonData,
+						success:function(result){
+							if(result.success){
+								that.showform=false;
+								that.m={};
+								C.simpleMsg("保存成功");
+								tb.ajax.reload();
+							}else{
+								C.errorMsg(result.message);
+							}
+						},
+						error:function(xhr,msg,e){
+							var errorText = xhr.status+" "+xhr.statusText+":"+action;
+							C.errorMsg(errorText);
+						}
+					});
+					console.log(action,jsonData);
 				}
 			},
 			computed:{

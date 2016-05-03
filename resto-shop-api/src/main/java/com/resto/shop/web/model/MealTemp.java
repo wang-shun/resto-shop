@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import java.util.List;
+
 public class MealTemp {
     private Integer id;
 
@@ -7,6 +9,8 @@ public class MealTemp {
 
     private String brandId;
 
+    private List<MealTempAttr> attrs;
+    
     public Integer getId() {
         return id;
     }
@@ -30,4 +34,12 @@ public class MealTemp {
     public void setBrandId(String brandId) {
         this.brandId = brandId == null ? null : brandId.trim();
     }
+
+	public List<MealTempAttr> getAttrs() {
+		return attrs;
+	}
+
+	public void setAttrs(List<MealTempAttr> attrs) {
+		this.attrs = attrs;
+	}
 }

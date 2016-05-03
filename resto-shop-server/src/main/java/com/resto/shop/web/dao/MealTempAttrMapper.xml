@@ -37,4 +37,18 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.MealTempAttr">update tb_meal_temp_attr set name = #{name,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, meal_temp_id = #{mealTempId,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="MealTempAttr">select * from tb_meal_temp_attr</select>
+  <delete id="deleteByTempId">
+  	delete from tb_meal_temp_attr where meal_temp_id=#{0}
+  </delete>
+  
+   <select id="selectByTempId" resultType="MealTempAttr">
+  	select * from tb_meal_temp_attr where meal_temp_id=#{0}
+  </select>
+  
+  <insert id="insertBatch">
+  	 insert into tb_meal_temp_attr (name, sort, meal_temp_id) values 
+  	 <foreach collection="attrs" separator="," item="attr">
+  	 	(#{attr.name},#{attr.sort},#{tempId})
+  	 </foreach>
+  </insert>
 </mapper>

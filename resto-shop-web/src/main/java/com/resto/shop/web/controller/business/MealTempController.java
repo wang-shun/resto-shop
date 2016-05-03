@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,7 +29,7 @@ public class MealTempController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<MealTemp> listData(){
-		return mealtempService.selectList();
+		return mealtempService.selectList(getCurrentBrandId());
 	}
 	
 	@RequestMapping("list_one")
@@ -37,18 +38,26 @@ public class MealTempController extends GenericController{
 		MealTemp mealtemp = mealtempService.selectById(id);
 		return getSuccessResult(mealtemp);
 	}
+	@RequestMapping("list_one_full")
+	@ResponseBody
+	public Result listonefull(Integer id){
+		MealTemp temp = mealtempService.selectFull(id);
+		return getSuccessResult(temp);
+	}
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid MealTemp brand){
-		mealtempService.insert(brand);
+	public Result create(@Valid @RequestBody MealTemp mealTemp){
+		mealTemp.setBrandId(getCurrentBrandId());
+		mealtempService.create(mealTemp);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid MealTemp brand){
-		mealtempService.update(brand);
+	public Result modify(@Valid @RequestBody MealTemp mealTemp){
+		mealTemp.setBrandId(getCurrentBrandId());
+		mealtempService.update(mealTemp);
 		return Result.getSuccess();
 	}
 	
