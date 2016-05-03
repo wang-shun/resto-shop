@@ -145,13 +145,18 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			if(articleId.contains("@")){
 				articleId = articleId.split("@")[0];
 			}
-			pic = articleService.selectById(articleId).getPhotoSmall();
+			Article article = articleService.selectById(articleId);
+			if(article!=null){
+				pic = article.getPhotoSmall();
+			}
 			break;
 		case 2:
 			if(StringUtils.isNumeric(appraise.getArticleId())){
 				Integer showPhotoId = Integer.parseInt(appraise.getArticleId());
 				ShowPhoto showPhoto = showPhotoService.selectById(showPhotoId);
-				pic = showPhoto.getPicUrl();
+				if(showPhoto!=null){
+					pic = showPhoto.getPicUrl();
+				}
 			}
 			break;
 		default:
