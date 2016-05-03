@@ -18,32 +18,22 @@
 								<label>店铺名称</label> 
 								<input type="text" class="form-control" name="name" :value="m.name" placeholder="必填" required="required">
 							</div>
-							
-							<div class="form-group">
-								<label>店铺描述</label> 
-								<input type="text" class="form-control" name="remark" :value="m.remark">
-							</div>
-							
 							<div class="form-group">
 								<label>店铺电话</label> 
 								<input type="text" class="form-control" name="phone" :value="m.phone">
 							</div>
-							
 							<div class="form-group">
 								<label>店铺地址</label> 
 								<input type="text" class="form-control" name="address" :value="m.address" @blur="showjwd" placeholder="必填" required="required">
 							</div>
-							
 							<div class="form-group">
 								<label>经度</label> 
 								<input type="text" class="form-control" name="longitude" :value="m.longitude">
 							</div>
 							<div class="form-group">
 								<label>纬度</label> 
-								
 								<input type="text" class="form-control" name="latitude" :value="m.latitude">
 							</div>
-							
 							<div class="form-group">
                                        <labe>营业时间</label>
                                           <div class="input-group">
@@ -55,7 +45,6 @@
                                         </span>
                                     </div>
                             </div>
-                            
 							<div class="form-group">
                                        <labe>关门时间</label>
                                           <div class="input-group">
