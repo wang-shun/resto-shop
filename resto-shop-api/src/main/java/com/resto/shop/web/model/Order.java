@@ -82,6 +82,12 @@ public class Order {
     
     private String brandId;
     
+    private BigDecimal amountWithChildren;
+
+    private String parentOrderId;
+
+    private Boolean allowContinueOrder;
+    
     private Customer customer;
     
      /**
@@ -397,5 +403,29 @@ public class Order {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public BigDecimal getAmountWithChildren() {
+		return amountWithChildren;
+	}
+
+	public String getParentOrderId() {
+		return parentOrderId;
+	}
+
+	public Boolean getAllowContinueOrder() {
+		return allowContinueOrder;
+	}
+
+	public void setAmountWithChildren(BigDecimal amountWithChildren) {
+		this.amountWithChildren = amountWithChildren;
+	}
+
+	public void setParentOrderId(String parentOrderId) {
+		this.parentOrderId = parentOrderId;
+	}
+
+	public void setAllowContinueOrder(Boolean allowContinueOrder) {
+		this.allowContinueOrder = allowContinueOrder;
 	}
 }

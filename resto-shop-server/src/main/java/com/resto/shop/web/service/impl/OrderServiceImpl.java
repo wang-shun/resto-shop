@@ -260,6 +260,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
+	private void updateParentAmount(String orderId) {
+		Double money = orderMapper.selectParentAmount(orderId);
+		orderMapper.updateParentAmount(orderId,money);
+	}
+
 	@Override
 	public Order findCustomerNewOrder(String customerId, String shopId, String orderId) {
 		Date beginDate = DateUtil.getDateBegin(new Date());
@@ -370,6 +375,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public Order printSuccess(String orderId) {
 		Order order = selectById(orderId);
 		if (order.getPrintOrderTime() == null) {
+			if(order.getParentOrderId()==null){
+				order.setAllowContinueOrder(true);
+			}else{
+				order.setAllowContinueOrder(false);
+				updateParentAmount(order.getParentOrderId());
+			}
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
 			if(order.getOrderMode()==3){

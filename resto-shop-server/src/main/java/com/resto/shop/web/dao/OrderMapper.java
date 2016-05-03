@@ -87,5 +87,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> listOrderByStatus(@Param("shopId")String currentShopId,@Param("begin") Date begin, 
 			@Param("end")Date end, @Param("p_status")int[] productionStatus, 
 			@Param("o_state")int[] orderState);
+
+	void updateParentAmount(String orderId, Double money);
+
+	Double selectParentAmount(String orderId);
 	
 }

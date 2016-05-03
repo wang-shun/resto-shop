@@ -35,17 +35,17 @@
     <result column="call_number_time" property="callNumberTime" jdbcType="TIMESTAMP" />
     <result column="order_mode" property="orderMode" jdbcType="INTEGER" />
     <result column="brand_id" property="brandId" jdbcType="VARCHAR" />
+    <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL" />
+    <result column="parent_order_id" property="parentOrderId" jdbcType="VARCHAR" />
+    <result column="allow_continue_order" property="allowContinueOrder" jdbcType="BIT" />
   </resultMap>
-  
-  
-  
   <sql id="Base_Column_List" >
     id, table_number, customer_count, accounting_time, order_state, production_status, 
     original_amount, reduction_amount, payment_amount, order_money, article_count, serial_number, 
     confirm_time, print_times, allow_cancel, allow_appraise, closed, remark, create_time, 
     operator_id, customer_id, distribution_date, distribution_time_id, delivery_point_id, 
     shop_detail_id, distribution_mode_id, ver_code, push_order_time, print_order_time, 
-    call_number_time, order_mode, brand_id
+    call_number_time, order_mode, brand_id, amount_with_children, parent_order_id, allow_continue_order
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -68,7 +68,8 @@
       distribution_date, distribution_time_id, delivery_point_id, 
       shop_detail_id, distribution_mode_id, ver_code, 
       push_order_time, print_order_time, call_number_time, 
-      order_mode, brand_id)
+      order_mode, brand_id, amount_with_children, 
+      parent_order_id, allow_continue_order)
     values (#{id,jdbcType=VARCHAR}, #{tableNumber,jdbcType=VARCHAR}, #{customerCount,jdbcType=INTEGER}, 
       #{accountingTime,jdbcType=DATE}, #{orderState,jdbcType=INTEGER}, #{productionStatus,jdbcType=INTEGER}, 
       #{originalAmount,jdbcType=DECIMAL}, #{reductionAmount,jdbcType=DECIMAL}, #{paymentAmount,jdbcType=DECIMAL}, 
@@ -79,7 +80,8 @@
       #{distributionDate,jdbcType=DATE}, #{distributionTimeId,jdbcType=INTEGER}, #{deliveryPointId,jdbcType=INTEGER}, 
       #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{verCode,jdbcType=VARCHAR}, 
       #{pushOrderTime,jdbcType=TIMESTAMP}, #{printOrderTime,jdbcType=TIMESTAMP}, #{callNumberTime,jdbcType=TIMESTAMP}, 
-      #{orderMode,jdbcType=INTEGER}, #{brandId,jdbcType=VARCHAR})
+      #{orderMode,jdbcType=INTEGER}, #{brandId,jdbcType=VARCHAR}, #{amountWithChildren,jdbcType=DECIMAL}, 
+      #{parentOrderId,jdbcType=VARCHAR}, #{allowContinueOrder,jdbcType=BIT})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order" >
     insert into tb_order
@@ -180,6 +182,15 @@
       <if test="brandId != null" >
         brand_id,
       </if>
+      <if test="amountWithChildren != null" >
+        amount_with_children,
+      </if>
+      <if test="parentOrderId != null" >
+        parent_order_id,
+      </if>
+      <if test="allowContinueOrder != null" >
+        allow_continue_order,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -277,6 +288,15 @@
       </if>
       <if test="brandId != null" >
         #{brandId,jdbcType=VARCHAR},
+      </if>
+      <if test="amountWithChildren != null" >
+        #{amountWithChildren,jdbcType=DECIMAL},
+      </if>
+      <if test="parentOrderId != null" >
+        #{parentOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="allowContinueOrder != null" >
+        #{allowContinueOrder,jdbcType=BIT},
       </if>
     </trim>
   </insert>
@@ -376,6 +396,15 @@
       <if test="brandId != null" >
         brand_id = #{brandId,jdbcType=VARCHAR},
       </if>
+      <if test="amountWithChildren != null" >
+        amount_with_children = #{amountWithChildren,jdbcType=DECIMAL},
+      </if>
+      <if test="parentOrderId != null" >
+        parent_order_id = #{parentOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="allowContinueOrder != null" >
+        allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -411,7 +440,10 @@
       print_order_time = #{printOrderTime,jdbcType=TIMESTAMP},
       call_number_time = #{callNumberTime,jdbcType=TIMESTAMP},
       order_mode = #{orderMode,jdbcType=INTEGER},
-      brand_id = #{brandId,jdbcType=VARCHAR}
+      brand_id = #{brandId,jdbcType=VARCHAR},
+      amount_with_children = #{amountWithChildren,jdbcType=DECIMAL},
+      parent_order_id = #{parentOrderId,jdbcType=VARCHAR},
+      allow_continue_order = #{allowContinueOrder,jdbcType=BIT}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   
@@ -432,7 +464,7 @@
   
   <!-- 根据订单查询 订单状态 和 生产状态 -->
   <select id="selectOrderStatesById" resultType="Order">
-  	SELECT id,order_state,production_status from tb_order where id = #{orderId}
+  	SELECT id,order_state,production_status,allow_continue_order,allow_cancel,allow_appraise from tb_order where id = #{orderId}
   </select>
   
   <!-- 查询  用户的新订单,如果 订单ID有值。则查询订单的详情 -->
@@ -536,6 +568,13 @@
   	 ORDER BY push_order_time DESC
   </select>
   
+  <select id="selectParentAmount" resultType="java.lang.Double">
+  	SELECT SUM(order_money) FROM tb_order WHERE id=#{0} OR parent_order_id=#{0}
+  </select>
+  
+  <update id="updateParentAmount">
+  	UPDATE tb_order SET amount_with_children = #{1} where id=#{0}
+  </update>
 </mapper>
 
 
