@@ -1,24 +1,14 @@
 package com.resto.shop.web.container;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ObjectTranscoder;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Customer;
@@ -46,22 +36,6 @@ public class OrderProductionStateContainer {
 	private static final Jedis redis = new Jedis(IP);
 	
 	
-	static {
-		System.out.println("static");
-		Date date = DateUtil.getDateBegin(new Date());
-	    long daySpan = 24 * 60 * 60 * 1000;
-	    Timer t = new Timer();
-	    t.schedule(new TimerTask() {
-	    	Logger log = LoggerFactory.getLogger(getClass());
-			@Override
-			public void run() {
-				log.info("清理订单容器定时器开始执行，清空所有缓存信息");
-				redis.flushAll();//清空所有的数据
-				log.info("清理订单状态容器成功！");
-			}
-		}, date.getTime(),daySpan);
-	}
-	
 	@Resource
 	OrderService orderService;
 	@Resource
@@ -76,7 +50,7 @@ public class OrderProductionStateContainer {
 		List<Order> orderList = new ArrayList<>();
 		Set<byte[]> orderSet = redis.zrangeByScore(buildPushKey(shopId), lastTime+1, System.currentTimeMillis());
 		Iterator<byte[]> iterator = orderSet.iterator();
-		while (iterator.hasNext()) {  
+		while (iterator.hasNext()) {
 			Order order = (Order)ObjectTranscoder.deserialize(iterator.next());
 			orderList.add(order);
 		}
@@ -88,7 +62,7 @@ public class OrderProductionStateContainer {
 			lastTime = Long.valueOf(0);
 		}
 		List<Order> orderList = new ArrayList<>();
-		Set<byte[]> orderSet = redis.zrangeByScore(buildPushKey(shopId), lastTime+1, System.currentTimeMillis());
+		Set<byte[]> orderSet = redis.zrangeByScore(buildReadyKey(shopId), lastTime+1, System.currentTimeMillis());
 		Iterator<byte[]> iterator = orderSet.iterator();
 		while (iterator.hasNext()) {  
 			Order order = (Order)ObjectTranscoder.deserialize(iterator.next());
@@ -102,7 +76,7 @@ public class OrderProductionStateContainer {
 			lastTime = Long.valueOf(0);
 		}
 		List<Order> orderList = new ArrayList<>();
-		Set<byte[]> orderSet = redis.zrangeByScore(buildPushKey(shopId), lastTime+1, System.currentTimeMillis());
+		Set<byte[]> orderSet = redis.zrangeByScore(buildCallKey(shopId), lastTime+1, System.currentTimeMillis());
 		Iterator<byte[]> iterator = orderSet.iterator();
 		while (iterator.hasNext()) {  
 			Order order = (Order)ObjectTranscoder.deserialize(iterator.next());
@@ -136,6 +110,10 @@ public class OrderProductionStateContainer {
 	}
 
 
+	/**
+	 * 初始化店铺订单信息
+	 * @param shopId
+	 */
 	private void initShop(String shopId) {
 		//判断是否存在
 		if(!redis.hexists(SHOP_INFO, shopId)){
@@ -148,11 +126,18 @@ public class OrderProductionStateContainer {
 	}
 	
 
-	//移除  已下单的订单信息
+	/**
+	 * 移除  已下单的订单信息
+	 * @param order
+	 */
 	public void removePushOrder(Order order) {
 		redis.zrem(buildPushKey(order.getShopDetailId()), ObjectTranscoder.serialize(order));
 	}
 
+	/**
+	 * 删除 指定店铺的 队列 数据
+	 * @param currentShopId
+	 */
 	public static void clearMap(String currentShopId) {
 		redis.del(buildCallKey(currentShopId));
 		redis.del(buildPushKey(currentShopId));
@@ -160,15 +145,29 @@ public class OrderProductionStateContainer {
 		redis.hdel(SHOP_INFO, currentShopId);
 	}
 	
-	//已下单 id
+	/**
+	 * 根据 店铺ID 生成 已下单ID 
+	 * @param shopId
+	 * @return
+	 */
 	public static byte[] buildPushKey(String shopId){
 		return (PUSH_ORDER+"@"+shopId).getBytes();
 	}
-	//准备中 id
+	
+	/**
+	 * 根据 店铺ID 生成 准备中 ID
+	 * @param shopId
+	 * @return
+	 */
 	public static byte[] buildReadyKey(String shopId){
 		return (READY_ORDER+"@"+shopId).getBytes();
 	}
-	//已叫号 id
+	
+	/**
+	 * 根据 店铺ID 生成 已叫号 ID
+	 * @param shopId
+	 * @return
+	 */
 	public static byte[] buildCallKey(String shopId){
 		return (CALL_NOW+"@"+shopId).getBytes();
 	}
