@@ -52,6 +52,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
 	@Override
 	public Article save(Article article) {
+		article.setId(ApplicationUtils.randomUUID());
 		this.insert(article);
 		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());

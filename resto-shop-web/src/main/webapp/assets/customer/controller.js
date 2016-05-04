@@ -455,6 +455,7 @@ var Controller = function(controlId,datatable){
 			});
 			this.$watch("m",function(){
 				if(this.showform){
+					App.initUniform();
 					App.updateUniform();
 				}
 			},{

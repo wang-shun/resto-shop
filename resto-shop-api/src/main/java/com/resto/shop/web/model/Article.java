@@ -10,6 +10,16 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Article {
+	
+	/**
+	 * 单品
+	 */
+	public static final int ARTICLE_TYPE_SIGNLE=1; 
+	/**
+	 * 套餐
+	 */
+	public static final int ARTICLE_TYPE_MEALS=2; 
+	
     private String id;
 
     private String name;
@@ -30,7 +40,7 @@ public class Article {
 
     private Integer sort;
 
-    private Byte activated;
+    private Boolean activated;
 
     private Boolean state;
 
@@ -73,6 +83,8 @@ public class Article {
     private Boolean isRemind;
     
     private String controlColor;
+    
+    private Integer articleType;
     
     public ArticleFamily getArticleFamily() {
 		return articleFamily;
@@ -171,11 +183,11 @@ public class Article {
         this.sort = sort;
     }
 
-    public Byte getActivated() {
+    public Boolean getActivated() {
         return activated;
     }
 
-    public void setActivated(Byte activated) {
+    public void setActivated(Boolean activated) {
         this.activated = activated;
     }
 
@@ -369,6 +381,14 @@ public class Article {
 
 	public void setIsRemind(Boolean isRemind) {
 		this.isRemind = isRemind;
+	}
+
+	public Integer getArticleType() {
+		return articleType;
+	}
+
+	public void setArticleType(Integer articleType) {
+		this.articleType = articleType;
 	}
 	
 	

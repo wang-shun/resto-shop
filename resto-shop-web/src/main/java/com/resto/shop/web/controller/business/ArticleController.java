@@ -1,6 +1,5 @@
  package com.resto.shop.web.controller.business;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.ArticleService;
 
 @Controller
@@ -53,21 +50,12 @@ public class ArticleController extends GenericController{
 	
 	@RequestMapping("save")
 	@ResponseBody
-	public Result create(@Valid @RequestBody Article article,Integer [] hasUnitIds,String[]unit_ids,String[]unitNames,Double []unitPrices,Double[]unitFansPrices,String[] unitPeferences){
-		String articleId = article.getId();
-		boolean isCreate = false;
-		if(StringUtils.isEmpty(articleId)){
-			articleId = ApplicationUtils.randomUUID();
-			article.setId(articleId);
-			article.setCreateUserId(getCurrentUserId());
-			isCreate=true;
-		}else{
-			article.setUpdateTime(new Date());			
-		}
+	public Result create(@Valid @RequestBody Article article){
 		article.setShopDetailId(getCurrentShopId());
 		article.setUpdateUserId(getCurrentUserId());
-		
-		if(isCreate){
+		article.setUpdateTime(new Date());	
+		if(StringUtils.isEmpty(article.getId())){
+			article.setCreateUserId(getCurrentUserId());
 			articleService.save(article);
 		}else{
 			articleService.update(article);
