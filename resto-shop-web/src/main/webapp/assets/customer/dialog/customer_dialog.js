@@ -680,7 +680,7 @@ define("dialog-config", {
     //fixed: false,
     
     // 对话框叠加高度值(重要：此值不能超过浏览器最大限制)
-    zIndex: 9996,
+    zIndex: 11000,
 
     // 设置遮罩背景颜色
     backdropBackground: '#333',

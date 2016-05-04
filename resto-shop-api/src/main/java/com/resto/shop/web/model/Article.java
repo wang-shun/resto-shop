@@ -86,14 +86,8 @@ public class Article {
     
     private Integer articleType;
     
-    public ArticleFamily getArticleFamily() {
-		return articleFamily;
-	}
-
-	public void setArticleFamily(ArticleFamily articleFamily) {
-		this.articleFamily = articleFamily;
-	}
-
+    private List<MealAttr> mealAttrs;
+    
 	/**
      * 用于保存 类型名称
      */
@@ -103,6 +97,16 @@ public class Article {
     private Integer [] supportTimes;
     private Integer [] kitchenList;
 
+    
+    public ArticleFamily getArticleFamily() {
+  		return articleFamily;
+  	}
+
+  	public void setArticleFamily(ArticleFamily articleFamily) {
+  		this.articleFamily = articleFamily;
+  	}
+
+    
     public String getId() {
         return id;
     }
@@ -389,6 +393,14 @@ public class Article {
 
 	public void setArticleType(Integer articleType) {
 		this.articleType = articleType;
+	}
+
+	public List<MealAttr> getMealAttrs() {
+		return mealAttrs;
+	}
+
+	public void setMealAttrs(List<MealAttr> mealAttrs) {
+		this.mealAttrs = mealAttrs;
 	}
 	
 	

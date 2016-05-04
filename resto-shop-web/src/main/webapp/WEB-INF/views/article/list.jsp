@@ -11,6 +11,7 @@
 	}
 </style>
 <div id="control">
+	
 	<div class="modal fade" id="article-dialog" v-if="showform">
 	  <div class="modal-dialog " style="width:90%;">
 	    <div class="modal-content">
@@ -18,7 +19,7 @@
 	        <h4 class="modal-title">表单</h4>
 	      </div>
 	      <div class="modal-body">
-	             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
+             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
 				<div class="form-body">
 					<div class="form-group col-md-4">
 					    <label class="col-md-5 control-label">餐品类别</label>
@@ -194,16 +195,84 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group col-md-4">
-						<label for="" class="col-md-5 control-label">套餐模板：</label>
-						<div class="col-md-7">
-							<select class="form-control">
-								<option value="">不选择模板</option>
-								<option v-for="meal in mealtempList">{{meal.name}}</option>
-							</select>
-						</div>
+					<div class="col-md-12" v-if="m.articleType==2">
+						<div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption font-green-sharp">
+                                    <i class="icon-speech font-green-sharp"></i>
+                                    <span class="caption-subject bold uppercase"> 编辑套餐</span>
+                                </div>
+                                <div class="actions">
+                                    <select class="form-control" @change="choiceMealTemp" v-model="choiceTemp">
+										<option value="">不选择模板</option>
+										<option :value="meal.id" v-for="meal in mealtempList">{{meal.name}}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                            	<div class="portlet box blue-hoki"  v-for="attr in m.mealAttrs | orderBy  'sort'">
+	                                <div class="portlet-title">
+	                                    <div class="caption">
+										    <label class="control-label">&nbsp;</label>
+										    <div class="pull-right">
+											    <input class="form-control" type="text" v-model="attr.name" required="required">
+										    </div>
+										</div>
+	                                    <div class="caption">
+										    <label class="control-label col-md-4">排序&nbsp;</label>
+										    <div class="col-md-4">
+											    <input class="form-control" type="text" v-model="attr.sort" required="required" lazy>
+										    </div>
+										</div>
+	                                    <div class="tools">
+	                                        <a href="javascript:;" class="remove" @click="delMealAttr(attr)"></a>
+	                                    </div>
+	                                </div>
+	                                <div class="portlet-body">
+	                                	<div class="form-group col-md-12" v-if="attr.mealItems.length">
+											<div class="flex-row">
+												<div class="flex-2">餐品名称</div>
+												<div class="flex-2">差价</div>
+												<div class="flex-1">排序</div>
+												<div class="flex-1">默认</div>
+												<div class="flex-1">移除</div>
+											</div>
+											<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
+												<div class="flex-2">
+													<input type="text" class="form-control"  v-model="item.name" required="required"/>
+												</div>
+												<div class="flex-2">
+													<input type="text" class="form-control"  v-model="item.priceDif" required="required"/>
+												</div>
+												<div class="flex-1">
+													<input type="text" class="form-control"  v-model="item.sort" required="required" lazy/>
+												</div>
+												<div class="flex-1 radio-list">
+													<label class="radio-inline">
+														<input type="radio" :name="attr.name" :value="true" v-model="item.isDefault" @change="itemDefaultChange(attr,item)"/>
+														设为默认
+													</label>
+												</div>
+												<div class="flex-1">
+													<button class="btn red" type="button" @click="removeMealItem(attr,item)">移除</button>
+												</div>
+											</div>
+										</div>
+	                                	<div class="col-md-4 col-md-offset-8">
+			                            	<button class="btn btn-block blue" type="button" @click="addMealItem(attr)"><i class="fa fa-cutlery"></i> 添加{{attr.name}}</button>
+			                            </div>
+			                            <div class="clearfix"></div>
+									</div>
+	                            </div>
+	                            <div class="col-md-4 col-md-offset-4">
+	                            	<button class="btn btn-block blue" type="button" @click="addMealAttr">
+	                            	<i class="fa fa-plus"></i>
+	                            	添加套餐属性</button>
+	                            </div>
+	                            <div class="clearfix"></div>
+                            </div>
+                        </div>
 					</div>
-					
 				</div>
 				<div class="clearfix"></div>
 				<div class="form-actions">
@@ -216,6 +285,63 @@
                      </div>
                  </div>
 			</form>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="modal fade" id="article-choice-dialog" v-if="showform&&choiceArticleShow.show">
+	  <div class="modal-dialog " style="width:90%;">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+	      		<div class="col-md-6">
+			      	<table class="table">
+			      		<thead>
+			      			<tr>
+				      			<th>
+				      				<select v-model="choiceArticleShow.currentFamily">
+				      					<option value="">餐品分类(全部)</option>
+				      					<option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
+				      				</select>
+				      			</th>
+				      			<th>餐品名称</th>
+				      			<th>添加</th>
+			      			</tr>
+			      		</thead>
+			      		<tbody>
+							<tr v-for="art in choiceArticleCanChoice">
+								<td>{{art.articleFamilyName}}</td>
+								<td>{{art.name}}</td>
+								<td><button class="btn blue" type="button" @click="addArticleItem(art)">添加</button></td>
+							</tr>	      			
+			      		</tbody>
+			      	</table>
+		      	</div>
+		      	<div class="col-md-6">
+			      	<table class="table">
+			      		<thead>
+			      			<tr>
+				      			<th>餐品名称(已添加)</th>
+				      			<th>移除</th>
+			      			</tr>
+			      		</thead>
+			      		<tbody>
+							<tr v-for="art in choiceArticleShow.items">
+								<td>{{art.articleName}}</td>
+								<td><button class="btn red" type="button" @click="removeArticleItem(art)">移除</button></td>
+							</tr>	      			
+			      		</tbody>
+			      	</table>
+		      	</div>
+	      	</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	        <button type="button" class="btn green" @click="updateAttrItems">确定</button>
 	      </div>
 	    </div>
 	  </div>
@@ -374,9 +500,89 @@
 				articleunits:{},
 				unitPrices:[],
 				mealtempList:[],
+				choiceTemp:"",
+				lastChoiceTemp:"",
 				allArticles:allArticles,
+				choiceArticleShow:{show:false,mealAttr:null,items:[],currentFamily:""}
 			},
 			methods:{
+				itemDefaultChange:function(attr,item){
+					for(var i in attr.mealItems){
+						var m  = attr.mealItems[i];
+						if(m!=item){
+							m.isDefault=false;
+						}
+					}
+				},
+				updateAttrItems:function(){
+					this.choiceArticleShow.mealAttr.mealItems = $.extend({},this.choiceArticleShow).items;
+					$("#article-choice-dialog").modal('hide');
+				},
+				removeMealItem:function(attr,item){
+					attr.mealItems.$remove(item);
+				},
+				removeArticleItem:function(mealItem){
+					this.choiceArticleShow.items.$remove(mealItem);
+				},
+				addArticleItem:function(art){
+					this.choiceArticleShow.items.push({
+						name:art.name,
+						sort:art.sort,
+						articleName:art.name,
+						priceDif:0,
+						articleId:art.id,
+						photoSmall:art.photoSmall,
+						isDefault:false,
+					});
+				},
+				addMealItem:function(meal){
+					this.choiceArticleShow.show=true;	
+					this.choiceArticleShow.mealAttr=meal;
+					this.choiceArticleShow.items=meal.mealItems;	
+					this.$nextTick(function(){
+						$("#article-choice-dialog").modal('show');
+						var that = this;
+						$("#article-choice-dialog").on('hidden.bs.modal',function(){
+							that.choiceArticleShow.show=false;
+						});
+					})
+				},
+				delMealAttr:function(meal){
+					this.m.mealAttrs.$remove(meal);
+				},
+				addMealAttr:function(){
+					var sort = this.maxMealAttrSort+1;
+					this.m.mealAttrs.push({
+						name:"套餐属性"+sort,
+						sort:sort,
+						mealItems:[],
+					});
+				},
+				choiceMealTemp:function(e){
+					var that = this;
+					C.confirmDialog("切换模板后，所有套餐编辑的内容将被清空，你确定要切换模板吗?","提示",function(){
+						that.lastChoiceTemp = $(e.target).val();
+						var mealAttrs = [];
+						for(var i=0;i<that.mealtempList.length;i++){
+							var temp = that.mealtempList[i];
+							if(temp.id==that.lastChoiceTemp){
+								for(var n=0;n<temp.attrs.length;n++){
+									var attr = temp.attrs[n];
+									mealAttrs.push({
+										name:attr.name,
+										sort:attr.sort,
+										mealItems:[],
+									});
+								}
+								that.m.mealAttrs = mealAttrs;
+								return false;
+							}
+						}
+						that.m.mealAttrs  = [];
+					},function(){
+						that.choiceTemp = that.lastChoiceTemp.toString();
+					});
+				},
 				selectAllTimes:function(m,e){
 					var isCheck = $(e.target).is(":checked");
 					if(isCheck){
@@ -393,6 +599,7 @@
 						articleFamilyId:this.articlefamilys[0].id,
 						supportTimes:[],
 						kitchenList:[],
+						mealAttrs:[],
 						isRemind:false,
 						activated:true,
 						showDesc:true,
@@ -417,6 +624,7 @@
 					that.showform=true;
 					$.post("article/list_one_full",{id:model.id},function(result){
 						var article=result.data;
+						article.mealAttrs||(article.mealAttrs=[]);
 						that.m= article;
 						if(article.hasUnit!=" "&&article.hasUnit.length){
 							var unit = article.hasUnit.split(",");
@@ -469,10 +677,37 @@
 							C.errorMsg(errorText);
 						}
 					});
-					console.log(action,jsonData);
 				}
 			},
 			computed:{
+				choiceArticleCanChoice:function(){
+					var arts = [];
+					for(var i in this.allArticles){
+						var art = this.allArticles[i];
+						var has = false;
+						for(var n in this.choiceArticleShow.items){
+							var mealItem = this.choiceArticleShow.items[n];
+							if(mealItem.articleId==art.id){
+								has=true;
+								break;
+							}
+						}
+						if(!has&&art.articleType==1&&(this.choiceArticleShow.currentFamily==art.articleFamilyName||this.choiceArticleShow.currentFamily=="")){
+							arts.push(art);
+						}
+					}
+					return arts;
+				},
+				maxMealAttrSort:function(){
+					var sort = 0;
+					for(var i in this.m.mealAttrs){
+						var meal = this.m.mealAttrs[i];
+						if(meal.sort>sort){
+							sort = meal.sort;
+						}
+					}
+					return parseInt(sort);
+				},
 				allUnitPrice:function(){
 					var result = [];
 					for(var i=0;i<this.articleattrs.length;i++){
