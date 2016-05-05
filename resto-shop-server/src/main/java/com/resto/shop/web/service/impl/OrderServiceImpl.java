@@ -583,7 +583,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		print.put("ADD_TIME", new Date());
 		print.put("TICKET_TYPE", TicketType.RECEIPT);
 		return print;
-
 	}
 
 	@Override

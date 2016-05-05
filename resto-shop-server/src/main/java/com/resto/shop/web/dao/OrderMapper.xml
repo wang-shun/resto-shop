@@ -496,7 +496,8 @@
 		push_order_time,
 		id,
 		ver_code,
-		article_count
+		article_count,
+		table_number
 		FROM
 		tb_order 
 		WHERE
@@ -512,7 +513,8 @@
 		push_order_time,
 		id,
 		ver_code,
-		article_count
+		article_count,
+		table_number
 		FROM
 		tb_order 
 		WHERE
