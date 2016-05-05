@@ -134,7 +134,7 @@
 			},
 			methods:{
 				addUnit:function(e){
-					this.articleUnits.push({ name:"", sort:"" });
+					this.articleUnits.push({ name:"", sort:0 });
 				},
 				removeUnit:function(unit){
 					this.articleUnits.$remove(unit);

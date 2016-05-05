@@ -231,6 +231,7 @@
 	                                <div class="portlet-body">
 	                                	<div class="form-group col-md-12" v-if="attr.mealItems.length">
 											<div class="flex-row">
+												<div class="flex-1">餐品原名</div>
 												<div class="flex-2">餐品名称</div>
 												<div class="flex-2">差价</div>
 												<div class="flex-1">排序</div>
@@ -238,6 +239,9 @@
 												<div class="flex-1">移除</div>
 											</div>
 											<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
+												<div class="flex-1">
+													<p class="form-control-static">{{item.articleName}}</p>
+												</div>
 												<div class="flex-2">
 													<input type="text" class="form-control"  v-model="item.name" required="required"/>
 												</div>
@@ -340,7 +344,6 @@
 	      	</div>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
 	        <button type="button" class="btn green" @click="updateAttrItems">确定</button>
 	      </div>
 	    </div>
@@ -355,15 +358,6 @@
 		</div>
 		<div class="clearfix"></div>
 		<div class="table-filter form-horizontal">
-			<div class="form-group">
-			    <label class="col-md-1 control-label">菜品类别:</label>
-			    <div class="col-md-2">
-			    	<select class="form-control" @change="filterTable">
-			    		<option value="-1">全部</option>
-			    		<option :value="af.name" v-for="af in articlefamilys">{{af.name}}</option>
-			    	</select>
-			    </div>
-			</div>
 		</div>
 		<div class="table-body">
 			<table class="table table-striped table-hover table-bordered "></table>
@@ -387,7 +381,7 @@
 			ordering: false,
 			columns : [
 			    {
-			    	title:"类别",
+			    	title:"餐品类别",
 			    	data:"articleFamilyName",
 			    	s_filter:true,
 			    },
@@ -400,7 +394,8 @@
 								2:"套餐"
 						}
 						$(td).html(text[tdData]);
-					}
+					},
+					s_filter:true,
 				},                 
 				{                 
 					title : "名称",
@@ -525,15 +520,20 @@
 					this.choiceArticleShow.items.$remove(mealItem);
 				},
 				addArticleItem:function(art){
-					this.choiceArticleShow.items.push({
-						name:art.name,
-						sort:art.sort,
-						articleName:art.name,
-						priceDif:0,
-						articleId:art.id,
-						photoSmall:art.photoSmall,
-						isDefault:false,
-					});
+					var item = {
+							name:art.name,
+							sort:art.sort,
+							articleName:art.name,
+							priceDif:0,
+							articleId:art.id,
+							photoSmall:art.photoSmall,
+							isDefault:false,
+						};
+					console.log(this.choiceArticleShow.items.length);
+					if(!this.choiceArticleShow.items.length){
+						item.isDefault=true;
+					}
+					this.choiceArticleShow.items.push(item);
 				},
 				addMealItem:function(meal){
 					this.choiceArticleShow.show=true;	
