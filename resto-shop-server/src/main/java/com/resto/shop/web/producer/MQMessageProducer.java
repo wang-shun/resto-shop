@@ -64,6 +64,14 @@ public class MQMessageProducer {
 		}).start();
 	}
 
+	public static void sendPlaceOrderMessage(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
 	
 	
 }
