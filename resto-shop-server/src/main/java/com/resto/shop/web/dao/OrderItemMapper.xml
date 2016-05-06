@@ -2,77 +2,215 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderItemMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.OrderItem">
-    <id column="id" property="id" jdbcType="VARCHAR"/>
-    <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
-    <result column="article_designation" property="articleDesignation" jdbcType="VARCHAR"/>
-    <result column="count" property="count" jdbcType="INTEGER"/>
-    <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
-    <result column="unit_price" property="unitPrice" jdbcType="DECIMAL"/>
-    <result column="final_price" property="finalPrice" jdbcType="DECIMAL"/>
-    <result column="remark" property="remark" jdbcType="VARCHAR"/>
-    <result column="sort" property="sort" jdbcType="INTEGER"/>
-    <result column="status" property="status" jdbcType="INTEGER"/>
-    <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
-    <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
-    <result column="type" property="type" jdbcType="VARCHAR"/>
-    
+   <resultMap id="BaseResultMap" type="com.resto.shop.web.model.OrderItem">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="article_name" jdbcType="VARCHAR" property="articleName" />
+    <result column="article_designation" jdbcType="VARCHAR" property="articleDesignation" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="original_price" jdbcType="DECIMAL" property="originalPrice" />
+    <result column="unit_price" jdbcType="DECIMAL" property="unitPrice" />
+    <result column="final_price" jdbcType="DECIMAL" property="finalPrice" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="article_id" jdbcType="VARCHAR" property="articleId" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
-  <sql id="Base_Column_List">id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type</sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
-    <include refid="Base_Column_List"/> from tb_order_item where id = #{id,jdbcType=VARCHAR}
+  <sql id="Base_Column_List">
+    id, article_name, article_designation, count, original_price, unit_price, final_price, 
+    remark, sort, status, order_id, article_id, type, parent_id, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_order_item
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_order_item where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.OrderItem">insert into tb_order_item (id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id ) values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{articleDesignation,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER}, #{originalPrice,jdbcType=DECIMAL}, #{unitPrice,jdbcType=DECIMAL}, #{finalPrice,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR} )</insert>
-  <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderItem">insert into tb_order_item 
-    <trim prefix="(" suffix=")" suffixOverrides=","> 
-      <if test="id != null">id,</if>  
-      <if test="articleName != null">article_name,</if>  
-      <if test="articleDesignation != null">article_designation,</if>  
-      <if test="count != null">count,</if>  
-      <if test="originalPrice != null">original_price,</if>  
-      <if test="unitPrice != null">unit_price,</if>  
-      <if test="finalPrice != null">final_price,</if>  
-      <if test="remark != null">remark,</if>  
-      <if test="sort != null">sort,</if>  
-      <if test="status != null">status,</if>  
-      <if test="orderId != null">order_id,</if>  
-      <if test="articleId != null">article_id,</if> 
-      <if test="type != null">type,</if> 
-    </trim>  
-    <trim prefix="values (" suffix=")" suffixOverrides=","> 
-      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
-      <if test="articleName != null">#{articleName,jdbcType=VARCHAR},</if>  
-      <if test="articleDesignation != null">#{articleDesignation,jdbcType=VARCHAR},</if>  
-      <if test="count != null">#{count,jdbcType=INTEGER},</if>  
-      <if test="originalPrice != null">#{originalPrice,jdbcType=DECIMAL},</if>  
-      <if test="unitPrice != null">#{unitPrice,jdbcType=DECIMAL},</if>  
-      <if test="finalPrice != null">#{finalPrice,jdbcType=DECIMAL},</if>  
-      <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
-      <if test="sort != null">#{sort,jdbcType=INTEGER},</if>  
-      <if test="status != null">#{status,jdbcType=INTEGER},</if>  
-      <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>  
-      <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if> 
-      <if test="type != null">#{type},</if> 
-    </trim> 
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_order_item
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.OrderItem">
+    insert into tb_order_item (id, article_name, article_designation, 
+      count, original_price, unit_price, 
+      final_price, remark, sort, 
+      status, order_id, article_id, 
+      type, parent_id, create_time
+      )
+    values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{articleDesignation,jdbcType=VARCHAR}, 
+      #{count,jdbcType=INTEGER}, #{originalPrice,jdbcType=DECIMAL}, #{unitPrice,jdbcType=DECIMAL}, 
+      #{finalPrice,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{parentId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item 
-    <set> 
-      <if test="articleName != null">article_name = #{articleName,jdbcType=VARCHAR},</if>  
-      <if test="articleDesignation != null">article_designation = #{articleDesignation,jdbcType=VARCHAR},</if>  
-      <if test="count != null">count = #{count,jdbcType=INTEGER},</if>  
-      <if test="originalPrice != null">original_price = #{originalPrice,jdbcType=DECIMAL},</if>  
-      <if test="unitPrice != null">unit_price = #{unitPrice,jdbcType=DECIMAL},</if>  
-      <if test="finalPrice != null">final_price = #{finalPrice,jdbcType=DECIMAL},</if>  
-      <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
-      <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
-      <if test="status != null">status = #{status,jdbcType=INTEGER},</if>  
-      <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>  
-      <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if> 
-      <if test="type != null">type = #{type},</if> 
-    </set> where id = #{id,jdbcType=VARCHAR}
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderItem">
+    insert into tb_order_item
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="articleName != null">
+        article_name,
+      </if>
+      <if test="articleDesignation != null">
+        article_designation,
+      </if>
+      <if test="count != null">
+        count,
+      </if>
+      <if test="originalPrice != null">
+        original_price,
+      </if>
+      <if test="unitPrice != null">
+        unit_price,
+      </if>
+      <if test="finalPrice != null">
+        final_price,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="articleId != null">
+        article_id,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="articleName != null">
+        #{articleName,jdbcType=VARCHAR},
+      </if>
+      <if test="articleDesignation != null">
+        #{articleDesignation,jdbcType=VARCHAR},
+      </if>
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
+      </if>
+      <if test="originalPrice != null">
+        #{originalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="unitPrice != null">
+        #{unitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="finalPrice != null">
+        #{finalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="articleId != null">
+        #{articleId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">
+    update tb_order_item
+    <set>
+      <if test="articleName != null">
+        article_name = #{articleName,jdbcType=VARCHAR},
+      </if>
+      <if test="articleDesignation != null">
+        article_designation = #{articleDesignation,jdbcType=VARCHAR},
+      </if>
+      <if test="count != null">
+        count = #{count,jdbcType=INTEGER},
+      </if>
+      <if test="originalPrice != null">
+        original_price = #{originalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="unitPrice != null">
+        unit_price = #{unitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="finalPrice != null">
+        final_price = #{finalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="articleId != null">
+        article_id = #{articleId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderItem">update tb_order_item set article_name = #{articleName,jdbcType=VARCHAR}, article_designation = #{articleDesignation,jdbcType=VARCHAR}, count = #{count,jdbcType=INTEGER}, original_price = #{originalPrice,jdbcType=DECIMAL}, unit_price = #{unitPrice,jdbcType=DECIMAL}, final_price = #{finalPrice,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, status = #{status,jdbcType=INTEGER}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR} ,type=#{type} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderItem">
+    update tb_order_item
+    set article_name = #{articleName,jdbcType=VARCHAR},
+      article_designation = #{articleDesignation,jdbcType=VARCHAR},
+      count = #{count,jdbcType=INTEGER},
+      original_price = #{originalPrice,jdbcType=DECIMAL},
+      unit_price = #{unitPrice,jdbcType=DECIMAL},
+      final_price = #{finalPrice,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      article_id = #{articleId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      parent_id = #{parentId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
   <select id="selectList" resultType="OrderItem">select * from tb_order_item</select>
   
   <!-- 根据订单ID查询订单项 -->
@@ -81,11 +219,11 @@
   </select>
   <insert id="insertBatch">
   	insert into tb_order_item 
-  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type) 
+  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id) 
   	values
   	<foreach collection="list" item="t" separator="," >
-  		( #{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type} )
+  		(#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
+  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId})
   	</foreach>
   </insert>
   

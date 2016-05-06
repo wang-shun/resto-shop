@@ -26,4 +26,6 @@ public interface MealItemMapper  extends GenericDao<MealItem,Integer> {
 	void insertBatch(@Param("mealItems") List<MealItem> mealAttrs);
 
 	List<MealItem> selectByAttrIds(@Param("mealAttrIds") List<Integer> mealAttrIds);
+
+	List<MealItem> selectByIds(@Param("ids") Integer[] mealItemIds);
 }

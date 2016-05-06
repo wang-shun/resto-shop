@@ -101,7 +101,7 @@
 					<div class="form-group col-md-4">
 				        <label class="col-md-5 control-label">按钮颜色</label>
 				        <div class="col-md-2">
-				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" :value="m.controlColor||'#ffffff'" > 
+				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" v-model="m.controlColor"> 
 				        </div>
 				        <div class="col-md-5">
 				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
@@ -510,7 +510,7 @@
 					}
 				},
 				updateAttrItems:function(){
-					this.choiceArticleShow.mealAttr.mealItems = $.extend({},this.choiceArticleShow).items;
+					this.choiceArticleShow.mealAttr.mealItems = $.extend(true,{},this.choiceArticleShow).items;
 					$("#article-choice-dialog").modal('hide');
 				},
 				removeMealItem:function(attr,item){
@@ -538,7 +538,7 @@
 				addMealItem:function(meal){
 					this.choiceArticleShow.show=true;	
 					this.choiceArticleShow.mealAttr=meal;
-					this.choiceArticleShow.items=meal.mealItems;	
+					this.choiceArticleShow.items=$.extend(true,{},meal).mealItems||[];	
 					this.$nextTick(function(){
 						$("#article-choice-dialog").modal('show');
 						var that = this;

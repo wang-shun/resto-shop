@@ -14,6 +14,7 @@ import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.MealAttr;
+import com.resto.shop.web.model.MealItem;
 import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
@@ -103,9 +104,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId,distributionModeId);
 		Map<String,Article> articleMap = selectAllSupportArticle(currentShopId);
 		for (Article a: articleList) {
-			if(!StringUtil.isEmpty(a.getHasUnit())){
-				List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
-				a.setArticlePrices(prices);
+			if(a.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
+				if(!StringUtil.isEmpty(a.getHasUnit())){
+					List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
+					a.setArticlePrices(prices);
+				}
+			}else if(a.getArticleType()==Article.ARTICLE_TYPE_MEALS){
+				List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId());
+				a.setMealAttrs(mealAttrs);
 			}
 			if(!articleMap.containsKey(a.getId())){
 				a.setIsEmpty(true);

@@ -39,6 +39,11 @@ public class MealItemServiceImpl extends GenericServiceImpl<MealItem, Integer> i
 	@Override
 	public List<MealItem> selectByAttrIds(List<Integer> ids) {
 		return mealitemMapper.selectByAttrIds(ids);
+	}
+
+	@Override
+	public List<MealItem> selectByIds(Integer[] mealItemIds) {
+		return mealitemMapper.selectByIds(mealItemIds);
 	} 
 
 }

@@ -79,4 +79,10 @@
   		(#{item.name},#{item.sort},#{item.articleName},#{item.priceDif},#{item.mealAttrId},#{item.articleId},#{item.isDefault})
   	</foreach>
   </insert>
+  <select id="selectByIds" resultType="MealItem">
+  	select * from tb_meal_item where id in 
+  	<foreach collection="ids" open="(" close=")" separator="," item="id">
+  		#{id}
+  	</foreach>
+  </select>
 </mapper>

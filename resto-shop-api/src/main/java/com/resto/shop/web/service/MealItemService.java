@@ -12,5 +12,7 @@ public interface MealItemService extends GenericService<MealItem, Integer> {
 	void insertBatch(List<MealItem> mealItems);
 
 	List<MealItem> selectByAttrIds(List<Integer> ids);
+
+	List<MealItem> selectByIds(Integer[] mealItemIds);
     
 }
