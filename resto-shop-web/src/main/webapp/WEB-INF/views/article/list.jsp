@@ -482,7 +482,6 @@
 				}
 		});
 		var C = new Controller(null,tb);
-		window.tt = tb;
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],

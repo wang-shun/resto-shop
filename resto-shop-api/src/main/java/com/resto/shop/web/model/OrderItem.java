@@ -39,6 +39,8 @@ public class OrderItem {
     
     private List<OrderItem> children;
     
+    private Integer articleSum;
+    
     public String getId() {
         return id;
     }
@@ -173,6 +175,14 @@ public class OrderItem {
 
 	public void setChildren(List<OrderItem> children) {
 		this.children = children;
+	}
+
+	public Integer getArticleSum() {
+		return articleSum;
+	}
+
+	public void setArticleSum(Integer articleSum) {
+		this.articleSum = articleSum;
 	}
 	
 }

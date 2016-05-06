@@ -35,12 +35,17 @@
 							
 							<div class="form-group">
 								<div class="col-sm-3 control-label">打印机类型：</div>
-							    <input type="radio"  name="printType" v-model="m.printType" value=1 checked="checked">
-							    <label for="printType">厨房</label>
-							    <input type="radio"  name="printType" v-model="m.printType" value=2> 
-							    <label for="printType">前台</label>
-							    <input type="radio"  name="printType" v-model="m.printType" value=3> 
-							    <label for="printType">打包</label>
+								<div class="col-sm-9 radio-list">
+								    <label class="radio-inline">
+								    	<input type="radio"  name="printType" v-model="m.printType" value="1">
+								    	厨房</label> 
+							    	<label class="radio-inline">
+								    	<input type="radio"  name="printType" v-model="m.printType" value="2">
+								    	前台</label>
+							    	<label class="radio-inline">
+								    	<input type="radio"  name="printType" v-model="m.printType" value="3"> 
+								    	打包</label>
+								</div>
 							</div>
 						</div>
 						<div class="text-center">
@@ -128,7 +133,11 @@
 		});
 		
 		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix]
+		});
+		C.vue = vueObj;
 	}());
 	
 	
