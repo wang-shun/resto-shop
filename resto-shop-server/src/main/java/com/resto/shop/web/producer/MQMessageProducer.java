@@ -68,6 +68,10 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		
+		/*obj.put("order", order);*/
+		
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
