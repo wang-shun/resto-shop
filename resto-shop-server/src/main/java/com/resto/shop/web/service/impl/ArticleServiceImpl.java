@@ -140,5 +140,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public void setEmpty(Integer isEmpty,String articleId) {
 		articleMapper.setEmpty(isEmpty, articleId);
 	}
+
+	@Override
+	public void addLikes(String articleId) {
+		articleMapper.addLikes(articleId);
+	}
+
+	@Override
+	public void updateLikes(String articleId, Long likes) {
+		articleMapper.updateLikes(articleId,likes);
+	}
 	
 }

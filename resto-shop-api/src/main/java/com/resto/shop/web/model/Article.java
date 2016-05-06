@@ -86,6 +86,8 @@ public class Article {
     
     private Integer articleType;
     
+    private Long likes;
+    
     private List<MealAttr> mealAttrs;
     
 	/**
@@ -401,6 +403,14 @@ public class Article {
 
 	public void setMealAttrs(List<MealAttr> mealAttrs) {
 		this.mealAttrs = mealAttrs;
+	}
+
+	public Long getLikes() {
+		return likes;
+	}
+
+	public void setLikes(Long likes) {
+		this.likes = likes;
 	}
 	
 	

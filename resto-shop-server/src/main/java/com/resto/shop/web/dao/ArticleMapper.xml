@@ -425,7 +425,7 @@
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
   	a.show_big,	a.description,a.photo_small,a.is_empty,
   	a.sort,a.remain_number,a.article_family_id,a.price,
-  	a.fans_price,a.has_unit,a.unit,a.article_type
+  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
 	AND a.shop_detail_id=#{0}
@@ -448,8 +448,17 @@
   	 a.article_family_id = f.id where a.activated = 1 and a.is_empty = #{isEmpty} and a.shop_detail_id = #{shopId}
   </select>
   
+  
+  
   <!-- 根据菜品Id 设置谷清 -->
   <update id="setEmpty">
 	update tb_article set is_empty = #{isEmpty} where id = #{articleId}
+  </update>
+  
+  <update id="addLikes" >
+  	update tb_article set likes = likes+1 where id=#{0}
+  </update>
+  <update id="updateLikes" >
+  	update tb_article set likes = #{1} where id=#{0}
   </update>
 </mapper>
