@@ -34,4 +34,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 */
 	void setEmpty(Integer isEmpty,String articleId);
     
+	void addLikes(String articleId);
+	
+	void updateLikes(String articleId,Long likes);
 }

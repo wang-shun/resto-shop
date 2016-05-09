@@ -10,6 +10,16 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Article {
+	
+	/**
+	 * 单品
+	 */
+	public static final int ARTICLE_TYPE_SIGNLE=1; 
+	/**
+	 * 套餐
+	 */
+	public static final int ARTICLE_TYPE_MEALS=2; 
+	
     private String id;
 
     private String name;
@@ -30,7 +40,7 @@ public class Article {
 
     private Integer sort;
 
-    private Byte activated;
+    private Boolean activated;
 
     private Boolean state;
 
@@ -74,14 +84,12 @@ public class Article {
     
     private String controlColor;
     
-    public ArticleFamily getArticleFamily() {
-		return articleFamily;
-	}
-
-	public void setArticleFamily(ArticleFamily articleFamily) {
-		this.articleFamily = articleFamily;
-	}
-
+    private Integer articleType;
+    
+    private Long likes;
+    
+    private List<MealAttr> mealAttrs;
+    
 	/**
      * 用于保存 类型名称
      */
@@ -91,6 +99,16 @@ public class Article {
     private Integer [] supportTimes;
     private Integer [] kitchenList;
 
+    
+    public ArticleFamily getArticleFamily() {
+  		return articleFamily;
+  	}
+
+  	public void setArticleFamily(ArticleFamily articleFamily) {
+  		this.articleFamily = articleFamily;
+  	}
+
+    
     public String getId() {
         return id;
     }
@@ -171,11 +189,11 @@ public class Article {
         this.sort = sort;
     }
 
-    public Byte getActivated() {
+    public Boolean getActivated() {
         return activated;
     }
 
-    public void setActivated(Byte activated) {
+    public void setActivated(Boolean activated) {
         this.activated = activated;
     }
 
@@ -369,6 +387,30 @@ public class Article {
 
 	public void setIsRemind(Boolean isRemind) {
 		this.isRemind = isRemind;
+	}
+
+	public Integer getArticleType() {
+		return articleType;
+	}
+
+	public void setArticleType(Integer articleType) {
+		this.articleType = articleType;
+	}
+
+	public List<MealAttr> getMealAttrs() {
+		return mealAttrs;
+	}
+
+	public void setMealAttrs(List<MealAttr> mealAttrs) {
+		this.mealAttrs = mealAttrs;
+	}
+
+	public Long getLikes() {
+		return likes;
+	}
+
+	public void setLikes(Long likes) {
+		this.likes = likes;
 	}
 	
 	

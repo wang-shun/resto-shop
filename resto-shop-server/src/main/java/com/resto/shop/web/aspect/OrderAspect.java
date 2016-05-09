@@ -76,7 +76,7 @@ public class OrderAspect {
 		msg.append("取餐店铺："+order.getShopName()+"\n");
 		msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
 		msg.append("订单明细：\n");
-		List<OrderItem> orderItem  = orderItemService.selectOrderArticleList(order.getId());
+		List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
 		for(OrderItem item : orderItem){
 			msg.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
 		}

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.ArticlePriceMapper;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.ArticlePriceService;
@@ -28,6 +29,7 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
 	public void saveArticlePrices(String articleId,List<ArticlePrice> articlePrises) {
 		articlepriceMapper.deleteArticlePrices(articleId);
 		for(ArticlePrice price:articlePrises){
+			price.setId(ApplicationUtils.randomUUID());
 			price.setArticleId(articleId);
 			articlepriceMapper.insertSelective(price);
 		}

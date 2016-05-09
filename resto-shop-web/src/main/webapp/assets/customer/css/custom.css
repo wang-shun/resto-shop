@@ -35,3 +35,7 @@
     -ms-flex: 4;
     flex: 4;
 }
+th>select,th>select:focus{
+	border:0;
+	 outline: 0;
+}

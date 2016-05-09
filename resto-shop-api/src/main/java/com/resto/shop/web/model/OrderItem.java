@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 public class OrderItem {
     private String id;
@@ -29,9 +31,14 @@ public class OrderItem {
 
     private Integer type;
     
-    /**
-     * 用于保存 菜品总数
-     */
+    private Integer[] mealItems;
+    
+    private String parentId;
+
+    private Date createTime;
+    
+    private List<OrderItem> children;
+    
     private Integer articleSum;
     
     public String getId() {
@@ -136,6 +143,38 @@ public class OrderItem {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Integer[] getMealItems() {
+		return mealItems;
+	}
+
+	public void setMealItems(Integer[] mealItems) {
+		this.mealItems = mealItems;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public List<OrderItem> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<OrderItem> children) {
+		this.children = children;
 	}
 
 	public Integer getArticleSum() {

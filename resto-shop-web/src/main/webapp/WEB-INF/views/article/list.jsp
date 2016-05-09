@@ -11,6 +11,7 @@
 	}
 </style>
 <div id="control">
+	
 	<div class="modal fade" id="article-dialog" v-if="showform">
 	  <div class="modal-dialog " style="width:90%;">
 	    <div class="modal-content">
@@ -18,7 +19,7 @@
 	        <h4 class="modal-title">表单</h4>
 	      </div>
 	      <div class="modal-body">
-	             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
+             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
 				<div class="form-body">
 					<div class="form-group col-md-4">
 					    <label class="col-md-5 control-label">餐品类别</label>
@@ -62,70 +63,45 @@
 					</div>
 					
 					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">是否上架</label>
+					 	<label class="col-md-5 control-label">上架沽清</label>
 					    <div class="col-md-7 radio-list">
 					    	<label class="radio-inline">
-						    	<input type="radio" name="activated" value="1"  v-model="m.activated">是
+						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.activated">上架
 						    </label>
-						    <label class="radio-inline">
-						    	 <input type="radio" name="activated" value="0"  v-model="m.activated">否
-					    	</label>
+					    	<label class="radio-inline">
+						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.isEmpty">沽清
+						    </label>
 					    </div>
 					</div>
 					
 					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">是否沽清</label>
+					 	<label class="col-md-5 control-label">显示</label>
 					    <div class="col-md-7 radio-list">
 					    	<label class="radio-inline">
-						    	<input type="radio" name="isEmpty" value="1"  v-model="m.isEmpty">是
+						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig">大图
 						    </label>
-						    <label class="radio-inline">
-						    	 <input type="radio" name="isEmpty" value="0"  v-model="m.isEmpty">否
-					    	</label>
+					    	<label class="radio-inline">
+						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showDesc">描述
+						    </label>
 					    </div>
 					</div>
 					
-					<div class="form-group col-md-4">
+					<div class="form-group col-md-4" >
 					 	<label class="col-md-5 control-label">未点提示</label>
 					    <div class="col-md-7 radio-list">
-					    	<label class="radio-inline">
-						    	<input type="radio" name="isRemind" value="1"  v-model="m.isRemind">是
+					    	<label class="radio-inline" v-if="m.articleType==1">
+						    	<input  type="checkbox"  v-bind:true-value="true" v-bind:false-value="false"   v-model="m.isRemind">提示
 						    </label>
-						    <label class="radio-inline">
-						    	 <input type="radio" name="isRemind" value="0"  v-model="m.isRemind">否
-					    	</label>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">显示大图</label>
-					    <div class="col-md-7 radio-list">
-					    	<label class="radio-inline">
-						    	<input type="radio" name="showBig" value="1"  v-model="m.showBig">是
+					    	<label class="radio-inline" v-else>
+						    	<input v-else type="checkbox"  value="false" v-model="m.isRemind" disabled>提示
 						    </label>
-						    <label class="radio-inline">
-						    	 <input type="radio" name="showBig" value="0"  v-model="m.showBig">否
-					    	</label>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">显示描述</label>
-					    <div class="col-md-7 radio-list">
-					    
-					    	<label class="radio-inline">
-						    	<input type="radio" name="showDesc" value="1"  v-model="m.showDesc">是
-						    </label>
-						    <label class="radio-inline">
-						    	 <input type="radio" name="showDesc" value="0"  v-model="m.showDesc">否
-					    	</label>
 					    </div>
 					</div>
 					
 					<div class="form-group col-md-4">
 				        <label class="col-md-5 control-label">按钮颜色</label>
 				        <div class="col-md-2">
-				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" :value="m.controlColor||'#ffffff'" > 
+				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" v-model="m.controlColor"> 
 				        </div>
 				        <div class="col-md-5">
 				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
@@ -148,51 +124,55 @@
 					    </div>
 					</div>
 					
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">描述</label>
+					<div class="form-group col-md-5" v-if="m.articleType==1">
+					    <label class="col-md-3 control-label">描述</label>
 					    <div class="col-md-7">
 						    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
 					    </div>
 					</div>
+					<div class="form-group col-md-7">
+						<div class="row">
+							<div class="form-group col-md-12" v-if="m.articleType==1">
+							    <label class="col-md-2 text-right">出餐厨房</label>
+							    <div class="col-md-8">
+								    <label v-for="kitchen in kitchenList">
+								    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
+								    </label>
+							    </div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group  col-md-12">
+							    <label class="col-md-2 text-right">供应时间</label>
+							    <div class="col-md-8">
+								    <label v-for="time in supportTimes">
+								    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
+								    </label>
+								    <label>
+									    <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
+								    </label>
+							    </div>
+							</div>
+						</div>
+					</div>
 					<div class="clearfix"></div>
 					
-					<div class="form-group">
-					    <label class="col-md-3 control-label">出餐厨房</label>
-					    <div class="col-md-9">
-						    <label v-for="kitchen in kitchenList">
-						    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
-						    </label>
-					    </div>
-					</div>
-					<div class="form-group">
-					    <label class="col-md-3 control-label">供应时间</label>
-					    <div class="col-md-9">
-						    <label v-for="time in supportTimes">
-						    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
-						    </label>
-						    <label>
-							    <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
-						    </label>
-					    </div>
-					</div>
-					
-					
-					<div class="form-group">
-						<label class="col-md-3 control-label">餐品规格</label>
-						<div class="col-md-9">
+					<div class="form-group col-md-10" v-if="m.articleType==1">
+						<label class="col-md-2 text-right">餐品规格</label>
+						<div class="col-md-10">
 							<div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
 								<label class="article-attr-label">{{attr.name}}:</label>
 								<span class="article-units">
 									<label v-for="unit in attr.articleUnits" >
-								    	<input type="checkbox" name="hasUnitIds" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
+								    	<input type="checkbox" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
 								    </label>
 								</span> 
 							</div>
 						</div>
 					</div>
-					<div class="form-group" v-if="allUnitPrice.length">
-						<label class="col-md-3 control-label">规格价格</label>
-						<div class="col-md-8">
+					<div class="form-group col-md-10" v-if="allUnitPrice.length">
+						<label class="col-md-2 control-label">规格价格</label>
+						<div class="col-md-10">
 							<div class="flex-row">
 								<div class="flex-1 text-right">规格</div>
 								<div class="flex-2">价格</div>
@@ -200,7 +180,7 @@
 								<div class="flex-2">编号</div>
 							</div>
 							<div class="flex-row" v-for="u in unitPrices">
-								<div class="flex-1 text-right">{{u.name}}</div>
+								<label class="control-label">{{u.name}}</label>
 								<div class="flex-2">
 									<input type="hidden" name="unitNames" :value="u.name"/>
 									<input type="hidden" name="unit_ids" :value="u.unitIds"/>
@@ -215,8 +195,90 @@
 							</div>
 						</div>
 					</div>
-					
+					<div class="col-md-12" v-if="m.articleType==2">
+						<div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption font-green-sharp">
+                                    <i class="icon-speech font-green-sharp"></i>
+                                    <span class="caption-subject bold uppercase"> 编辑套餐</span>
+                                </div>
+                                <div class="actions">
+                                    <select class="form-control" @change="choiceMealTemp" v-model="choiceTemp">
+										<option value="">不选择模板</option>
+										<option :value="meal.id" v-for="meal in mealtempList">{{meal.name}}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                            	<div class="portlet box blue-hoki"  v-for="attr in m.mealAttrs | orderBy  'sort'">
+	                                <div class="portlet-title">
+	                                    <div class="caption">
+										    <label class="control-label">&nbsp;</label>
+										    <div class="pull-right">
+											    <input class="form-control" type="text" v-model="attr.name" required="required">
+										    </div>
+										</div>
+	                                    <div class="caption">
+										    <label class="control-label col-md-4">排序&nbsp;</label>
+										    <div class="col-md-4">
+											    <input class="form-control" type="text" v-model="attr.sort" required="required" lazy>
+										    </div>
+										</div>
+	                                    <div class="tools">
+	                                        <a href="javascript:;" class="remove" @click="delMealAttr(attr)"></a>
+	                                    </div>
+	                                </div>
+	                                <div class="portlet-body">
+	                                	<div class="form-group col-md-12" v-if="attr.mealItems.length">
+											<div class="flex-row">
+												<div class="flex-1">餐品原名</div>
+												<div class="flex-2">餐品名称</div>
+												<div class="flex-2">差价</div>
+												<div class="flex-1">排序</div>
+												<div class="flex-1">默认</div>
+												<div class="flex-1">移除</div>
+											</div>
+											<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
+												<div class="flex-1">
+													<p class="form-control-static">{{item.articleName}}</p>
+												</div>
+												<div class="flex-2">
+													<input type="text" class="form-control"  v-model="item.name" required="required"/>
+												</div>
+												<div class="flex-2">
+													<input type="text" class="form-control"  v-model="item.priceDif" required="required"/>
+												</div>
+												<div class="flex-1">
+													<input type="text" class="form-control"  v-model="item.sort" required="required" lazy/>
+												</div>
+												<div class="flex-1 radio-list">
+													<label class="radio-inline">
+														<input type="radio" :name="attr.name" :value="true" v-model="item.isDefault" @change="itemDefaultChange(attr,item)"/>
+														设为默认
+													</label>
+												</div>
+												<div class="flex-1">
+													<button class="btn red" type="button" @click="removeMealItem(attr,item)">移除</button>
+												</div>
+											</div>
+										</div>
+	                                	<div class="col-md-4 col-md-offset-8">
+			                            	<button class="btn btn-block blue" type="button" @click="addMealItem(attr)"><i class="fa fa-cutlery"></i> 添加{{attr.name}}</button>
+			                            </div>
+			                            <div class="clearfix"></div>
+									</div>
+	                            </div>
+	                            <div class="col-md-4 col-md-offset-4">
+	                            	<button class="btn btn-block blue" type="button" @click="addMealAttr">
+	                            	<i class="fa fa-plus"></i>
+	                            	添加套餐属性</button>
+	                            </div>
+	                            <div class="clearfix"></div>
+                            </div>
+                        </div>
+					</div>
 				</div>
+				<div class="clearfix"></div>
 				<div class="form-actions">
                     <div class="row">
                         <div class="col-md-offset-3 col-md-5">
@@ -231,23 +293,71 @@
 	    </div>
 	  </div>
 	</div>
+	
+	<div class="modal fade" id="article-choice-dialog" v-if="showform&&choiceArticleShow.show">
+	  <div class="modal-dialog " style="width:90%;">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+	      		<div class="col-md-6">
+			      	<table class="table">
+			      		<thead>
+			      			<tr>
+				      			<th>
+				      				<select v-model="choiceArticleShow.currentFamily">
+				      					<option value="">餐品分类(全部)</option>
+				      					<option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
+				      				</select>
+				      			</th>
+				      			<th>餐品名称</th>
+				      			<th>添加</th>
+			      			</tr>
+			      		</thead>
+			      		<tbody>
+							<tr v-for="art in choiceArticleCanChoice">
+								<td>{{art.articleFamilyName}}</td>
+								<td>{{art.name}}</td>
+								<td><button class="btn blue" type="button" @click="addArticleItem(art)">添加</button></td>
+							</tr>	      			
+			      		</tbody>
+			      	</table>
+		      	</div>
+		      	<div class="col-md-6">
+			      	<table class="table">
+			      		<thead>
+			      			<tr>
+				      			<th>餐品名称(已添加)</th>
+				      			<th>移除</th>
+			      			</tr>
+			      		</thead>
+			      		<tbody>
+							<tr v-for="art in choiceArticleShow.items">
+								<td>{{art.articleName}}</td>
+								<td><button class="btn red" type="button" @click="removeArticleItem(art)">移除</button></td>
+							</tr>	      			
+			      		</tbody>
+			      	</table>
+		      	</div>
+	      	</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn green" @click="updateAttrItems">确定</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="article/add">
-			<button class="btn green pull-right" @click="create">新建</button>
+			<button class="btn green pull-right" @click="create(1)">新建餐品</button>
+			<button class="btn blue pull-right" @click="create(2)">新建套餐</button>
 			</s:hasPermission>
 		</div>
 		<div class="clearfix"></div>
-		<div class="table-filter">
-			<div class="form-group">
-			    <label class="col-md-1 control-label">菜品类别:</label>
-			    <div class="col-md-3">
-			    	<select class="form-control" @change="filterTable">
-			    		<option value="-1">全部</option>
-			    		<option :value="af.name" v-for="af in articlefamilys">{{af.name}}</option>
-			    	</select>
-			    </div>
-			</div>
+		<div class="table-filter form-horizontal">
 		</div>
 		<div class="table-body">
 			<table class="table table-striped table-hover table-bordered "></table>
@@ -260,6 +370,7 @@
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
+		var allArticles = [];
 		var tb = $table.DataTable({
 			ajax : {
 				url : "article/list_all",
@@ -267,17 +378,31 @@
 			},
 			stateSave:true,
 			deferRender:true,
+			ordering: false,
 			columns : [
 			    {
 			    	title:"餐品类别",
 			    	data:"articleFamilyName",
+			    	s_filter:true,
 			    },
 				{                 
-					title : "餐品名称",
+					title : "类型",
+					data : "articleType",
+					createdCell:function(td,tdData){
+						var text ={
+								1:"单品",
+								2:"套餐"
+						}
+						$(td).html(text[tdData]);
+					},
+					s_filter:true,
+				},                 
+				{                 
+					title : "名称",
 					data : "name",
 				},                 
 				{                 
-					title : "餐品价格",
+					title : "价格",
 					data : "price",
 				},                 
 				{                 
@@ -286,29 +411,21 @@
 					defaultContent:"",
 				},                 
 				{                 
-					title : "餐品图片",
+					title : "图片",
 					data : "photoSmall",
+					defaultContent:"",
 					createdCell:function(td,tdData){
 						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
 					}
 				},                 
-// 				{                 
-// 					title : "餐品描述",
-// 					data : "description",
-// 					createdCell:function(td,tdData){
-// 						if(tdData.length>10){
-// 							tdData = tdData.substring(0,10);
-// 							$(td).html(tdData+"...");
-// 						}
-// 					}
-// 				},                 
 				{                 
-					title : "餐品排序",
+					title : "排序",
 					data : "sort",
 				},                 
 				{                 
 					title : "上架",
 					data : "activated",
+					s_filter:true,
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
@@ -316,6 +433,7 @@
 				{
 					title:"沽清",
 					data:"isEmpty",
+					s_filter:true,
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
@@ -336,12 +454,34 @@
 					}
 				}],
 				initComplete:function(){
-					
+					var api =this.api();
+					api.search('');
+					var data = api.data();
+					for(var i=0;i<data.length;i++){
+						allArticles.push(data[i]);
+					}
+					var columnsSetting = api.settings()[0].oInit.columns;
+					$(columnsSetting).each(function(i){
+						if(this.s_filter){
+							var column = api.column( i );
+							var title = this.title;
+						    var select = $('<select><option value="">'+this.title+'(全部)</option></select>');
+						    column.data().unique().each( function ( d, j ) {
+			                	var text = column.nodes()[j];
+			                	text = $(text).text();
+			                    select.append( '<option value="'+d+'">'+text+'</option>' )
+			                } );
+						    select.appendTo($(column.header()).empty()).on( 'change', function () {
+		                        var val = $.fn.dataTable.util.escapeRegex(
+		                            $(this).val()
+		                        );
+		                        column.search( val ? '^'+val+'$' : '', true, false ).draw();
+		                    });
+						}
+					});
 				}
 		});
-		
 		var C = new Controller(null,tb);
-		
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
@@ -353,8 +493,95 @@
 				articleattrs:[],
 				articleunits:{},
 				unitPrices:[],
+				mealtempList:[],
+				choiceTemp:"",
+				lastChoiceTemp:"",
+				allArticles:allArticles,
+				choiceArticleShow:{show:false,mealAttr:null,items:[],currentFamily:""}
 			},
 			methods:{
+				itemDefaultChange:function(attr,item){
+					for(var i in attr.mealItems){
+						var m  = attr.mealItems[i];
+						if(m!=item){
+							m.isDefault=false;
+						}
+					}
+				},
+				updateAttrItems:function(){
+					this.choiceArticleShow.mealAttr.mealItems = $.extend(true,{},this.choiceArticleShow).items;
+					$("#article-choice-dialog").modal('hide');
+				},
+				removeMealItem:function(attr,item){
+					attr.mealItems.$remove(item);
+				},
+				removeArticleItem:function(mealItem){
+					this.choiceArticleShow.items.$remove(mealItem);
+				},
+				addArticleItem:function(art){
+					var item = {
+							name:art.name,
+							sort:art.sort,
+							articleName:art.name,
+							priceDif:0,
+							articleId:art.id,
+							photoSmall:art.photoSmall,
+							isDefault:false,
+						};
+					console.log(this.choiceArticleShow.items.length);
+					if(!this.choiceArticleShow.items.length){
+						item.isDefault=true;
+					}
+					this.choiceArticleShow.items.push(item);
+				},
+				addMealItem:function(meal){
+					this.choiceArticleShow.show=true;	
+					this.choiceArticleShow.mealAttr=meal;
+					this.choiceArticleShow.items=$.extend(true,{},meal).mealItems||[];	
+					this.$nextTick(function(){
+						$("#article-choice-dialog").modal('show');
+						var that = this;
+						$("#article-choice-dialog").on('hidden.bs.modal',function(){
+							that.choiceArticleShow.show=false;
+						});
+					})
+				},
+				delMealAttr:function(meal){
+					this.m.mealAttrs.$remove(meal);
+				},
+				addMealAttr:function(){
+					var sort = this.maxMealAttrSort+1;
+					this.m.mealAttrs.push({
+						name:"套餐属性"+sort,
+						sort:sort,
+						mealItems:[],
+					});
+				},
+				choiceMealTemp:function(e){
+					var that = this;
+					C.confirmDialog("切换模板后，所有套餐编辑的内容将被清空，你确定要切换模板吗?","提示",function(){
+						that.lastChoiceTemp = $(e.target).val();
+						var mealAttrs = [];
+						for(var i=0;i<that.mealtempList.length;i++){
+							var temp = that.mealtempList[i];
+							if(temp.id==that.lastChoiceTemp){
+								for(var n=0;n<temp.attrs.length;n++){
+									var attr = temp.attrs[n];
+									mealAttrs.push({
+										name:attr.name,
+										sort:attr.sort,
+										mealItems:[],
+									});
+								}
+								that.m.mealAttrs = mealAttrs;
+								return false;
+							}
+						}
+						that.m.mealAttrs  = [];
+					},function(){
+						that.choiceTemp = that.lastChoiceTemp.toString();
+					});
+				},
 				selectAllTimes:function(m,e){
 					var isCheck = $(e.target).is(":checked");
 					if(isCheck){
@@ -366,16 +593,19 @@
 						m.supportTimes=[];
 					}
 				},
-				create:function(){
+				create:function(article_type){
 					this.m= {
+						articleFamilyId:this.articlefamilys[0].id,
 						supportTimes:[],
 						kitchenList:[],
+						mealAttrs:[],
 						isRemind:false,
 						activated:true,
 						showDesc:true,
 						showBig:true,
 						isEmpty:false,
 						sort:0,
+						articleType:article_type,
 					};
 					this.checkedUnit=[];
 					this.showform=true;
@@ -393,8 +623,9 @@
 					that.showform=true;
 					$.post("article/list_one_full",{id:model.id},function(result){
 						var article=result.data;
+						article.mealAttrs||(article.mealAttrs=[]);
 						that.m= article;
-						if(article.hasUnit&&article.hasUnit.length){
+						if(article.hasUnit!=" "&&article.hasUnit.length){
 							var unit = article.hasUnit.split(",");
 							for(var i in  unit){
 								that.checkedUnit.push(parseInt(unit[i]));
@@ -416,9 +647,66 @@
 				},
 				changeColor:function(val){
 					$(".color-mini").minicolors("value",val);
+				},
+				save:function(e){
+					var that = this;
+					var action = $(e.target).attr("action");
+					this.m.articlePrices = this.unitPrices;
+					this.m.hasUnit = this.checkedUnit.join()||" ";
+					var m = this.m;
+					
+					var jsonData =JSON.stringify(this.m);
+					$.ajax({
+						contentType : "application/json",
+						type : "post",
+						url : action,
+						data:jsonData,
+						success:function(result){
+							if(result.success){
+								that.showform=false;
+								that.m={};
+								C.simpleMsg("保存成功");
+								tb.ajax.reload();
+							}else{
+								C.errorMsg(result.message);
+							}
+						},
+						error:function(xhr,msg,e){
+							var errorText = xhr.status+" "+xhr.statusText+":"+action;
+							C.errorMsg(errorText);
+						}
+					});
 				}
 			},
 			computed:{
+				choiceArticleCanChoice:function(){
+					var arts = [];
+					for(var i in this.allArticles){
+						var art = this.allArticles[i];
+						var has = false;
+						for(var n in this.choiceArticleShow.items){
+							var mealItem = this.choiceArticleShow.items[n];
+							if(mealItem.articleId==art.id){
+								has=true;
+								break;
+							}
+						}
+						if(!has&&art.articleType==1&&(this.choiceArticleShow.currentFamily==art.articleFamilyName||this.choiceArticleShow.currentFamily=="")){
+							arts.push(art);
+						}
+					}
+					return arts;
+				},
+				maxMealAttrSort:function(){
+					var sort = 0;
+					for(var i in this.m.mealAttrs){
+						var meal = this.m.mealAttrs[i];
+						if(meal.sort>sort){
+							sort = meal.sort;
+						}
+					}
+					return parseInt(sort);
+				},
 				allUnitPrice:function(){
 					var result = [];
 					for(var i=0;i<this.articleattrs.length;i++){
@@ -532,6 +820,9 @@
 				});
 				$.post("kitchen/list_all",null,function(data){
 					that.kitchenList = data;
+				});
+				$.post("mealtemp/list_all",null,function(data){
+					that.mealtempList = data;
 				});
 				$.post("articleattr/list_all",null,function(data){
 					var article_units = {};

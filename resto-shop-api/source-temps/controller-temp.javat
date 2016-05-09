@@ -40,15 +40,15 @@ public class {{modelName}}Controller extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid {{modelName}} brand){
-		{{modelNameLower}}Service.insert(brand);
+	public Result create(@Valid {{modelName}} {{modelNameLower}}){
+		{{modelNameLower}}Service.insert({{modelNameLower}});
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid {{modelName}} brand){
-		{{modelNameLower}}Service.update(brand);
+	public Result modify(@Valid {{modelName}} {{modelNameLower}}){
+		{{modelNameLower}}Service.update({{modelNameLower}});
 		return Result.getSuccess();
 	}
 	

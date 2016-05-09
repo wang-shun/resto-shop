@@ -398,10 +398,12 @@ var Controller = function(controlId,datatable){
 	}
 	
 	this.confirmDialog=function(text,title,successcbk,cancelcbk){
+		var width = text.length*16;
+		width = width>200?width:200;
 		var cDialog = new dialog({
 			title:title||"",
 			content:text||"",
-			width:200,
+			width:width,
 			ok:function(){
 				if(typeof successcbk=="function"){
 					successcbk();
@@ -455,6 +457,7 @@ var Controller = function(controlId,datatable){
 			});
 			this.$watch("m",function(){
 				if(this.showform){
+					App.initUniform();
 					App.updateUniform();
 				}
 			},{
