@@ -75,6 +75,7 @@ public class MQMessageProducer {
  		JSONObject obj  = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
+		obj.put("tableNumber", order.getTableNumber());
 		obj.put("shopDetailId", order.getShopDetailId());
 		obj.put("articleCount", order.getArticleCount());
 		obj.put("productionStatus", order.getProductionStatus());
@@ -82,6 +83,21 @@ public class MQMessageProducer {
 		obj.put("parentOrderId", order.getParentOrderId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
+	}
+
+	public static void sendCancelOrderMessage(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("tableNumber", order.getTableNumber());
+		obj.put("id", order.getId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		obj.put("articleCount", order.getArticleCount());
+		obj.put("productionStatus", order.getProductionStatus());
+		obj.put("verCode", order.getVerCode());
+		obj.put("parentOrderId", order.getParentOrderId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+		
 	}
 
 	

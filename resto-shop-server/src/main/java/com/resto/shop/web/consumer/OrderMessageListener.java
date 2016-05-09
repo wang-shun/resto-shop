@@ -31,7 +31,7 @@ public class OrderMessageListener implements MessageListener{
 	public Action consume(Message message, ConsumeContext context) {
 		Logger log = LoggerFactory.getLogger(getClass());
 		
-		log.info("接收到队列消息:"+message);
+		log.info("接收到队列消息:"+message.getTag()+"@"+message);
 		try {
 			return executeMessage(message);
 		} catch (UnsupportedEncodingException e) {
