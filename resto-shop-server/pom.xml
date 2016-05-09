@@ -152,12 +152,6 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid</artifactId>
 		</dependency>
-		
-		<!-- Redis -->
-	    <dependency>
-		  <groupId>redis.clients</groupId>
-		  <artifactId>jedis</artifactId>
-		</dependency>
 	</dependencies>
 
 

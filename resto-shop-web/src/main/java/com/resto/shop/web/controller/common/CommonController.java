@@ -42,7 +42,7 @@ public class CommonController {
      * 
      * @param classPath  例如 D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/model
      * @param classPackage 例如 com.resto.shop.web.model
-     * @param className 例如 com.resto.shop.web.model.ArticleAttr
+     * @param className 例如 ArticleAttr
      * @return
      * @throws ClassNotFoundException
      */
@@ -63,7 +63,7 @@ public class CommonController {
 		r.setMenuType(MenuType.AJAX);
 		r.setPermissionName("Auto Genic Manager");
 		r.setPermissionSign("auto genic"+System.currentTimeMillis());
-		r.setId(200L);
+		r.setId(500L);
 		permissionService.insert(r);
 		Long rootId = r.getId();
 		long base = 1;

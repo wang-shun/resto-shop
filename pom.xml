@@ -12,7 +12,7 @@
 			<url>http://42.96.203.79:8081/nexus/content/repositories/releases/</url>
 		</repository>
 	</distributionManagement>
-	<parent>
+	<parent> 
 		<groupId>cn.restoplus</groupId>
 		<artifactId>resto</artifactId>
 		<version>1.0.1</version>

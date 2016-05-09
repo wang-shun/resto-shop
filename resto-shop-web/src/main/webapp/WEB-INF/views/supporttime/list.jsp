@@ -196,6 +196,12 @@
 					this.showform=false;
 					this.checkedValues=[];
 				},
+				create:function(){
+					this.m={};
+					this.checkedValues=[];
+					this.openForm();
+					
+				},
 				edit:function(model){
 					var that = this;
 					this.m= model;

@@ -38,4 +38,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	 * @param articleId
 	 */
 	void setEmpty(@Param("isEmpty") Integer isEmpty,@Param("articleId") String articleId);
+
+	void updateLikes(String articleId, Long likes);
+
+	void addLikes(String articleId);
 }

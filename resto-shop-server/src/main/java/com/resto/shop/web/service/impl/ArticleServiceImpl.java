@@ -13,10 +13,13 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
+import com.resto.shop.web.model.MealAttr;
+import com.resto.shop.web.model.MealItem;
 import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.KitchenService;
+import com.resto.shop.web.service.MealAttrService;
 import com.resto.shop.web.service.SupportTimeService;
 
 import cn.restoplus.rpc.common.util.StringUtil;
@@ -40,6 +43,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Resource
     private KitchenService kitchenService;
     
+    @Resource
+    private MealAttrService mealAttrService;
+    
     @Override
     public GenericDao<Article, String> getDao() {
         return articleMapper;
@@ -52,30 +58,44 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
 	@Override
 	public Article save(Article article) {
+		article.setId(ApplicationUtils.randomUUID());
 		this.insert(article);
-		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
+		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
+			articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
+			kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
+		}else if(article.getArticleType()==Article.ARTICLE_TYPE_MEALS){
+			mealAttrService.insertBatch(article.getMealAttrs(),article.getId());
+		}
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
-		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		return article;
 	} 
 	
 	@Override
 	public int update(Article article) {
-		articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
+		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
+			articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
+			kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
+		}else if(article.getArticleType()==Article.ARTICLE_TYPE_MEALS){
+			mealAttrService.insertBatch(article.getMealAttrs(),article.getId());
+		}
 		supportTimeService.saveSupportTimes(article.getId(),article.getSupportTimes());
-		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		return super.update(article);
 	}
 
 	@Override
 	public Article selectFullById(String id) {
-		List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
-		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
-		List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
 		Article article  = selectById(id);
-		article.setArticlePrices(prices);
+		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
+			List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
+			article.setArticlePrices(prices);
+			List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
+			article.setKitchenList(kitchenList.toArray(new Integer[0]));
+		}else{
+			List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(id);
+			article.setMealAttrs(mealAttrs);
+		}
+		List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
 		article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
-		article.setKitchenList(kitchenList.toArray(new Integer[0]));
 		return article;
 	}
 
@@ -84,9 +104,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId,distributionModeId);
 		Map<String,Article> articleMap = selectAllSupportArticle(currentShopId);
 		for (Article a: articleList) {
-			if(!StringUtil.isEmpty(a.getHasUnit())){
-				List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
-				a.setArticlePrices(prices);
+			if(a.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
+				if(!StringUtil.isEmpty(a.getHasUnit())){
+					List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
+					a.setArticlePrices(prices);
+				}
+			}else if(a.getArticleType()==Article.ARTICLE_TYPE_MEALS){
+				List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId());
+				a.setMealAttrs(mealAttrs);
 			}
 			if(!articleMap.containsKey(a.getId())){
 				a.setIsEmpty(true);
@@ -114,6 +139,16 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	@Override
 	public void setEmpty(Integer isEmpty,String articleId) {
 		articleMapper.setEmpty(isEmpty, articleId);
+	}
+
+	@Override
+	public void addLikes(String articleId) {
+		articleMapper.addLikes(articleId);
+	}
+
+	@Override
+	public void updateLikes(String articleId, Long likes) {
+		articleMapper.updateLikes(articleId,likes);
 	}
 	
 }

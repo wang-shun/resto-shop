@@ -16,8 +16,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 
 	public void insertItems(List<OrderItem> orderItems);
 
-	public List<OrderItem> selectOrderArticleList(String orderId);
-	
 	/**
 	 * 根据时间查询 当前店铺的 菜品销售记录
 	 * @param beginDate

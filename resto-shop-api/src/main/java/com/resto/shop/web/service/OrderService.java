@@ -43,7 +43,7 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<Map<String,Object>> getPrintData(String order);
 	
-	public Order printSuccess(String orderId);
+	public Order printSuccess(String orderId) throws AppException;
 
 	/**
 	 * 查询当天某些状态的订单
