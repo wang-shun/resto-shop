@@ -34,4 +34,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	List<Customer> selectListByBrandId(String brandId);
 
 	Customer selectByPhone(String phone);
+
+	void changeLastOrderShop(String shopDetailId, String customerId);
 }

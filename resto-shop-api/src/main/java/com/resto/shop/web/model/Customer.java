@@ -44,6 +44,8 @@ public class Customer implements Serializable{
     
     private BigDecimal account;
     
+    private String lastOrderShop;
+    
     public String getId() {
         return id;
     }
@@ -178,5 +180,13 @@ public class Customer implements Serializable{
 
 	public void setAccount(BigDecimal account) {
 		this.account = account;
+	}
+
+	public String getLastOrderShop() {
+		return lastOrderShop;
+	}
+
+	public void setLastOrderShop(String lastOrderShop) {
+		this.lastOrderShop = lastOrderShop;
 	}
 }
