@@ -281,6 +281,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setProductionStatus(ProductionStatus.NOT_ORDER);
 		ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
 		order.setOrderMode(detail.getShopMode());
+		if(order.getParentOrderId()!=null){
+			Order parentOrder = selectById(order.getParentOrderId());
+			order.setTableNumber(parentOrder.getTableNumber());
+		}
 		insert(order);
 		customerService.changeLastOrderShop(order.getShopDetailId(),order.getCustomerId());
 		if (order.getPaymentAmount().doubleValue() == 0) {

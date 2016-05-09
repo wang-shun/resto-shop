@@ -40,6 +40,9 @@ public class RedConfigServiceImpl extends GenericServiceImpl<RedConfig, Long> im
 		if(configList.size()==1){
 			RedConfig config = configList.get(0); 
 			BigDecimal money = order.getOrderMoney();
+			if(order.getAmountWithChildren()!=null&&order.getAmountWithChildren().compareTo(money)==1){
+				money = order.getAmountWithChildren();
+			}
 			
 			boolean addRatio = config.getIsAddRatio()==1;
 			
