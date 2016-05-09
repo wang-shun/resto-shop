@@ -172,7 +172,7 @@ public class OrderAspect {
 			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消");
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送订单取消通知成功:"+msg+result);
-			MQMessageProducer.sendCancelOrderMessage(order);
+			MQMessageProducer.sendNoticeOrderMessage(order);
 		}
 	}
 	
