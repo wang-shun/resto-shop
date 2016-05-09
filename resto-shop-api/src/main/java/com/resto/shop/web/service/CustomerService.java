@@ -22,4 +22,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Customer selectNickNameAndTelephone(String customerId);
 
 	List<Customer> selectListByBrandId(String currentBrandId);
+
+	void changeLastOrderShop(String shopDetailId, String customerId);
 }

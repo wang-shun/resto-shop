@@ -282,6 +282,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
 		order.setOrderMode(detail.getShopMode());
 		insert(order);
+		customerService.changeLastOrderShop(order.getShopDetailId(),order.getCustomerId());
 		if (order.getPaymentAmount().doubleValue() == 0) {
 			payOrderSuccess(order);
 		}

@@ -22,7 +22,7 @@
   <sql id="Base_Column_List">
     id, wechat_id, nickname, telephone, head_photo, default_delivery_point, is_bind_phone, 
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, 
-    city, country
+    city, country,last_order_shop
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -236,4 +236,7 @@
   <select id="selectByPhone" resultType="Customer">
   	select * from tb_customer where telephone=#{0}
   </select>
+  <update id="changeLastOrderShop">
+  	update tb_customer set last_order_shop = #{0} where id=#{1} 
+  </update>
 </mapper>
