@@ -15,7 +15,7 @@
 	
 	<div class="table-div">
 		<div class="clearfix"></div>
-		<div class="table-filter">&nbsp;</div>
+		<div class="table-filter"></div>
 		<div class="table-body">
 			<table class="table table-striped table-hover table-bordered "></table>
 		</div>
