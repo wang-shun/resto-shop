@@ -116,6 +116,7 @@ public class OrderAspect {
 				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
+				log.info("发送消息：两小时后，禁止加菜");
 				MQMessageProducer.sendNotAllowContinueMessage(order,1000*60*120); //延迟两小时，禁止继续加菜
 				if(order.getOrderMode()!=null){
 					switch (order.getOrderMode()) {
