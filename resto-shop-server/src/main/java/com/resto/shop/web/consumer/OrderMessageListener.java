@@ -49,7 +49,17 @@ public class OrderMessageListener implements MessageListener{
 			return executeAutoConfirmOrder(message);
 		}else if(tag.equals(MQSetting.TAG_NOT_PRINT_ORDER)){
 			return executeChangeProductionState(message);
+		}else if(tag.equals(MQSetting.TAG_NOT_ALLOW_CONTINUE)){
+			return executeNotAllowContinue(message);
 		}
+		return Action.CommitMessage;
+	}
+
+	private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {
+		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
+		Order order = JSON.parseObject(msg, Order.class);
+		DataSourceContextHolder.setDataSourceName(order.getBrandId());
+		orderService.updateAllowContinue(order.getId(),false);
 		return Action.CommitMessage;
 	}
 

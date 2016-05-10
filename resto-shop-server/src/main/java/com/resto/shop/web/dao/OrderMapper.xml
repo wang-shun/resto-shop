@@ -577,6 +577,9 @@
   <update id="updateParentAmount">
   	UPDATE tb_order SET amount_with_children = #{1} where id=#{0}
   </update>
+  <update id="changeAllowContinue">
+	  UPDATE tb_order SET allow_continue_order=#{1} where id=#{0}
+  </update>
 </mapper>
 
 

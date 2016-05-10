@@ -102,6 +102,14 @@ public class MQMessageProducer {
 		
 	}
 
+	public static void sendNotAllowContinueMessage(Order order, long delay) {
+		JSONObject object=  new JSONObject();
+		object.put("brandId", order.getBrandId());
+		object.put("id", order.getId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_ALLOW_CONTINUE,object.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
 	
 	
 }

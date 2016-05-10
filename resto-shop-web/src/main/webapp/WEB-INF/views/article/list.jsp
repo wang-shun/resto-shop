@@ -371,6 +371,10 @@
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var allArticles = [];
+		var articleType ={
+				1:"单品",
+				2:"套餐"
+		}
 		var tb = $table.DataTable({
 			ajax : {
 				url : "article/list_all",
@@ -389,13 +393,12 @@
 					title : "类型",
 					data : "articleType",
 					createdCell:function(td,tdData){
-						var text ={
-								1:"单品",
-								2:"套餐"
-						}
-						$(td).html(text[tdData]);
+						$(td).html(articleType[tdData]);
 					},
 					s_filter:true,
+					s_render:function(d){
+						return articleType[d];
+					}
 				},                 
 				{                 
 					title : "名称",
@@ -426,6 +429,7 @@
 					title : "上架",
 					data : "activated",
 					s_filter:true,
+					s_render:function(d){return d?"是":"否"},
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
@@ -434,6 +438,7 @@
 					title:"沽清",
 					data:"isEmpty",
 					s_filter:true,
+					s_render:function(d){return d?"是":"否"},
 					createdCell:function(td,tdData){
 						$(td).html(tdData?"是":"否");
 					}
@@ -466,11 +471,11 @@
 							var column = api.column( i );
 							var title = this.title;
 						    var select = $('<select><option value="">'+this.title+'(全部)</option></select>');
-						    column.data().unique().each( function ( d, j ) {
-			                	var text = column.nodes()[j];
-			                	text = $(text).text();
-			                    select.append( '<option value="'+d+'">'+text+'</option>' )
+						    var that =this;
+						    column.data().unique().each( function ( d) {
+			                    select.append( '<option value="'+d+'">'+((that.s_render&&that.s_render(d))||d)+'</option>' )
 			                } );
+						    
 						    select.appendTo($(column.header()).empty()).on( 'change', function () {
 		                        var val = $.fn.dataTable.util.escapeRegex(
 		                            $(this).val()
@@ -625,7 +630,7 @@
 						var article=result.data;
 						article.mealAttrs||(article.mealAttrs=[]);
 						that.m= article;
-						if(article.hasUnit!=" "&&article.hasUnit.length){
+						if(article.hasUnit&&article.hasUnit!=" "&&article.hasUnit.length){
 							var unit = article.hasUnit.split(",");
 							for(var i in  unit){
 								that.checkedUnit.push(parseInt(unit[i]));
@@ -666,7 +671,7 @@
 								that.showform=false;
 								that.m={};
 								C.simpleMsg("保存成功");
-								tb.ajax.reload();
+								tb.ajax.reload(null,false);
 							}else{
 								C.errorMsg(result.message);
 							}

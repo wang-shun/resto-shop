@@ -722,4 +722,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			int[] orderState) {
 		return orderMapper.listOrderByStatus(currentShopId,begin,end,productionStatus,orderState);
 	}
+
+	@Override
+	public void updateAllowContinue(String id, boolean b) {
+		orderMapper.changeAllowContinue(id,b);
+	}
 }

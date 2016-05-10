@@ -113,4 +113,6 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Order> listOrderByStatus(String currentShopId, Date begin, Date end, int[] productionStatus,
 			int[] orderState);
 
+	public void updateAllowContinue(String id, boolean b);
+
 }
