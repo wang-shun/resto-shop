@@ -180,7 +180,7 @@
 								<div class="flex-2">编号</div>
 							</div>
 							<div class="flex-row" v-for="u in unitPrices">
-								<label class="control-label">{{u.name}}</label>
+								<label class="flex-1 control-label">{{u.name}}</label>
 								<div class="flex-2">
 									<input type="hidden" name="unitNames" :value="u.name"/>
 									<input type="hidden" name="unit_ids" :value="u.unitIds"/>
@@ -352,11 +352,11 @@
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="article/add">
-			<button class="btn green pull-right" @click="create(1)">新建餐品</button>
-			<button class="btn blue pull-right" @click="create(2)">新建套餐</button>
+			<button class="btn blue" @click="create(2)">新建套餐</button>
+			<button class="btn green" @click="create(1)">新建餐品</button>
 			</s:hasPermission>
+			<div class="clearfix"></div>
 		</div>
-		<div class="clearfix"></div>
 		<div class="table-filter form-horizontal">
 		</div>
 		<div class="table-body">
@@ -367,6 +367,7 @@
 
 
 <script>
+Vue.config.debug = true;
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
@@ -717,6 +718,9 @@
 					for(var i=0;i<this.articleattrs.length;i++){
 						var attr = this.articleattrs[i];
 						var checked =[];
+						if(!attr.articleUnits){
+							continue;
+						}
 						for(var j=0;j<attr.articleUnits.length;j++){
 							var c = attr.articleUnits[j];
 							for(var n in this.checkedUnit){
