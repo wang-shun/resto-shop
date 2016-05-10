@@ -416,14 +416,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if (order.getPrintOrderTime() == null) {
 			if(StringUtils.isEmpty(order.getParentOrderId())){
 				log.info("打印成功，订单为主订单，允许加菜-:"+order.getId());
-				order.setAllowContinueOrder(true);
-				updateAllowContinue(order.getId(), true);
+				order.setAllowContinueOrder(false);
 			}else{
 				log.info("打印成功，订单为子订单:"+order.getId()+" pid:"+order.getParentOrderId());
 				order.setAllowContinueOrder(false);
 				updateParentAmount(order.getParentOrderId());
-				updateAllowContinue(order.getId(), false);
 			}
+			order.setAllowContinueOrder(false);
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
 			order.setAllowCancel(false);
