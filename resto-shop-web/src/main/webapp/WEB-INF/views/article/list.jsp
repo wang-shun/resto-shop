@@ -367,6 +367,7 @@
 
 
 <script>
+	Vue.config.debug = true;
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
@@ -626,6 +627,7 @@
 				edit:function(model){
 					var that = this;
 					that.showform=true;
+					that.checkedUnit=[];
 					$.post("article/list_one_full",{id:model.id},function(result){
 						var article=result.data;
 						article.mealAttrs||(article.mealAttrs=[]);
@@ -635,8 +637,6 @@
 							for(var i in  unit){
 								that.checkedUnit.push(parseInt(unit[i]));
 							}
-						}else{
-							that.checkedUnit=[];
 						}
 						that.unitPrices = article.articlePrices;
 					});
