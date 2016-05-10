@@ -26,12 +26,6 @@
 							    </div>
 							</div>
 							<div class="validataMsg"></div>
-							<div class="form-group">
-			           			<label class="col-sm-2 control-label">状态：</label>
-							    <div class="col-sm-8">
-									<input type="number" class="form-control" required placeholder="请输入数字！" name="state" v-model="m.state">
-							    </div>
-							</div>
 							<div class="text-center">
 								<input type="hidden" name="id" v-model="m.id" />
 								<input class="btn green"  type="submit"  value="保存"/>

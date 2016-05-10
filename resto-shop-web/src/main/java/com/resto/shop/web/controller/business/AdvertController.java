@@ -44,6 +44,7 @@ public class AdvertController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid Advert advert,HttpServletRequest request){
 		advert.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
+		advert.setState((byte)1);
 		advertService.insert(advert);
 		return Result.getSuccess();
 	}

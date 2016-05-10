@@ -617,6 +617,7 @@
 					this.showform=true;
 				},
 				uploadSuccess:function(url){
+					console.log(url);
 					$("[name='photoSmall']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
 					$("#photoSmall").attr("src","/"+url);
