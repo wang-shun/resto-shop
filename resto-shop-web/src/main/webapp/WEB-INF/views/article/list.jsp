@@ -367,7 +367,6 @@
 
 
 <script>
-Vue.config.debug = true;
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
