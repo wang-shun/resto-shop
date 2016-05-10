@@ -14,7 +14,6 @@ import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.MealAttr;
-import com.resto.shop.web.model.MealItem;
 import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
