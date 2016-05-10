@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 
@@ -413,9 +414,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public Order printSuccess(String orderId) throws AppException {
 		Order order = selectById(orderId);
 		if (order.getPrintOrderTime() == null) {
-			if(order.getParentOrderId()==null){
+			if(StringUtils.isEmpty(order.getParentOrderId())){
+				log.info("打印成功，订单为主订单，允许加菜"+order.getId());
 				order.setAllowContinueOrder(true);
 			}else{
+				log.info("打印成功，订单为子订单:"+order.getId()+" pid:"+order.getParentOrderId());
 				order.setAllowContinueOrder(false);
 				updateParentAmount(order.getParentOrderId());
 			}
