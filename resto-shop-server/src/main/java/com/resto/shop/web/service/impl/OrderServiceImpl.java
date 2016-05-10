@@ -325,7 +325,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
-			orderProductionStateContainer.removePushOrder(order);
 			log.info("取消订单成功:" + order.getId());
 			return true;
 		} else {
@@ -422,9 +421,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
-			if(order.getOrderMode()==3){
-				order.setAllowCancel(false);
-			}
+			order.setAllowCancel(false);
 			update(order);
 			return order;
 		}
@@ -644,7 +641,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			update(order);
 			refundOrder(order);
 			log.info("取消订单成功:" + order.getId());
-			orderProductionStateContainer.removePushOrder(order);
 		}
 		return order;
 	}
@@ -654,7 +650,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order = selectById(order.getId());
 		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){ //如果还是已下单状态，则将订单状态改为未下单
 			orderMapper.clearPushOrder(order.getId(),ProductionStatus.NOT_ORDER);
-			orderProductionStateContainer.removePushOrder(order);
 		}
 	}
 

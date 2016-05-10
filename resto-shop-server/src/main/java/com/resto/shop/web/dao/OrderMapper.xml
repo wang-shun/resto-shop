@@ -531,7 +531,7 @@
   </select>
   
   <update id="clearPushOrder" >
-  	update tb_order set push_order_time=(NULL),production_status =#{1} where id=#{0} 
+  	update tb_order set push_order_time=(NULL),production_status =#{1},allow_cancel=1 where id=#{0} 
   </update>
   <update id="setOrderNumber" >
   	update tb_order set table_number=#{1} where id=#{0}
