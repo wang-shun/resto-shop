@@ -93,5 +93,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Double selectParentAmount(String orderId);
 
 	void changeAllowContinue(String id, boolean b);
+
+	Integer selectArticleCountById(String id);
+
+	List<Order> selectByParentId(String parentOrderId);
+
+	List<String> selectChildIdsByParentId(String id);
 	
 }

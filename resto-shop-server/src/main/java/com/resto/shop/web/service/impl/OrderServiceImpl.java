@@ -45,6 +45,7 @@ import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.model.Printer;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
@@ -120,8 +121,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 	@Override
-	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId,
-			String ORDER_STATE) {
+	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId,String ORDER_STATE) {
 		String[] states = null;
 		if (ORDER_STATE != null) {
 			states = ORDER_STATE.split(",");
@@ -297,12 +297,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public Order payOrderSuccess(Order order) {
 		order.setOrderState(OrderState.PAYMENT);
 		update(order);
+		if(order.getParentOrderId()!=null){  //子订单
+			Order parent = selectById(order.getParentOrderId());
+			int articleCountWithChildren = selectArticleCountById(parent.getId());
+			if(parent.getLastOrderTime()==null||parent.getLastOrderTime().getTime()<order.getCreateTime().getTime()){
+				parent.setLastOrderTime(order.getCreateTime());
+			}
+			Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+			parent.setCountWithChild(articleCountWithChildren);
+			parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+			update(parent);
+			try {
+				order = pushOrder(order.getId());
+				log.info("子订单，自动下单成功："+order.getId());
+				MQMessageProducer.sendPlaceOrderMessage(order);
+			} catch (AppException e) {
+				e.printStackTrace();
+				log.error("子订单自动下单失败:"+e.getMessage());
+				changePushOrder(order);
+			}
+		}
 		return order;
 	}
 
-	private void updateParentAmount(String orderId) {
-		Double money = orderMapper.selectParentAmount(orderId);
-		orderMapper.updateParentAmount(orderId,money);
+	private int selectArticleCountById(String id) {
+		return orderMapper.selectArticleCountById(id);
 	}
 
 	@Override
@@ -310,11 +329,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date beginDate = DateUtil.getDateBegin(new Date());
 		Integer[] orderState = new Integer[] { OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM };
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
+		if(order.getParentOrderId()!=null){
+			return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
+		}
 		if (order != null) {
 			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
 			order.setOrderItems(itemList);
+			List<String> childIds = selectChildIdsByParentId(order.getId());
+			List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
+			order.getOrderItems().addAll(childItems);
 		}
 		return order;
+	}
+
+	private List<String> selectChildIdsByParentId(String id) {
+		return orderMapper.selectChildIdsByParentId(id);
+	}
+
+	@Override
+	public List<Order> selectByParentId(String parentOrderId) {
+		return orderMapper.selectByParentId(parentOrderId);
 	}
 
 	@Override
@@ -421,7 +455,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				log.info("打印成功，订单为子订单:"+order.getId()+" pid:"+order.getParentOrderId());
 				order.setAllowContinueOrder(false);
 				order.setAllowAppraise(false);
-				updateParentAmount(order.getParentOrderId());
 			}
 			order.setProductionStatus(ProductionStatus.PRINTED);
 			order.setPrintOrderTime(new Date());
@@ -489,7 +522,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//打印线程集合
 		List<Map<String,Object>> printTask = new ArrayList<Map<String,Object>>();
 		
-		String modeText = DistributionType.getModeText(order.getDistributionModeId());//就餐模式
+		String modeText = getModeText(order);//就餐模式
 		String serialNumber = order.getSerialNumber();//序列号
 		
 		//编列 厨房菜品 集合
@@ -537,6 +570,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
   
+	private String getModeText(Order order) {
+		if(order==null){
+			return "";
+		}
+		String text = DistributionType.getModeText(order.getDistributionModeId());
+		if(order.getParentOrderId()!=null){  //如果是加菜的订单，会出现加的字样
+			text+=" (加)";
+		}
+		return text;
+	}
+
 	@Override
 	public Map<String, Object> printReceipt(String orderId) {
 		// 根据id查询订单
@@ -565,7 +609,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 
 		Map<String, Object> data = new HashMap<>();
-		String modeText = DistributionType.getModeText(order.getDistributionModeId());
+		String modeText = getModeText(order);
 		data.put("DISTRIBUTION_MODE", modeText);
 		data.put("ARTICLE_COUNT", order.getArticleCount());
 		data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -652,7 +696,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public void changePushOrder(Order order) {
 		order = selectById(order.getId());
-		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){ //如果还是已下单状态，则将订单状态改为未下单
+		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){ //如果还是已下单状态，则将订单状态改为未下单,并且订单改为可以取消
 			orderMapper.clearPushOrder(order.getId(),ProductionStatus.NOT_ORDER);
 		}
 	}

@@ -65,7 +65,7 @@ public class MQMessageProducer {
 			@Override
 			public void run() {
 				SendResult result = producer.send(message);
-				log.info("["+message.getTag()+"]"+"发送消息成功:"+result);
+				log.info("["+message.getTag()+"] "+"发送消息成功:"+result);
 			}
 		}).start();
 	}
@@ -111,6 +111,4 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
-	
-	
 }

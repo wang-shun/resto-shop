@@ -24,4 +24,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @return
 	 */
 	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate);
+
+	public List<OrderItem> listByOrderIds(List<String> childIds);
 }

@@ -115,4 +115,6 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public void updateAllowContinue(String id, boolean b);
 
+	List<Order> selectByParentId(String parentOrderId);
+
 }

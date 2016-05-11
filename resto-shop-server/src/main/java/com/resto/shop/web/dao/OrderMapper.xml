@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order" >
+    <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order" >
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="table_number" property="tableNumber" jdbcType="VARCHAR" />
     <result column="customer_count" property="customerCount" jdbcType="INTEGER" />
@@ -38,6 +38,8 @@
     <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL" />
     <result column="parent_order_id" property="parentOrderId" jdbcType="VARCHAR" />
     <result column="allow_continue_order" property="allowContinueOrder" jdbcType="BIT" />
+    <result column="count_with_child" property="countWithChild" jdbcType="INTEGER" />
+    <result column="last_order_time" property="lastOrderTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, table_number, customer_count, accounting_time, order_state, production_status, 
@@ -45,7 +47,8 @@
     confirm_time, print_times, allow_cancel, allow_appraise, closed, remark, create_time, 
     operator_id, customer_id, distribution_date, distribution_time_id, delivery_point_id, 
     shop_detail_id, distribution_mode_id, ver_code, push_order_time, print_order_time, 
-    call_number_time, order_mode, brand_id, amount_with_children, parent_order_id, allow_continue_order
+    call_number_time, order_mode, brand_id, amount_with_children, parent_order_id, allow_continue_order, 
+    count_with_child, last_order_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -69,7 +72,8 @@
       shop_detail_id, distribution_mode_id, ver_code, 
       push_order_time, print_order_time, call_number_time, 
       order_mode, brand_id, amount_with_children, 
-      parent_order_id, allow_continue_order)
+      parent_order_id, allow_continue_order, count_with_child, 
+      last_order_time)
     values (#{id,jdbcType=VARCHAR}, #{tableNumber,jdbcType=VARCHAR}, #{customerCount,jdbcType=INTEGER}, 
       #{accountingTime,jdbcType=DATE}, #{orderState,jdbcType=INTEGER}, #{productionStatus,jdbcType=INTEGER}, 
       #{originalAmount,jdbcType=DECIMAL}, #{reductionAmount,jdbcType=DECIMAL}, #{paymentAmount,jdbcType=DECIMAL}, 
@@ -81,7 +85,8 @@
       #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{verCode,jdbcType=VARCHAR}, 
       #{pushOrderTime,jdbcType=TIMESTAMP}, #{printOrderTime,jdbcType=TIMESTAMP}, #{callNumberTime,jdbcType=TIMESTAMP}, 
       #{orderMode,jdbcType=INTEGER}, #{brandId,jdbcType=VARCHAR}, #{amountWithChildren,jdbcType=DECIMAL}, 
-      #{parentOrderId,jdbcType=VARCHAR}, #{allowContinueOrder,jdbcType=BIT})
+      #{parentOrderId,jdbcType=VARCHAR}, #{allowContinueOrder,jdbcType=BIT}, #{countWithChild,jdbcType=INTEGER}, 
+      #{lastOrderTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order" >
     insert into tb_order
@@ -191,6 +196,12 @@
       <if test="allowContinueOrder != null" >
         allow_continue_order,
       </if>
+      <if test="countWithChild != null" >
+        count_with_child,
+      </if>
+      <if test="lastOrderTime != null" >
+        last_order_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -297,6 +308,12 @@
       </if>
       <if test="allowContinueOrder != null" >
         #{allowContinueOrder,jdbcType=BIT},
+      </if>
+      <if test="countWithChild != null" >
+        #{countWithChild,jdbcType=INTEGER},
+      </if>
+      <if test="lastOrderTime != null" >
+        #{lastOrderTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -405,6 +422,12 @@
       <if test="allowContinueOrder != null" >
         allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
       </if>
+      <if test="countWithChild != null" >
+        count_with_child = #{countWithChild,jdbcType=INTEGER},
+      </if>
+      <if test="lastOrderTime != null" >
+        last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -443,10 +466,11 @@
       brand_id = #{brandId,jdbcType=VARCHAR},
       amount_with_children = #{amountWithChildren,jdbcType=DECIMAL},
       parent_order_id = #{parentOrderId,jdbcType=VARCHAR},
-      allow_continue_order = #{allowContinueOrder,jdbcType=BIT}
+      allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
+      count_with_child = #{countWithChild,jdbcType=INTEGER},
+      last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  
   
   <select id="selectList" resultType="Order">select * from tb_order</select>
   
@@ -459,6 +483,7 @@
 			#{state}
 		</foreach>
   	</if>
+  	and parent_order_id is null 
   	 ORDER BY create_time DESC LIMIT #{start},#{datalength}
   </select>
   
@@ -514,7 +539,8 @@
 		id,
 		ver_code,
 		article_count,
-		table_number
+		table_number,
+		parent_order_id
 		FROM
 		tb_order 
 		WHERE
@@ -580,6 +606,15 @@
   <update id="changeAllowContinue">
 	  UPDATE tb_order SET allow_continue_order=#{1} where id=#{0}
   </update>
+  <select id="selectArticleCountById" resultType="Integer">
+  	select sum(article_count) from tb_order WHERE id=#{0} OR parent_order_id=#{0}
+  </select>
+  <select id="selectByParentId" resultType="Order">
+  	select * from tb_order where parent_order_id=#{0}
+  </select>
+  <select id="selectChildIdsByParentId" resultType="String">
+  	select id from tb_order where parent_order_id=#{0}
+  </select>
 </mapper>
 
 

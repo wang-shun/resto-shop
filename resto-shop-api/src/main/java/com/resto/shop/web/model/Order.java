@@ -88,6 +88,10 @@ public class Order {
 
     private Boolean allowContinueOrder;
     
+    private Integer countWithChild;
+
+    private Date lastOrderTime;
+    
     private Customer customer;
     
      /**
@@ -427,5 +431,21 @@ public class Order {
 
 	public void setAllowContinueOrder(Boolean allowContinueOrder) {
 		this.allowContinueOrder = allowContinueOrder;
+	}
+
+	public Integer getCountWithChild() {
+		return countWithChild;
+	}
+
+	public Date getLastOrderTime() {
+		return lastOrderTime;
+	}
+
+	public void setCountWithChild(Integer countWithChild) {
+		this.countWithChild = countWithChild;
+	}
+
+	public void setLastOrderTime(Date lastOrderTime) {
+		this.lastOrderTime = lastOrderTime;
 	}
 }
