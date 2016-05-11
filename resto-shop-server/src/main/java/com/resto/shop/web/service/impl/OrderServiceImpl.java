@@ -420,6 +420,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}else{
 				log.info("打印成功，订单为子订单:"+order.getId()+" pid:"+order.getParentOrderId());
 				order.setAllowContinueOrder(false);
+				order.setAllowAppraise(false);
 				updateParentAmount(order.getParentOrderId());
 			}
 			order.setProductionStatus(ProductionStatus.PRINTED);
@@ -604,7 +605,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			order.setConfirmTime(new Date());
 			order.setAllowCancel(false);
 			BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-			if(setting.getAppraiseMinMoney().compareTo(order.getOrderMoney())<=0){ //如果订单金额大于 评论金额 则允许评论
+			if(setting.getAppraiseMinMoney().compareTo(order.getOrderMoney())<=0&&order.getParentOrderId()==null){ //如果订单金额大于 评论金额 则允许评论
 				order.setAllowAppraise(true);
 			}else{
 				order.setAllowAppraise(false);
