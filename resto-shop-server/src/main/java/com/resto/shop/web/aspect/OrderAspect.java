@@ -69,11 +69,22 @@ public class OrderAspect {
 	private void sendPaySuccessMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
-		StringBuffer msg = new StringBuffer("取餐码："+order.getVerCode()+"\n");
+		StringBuffer msg = new StringBuffer();
+		msg.append("订单编号:"+order.getSerialNumber()+"\n");
+		if(order.getOrderMode()!=null){
+			switch (order.getOrderMode()) {
+			case ShopMode.TABLE_MODE:
+				msg.append("桌号:"+order.getTableNumber()+"\n");
+				break;
+			default:
+				msg.append("取餐码："+order.getVerCode()+"\n");
+				break;
+			}
+		}
 		if( order.getShopName()==null||"".equals(order.getShopName())){
 			order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
 		}
-		msg.append("取餐店铺："+order.getShopName()+"\n");
+		msg.append("就餐店铺："+order.getShopName()+"\n");
 		msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
 		msg.append("订单明细：\n");
 		List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
