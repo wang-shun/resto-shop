@@ -41,6 +41,8 @@ public class ShowPhotoController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid ShowPhoto brand){
+		System.out.println(getCurrentShopId());
+		brand.setShopDetailId(getCurrentShopId());
 		showphotoService.insert(brand);
 		return Result.getSuccess();
 	}

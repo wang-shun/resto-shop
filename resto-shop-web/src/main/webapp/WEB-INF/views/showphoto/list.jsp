@@ -23,7 +23,10 @@
 						</div>
 						<div class="form-group">
 						    <label>图片地址</label>
-						    <input type="text" class="form-control" name="picUrl" v-model="m.picUrl">
+						    <img src="" id="picUrl"/>
+							<input type="hidden" name="picUrl" v-model="m.picUrl">
+							<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+											    
 						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -101,8 +104,22 @@
 				}],
 		});
 		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			methods:{
+				uploadSuccess:function(url){
+					$("[name='picUrl']").val(url).trigger("change");
+					C.simpleMsg("上传成功");
+					$("#picUrl").attr("src","/"+url);
+				},
+				uploadError:function(msg){
+					C.errorMsg(msg);
+				},
+			}
+		});
+		C.vue=vueObj;
 	}());
-	
+
 </script>
