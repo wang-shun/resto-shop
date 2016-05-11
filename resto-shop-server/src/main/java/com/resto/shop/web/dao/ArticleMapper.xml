@@ -415,11 +415,10 @@
   
   <select id="selectList" resultMap="selectResultMap">
       select ar.*,arf.name as articleFamilyName from tb_article ar  left join tb_article_family arf on ar.article_family_id=arf.id
-	  <where>
+      where state=1
 	  	<if test="shopId!=null and shopId!=''">
-	  		ar.shop_detail_id = #{shopId} 
+	  		and ar.shop_detail_id = #{shopId} 
 	  	</if>
-	  </where>
   </select>
   <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
@@ -440,12 +439,14 @@
 			#{id}
 		</foreach>
   	) and a.shop_detail_id=#{shopId}
+  	and a.state=1
   </select>
   
   <!-- 根据是否谷清查询菜品信息 -->
   <select id="selectListByIsEmpty" resultType="Article">
   	SELECT a.id,a.peference,a.name,a.is_empty,f.name articleFamilyName from tb_article a LEFT JOIN tb_article_family f on
   	 a.article_family_id = f.id where a.activated = 1 and a.is_empty = #{isEmpty} and a.shop_detail_id = #{shopId}
+  	 and a.state=1
   </select>
   
   

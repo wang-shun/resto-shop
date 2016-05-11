@@ -635,12 +635,14 @@
 						that.m= article;
 						if(article.hasUnit&&article.hasUnit!=" "&&article.hasUnit.length){
 							var unit = article.hasUnit.split(",");
+							unit = $.unique(unit);
 							for(var i in  unit){
 								that.checkedUnit.push(parseInt(unit[i]));
 							}
 						}
 						that.unitPrices = article.articlePrices;
 					});
+					
 				},
 				filterTable:function(e){
 					var s  = $(e.target);
@@ -715,6 +717,7 @@
 				},
 				allUnitPrice:function(){
 					var result = [];
+					console.log(this.checkedUnit);
 					for(var i=0;i<this.articleattrs.length;i++){
 						var attr = this.articleattrs[i];
 						var checked =[];

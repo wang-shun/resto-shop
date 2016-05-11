@@ -118,6 +118,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		}
 		return articleList;
 	}
+	
+	@Override
+	public int delete(String id) {
+		Article article = selectById(id);
+		article.setState(false);
+		return update(article);
+	}
 
 	private Map<String, Article> selectAllSupportArticle(String currentShopId) {
 		List<SupportTime> supportTime = supportTimeService.selectNowSopport(currentShopId);
