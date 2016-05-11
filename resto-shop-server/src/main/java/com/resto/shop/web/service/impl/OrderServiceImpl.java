@@ -329,10 +329,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date beginDate = DateUtil.getDateBegin(new Date());
 		Integer[] orderState = new Integer[] { OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM };
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
-		if(order.getParentOrderId()!=null){
-			return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
-		}
 		if (order != null) {
+			if(order.getParentOrderId()!=null){
+				return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
+			}
 			List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
 			order.setOrderItems(itemList);
 			List<String> childIds = selectChildIdsByParentId(order.getId());
