@@ -215,7 +215,7 @@
   
   <!-- 根据订单ID查询订单项 -->
   <select id="listByOrderId" resultType="OrderItem">
-  	SELECT * from tb_order_item where order_id = #{orderId} ORDER BY sort
+  	SELECT * from tb_order_item where order_id = #{orderId} ORDER BY create_time
   </select>
   <select id="listByOrderIds" resultType="OrderItem">
   	SELECT * from tb_order_item where 
@@ -223,7 +223,7 @@
   	<foreach collection="list" open="(" separator="," close=")" item="oid">
   		#{oid}
   	</foreach>
-  	 ORDER BY sort
+  	 ORDER BY create_time
   </select>
   <insert id="insertBatch">
   	insert into tb_order_item 
