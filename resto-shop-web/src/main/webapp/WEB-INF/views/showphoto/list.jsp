@@ -13,14 +13,33 @@
 	            <div class="portlet-body">
 	            	<form role="form" action="{{m.id?'showphoto/modify':'showphoto/create'}}" @submit.prevent="save">
 						<div class="form-body">
-							<div class="form-group">
-						    <label>图片的类型</label>
-						    <input type="text" class="form-control" name="showType" v-model="m.showType">
+						<div class="form-group">
+							<div label for="showType" class="control-label">选择图片类型</div>
+							<div>
+								<select class="form-control" name="showType" v-model="m.showType">
+									<option v-for="typeName in typeNames" :value="typeName.id">
+										{{typeName.value}}
+									</option>
+								</select>							
+							</div>
 						</div>
+						
+<!-- 						<div class="form-group col-md-4"> -->
+<!-- 					    <label class="col-md-5 control-label">餐品类别</label> -->
+<!-- 					    <div class="col-md-7"> -->
+<%-- 						    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId"> --%>
+<!-- 						    	<option :value="f.id" v-for="f in articlefamilys"> -->
+<!-- 						    		{{f.name}} -->
+<!-- 						    	</option> -->
+<%-- 						    </select> --%>
+<!-- 					    </div> -->
+<!-- 						</div> -->
+						
 						<div class="form-group">
 						    <label>主题</label>
 						    <input type="text" class="form-control" name="title" v-model="m.title">
 						</div>
+						
 						<div class="form-group">
 						    <label>图片地址</label>
 						    <img src="" id="picUrl"/>
@@ -67,7 +86,6 @@
 					title : "展示类型",
 					data : "showType",
 					createdCell:function(td,tdData,rowData,row){
-						console.log(tdData);
 						var typeName;
 						if(tdData==1){
 							typeName='餐品图片';
@@ -107,6 +125,9 @@
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
 			el:"#control",
+			data:{
+				typeNames:[{"id":"1","value":"餐品图片"},{"id":"2","value":"展示的图片"},{"id":"4","value":"差评"}],
+			},
 			mixins:[C.formVueMix],
 			methods:{
 				uploadSuccess:function(url){
