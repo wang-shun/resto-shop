@@ -19,11 +19,13 @@ import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.ShowPhoto;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.AppraiseService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.RedConfigService;
 import com.resto.shop.web.service.ShowPhotoService;
@@ -56,6 +58,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
     
     @Resource
     CustomerService customerService;
+    
+    @Resource
+    OrderItemService orderItemService;
     
     @Override
     public GenericDao<Appraise, String> getDao() {
@@ -149,7 +154,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		int type = appraise.getType();
 		switch (type) {
 		case 1: //好评
-			String articleId = appraise.getArticleId();
+			String itemId = appraise.getArticleId();
+			OrderItem item = orderItemService.selectById(itemId);
+			String articleId  = item.getArticleId();
 			if(articleId.contains("@")){
 				articleId = articleId.split("@")[0];
 			}
