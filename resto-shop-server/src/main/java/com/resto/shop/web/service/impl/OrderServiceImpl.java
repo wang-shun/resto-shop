@@ -649,7 +649,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order confirmOrder(Order order) {
 		order = selectById(order.getId());
-		if(order.getConfirmTime()==null){
+		if(order.getConfirmTime()==null&&!order.getClosed()){
 			order.setOrderState(OrderState.CONFIRM);
 			order.setConfirmTime(new Date());
 			order.setAllowCancel(false);
