@@ -29,7 +29,7 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
 	public void saveArticlePrices(String articleId,List<ArticlePrice> articlePrises) {
 		articlepriceMapper.deleteArticlePrices(articleId);
 		for(ArticlePrice price:articlePrises){
-			price.setId(ApplicationUtils.randomUUID());
+			price.setId(articleId+"@"+price.getUnitIds());
 			price.setArticleId(articleId);
 			articlepriceMapper.insertSelective(price);
 		}
