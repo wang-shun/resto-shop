@@ -502,6 +502,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(item.getType()==OrderItemType.UNITPRICE){
 				if(articleId.length()>32){
 					articleId = item.getArticleId().substring(0,32);
+				}else{
+					ArticlePrice price = articlePriceService.selectById(articleId);
+					if(price!=null){
+						articleId = price.getArticleId();
+					}
 				}
 			}
 			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
