@@ -113,13 +113,6 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		if(order.getAllowAppraise()){
 			String pic = getPicture(appraise);
 			appraise.setPictureUrl(pic);
-			if(1==appraise.getType()&&appraise.getArticleId()!=null){
-				String articleId =appraise.getArticleId(); 
-				if(articleId.contains("@")){
-					articleId = articleId.split("@")[0];
-				}
-				articleService.addLikes(articleId);
-			}
 			appraise.setId(ApplicationUtils.randomUUID());
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
@@ -163,6 +156,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			Article article = articleService.selectById(articleId);
 			if(article!=null){
 				pic = article.getPhotoSmall();
+				articleService.addLikes(article.getId());
 			}
 			break;
 		case 2:
