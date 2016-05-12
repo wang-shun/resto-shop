@@ -13,7 +13,7 @@ public class Advert {
     @NotBlank(message="{描述不能为空}")
     private String description;
     
-    @NotNull(message="{状态不能为空}")
+   
     private Byte state;
 
     private String shopDetailId;
