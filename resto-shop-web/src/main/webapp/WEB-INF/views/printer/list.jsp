@@ -22,7 +22,7 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">I&nbsp;P&nbsp;地址：</label>
 							    <div class="col-sm-8">
-							   		<input type="text" class="form-control" required name="ip" v-model="m.ip">
+							   		<input type="text" class="form-control" required name="ip" v-model="m.ip" onclick="$('#validateMsg').hide()">
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -32,12 +32,11 @@
 							    	<input type="text" class="form-control" required  name="port" v-model="m.port">
 							    </div>
 							</div>
-							
 							<div class="form-group">
 								<div class="col-sm-3 control-label">打印机类型：</div>
 								<div class="col-sm-9 radio-list">
 								    <label class="radio-inline">
-								    	<input type="radio"  name="printType" v-model="m.printType" value="1">
+								    	<input type="radio"  name="printType" required v-model="m.printType" value="1">
 								    	厨房</label> 
 							    	<label class="radio-inline">
 								    	<input type="radio"  name="printType" v-model="m.printType" value="2">
@@ -52,6 +51,10 @@
 							<input type="hidden" name="id" v-model="m.id" />
 							<input class="btn green" type="submit" value="保存" />
 							<a class="btn default" @click="cancel">取消</a>
+						</div>
+						<div class="text-center" style="display: none;" id="validateMsg">
+							<br/><br/>
+							<p class="text-danger"><strong>IP地址格式不正确</strong></p>
 						</div>
 					</form>
 	            </div>
@@ -135,12 +138,36 @@
 		var C = new Controller(cid,tb);
 		var vueObj = new Vue({
 			el:"#control",
-			mixins:[C.formVueMix]
+			mixins:[C.formVueMix],
+			methods:{
+				save:function(e){
+					var that = this;
+					var formDom = e.target;
+					if(isIP(formDom.ip.value)){
+						C.ajaxFormEx(formDom,function(){
+							that.cancel();
+							tb.ajax.reload();
+						});
+					}else{
+						$("#validateMsg").show();
+					}
+				},
+			}
 		});
 		C.vue = vueObj;
 	}());
 	
-	
+	function isIP(str){
+		console.log(str);
+		var flag = true;
+		var regexp = /^[A-Za-z]+$/	//验证是否为纯字母
+		if(!regexp.test(str)){
+			//验证 IP 地址是否合法
+			regexp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+			flag = regexp.test(str)?true:false;
+		}
+		return flag;
+	}
 
 	
 </script>
