@@ -157,6 +157,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			if(article!=null){
 				pic = article.getPhotoSmall();
 				articleService.addLikes(article.getId());
+				appraise.setArticleId(article.getId());
 			}
 			break;
 		case 2:
