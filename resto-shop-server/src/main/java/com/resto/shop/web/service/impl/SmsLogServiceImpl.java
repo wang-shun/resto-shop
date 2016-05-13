@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.json.JSONObject;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
@@ -52,6 +54,11 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		smsLog.setCreateTime(new Date());
 		smsLog.setPhone(phone);
 		smsLog.setSmsResult(string);
+		JSONObject obj = new JSONObject(string);
+		if(obj.optBoolean("success",false)){
+			
+		}
+		log.info("短信发送结果:"+string);
 		try{
 			insert(smsLog);
 		}catch(Exception e){

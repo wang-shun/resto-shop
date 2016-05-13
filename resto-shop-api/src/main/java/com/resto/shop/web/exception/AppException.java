@@ -1,7 +1,5 @@
 package com.resto.shop.web.exception;
 
-import com.resto.shop.web.exception.AppException.ErrorMsg;
-
 public class AppException extends Exception{
 	/**
 	 * 

@@ -3,9 +3,9 @@ package com.resto.shop.web.model;
 import java.util.Date;
 
 public class SmsLog {
-    public static final Byte CODE = 1;//验证码短信 
+    public static final Integer CODE = 1;//验证码短信 
 
-	private Long id;
+    private Long id;
 
     private String phone;
 
@@ -13,7 +13,7 @@ public class SmsLog {
 
     private Date createTime;
 
-    private Byte smsType;
+    private Integer smsType;
 
     private String smsResult;
 
@@ -21,6 +21,8 @@ public class SmsLog {
 
     private String brandId;
 
+    private Boolean isSuccess;
+    
     public Long getId() {
         return id;
     }
@@ -53,11 +55,11 @@ public class SmsLog {
         this.createTime = createTime;
     }
 
-    public Byte getSmsType() {
+    public Integer getSmsType() {
         return smsType;
     }
 
-    public void setSmsType(Byte smsType) {
+    public void setSmsType(Integer smsType) {
         this.smsType = smsType;
     }
 
@@ -84,4 +86,12 @@ public class SmsLog {
     public void setBrandId(String brandId) {
         this.brandId = brandId == null ? null : brandId.trim();
     }
+
+	public Boolean getIsSuccess() {
+		return isSuccess;
+	}
+
+	public void setIsSuccess(Boolean isSuccess) {
+		this.isSuccess = isSuccess;
+	}
 }
