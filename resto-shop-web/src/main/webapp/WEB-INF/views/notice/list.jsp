@@ -119,7 +119,7 @@
 					}
 				},                 
 				{                 
-					title : "排序方式",
+					title : "排序",
 					data : "sort",
 				},                 
 // 				{                 
@@ -130,6 +130,10 @@
 				{                 
 					title : "图片",
 					data : "noticeImage",
+					defaultContent:'',
+					createdCell:function(td,tdData){
+						$(td).html("<image src='/"+tdData+"' style='height:40px;width:80px;'/>")
+					}
 				},                 
 				{                 
 					title : "通知类型",

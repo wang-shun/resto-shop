@@ -104,6 +104,10 @@
 				{                 
 					title : "图片地址",
 					data : "picUrl",
+					defaultContent:'',
+					createdCell:function(td,tdData){
+						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
+					}
 				},                 
 				{
 					title : "操作",
