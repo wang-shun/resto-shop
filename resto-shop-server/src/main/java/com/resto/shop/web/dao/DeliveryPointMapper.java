@@ -1,10 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.DeliveryPoint;
-
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.DeliveryPoint;
 
 public interface DeliveryPointMapper  extends GenericDao<DeliveryPoint,Integer> {
     int deleteByPrimaryKey(Integer id);

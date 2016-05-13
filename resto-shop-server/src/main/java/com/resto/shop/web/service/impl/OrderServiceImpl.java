@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -415,6 +416,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	private boolean validOrderCanPush(Order order) throws AppException {
 		if(order.getOrderState()!=OrderState.PAYMENT||ProductionStatus.NOT_ORDER!=order.getProductionStatus()){
+			log.error("立即下单失败: "+order.getId());
 			throw new AppException(AppException.ORDER_STATE_ERR);
 		}
 		switch(order.getOrderMode()){

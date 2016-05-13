@@ -1,12 +1,11 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.MealTemp;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.MealTemp;
 
 public interface MealTempMapper  extends GenericDao<MealTemp,Integer> {
     int deleteByPrimaryKey(Integer id);

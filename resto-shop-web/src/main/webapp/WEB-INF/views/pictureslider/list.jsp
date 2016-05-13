@@ -14,13 +14,13 @@
 					<form role="form" class="form-horizontal" action="{{m.id?'pictureslider/modify':'pictureslider/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-								<label class="col-sm-3 control-label">标题：</label>
+								<label class="col-sm-3 control-label">图片名称：</label>
 								<div class="col-sm-8">
 									<input type="text" class="form-control" name="title" v-model="m.title">
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-3 control-label">路径：</label>
+								<label class="col-sm-3 control-label">图片路径：</label>
 								<div class="col-sm-8">
 									<img src="" id="pictureUrl"/>
 								    <input type="hidden" name="pictureUrl" v-model="m.pictureUrl">
@@ -71,11 +71,11 @@
 			},
 			columns : [
 				{                 
-					title : "标题",
+					title : "图片名称",
 					data : "title",
 				},                 
 				{                 
-					title : "图片路径",
+					title : "图片预览",
 					data : "pictureUrl",
 					defaultContent:'',
 					createdCell:function(td,tdData){

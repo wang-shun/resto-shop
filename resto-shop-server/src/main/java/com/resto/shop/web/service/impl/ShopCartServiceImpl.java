@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.List;
+
 import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -8,6 +9,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ShopCartMapper;
 import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**

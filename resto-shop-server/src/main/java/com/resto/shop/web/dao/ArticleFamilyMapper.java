@@ -1,12 +1,11 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.ArticleFamily;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.ArticleFamily;
 
 public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
     int deleteByPrimaryKey(String id);

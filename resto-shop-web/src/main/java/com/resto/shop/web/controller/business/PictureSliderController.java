@@ -42,6 +42,7 @@ public class PictureSliderController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid PictureSlider pictureSlider){
 		pictureSlider.setShopDetailId(getCurrentShopId());
+		pictureSlider.setState((byte)1);
 		picturesliderService.insert(pictureSlider);
 		return Result.getSuccess();
 	}

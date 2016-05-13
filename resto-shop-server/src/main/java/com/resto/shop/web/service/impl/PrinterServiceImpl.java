@@ -3,11 +3,13 @@ package com.resto.shop.web.service.impl;
 import java.util.List;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.PrinterMapper;
 import com.resto.shop.web.model.Printer;
 import com.resto.shop.web.service.PrinterService;
+
 import cn.restoplus.rpc.server.RpcService;
 
 /**

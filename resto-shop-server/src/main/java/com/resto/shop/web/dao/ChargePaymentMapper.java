@@ -1,7 +1,7 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.ChargePayment;
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.ChargePayment;
 
 public interface ChargePaymentMapper  extends GenericDao<ChargePayment,String> {
     int deleteByPrimaryKey(String id);

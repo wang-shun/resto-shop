@@ -1,10 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.NewCustomCoupon;
-
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.NewCustomCoupon;
 
 public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long> {
     int deleteByPrimaryKey(Long id);

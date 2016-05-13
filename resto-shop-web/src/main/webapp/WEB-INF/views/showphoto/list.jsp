@@ -14,29 +14,7 @@
 	            	<form role="form" action="{{m.id?'showphoto/modify':'showphoto/create'}}" @submit.prevent="save">
 						<div class="form-body">
 						<div class="form-group">
-							<div label for="showType" class="control-label">选择图片类型</div>
-							<div>
-								<select class="form-control" name="showType" v-model="m.showType">
-									<option v-for="typeName in typeNames" :value="typeName.id">
-										{{typeName.value}}
-									</option>
-								</select>							
-							</div>
-						</div>
-						
-<!-- 						<div class="form-group col-md-4"> -->
-<!-- 					    <label class="col-md-5 control-label">餐品类别</label> -->
-<!-- 					    <div class="col-md-7"> -->
-<%-- 						    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId"> --%>
-<!-- 						    	<option :value="f.id" v-for="f in articlefamilys"> -->
-<!-- 						    		{{f.name}} -->
-<!-- 						    	</option> -->
-<%-- 						    </select> --%>
-<!-- 					    </div> -->
-<!-- 						</div> -->
-						
-						<div class="form-group">
-						    <label>主题</label>
+						    <label>显示的标题名称</label>
 						    <input type="text" class="form-control" name="title" v-model="m.title">
 						</div>
 						
@@ -82,23 +60,8 @@
 				dataSrc : ""
 			},
 			columns : [
-								{                 
-					title : "展示类型",
-					data : "showType",
-					createdCell:function(td,tdData,rowData,row){
-						var typeName;
-						if(tdData==1){
-							typeName='餐品图片';
-						}else if(tdData==2){
-							typeName='展示的图片';
-						}else if(tdData==4){
-							typeName='差评';
-						}
-						$(td).html(typeName);
-					}
-				},                 
 				{                 
-					title : "主题",
+					title : "显示的标题名称",
 					data : "title",
 				},                 
 				{                 

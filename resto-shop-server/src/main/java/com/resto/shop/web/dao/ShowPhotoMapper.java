@@ -1,10 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.ShowPhoto;
-
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.ShowPhoto;
 
 public interface ShowPhotoMapper  extends GenericDao<ShowPhoto,Integer> {
     int deleteByPrimaryKey(Integer id);
