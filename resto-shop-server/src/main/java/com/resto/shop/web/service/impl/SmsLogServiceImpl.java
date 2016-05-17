@@ -75,9 +75,15 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
 	@Override
 	public List<SmsLog> selectListByShopIdAndDate(String ShopId) {
-		System.out.println(DateUtil.getAfterDayDate(new Date(), -2));
 		Date begin = DateUtil.getDateBegin(DateUtil.getAfterDayDate(new Date(), -2));
 		return smslogMapper.selectListByShopIdAndDate(ShopId,begin);
-	} 
+	}
+
+	@Override
+	public List<SmsLog> selectListWhere(List<String> shopIds,Date begin, Date end) {
+		return smslogMapper.selectListByWhere(shopIds,begin,end);
+	}
+
+
 
 }

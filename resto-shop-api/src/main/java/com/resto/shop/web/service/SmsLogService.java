@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.util.Date;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
@@ -17,8 +18,14 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
 	
 	/**
 	 * 根据店铺ID查询两天内的短信记录
-	 * @param currentShopId
+	 * @param smsLog
 	 * @return
 	 */
-	List<SmsLog> selectListByShopIdAndDate(String currentShopId);
+	List<SmsLog> selectListByShopIdAndDate(String shopId);
+	/**
+	 * 根据时间和店铺查询记录
+	 * @param smsLog
+	 * @return
+	 */
+	List<SmsLog> selectListWhere(List<String> shopIds,Date begin, Date end);
 }
