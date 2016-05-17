@@ -28,13 +28,12 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				<form role="form" class="form-horizontal">
+				<form role="form" class="form-horizontal" onsubmit="return false">
 					<div class="form-body">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">充值品牌：</label>
 							<div class="col-sm-8">
 								<input type="text" disabled="disabled" class="form-control" required name="brandName"> 
-								<input type="hidden" name="brandId">
 							</div>
 						</div>
 						<div class="form-group">
@@ -46,7 +45,7 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">充值金额：</label>
 							<div class="col-sm-8">
-								<input type="text" class="form-control" required name="chargeMoney">
+								<input type="text" class="form-control" placeholder="请输入要充值的金额" required name="chargeMoney">
 							</div>
 						</div>
 						<div class="form-group">
@@ -82,8 +81,7 @@
 						data : "brandName",
 						createdCell : function(td,tdData,rowData){
 							$(":input[name='brandName']").val(tdData);
-							$(":input[name='brandId']").val(rowData.brandId);
-							$(":input[name='smsUnitPrice']").val(rowData.smsUnitPrice);
+							$(":input[name='smsUnitPrice']").val(rowData.smsUnitPrice);//需要改成ajax查询
 						}
 					},
 					{
@@ -134,6 +132,18 @@
 				$(":input[name='number']").val(sum.toFixed(0));
 			}else{
 				$(this).val(chargeMoney.substring(0,chargeMoney.length-1));
+			}
+		})
+		
+		$("form").click(function(){
+			var chargeMoney = $(":input[name='chargeMoney']").val();
+			if(chargeMoney!=null && chargeMoney!="" && !isNaN(chargeMoney)){
+				$.post("smschargeorder/smscharge",{"chargeMoney":chargeMoney},function(result){
+					console.log(result);
+				})
+			}else{
+				$(":input[name='chargeMoney']").val("");
+				$(":input[name='number']").val("");
 			}
 		})
 	}());

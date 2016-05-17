@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +32,11 @@ public class SmsChargeOrderController extends GenericController {
 		return getSuccessResult(list);
 	}
 	
-	
-	public Result smsCharge(){
+	@RequestMapping("/smscharge")
+	@ResponseBody
+	public Result smsCharge(String chargeMoney,HttpServletRequest request){
+		String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
+		System.out.println(url);
 		
 		return getSuccessResult();
 	}
