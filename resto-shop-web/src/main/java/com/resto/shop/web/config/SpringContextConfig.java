@@ -219,6 +219,11 @@ public class SpringContextConfig {
 		return getProxy(MealAttrService.class);
 	}
 	
+	@Bean
+	public SmsChargeOrderService smsChargeOrderService(){
+		return proxy.create(SmsChargeOrderService.class);
+	}
+	
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}
