@@ -23,21 +23,21 @@
 						readonly="readonly">
 				</div>
 			</div>
-<%-- 			<s:hasPermission name="order/isAdmin"> --%>
- 				<div class="form-group">
-					<label for="choiceShop" class="col-sm-2 control-label">店铺选择</label>
-					<div class="col-sm-10" id="choiceShop">
+			<%-- 			<s:hasPermission name="order/isAdmin"> --%>
+			<div class="form-group">
+				<label for="choiceShop" class="col-sm-2 control-label">店铺选择</label>
+				<div class="col-sm-10" id="choiceShop">
 					<c:if test="${shopDetails}!=null">
-						<c:forEach items="${shopDetails}" var="item" >
- 							<label class='checkbox-inline'> <input type='checkbox'
-								name='shopIds' value="${item.id}"/>${item.name}
-							</label> 
+						<c:forEach items="${shopDetails}" var="item">
+							<label class='checkbox-inline'> <input type='checkbox'
+								name='shopIds' value="${item.id}" />${item.name}
+							</label>
 						</c:forEach>
 					</c:if>
-						
-					</div>
+
 				</div>
-<%-- 			</s:hasPermission> --%>
+			</div>
+			<%-- 			</s:hasPermission> --%>
 
 
 			<div class="form-group">
@@ -90,18 +90,16 @@
 		$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 
 		//查询店铺
-		$
-				.ajax({
+			$.ajax({
 					url : 'smsloginfo/shopName',
 					success : function(data) {
-						$(data)
-								.each(
-										function(i, shop) {
-											var str = "<label class='checkbox-inline'>"
-													+ "<input type='checkbox' name='shopIds' value='"+shop.id+"'/>"
-													+ shop.name + "</label>";
-											$("#choiceShop").append(str);
-										})
+						$(data).each(
+									function(i, shop) {
+										var str = "<label class='checkbox-inline'>"
+												+ "<input type='checkbox' name='shopIds' value='"+shop.id+"'/>"
+												+ shop.name + "</label>";
+										$("#choiceShop").append(str);
+									})
 						//默认选择所有店铺
 						$(":checkbox[name='shopIds']").prop("checked", true);
 						$("#choiceShop").trigger("create");
@@ -115,18 +113,19 @@
 				data : function(d) {
 					d.begin = $("#beginDate").val();
 					d.end = $("#endDate").val();
-					var shopIds = "";
-					$('input:checkbox[name=shopIds] :checked').each(function(i) {
-						if(0==i){
-							shopIds=$(this).val();
-						}else{
-							shopIds += (","+$(this).val());							
-						}
-					})
-					d.shopIds = shopIds;
+					var shopIds = "86d0cb619e224a85a1419060d3fba8de";
+					/* $("input[name='shopIds'] :checked").each(
+							function() {
+								if($(this).attr("checked")){
+									shopIds += $(this).val()+","
+								}
+								console.log(shopIds);
+							})
+					d.shopIds = shopIds; */
+					d.shopIds=shopIds;
 					return d;
 				}
-		
+
 			},
 			columns : [ {
 				title : "手机号",

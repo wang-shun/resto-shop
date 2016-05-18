@@ -90,8 +90,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		String[] temp = shopIds.split(","); 
 		System.out.println(temp);
 		//查询短信记录
-//		List<SmsLog> list =  smslogMapper.selectListByWhere(beginDate, endDate, temp);
-		List<SmsLog> list =  smslogMapper.selectListByWhere(temp);
+		List<SmsLog> list =  smslogMapper.selectListByWhere(beginDate, endDate, temp);
 		for (SmsLog smsLog : list) {
 			smsLog.setSmsLogTyPeName(SmsLogType.getSmsLogTypeName(smsLog.getSmsType()));
 		}
