@@ -182,10 +182,10 @@
 		FROM tb_sms_log
 		where
 		shop_detail_id IN
-		<if test="shopIds != null and shopIds != '' ">
-			<foreach collection="shopIds" item="temp" open="("
+		<if test="ids != null and ids != '' ">
+			<foreach collection="ids" item="id" open="("
 				separator="," close=")">
-				#{temp}
+				#{id}
 			</foreach>
 		</if>
 		AND <![CDATA[create_time>#{begin} AND create_time<#{end}]]>

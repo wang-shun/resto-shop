@@ -31,11 +31,7 @@ public interface SmsLogMapper  extends GenericDao<SmsLog,Long> {
 
 	List<SmsLog> selectListByShopIdAndDate(@Param("shopId") String shopId,@Param("begin") Date begin);
 
-//	List<SmsLog> selectListByWhere(@Param("maps")Map<?, ?> maps);
-
 	List<SmsLog> selectListByWhere(@Param("begin")Date beginDate,@Param("end")Date endDate,@Param("ids")String[] ids);
-	
-	//List<SmsLog> selectListByWhere(@Param("shopIds")String[] shopIds);
 	
 	
 	/**

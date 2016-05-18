@@ -110,6 +110,7 @@
 			ajax : {
 				url : "smsloginfo/listByShop",
 				dataSrc : "",
+				type : "POST",
 				data : function(d) {
 					d.begin = $("#beginDate").val();
 					d.end = $("#endDate").val();
@@ -124,7 +125,7 @@
 					d.shopIds = shopIds; */
 					d.shopIds=shopIds;
 					return d;
-				}
+				},
 
 			},
 			columns : [ {

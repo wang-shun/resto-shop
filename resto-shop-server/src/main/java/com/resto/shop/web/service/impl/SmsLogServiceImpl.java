@@ -88,7 +88,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		Date beginDate = DateUtil.getformatBeginDate(begin);
 		Date endDate = DateUtil.getformatEndDate(end);
 		String[] temp = shopIds.split(","); 
-		System.out.println(temp);
 		//查询短信记录
 		List<SmsLog> list =  smslogMapper.selectListByWhere(beginDate, endDate, temp);
 		for (SmsLog smsLog : list) {
