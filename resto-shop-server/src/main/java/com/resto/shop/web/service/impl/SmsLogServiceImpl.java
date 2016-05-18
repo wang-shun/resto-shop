@@ -1,7 +1,10 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,6 +18,7 @@ import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.SmsLogService;
@@ -29,7 +33,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
     @Resource
     private SmsLogMapper smslogMapper;
-
+    
     @Resource
     BrandService brandService;
     
@@ -80,8 +84,29 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	}
 
 	@Override
-	public List<SmsLog> selectListWhere(List<String> shopIds,Date begin, Date end) {
-		return smslogMapper.selectListByWhere(shopIds,begin,end);
+	public List<SmsLog> selectListWhere(String begin,String end,String shopIds) {
+		Date beginDate = DateUtil.getformatBeginDate(begin);
+		Date endDate = DateUtil.getformatEndDate(end);
+		String[] temp = shopIds.split(","); 
+		System.out.println(temp);
+		//查询短信记录
+//		List<SmsLog> list =  smslogMapper.selectListByWhere(beginDate, endDate, temp);
+		List<SmsLog> list =  smslogMapper.selectListByWhere(temp);
+		for (SmsLog smsLog : list) {
+			smsLog.setSmsLogTyPeName(SmsLogType.getSmsLogTypeName(smsLog.getSmsType()));
+		}
+		
+		return list;
+		
+	}
+
+	@Override
+	public List<SmsLog> selecByBrandId(String brandId) {
+		List<SmsLog> list = smslogMapper.selectListByBrandId(brandId);
+		for (SmsLog smsLog : list) {
+			smsLog.setSmsLogTyPeName(SmsLogType.getSmsLogTypeName(smsLog.getSmsType()));
+		}
+		return list;
 	}
 
 

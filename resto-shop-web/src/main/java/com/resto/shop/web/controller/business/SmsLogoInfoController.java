@@ -1,15 +1,17 @@
  package com.resto.shop.web.controller.business;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
@@ -36,7 +38,12 @@ public class SmsLogoInfoController extends GenericController{
 	
 	
 	@RequestMapping("/list")
-    public void list(){
+    public ModelAndView list(){
+		ModelAndView mv = new ModelAndView();
+		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+		mv.setViewName("smsloginfo/list");;
+		mv.addObject("shopDetails", shopDetails);
+		return mv;
     }
 	
 	@ResponseBody
@@ -48,30 +55,13 @@ public class SmsLogoInfoController extends GenericController{
 	@ResponseBody
 	@RequestMapping("/list_all")
 	public List<SmsLog> list_all(){
-		
-		return smsLogService.selectList();
+		return smsLogService.selecByBrandId(getCurrentBrandId());
 	}
 	
 	@ResponseBody
 	@RequestMapping("/listByShop")
-	public List<SmsLog> listByWhere(List<String> shopIds,Date begin,Date end){
-		return smsLogService.selectListWhere(shopIds,begin,end) ;
-		
+	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
+		return smsLogService.selectListWhere(begin,end,shopIds) ;
 	}
-	
-	@RequestMapping("/orderPaymentItems")
-	@ResponseBody
-	public Result orderPaymentItems(String beginDate,String endDate){
-		//收入条目
-		return getSuccessResult(orderPaymentItemService.selectpaymentByPaymentMode(getCurrentShopId(),beginDate,endDate));
-	}
-	
-	@RequestMapping("/orderArticleItems")
-	@ResponseBody
-	public Result reportList(String beginDate,String endDate){
-		//菜品销售记录
-		return getSuccessResult(orderItemService.selectSaleArticleByDate(getCurrentShopId() ,beginDate, endDate));
-	}
-	
 	
 }
