@@ -1,16 +1,25 @@
 package com.resto.shop.web.controller.business;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.brand.core.alipay.util.AlipayNotify;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.SmsChargeOrder;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.SmsChargeOrderService;
 import com.resto.shop.web.controller.GenericController;
 
@@ -20,6 +29,9 @@ public class SmsChargeOrderController extends GenericController {
 	
 	@Resource
 	private SmsChargeOrderService smsChargeOrderService;
+
+	@Resource
+	private BrandService brandService;
 
 	@RequestMapping("/list")
 	public void smscharge(){
@@ -32,12 +44,98 @@ public class SmsChargeOrderController extends GenericController {
 		return getSuccessResult(list);
 	}
 	
-	@RequestMapping("/smscharge")
+	@RequestMapping("/smsCharge")
+	public void smsCharge(String chargeMoney,HttpServletRequest request,HttpServletResponse response){
+		String returnHtml = "<h1>参数错误！</h1>";
+		if(chargeMoney!=null && chargeMoney!=""){
+			String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
+			String orderName = "短信充值";
+			returnHtml = smsChargeOrderService.createSmsChargeOrder(orderName, chargeMoney, url, getCurrentBrandId());
+		}
+		try {
+			//页面输出
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(returnHtml);
+			response.getWriter().flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@RequestMapping("/selectSmsUnitPrice")
 	@ResponseBody
-	public Result smsCharge(String chargeMoney,HttpServletRequest request){
-		String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
-		System.out.println(url);
+	public Result selectSmsUnitPrice(){
+		BigDecimal smsUnitPrice = brandService.selectSmsUnitPriceByBrandId(getCurrentBrandId());
+		return getSuccessResult(smsUnitPrice);
+	}
+	
+	@RequestMapping("/alipayReturn")
+	public void alipayReturn(){
+	}
+	
+	@RequestMapping("/alipayNotify")
+	public void alipayNotify(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException{
+		smsChargeOrderService.checkSmsChargeOrder();
 		
-		return getSuccessResult();
+		//获取支付宝POST过来反馈信息
+		Map<String,String> params = new HashMap<String,String>();
+		Map requestParams = request.getParameterMap();
+		for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			String[] values = (String[]) requestParams.get(name);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i]
+						: valueStr + values[i] + ",";
+			}
+			//乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
+			//valueStr = new String(valueStr.getBytes("ISO-8859-1"), "gbk");
+			params.put(name, valueStr);
+		}
+		
+		//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以下仅供参考)//
+		//商户订单号
+		String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"),"UTF-8");
+		//支付宝交易号
+		String trade_no = new String(request.getParameter("trade_no").getBytes("ISO-8859-1"),"UTF-8");
+		//交易状态
+		String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"),"UTF-8");
+		//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
+			
+		//返回值
+		String returnHtml = "fail";
+		if(AlipayNotify.verify(params)){//验证成功
+			if(trade_status.equals("TRADE_FINISHED")){
+				//判断该笔订单是否在商户网站中已经做过处理
+					//如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+					//请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
+					//如果有做过处理，不执行商户的业务程序
+					
+				//注意：
+				//退款日期超过可退款期限后（如三个月可退款），支付宝系统发送该交易状态通知
+			} else if (trade_status.equals("TRADE_SUCCESS")){
+				//判断该笔订单是否在商户网站中已经做过处理
+					//如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
+					//请务必判断请求时的total_fee、seller_id与通知时获取的total_fee、seller_id为一致的
+					//如果有做过处理，不执行商户的业务程序
+					
+				//注意：
+				//付款完成后，支付宝系统发送该交易状态通知
+			}
+
+			//——请根据您的业务逻辑来编写程序（以上代码仅作参考）——
+				
+			returnHtml = "success";	//请不要修改或删除
+
+			//////////////////////////////////////////////////////////////////////////////////////////
+		}
+		//返回
+		try {
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(returnHtml);
+			response.getWriter().flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
