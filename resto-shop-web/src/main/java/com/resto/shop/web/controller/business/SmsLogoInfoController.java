@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.OrderItemService;
@@ -37,7 +36,7 @@ public class SmsLogoInfoController extends GenericController{
 	SmsLogService smsLogService;
 	
 	@Resource
-	BrandService brandService;
+	SmsAcountService smsAcountService;
 	
 	
 	@RequestMapping("/list")
@@ -79,8 +78,8 @@ public class SmsLogoInfoController extends GenericController{
 	
 	@ResponseBody
 	@RequestMapping("/querySmsNum")
-	public Brand querySmsNumByBrand(){
-		return brandService.selectSmsNumByBrandId(getCurrentBrandId());
+	public String querySmsNumByBrand(){
+		return smsAcountService.selectSmsUnitPriceByBrandId(getCurrentBrandId()).toString();
 	}
 	
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.alipay.util.AlipayNotify;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.SmsChargeOrder;
-import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.SmsChargeOrderService;
 import com.resto.shop.web.controller.GenericController;
 
@@ -31,7 +31,7 @@ public class SmsChargeOrderController extends GenericController {
 	private SmsChargeOrderService smsChargeOrderService;
 
 	@Resource
-	private BrandService brandService;
+	private SmsAcountService smsAcountService;
 
 	@RequestMapping("/list")
 	public void smscharge(){
@@ -65,7 +65,7 @@ public class SmsChargeOrderController extends GenericController {
 	@RequestMapping("/selectSmsUnitPrice")
 	@ResponseBody
 	public Result selectSmsUnitPrice(){
-		BigDecimal smsUnitPrice = brandService.selectSmsUnitPriceByBrandId(getCurrentBrandId());
+		BigDecimal smsUnitPrice = smsAcountService.selectSmsUnitPriceByBrandId(getCurrentBrandId());
 		return getSuccessResult(smsUnitPrice);
 	}
 	
