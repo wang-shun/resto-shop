@@ -70,10 +70,10 @@ public class SmsChargeOrderController extends GenericController {
 	}
 	
 	@RequestMapping("/alipayReturn")
-	public void alipayReturn(){
+	public void alipayReturn(){//支付宝返回路径
 	}
 	
-	@RequestMapping("/alipayNotify")
+	@RequestMapping("/alipayNotify")//支付宝异步通知路径
 	public void alipayNotify(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException{
 		//获取支付宝POST过来反馈信息
 		Map<String,String> params = new HashMap<String,String>();
