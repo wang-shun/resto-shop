@@ -47,12 +47,11 @@
 			</div>
 
 		</form>
+		
+		
 	</div>
 </div>
 <br />
-<p class="text-danger text-center" hidden="true">
-	<strong>开始时间不能大于结束时间！</strong>
-</p>
 <br />
 <div class="panel panel-default">
 	<div class="panel-heading">短信记录详情</div>
@@ -73,6 +72,17 @@
 
 <script>
 	$(function() {
+		
+		//查询使用的条数
+		$.ajax({
+			url:"",
+			success:function(data){
+									
+			}
+			
+		})
+		
+		
 		//时间插件
 		$('.form_datetime').datetimepicker({
 			endDate : new Date(),
@@ -96,16 +106,16 @@
 						$(data).each(
 									function(i, shop) {
 										var str = "<label class='checkbox-inline'>"
-												+ "<input type='checkbox' name='shopIds' value='"+shop.id+"'/>"
+												+ "<input type='checkbox' name='shopName' value='"+shop.id+"'/>"
 												+ shop.name + "</label>";
 										$("#choiceShop").append(str);
 									})
 						//默认选择所有店铺
-						$(":checkbox[name='shopIds']").prop("checked", true);
-						$("#choiceShop").trigger("create");
+						$(":checkbox[name='shopName']").prop("checked", true);
 					}
 				})
 		var $table = $(".table-body>table");
+		
 		var tb = $table.DataTable({
 			ajax : {
 				url : "smsloginfo/listByShop",
@@ -114,16 +124,17 @@
 				data : function(d) {
 					d.begin = $("#beginDate").val();
 					d.end = $("#endDate").val();
-					var shopIds = "86d0cb619e224a85a1419060d3fba8de";
-					/* $("input[name='shopIds'] :checked").each(
+					var temp="";
+					 $(":checkbox[name='shopName']:checked").each(
 							function() {
-								if($(this).attr("checked")){
-									shopIds += $(this).val()+","
+ 								if($(this).attr("checked")){
+ 									temp += $(this).val()+","
 								}
-								console.log(shopIds);
-							})
-					d.shopIds = shopIds; */
-					d.shopIds=shopIds;
+								temp += $(this).val()+",";
+								
+						})
+						d.shopIds=temp;
+					console.log(temp);
 					return d;
 				},
 
@@ -161,32 +172,26 @@
 		})
 
 		//查询
-		// 		$("#querySms").click(function(){
-		// 			var begin = $("#beginDate").val();
-		// 			var end = $("#endDate").val();
-		// 			//判断时间是否合法
-		// 			if(begin>end){
-		// 				$(".text-danger").show();
-		// 				return ;
-		// 			}
-		// 			$(".text-danger").hide();//隐藏提示
-		// 			var shopIds=[];
-		// 			$(':checkbox[name="shopIds"]:checked').each(function(){
-		// 				console.log("11");
-		// 				console.log($(this).val());
-		// 				shopIds.put($(this).val());
-		// 			});
-		// 			var data = {"begin":begin,"end":end};
-		// 			data.shopIds=shopIds;
-		// 			console.log("22222222222222222222");
-		// 			console.log(data);
-		// 			tb.ajax.reload();
-		// 		})
-
-		$("#querySms").click(function() {
-
-			tb.ajax.reload();
-		})
-
+				$("#querySms").click(function(){
+					var begin = $("#beginDate").val();
+					var end = $("#endDate").val();
+					//判断时间是否合法
+					if(begin>end){
+						toastr.error("开始时间不能大于结束时间");
+						toastr.clear();
+						return ;
+					}
+					//检验是否选择了店铺
+					var checkboxes =$("input[type='checkbox']");
+					if(!checkboxes.is(":checked")){
+						toastr.error("请至少选择一个店铺");
+						toastr.clear();
+						return ;
+					}
+					
+					$(".text-danger").hide();//隐藏提示
+					$("#smsForm").serialize();
+					tb.ajax.reload();
+				})
 	})
 </script>

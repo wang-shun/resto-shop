@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
+import com.resto.shop.web.service.SmsLogService;
 
 @Component
 @Aspect
@@ -23,6 +24,9 @@ public class BindPhoneAspect {
 	CustomerService customerService;
 	@Resource
 	NewCustomCouponService newCustomerCouponService;
+	
+	@Resource
+	SmsLogService smsLogService;
 	
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
@@ -36,6 +40,7 @@ public class BindPhoneAspect {
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus);
 			log.info("首次绑定手机，执行指定动作");
+			
 		}else{
 			log.info("不是首次绑定，无任何动作");
 		}

@@ -148,10 +148,10 @@ $("#searchReport").click(function(){
 	var endDate = $("#endDate").val();
 	//判断 时间范围是否合法
 	if(beginDate>endDate){
-		$(".text-danger").show();
+		toastr.error("开始时间不能大于结束时间");
+		toastr.clear();
 		return ;
 	}
-	$(".text-danger").hide();//隐藏提示
 	
 	var data = {"beginDate":beginDate,"endDate":endDate};
 	//清空预览信息

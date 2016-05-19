@@ -3,16 +3,16 @@
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.SmsLog;
@@ -36,6 +36,9 @@ public class SmsLogoInfoController extends GenericController{
 	@Resource
 	SmsLogService smsLogService;
 	
+	@Resource
+	BrandService brandService;
+	
 	
 	@RequestMapping("/list")
     public ModelAndView list(){
@@ -46,6 +49,9 @@ public class SmsLogoInfoController extends GenericController{
 		return mv;
     }
 	
+	/**
+	 * 查询店铺的名字
+	 */
 	@ResponseBody
 	@RequestMapping("/shopName")
 	public List<ShopDetail> queryList(){
@@ -58,10 +64,23 @@ public class SmsLogoInfoController extends GenericController{
 		return smsLogService.selecByBrandId(getCurrentBrandId());
 	}
 	
+	/**
+	 * 根据时间和店铺id查询短信
+	 * @param begin
+	 * @param end
+	 * @param shopIds
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping("/listByShop")
 	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
 		return smsLogService.selectListWhere(begin,end,shopIds) ;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/querySmsNum")
+	public Brand querySmsNumByBrand(){
+		return brandService.selectSmsNumByBrandId(getCurrentBrandId());
 	}
 	
 }
