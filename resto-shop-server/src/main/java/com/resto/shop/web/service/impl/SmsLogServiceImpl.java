@@ -46,7 +46,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	public String sendCode(String phone, String code, String brandId,String shopId) {
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
-		String string = SMSUtils.sendCode(brandSetting.getSmsSign(), b.getBrandName(), code, phone);
+		String string = SMSUtils.sendCode(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandId);
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);

@@ -201,7 +201,7 @@
 		from tb_sms_log where brand_id =
 		#{brandId}
 	</select>
-
+	
 
 
 </mapper>
