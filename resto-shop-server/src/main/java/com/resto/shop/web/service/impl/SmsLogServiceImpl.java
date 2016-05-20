@@ -42,11 +42,13 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
         return smslogMapper;
     }
 
+    
+    
 	@Override
 	public String sendCode(String phone, String code, String brandId,String shopId) {
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
-		String string = SMSUtils.sendCode(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandId);
+		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandId);
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
@@ -62,12 +64,22 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		log.info("短信发送结果:"+string);
 		try{
 			insert(smsLog);
+			//更新短信账户的信息
+			
 		}catch(Exception e){
 			log.error("发送短信失败:"+e.getMessage());
 		}
 		return string;
 	}
 
+	/**
+	 * 这个方法做增强
+	 */
+	@Override
+	public String sendMsg(String sign,String serviceName,String code,String phone,String brandId){
+		return SMSUtils.sendCode(sign, serviceName, code, phone);
+	}
+	
 	@Override
 	public List<SmsLog> selectListByShopId(String shopId) {
 		

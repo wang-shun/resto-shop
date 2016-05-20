@@ -71,15 +71,33 @@ public class SmsLogoInfoController extends GenericController{
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping("/listByShop")
+	@RequestMapping("/listByShopAndDate")
 	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
 		return smsLogService.selectListWhere(begin,end,shopIds) ;
 	}
 	
 	@ResponseBody
+	@RequestMapping("/listByShopId")
+	public List<SmsLog> listByShop(@RequestParam("shopId")String shopId){
+		return smsLogService.selectListByShopId(shopId) ;
+	}
+	
+	
+	@ResponseBody
 	@RequestMapping("/querySmsNum")
 	public String querySmsNumByBrand(){
 		return smsAcountService.selectSmsUnitPriceByBrandId(getCurrentBrandId()).toString();
+	}
+	
+	/**
+	 * 测试发短信功能
+	 * @return
+	 */
+	@RequestMapping("/sendCode")
+	public String sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId){
+		
+//		return smsLogService.sendCode(phone, code, brandId, shopId);
+		return smsLogService.sendCode(phone, code, brandId, shopId);		
 	}
 	
 }
