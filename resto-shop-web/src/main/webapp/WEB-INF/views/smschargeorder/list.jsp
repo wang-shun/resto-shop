@@ -74,7 +74,7 @@
 								<div class="md-radio-list">
 									<div class="md-radio">
 										<input type="radio" id="alipay" name="paytype"
-											class="md-radiobtn" value="alipay" checked="checked" required> <label for="alipay"> <span></span>
+											class="md-radiobtn" value="alipay" required> <label for="alipay"> <span></span>
 											<span class="check"></span> <span class="box"></span>&nbsp;<img
 											alt="支付宝支付" src="assets/pages/img/alipay.png" width="23px"
 											height="23px">&nbsp;支付宝支付
@@ -178,12 +178,6 @@
 		$.post("smschargeorder/selectSmsUnitPrice", function(result) {
 			$(":input[name='smsUnitPrice']").val(result.data);
 		})
-
-		//改变显示文本
-		$("form").onsub(function() {
-			
-		})
-
 	}());
 
 	//自动计算出 对应的短信条数
