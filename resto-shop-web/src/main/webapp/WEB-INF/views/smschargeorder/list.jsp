@@ -73,11 +73,19 @@
 							<div class="col-sm-8">
 								<div class="md-radio-list">
 									<div class="md-radio">
-										<input type="radio" id="alipay" name="alipay"
-											class="md-radiobtn" checked="checked" required> <label for="alipay"> <span></span>
+										<input type="radio" id="alipay" name="paytype"
+											class="md-radiobtn" value="alipay" checked="checked" required> <label for="alipay"> <span></span>
 											<span class="check"></span> <span class="box"></span>&nbsp;<img
 											alt="支付宝支付" src="assets/pages/img/alipay.png" width="23px"
 											height="23px">&nbsp;支付宝支付
+										</label>
+									</div>
+									<div class="md-radio">
+										<input type="radio" id="wxpay" name="paytype"
+											class="md-radiobtn" value="wxpay"> <label for="wxpay"> <span></span>
+											<span class="check"></span> <span class="box"></span>&nbsp;<img
+											alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
+											height="23px">&nbsp;微信支付
 										</label>
 									</div>
 								</div>
