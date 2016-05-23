@@ -9,6 +9,36 @@
 </h2>
 <br />
 <div class="row">
+     <div class="col-md-4 col-md-offset-2">
+         <div class="dashboard-stat blue">
+             <div class="visual">
+                 <i class="fa fa-comments"></i>
+             </div>
+             <div class="details">
+                 <div class="number">
+                     <span data-counter="counterup" data-value="1349">${smsAcount.usedNum}</span>条
+                 </div>
+                 <div class="desc"> 已经使用的短信数量 </div>
+             </div>
+         </div>
+     </div>
+     <div class="col-md-4">
+         <div class="dashboard-stat green">
+             <div class="visual">
+                 <i class="fa fa-bar-chart-o"></i>
+             </div>
+             <div class="details">
+                 <div class="number">
+                     <span data-counter="counterup" data-value="12,5">${smsAcount.remainderNum}</span>条 </div>
+                 <div class="desc"> 剩余短信数量 </div>
+             </div>
+         </div>
+     </div>
+ </div>
+                    
+                    
+                    
+<div class="row">
 	<div class="col-md-8 col-md-offset-2">
 		<form class="form-horizontal" id="smsForm">
 			<div class="form-group">
@@ -23,7 +53,7 @@
 						readonly="readonly">
 				</div>
 			</div>
-			<%-- 			<s:hasPermission name="order/isAdmin"> --%>
+			<s:hasPermission name="smsloginfo/isBrand">
 			<div class="form-group">
 				<label for="choiceShop" class="col-sm-2 control-label">店铺选择</label>
 				<div class="col-sm-10" id="choiceShop">
@@ -37,7 +67,7 @@
 
 				</div>
 			</div>
-			<%-- 			</s:hasPermission> --%>
+			</s:hasPermission>
 
 
 			<div class="form-group">
@@ -118,7 +148,7 @@
 		
 		var tb = $table.DataTable({
 			ajax : {
-				url : "smsloginfo/listByShop",
+				url : "smsloginfo/listByShopAndDate",
 				dataSrc : "",
 				type : "POST",
 				data : function(d) {
@@ -178,18 +208,15 @@
 					//判断时间是否合法
 					if(begin>end){
 						toastr.error("开始时间不能大于结束时间");
-						toastr.clear();
 						return ;
 					}
 					//检验是否选择了店铺
 					var checkboxes =$("input[type='checkbox']");
 					if(!checkboxes.is(":checked")){
 						toastr.error("请至少选择一个店铺");
-						toastr.clear();
 						return ;
 					}
 					
-					$(".text-danger").hide();//隐藏提示
 					$("#smsForm").serialize();
 					tb.ajax.reload();
 				})

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.controller.GenericController;
@@ -43,8 +44,10 @@ public class SmsLogoInfoController extends GenericController{
     public ModelAndView list(){
 		ModelAndView mv = new ModelAndView();
 		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(getCurrentBrandId());
 		mv.setViewName("smsloginfo/list");;
 		mv.addObject("shopDetails", shopDetails);
+		mv.addObject("smsAcount", smsAcount);
 		return mv;
     }
 	

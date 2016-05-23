@@ -64,9 +64,7 @@ public class SmsAspect {
 			//通知商家短信余额不足需要充值
 			
 			log.info("短信账户余额不足");
-			
 			return;
-			//不能执行发短信的方法
 		}
 		return;
 	}
