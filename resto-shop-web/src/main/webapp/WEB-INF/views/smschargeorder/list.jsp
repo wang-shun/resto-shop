@@ -15,8 +15,8 @@
 	</div>
 </div>
 
-<div class="modal fade" id="create" tabindex="-1" role="dialog"
-	data-backdrop="false">
+<!-- 短信充值 -->
+<div class="modal fade" id="create" tabindex="-1" role="dialog" data-backdrop="static">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -74,16 +74,16 @@
 								<div class="md-radio-list">
 									<div class="md-radio">
 										<input type="radio" id="alipay" name="paytype"
-											class="md-radiobtn" value="alipay" required> <label for="alipay"> <span></span>
-											<span class="check"></span> <span class="box"></span>&nbsp;<img
-											alt="支付宝支付" src="assets/pages/img/alipay.png" width="23px"
-											height="23px">&nbsp;支付宝支付
+											checked="checked" class="md-radiobtn" value="1"> <label
+											for="alipay"> <span></span> <span class="check"></span>
+											<span class="box"></span>&nbsp;<img alt="支付宝支付"
+											src="assets/pages/img/alipay.png" width="23px" height="23px">&nbsp;支付宝支付
 										</label>
 									</div>
 									<div class="md-radio">
 										<input type="radio" id="wxpay" name="paytype"
-											class="md-radiobtn" value="wxpay"> <label for="wxpay"> <span></span>
-											<span class="check"></span> <span class="box"></span>&nbsp;<img
+											class="md-radiobtn" value="2"> <label for="wxpay">
+											<span></span> <span class="check"></span> <span class="box"></span>&nbsp;<img
 											alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
 											height="23px">&nbsp;微信支付
 										</label>
@@ -102,12 +102,56 @@
 	</div>
 </div>
 
+
+<!-- 申请发票 -->
+<div class="modal fade" id="applyInvoice" tabindex="-1" role="dialog" aria-labelledby="myModlLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title text-center">
+					<strong>申请发票</strong>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" onsubmit="return applyInvoiceForm()" id="applyInvoiceForm">
+					<div class="form-group">
+						<label for="header" class="col-sm-3 control-label">发票抬头：</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" required id="header" name="header">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="header" class="col-sm-3 control-label">发票内容：</label>
+						<div class="col-sm-8">
+							<div class="md-radio-inline">
+								<div class="md-radio">
+									<input type="radio" id="type_1" name="type" checked="checked" class="md-radiobtn">
+									<label for="type_1"> <span> </span>
+									<span class="check"></span> <span class="box"></span> 明细
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="text-center">
+						<a class="btn default" data-dismiss="modal">取消</a> <input
+							class="btn green" type="submit" value="申请"/>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
+	var tb ;
 	(function() {
 		var cid = "#control";
 		var $table = $(".table-body>table");
-		var tb = $table
-				.DataTable({
+		tb = $table.DataTable({
 					ajax : {
 						url : "smschargeorder/list_all",
 						dataSrc : "data"
@@ -117,7 +161,8 @@
 								title : "品牌名称",
 								data : "brandName",
 								createdCell : function(td, tdData, rowData) {
-									$(":input[name='brandName']").val(tdData);
+									$(":input[name='brandName']").val(tdData);//充值
+									$(":input[name='header']").val(tdData);//发票
 								}
 							},
 							{
@@ -147,11 +192,19 @@
 								}
 							},
 							{
+								title : "支付类型",
+								data : "payType",
+								createdCell : function(td, tdData) {
+									var payType = tdData=1?"支付宝":"微信";
+									$(td).html(payType);
+								}
+							},
+							{
 								title : "交易状态",
 								data : "status",
 								createdCell : function(td, tdData) {
-									var str = tdData == 0 ? "<span class='label label-primary'>待支付</span>"
-											: tdData == 1 ? "<span class='label label-success'>已完成</span>"
+									var str = tdData == 0 ? "<span class='label label-primary'>待 支 付</span>"
+											: tdData == 1 ? "<span class='label label-success'>已 完 成</span>"
 													: "<span class='label label-danger'>交易异常</span>";
 									$(td).html(str);
 								}
@@ -162,12 +215,22 @@
 								createdCell : function(td, tdData, rowData) {
 									var info = "";
 									if (rowData.status == 1) {//订单已完成
-										info = $("<button class='btn btn-sm btn-primary'>查看详情</button>");
 										if (tdData == null || tdData == "") {
-											info = $("<button class='btn btn-sm btn-info'>申请发票</button>");
+											info = createBtn(rowData.id,"申请发票","green-meadow",function() {
+												var orderId = $(this).attr("name");
+												var brandName = rowData.id
+												$("#header").val();
+												$("#applyInvoice").modal();
+											})
+										} else {
+											info = createBtn(null,"查看详情","btn-primary",function() {
+												alert("我是发票详情");
+											})
 										}
 									} else {//订单未完成
-										info = "<button class='btn btn-sm btn-success'>去支付</button>";
+										info = createBtn(null,"去 支 付","btn-success",function() {
+											alert("去支付链接");
+										})
 									}
 									$(td).html(info);
 								}
@@ -193,6 +256,24 @@
 		}
 	}
 
+	//申请发票  ajax提交
+	function applyInvoiceForm(){
+		var data = $("#applyInvoiceForm").serialize();
+		$.post("smschargeorder/applyInvoice",data,function(result){
+			if(result.success){
+				$("#applyInvoice").modal("hide");
+				toastr.success("申请成功！");
+			}else{
+				$("#applyInvoice").modal("hide");
+				toastr.error("申请失败！请重新操作！");
+			}
+			tb.ajax.reload();
+			console.log("---刷新");
+		});
+		return false;
+	}
+	
+	//格式化时间
 	function formatDate(date) {
 		var temp = "";
 		if (date != null && date != "") {
@@ -200,5 +281,16 @@
 			temp = temp.format("yyyy-MM-dd hh:mm:ss");
 		}
 		return temp;
+	}
+	
+	//创建一个按钮
+	function createBtn(btnName,btnValue,btnClass,btnfunction){
+		return $('<input />', {
+			name : btnName,
+			value : btnValue,
+			type : "button",
+			class : "btn btn-sm " + btnClass,
+			click : btnfunction
+		})
 	}
 </script>

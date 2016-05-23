@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.alipay.util.AlipayNotify;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.PayType;
 import com.resto.brand.web.model.SmsChargeOrder;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.SmsChargeOrderService;
 import com.resto.shop.web.controller.GenericController;
+
+import cn.restoplus.rpc.common.util.StringUtil;
 
 @Controller
 @RequestMapping("smschargeorder")
@@ -34,7 +37,7 @@ public class SmsChargeOrderController extends GenericController {
 	private SmsAcountService smsAcountService;
 
 	@RequestMapping("/list")
-	public void smscharge(){
+	public void list(){
 	}
 	
 	@RequestMapping("/list_all")
@@ -45,12 +48,16 @@ public class SmsChargeOrderController extends GenericController {
 	}
 	
 	@RequestMapping("/smsCharge")
-	public void smsCharge(String chargeMoney,HttpServletRequest request,HttpServletResponse response){
+	public void smsCharge(String chargeMoney,String paytype,HttpServletRequest request,HttpServletResponse response){
 		String returnHtml = "<h1>参数错误！</h1>";
-		if(chargeMoney!=null && chargeMoney!=""){
-			String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
-			String orderName = "短信充值";
-			returnHtml = smsChargeOrderService.createSmsChargeOrder(orderName, chargeMoney, url, getCurrentBrandId());
+		if(StringUtil.isNotEmpty(chargeMoney) && StringUtil.isNotEmpty(paytype)){
+			if(paytype.equals(PayType.ALI_PAY)){//支付宝支付
+				String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
+				String orderName = "短信充值";
+				returnHtml = smsChargeOrderService.createSmsChargeOrder(orderName, chargeMoney, url, getCurrentBrandId());
+			}else if(paytype.equals(PayType.WECHAT_PAY)){//微信支付
+				
+			}
 		}
 		try {
 			//页面输出
@@ -123,5 +130,12 @@ public class SmsChargeOrderController extends GenericController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@RequestMapping("/applyInvoice")
+	@ResponseBody
+	public Result applyInvoice(){
+		//待完成 发票记录逻辑
+		return getSuccessResult();
 	}
 }
