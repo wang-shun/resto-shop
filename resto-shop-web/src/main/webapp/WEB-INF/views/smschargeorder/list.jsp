@@ -5,7 +5,7 @@
 	<div class="table-operator">
 		<s:hasPermission name="notice/add">
 			<button type="button" class="btn green pull-right"
-				data-toggle="modal" data-target="#create">短信充值</button>
+				data-toggle="modal" data-target="#createChargeOrder">短信充值</button>
 		</s:hasPermission>
 	</div>
 	<div class="clearfix"></div>
@@ -16,21 +16,17 @@
 </div>
 
 <!-- 短信充值 -->
-<div class="modal fade" id="create" tabindex="-1" role="dialog" data-backdrop="static">
+<div class="modal fade" id="createChargeOrder" tabindex="-1" role="dialog" data-backdrop="static">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
 				<h4 class="modal-title text-center">
 					<strong>短信充值</strong>
 				</h4>
 			</div>
 			<div class="modal-body">
 				<form role="form" class="form-horizontal"
-					action="smschargeorder/smsCharge" method="post" target="_blank">
+					action="smschargeorder/smsCharge" method="post" target="_blank" onsubmit="showChargeInfo()">
 					<!-- 				<form role="form" class="form-horizontal" onsubmit="return false"> -->
 					<div class="form-body">
 						<div class="form-group">
@@ -51,7 +47,7 @@
 							<label class="col-sm-3 control-label">充值金额：</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input type="number" class="form-control" min="1" max="10000"
+									<input type="number" class="form-control" max="10000"
 										placeholder="请输入要充值的金额" onchange="computeSmsCount()"
 										onkeyup="computeSmsCount()" required name="chargeMoney">
 									<div class="input-group-addon">元</div>
@@ -92,7 +88,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="text-center">
+					<div class="text-center" id="chargeBtn">
 						<a class="btn default" data-dismiss="modal">取消</a> <input
 							class="btn green" type="submit" value="充值" />
 					</div>
@@ -120,7 +116,8 @@
 					<div class="form-group">
 						<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 						<div class="col-sm-8">
-							<input type="text" class="form-control" required id="header" name="header">
+							<input type="url" class="form-control" required id="header" name="header">
+							<input type="url">
 						</div>
 					</div>
 					<div class="form-group">
@@ -216,19 +213,19 @@
 									var info = "";
 									if (rowData.status == 1) {//订单已完成
 										if (tdData == null || tdData == "") {
-											info = createBtn(rowData.id,"申请发票","green-meadow",function() {
+											info = createBtn(rowData.id,"申请发票","btn-sm green-meadow",function() {
 												var orderId = $(this).attr("name");
 												var brandName = rowData.id
 												$("#header").val();
 												$("#applyInvoice").modal();
 											})
 										} else {
-											info = createBtn(null,"查看详情","btn-primary",function() {
+											info = createBtn(null,"查看详情","btn-sm btn-primary",function() {
 												alert("我是发票详情");
 											})
 										}
 									} else {//订单未完成
-										info = createBtn(null,"去 支 付","btn-success",function() {
+										info = createBtn(null,"去 支 付","btn-sm btn-success",function() {
 											alert("去支付链接");
 										})
 									}
@@ -254,6 +251,19 @@
 			$(":input[name='chargeMoney']").val("0");
 			$(":input[name='number']").val("0");
 		}
+	}
+	
+	//短信充值，显示订单详情
+	function showChargeInfo(){
+		$("#successBtn").show();
+		var successBtn = createBtn(null,"充值成功","green",function(){
+			$("#createChargeOrder").modal("hide");
+			tb.ajax.reload();//刷新
+			$("#chargeBtn").html("<a class='btn default' data-dismiss='modal'>取消</a> <input class='btn green' type='submit' value='充值' />");
+			$(":input[name='chargeMoney']").val("");
+			$(":input[name='number']").val("");
+		});
+		$("#chargeBtn").html(successBtn);
 	}
 
 	//申请发票  ajax提交
@@ -289,7 +299,7 @@
 			name : btnName,
 			value : btnValue,
 			type : "button",
-			class : "btn btn-sm " + btnClass,
+			class : "btn " + btnClass,
 			click : btnfunction
 		})
 	}
