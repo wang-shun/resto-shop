@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ImportResource;
 
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.BrandUserService;
 import com.resto.brand.web.service.DatabaseConfigService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.SmsAcountService;
@@ -48,6 +49,11 @@ public class ServerConfig {
 	@Bean
 	public SmsAcountService smsAcountService(){
 		return proxy.create(SmsAcountService.class);
+	}
+	
+	@Bean
+	public BrandUserService brandUserService(){
+		return proxy.create(BrandUserService.class);
 	}
 	
 	@Bean

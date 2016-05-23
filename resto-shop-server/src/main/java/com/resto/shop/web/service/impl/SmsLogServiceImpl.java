@@ -13,11 +13,14 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.BrandUserService;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.constant.SmsLogType;
+import com.resto.shop.web.constant.SmsNumNotice;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
 import com.resto.shop.web.service.SmsLogService;
@@ -35,6 +38,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     @Resource
     BrandService brandService;
+    
+    @Resource
+    BrandUserService brandUserService;
     
     @Resource
     BrandSettingService brandSettingService;
@@ -55,7 +61,10 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	public String sendCode(String phone, String code, String brandId,String shopId) {
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
-		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandId);
+		//查询
+		BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
+		//商家给客户发短信
+		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
@@ -72,23 +81,51 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		try{
 			insert(smsLog);
 			//更新短信账户的信息
-			
+			smsAcountService.updateByBrandId(brandId);
+			//判断是否要提醒商家充值短信账户
+			sendNotice(brandId,brandUser);
 		}catch(Exception e){
 			log.error("发送短信失败:"+e.getMessage());
 		}
 		return string;
 	}
 
+	private void sendNotice(String brandId,BrandUser brandUser) {
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
+		switch (smsAcount.getRemainderNum()) {
+		case SmsNumNotice.NOTICE_FIRST:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足50条", brandUser.getPhone());
+			break;
+		case SmsNumNotice.NOTICE_SECOND:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足20条", brandUser.getPhone());
+			break;
+		case SmsNumNotice.NOTICE_LAST:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足10条", brandUser.getPhone());
+			break;
+		default:
+			break;
+		}
+		
+	}
+
 	/**
 	 * 这个方法做增强
 	 */
-	@Override
-	public String sendMsg(String sign,String serviceName,String code,String phone,String brandId){
+	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser){
 		//判断该品牌账户的余额是否充足
-		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
-		if(smsAcount.getRemainderNum()<=0){
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", 20, "13317182430");
-			
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
+		switch (smsAcount.getRemainderNum()) {
+		case SmsNumNotice.NOTICE_OWING_FIRST:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费10条", brandUser.getPhone());
+			break;
+		case SmsNumNotice.NOTICE_OWING_SECOND:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费20条", brandUser.getPhone());
+			break;
+		case SmsNumNotice.NOTICE_OWING_LAST:
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费50条", brandUser.getPhone());
+			return "";
+		default:
+			break;
 		}
 		
 		return SMSUtils.sendCode(sign, serviceName, code, phone);
@@ -129,7 +166,4 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		}
 		return list;
 	}
-
-
-
 }

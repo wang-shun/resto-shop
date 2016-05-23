@@ -15,8 +15,6 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
      */
 	List<SmsLog> selectListByShopId(String shopId);
 	
-	String sendMsg(String sign,String serviceName,String code,String phone,String brandId);
-	
 	/**
 	 * 根据店铺ID查询两天内的短信记录
 	 * @param smsLog
