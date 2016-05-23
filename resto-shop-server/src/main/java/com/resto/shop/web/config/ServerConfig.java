@@ -10,6 +10,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.DatabaseConfigService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.datasource.DynamicDataSource;
 
@@ -42,6 +43,11 @@ public class ServerConfig {
 	@Bean
 	public ShopDetailService shopDetailService(){
 		return proxy.create(ShopDetailService.class);
+	}
+	
+	@Bean
+	public SmsAcountService smsAcountService(){
+		return proxy.create(SmsAcountService.class);
 	}
 	
 	@Bean

@@ -13,8 +13,10 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
@@ -36,6 +38,11 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     @Resource
     BrandSettingService brandSettingService;
+    
+    @Resource
+    SmsAcountService smsAcountService;
+    
+    
     
     @Override
     public GenericDao<SmsLog, Long> getDao() {
@@ -77,6 +84,13 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	 */
 	@Override
 	public String sendMsg(String sign,String serviceName,String code,String phone,String brandId){
+		//判断该品牌账户的余额是否充足
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
+		if(smsAcount.getRemainderNum()<=0){
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", 20, "13317182430");
+			
+		}
+		
 		return SMSUtils.sendCode(sign, serviceName, code, phone);
 	}
 	

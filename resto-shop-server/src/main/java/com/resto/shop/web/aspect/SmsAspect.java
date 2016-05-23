@@ -24,17 +24,17 @@ import cn.restoplus.rpc.client.RpcProxy;
 @Aspect
 public class SmsAspect {
 
-	Logger log = LoggerFactory.getLogger(getClass());
-	
-	@Resource
-	RpcProxy rpcProxy;
-	private SmsAcountService smsAcountService;
-	
-	@Autowired
-	public SmsAspect(RpcProxy rpcProxy) {
-		smsAcountService = rpcProxy.create(SmsAcountService.class);
-	}
-	
+//	Logger log = LoggerFactory.getLogger(getClass());
+//	
+//	@Resource
+//	RpcProxy rpcProxy;
+//	private SmsAcountService smsAcountService;
+//	
+//	@Autowired
+//	public SmsAspect(RpcProxy rpcProxy) {
+//		smsAcountService = rpcProxy.create(SmsAcountService.class);
+//	}
+//	
 	
 //	@Resource
 //	RpcProxy rpcProxy;
@@ -46,38 +46,38 @@ public class SmsAspect {
 //	}
 	
 	
-    
-	@Pointcut("execution(* com.resto.shop.web.service.impl.SmsLogServiceImpl.sendMsg(..))")
-	public void sendMsg(){};
-	
-	
-	//发短信前看是否有剩余条数
-	@Before(value="sendMsg()")
-	public void sendMessageBefore(JoinPoint pj) throws Throwable{
-		System.out.println("======");
-		Object[] args = pj.getArgs();
-		String brandId = args[4].toString();
-		log.info(".............................+");
-		//查询这个商家的剩余短信的条数
-		SmsAcount smsCount = smsAcountService.selectByBrandId(brandId);
-		if(smsCount.getRemainderNum()<=0){
-			//通知商家短信余额不足需要充值
-			
-			log.info("短信账户余额不足");
-			return;
-		}
-		return;
-	}
-	
-	@Pointcut("execution(* com.resto.shop.web.service.impl.SmsLogServiceImpl.selectListByShopId(..))")
-	public void selectList(){};
-	
-	@Before(value="selectList()")
-	public void selectBefore(){
-		
-		System.out.println("执行了该方法。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。");
-	}
-	
+//    
+//	@Pointcut("execution(* com.resto.shop.web.service.impl.SmsLogServiceImpl.sendMsg(..))")
+//	public void sendMsg(){};
+//	
+//	
+//	//发短信前看是否有剩余条数
+//	@Before(value="sendMsg()")
+//	public void sendMessageBefore(JoinPoint pj) throws Throwable{
+//		System.out.println("======");
+//		Object[] args = pj.getArgs();
+//		String brandId = args[4].toString();
+//		log.info(".............................+");
+//		//查询这个商家的剩余短信的条数
+//		SmsAcount smsCount = smsAcountService.selectByBrandId(brandId);
+//		if(smsCount.getRemainderNum()<=0){
+//			//通知商家短信余额不足需要充值
+//			
+//			log.info("短信账户余额不足");
+//			return;
+//		}
+//		return;
+//	}
+//	
+//	@Pointcut("execution(* com.resto.shop.web.service.impl.SmsLogServiceImpl.selectListByShopId(..))")
+//	public void selectList(){};
+//	
+//	@Before(value="selectList()")
+//	public void selectBefore(){
+//		
+//		System.out.println("执行了该方法。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。");
+//	}
+//	
 	
 //	@AfterReturning(value="sendMsg()")
 //	public void sendCodeAfter(String phone,String data,String sign, String codeSmsTemp,String brandId) throws Throwable{
