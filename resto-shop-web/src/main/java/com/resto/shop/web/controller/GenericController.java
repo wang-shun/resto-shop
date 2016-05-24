@@ -145,4 +145,11 @@ public abstract class GenericController{
 	public String getCurrentUserId(){
 		return getCurrentBrandUser().getId();
 	}
+	
+	public String getBaseUrl(){
+		HttpServletRequest request = getRequest();
+		String path = request.getContextPath();
+		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+		return basePath;
+	}
 }
