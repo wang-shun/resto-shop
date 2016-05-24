@@ -39,7 +39,7 @@ public class OrderAspect {
 	
 	@Resource
 	ShopCartService shopCartService;
-	@Resource
+	@Resource 
 	CustomerService customerService;
 	@Resource
 	WechatConfigService wechatConfigService;
