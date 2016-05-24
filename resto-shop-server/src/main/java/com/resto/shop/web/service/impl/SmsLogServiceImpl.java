@@ -114,20 +114,14 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser){
 		//判断该品牌账户的余额是否充足
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
-		switch (smsAcount.getRemainderNum()) {
-		case SmsNumNotice.NOTICE_OWING_FIRST:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费10条", brandUser.getPhone());
-			break;
-		case SmsNumNotice.NOTICE_OWING_SECOND:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费20条", brandUser.getPhone());
-			break;
-		case SmsNumNotice.NOTICE_OWING_LAST:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费50条", brandUser.getPhone());
-			return "";
-		default:
-			break;
-		}
 		
+		if(SmsNumNotice.NOTICE_OWING_FIRST==smsAcount.getRemainderNum()){
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费10条", brandUser.getPhone());
+		}else if(SmsNumNotice.NOTICE_OWING_SECOND==smsAcount.getRemainderNum()){
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费20条", brandUser.getPhone());
+		}else if(SmsNumNotice.NOTICE_OWING_LAST > smsAcount.getRemainderNum()||SmsNumNotice.NOTICE_OWING_LAST==smsAcount.getRemainderNum()){
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费50条", brandUser.getPhone());
+		}
 		return SMSUtils.sendCode(sign, serviceName, code, phone);
 	}
 	

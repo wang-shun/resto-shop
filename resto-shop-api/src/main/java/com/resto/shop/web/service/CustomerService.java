@@ -24,4 +24,10 @@ public interface CustomerService extends GenericService<Customer, String> {
 	List<Customer> selectListByBrandId(String currentBrandId);
 
 	void changeLastOrderShop(String shopDetailId, String customerId);
+	
+	/**
+	 * 解绑手机号码
+	 * @param currentCustomerId
+	 */
+	void unbindphone(String currentCustomerId);
 }

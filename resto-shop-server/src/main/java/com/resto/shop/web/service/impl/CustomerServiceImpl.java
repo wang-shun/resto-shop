@@ -109,6 +109,13 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public void changeLastOrderShop(String shopDetailId, String customerId) {
 		customerMapper.changeLastOrderShop(shopDetailId,customerId);
+	}
+
+	@Override
+	public void unbindphone(String currentCustomerId) {
+		Customer customer = customerMapper.selectByPrimaryKey(currentCustomerId);
+		customer.setTelephone(null);
+		customerMapper.updateByPrimaryKeySelective(customer);
 	} 
 	
 
