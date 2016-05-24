@@ -80,5 +80,5 @@
  <delete id="clearAllShopCart">
 	 delete from tb_shop_cart where customer_id = #{customerId}  and  shop_detail_id = #{shopDetailId}
  </delete>
-	
+ 
 </mapper>
