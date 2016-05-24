@@ -58,7 +58,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectCallOrder(String currentBrandId,Long lastTime);
 
-	public Map<String, Object> printReceipt(String orderId);
+	public Map<String, Object> printReceipt(String orderId,Integer selectPrinterId);
 
 	/**
 	 * 打印厨房的小票
@@ -116,5 +116,6 @@ public interface OrderService extends GenericService<Order, String> {
 	public void updateAllowContinue(String id, boolean b);
 
 	List<Order> selectByParentId(String parentOrderId);
+
 
 }

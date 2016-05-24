@@ -12,6 +12,6 @@ public interface PrinterService extends GenericService<Printer, Integer> {
 	 */
 	List<Printer> selectListByShopId(String shopId);
 
-	Printer selectByShopAndType(String shopId, int reception);
+	List<Printer> selectByShopAndType(String shopId, int reception);
 
 }

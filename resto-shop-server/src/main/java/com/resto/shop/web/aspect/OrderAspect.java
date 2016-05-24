@@ -61,7 +61,7 @@ public class OrderAspect {
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			long delay = 1000*60*15;//15分钟后自动取消订单
 			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-		}else if(order.getOrderState().equals((OrderState.PAYMENT))){
+		}else if(order.getOrderState().equals((OrderState.PAYMENT))&&order.getOrderMode()!=ShopMode.TABLE_MODE){ //坐下点餐模式不发送
 			sendPaySuccessMsg(order);
 		}
 	}
@@ -105,7 +105,7 @@ public class OrderAspect {
 	
 	@AfterReturning(value="orderWxPaySuccess()",returning="order")
 	public void orderPayAfter(Order order){
-		if(order!=null&&order.getOrderState().equals(OrderState.PAYMENT)){
+		if(order!=null&&order.getOrderState().equals(OrderState.PAYMENT)&&ShopMode.TABLE_MODE!=order.getOrderMode()){//坐下点餐模式不发送该消息
 			sendPaySuccessMsg(order);
 		}
 	}
@@ -126,9 +126,13 @@ public class OrderAspect {
 				MQMessageProducer.sendPlaceOrderMessage(order);
 				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
+				if(order.getOrderMode()==ShopMode.TABLE_MODE){  //坐下点餐在立即下单的时候，发送支付成功消息通知
+					sendPaySuccessMsg(order);
+				}
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
-				log.info("发送消息：两小时后，禁止加菜");
-				MQMessageProducer.sendNotAllowContinueMessage(order,1000*60*120); //延迟两小时，禁止继续加菜
+				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+				log.info("发送禁止加菜:"+setting.getCloseContinueTime()+"s 后发送");
+				MQMessageProducer.sendNotAllowContinueMessage(order,1000*setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
 				if(order.getOrderMode()!=null){
 					switch (order.getOrderMode()) {
 					case ShopMode.CALL_NUMBER:
@@ -142,8 +146,7 @@ public class OrderAspect {
 				log.info("发送打印信息");
 				MQMessageProducer.sendPlaceOrderMessage(order);
 				
-				log.info("打印成功后，发送自动确认订单通知！");
-				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");

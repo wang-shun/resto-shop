@@ -358,6 +358,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if (order.getAllowCancel()&&order.getProductionStatus()!=ProductionStatus.PRINTED&&(order.getOrderState().equals(OrderState.SUBMIT)||order.getOrderState()==OrderState.PAYMENT)) {
 			order.setAllowCancel(false);
 			order.setClosed(true);
+			order.setAllowAppraise(false);
+			order.setAllowContinueOrder(false);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
@@ -589,15 +591,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public Map<String, Object> printReceipt(String orderId) {
+	public Map<String, Object> printReceipt(String orderId,Integer selectPrinterId) {
 		// 根据id查询订单
 		Order order = selectById(orderId);
 		//查询店铺
 		ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 		// 查询订单菜品
 		List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
-		Printer printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
-		return printTicket(order, orderItems, shopDetail,printer);
+		if(selectPrinterId==null){
+			List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+			if(printer.size()>0){
+				return printTicket(order, orderItems, shopDetail, printer.get(0));
+			}
+		}else{
+			Printer p = printerService.selectById(selectPrinterId);
+			return printTicket(order, orderItems, shopDetail, p);
+		}
+		return null;
 	}
 
  
@@ -695,6 +705,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			throw new AppException(AppException.ORDER_IS_CLOSED);
 		}else{
 			order.setClosed(true);
+			order.setAllowAppraise(false);
+			order.setAllowContinueOrder(false);
+			order.setAllowCancel(false);
 			order.setOrderState(OrderState.CANCEL);
 			update(order);
 			refundOrder(order);
@@ -718,22 +731,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		ShopDetail shop= shopDetailService.selectById(order.getShopDetailId());
 		List<OrderItem> items = orderItemService.listByOrderId(orderId);
 		List<Map<String,Object>> printTask = new ArrayList<>();
-		Printer ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
-		Map<String,Object> ticket = printTicket(order, items,shop,ticketPrinter );
+		List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+		for (Printer printer : ticketPrinter) {
+			Map<String,Object> ticket = printTicket(order, items,shop,printer);
+			if(ticket!=null){
+				printTask.add(ticket);
+			}
+			
+		}
 		List<Map<String,Object>> kitchenTicket = printKitchen(order, items);
 		
 		//如果是外带，添加一张外带小票
 		if(order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){
-			Printer packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
-			Map<String,Object> packageTicket = printTicket(order, items,shop,packagePrinter);
-			if(packageTicket!=null){
-				printTask.add(packageTicket);
+			List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
+			for (Printer printer : packagePrinter) {
+				Map<String,Object> packageTicket = printTicket(order, items,shop,printer);
+				if(packageTicket!=null){
+					printTask.add(packageTicket);
+				}
 			}
 		}
 		
-		if(ticket!=null){
-			printTask.add(ticket);
-		}
 		if(!kitchenTicket.isEmpty()){
 			printTask.addAll(kitchenTicket);
 		}

@@ -68,10 +68,22 @@
 				</div>
 				<div class="form-group">
 				    <label>微信自定义样式</label>
-<!-- 				    <input type="text" class="form-control" name="wechatCustomoStyle" v-model="m.wechatCustomoStyle"> -->
 				    <textarea class="form-control" name="wechatCustomoStyle" v-model="m.wechatCustomoStyle"></textarea>
 				</div>
-
+				
+				<div class="form-group">
+				    <label>多久不能加菜</label>
+				    <input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime">
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label">是否选择配送模式</div>
+					<input type="radio"  id="choiceIs" name="isChoiceMode" v-model="m.isChoiceMode" value=1>
+					<label for="choiceIs">是</label>
+					<input type="radio" id="choiceNo" name="isChoiceMode" v-model="m.isChoiceMode" value=0> 
+					<label for="choiceNo">否</label>
+				</div>
+				
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
