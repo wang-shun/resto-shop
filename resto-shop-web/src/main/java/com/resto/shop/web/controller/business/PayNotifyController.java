@@ -99,6 +99,7 @@ public class PayNotifyController {
 					String total_fee = resultMap.get("total_fee");
 					String out_trade_no = resultMap.get("out_trade_no");
 					String transaction_id = resultMap.get("transaction_id");
+					log.info("开始远程调用--------->");
 					smsChargeOrderService.checkSmsChargeOrder_WxPay(out_trade_no,transaction_id,total_fee);
 					wxResult.put("return_code", "SUCCESS");
 				}catch(Exception e){
