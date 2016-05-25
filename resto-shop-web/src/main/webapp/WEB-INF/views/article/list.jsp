@@ -9,6 +9,10 @@
 		display: inline-block;
 		min-width: 70px;
 	}
+	.modal-body.auto-height{
+		max-height: 80vh;
+   	 	overflow-y: auto;
+	}
 </style>
 <div id="control">
 	
@@ -18,278 +22,274 @@
 	      <div class="modal-header">
 	        <h4 class="modal-title">表单</h4>
 	      </div>
-	      <div class="modal-body">
-             <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
-				<div class="form-body">
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品类别</label>
-					    <div class="col-md-7">
-						    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
-						    	<option :value="f.id" v-for="f in articlefamilys">
-						    		{{f.name}}
-						    	</option>
-						    </select>
+          <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
+		      <div class="modal-body auto-height">
+					<div class="form-body">
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">餐品类别</label>
+						    <div class="col-md-7">
+							    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+							    	<option :value="f.id" v-for="f in articlefamilys">
+							    		{{f.name}}
+							    	</option>
+							    </select>
+						    </div>
+						</div>
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">餐品名称</label>
+						    <div class="col-md-7">
+							    <input type="text" class="form-control" name="name" v-model="m.name" required="required">
+						    </div>
+						</div>
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">餐品单位</label>
+						    <div class="col-md-7">
+							    <input type="text" class="form-control" name="unit" v-model="m.unit">
+						    </div>
+						</div>
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">价格</label>
+						    <div class="col-md-7">
+							    <input type="text" class="form-control" name="price" v-model="m.price" required="required">
+						    </div>
+						</div>
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">粉丝价</label>
+						    <div class="col-md-7">
+							    <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
+						    </div>
+						</div>
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">排序</label>
+						    <div class="col-md-7">
+							    <input type="number" class="form-control" name="sort" v-model="m.sort">
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-4">
+						 	<label class="col-md-5 control-label">上架沽清</label>
+						    <div class="col-md-7 radio-list">
+						    	<label class="radio-inline">
+							    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.activated">上架
+							    </label>
+						    	<label class="radio-inline">
+							    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.isEmpty">沽清
+							    </label>
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-4">
+						 	<label class="col-md-5 control-label">显示</label>
+						    <div class="col-md-7 radio-list">
+						    	<label class="radio-inline">
+							    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig">大图
+							    </label>
+						    	<label class="radio-inline">
+							    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showDesc">描述
+							    </label>
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-4" >
+						 	<label class="col-md-5 control-label">未点提示</label>
+						    <div class="col-md-7 radio-list">
+						    	<label class="radio-inline" v-if="m.articleType==1">
+							    	<input  type="checkbox"  v-bind:true-value="true" v-bind:false-value="false"   v-model="m.isRemind">提示
+							    </label>
+						    	<label class="radio-inline" v-else>
+							    	<input v-else type="checkbox"  value="false" v-model="m.isRemind" disabled>提示
+							    </label>
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-4">
+					        <label class="col-md-5 control-label">按钮颜色</label>
+					        <div class="col-md-2">
+					            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" v-model="m.controlColor"> 
+					        </div>
+					        <div class="col-md-5">
+					        	<span class="btn dark" @click="changeColor('#000')">黑</span>
+					            <span class="btn btn-default" @click="changeColor('#fff')">白</span>
+					        </div>
 					    </div>
-					</div>
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品名称</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="name" v-model="m.name" required="required">
-					    </div>
-					</div>
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品单位</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="unit" v-model="m.unit">
-					    </div>
-					</div>
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">价格</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="price" v-model="m.price" required="required">
-					    </div>
-					</div>
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">粉丝价</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
-					    </div>
-					</div>
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">排序</label>
-					    <div class="col-md-7">
-						    <input type="number" class="form-control" name="sort" v-model="m.sort">
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">上架沽清</label>
-					    <div class="col-md-7 radio-list">
-					    	<label class="radio-inline">
-						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.activated">上架
-						    </label>
-					    	<label class="radio-inline">
-						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.isEmpty">沽清
-						    </label>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					 	<label class="col-md-5 control-label">显示</label>
-					    <div class="col-md-7 radio-list">
-					    	<label class="radio-inline">
-						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig">大图
-						    </label>
-					    	<label class="radio-inline">
-						    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.showDesc">描述
-						    </label>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4" >
-					 	<label class="col-md-5 control-label">未点提示</label>
-					    <div class="col-md-7 radio-list">
-					    	<label class="radio-inline" v-if="m.articleType==1">
-						    	<input  type="checkbox"  v-bind:true-value="true" v-bind:false-value="false"   v-model="m.isRemind">提示
-						    </label>
-					    	<label class="radio-inline" v-else>
-						    	<input v-else type="checkbox"  value="false" v-model="m.isRemind" disabled>提示
-						    </label>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-				        <label class="col-md-5 control-label">按钮颜色</label>
-				        <div class="col-md-2">
-				            <input type="text"  class="form-control color-mini" name="controlColor" data-position="bottom left" v-model="m.controlColor"> 
-				        </div>
-				        <div class="col-md-5">
-				        	<span class="btn dark" @click="changeColor('#000')">黑</span>
-				            <span class="btn btn-default" @click="changeColor('#fff')">白</span>
-				        </div>
-				    </div>
-					
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品编号</label>
-					    <div class="col-md-7">
-						    <input type="text" class="form-control" name="peference" v-model="m.peference">
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-4">
-					    <label class="col-md-5 control-label">餐品图片</label>
-					    <div class="col-md-7">
-						    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
-						    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
-					    </div>
-					</div>
-					
-					<div class="form-group col-md-5" v-if="m.articleType==1">
-					    <label class="col-md-3 control-label">描述</label>
-					    <div class="col-md-7">
-						    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
-					    </div>
-					</div>
-					<div class="form-group col-md-7">
-						<div class="row">
-							<div class="form-group col-md-12" v-if="m.articleType==1">
-							    <label class="col-md-2 text-right">出餐厨房</label>
-							    <div class="col-md-8">
-								    <label v-for="kitchen in kitchenList">
-								    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
-								    </label>
-							    </div>
+						
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">餐品编号</label>
+						    <div class="col-md-7">
+							    <input type="text" class="form-control" name="peference" v-model="m.peference">
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-4">
+						    <label class="col-md-5 control-label">餐品图片</label>
+						    <div class="col-md-7">
+							    <input type="hidden" name="photoSmall" v-model="m.photoSmall">
+							    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+						    </div>
+						</div>
+						
+						<div class="form-group col-md-5" v-if="m.articleType==1">
+						    <label class="col-md-3 control-label">描述</label>
+						    <div class="col-md-7">
+							    <textarea rows="3" class="form-control" name="description" v-model="m.description"></textarea>
+						    </div>
+						</div>
+						<div class="form-group col-md-7">
+							<div class="row">
+								<div class="form-group col-md-12" v-if="m.articleType==1">
+								    <label class="col-md-2 text-right">出餐厨房</label>
+								    <div class="col-md-8">
+									    <label v-for="kitchen in kitchenList">
+									    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
+									    </label>
+								    </div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group  col-md-12">
+								    <label class="col-md-2 text-right">供应时间</label>
+								    <div class="col-md-8">
+									    <label v-for="time in supportTimes">
+									    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
+									    </label>
+									    <label>
+										    <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
+									    </label>
+								    </div>
+								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="form-group  col-md-12">
-							    <label class="col-md-2 text-right">供应时间</label>
-							    <div class="col-md-8">
-								    <label v-for="time in supportTimes">
-								    	<input type="checkbox" name="supportTimes" :value="time.id"  v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
-								    </label>
-								    <label>
-									    <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
-								    </label>
-							    </div>
+						<div class="clearfix"></div>
+						
+						<div class="form-group col-md-10" v-if="m.articleType==1">
+							<label class="col-md-2 text-right">餐品规格</label>
+							<div class="col-md-10">
+								<div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
+									<label class="article-attr-label">{{attr.name}}:</label>
+									<span class="article-units">
+										<label v-for="unit in attr.articleUnits" >
+									    	<input type="checkbox" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
+									    </label>
+									</span> 
+								</div>
 							</div>
+						</div>
+						<div class="form-group col-md-10" v-if="allUnitPrice.length">
+							<label class="col-md-2 control-label">规格价格</label>
+							<div class="col-md-10">
+								<div class="flex-row">
+									<div class="flex-1 text-right">规格</div>
+									<div class="flex-2">价格</div>
+									<div class="flex-2">粉丝价</div>
+									<div class="flex-2">编号</div>
+								</div>
+								<div class="flex-row" v-for="u in unitPrices">
+									<label class="flex-1 control-label">{{u.name}}</label>
+									<div class="flex-2">
+										<input type="hidden" name="unitNames" :value="u.name"/>
+										<input type="hidden" name="unit_ids" :value="u.unitIds"/>
+										<input type="text" class="form-control" name="unitPrices" required="required" :value="u.price" v-model="u.price"/>
+									</div>
+									<div class="flex-2">
+										<input type="text" class="form-control" name="unitFansPrices" v-model="u.fansPrice"/>
+									</div>
+									<div class="flex-2">
+										<input type="text" class="form-control" name="unitPeferences" v-model="u.peference"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12" v-if="m.articleType==2">
+							<div class="portlet light bordered">
+	                            <div class="portlet-title">
+	                                <div class="caption font-green-sharp">
+	                                    <i class="icon-speech font-green-sharp"></i>
+	                                    <span class="caption-subject bold uppercase"> 编辑套餐</span>
+	                                </div>
+	                                <div class="actions">
+	                                    <select class="form-control" @change="choiceMealTemp" v-model="choiceTemp">
+											<option value="">不选择模板</option>
+											<option :value="meal.id" v-for="meal in mealtempList">{{meal.name}}</option>
+										</select>
+	                                </div>
+	                            </div>
+	                            <div class="portlet-body">
+	                            	<div class="portlet box blue-hoki"  v-for="attr in m.mealAttrs | orderBy  'sort'">
+		                                <div class="portlet-title">
+		                                    <div class="caption">
+											    <label class="control-label">&nbsp;</label>
+											    <div class="pull-right">
+												    <input class="form-control" type="text" v-model="attr.name" required="required">
+											    </div>
+											</div>
+		                                    <div class="caption">
+											    <label class="control-label col-md-4">排序&nbsp;</label>
+											    <div class="col-md-4">
+												    <input class="form-control" type="text" v-model="attr.sort" required="required" lazy>
+											    </div>
+											</div>
+		                                    <div class="tools">
+		                                        <a href="javascript:;" class="remove" @click="delMealAttr(attr)"></a>
+		                                    </div>
+		                                </div>
+		                                <div class="portlet-body">
+		                                	<div class="form-group col-md-12" v-if="attr.mealItems.length">
+												<div class="flex-row">
+													<div class="flex-1">餐品原名</div>
+													<div class="flex-2">餐品名称</div>
+													<div class="flex-2">差价</div>
+													<div class="flex-1">排序</div>
+													<div class="flex-1">默认</div>
+													<div class="flex-1">移除</div>
+												</div>
+												<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
+													<div class="flex-1">
+														<p class="form-control-static">{{item.articleName}}</p>
+													</div>
+													<div class="flex-2">
+														<input type="text" class="form-control"  v-model="item.name" required="required"/>
+													</div>
+													<div class="flex-2">
+														<input type="text" class="form-control"  v-model="item.priceDif" required="required"/>
+													</div>
+													<div class="flex-1">
+														<input type="text" class="form-control"  v-model="item.sort" required="required" lazy/>
+													</div>
+													<div class="flex-1 radio-list">
+														<label class="radio-inline">
+															<input type="radio" :name="attr.name" :value="true" v-model="item.isDefault" @change="itemDefaultChange(attr,item)"/>
+															设为默认
+														</label>
+													</div>
+													<div class="flex-1">
+														<button class="btn red" type="button" @click="removeMealItem(attr,item)">移除</button>
+													</div>
+												</div>
+											</div>
+		                                	<div class="col-md-4 col-md-offset-8">
+				                            	<button class="btn btn-block blue" type="button" @click="addMealItem(attr)"><i class="fa fa-cutlery"></i> 添加{{attr.name}}</button>
+				                            </div>
+				                            <div class="clearfix"></div>
+										</div>
+		                            </div>
+		                            <div class="col-md-4 col-md-offset-4">
+		                            	<button class="btn btn-block blue" type="button" @click="addMealAttr">
+		                            	<i class="fa fa-plus"></i>
+		                            	添加套餐属性</button>
+		                            </div>
+		                            <div class="clearfix"></div>
+	                            </div>
+	                        </div>
 						</div>
 					</div>
 					<div class="clearfix"></div>
-					
-					<div class="form-group col-md-10" v-if="m.articleType==1">
-						<label class="col-md-2 text-right">餐品规格</label>
-						<div class="col-md-10">
-							<div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
-								<label class="article-attr-label">{{attr.name}}:</label>
-								<span class="article-units">
-									<label v-for="unit in attr.articleUnits" >
-								    	<input type="checkbox" :value="unit.id" v-model="checkedUnit"> {{unit.name}} 
-								    </label>
-								</span> 
-							</div>
-						</div>
-					</div>
-					<div class="form-group col-md-10" v-if="allUnitPrice.length">
-						<label class="col-md-2 control-label">规格价格</label>
-						<div class="col-md-10">
-							<div class="flex-row">
-								<div class="flex-1 text-right">规格</div>
-								<div class="flex-2">价格</div>
-								<div class="flex-2">粉丝价</div>
-								<div class="flex-2">编号</div>
-							</div>
-							<div class="flex-row" v-for="u in unitPrices">
-								<label class="flex-1 control-label">{{u.name}}</label>
-								<div class="flex-2">
-									<input type="hidden" name="unitNames" :value="u.name"/>
-									<input type="hidden" name="unit_ids" :value="u.unitIds"/>
-									<input type="text" class="form-control" name="unitPrices" required="required" :value="u.price" v-model="u.price"/>
-								</div>
-								<div class="flex-2">
-									<input type="text" class="form-control" name="unitFansPrices" v-model="u.fansPrice"/>
-								</div>
-								<div class="flex-2">
-									<input type="text" class="form-control" name="unitPeferences" v-model="u.peference"/>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-12" v-if="m.articleType==2">
-						<div class="portlet light bordered">
-                            <div class="portlet-title">
-                                <div class="caption font-green-sharp">
-                                    <i class="icon-speech font-green-sharp"></i>
-                                    <span class="caption-subject bold uppercase"> 编辑套餐</span>
-                                </div>
-                                <div class="actions">
-                                    <select class="form-control" @change="choiceMealTemp" v-model="choiceTemp">
-										<option value="">不选择模板</option>
-										<option :value="meal.id" v-for="meal in mealtempList">{{meal.name}}</option>
-									</select>
-                                </div>
-                            </div>
-                            <div class="portlet-body">
-                            	<div class="portlet box blue-hoki"  v-for="attr in m.mealAttrs | orderBy  'sort'">
-	                                <div class="portlet-title">
-	                                    <div class="caption">
-										    <label class="control-label">&nbsp;</label>
-										    <div class="pull-right">
-											    <input class="form-control" type="text" v-model="attr.name" required="required">
-										    </div>
-										</div>
-	                                    <div class="caption">
-										    <label class="control-label col-md-4">排序&nbsp;</label>
-										    <div class="col-md-4">
-											    <input class="form-control" type="text" v-model="attr.sort" required="required" lazy>
-										    </div>
-										</div>
-	                                    <div class="tools">
-	                                        <a href="javascript:;" class="remove" @click="delMealAttr(attr)"></a>
-	                                    </div>
-	                                </div>
-	                                <div class="portlet-body">
-	                                	<div class="form-group col-md-12" v-if="attr.mealItems.length">
-											<div class="flex-row">
-												<div class="flex-1">餐品原名</div>
-												<div class="flex-2">餐品名称</div>
-												<div class="flex-2">差价</div>
-												<div class="flex-1">排序</div>
-												<div class="flex-1">默认</div>
-												<div class="flex-1">移除</div>
-											</div>
-											<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
-												<div class="flex-1">
-													<p class="form-control-static">{{item.articleName}}</p>
-												</div>
-												<div class="flex-2">
-													<input type="text" class="form-control"  v-model="item.name" required="required"/>
-												</div>
-												<div class="flex-2">
-													<input type="text" class="form-control"  v-model="item.priceDif" required="required"/>
-												</div>
-												<div class="flex-1">
-													<input type="text" class="form-control"  v-model="item.sort" required="required" lazy/>
-												</div>
-												<div class="flex-1 radio-list">
-													<label class="radio-inline">
-														<input type="radio" :name="attr.name" :value="true" v-model="item.isDefault" @change="itemDefaultChange(attr,item)"/>
-														设为默认
-													</label>
-												</div>
-												<div class="flex-1">
-													<button class="btn red" type="button" @click="removeMealItem(attr,item)">移除</button>
-												</div>
-											</div>
-										</div>
-	                                	<div class="col-md-4 col-md-offset-8">
-			                            	<button class="btn btn-block blue" type="button" @click="addMealItem(attr)"><i class="fa fa-cutlery"></i> 添加{{attr.name}}</button>
-			                            </div>
-			                            <div class="clearfix"></div>
-									</div>
-	                            </div>
-	                            <div class="col-md-4 col-md-offset-4">
-	                            	<button class="btn btn-block blue" type="button" @click="addMealAttr">
-	                            	<i class="fa fa-plus"></i>
-	                            	添加套餐属性</button>
-	                            </div>
-	                            <div class="clearfix"></div>
-                            </div>
-                        </div>
-					</div>
-				</div>
-				<div class="clearfix"></div>
-				<div class="form-actions">
-                    <div class="row">
-                        <div class="col-md-offset-3 col-md-5">
-                            <input type="hidden" name="id" v-model="m.id" />
-						    <input class="btn green"  type="submit"  value="保存"/>
-						    <a class="btn default" @click="cancel" >取消</a>
-                        </div>
-                     </div>
-                 </div>
-			</form>
-	      </div>
+		      </div>
+		      <div class="modal-footer">
+		          <input type="hidden" name="id" v-model="m.id" />
+		      	  <button type="button" class="btn btn-default" @click="cancel">取消</button>
+		          <button  type="submit" class="btn btn-primary">保存</button>
+		      </div>
+		  </form>
 	    </div>
 	  </div>
 	</div>
@@ -300,7 +300,7 @@
 	      <div class="modal-header">
 	        <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
 	      </div>
-	      <div class="modal-body">
+	      <div class="modal-body auto-height">
 	      	<div class="row">
 	      		<div class="col-md-6">
 			      	<table class="table">
