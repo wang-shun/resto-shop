@@ -32,8 +32,8 @@ import com.resto.brand.web.service.SmsChargeOrderService;
 public class PayNotifyController {
 	
 	@Resource
-	private SmsChargeOrderService smsChargeOrderService;
-
+	SmsChargeOrderService smsChargeOrderService;
+	
 	Logger log = LoggerFactory.getLogger(getClass());
 	
 	@RequestMapping("alipay_notify")
