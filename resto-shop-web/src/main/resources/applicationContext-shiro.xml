@@ -19,8 +19,9 @@
                 <!-- 登录页允许访问 -->
                 /branduser/login = anon
                 /installedPermission =anon
-                /smschargeorder/alipayNotify=anon<!-- 支付宝通知 -->
-                /smschargeorder/alipayReturn=anon<!-- 支付宝通知 -->
+                /paynotify/alipay_notify=anon<!-- 支付宝通知 -->
+                /paynotify/alipay_return=anon<!-- 支付宝通知 -->
+                /paynotify/wxpay_notify=anon<!-- 微信通知 -->
                 <!-- 其他资源需要认证 -->
                 /** = authc
             </value>

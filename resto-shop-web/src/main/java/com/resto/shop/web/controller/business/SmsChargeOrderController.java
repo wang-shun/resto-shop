@@ -71,6 +71,7 @@ public class SmsChargeOrderController extends GenericController {
 			}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 				String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 				String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
+				log.info("微信的通知路径为："+notify_url);
 				String body = "短信充值";
 				Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, "0.01", spbill_create_ip, notify_url,body);
 				if("true".equals(apiReqeust.get("success"))){
