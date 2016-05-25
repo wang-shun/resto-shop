@@ -56,7 +56,7 @@ public class SmsChargeOrderController extends GenericController {
 	public void smsCharge(String chargeMoney,String paytype,HttpServletRequest request,HttpServletResponse response) throws IOException, WriterException, DocumentException{
 		String returnHtml = "<h1>参数错误！</h1>";
 		if(StringUtil.isNotEmpty(chargeMoney) && StringUtil.isNotEmpty(paytype)){
-			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), chargeMoney,paytype);//创建充值订单
+			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), "0.01",paytype);//创建充值订单
 			String out_trade_no = smsChargeOrder.getId();
 			if(paytype.equals(PayType.ALI_PAY+"")){//支付宝支付
 //				String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
@@ -66,13 +66,13 @@ public class SmsChargeOrderController extends GenericController {
 				String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 				String return_url = getBaseUrl()+"paynotify/alipay_return";
 				String subject = "短信充值";
-				Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
+				Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, "0.01", show_url, notify_url, return_url, null);
 				returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
 			}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 				String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 				String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
 				String body = "短信充值";
-				Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, chargeMoney, spbill_create_ip, notify_url,body);
+				Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, "0.01", spbill_create_ip, notify_url,body);
 				if("true".equals(apiReqeust.get("success"))){
 					request.getSession().setAttribute("wxPayCode", apiReqeust.get("url"));
 					returnHtml = getWxPayHtml();
