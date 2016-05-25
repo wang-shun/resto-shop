@@ -5,7 +5,7 @@
 	<div class="page-header-inner ">
 		<!-- BEGIN LOGO -->
 		<div class="page-logo">
-			<a href="index.html"> <img	src="<%=resourcePath%>/assets/layouts/layout/img/logo.png"	alt="logo" class="logo-default" />
+			<a href="javascript:(0)"> <img	src="<%=resourcePath%>/assets/pages/img/Resto+.png" width="110px" height="20px"	alt="logo" class="logo-default" style="margin-top: 15px;" />
 			</a>
 			<div class="menu-toggler sidebar-toggler"></div>
 		</div>

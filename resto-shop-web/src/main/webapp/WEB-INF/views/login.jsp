@@ -35,7 +35,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<!-- BEGIN LOGO -->
 		<div class="logo">
 			<a href="index.html">
-			<img src="assets/admin/layout/img/logo-big-white.png" style="height: 17px;" alt=""/>
+			<img src="assets/pages/img/Resto+.png" style="height: 40px;" alt=""/>
 			</a>
 		</div>
 		<!-- END LOGO -->
@@ -43,9 +43,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="content">
 			<!-- BEGIN LOGIN FORM -->
 			<form class="login-form" method="post" action="branduser/login">
-				<div class="form-title">
-					<span class="form-title">欢迎.</span>
-					<span class="form-subtitle">请登录</span>
+				<div class="form-title" style="text-align: center">
+					<strong>欢迎使用上海餐加企业管理后台系统</strong>
 				</div>
 				<div class="alert alert-danger display-hide">
 					<button class="close" data-close="alert"></button>
@@ -53,11 +52,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</div>
 				<div class="form-group">
 					<label class="control-label visible-ie8 visible-ie9">用户名</label>
-					<input class="form-control form-control-solid placeholder-no-fix" type="text"  placeholder="Username" name="username"/>
+					<input class="form-control form-control-solid placeholder-no-fix" type="text"  placeholder="用户名" name="username"/>
 				</div>
 				<div class="form-group">
 					<label class="control-label visible-ie8 visible-ie9">密码</label>
-					<input class="form-control form-control-solid placeholder-no-fix" type="password"  placeholder="Password" name="password"/>
+					<input class="form-control form-control-solid placeholder-no-fix" type="password"  placeholder="密码" name="password"/>
 				</div>
 				<div class="form-actions">
 					<button type="submit" class="btn btn-primary btn-block uppercase">登录</button>
@@ -65,8 +64,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</form>
 			<!-- END LOGIN FORM -->
 		</div>
-		<div class="copyright hide">
-			 &copy; Diamond Admin 
+		<div class="copyright">
+			&copy;  上海餐加企业管理咨询有限公司
 		</div>
 		<!-- END LOGIN -->
 		<script src="assets/global/plugins/jquery.min.js" type="text/javascript"></script>
