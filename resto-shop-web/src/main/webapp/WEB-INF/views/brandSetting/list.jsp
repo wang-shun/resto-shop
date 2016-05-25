@@ -78,10 +78,14 @@
 				
 				<div class="form-group">
 					<div class="control-label">是否选择配送模式</div>
-					<input type="radio"  id="choiceIs" name="isChoiceMode" v-model="m.isChoiceMode" value=1>
-					<label for="choiceIs">是</label>
-					<input type="radio" id="choiceNo" name="isChoiceMode" v-model="m.isChoiceMode" value=0> 
-					<label for="choiceNo">否</label>
+					<label >
+						<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="1">
+						是
+					</label>
+					<label>
+						<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0"> 
+						否
+					</label>
 				</div>
 				
 			</div>

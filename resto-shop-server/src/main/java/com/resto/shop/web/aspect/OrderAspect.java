@@ -57,7 +57,7 @@ public class OrderAspect {
 	
 	@AfterReturning(value="createOrder()",returning="order")
 	public void createOrderAround(Order order) throws Throwable{
-		shopCartService.clearShopCart(order.getCustomerId(),order.getDistributionModeId(),order.getShopDetailId());
+		shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			long delay = 1000*60*15;//15分钟后自动取消订单
 			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
@@ -122,11 +122,12 @@ public class OrderAspect {
 	public void pushOrderAfter(Order order){
 		if(order!=null){
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
-				log.info("客户下单,发送成功下单通知");
+				log.info("客户下单,发送成功下单通知"+order.getId());
 				MQMessageProducer.sendPlaceOrderMessage(order);
 				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 				if(order.getOrderMode()==ShopMode.TABLE_MODE){  //坐下点餐在立即下单的时候，发送支付成功消息通知
+					log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:"+order.getId());
 					sendPaySuccessMsg(order);
 				}
 			}else if(ProductionStatus.PRINTED==order.getProductionStatus()){
