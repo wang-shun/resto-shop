@@ -22,6 +22,11 @@ import com.resto.brand.core.alipay.util.AlipayNotify;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.service.SmsChargeOrderService;
 
+/**
+ * 短信支付  回掉 Controller
+ * @author Administrator
+ *
+ */
 @Controller
 @RequestMapping("paynotify")
 public class PayNotifyController {
@@ -57,14 +62,15 @@ public class PayNotifyController {
 			String seller_id = params.get("seller_id");//收款支付宝账号
 			if(trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")){
 				log.info("支付宝充值成功：orderID："+out_trade_no);
-				smsChargeOrderService.checkSmsChargeOrder(out_trade_no,trade_no,total_fee,seller_id);
+				boolean flag = smsChargeOrderService.checkSmsChargeOrder_AliPay(out_trade_no, trade_no, total_fee, seller_id);
+				returnHtml = flag?"success":"fail";	//请不要修改或删除
 			}
-			returnHtml = "success";	//请不要修改或删除
 		}else{//验证失败
 			returnHtml = "fail";
 		}
 		//返回
 		try {
+			log.info("支付宝支付返回的信息为："+returnHtml);
 			response.setContentType("text/html;charset=utf-8");
 			response.getWriter().write(returnHtml);
 			response.getWriter().flush();
@@ -85,7 +91,7 @@ public class PayNotifyController {
 		log.info("微信---->  异步    发来贺电");
 		Map<String,String> resultMap = getResultMap(request);
 		Map<String,String> wxResult = new HashMap<String, String>();
-		wxResult.put("return_code", "SUCCESS");
+		wxResult.put("return_code", "FAIL");
 		if("SUCCESS".equals(resultMap.get("return_code"))&&"SUCCESS".equals(resultMap.get("result_code"))){
 			if(WeChatPayUtils.validSign(resultMap,WeChatPayUtils.RESTO_MCHKEY)){
 				try{
@@ -93,16 +99,14 @@ public class PayNotifyController {
 					String total_fee = resultMap.get("total_fee");
 					String out_trade_no = resultMap.get("out_trade_no");
 					String transaction_id = resultMap.get("transaction_id");
-					String seller_id = resultMap.get("seller_id");
-					smsChargeOrderService.checkSmsChargeOrder(out_trade_no,transaction_id,total_fee,seller_id);
+					smsChargeOrderService.checkSmsChargeOrder_WxPay(out_trade_no,transaction_id,total_fee);
+					wxResult.put("return_code", "SUCCESS");
 				}catch(Exception e){
 					log.info("接受微信支付请求失败:"+e.getMessage());
 					e.printStackTrace();
-					wxResult.put("return_code", "FAIL");
 					wxResult.put("return_msg", e.toString());
 				}
 			}else{
-				wxResult.put("return_code", "FAIL");
 				wxResult.put("return_msg", "签名失败");
 			}
 		}
