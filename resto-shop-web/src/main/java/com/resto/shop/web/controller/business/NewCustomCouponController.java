@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -54,10 +55,18 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid NewCustomCoupon brand, HttpServletRequest request){
-	        System.out.println(brand.getBeginTime());
-	        String brandId = (String) request.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
-	        brand.setBrandId(brandId);
-	        brand.setCreateTime(new Date());
+		if((brand.getBeginTime()!=null&&brand.getEndTime()!=null)||(brand.getBeginDateTime()!=null&&brand.getEndDateTime()!=null)){
+			if(brand.getBeginTime().compareTo(brand.getEndTime())>0){
+				log.info("开始时间大于结束时间");
+				return new Result(false);
+			}else if(brand.getBeginDateTime().compareTo(brand.getEndDateTime())>0){
+				log.info("优惠券的开始时间不能大于结束时间");
+				return new Result(false);
+			}
+		}
+		String brandId = (String) request.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
+		brand.setBrandId(brandId);
+		brand.setCreateTime(new Date());
 		newcustomcouponService.insertNewCustomCoupon(brand);
 		return Result.getSuccess();
 	}
@@ -65,6 +74,16 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid NewCustomCoupon brand){
+		if((brand.getBeginTime()!=null&&brand.getEndTime()!=null)||(brand.getBeginDateTime()!=null&&brand.getEndDateTime()!=null)){
+			if(brand.getBeginTime().compareTo(brand.getEndTime())>0){
+				log.info("开始时间大于结束时间");
+				return new Result(false);
+			}else if(brand.getBeginDateTime().compareTo(brand.getEndDateTime())>0){
+				log.info("优惠券的开始时间不能大于结束时间");
+				return new Result(false);
+			}
+		}
+		
 		newcustomcouponService.update(brand);
 		return Result.getSuccess();
 	}

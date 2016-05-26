@@ -9,6 +9,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.CouponSource;
+import com.resto.shop.web.constant.TimeCons;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
@@ -59,14 +60,23 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	        coupon.setName(cfg.getCouponName());
 	        coupon.setValue(cfg.getCouponValue());
 	        coupon.setMinAmount(cfg.getCouponMinMoney());
-	        coupon.setBeginDate(beginDate);
-	        coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
+	        
 	        coupon.setBeginTime(cfg.getBeginTime());
 	        coupon.setEndTime(cfg.getEndTime());
 	        coupon.setUseWithAccount(cfg.getUseWithAccount());
 	        coupon.setDistributionModeId(cfg.getDistributionModeId());
 	        coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
 	        coupon.setCustomerId(cus.getId());
+	        //优惠券时间选择的类型分配时间
+	        if(cfg.getTimeConsType()==TimeCons.MODELA){
+	        	coupon.setBeginDate(beginDate);
+		        coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
+	        }else if(cfg.getTimeConsType()==TimeCons.MODELB){
+	        	coupon.setBeginDate(cfg.getBeginDateTime());
+	        	coupon.setEndDate(cfg.getEndDateTime());
+	        }
+	        
+	        
 	        for(int i=0;i<cfg.getCouponNumber();i++){
 	            couponService.insertCoupon(coupon);
 	        }

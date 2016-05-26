@@ -5,11 +5,14 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import org.junit.runners.Parameterized.Parameter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.exception.AppException;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
@@ -58,4 +61,16 @@ public class CustomerController extends GenericController{
 		customerService.delete(id);
 		return Result.getSuccess();
 	}
+	
+	//void bindPhone(String phone, String currentCustomerId) throws AppException;
+	@RequestMapping("test")
+	@ResponseBody
+	public Result test(@RequestParam(value="phone",defaultValue="13317182430")String phone,@RequestParam(value="customerId",defaultValue="f2361f9ef9814ddbba10c3bdb93a3bc1")String customerId) throws AppException{
+		customerService.bindPhone(phone, customerId);
+		return Result.getSuccess();
+	}
+	
+	
+	
+	
 }

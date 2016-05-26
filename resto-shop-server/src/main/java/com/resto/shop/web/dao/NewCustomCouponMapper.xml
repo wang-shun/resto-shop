@@ -40,6 +40,9 @@
       <if test="isActivty != null">is_activty,</if>  
       <if test="brandId != null">brand_id,</if>  
       <if test="distributionModeId != null">distribution_mode_id,</if> 
+      <if test="timeConsType != null">time_cons_type,</if> 
+      <if test="beginDateTime != null">begin_date_time,</if> 
+      <if test="endDateTime != null">end_date_time,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=BIGINT},</if>  
@@ -56,6 +59,9 @@
       <if test="isActivty != null">#{isActivty,jdbcType=BIT},</if>  
       <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="timeConsType != null">#{timeConsType},</if> 
+      <if test="beginDateTime != null">#{beginDateTime},</if> 
+      <if test="endDateTime != null">#{endDateTime},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon 
@@ -72,14 +78,17 @@
       <if test="endTime != null">end_time = #{endTime,jdbcType=TIME},</if>  
       <if test="isActivty != null">is_activty = #{isActivty,jdbcType=BIT},</if>  
       <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if>  
-      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="distributionModeId != null">time_cons_type = #{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="timeConsType != null">time_cons_type = #{timeConsType},</if> 
+      <if test="beginDateTime != null">begin_date_time = #{beginDateTime},</if> 
+      <if test="endDateTime != null">end_date_time = #{endDateTime},</if> 
     </set> where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon set name = #{name,jdbcType=VARCHAR}, coupon_value = #{couponValue,jdbcType=DECIMAL}, coupon_validay = #{couponValiday,jdbcType=INTEGER}, coupon_number = #{couponNumber,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP}, use_with_account = #{useWithAccount,jdbcType=BIT}, coupon_name = #{couponName,jdbcType=VARCHAR}, coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_activty = #{isActivty,jdbcType=BIT}, brand_id = #{brandId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=BIGINT}</update>
   <select id="selectList" resultType="NewCustomCoupon">select * from tb_new_custom_coupon</select>
   <select id="selectListByBrandId" resultType="NewCustomCoupon">
   select id,name,coupon_value,coupon_validay,coupon_number,create_time,
-  use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id
+  use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time
    from tb_new_custom_coupon where brand_id=#{brandId}
   </select>
 </mapper>

@@ -18,7 +18,6 @@ public class NewCustomCoupon {
     @Min(message="优惠券的价值最小值0" ,value=0)
     private BigDecimal couponValue;//优惠券的价值
     
-    @NotNull(message="优惠券的有效期不能为空")
     private Integer couponValiday;
     
     @NotNull(message="优惠券的个数不能为空")
@@ -47,8 +46,46 @@ public class NewCustomCoupon {
     
     @NotNull(message="配送模式不能为空")
     private Integer distributionModeId;
+    
+    /**
+     * 新增字段用来区别优惠券使用时间的类型
+     * 1.按天算 2.按范围算
+     */
+    private Integer timeConsType;
+    
+    
+    
+    @DateTimeFormat(pattern=("yyyy-MM-dd HH:mm:ss"))
+    private Date beginDateTime;
+    
+    @DateTimeFormat(pattern=("yyyy-MM-dd HH:mm:ss"))
+    private Date endDateTime;
+    
+    public Integer getTimeConsType() {
+		return timeConsType;
+	}
 
-    public Long getId() {
+	public void setTimeConsType(Integer timeConsType) {
+		this.timeConsType = timeConsType;
+	}
+
+	public Date getBeginDateTime() {
+		return beginDateTime;
+	}
+
+	public void setBeginDateTime(Date beginDateTime) {
+		this.beginDateTime = beginDateTime;
+	}
+
+	public Date getEndDateTime() {
+		return endDateTime;
+	}
+
+	public void setEndDateTime(Date endDateTime) {
+		this.endDateTime = endDateTime;
+	}
+
+	public Long getId() {
         return id;
     }
 
