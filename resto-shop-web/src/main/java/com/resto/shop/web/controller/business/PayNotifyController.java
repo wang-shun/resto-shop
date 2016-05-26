@@ -40,18 +40,14 @@ public class PayNotifyController {
 	public void alipayNotify(HttpServletRequest request,HttpServletResponse response){
 		log.info("支付宝---->  异步    发来贺电");
 		//获取支付宝返回的所有参数
-		Map<String, String> params = AlipayNotify.getNotifyParams(request, response);
+		Map<String, String> resultMap = AlipayNotify.getNotifyParams(request, response);
 		//返回值
 		String returnHtml = "fail";
-		if(AlipayNotify.verify(params)){//验证成功
-			String out_trade_no = params.get("out_trade_no");//商户订单号
-			String trade_no = params.get("trade_no");//支付宝交易号
-			String trade_status = params.get("trade_status");//交易状态
-			String total_fee = params.get("total_fee");//交易金额
-			String seller_id = params.get("seller_id");//收款支付宝账号
+		if(AlipayNotify.verify(resultMap)){//验证成功
+			String trade_status = resultMap.get("trade_status");//交易状态
 			if(trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")){
-				log.info("支付宝充值成功：orderID："+out_trade_no);
-				boolean flag = smsChargeOrderService.checkSmsChargeOrder_AliPay(out_trade_no, trade_no, total_fee, seller_id);
+				log.info("支付宝充值成功返回的参数为:"+resultMap);
+				boolean flag = smsChargeOrderService.checkSmsChargeOrder_AliPay(resultMap);
 				returnHtml = flag?"success":"fail";	//请不要修改或删除
 			}
 		}else{//验证失败
@@ -97,12 +93,8 @@ public class PayNotifyController {
 		if("SUCCESS".equals(resultMap.get("return_code"))&&"SUCCESS".equals(resultMap.get("result_code"))){
 			if(WeChatPayUtils.validSign(resultMap,WeChatPayUtils.RESTO_MCHKEY)){
 				try{
-					log.info("微信充值成功:"+resultMap);
-					String total_fee = resultMap.get("total_fee");
-					String out_trade_no = resultMap.get("out_trade_no");
-					String transaction_id = resultMap.get("transaction_id");
-					log.info("开始远程调用--------->");
-					smsChargeOrderService.checkSmsChargeOrder_WxPay(out_trade_no,transaction_id,total_fee);
+					log.info("微信充值成功返回的参数为:"+resultMap);
+					smsChargeOrderService.checkSmsChargeOrder_WxPay(resultMap);
 					wxResult.put("return_code", "SUCCESS");
 				}catch(Exception e){
 					log.info("接受微信支付请求失败:"+e.getMessage());
