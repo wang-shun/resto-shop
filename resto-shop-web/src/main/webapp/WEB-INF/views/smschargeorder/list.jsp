@@ -116,8 +116,7 @@
 					<div class="form-group">
 						<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 						<div class="col-sm-8">
-							<input type="url" class="form-control" required id="header" name="header">
-							<input type="url">
+							<input type="text" class="form-control" required id="header" name="header">
 						</div>
 					</div>
 					<div class="form-group">
