@@ -83,24 +83,24 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			//更新短信账户的信息
 			smsAcountService.updateByBrandId(brandId);
 			//判断是否要提醒商家充值短信账户
-			sendNotice(brandId,brandUser);
+			sendNotice(b,brandUser);
 		}catch(Exception e){
 			log.error("发送短信失败:"+e.getMessage());
 		}
 		return string;
 	}
 
-	private void sendNotice(String brandId,BrandUser brandUser) {
-		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
+	private void sendNotice(Brand b,BrandUser brandUser) {
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(b.getId());
 		switch (smsAcount.getRemainderNum()) {
 		case SmsNumNotice.NOTICE_FIRST:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足50条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),SmsNumNotice.NOTICE_FIRST, brandUser.getPhone());
 			break;
 		case SmsNumNotice.NOTICE_SECOND:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足20条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),SmsNumNotice.NOTICE_SECOND, brandUser.getPhone());
 			break;
 		case SmsNumNotice.NOTICE_LAST:
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你的余额不足10条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),SmsNumNotice.NOTICE_LAST, brandUser.getPhone());
 			break;
 		default:
 			break;
@@ -116,11 +116,13 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		
 		if(SmsNumNotice.NOTICE_OWING_FIRST==smsAcount.getRemainderNum()){
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费10条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,SmsNumNotice.NOTICE_OWING_FIRST, brandUser.getPhone());
 		}else if(SmsNumNotice.NOTICE_OWING_SECOND==smsAcount.getRemainderNum()){
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费20条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,SmsNumNotice.NOTICE_OWING_SECOND, brandUser.getPhone());
 		}else if(SmsNumNotice.NOTICE_OWING_LAST > smsAcount.getRemainderNum()||SmsNumNotice.NOTICE_OWING_LAST==smsAcount.getRemainderNum()){
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", "你已欠费50条", brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone());
+			log.info("欠费超过50无法发短信");
+			return null;
 		}
 		return SMSUtils.sendCode(sign, serviceName, code, phone);
 	}
