@@ -69,7 +69,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		
 		//判断优惠卷使用类型是否0 或者是否等于订单类型
 		if(coupon.getDistributionModeId()!=0&&coupon.getDistributionModeId()!=order.getDistributionModeId()){
-			throw new AppException(AppException.COUPON_MODE_ERR);
+			if(coupon.getDistributionModeId()!=1&&order.getDistributionModeId()!=3){
+				throw new AppException(AppException.COUPON_MODE_ERR);
+			}
 		}
 		//判断优惠卷订单金额是否大于优惠卷可用金额
 		if(totalMoney.compareTo(totalMoney)<0){
