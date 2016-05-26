@@ -52,7 +52,7 @@
         
         <link rel="stylesheet" href="<%=resourcePath %>/assets/customer/css/custom.css"/>
         <!-- END THEME LAYOUT STYLES -->
-        <link rel="shortcut icon" href="favicon.ico" /> </head>
+		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
         
     <!-- END HEAD -->
 

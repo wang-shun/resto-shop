@@ -24,7 +24,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<link href="assets/global/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>
 		<link href="assets/global/css/plugins.css" rel="stylesheet" type="text/css"/>
 		<!-- END THEME STYLES -->
-		<link rel="shortcut icon" href="favicon.ico"/>
+		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
 	</head>
 <!-- BEGIN BODY -->
 	<body class="login">
