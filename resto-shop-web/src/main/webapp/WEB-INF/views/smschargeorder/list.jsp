@@ -4,7 +4,9 @@
 <div class="table-div">
 	<div class="table-operator">
 		<s:hasPermission name="notice/add">
-			<button type="button" class="btn green pull-right"
+			<button type="button" class="btn blue"
+				data-toggle="modal" data-target="#applyInvoice">申请发票</button>&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn green "
 				data-toggle="modal" data-target="#createChargeOrder">短信充值</button>
 		</s:hasPermission>
 	</div>
