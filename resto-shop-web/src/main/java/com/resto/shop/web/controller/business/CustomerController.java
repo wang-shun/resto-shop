@@ -62,15 +62,5 @@ public class CustomerController extends GenericController{
 		return Result.getSuccess();
 	}
 	
-	//void bindPhone(String phone, String currentCustomerId) throws AppException;
-	@RequestMapping("test")
-	@ResponseBody
-	public Result test(@RequestParam(value="phone",defaultValue="13317182430")String phone,@RequestParam(value="customerId",defaultValue="f2361f9ef9814ddbba10c3bdb93a3bc1")String customerId) throws AppException{
-		customerService.bindPhone(phone, customerId);
-		return Result.getSuccess();
-	}
-	
-	
-	
 	
 }
