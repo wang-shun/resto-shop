@@ -116,7 +116,7 @@
 					<div class="form-group">
 						<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 						<div class="col-sm-8">
-							<input type="text" class="form-control" required id="header" name="header">
+							<input type="text" class="form-control" required name="header">
 						</div>
 					</div>
 					<div class="form-group">
@@ -133,6 +133,7 @@
 						</div>
 					</div>
 					<div class="text-center">
+						<input type="hidden" name="chargeOrderId"/>
 						<a class="btn default" data-dismiss="modal">取消</a> <input
 							class="btn green" type="submit" value="申请"/>
 					</div>
@@ -191,7 +192,9 @@
 								title : "支付类型",
 								data : "payType",
 								createdCell : function(td, tdData) {
-									var payType = tdData==1?"支付宝":"微信";
+									var payType = tdData==1?
+											"<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
+											:"<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
 									$(td).html(payType);
 								}
 							},
@@ -213,9 +216,7 @@
 									if (rowData.status == 1) {//订单已完成
 										if (tdData == null || tdData == "") {
 											info = createBtn(rowData.id,"申请发票","btn-sm green-meadow",function() {
-												var orderId = $(this).attr("name");
-												var brandName = rowData.id
-												$("#header").val();
+												$(":input[name='chargeOrderId']").val(rowData.id);//发票
 												$("#applyInvoice").modal();
 											})
 										} else {
@@ -275,7 +276,6 @@
 				toastr.error("申请失败！请重新操作！");
 			}
 			tb.ajax.reload();
-			console.log("---刷新");
 		});
 		return false;
 	}

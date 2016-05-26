@@ -171,6 +171,12 @@ public class SmsChargeOrderController extends GenericController {
 	    }
 	}
 	
+	/**
+	 * 得到文件路径
+	 * @param request
+	 * @param fileName
+	 * @return
+	 */
 	public String getFilePath(HttpServletRequest request,String fileName){
 		String systemPath = request.getServletContext().getRealPath("");
 		systemPath = systemPath.replaceAll("\\\\", "/");
@@ -183,6 +189,10 @@ public class SmsChargeOrderController extends GenericController {
 		return systemPath+filePath;
 	}
 	
+	/**
+	 * 生成微信支付的页面
+	 * @return
+	 */
 	public String getWxPayHtml(){
 		StringBuffer str = new StringBuffer();
 		str.append("<style>.closeBtn{line-height:30px; height:30px; width:163px; color:#ffffff; background-color:#d9534f; font-size:16px; font-weight:normal; font-family:Arial; border:0px solid #dcdcdc; -webkit-border-top-left-radius:3px; -moz-border-radius-topleft:3px; border-top-left-radius:3px; -webkit-border-top-right-radius:3px; -moz-border-radius-topright:3px; border-top-right-radius:3px; -webkit-border-bottom-left-radius:3px; -moz-border-radius-bottomleft:3px; border-bottom-left-radius:3px; -webkit-border-bottom-right-radius:3px; -moz-border-radius-bottomright:3px; border-bottom-right-radius:3px; -moz-box-shadow: inset 0px 0px 0px 0px #ffffff; -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff; box-shadow: inset 0px 0px 0px 0px #ffffff; text-align:center; display:inline-block; text-decoration:none;}.closeBtn:hover{background-color:#c9302c; cursor:pointer;}</style>");
