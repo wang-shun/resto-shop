@@ -157,7 +157,7 @@ public class SmsChargeOrderController extends GenericController {
 		str.append("<div style='position:absolute; left:0; top:0px; width:100%; height:100%; background:#BBB;text-align: center;'>");
 		str.append("<img src = 'createWxPayCode' style='margin-top:150px;'>");
 		str.append("<p><strong>扫码即可使用微信支付</strong></p>");
-		str.append("<button class='closeBtn' onclick='javascript:window.opener=null;window.open('','_self');window.close();'>关闭页面</button>");
+		str.append("<button class=\"closeBtn\" onclick=\"javascript:window.opener=null;window.open('','_self');window.close();\">关闭页面</button>");
 		str.append("</div></body>");
 		return str.toString();
 	}
