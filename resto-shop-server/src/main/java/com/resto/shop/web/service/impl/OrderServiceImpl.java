@@ -328,6 +328,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order findCustomerNewOrder(String customerId, String shopId, String orderId) {
 		Date beginDate = DateUtil.getDateBegin(new Date());
+		return findCustomerNewOrder(beginDate,customerId,shopId,orderId);
+	}
+
+	public Order findCustomerNewOrder(Date beginDate,String customerId,String shopId,String orderId){
 		Integer[] orderState = new Integer[] { OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM };
 		Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
 		if (order != null) {
@@ -342,7 +346,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		return order;
 	}
-
+	
 	private List<String> selectChildIdsByParentId(String id) {
 		return orderMapper.selectChildIdsByParentId(id);
 	}
@@ -798,5 +802,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public void updateAllowContinue(String id, boolean b) {
 		orderMapper.changeAllowContinue(id,b);
+	}
+
+	@Override
+	public Order findCustomerNewPackage(String currentCustomerId, String currentShopId) {
+		String oid = orderMapper.selectNewCustomerPackageId(currentCustomerId,currentShopId);
+		Order order = null;
+		if(StringUtils.isNoneBlank(oid)){
+			Date beginDate = DateUtil.getAfterDayDate(new Date(), -15);
+			order = findCustomerNewOrder(beginDate,null,null,oid);
+		}
+		return order;
 	}
 }

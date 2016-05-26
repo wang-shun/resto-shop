@@ -72,8 +72,12 @@
 				</div>
 				
 				<div class="form-group">
-				    <label>多久不能加菜</label>
-				    <input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime">
+				    <label>红包提醒倒计时(秒)</label>
+				    <input type="number" class="form-control" name="autoConfirmTime" v-model="m.autoConfirmTime" required="required"> 
+				</div>
+				<div class="form-group">
+				    <label>最迟加菜时间(秒)</label>
+				    <input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime" required="required">
 				</div>
 				
 				<div class="form-group">

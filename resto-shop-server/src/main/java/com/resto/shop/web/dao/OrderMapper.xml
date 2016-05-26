@@ -615,6 +615,13 @@
   <select id="selectChildIdsByParentId" resultType="String">
   	select id from tb_order where parent_order_id=#{0}
   </select>
+  <select id="selectNewCustomerPackageId" resultType="String">
+  	SELECT id FROM tb_order WHERE allow_appraise=1 AND confirm_time IS NOT NULL
+	and customer_id=#{0} and shop_detail_id=#{1}
+	ORDER BY confirm_time DESC LIMIT 0,1
+  	
+  </select>
+  
 </mapper>
 
 

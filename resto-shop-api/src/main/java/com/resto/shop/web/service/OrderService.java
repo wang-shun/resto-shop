@@ -117,5 +117,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	List<Order> selectByParentId(String parentOrderId);
 
+	public Order findCustomerNewPackage(String currentCustomerId, String currentShopId);
+
 
 }

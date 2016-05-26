@@ -99,5 +99,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectByParentId(String parentOrderId);
 
 	List<String> selectChildIdsByParentId(String id);
+
+	String selectNewCustomerPackageId(String currentCustomerId, String currentShopId);
 	
 }
