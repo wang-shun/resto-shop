@@ -59,9 +59,6 @@ public class SmsChargeOrderController extends GenericController {
 			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), "0.01",paytype);//创建充值订单
 			String out_trade_no = smsChargeOrder.getId();
 			if(paytype.equals(PayType.ALI_PAY+"")){//支付宝支付
-//				String url = request.getScheme()+"://"+ request.getServerName()+request.getRequestURI()+"?"+request.getQueryString();
-//				String orderName = "短信充值";
-//				returnHtml = smsChargeOrderService.createSmsChargeOrder(orderName, chargeMoney, url, getCurrentBrandId());
 				String show_url = "";
 				String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 				String return_url = getBaseUrl()+"paynotify/alipay_return";

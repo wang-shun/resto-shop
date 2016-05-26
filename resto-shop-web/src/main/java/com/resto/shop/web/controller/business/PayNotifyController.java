@@ -39,17 +39,6 @@ public class PayNotifyController {
 	@RequestMapping("alipay_notify")
 	public void alipayNotify(HttpServletRequest request,HttpServletResponse response){
 		log.info("支付宝---->  异步    发来贺电");
-//		//商户订单号
-//		String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"),"UTF-8");
-//		//支付宝交易号
-//		String trade_no = new String(request.getParameter("trade_no").getBytes("ISO-8859-1"),"UTF-8");
-//		//交易状态
-//		String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"),"UTF-8");
-//		//交易金额
-//		String total_fee = new String(request.getParameter("total_fee").getBytes("ISO-8859-1"),"UTF-8");
-//		//收款支付宝账号
-//		String seller_id = new String(request.getParameter("seller_id").getBytes("ISO-8859-1"),"UTF-8");
-		
 		//获取支付宝返回的所有参数
 		Map<String, String> params = AlipayNotify.getNotifyParams(request, response);
 		//返回值
@@ -80,7 +69,20 @@ public class PayNotifyController {
 	}
 	
 	@RequestMapping("/alipay_return")
-	public void alipayReturn(){//支付宝返回路径
+	public String alipayReturn(HttpServletRequest request,HttpServletResponse response){//支付宝返回路径
+		log.info("支付宝---->  充值完成   页面跳转");
+		Map<String, String> params = AlipayNotify.getNotifyParams(request, response);
+		if(AlipayNotify.verify(params)){//验证成功
+			String trade_status = params.get("trade_status");//交易状态
+			if(trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")){
+				log.info("支付宝充值成功：orderID："+params.get("out_trade_no"));
+				params.put("restoResut", "success");
+			}
+		}else{//验证失败
+			params.put("restoResut", "fail");
+		}
+		request.setAttribute("returnParams", params);
+		return "alipayReturn";
 	}
 	
 	
