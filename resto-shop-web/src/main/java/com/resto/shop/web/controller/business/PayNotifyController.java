@@ -70,7 +70,7 @@ public class PayNotifyController {
 		}
 		//返回
 		try {
-			log.info("支付宝支付返回的信息为："+returnHtml);
+			log.info("给支付宝支付异步请求的返回的信息为："+returnHtml);
 			response.setContentType("text/html;charset=utf-8");
 			response.getWriter().write(returnHtml);
 			response.getWriter().flush();
