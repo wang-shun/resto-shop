@@ -39,8 +39,7 @@
 							</dl>
 						</div>
 						<div class="col-md-4 col-md-offset-4">
-							<button class="btn btn-danger btn-block">关闭页面</button>
-							<a href="javascript:window.opener=null;window.open('','_self');window.close();">关闭</a> 
+							<button class="btn btn-danger btn-block" onclick="javascript:window.opener=null;window.open('','_self');window.close();">关闭页面</button>
 						</div>
 					</div>
 				</div>
@@ -64,8 +63,7 @@
 						</dl>
 						</div>
 						<div class="col-md-4 col-md-offset-4">
-							<button class="btn btn-danger btn-block">关闭页面</button>
-							<a href="javascript:window.opener=null;window.open('','_self');window.close();">关闭</a> 
+							<button class="btn btn-danger btn-block" onclick="javascript:window.opener=null;window.open('','_self');window.close();">关闭页面</button>
 						</div>
 					</div>
 				</div>
@@ -91,20 +89,6 @@
 			}
 			$("#successStatus").html(str);
 			$("#falseStatus").html(str);
-			
-			
-			$(".btn-danger").click(function() {
-				var userAgent = navigator.userAgent;
-				if (userAgent.indexOf("Firefox") != -1
-						|| userAgent.indexOf("Chrome") != -1) {
-					window.location.href = "about:blank";
-					window.opener=null;window.open('','_self');window.close();
-				} else {
-					window.opener = null;
-					window.open("", "_self");
-					window.close();
-				}
-			});
 		})
 	</script>
 </body>

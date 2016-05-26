@@ -152,10 +152,12 @@ public class SmsChargeOrderController extends GenericController {
 	
 	public String getWxPayHtml(){
 		StringBuffer str = new StringBuffer();
+		str.append("<style>.closeBtn{line-height:30px; height:30px; width:163px; color:#ffffff; background-color:#d9534f; font-size:16px; font-weight:normal; font-family:Arial; border:0px solid #dcdcdc; -webkit-border-top-left-radius:3px; -moz-border-radius-topleft:3px; border-top-left-radius:3px; -webkit-border-top-right-radius:3px; -moz-border-radius-topright:3px; border-top-right-radius:3px; -webkit-border-bottom-left-radius:3px; -moz-border-radius-bottomleft:3px; border-bottom-left-radius:3px; -webkit-border-bottom-right-radius:3px; -moz-border-radius-bottomright:3px; border-bottom-right-radius:3px; -moz-box-shadow: inset 0px 0px 0px 0px #ffffff; -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff; box-shadow: inset 0px 0px 0px 0px #ffffff; text-align:center; display:inline-block; text-decoration:none;}.closeBtn:hover{background-color:#c9302c; cursor:pointer;}</style>");
 		str.append("<body style='height:100%;overflow:hidden;'>");
 		str.append("<div style='position:absolute; left:0; top:0px; width:100%; height:100%; background:#BBB;text-align: center;'>");
 		str.append("<img src = 'createWxPayCode' style='margin-top:150px;'>");
 		str.append("<p><strong>扫码即可使用微信支付</strong></p>");
+		str.append("<button class='closeBtn' onclick='javascript:window.opener=null;window.open('','_self');window.close();'>关闭页面</button>");
 		str.append("</div></body>");
 		return str.toString();
 	}
