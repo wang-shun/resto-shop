@@ -72,13 +72,13 @@ public class PayNotifyController {
 			String trade_status = params.get("trade_status");//交易状态
 			if(trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")){
 				log.info("支付宝充值成功：orderID："+params.get("out_trade_no"));
-				params.put("restoResut", "success");
+				params.put("restoResut", "true");
 			}
 		}else{//验证失败
-			params.put("restoResut", "fail");
+			params.put("restoResut", "false");
 		}
 		request.setAttribute("returnParams", params);
-		return "alipayReturn";
+		return "smschargeorder/alipayReturn";
 	}
 	
 	

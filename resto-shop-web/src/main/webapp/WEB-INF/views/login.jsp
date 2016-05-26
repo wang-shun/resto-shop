@@ -24,7 +24,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<link href="assets/global/css/components.css" id="style_components" rel="stylesheet" type="text/css"/>
 		<link href="assets/global/css/plugins.css" rel="stylesheet" type="text/css"/>
 		<!-- END THEME STYLES -->
-		<link rel="shortcut icon" href="favicon.ico"/>
+		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
 	</head>
 <!-- BEGIN BODY -->
 	<body class="login">
@@ -35,7 +35,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<!-- BEGIN LOGO -->
 		<div class="logo">
 			<a href="index.html">
-			<img src="assets/admin/layout/img/logo-big-white.png" style="height: 17px;" alt=""/>
+<!-- 			<img src="assets/admin/layout/img/logo-big-white.png" style="height: 17px;" alt=""/> -->
 			</a>
 		</div>
 		<!-- END LOGO -->

@@ -191,7 +191,7 @@
 								title : "支付类型",
 								data : "payType",
 								createdCell : function(td, tdData) {
-									var payType = tdData=1?"支付宝":"微信";
+									var payType = tdData==1?"支付宝":"微信";
 									$(td).html(payType);
 								}
 							},
