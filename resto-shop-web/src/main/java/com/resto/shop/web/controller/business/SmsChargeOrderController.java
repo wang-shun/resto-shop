@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -56,35 +57,67 @@ public class SmsChargeOrderController extends GenericController {
 	public void smsCharge(String chargeMoney,String paytype,HttpServletRequest request,HttpServletResponse response) throws IOException, WriterException, DocumentException{
 		String returnHtml = "<h1>参数错误！</h1>";
 		if(StringUtil.isNotEmpty(chargeMoney) && StringUtil.isNotEmpty(paytype)){
-			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), "0.01",paytype);//创建充值订单
+			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), chargeMoney,paytype);//创建充值订单
 			String out_trade_no = smsChargeOrder.getId();
 			if(paytype.equals(PayType.ALI_PAY+"")){//支付宝支付
 				String show_url = "";
 				String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 				String return_url = getBaseUrl()+"paynotify/alipay_return";
 				String subject = "短信充值";
-				Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, "0.01", show_url, notify_url, return_url, null);
+				Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
 				returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
 			}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 				String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 				String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
 				log.info("微信的通知路径为："+notify_url);
 				String body = "短信充值";
-				Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, "0.01", spbill_create_ip, notify_url,body);
+				Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, chargeMoney, spbill_create_ip, notify_url,body);
 				if("true".equals(apiReqeust.get("success"))){
 					request.getSession().setAttribute("wxPayCode", apiReqeust.get("url"));
 					returnHtml = getWxPayHtml();
 				}
 			}
 		}
-		try {
-			//页面输出
-			response.setContentType("text/html;charset=utf-8");
-			response.getWriter().write(returnHtml);
-			response.getWriter().flush();
-		} catch (IOException e) {
-			e.printStackTrace();
+		outprint(returnHtml, response);
+	}
+	
+	/**
+	 * 完成未支付的订单
+	 * @param chargeOrderId
+	 * @param request
+	 * @param response
+	 * @throws UnknownHostException 
+	 * @throws DocumentException 
+	 */
+	@RequestMapping("/payAgain")
+	public void payAgain(String chargeOrderId,HttpServletRequest request,HttpServletResponse response) throws UnknownHostException, DocumentException{
+		String returnHtml = "<h1>参数错误！</h1>";
+		if(StringUtil.isNotEmpty(chargeOrderId) && StringUtil.isNotEmpty(chargeOrderId)){
+			SmsChargeOrder smsChargeOrder = smsChargeOrderService.selectById(chargeOrderId);
+			String chargeMoney = smsChargeOrder.getChargeMoney().toString();
+			int paytype = smsChargeOrder.getPayType();
+			if(smsChargeOrder!=null){
+				String out_trade_no = smsChargeOrder.getId();
+				if(PayType.ALI_PAY == paytype){//支付宝支付
+					String show_url = "";//商品展示页面
+					String notify_url = getBaseUrl()+"paynotify/alipay_notify";
+					String return_url = getBaseUrl()+"paynotify/alipay_return";
+					String subject = "短信充值";
+					Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
+					returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
+				}else if(PayType.WECHAT_PAY == paytype){//微信支付
+					String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
+					String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
+					String body = "短信充值";
+					Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, chargeMoney, spbill_create_ip, notify_url,body);
+					if("true".equals(apiReqeust.get("success"))){
+						request.getSession().setAttribute("wxPayCode", apiReqeust.get("url"));
+						returnHtml = getWxPayHtml();
+					}
+				}
+			}
 		}
+		outprint(returnHtml, response);
 	}
 	
 	@RequestMapping("/selectSmsUnitPrice")
@@ -162,4 +195,19 @@ public class SmsChargeOrderController extends GenericController {
 		return str.toString();
 	}
 	
+	/**
+	 * 输出到页面
+	 * @param body
+	 * @param response
+	 */
+	public void outprint(String body,HttpServletResponse response){
+		try {
+			//页面输出
+			response.setContentType("text/html;charset=utf-8");
+			response.getWriter().write(body);
+			response.getWriter().flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

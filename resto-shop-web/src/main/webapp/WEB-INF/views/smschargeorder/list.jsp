@@ -184,7 +184,7 @@
 								title : "完成时间",
 								data : "pushOrderTime",
 								createdCell : function(td, tdData) {
-									$(td).html(formatDate(tdData));
+									$(td).html(tdData!=null?formatDate(tdData):"未完成");
 								}
 							},
 							{
@@ -224,9 +224,7 @@
 											})
 										}
 									} else {//订单未完成
-										info = createBtn(null,"去 支 付","btn-sm btn-success",function() {
-											alert("去支付链接");
-										})
+										info = $("<a href='smschargeorder/payAgain?chargeOrderId="+rowData.id+"' class='btn btn-sm btn-success' target='_blank'>去 支 付</a>")
 									}
 									$(td).html(info);
 								}
