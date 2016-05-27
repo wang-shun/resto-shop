@@ -16,7 +16,7 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">通知名称：</label>
 							    <div class="col-sm-8">
-									<input type="text" class="form-control" name="title" v-model="m.title">
+									<input type="text" class="form-control" name="title" v-model="m.title" required="required">
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -151,6 +151,14 @@
 			el:"#control",
 			mixins:[C.formVueMix],
 			methods:{
+				create:function(){
+					this.m ={
+						sort:0,
+						noticeType:1,
+						title:"通知"+new Date().getTime(),
+					};
+					this.showform=true;
+				},
 				uploadSuccess:function(url){
 					$("[name='noticeImage']").val(url).trigger("change");
 					C.simpleMsg("上传成功");

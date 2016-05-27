@@ -9,22 +9,22 @@ import org.hibernate.validator.constraints.NotBlank;
 public class Notice {
     private String id;
     
-    @NotBlank(message="{通知标题   不能为空}")
+    @NotBlank(message="通知标题不能为空")
     private String title;
 
     private String content;
 
     private Date createDate;
     
-    @NotNull(message="{排序  不能为空}")
+    @NotNull(message="排序不能为空")
     private Integer sort;
 
     private Byte status;
 
-    @NotBlank(message="{图片   不能为空}")
+    @NotBlank(message="请上传图片！")
     private String noticeImage;
 
-    @NotNull(message="{通知类型   不能为空}")
+    @NotNull(message="请选择通知类型！")
     private Byte noticeType;
 
     private String shopDetailId;

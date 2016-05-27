@@ -32,7 +32,7 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
     public void create(Notice notice) {
     	notice.setId(ApplicationUtils.randomUUID());
     	notice.setCreateDate(new Date());
-    	noticeMapper.insert(notice);
+    	insert(notice);
     }
 
 	@Override

@@ -5,15 +5,12 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.junit.runners.Parameterized.Parameter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.exception.AppException;
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
 
