@@ -118,5 +118,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customerMapper.updateByPrimaryKeySelective(customer);
 	} 
 	
+	@Override
+	public void updateNewNoticeTime(String id){
+		customerMapper.updateNewNoticeTime(id);
+	}
 
 }

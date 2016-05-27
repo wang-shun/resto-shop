@@ -46,6 +46,8 @@ public class Customer implements Serializable{
     
     private String lastOrderShop;
     
+    private Date newNoticeTime;
+    
     public String getId() {
         return id;
     }
@@ -188,5 +190,13 @@ public class Customer implements Serializable{
 
 	public void setLastOrderShop(String lastOrderShop) {
 		this.lastOrderShop = lastOrderShop;
+	}
+
+	public Date getNewNoticeTime() {
+		return newNoticeTime;
+	}
+
+	public void setNewNoticeTime(Date newNoticeTime) {
+		this.newNoticeTime = newNoticeTime;
 	}
 }

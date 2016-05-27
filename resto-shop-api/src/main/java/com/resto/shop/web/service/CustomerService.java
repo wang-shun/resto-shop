@@ -30,4 +30,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	 * @param currentCustomerId
 	 */
 	void unbindphone(String currentCustomerId);
+
+	void updateNewNoticeTime(String id);
 }
