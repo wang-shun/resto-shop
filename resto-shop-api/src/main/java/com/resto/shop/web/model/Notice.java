@@ -12,15 +12,13 @@ public class Notice {
     @NotBlank(message="{通知标题   不能为空}")
     private String title;
 
-    @NotBlank(message="{通知能容   不能为空}")
     private String content;
 
     private Date createDate;
     
-    @NotNull(message="{排序方式   不能为空}")
+    @NotNull(message="{排序  不能为空}")
     private Integer sort;
 
-    @NotNull(message="{通知状态   不能为空}")
     private Byte status;
 
     @NotBlank(message="{图片   不能为空}")

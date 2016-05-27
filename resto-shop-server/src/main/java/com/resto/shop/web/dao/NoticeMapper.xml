@@ -63,6 +63,6 @@
   <!-- 根据店铺ID查询信息 -->
   <select id="selectListByShopId" resultType="Notice">
   	select * from tb_notice
-	where shop_detail_id = #{shopId} and status=1 
+	where shop_detail_id = #{shopId}
   </select>
 </mapper>

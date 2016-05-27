@@ -14,15 +14,15 @@
 					<form role="form" class="form-horizontal" action="{{m.id?'notice/modify':'notice/create'}}" @submit.prevent="save">
 						<div class="form-body">
 			           		<div class="form-group">
-			           			<label class="col-sm-3 control-label">通知标题：</label>
+			           			<label class="col-sm-3 control-label">通知名称：</label>
 							    <div class="col-sm-8">
-									<input type="text" class="form-control" required  name="title" v-model="m.title">
+									<input type="text" class="form-control" name="title" v-model="m.title">
 							    </div>
 							</div>
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">通知内容：</label>
 							    <div class="col-sm-8">
-									<textarea class="form-control" name="content" required v-model="m.content"></textarea>
+									<textarea class="form-control" name="content" v-model="m.content"></textarea>
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -32,18 +32,6 @@
 							    </div>
 							</div>
 							
-			           		<div class="form-group">
-			           			<label class="col-sm-3 control-label">选择通知状态：</label>
-							    <div class="col-sm-8 radio-list"> 
-									<label class="radio-inline">
-										<input type="radio" name="status" v-model="m.status" value=0 >
-										禁用
-									</label>
-									<label class="radio-inline">
-										<input type="radio" name="status" v-model="m.status" value=1>
-									启用</label>
-							    </div>
-							</div>
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">显示图片：</label>
 							    <div class="col-sm-8">
@@ -110,23 +98,9 @@
 					data : "content",
 				},                 
 				{                 
-					title : "创建时间",
-					data : "createDate",
-					createdCell:function(td,tdData,rowData,row){
-						var temp = new Date(tdData);
-						temp  = temp.format("yyyy-MM-dd hh:mm:ss");
-						$(td).html(temp);
-					}
-				},                 
-				{                 
 					title : "排序",
 					data : "sort",
 				},                 
-// 				{                 
-// 					title : "通知状态",
-// 					data : "status",
-					
-// 				},                 
 				{                 
 					title : "图片",
 					data : "noticeImage",
@@ -146,6 +120,15 @@
 						$(td).html(text[data]);
 					}
 				},
+				{                 
+					title : "创建时间",
+					data : "createDate",
+					createdCell:function(td,tdData,rowData,row){
+						var temp = new Date(tdData);
+						temp  = temp.format("yyyy-MM-dd hh:mm:ss");
+						$(td).html(temp);
+					}
+				},  
 				{
 					title : "操作",
 					data : "id",
