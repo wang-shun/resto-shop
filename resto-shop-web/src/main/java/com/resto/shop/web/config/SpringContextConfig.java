@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 
+import com.resto.brand.web.service.AddressInfoService;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.BrandUserService;
@@ -273,6 +274,11 @@ public class SpringContextConfig {
 	@Bean
 	public SmsAcountService smsAcountService(){
 		return proxy.create(SmsAcountService.class);
+	}
+	
+	@Bean
+	public AddressInfoService addressInfoService(){
+		return proxy.create(AddressInfoService.class);
 	}
 	
 	public <T> T getProxy(Class<T> clazz){

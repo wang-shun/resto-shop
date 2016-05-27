@@ -155,12 +155,12 @@
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">收件地址：</label>
 									<div class="col-sm-8">
-										<select class="bs-select form-control">
-											<option>Mustard</option>
-											<option>Ketchup</option>
-											<option>Relish</option>
+										<select class="bs-select form-control" name="address">
 										</select>
 									</div>
+									<button type="button" class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal" data-target="#addressInfoModal">
+									  	添加
+									</button>
 								</div>
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">收 件
@@ -211,7 +211,7 @@
 										<label for="header" class="col-sm-3 control-label">注册地址：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
-												name="address">
+												name="registerAddress">
 										</div>
 									</div>
 									<div class="form-group">
@@ -238,12 +238,12 @@
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control">
-												<option>Mustard</option>
-												<option>Ketchup</option>
-												<option>Relish</option>
+											<select class="bs-select form-control" name="address">
 											</select>
 										</div>
+										<button type="button" class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal" data-target="#addressInfoModal">
+									  		添加
+										</button>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收 件
@@ -280,123 +280,161 @@
 	</div>
 </div>
 
+<!-- 添加地址 -->
+<div class="modal fade" id="addressInfoModal" tabindex="-1" role="dialog" aria-labelledby="addressInfoModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center"><strong>添加地址</strong></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" onsubmit="return addressInfoForm()" id="addressInfoForm">
+			<div class="form-group">
+				<label for="header" class="col-sm-3 control-label">收 件
+					人：</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" required
+						name="name">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="header" class="col-sm-3 control-label">联系电话：</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" required
+						name="phone">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="header" class="col-sm-3 control-label">收件地址：</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" required
+						name="address">
+				</div>
+			</div>
+			<div class="text-center">
+				<a class="btn default" data-dismiss="modal">取消</a> <input
+					class="btn green" type="submit" value="添加" />
+			</div>
+		</form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 	var tb;
 	(function() {
 		var cid = "#control";
 		var $table = $(".table-body>table");
-		tb = $table
-				.DataTable({
-					ajax : {
-						url : "smschargeorder/list_all",
-						dataSrc : "data"
+		tb = $table.DataTable({
+			ajax : {
+				url : "smschargeorder/list_all",
+				dataSrc : "data"
+			},
+			columns : [
+					{
+						title : "品牌名称",
+						data : "brandName",
 					},
-					columns : [
-							{
-								title : "品牌名称",
-								data : "brandName",
-								createdCell : function(td, tdData, rowData) {
-									$(":input[name='brandName']").val(tdData);//充值
-								}
-							},
-							{
-								title : "充值金额（元）",
-								data : "chargeMoney",
-							},
-							{
-								title : "充值条数",
-								data : "number",
-							},
-							{
-								title : "短信单价（元）",
-								data : "smsUnitPrice",
-							},
-							{
-								title : "创建时间",
-								data : "createTime",
-								createdCell : function(td, tdData) {
-									$(td).html(formatDate(tdData));
-								}
-							},
-							{
-								title : "完成时间",
-								data : "pushOrderTime",
-								createdCell : function(td, tdData) {
-									$(td).html(tdData != null ? formatDate(tdData): "未完成");}
-							},
-							{
-								title : "支付类型",
-								data : "payType",
-								createdCell : function(td, tdData) {
-									var payType = "";
-									if(tdData!=null){
-										payType = tdData == 1 ? "<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
-												: "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
-									}else{
-										payType = "<img alt=\"为支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
-									}
-									
-									$(td).html(payType);
-								}
-							},
-							{
-								title : "交易状态",
-								data : "orderStatus",
-								createdCell : function(td, tdData) {
-									var str = tdData == 0 ? "<span class='label label-danger'>待 支 付</span>"
-											: "<span class='label label-success'>已 完 成</span>";
-									$(td).html(str);
-								}
-							},
-							{
-								title : "操作",
-								data : "id",
-								createdCell : function(td, tdData, rowData) {
-									var info = [];
-									if (rowData.status == 1) {//订单已完成
-										var btn = createBtn(null, "查看详情",
-												"btn-sm btn-primary",
-												function() {
-													alert("我是发票详情");
-												})
-										info.push(btn);
-									} else {//订单未完成
-										var btn = createBtn(null, "立即支付",
-												"btn-sm btn-success",
-												function() {
-													$("#createChargeOrder").modal();
-													$("#chargeForm").attr("action", "smschargeorder/payAgain");
-													$(":input[name='chargeOrderId']").val(tdData);
-													$(":input[name='chargeMoney']").val(rowData.chargeMoney);
-													$(":input[name='smsUnitPrice']").val(rowData.smsUnitPrice);
-													$(":input[name='number']").val(rowData.number);
-													$(":input[name='chargeMoney']").attr("disabled","disabled");
-												})
-										info.push(btn);
-									}
-									var btn = createBtn(
-											null,
-											"删除订单",
-											"btn-sm red-sunglo",
-											function() {
-												C.confirmDialog("确定要删除么","提示",
-												function() {
-													var data = {"id":tdData}; 
-													$.post("smschargeorder/deleteOrder",data,function(result){
-														if(result){
-															toastr.success("删除成功！");
-														}else{
-															toastr.error("删除失败！");
-														}
-														tb.ajax.reload();//刷新
-													})
-												});
+					{
+						title : "充值金额（元）",
+						data : "chargeMoney",
+					},
+					{
+						title : "充值条数",
+						data : "number",
+					},
+					{
+						title : "短信单价（元）",
+						data : "smsUnitPrice",
+					},
+					{
+						title : "创建时间",
+						data : "createTime",
+						createdCell : function(td, tdData) {
+							$(td).html(formatDate(tdData));
+						}
+					},
+					{
+						title : "完成时间",
+						data : "pushOrderTime",
+						createdCell : function(td, tdData) {
+							$(td).html(tdData != null ? formatDate(tdData): "未完成");}
+					},
+					{
+						title : "支付类型",
+						data : "payType",
+						createdCell : function(td, tdData) {
+							var payType = "";
+							if(tdData!=null){
+								payType = tdData == 1 ? "<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
+										: "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+							}else{
+								payType = "<img alt=\"为支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
+							}
+							
+							$(td).html(payType);
+						}
+					},
+					{
+						title : "交易状态",
+						data : "orderStatus",
+						createdCell : function(td, tdData) {
+							var str = tdData == 0 ? "<span class='label label-danger'>待 支 付</span>"
+									: "<span class='label label-success'>已 完 成</span>";
+							$(td).html(str);
+						}
+					},
+					{
+						title : "操作",
+						data : "id",
+						createdCell : function(td, tdData, rowData) {
+							var info = [];
+							if (rowData.status == 1) {//订单已完成
+								var btn = createBtn(null, "查看详情",
+										"btn-sm btn-primary",
+										function() {
+											alert("我是发票详情");
+										})
+								info.push(btn);
+							} else {//订单未完成
+								var btn = createBtn(null, "立即支付",
+										"btn-sm btn-success",
+										function() {
+											$("#createChargeOrder").modal();
+											$("#chargeForm").attr("action", "smschargeorder/payAgain");
+											$(":input[name='chargeOrderId']").val(tdData);
+											$(":input[name='chargeMoney']").val(rowData.chargeMoney);
+											$(":input[name='smsUnitPrice']").val(rowData.smsUnitPrice);
+											$(":input[name='number']").val(rowData.number);
+											$(":input[name='chargeMoney']").attr("disabled","disabled");
+										})
+								info.push(btn);
+							}
+							var btn = createBtn(
+									null,
+									"删除订单",
+									"btn-sm red-sunglo",
+									function() {
+										C.confirmDialog("确定要删除么","提示",
+										function() {
+											var data = {"id":tdData}; 
+											$.post("smschargeorder/deleteOrder",data,function(result){
+												if(result){
+													toastr.success("删除成功！");
+												}else{
+													toastr.error("删除失败！");
+												}
+												tb.ajax.reload();//刷新
 											})
-									info.push(btn);
-									$(td).html(info);
-								}
-							} ],
-				});
+										});
+									})
+							info.push(btn);
+							$(td).html(info);
+						}
+					} ],
+		});
 		
 		var defaultPrice = "";
 		//查询出当前品牌的短信单价
@@ -405,16 +443,35 @@
 			defaultPrice = result.data;
 		})
 		
+		queryAddress();
+		
 		$("#btn_smsCharge").click(function(){
 			$(":input[name='chargeMoney']").val("");
 			$(":input[name='smsUnitPrice']").val(defaultPrice);
 			$(":input[name='number']").val("");
 			$(":input[name='chargeMoney']").removeAttr("disabled");
 		})
+		
+		$(":input[name='address']").change(function(){
+			var temp = addressInfo[$(this).val()];
+			$(":input[name='userName']").val(temp.name);
+			$(":input[name='phoneNumber']").val(temp.phone);
+		})
 	}());
 
 	var C = new Controller(null, tb);
-
+	
+	var addressInfo = {};
+	function queryAddress(){
+		$.post("addressinfo/list_all",function(result){
+			$(":input[name='address']").empty();
+			$(result.data).each(function(i,item){
+				$(":input[name='address']").append("<option value='"+item.id+"'>"+item.address+"</option>");
+				addressInfo[item.id]=item;
+			})
+		})
+	}
+	
 	//自动计算出 对应的短信条数
 	function computeSmsCount() {
 		var chargeMoney = $(":input[name='chargeMoney']").val();
@@ -431,17 +488,13 @@
 	//短信充值，显示订单详情
 	function showChargeInfo() {
 		$("#successBtn").show();
-		var successBtn = createBtn(
-				null,
-				"充值成功",
-				"green",
-				function() {
-					$("#createChargeOrder").modal("hide");
-					tb.ajax.reload();//刷新
-					$("#chargeBtn").html("<a class='btn default' data-dismiss='modal'>取消</a> <input class='btn green' type='submit' value='充值' />");
-					$(":input[name='chargeMoney']").val("");
-					$(":input[name='number']").val("");
-				});
+		var successBtn = createBtn(null,"充值成功","green",function() {
+			$("#createChargeOrder").modal("hide");
+			tb.ajax.reload();//刷新
+			$("#chargeBtn").html("<a class='btn default' data-dismiss='modal'>取消</a> <input class='btn green' type='submit' value='充值' />");
+			$(":input[name='chargeMoney']").val("");
+			$(":input[name='number']").val("");
+		});
 		$("#chargeBtn").html(successBtn);
 	}
 
@@ -457,6 +510,22 @@
 				toastr.error("申请失败！请重新操作！");
 			}
 			tb.ajax.reload();
+		});
+		return false;
+	}
+	
+	//添加地址
+	function addressInfoForm(){
+		var data = $("#addressInfoForm").serialize();
+		$.post("addressinfo/create", data, function(result) {
+			if (result) {
+				$("#addressInfoModal").modal("hide");
+				toastr.success("添加成功！");
+				queryAddress();
+			} else {
+				$("#addressInfoModal").modal("hide");
+				toastr.error("添加失败！请重新操作！");
+			}
 		});
 		return false;
 	}
