@@ -16,7 +16,7 @@
              </div>
              <div class="details">
                  <div class="number">
-                     <span data-counter="counterup" data-value="1349">${smsAcount.usedNum}</span>条
+                <span data-counter="counterup" data-value="${smsAcount.usedNum}">${smsAcount.usedNum}</span>条
                  </div>
                  <div class="desc"> 已经使用的短信数量 </div>
              </div>
@@ -29,7 +29,7 @@
              </div>
              <div class="details">
                  <div class="number">
-                     <span data-counter="counterup" data-value="12,5">${smsAcount.remainderNum}</span>条 </div>
+                     <span data-counter="counterup" data-value="smsAcount.remainderNum">${smsAcount.remainderNum}</span>条 </div>
                  <div class="desc"> 剩余短信数量 </div>
              </div>
          </div>
@@ -94,25 +94,12 @@
 </div>
 
 <!-- <!-- 日期框 -->
-<script
-	src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-<script
-	src="assets/global/plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
-
-
+<script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	
+<script src="assets/global/plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+	
 <script>
 	$(function() {
-		
-		//查询使用的条数
-		$.ajax({
-			url:"",
-			success:function(data){
-									
-			}
-			
-		})
-		
-		
 		//时间插件
 		$('.form_datetime').datetimepicker({
 			endDate : new Date(),
