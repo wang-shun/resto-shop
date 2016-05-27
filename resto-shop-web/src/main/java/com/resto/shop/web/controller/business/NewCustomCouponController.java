@@ -17,6 +17,7 @@ import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DistributionModeService;
 import com.resto.shop.web.config.SessionKey;
+import com.resto.shop.web.constant.TimeConsType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.service.NewCustomCouponService;
@@ -55,15 +56,31 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid NewCustomCoupon brand, HttpServletRequest request){
-		if((brand.getBeginTime()!=null&&brand.getEndTime()!=null)||(brand.getBeginDateTime()!=null&&brand.getEndDateTime()!=null)){
-			if(brand.getBeginTime().compareTo(brand.getEndTime())>0){
-				log.info("开始时间大于结束时间");
-				return new Result(false);
-			}else if(brand.getBeginDateTime().compareTo(brand.getEndDateTime())>0){
-				log.info("优惠券的开始时间不能大于结束时间");
+		
+		//选择优惠券时间类型1时,日期需要填写
+		if(TimeConsType.TYPENUM==brand.getTimeConsType()){
+			if(brand.getCouponValiday()==null||"".equals(brand.getCouponValiday())){
+				log.info("日期不能为空");
 				return new Result(false);
 			}
+			//选择优惠券时间类型2时，开始和结束时间必须填
+		}else if(TimeConsType.TYPETIME==brand.getTimeConsType()){
+			if(brand.getBeginDateTime()==null||brand.getEndDateTime()==null){
+				log.info("优惠券开始或者结束时间不能为空");
+				return new Result(false);
+			}
+		}else {
+			if((brand.getBeginTime()!=null&&brand.getEndTime()!=null)||(brand.getBeginDateTime()!=null&&brand.getEndDateTime()!=null)){
+				if(brand.getBeginTime().compareTo(brand.getEndTime())>0){
+					log.info("开始时间大于结束时间");
+					return new Result(false);
+				}else if(brand.getBeginDateTime().compareTo(brand.getEndDateTime())>0){
+					log.info("优惠券的开始时间不能大于结束时间");
+					return new Result(false);
+				}
+			}
 		}
+		
 		String brandId = (String) request.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
 		brand.setBrandId(brandId);
 		brand.setCreateTime(new Date());
@@ -74,6 +91,19 @@ public class NewCustomCouponController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid NewCustomCoupon brand){
+		if(TimeConsType.TYPENUM==brand.getTimeConsType()){
+			if(brand.getCouponValiday()==null){
+				log.info("日期不能为空");
+				return new Result(false);
+			}
+			
+		}else if(TimeConsType.TYPETIME==brand.getTimeConsType()){
+			if(brand.getBeginDateTime()==null||brand.getEndDateTime()==null){
+				log.info("优惠券开始或者结束时间不能为空");
+				return new Result(false);
+			}
+		}else {
+		
 		if((brand.getBeginTime()!=null&&brand.getEndTime()!=null)||(brand.getBeginDateTime()!=null&&brand.getEndDateTime()!=null)){
 			if(brand.getBeginTime().compareTo(brand.getEndTime())>0){
 				log.info("开始时间大于结束时间");
@@ -82,8 +112,8 @@ public class NewCustomCouponController extends GenericController{
 				log.info("优惠券的开始时间不能大于结束时间");
 				return new Result(false);
 			}
+			}
 		}
-		
 		newcustomcouponService.update(brand);
 		return Result.getSuccess();
 	}

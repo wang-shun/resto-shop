@@ -51,6 +51,7 @@ public class NewCustomCoupon {
      * 新增字段用来区别优惠券使用时间的类型
      * 1.按天算 2.按范围算
      */
+    @NotNull(message="优惠券类型不能为空")
     private Integer timeConsType;
     
     
