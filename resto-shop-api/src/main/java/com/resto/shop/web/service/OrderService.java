@@ -52,7 +52,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<Order> selectTodayOrder(String shopId, int[] is);
 
-	public List<Order> selectReadyOrder(String currentShopId,Long lastTime);
+	public List<Order> selectReadyOrder(String currentShopId);
 
 	public List<Order> selectPushOrder(String currentShopId,Long lastTime);
 

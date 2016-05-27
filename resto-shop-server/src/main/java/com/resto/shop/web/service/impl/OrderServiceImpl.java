@@ -481,8 +481,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<Order> selectReadyOrder(String currentShopId,Long lastTime) {
-		List<Order> order = orderProductionStateContainer.getReadyOrderList(currentShopId,lastTime);
+	public List<Order> selectReadyOrder(String currentShopId) {
+		List<Order> order = orderMapper.selectReadyList(currentShopId);
 		return order;
 	}
 
@@ -814,4 +814,5 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		return order;
 	}
+
 }
