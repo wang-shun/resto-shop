@@ -20,6 +20,7 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -283,6 +284,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		order.setProductionStatus(ProductionStatus.NOT_ORDER);
 		ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
 		order.setOrderMode(detail.getShopMode());
+		if(order.getOrderMode()==ShopMode.CALL_NUMBER){
+			order.setTableNumber(order.getVerCode());
+		}
 		if(order.getParentOrderId()!=null){
 			Order parentOrder = selectById(order.getParentOrderId());
 			order.setTableNumber(parentOrder.getTableNumber());

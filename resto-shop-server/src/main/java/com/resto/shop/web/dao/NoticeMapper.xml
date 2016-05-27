@@ -64,5 +64,6 @@
   <select id="selectListByShopId" resultType="Notice">
   	select * from tb_notice
 	where shop_detail_id = #{shopId}
+	order by sort
   </select>
 </mapper>
