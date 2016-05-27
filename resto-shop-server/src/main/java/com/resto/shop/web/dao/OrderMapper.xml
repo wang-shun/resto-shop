@@ -624,6 +624,7 @@
   	SELECT o.id,nickname as remark,o.print_order_time FROM tb_order o LEFT JOIN tb_customer c 
 	ON o.customer_id=c.id 
 	WHERE production_status=2 and shop_detail_id=#{0}
+	and closed=0
 	ORDER BY print_order_time 
   </select>
 </mapper>
