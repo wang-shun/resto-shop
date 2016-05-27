@@ -57,7 +57,7 @@ public class SmsChargeOrderController extends GenericController {
 	public void smsCharge(String chargeMoney,String paytype,HttpServletRequest request,HttpServletResponse response) throws IOException, WriterException, DocumentException{
 		String returnHtml = "<h1>参数错误！</h1>";
 		if(StringUtil.isNotEmpty(chargeMoney) && StringUtil.isNotEmpty(paytype)){
-			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), chargeMoney,paytype);//创建充值订单
+			SmsChargeOrder smsChargeOrder = smsChargeOrderService.saveSmsOrder(getCurrentBrandId(), chargeMoney);//创建充值订单
 			String out_trade_no = smsChargeOrder.getId();
 			if(paytype.equals(PayType.ALI_PAY+"")){//支付宝支付
 				String show_url = "";
@@ -90,22 +90,21 @@ public class SmsChargeOrderController extends GenericController {
 	 * @throws DocumentException 
 	 */
 	@RequestMapping("/payAgain")
-	public void payAgain(String chargeOrderId,HttpServletRequest request,HttpServletResponse response) throws UnknownHostException, DocumentException{
+	public void payAgain(String chargeOrderId,String paytype,HttpServletRequest request,HttpServletResponse response) throws UnknownHostException, DocumentException{
 		String returnHtml = "<h1>参数错误！</h1>";
-		if(StringUtil.isNotEmpty(chargeOrderId) && StringUtil.isNotEmpty(chargeOrderId)){
+		if(StringUtil.isNotEmpty(chargeOrderId) && StringUtil.isNotEmpty(paytype)){
 			SmsChargeOrder smsChargeOrder = smsChargeOrderService.selectById(chargeOrderId);
 			String chargeMoney = smsChargeOrder.getChargeMoney().toString();
-			int paytype = smsChargeOrder.getPayType();
 			if(smsChargeOrder!=null){
 				String out_trade_no = smsChargeOrder.getId();
-				if(PayType.ALI_PAY == paytype){//支付宝支付
+				if(paytype.equals(PayType.ALI_PAY+"")){//支付宝支付
 					String show_url = "";//商品展示页面
 					String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 					String return_url = getBaseUrl()+"paynotify/alipay_return";
 					String subject = "短信充值";
 					Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
 					returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
-				}else if(PayType.WECHAT_PAY == paytype){//微信支付
+				}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 					String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 					String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
 					String body = "短信充值";
@@ -132,6 +131,18 @@ public class SmsChargeOrderController extends GenericController {
 	public Result applyInvoice(){
 		//待完成 发票记录查询
 		return getSuccessResult();
+	}
+	
+	/**
+	 * 删除短信充值订单
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping("/deleteOrder")
+	@ResponseBody
+	public boolean deleteOrder(String id){
+		int row = smsChargeOrderService.delete(id);
+		return row>0?true:false;
 	}
 	
 	/**

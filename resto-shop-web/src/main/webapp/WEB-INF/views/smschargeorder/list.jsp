@@ -4,10 +4,10 @@
 <div class="table-div">
 	<div class="table-operator">
 		<s:hasPermission name="notice/add">
-			<button type="button" class="btn blue"
-				data-toggle="modal" data-target="#applyInvoice">申请发票</button>&nbsp;&nbsp;&nbsp;
-			<button type="button" class="btn green "
-				data-toggle="modal" data-target="#createChargeOrder">短信充值</button>
+			<button type="button" class="btn green-meadow" data-toggle="modal"
+				data-target="#applyInvoice">申请发票</button>&nbsp;&nbsp;&nbsp;
+			<button type="button" class="btn green " data-toggle="modal"
+				data-target="#createChargeOrder" id="btn_smsCharge">短信充值</button>
 		</s:hasPermission>
 	</div>
 	<div class="clearfix"></div>
@@ -18,7 +18,8 @@
 </div>
 
 <!-- 短信充值 -->
-<div class="modal fade" id="createChargeOrder" tabindex="-1" role="dialog" data-backdrop="static">
+<div class="modal fade" id="createChargeOrder" tabindex="-1"
+	role="dialog" data-backdrop="static">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -28,7 +29,8 @@
 			</div>
 			<div class="modal-body">
 				<form role="form" class="form-horizontal"
-					action="smschargeorder/smsCharge" method="post" target="_blank" onsubmit="showChargeInfo()">
+					action="smschargeorder/smsCharge" method="post" target="_blank"
+					onsubmit="showChargeInfo()" id="chargeForm">
 					<!-- 				<form role="form" class="form-horizontal" onsubmit="return false"> -->
 					<div class="form-body">
 						<div class="form-group">
@@ -89,6 +91,7 @@
 								</div>
 							</div>
 						</div>
+						<input type="hidden" name="chargeOrderId" value="">
 					</div>
 					<div class="text-center" id="chargeBtn">
 						<a class="btn default" data-dismiss="modal">取消</a> <input
@@ -102,11 +105,13 @@
 
 
 <!-- 申请发票 -->
-<div class="modal fade" id="applyInvoice" tabindex="-1" role="dialog" aria-labelledby="myModlLabel">
+<div class="modal fade" id="applyInvoice" tabindex="-1" role="dialog"
+	aria-labelledby="myModlLabel">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 				<h4 class="modal-title text-center">
@@ -114,43 +119,174 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				<form class="form-horizontal" onsubmit="return applyInvoiceForm()" id="applyInvoiceForm">
-					<div class="form-group">
-						<label for="header" class="col-sm-3 control-label">发票抬头：</label>
-						<div class="col-sm-8">
-							<input type="text" class="form-control" required name="header">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="header" class="col-sm-3 control-label">发票内容：</label>
-						<div class="col-sm-8">
-							<div class="md-radio-inline">
-								<div class="md-radio">
-									<input type="radio" id="type_1" name="type" checked="checked" class="md-radiobtn">
-									<label for="type_1"> <span> </span>
-									<span class="check"></span> <span class="box"></span> 明细
-									</label>
+				<div>
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active"><a href="#general"
+							aria-controls="general" role="tab" data-toggle="tab">普通发票</a></li>
+						<li role="presentation"><a href="#increment"
+							aria-controls="increment" role="tab" data-toggle="tab">增值发票</a></li>
+					</ul>
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane active" id="general">
+							<form class="form-horizontal"
+								onsubmit="return applyInvoiceForm()" id="applyInvoiceForm">
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">发票抬头：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="header">
+									</div>
 								</div>
-							</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">发票内容：</label>
+									<div class="col-sm-8">
+										<div class="md-radio-inline">
+											<div class="md-radio">
+												<input type="radio" id="type_1" name="type"
+													checked="checked" class="md-radiobtn"> <label
+													for="type_1"> <span> </span> <span class="check"></span>
+													<span class="box"></span> 明细
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收件地址：</label>
+									<div class="col-sm-8">
+										<select class="bs-select form-control">
+											<option>Mustard</option>
+											<option>Ketchup</option>
+											<option>Relish</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收 件
+										人：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required
+											name="userName">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">联系电话：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required
+											name="phoneNumber">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">备&nbsp;&nbsp;注：</label>
+									<div class="col-sm-8">
+										<textarea class="form-control" name="remark"></textarea>
+									</div>
+								</div>
+								<div class="text-center">
+									<a class="btn default" data-dismiss="modal">取消</a> <input
+										class="btn green" type="submit" value="申请" />
+								</div>
+							</form>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="increment">
+							<form class="form-horizontal"
+								onsubmit="return applyInvoiceForm()" id="applyInvoiceForm">
+								<div id="increment_info">
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">单位名称：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="companyName">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">纳税人识别码：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="taxpayerCode">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">注册地址：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="address">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">注册电话：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="registerPhone">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">开户银行：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="bankName">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">银行账户：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="bankAccount">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">收件地址：</label>
+										<div class="col-sm-8">
+											<select class="bs-select form-control">
+												<option>Mustard</option>
+												<option>Ketchup</option>
+												<option>Relish</option>
+											</select>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">收 件
+											人：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="userName">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">联系电话：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required
+												name="phoneNumber">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">备&nbsp;&nbsp;注：</label>
+										<div class="col-sm-8">
+											<textarea class="form-control" name="remark"></textarea>
+										</div>
+									</div>
+									<div class="text-center">
+										<a class="btn default" data-dismiss="modal">取消</a> <input
+											class="btn green" type="submit" value="申请" />
+									</div>
+								</div>
+							</form>
 						</div>
 					</div>
-					<div class="text-center">
-						<input type="hidden" name="chargeOrderId"/>
-						<a class="btn default" data-dismiss="modal">取消</a> <input
-							class="btn green" type="submit" value="申请"/>
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
 <script>
-	var tb ;
+	var tb;
 	(function() {
 		var cid = "#control";
 		var $table = $(".table-body>table");
-		tb = $table.DataTable({
+		tb = $table
+				.DataTable({
 					ajax : {
 						url : "smschargeorder/list_all",
 						dataSrc : "data"
@@ -161,7 +297,6 @@
 								data : "brandName",
 								createdCell : function(td, tdData, rowData) {
 									$(":input[name='brandName']").val(tdData);//充值
-									$(":input[name='header']").val(tdData);//发票
 								}
 							},
 							{
@@ -187,58 +322,98 @@
 								title : "完成时间",
 								data : "pushOrderTime",
 								createdCell : function(td, tdData) {
-									$(td).html(tdData!=null?formatDate(tdData):"未完成");
-								}
+									$(td).html(tdData != null ? formatDate(tdData): "未完成");}
 							},
 							{
 								title : "支付类型",
 								data : "payType",
 								createdCell : function(td, tdData) {
-									var payType = tdData==1?
-											"<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
-											:"<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+									var payType = "";
+									if(tdData!=null){
+										payType = tdData == 1 ? "<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
+												: "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+									}else{
+										payType = "<img alt=\"为支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
+									}
+									
 									$(td).html(payType);
 								}
 							},
 							{
 								title : "交易状态",
-								data : "status",
+								data : "orderStatus",
 								createdCell : function(td, tdData) {
-									var str = tdData == 0 ? "<span class='label label-primary'>待 支 付</span>"
-											: tdData == 1 ? "<span class='label label-success'>已 完 成</span>"
-													: "<span class='label label-danger'>交易异常</span>";
+									var str = tdData == 0 ? "<span class='label label-danger'>待 支 付</span>"
+											: "<span class='label label-success'>已 完 成</span>";
 									$(td).html(str);
 								}
 							},
 							{
-								title : "发票信息",
-								data : "ticketId",
+								title : "操作",
+								data : "id",
 								createdCell : function(td, tdData, rowData) {
-									var info = "";
+									var info = [];
 									if (rowData.status == 1) {//订单已完成
-										if (tdData == null || tdData == "") {
-											info = createBtn(rowData.id,"申请发票","btn-sm green-meadow",function() {
-												$(":input[name='chargeOrderId']").val(rowData.id);//发票
-												$("#applyInvoice").modal();
-											})
-										} else {
-											info = createBtn(null,"查看详情","btn-sm btn-primary",function() {
-												alert("我是发票详情");
-											})
-										}
+										var btn = createBtn(null, "查看详情",
+												"btn-sm btn-primary",
+												function() {
+													alert("我是发票详情");
+												})
+										info.push(btn);
 									} else {//订单未完成
-										info = $("<a href='smschargeorder/payAgain?chargeOrderId="+rowData.id+"' class='btn btn-sm btn-success' target='_blank'>去 支 付</a>")
+										var btn = createBtn(null, "立即支付",
+												"btn-sm btn-success",
+												function() {
+													$("#createChargeOrder").modal();
+													$("#chargeForm").attr("action", "smschargeorder/payAgain");
+													$(":input[name='chargeOrderId']").val(tdData);
+													$(":input[name='chargeMoney']").val(rowData.chargeMoney);
+													$(":input[name='smsUnitPrice']").val(rowData.smsUnitPrice);
+													$(":input[name='number']").val(rowData.number);
+													$(":input[name='chargeMoney']").attr("disabled","disabled");
+												})
+										info.push(btn);
 									}
+									var btn = createBtn(
+											null,
+											"删除订单",
+											"btn-sm red-sunglo",
+											function() {
+												C.confirmDialog("确定要删除么","提示",
+												function() {
+													var data = {"id":tdData}; 
+													$.post("smschargeorder/deleteOrder",data,function(result){
+														if(result){
+															toastr.success("删除成功！");
+														}else{
+															toastr.error("删除失败！");
+														}
+														tb.ajax.reload();//刷新
+													})
+												});
+											})
+									info.push(btn);
 									$(td).html(info);
 								}
 							} ],
 				});
-
+		
+		var defaultPrice = "";
 		//查询出当前品牌的短信单价
 		$.post("smschargeorder/selectSmsUnitPrice", function(result) {
 			$(":input[name='smsUnitPrice']").val(result.data);
+			defaultPrice = result.data;
+		})
+		
+		$("#btn_smsCharge").click(function(){
+			$(":input[name='chargeMoney']").val("");
+			$(":input[name='smsUnitPrice']").val(defaultPrice);
+			$(":input[name='number']").val("");
+			$(":input[name='chargeMoney']").removeAttr("disabled");
 		})
 	}());
+
+	var C = new Controller(null, tb);
 
 	//自动计算出 对应的短信条数
 	function computeSmsCount() {
@@ -252,28 +427,32 @@
 			$(":input[name='number']").val("0");
 		}
 	}
-	
+
 	//短信充值，显示订单详情
-	function showChargeInfo(){
+	function showChargeInfo() {
 		$("#successBtn").show();
-		var successBtn = createBtn(null,"充值成功","green",function(){
-			$("#createChargeOrder").modal("hide");
-			tb.ajax.reload();//刷新
-			$("#chargeBtn").html("<a class='btn default' data-dismiss='modal'>取消</a> <input class='btn green' type='submit' value='充值' />");
-			$(":input[name='chargeMoney']").val("");
-			$(":input[name='number']").val("");
-		});
+		var successBtn = createBtn(
+				null,
+				"充值成功",
+				"green",
+				function() {
+					$("#createChargeOrder").modal("hide");
+					tb.ajax.reload();//刷新
+					$("#chargeBtn").html("<a class='btn default' data-dismiss='modal'>取消</a> <input class='btn green' type='submit' value='充值' />");
+					$(":input[name='chargeMoney']").val("");
+					$(":input[name='number']").val("");
+				});
 		$("#chargeBtn").html(successBtn);
 	}
 
 	//申请发票  ajax提交
-	function applyInvoiceForm(){
+	function applyInvoiceForm() {
 		var data = $("#applyInvoiceForm").serialize();
-		$.post("smschargeorder/applyInvoice",data,function(result){
-			if(result.success){
+		$.post("smschargeorder/applyInvoice", data, function(result) {
+			if (result.success) {
 				$("#applyInvoice").modal("hide");
 				toastr.success("申请成功！");
-			}else{
+			} else {
 				$("#applyInvoice").modal("hide");
 				toastr.error("申请失败！请重新操作！");
 			}
@@ -281,7 +460,7 @@
 		});
 		return false;
 	}
-	
+
 	//格式化时间
 	function formatDate(date) {
 		var temp = "";
@@ -291,9 +470,9 @@
 		}
 		return temp;
 	}
-	
+
 	//创建一个按钮
-	function createBtn(btnName,btnValue,btnClass,btnfunction){
+	function createBtn(btnName, btnValue, btnClass, btnfunction) {
 		return $('<input />', {
 			name : btnName,
 			value : btnValue,
