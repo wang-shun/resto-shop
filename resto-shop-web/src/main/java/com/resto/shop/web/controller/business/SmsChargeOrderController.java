@@ -28,6 +28,7 @@ import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.SmsChargeOrder;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.SmsChargeOrderService;
+import com.resto.brand.web.service.SmsTicketService;
 import com.resto.shop.web.controller.GenericController;
 
 import cn.restoplus.rpc.common.util.StringUtil;
@@ -41,6 +42,8 @@ public class SmsChargeOrderController extends GenericController {
 
 	@Resource
 	private SmsAcountService smsAcountService;
+	
+	private SmsTicketService smsTicketService;
 
 	@RequestMapping("/list")
 	public void list(){
@@ -126,12 +129,17 @@ public class SmsChargeOrderController extends GenericController {
 		return getSuccessResult(smsUnitPrice);
 	}
 	
+	/**
+	 * 申请发票
+	 * @return
+	 */
 	@RequestMapping("/applyInvoice")
 	@ResponseBody
 	public Result applyInvoice(){
-		//待完成 发票记录查询
+//		smsTicketService
 		return getSuccessResult();
 	}
+	
 	
 	/**
 	 * 删除短信充值订单
