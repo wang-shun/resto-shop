@@ -65,14 +65,14 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control" name="consigneceId" v-model="currentAddress">
+											<select class="bs-select form-control" name="consigneceId" v-model="consigneceId">
 												<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 											</select>
-											<input type="hidden" type="text" name="address"/>
+											<input type="hidden" type="text" name="address" v-model="currentAddress.address"/>
 										</div>
 										<button type="button" class="col-sm-1 btn btn-sm green-meadow"
 											data-toggle="modal" data-target="#addressInfoModal">
-											添加</button>
+											编辑</button>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收 件
@@ -86,7 +86,7 @@ dt, dd {
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
-												name="phone">
+												name="phone" v-model="currentAddress.phone">
 										</div>
 									</div>
 									<div class="form-group">
@@ -170,10 +170,10 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">收件地址：</label>
 											<div class="col-sm-8">
-												<select class="bs-select form-control" name="consigneceId">
+												<select class="bs-select form-control" name="consigneceId" v-model="consigneceId">
 													<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 												</select>
-												<input type="hidden" type="text" name="address"/>
+												<input type="hidden" type="text" name="address" v-model="currentAddress.address"/>
 											</div>
 											<button type="button"
 												class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal"
@@ -184,14 +184,14 @@ dt, dd {
 												件 人：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="name">
+													name="name" v-model="currentAddress.name">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">联系电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="phone">
+													name="phone" v-model="currentAddress.phone">
 											</div>
 										</div>
 										<div class="form-group">
@@ -227,35 +227,75 @@ dt, dd {
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h4 class="modal-title text-center">
-						<strong>添加地址</strong>
+						<strong>管理地址</strong>
 					</h4>
 				</div>
 				<div class="modal-body">
-					<form class="form-horizontal" onsubmit="return addressInfoForm()"
-						id="addressInfoForm">
-						<div class="form-group">
-							<label for="header" class="col-sm-3 control-label">收 件 人：</label>
-							<div class="col-sm-8">
-								<input type="text" class="form-control" required name="name">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="header" class="col-sm-3 control-label">联系电话：</label>
-							<div class="col-sm-8">
-								<input type="text" class="form-control" required name="phone">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="header" class="col-sm-3 control-label">收件地址：</label>
-							<div class="col-sm-8">
-								<input type="text" class="form-control" required name="address">
-							</div>
-						</div>
-						<div class="text-center">
-							<a class="btn default" data-dismiss="modal">取消</a> <input
-								class="btn green" type="submit" value="添加" />
-						</div>
-					</form>
+					<div>
+					  <ul class="nav nav-tabs" role="tablist">
+					    <li role="presentation" class="active"><a href="#address_update" aria-controls="address_update" role="tab" data-toggle="tab">修改地址</a></li>
+					    <li role="presentation"><a href="#address_add" aria-controls="profile" role="tab" data-toggle="tab">新增地址</a></li>
+					  </ul>
+					  <div class="tab-content">
+					    <div role="tabpanel" class="tab-pane active" id="address_update">
+					    	<form class="form-horizontal" onsubmit="return addressInfoForm()"
+								id="addressInfoForm">
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收 件 人：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="name">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">联系电话：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="phone">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收件地址：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="address">
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-3 text-center"><a class="btn btn-danger">删除</a></div>
+									<div class="col-sm-6 text-center">
+										<a class="btn default" data-dismiss="modal">取消</a> <input
+										class="btn green" type="submit" value="修改" />
+									</div>
+								</div>
+							</form>
+					    </div>
+					    <div role="tabpanel" class="tab-pane" id="address_add">
+					    	<form class="form-horizontal" onsubmit="return addressInfoForm()"
+								id="addressInfoForm">
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收 件 人：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="name">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">联系电话：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="phone">
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收件地址：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="address">
+									</div>
+								</div>
+								<div class="text-center">
+									<a class="btn default" data-dismiss="modal">取消</a> <input
+										class="btn green" type="submit" value="添加" />
+								</div>
+							</form>
+					    </div>
+					  </div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -443,7 +483,8 @@ dt, dd {
 				smsticketInfo : {},
 				invoice:{},
 				addressInfo:[],
-				currentAddress:"",
+				currentAddress:{},
+				consigneceId:""
 			},
 			methods : {
 				create : function() {
@@ -467,7 +508,7 @@ dt, dd {
 					var that=this;
 					$.post("addressinfo/list_all",function(result){
 						that.addressInfo=result.data;
-						that.currentAddress=result.data[0].id;
+						that.consigneceId=result.data[0].id;
 					})
 				},
 				changedTest : function(){
@@ -478,16 +519,13 @@ dt, dd {
 				this.queryAddress();
 			},
 			 watch: {
-				 currentAddress: function(val) {
-// 					 $(this.addressInfo).each(function(i,item){
-// 						 console.log(item);
-// 						 if(item.id==val){
-// 							 this.currentAddress.name=item.name;
-// 							 this.currentAddress.phone=item.phone;
-// 						 }
-// 					 })
-// 					 console.log(this.currentAddress);
-					 console.log(val);
+				 consigneceId: function(val) {
+					 var that = this;
+					 $(this.addressInfo).each(function(i,item){
+						 if(item.id==val){
+							 that.currentAddress = item;
+						 }
+					 })
                 }
             }
 		});
