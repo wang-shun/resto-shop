@@ -2,6 +2,8 @@ package com.resto.shop.web.controller.business;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,17 +15,18 @@ import com.resto.shop.web.controller.GenericController;
 
 @Controller
 @RequestMapping("invoice")
-public class InvoiceController extends GenericController{
+public class InvoiceController extends GenericController {
 
-	private SmsTicketService smsTicketService;
-	
-	@RequestMapping("list")
-	public void list(){
+	@Resource
+	SmsTicketService smsTicketService;
+
+	@RequestMapping("/list")
+	public void list() {
 	}
-	
-	@RequestMapping("list_all")
+
+	@RequestMapping("/list_all")
 	@ResponseBody
-	public Result list_all(){
+	public Result listData() {
 		List<SmsTicket> list = smsTicketService.selectList();
 		return getSuccessResult(list);
 	}

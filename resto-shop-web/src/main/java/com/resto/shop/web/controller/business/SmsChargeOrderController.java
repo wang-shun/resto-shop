@@ -43,7 +43,6 @@ public class SmsChargeOrderController extends GenericController {
 	@Resource
 	private SmsAcountService smsAcountService;
 	
-	private SmsTicketService smsTicketService;
 
 	@RequestMapping("/list")
 	public void list(){
