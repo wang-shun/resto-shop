@@ -59,14 +59,14 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">发票金额：</label>
 										<div class="col-sm-8">
-											<input class="bs-select form-control" type="number" name="money" min="100"/>
+											<input class="bs-select form-control" type="number" required name="money" min="100"/>
 										</div>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control" name="consigneceId">
-												<option v-for="item in addressInfo">{{item.address}}</option>
+											<select class="bs-select form-control" name="consigneceId" v-model="currentAddress">
+												<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 											</select>
 											<input type="hidden" type="text" name="address"/>
 										</div>
@@ -79,7 +79,7 @@ dt, dd {
 											人：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
-												name="name">
+												name="name" v-model="currentAddress.name">
 										</div>
 									</div>
 									<div class="form-group">
@@ -150,7 +150,7 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">发票金额：</label>
 											<div class="col-sm-8">
-												<input class="bs-select form-control" type="number" name="money" min="100"/>
+												<input class="bs-select form-control" type="number" required name="money" min="100"/>
 											</div>
 										</div>
 										<div class="form-group">
@@ -443,6 +443,7 @@ dt, dd {
 				smsticketInfo : {},
 				invoice:{},
 				addressInfo:[],
+				currentAddress:"",
 			},
 			methods : {
 				create : function() {
@@ -452,6 +453,7 @@ dt, dd {
 				},
 				cancel:function(){
 					$("#applyInvoice").modal("hide");
+					$("form")[0].reset();
 				},
 				save : function(e) {
 					var that = this;
@@ -465,12 +467,29 @@ dt, dd {
 					var that=this;
 					$.post("addressinfo/list_all",function(result){
 						that.addressInfo=result.data;
+						that.currentAddress=result.data[0].id;
 					})
+				},
+				changedTest : function(){
+					console.log("change");
 				}
 			},
 			created : function(){
 				this.queryAddress();
-			}
+			},
+			 watch: {
+				 currentAddress: function(val) {
+// 					 $(this.addressInfo).each(function(i,item){
+// 						 console.log(item);
+// 						 if(item.id==val){
+// 							 this.currentAddress.name=item.name;
+// 							 this.currentAddress.phone=item.phone;
+// 						 }
+// 					 })
+// 					 console.log(this.currentAddress);
+					 console.log(val);
+                }
+            }
 		});
 
 		//创建一个按钮
