@@ -135,7 +135,7 @@
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="header">
+										<input type="text" class="form-control" required name="title">
 									</div>
 								</div>
 								<div class="form-group">
@@ -143,13 +143,23 @@
 									<div class="col-sm-8">
 										<div class="md-radio-inline">
 											<div class="md-radio">
-												<input type="radio" id="type_1" name="type"
+												<input type="radio" id="type_1" name="content"
 													checked="checked" class="md-radiobtn"> <label
 													for="type_1"> <span> </span> <span class="check"></span>
 													<span class="box"></span> 明细
 												</label>
 											</div>
 										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">发票金额：</label>
+									<div class="col-sm-8">
+										<select class="bs-select form-control" name="money">
+											<option value="100">100</option>
+											<option value="300">300</option>
+											<option value="500">500</option>
+										</select>
 									</div>
 								</div>
 								<div class="form-group">
@@ -233,6 +243,16 @@
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
 												name="bankAccount">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">发票金额：</label>
+										<div class="col-sm-8">
+											<select class="bs-select form-control" name="money">
+												<option value="100">100</option>
+												<option value="300">300</option>
+												<option value="500">500</option>
+											</select>
 										</div>
 									</div>
 									<div class="form-group">
