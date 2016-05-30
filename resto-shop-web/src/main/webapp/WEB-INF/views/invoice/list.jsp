@@ -105,8 +105,7 @@ dt, dd {
 								</form>
 							</div>
 							<div role="tabpanel" class="tab-pane" id="increment">
-								<form class="form-horizontal"
-									onsubmit="return applyInvoiceForm()" id="applyInvoiceForm">
+								<form class="form-horizontal" action="invoice/create"  @submit.prevent="save">
 									<div id="increment_info">
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">单位名称：</label>
@@ -126,14 +125,14 @@ dt, dd {
 											<label for="header" class="col-sm-3 control-label">注册地址：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="registerAddress">
+													name="registeredAddress">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">注册电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="registerPhone">
+													name="registeredPhone">
 											</div>
 										</div>
 										<div class="form-group">
@@ -163,8 +162,9 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">收件地址：</label>
 											<div class="col-sm-8">
-												<select class="bs-select form-control" name="address">
+												<select class="bs-select form-control" name="consigneceId">
 												</select>
+												<input type="text" name="address"/>
 											</div>
 											<button type="button"
 												class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal"
@@ -175,14 +175,14 @@ dt, dd {
 												件 人：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="userName">
+													name="name">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">联系电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="phoneNumber">
+													name="phone">
 											</div>
 										</div>
 										<div class="form-group">
