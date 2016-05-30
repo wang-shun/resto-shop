@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.business;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -13,6 +14,11 @@ import com.resto.brand.web.model.SmsTicket;
 import com.resto.brand.web.service.SmsTicketService;
 import com.resto.shop.web.controller.GenericController;
 
+/**
+ * 发票信息 Controller
+ * @author Administrator
+ *
+ */
 @Controller
 @RequestMapping("invoice")
 public class InvoiceController extends GenericController {
@@ -27,7 +33,15 @@ public class InvoiceController extends GenericController {
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData() {
-		List<SmsTicket> list = smsTicketService.selectList();
+		List<SmsTicket> list = smsTicketService.selectByBrandId(getCurrentBrandId());
 		return getSuccessResult(list);
+	}
+	
+	@RequestMapping("create")
+	@ResponseBody
+	public Result create(SmsTicket smsTicket){
+		smsTicket.setProposer(getCurrentUserId());
+		smsTicket.setCreateTime(new Date());
+		return getSuccessResult();
 	}
 }

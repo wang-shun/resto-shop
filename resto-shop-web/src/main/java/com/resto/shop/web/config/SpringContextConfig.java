@@ -20,6 +20,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.ShopModeService;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.SmsChargeOrderService;
+import com.resto.brand.web.service.SmsTicketService;
 import com.resto.brand.web.service.UserGroupService;
 import com.resto.brand.web.service.UserService;
 import com.resto.brand.web.service.WechatConfigService;
@@ -279,6 +280,11 @@ public class SpringContextConfig {
 	@Bean
 	public AddressInfoService addressInfoService(){
 		return proxy.create(AddressInfoService.class);
+	}
+	
+	@Bean
+	public SmsTicketService smsTicketService(){
+		return proxy.create(SmsTicketService.class);
 	}
 	
 	public <T> T getProxy(Class<T> clazz){
