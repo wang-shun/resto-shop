@@ -39,7 +39,7 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="title" v-model="invoice.title">
+											<input type="text" class="form-control" required name="header" v-model="invoice.header">
 										</div>
 									</div>
 									<div class="form-group">
@@ -48,7 +48,7 @@ dt, dd {
 											<div class="md-radio-inline">
 												<div class="md-radio">
 													<input type="radio" id="type_1" name="content"
-														checked="checked" class="md-radiobtn"> <label
+														checked="checked" class="md-radiobtn" value="明细"> <label
 														for="type_1"> <span> </span> <span class="check"></span>
 														<span class="box"></span> 明细
 													</label>
@@ -59,18 +59,16 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">发票金额：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control" name="money">
-												<option value="100">100</option>
-												<option value="300">300</option>
-												<option value="500">500</option>
-											</select>
+											<input class="bs-select form-control" type="number" name="money" min="100"/>
 										</div>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control" name="address">
+											<select class="bs-select form-control" name="consigneceId">
+												<option v-for="item in addressInfo">{{item.address}}</option>
 											</select>
+											<input type="hidden" type="text" name="address"/>
 										</div>
 										<button type="button" class="col-sm-1 btn btn-sm green-meadow"
 											data-toggle="modal" data-target="#addressInfoModal">
@@ -97,7 +95,7 @@ dt, dd {
 											<textarea class="form-control" name="remark"></textarea>
 										</div>
 									</div>
-									<input name="type" value="1" />
+									<input type="hidden" name="type" value="1" />
 									<div class="text-center">
 										<a class="btn default" data-dismiss="modal">取消</a> <input
 											class="btn green" type="submit" value="申请" />
@@ -111,7 +109,7 @@ dt, dd {
 											<label for="header" class="col-sm-3 control-label">单位名称：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="companyName">
+													name="header">
 											</div>
 										</div>
 										<div class="form-group">
@@ -152,19 +150,30 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">发票金额：</label>
 											<div class="col-sm-8">
-												<select class="bs-select form-control" name="money">
-													<option value="100">100</option>
-													<option value="300">300</option>
-													<option value="500">500</option>
-												</select>
+												<input class="bs-select form-control" type="number" name="money" min="100"/>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="header" class="col-sm-3 control-label">发票内容：</label>
+											<div class="col-sm-8">
+												<div class="md-radio-inline">
+													<div class="md-radio">
+														<input type="radio" id="type_1" name="content"
+															checked="checked" class="md-radiobtn" value="明细"> <label
+															for="type_1"> <span> </span> <span class="check"></span>
+															<span class="box"></span> 明细
+														</label>
+													</div>
+												</div>
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">收件地址：</label>
 											<div class="col-sm-8">
 												<select class="bs-select form-control" name="consigneceId">
+													<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 												</select>
-												<input type="text" name="address"/>
+												<input type="hidden" type="text" name="address"/>
 											</div>
 											<button type="button"
 												class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal"
@@ -191,7 +200,7 @@ dt, dd {
 												<textarea class="form-control" name="remark"></textarea>
 											</div>
 										</div>
-									<input name="type" value="2" />
+									<input type="hidden" name="type" value="2" />
 										<div class="text-center">
 											<a class="btn default" data-dismiss="modal">取消</a> <input
 												class="btn green" type="submit" value="申请" />
@@ -269,7 +278,7 @@ dt, dd {
 				<div class="modal-body">
 					<dl class="dl-horizontal">
 						<dt>单位名称：</dt>
-						<dd>{{smsticketInfo.companyName}}</dd>
+						<dd>{{smsticketInfo.header}}</dd>
 						<dt>纳税人识别码：</dt>
 						<dd>{{smsticketInfo.taxpayerCode}}</dd>
 						<dt>注册地址：</dt>
@@ -355,7 +364,7 @@ dt, dd {
 		columns : [
 				{
 					title : "发票抬头",
-					data : "title",
+					data : "header",
 				},
 				{
 					title : "内容",
@@ -364,6 +373,24 @@ dt, dd {
 				{
 					title : "金额(人民币)",
 					data : "money",
+				},
+				{
+					title : "备注",
+					data : "remark",
+				},
+				{
+					title : "快递单号",
+					data : "expersage",
+					createdCell : function(td, tdData) {
+						$(td).html(tdData != null ? "<a href='http://m.kuaidi100.com/result.jsp?com=&nu="+ tdData+ "' target='_blank'>"+ tdData+ "</a>": "未完成");
+					}
+				},
+				{
+					title : "发票类型",
+					data : "type",
+					createdCell : function(td, tdData) {
+						$(td).html(tdData == 1 ? "普通发票": "增值税发票");
+					}
 				},
 				{
 					title : "申请时间",
@@ -384,20 +411,6 @@ dt, dd {
 					data : "ticketStatus",
 					createdCell : function(td, tdData) {
 						$(td).html(tdData == 0 ? "申请中": "已完成");
-					}
-				},
-				{
-					title : "快递单号",
-					data : "expersage",
-					createdCell : function(td, tdData) {
-						$(td).html(tdData != null ? "<a href='http://m.kuaidi100.com/result.jsp?com=&nu="+ tdData+ "' target='_blank'>"+ tdData+ "</a>": "未完成");
-					}
-				},
-				{
-					title : "发票类型",
-					data : "type",
-					createdCell : function(td, tdData) {
-						$(td).html(tdData == 1 ? "普通发票": "增值税发票");
 					}
 				},
 				{
@@ -428,20 +441,17 @@ dt, dd {
 			el : "#control",
 			data : {
 				smsticketInfo : {},
-				invoice:{}
+				invoice:{},
+				addressInfo:[],
 			},
 			methods : {
 				create : function() {
-					
-// 					invoice
 				},
 				showDetailInfo : function(smsticketInfo) {
 					this.smsticketInfo = smsticketInfo;
 				},
-				edit : function(brandId, brandInfo) {
-					this.brandInfo = brandInfo;
-					this.showMsg = false;
-					$("#brandInfoModal").modal();
+				cancel:function(){
+					$("#applyInvoice").modal("hide");
 				},
 				save : function(e) {
 					var that = this;
@@ -450,7 +460,16 @@ dt, dd {
 						that.cancel();
 						tb.ajax.reload();
 					});
+				},
+				queryAddress : function(){
+					var that=this;
+					$.post("addressinfo/list_all",function(result){
+						that.addressInfo=result.data;
+					})
 				}
+			},
+			created : function(){
+				this.queryAddress();
 			}
 		});
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.SmsTicket;
 import com.resto.brand.web.service.SmsTicketService;
 import com.resto.shop.web.controller.GenericController;
@@ -40,8 +41,11 @@ public class InvoiceController extends GenericController {
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(SmsTicket smsTicket){
+		smsTicket.setId(ApplicationUtils.randomUUID());
 		smsTicket.setProposer(getCurrentUserId());
+		smsTicket.setBrandId(getCurrentBrandId());
 		smsTicket.setCreateTime(new Date());
+		smsTicketService.insert(smsTicket);
 		return getSuccessResult();
 	}
 }
