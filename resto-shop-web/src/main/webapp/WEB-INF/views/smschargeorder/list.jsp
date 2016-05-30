@@ -368,10 +368,10 @@
 						createdCell : function(td, tdData) {
 							var payType = "";
 							if(tdData!=null){
-								payType = tdData == 1 ? "<img alt=\"微信支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
+								payType = tdData == 1 ? "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
 										: "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
 							}else{
-								payType = "<img alt=\"为支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
+								payType = "<img alt=\"未支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
 							}
 							
 							$(td).html(payType);
@@ -391,7 +391,7 @@
 						data : "id",
 						createdCell : function(td, tdData, rowData) {
 							var info = [];
-							if (rowData.status == 1) {//订单已完成
+							if (rowData.orderStatus == 1) {//订单已完成
 								var btn = createBtn(null, "查看详情",
 										"btn-sm btn-primary",
 										function() {
@@ -454,8 +454,10 @@
 		
 		$(":input[name='address']").change(function(){
 			var temp = addressInfo[$(this).val()];
-			$(":input[name='userName']").val(temp.name);
-			$(":input[name='phoneNumber']").val(temp.phone);
+			if(temp!=null){
+				$(":input[name='userName']").val(temp.name);
+				$(":input[name='phoneNumber']").val(temp.phone);
+			}
 		})
 	}());
 
@@ -465,10 +467,13 @@
 	function queryAddress(){
 		$.post("addressinfo/list_all",function(result){
 			$(":input[name='address']").empty();
+			addressInfo = {};
 			$(result.data).each(function(i,item){
 				$(":input[name='address']").append("<option value='"+item.id+"'>"+item.address+"</option>");
 				addressInfo[item.id]=item;
 			})
+			$(":input[name='userName']").val(result.data[0].name);
+			$(":input[name='phoneNumber']").val(result.data[0].phone);
 		})
 	}
 	
