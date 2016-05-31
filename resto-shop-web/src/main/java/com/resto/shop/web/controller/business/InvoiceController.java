@@ -45,7 +45,6 @@ public class InvoiceController extends GenericController {
 		smsTicket.setProposer(getCurrentUserId());
 		smsTicket.setBrandId(getCurrentBrandId());
 		smsTicket.setCreateTime(new Date());
-		smsTicketService.insert(smsTicket);
-		return getSuccessResult();
+		return smsTicketService.createInvoice(smsTicket);
 	}
 }
