@@ -31,17 +31,24 @@ public class AddressInfoController extends GenericController{
 	
 	@RequestMapping("/create")
 	@ResponseBody
-	public boolean create(AddressInfo addressInfo){
+	public Result create(AddressInfo addressInfo){
 		addressInfo.setBrandId(getCurrentBrandId());
 		addressInfo.setId(ApplicationUtils.randomUUID());
 		int row = addressInfoService.insert(addressInfo);
-		return row>0?true:false;
+		return new Result(row>0?true:false);
+	}
+	
+	@RequestMapping("/modify")
+	@ResponseBody
+	public Result modify(AddressInfo addressInfo){
+		int row = addressInfoService.update(addressInfo);
+		return new Result(row>0?true:false);
 	}
 	
 	@RequestMapping("/delete")
 	@ResponseBody
 	public boolean delete(String id){
-		int row = 1;
+		int row = addressInfoService.delete(id);
 		return row>0?true:false;
 	}
 }

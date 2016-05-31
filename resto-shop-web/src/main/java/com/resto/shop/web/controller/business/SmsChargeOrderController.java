@@ -28,7 +28,6 @@ import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.SmsChargeOrder;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.brand.web.service.SmsChargeOrderService;
-import com.resto.brand.web.service.SmsTicketService;
 import com.resto.shop.web.controller.GenericController;
 
 import cn.restoplus.rpc.common.util.StringUtil;
@@ -126,6 +125,13 @@ public class SmsChargeOrderController extends GenericController {
 	public Result selectSmsUnitPrice(){
 		BigDecimal smsUnitPrice = smsAcountService.selectSmsUnitPriceByBrandId(getCurrentBrandId());
 		return getSuccessResult(smsUnitPrice);
+	}
+	
+	@RequestMapping("/selectInvoiceMoney")
+	@ResponseBody
+	public Result selectInvoiceMoney(){
+		BigDecimal invoiceMoney = smsAcountService.selectInvoiceMoney(getCurrentBrandId());
+		return getSuccessResult(invoiceMoney);
 	}
 	
 	/**
