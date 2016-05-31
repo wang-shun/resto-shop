@@ -43,13 +43,9 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">选择通知类型：</label>
 							    <div class="col-sm-8 radio-list">
-									<label class="radio-inline">
-										<input type="radio" name="noticeType" v-model="m.noticeType" value="1">普通
+									<label class="radio-inline" v-for="(key, val) in noticeType">
+										<input type="radio" name="noticeType" v-model="m.noticeType" :value="key">{{val}}
 									</label>
-									<label class="radio-inline">
-										<input type="radio" name="noticeType" v-model="m.noticeType" value="2">注册提醒
-									</label>
-									
 							    </div>
 							</div>
 						</div>
@@ -113,11 +109,7 @@
 					title : "通知类型",
 					data : "noticeType",
 					createdCell:function(td,data){
-						var text = {
-							1:"普通通知",
-							2:"注册通知"
-						}
-						$(td).html(text[data]);
+						$(td).html(vueObj.noticeType[data]);
 					}
 				},
 				{                 
@@ -150,6 +142,13 @@
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
+			data:{
+				noticeType: {
+					1:"普通通知",
+					3:"大图弹窗",
+					2:"注册通知",
+				}
+			},
 			methods:{
 				create:function(){
 					this.m ={
