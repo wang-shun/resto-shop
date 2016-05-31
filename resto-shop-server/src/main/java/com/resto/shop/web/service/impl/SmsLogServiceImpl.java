@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import org.json.JSONObject;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
@@ -63,8 +64,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
 		//查询
 		BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
-		//商家给客户发短信
+		
 		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
+		
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
@@ -122,8 +124,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		}else if(SmsNumNotice.NOTICE_OWING_LAST > smsAcount.getRemainderNum()||SmsNumNotice.NOTICE_OWING_LAST==smsAcount.getRemainderNum()){
 			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone());
 			log.info("欠费超过50无法发短信");
-			return null;
+			return "{'msg':'当前品牌已欠费，请充值后使用短信功能','success':'false'}";
 		}
+		//商家给客户发短信
 		return SMSUtils.sendCode(sign, serviceName, code, phone);
 	}
 	
