@@ -4,8 +4,6 @@
 <div class="table-div">
 	<div class="table-operator">
 		<s:hasPermission name="notice/add">
-			<button type="button" class="btn green-meadow" data-toggle="modal"
-				data-target="#applyInvoice">申请发票</button>&nbsp;&nbsp;&nbsp;
 			<button type="button" class="btn green " data-toggle="modal"
 				data-target="#createChargeOrder" id="btn_smsCharge">短信充值</button>
 		</s:hasPermission>
@@ -28,76 +26,100 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				<form role="form" class="form-horizontal"
-					action="smschargeorder/smsCharge" method="post" target="_blank"
-					onsubmit="showChargeInfo()" id="chargeForm">
-					<!-- 				<form role="form" class="form-horizontal" onsubmit="return false"> -->
-					<div class="form-body">
-						<div class="form-group">
-							<label class="col-sm-3 control-label">充值品牌：</label>
-							<div class="col-sm-8">
-								<input type="text" disabled="disabled" class="form-control"
-									required name="brandName">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-3 control-label">短信单价：</label>
-							<div class="col-sm-8">
-								<input type="text" class="form-control" disabled="disabled"
-									name="smsUnitPrice">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-3 control-label">充值金额：</label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<input type="number" class="form-control" max="10000"
-										placeholder="请输入要充值的金额" onchange="computeSmsCount()"
-										onkeyup="computeSmsCount()" required name="chargeMoney">
-									<div class="input-group-addon">元</div>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-3 control-label">短信条数：</label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<input type="text" class="form-control" disabled="disabled"
-										name="number">
-									<div class="input-group-addon">条</div>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-3 control-label">支付方式：</label>
-							<div class="col-sm-8">
-								<div class="md-radio-list">
-									<div class="md-radio">
-										<input type="radio" id="alipay" name="paytype"
-											checked="checked" class="md-radiobtn" value="1"> <label
-											for="alipay"> <span></span> <span class="check"></span>
-											<span class="box"></span>&nbsp;<img alt="支付宝支付"
-											src="assets/pages/img/alipay.png" width="23px" height="23px">&nbsp;支付宝支付
-										</label>
-									</div>
-									<div class="md-radio">
-										<input type="radio" id="wxpay" name="paytype"
-											class="md-radiobtn" value="2"> <label for="wxpay">
-											<span></span> <span class="check"></span> <span class="box"></span>&nbsp;<img
-											alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
-											height="23px">&nbsp;微信支付
-										</label>
+				<div>
+				  <ul class="nav nav-tabs" role="tablist">
+				    <li role="presentation" class="active"><a href="#onlinePay" aria-controls="home" role="tab" data-toggle="tab">第三方支付</a></li>
+				    <li role="presentation"><a href="#bankPay" aria-controls="profile" role="tab" data-toggle="tab">银行转账</a></li>
+				  </ul>
+				  <div class="tab-content">
+				    <div role="tabpanel" class="tab-pane active" id="onlinePay">
+				    	<form role="form" class="form-horizontal"
+							action="smschargeorder/smsCharge" method="post" target="_blank"
+							onsubmit="showChargeInfo()" id="chargeForm">
+							<div class="form-body">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">充值品牌：</label>
+									<div class="col-sm-8">
+										<input type="text" disabled="disabled" class="form-control"
+											required name="brandName">
 									</div>
 								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">短信单价：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" disabled="disabled"
+											name="smsUnitPrice">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">充值金额：</label>
+									<div class="col-sm-8">
+										<div class="input-group">
+											<input type="number" class="form-control" max="10000"
+												placeholder="请输入要充值的金额" onchange="computeSmsCount()"
+												onkeyup="computeSmsCount()" required name="chargeMoney">
+											<div class="input-group-addon">元</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">短信条数：</label>
+									<div class="col-sm-8">
+										<div class="input-group">
+											<input type="text" class="form-control" disabled="disabled"
+												name="number">
+											<div class="input-group-addon">条</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">支付方式：</label>
+									<div class="col-sm-8">
+										<div class="md-radio-list">
+											<div class="md-radio">
+												<input type="radio" id="alipay" name="paytype"
+													checked="checked" class="md-radiobtn" value="1"> <label
+													for="alipay"> <span></span> <span class="check"></span>
+													<span class="box"></span>&nbsp;<img alt="支付宝支付"
+													src="assets/pages/img/alipay.png" width="23px" height="23px">&nbsp;支付宝支付
+												</label>
+											</div>
+											<div class="md-radio">
+												<input type="radio" id="wxpay" name="paytype"
+													class="md-radiobtn" value="2"> <label for="wxpay">
+													<span></span> <span class="check"></span> <span class="box"></span>&nbsp;<img
+													alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
+													height="23px">&nbsp;微信支付
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" name="chargeOrderId" value="">
 							</div>
+							<div class="text-center" id="chargeBtn">
+								<a class="btn default" data-dismiss="modal">取消</a> <input
+									class="btn green" type="submit" value="充值" />
+							</div>
+						</form>
+				    </div>
+				    <div role="tabpanel" class="tab-pane" id="bankPay">
+						<form class="form-horizontal">
+						  <div class="form-group">
+								<label class="col-sm-3 control-label">转账流水号：</label>
+								<div class="col-sm-8">
+									<input type="text" class="form-control" required name="serialNumber">
+									<span class="help-block">银行卡转账需官方确认后，充值才会到账，耗时可能较长，静候佳音！</span>
+								</div>
+								</div>
+						  <div class="text-center" id="chargeBtn">
+								<a class="btn default" data-dismiss="modal">取消</a> <input
+									class="btn green" type="submit" value="提交" />
 						</div>
-						<input type="hidden" name="chargeOrderId" value="">
-					</div>
-					<div class="text-center" id="chargeBtn">
-						<a class="btn default" data-dismiss="modal">取消</a> <input
-							class="btn green" type="submit" value="充值" />
-					</div>
-				</form>
+						</form>
+				    </div>
+				  </div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -390,15 +412,15 @@
 							if(tdData!=null){
 								var str = ""
 								if(tdData==1){
-									str = "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝";
+									str = "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支 付 宝";
 								}else if(tdData==2){
-									str = "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+									str = "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;&nbsp;信";
 								}else if(tdData==3){
-									str = "<img alt=\"银行卡转账\" src=\"assets/pages/img/bank.png\" width=\"23px\" height=\"23px\">&nbsp;银行卡转账";
+									str = "<img alt=\"银行转账\" src=\"assets/pages/img/bank.png\" width=\"23px\" height=\"18px\">&nbsp;银行转账";
 								}
 								payType = str;
 							}else{
-								payType = "<img alt=\"未支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
+								payType = "<img alt=\"未支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未 支 付";
 							}
 							$(td).html(payType);
 						}
