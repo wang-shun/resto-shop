@@ -388,12 +388,18 @@
 						createdCell : function(td, tdData) {
 							var payType = "";
 							if(tdData!=null){
-								payType = tdData == 1 ? "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝"
-										: "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+								var str = ""
+								if(tdData==1){
+									str = "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支付宝";
+								}else if(tdData==2){
+									str = "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;信";
+								}else if(tdData==3){
+									str = "<img alt=\"银行卡转账\" src=\"assets/pages/img/bank.png\" width=\"23px\" height=\"23px\">&nbsp;银行卡转账";
+								}
+								payType = str;
 							}else{
 								payType = "<img alt=\"未支付\" src=\"assets/pages/img/wait.png\" width=\"23px\" height=\"23px\">&nbsp;未支付";
 							}
-							
 							$(td).html(payType);
 						}
 					},
