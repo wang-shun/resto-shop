@@ -37,4 +37,11 @@ public class AddressInfoController extends GenericController{
 		int row = addressInfoService.insert(addressInfo);
 		return row>0?true:false;
 	}
+	
+	@RequestMapping("/delete")
+	@ResponseBody
+	public boolean delete(String id){
+		int row = 1;
+		return row>0?true:false;
+	}
 }

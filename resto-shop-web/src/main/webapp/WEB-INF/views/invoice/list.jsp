@@ -59,20 +59,22 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">发票金额：</label>
 										<div class="col-sm-8">
-											<input class="bs-select form-control" type="number" required name="money" min="100"/>
+											<input class="bs-select form-control" type="number" required name="money" min="100" :max="invoiceMoney" :value="invoiceMoney"/>
+											<span class="help-block">金额不能低于100元,您当前最高能够开{{invoiceMoney}}元的发票</span>
 										</div>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<select class="bs-select form-control" name="consigneceId" v-model="consigneceId">
+											<select class="bs-select form-control" name="consigneceId" required v-model="consigneceId">
 												<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 											</select>
 											<input type="hidden" type="text" name="address" v-model="currentAddress.address"/>
+											<span class="help-block text-danger" v-if="!currentAddress.id">您当前暂未添加任何地址，请点击右边的【管理】按钮，进行添加操作！</span>
 										</div>
 										<button type="button" class="col-sm-1 btn btn-sm green-meadow"
 											data-toggle="modal" data-target="#addressInfoModal">
-											编辑</button>
+											管理</button>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收 件
@@ -92,7 +94,7 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">备&nbsp;&nbsp;注：</label>
 										<div class="col-sm-8">
-											<textarea class="form-control" name="remark"></textarea>
+											<textarea class="form-control" name="remark" placeholder="写下你的备注，可不填！"></textarea>
 										</div>
 									</div>
 									<input type="hidden" name="type" value="1" />
@@ -177,7 +179,7 @@ dt, dd {
 											</div>
 											<button type="button"
 												class="col-sm-1 btn btn-sm green-meadow" data-toggle="modal"
-												data-target="#addressInfoModal">添加</button>
+												data-target="#addressInfoModal">管理</button>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">收
@@ -197,7 +199,7 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">备&nbsp;&nbsp;注：</label>
 											<div class="col-sm-8">
-												<textarea class="form-control" name="remark"></textarea>
+												<textarea class="form-control" name="remark" placeholder="写下你的备注，可不填！"></textarea>
 											</div>
 										</div>
 									<input type="hidden" name="type" value="2" />
@@ -216,7 +218,7 @@ dt, dd {
 	</div>
 	<!-- 申请发票	end -->
 	
-	<!-- 添加地址 	begin-->
+	<!-- 编辑地址 	begin-->
 	<div class="modal fade" id="addressInfoModal" tabindex="-1"
 		role="dialog" aria-labelledby="addressInfoModal">
 		<div class="modal-dialog" role="document">
@@ -227,19 +229,55 @@ dt, dd {
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h4 class="modal-title text-center">
-						<strong>管理地址</strong>
+						<strong>地址管理</strong>
 					</h4>
 				</div>
 				<div class="modal-body">
 					<div>
 					  <ul class="nav nav-tabs" role="tablist">
-					    <li role="presentation" class="active"><a href="#address_update" aria-controls="address_update" role="tab" data-toggle="tab">修改地址</a></li>
-					    <li role="presentation"><a href="#address_add" aria-controls="profile" role="tab" data-toggle="tab">新增地址</a></li>
+					    <li role="presentation" class="active" v-if="currentAddress.id"><a href="#address_update" aria-controls="address_update" role="tab" data-toggle="tab">修改地址</a></li>
+					    <li role="presentation" :class="{active:!currentAddress.id}"><a href="#address_add" aria-controls="profile" role="tab" data-toggle="tab">新增地址</a></li>
 					  </ul>
 					  <div class="tab-content">
-					    <div role="tabpanel" class="tab-pane active" id="address_update">
+						    <div role="tabpanel" class="tab-pane active" id="address_update" v-if="currentAddress.id">
+						    	<form class="form-horizontal">
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">收件地址：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required name="address" v-model="currentAddress.address">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">收 件 人：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required name="name" v-model="currentAddress.name">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="header" class="col-sm-3 control-label">联系电话：</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" required name="phone" v-model="currentAddress.phone">
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-sm-3 text-center"><a class="btn btn-danger" v-on:click="addressDelete">删除</a></div>
+										<div class="col-sm-6 text-center">
+											<a class="btn default" data-dismiss="modal">取消</a> <input
+											class="btn green" type="submit" value="修改" />
+										</div>
+									</div>
+									<input type="hidden" name="id" v-model="currentAddress.id"/>
+								</form>
+						    </div>
+						<div role="tabpanel" class="tab-pane" :class="{active:!currentAddress.id}" id="address_add">
 					    	<form class="form-horizontal" onsubmit="return addressInfoForm()"
 								id="addressInfoForm">
+								<div class="form-group">
+									<label for="header" class="col-sm-3 control-label">收件地址：</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" required name="address">
+									</div>
+								</div>
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">收 件 人：</label>
 									<div class="col-sm-8">
@@ -250,42 +288,6 @@ dt, dd {
 									<label for="header" class="col-sm-3 control-label">联系电话：</label>
 									<div class="col-sm-8">
 										<input type="text" class="form-control" required name="phone">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="header" class="col-sm-3 control-label">收件地址：</label>
-									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="address">
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-sm-3 text-center"><a class="btn btn-danger">删除</a></div>
-									<div class="col-sm-6 text-center">
-										<a class="btn default" data-dismiss="modal">取消</a> <input
-										class="btn green" type="submit" value="修改" />
-									</div>
-								</div>
-							</form>
-					    </div>
-					    <div role="tabpanel" class="tab-pane" id="address_add">
-					    	<form class="form-horizontal" onsubmit="return addressInfoForm()"
-								id="addressInfoForm">
-								<div class="form-group">
-									<label for="header" class="col-sm-3 control-label">收 件 人：</label>
-									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="name">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="header" class="col-sm-3 control-label">联系电话：</label>
-									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="phone">
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="header" class="col-sm-3 control-label">收件地址：</label>
-									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="address">
 									</div>
 								</div>
 								<div class="text-center">
@@ -300,7 +302,7 @@ dt, dd {
 			</div>
 		</div>
 	</div>
-	<!-- 添加地址 	end-->
+	<!-- 编辑地址 	end-->
 	
 	
 	<!-- 增值发票详情   begin -->
@@ -480,11 +482,12 @@ dt, dd {
 		var vueObj = new Vue({
 			el : "#control",
 			data : {
-				smsticketInfo : {},
-				invoice:{},
-				addressInfo:[],
-				currentAddress:{},
-				consigneceId:""
+				smsticketInfo : {},//保存查看详情的信息
+				invoice:{},//
+				addressInfo:[],//保存当前品牌的所有地址
+				currentAddress:{},//当前选中的地址信息
+				consigneceId:"",//当前选中的地址的id
+				invoiceMoney:500//当前品牌可开发票的最大金额
 			},
 			methods : {
 				create : function() {
@@ -507,12 +510,26 @@ dt, dd {
 				queryAddress : function(){
 					var that=this;
 					$.post("addressinfo/list_all",function(result){
-						that.addressInfo=result.data;
-						that.consigneceId=result.data[0].id;
+						if(result.data!=null&&result.data!=""){
+							that.addressInfo=result.data;
+							that.consigneceId=result.data[0].id;
+						}
 					})
 				},
 				changedTest : function(){
 					console.log("change");
+				},
+				addressDelete : function(){
+					var that = this;
+					$.post("addressinfo/delete",{"id":this.consigneceId},function(result){
+						if(result){
+							$("#addressInfoModal").modal("hide");
+							this.queryAddress();
+							C.simpleMsg("删除成功！");
+						}else{
+							C.errorMsg("删除失败！");
+						}
+					})
 				}
 			},
 			created : function(){
