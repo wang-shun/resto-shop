@@ -411,6 +411,7 @@ dt, dd {
 	//载入 表格数据
 	tb = $('.table-body>table').DataTable(
 	{
+		ordering: false,//禁用datatables的默认排序
 		ajax : {
 			url : "invoice/list_all",
 			dataSrc : "data"
@@ -485,7 +486,7 @@ dt, dd {
 						}
 						info.push(btn);
 						$(td).html(info);
-						if(rowData.type==2){
+						if(rowData.type==2 && vueObj.invoice.id== null){
 							vueObj.invoice=rowData;
 						}
 					}
@@ -529,11 +530,12 @@ dt, dd {
 						}
 					});
 				},
-				invoiceSave:function(e){
+				invoiceSave : function(e){
 					var that = this;
 					var formDom = e.target;
 					C.ajaxFormEx(formDom,function(){
 						$("#applyInvoice").modal("hide");
+						that.queryInvoiceMoney();
 						tb.ajax.reload();
 					});
 				},
