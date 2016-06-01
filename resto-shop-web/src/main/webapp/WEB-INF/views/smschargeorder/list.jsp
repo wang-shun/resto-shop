@@ -102,7 +102,7 @@ dt, dd {
 									class="btn green" type="submit" value="充值" />
 							</div>
 							<div class="text-center" v-else>
-								<button class="btn green" data-dismiss="modal">操作完成</button>
+								<button class="btn green" data-dismiss="modal" @click="refresh">操作完成</button>
 							</div>
 						</form>
 				    </div>
@@ -198,7 +198,7 @@ dt, dd {
 							class="btn green" type="submit" value="支付" />
 					</div>
 					<div class="text-center" v-else>
-						<button class="btn green" data-dismiss="modal">操作完成</button>
+						<button class="btn green" data-dismiss="modal" @click="refresh">操作完成</button>
 					</div>
 				</form>
 			</div>
@@ -257,10 +257,12 @@ dt, dd {
 					{
 						title : "充值金额（元）",
 						data : "chargeMoney",
+						defaultContent:"未完成"
 					},
 					{
 						title : "充值条数",
 						data : "number",
+						defaultContent:"未完成"
 					},
 					{
 						title : "短信单价（元）",
@@ -324,6 +326,7 @@ dt, dd {
 								info.push(btn);
 							} else if(rowData.orderStatus == 0){//订单未完成
 								var btn = createBtn(null, "立即支付","btn-sm btn-success",function() {
+											vueObj.chargeBtn = true;
 											vueObj.orderInfo = rowData;
 											$("#payAgainModal").modal();
 										})
@@ -401,6 +404,9 @@ dt, dd {
 					$("#createChargeOrder").modal("hide");
 					tb.ajax.reload();
 				});
+			},
+			refresh : function(){
+				tb.ajax.reload();
 			}
 		},
 		created : function(){
