@@ -22,7 +22,8 @@ public interface NoticeMapper  extends GenericDao<Notice,String> {
     
     /**
      * 根据店铺ID查询信息
+     * @param noticeType 
      * @return
      */
-    List<Notice> selectListByShopId(@Param(value = "shopId") String currentShopId);
+    List<Notice> selectListByShopId(@Param(value = "shopId") String currentShopId,@Param(value = "noticeType")  Integer noticeType);
 }

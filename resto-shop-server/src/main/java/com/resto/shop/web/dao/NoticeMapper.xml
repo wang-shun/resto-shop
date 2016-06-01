@@ -64,6 +64,10 @@
   <select id="selectListByShopId" resultType="Notice">
   	select * from tb_notice
 	where shop_detail_id = #{shopId}
+	<if test="noticeType!=null and noticeType!=''">
+		and notice_type = #{noticeType}
+	</if>
 	order by sort
   </select>
+  
 </mapper>

@@ -36,7 +36,12 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
     }
 
 	@Override
-	public List<Notice> selectListByShopId(String shopId) {
-		return noticeMapper.selectListByShopId(shopId);
+	public List<Notice> selectListByShopId(String shopId, Integer noticeType) {
+		return noticeMapper.selectListByShopId(shopId,noticeType);
+	}
+
+	@Override
+	public List<Notice> selectListByShopId(String currentShopId) {
+		return noticeMapper.selectListByShopId(currentShopId,null);
 	}
 }
