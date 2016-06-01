@@ -82,6 +82,19 @@ public class SmsChargeOrderController extends GenericController {
 		outprint(returnHtml, response);
 	}
 	
+	@RequestMapping("/smsChargeByBank")
+	@ResponseBody
+	public Result smsChargeByBank(String serialNumber){
+		Result result = new Result(false);
+		if(StringUtil.isNotEmpty(serialNumber)){
+			boolean flag = smsChargeOrderService.saveSmsOrderByBank(getCurrentBrandId(), serialNumber);
+			result.setSuccess(flag);
+		}else{
+			result.setMessage("流水号不能为空");
+		}
+		return result;
+	}
+	
 	/**
 	 * 完成未支付的订单
 	 * @param chargeOrderId
@@ -132,17 +145,6 @@ public class SmsChargeOrderController extends GenericController {
 	public Result selectInvoiceMoney(){
 		BigDecimal invoiceMoney = smsAcountService.selectInvoiceMoney(getCurrentBrandId());
 		return getSuccessResult(invoiceMoney);
-	}
-	
-	/**
-	 * 申请发票
-	 * @return
-	 */
-	@RequestMapping("/applyInvoice")
-	@ResponseBody
-	public Result applyInvoice(){
-//		smsTicketService
-		return getSuccessResult();
 	}
 	
 	
