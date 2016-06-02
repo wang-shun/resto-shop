@@ -177,11 +177,6 @@
 			},
 
 			{
-				title : "返回结果",
-				data : "smsResult",
-			},
-
-			{
 				title : "是否成功",
 				data : "isSuccess",
 			} ]
