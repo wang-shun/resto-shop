@@ -223,7 +223,10 @@ public class SpringContextConfig {
 	public ModuleListService moduleListService(){
 		return getProxy(ModuleListService.class);
 	}
-	
+	@Bean
+	public ShareSettingService shareSettingService(){
+		return getProxy(ShareSettingService.class);
+	}
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}

@@ -11,7 +11,6 @@
 	</div>
 </div>
 
-
 <script>
 	(function(){
 		var cid="#control";

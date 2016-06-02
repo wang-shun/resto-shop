@@ -57,6 +57,7 @@ public class ModuleListController extends GenericController{
 	@RequestMapping("edit_share")
 	@ResponseBody
 	public Result editshare(ShareSetting setting){
+		setting.setBrandId(getCurrentBrandId());
 		shareSettingService.updateByBrandId(setting);
 		return getSuccessResult();
 	}

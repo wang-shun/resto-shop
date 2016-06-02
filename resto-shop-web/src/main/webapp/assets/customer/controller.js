@@ -175,20 +175,10 @@ var Controller = function(controlId,datatable){
 			formDialog.showModal();
 			handlerDatePicker();
 			var formNode = $(formDialog.node);
-			console.log(formNode);
 			formNode.find("select").each(function(){
 				var defaultData = $(this).data("selected");
 				defaultData&&$(this).val(defaultData).trigger("change");
 			});
-			if(formNode.find(".ueditor-textarea").length>0&&UE){
-				formDialog.UE = [];
-				formNode.find(".ueditor-textarea").each(function(){
-					var randomId = "ueditor_id_"+new Date().getTime();
-					$(this).attr("id",randomId);
-					var ue = UE.getEditor(randomId);
-					formDialog.UE.push(ue);
-				})
-			}
 			formDialog.button([{
 				value:"关闭",
 				callback:function(){}
