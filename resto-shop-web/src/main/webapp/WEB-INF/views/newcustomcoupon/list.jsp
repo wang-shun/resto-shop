@@ -417,16 +417,21 @@
 								save:function(e){
 									var that = this;
 										var formDom = e.target;
-										if(this.m.beginDateTime>this.m.endDateTime){
-											toastr.error("优惠券开始时间不能大于结束时间");
-										}else if(this.m.beginTime>this.m.endTime){
-											toastr.error("开始时间不能大于结束时间");
-										}else{
-											C.ajaxFormEx(formDom,function(){
-												that.cancel();
-												tb.ajax.reload();
-											});
-										}
+// 										if(this.m.beginDateTime>this.m.endDateTime){
+// 											toastr.error("优惠券开始时间不能大于结束时间");
+// 										}else if(this.m.beginTime>this.m.endTime){
+// 											toastr.error("开始时间不能大于结束时间");
+// 										}else{
+// 											C.ajaxFormEx(formDom,function(){
+// 												that.cancel();
+// 												tb.ajax.reload();
+// 											});
+// 										}
+								C.ajaxFormEx(formDom,function(){
+ 												that.cancel();
+ 												tb.ajax.reload();
+								});
+								
 										
 								},
 								initdistributionMode :function(){
