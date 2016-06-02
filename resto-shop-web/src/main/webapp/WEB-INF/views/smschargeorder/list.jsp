@@ -56,12 +56,17 @@ dt, dd {
 								</div>
 								<div class="form-group">
 									<label class="col-sm-3 control-label">充值金额：</label>
-									<div class="col-sm-8">
+									<div class="col-sm-4">
 										<div class="input-group">
 											<input type="number" class="form-control" max="10000"
 												placeholder="请输入要充值的金额" required name="chargeMoney" min="100" v-model="chargeMoney">
-											<div class="input-group-addon">元</div>
+											<div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
 										</div>
+									</div>
+									<div class="col-sm-5 text-center">
+										<a class="btn btn-info" @click="changeMoney(500)">500</a>&nbsp;
+										<a class="btn btn-info" @click="changeMoney(1000)">1000</a>&nbsp;
+										<a class="btn btn-info" @click="changeMoney(2000)">2000</a>
 									</div>
 								</div>
 								<div class="form-group">
@@ -426,6 +431,9 @@ dt, dd {
 					$("#createChargeOrder").modal("hide");
 					tb.ajax.reload();
 				});
+			},
+			changeMoney : function(money){
+				this.chargeMoney = money; 
 			},
 			refresh : function(){
 				tb.ajax.reload();
