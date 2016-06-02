@@ -244,6 +244,11 @@ dt, dd {
 		var cid = "#control";
 		var $table = $(".table-body>table");
 		tb = $table.DataTable({
+			bAutoWidth: false,//禁止自适应列宽
+// 			aoColumnDefs: [
+// 				{"sWidth": "220px", "aTargets": [ 6 ]},
+// 				{"sWidth": "130px", "aTargets": [ 8 ]},
+//             ],
 			ajax : {
 				url : "smschargeorder/list_all",
 				dataSrc : "data"
@@ -349,6 +354,18 @@ dt, dd {
 							$(td).html(info);
 						}
 					} ],
+// 					bAutoWidth: false,
+// 					aoColumns: [                          //设定各列宽度   
+// 			            {"sWidth": "10%"},   
+// 			            {"sWidth": "10%"},   
+// 			            {"sWidth": "10%"},   
+// 			            {"sWidth": "10%"},   
+// 			            {"sWidth": "10%"},   
+// //		 	            {"sWidth": "10%"},   
+// //		 	            {"sWidth": "10%"},   
+// //		 	            {"sWidth": "10%"},
+// //		 	            {"sWidth": "10%"},
+// 				    ],
 		});
 	}());
 
