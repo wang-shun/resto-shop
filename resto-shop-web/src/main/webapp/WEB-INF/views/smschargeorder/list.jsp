@@ -109,6 +109,12 @@ dt, dd {
 				    <div role="tabpanel" class="tab-pane" id="bankPay">
 						<form  role="form" class="form-horizontal" action="smschargeorder/smsChargeByBank" @submit.prevent="saveBankOrder">
 <!-- 						<h3 class="bg-grey text-center">请确保转账金额大于一百元</h3><br/> -->
+						<div class="form-group">
+							<label class="col-sm-3 control-label">短信单价：</label>
+							<div class="col-sm-8">
+								<p class="form-control-static">{{brandInfo.smsUnitPrice}}&nbsp;元</p>
+							</div>
+						</div>
 						  <div class="form-group">
 								<label class="col-md-3 control-label">转账流水号：</label>
 								<div class="col-md-8">
