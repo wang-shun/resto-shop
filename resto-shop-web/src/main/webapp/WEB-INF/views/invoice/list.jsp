@@ -336,7 +336,7 @@ dt, dd {
 							<dd><span class='label' style='background-color: #3598dc'>普通发票</span></dd>
 							<dt>发票抬头：</dt>
 							<dd>{{smsticketInfo.header}}</dd>
-						</template >
+						</template>
 						<template v-else>
 							<dt>发票类型：</dt>
 							<dd><span class='label' style='background-color: #26c281'>增值税发票</span></dd>
