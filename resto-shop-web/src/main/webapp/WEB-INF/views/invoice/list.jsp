@@ -116,6 +116,7 @@ dt, dd {
 												<input type="text" class="form-control" required
 													name="header" v-model="invoice.header">
 											</div>
+											<a class="col-sm-1 btn btn-sm btn-danger" @click="cleanLastInvoice" v-if="invoice.id">清空</a>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">纳税人识别码：</label>
@@ -176,7 +177,7 @@ dt, dd {
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">收件地址：</label>
 											<div class="col-sm-8">
-												<select class="bs-select form-control" name="consigneceId" v-model="consigneceId">
+												<select class="bs-select form-control" name="consigneceId" required v-model="consigneceId">
 													<option v-for="item in addressInfo" value="{{item.id}}">{{item.address}}</option>
 												</select>
 												<input type="hidden" type="text" name="address" v-model="currentAddress.address"/>
@@ -208,12 +209,9 @@ dt, dd {
 											</div>
 										</div>
 										<input type="hidden" name="type" value="2" />
-										<div  class="row" v-if="invoiceMoney>=100">
-											<div class="col-sm-3 text-center"><a class="btn btn-danger" @click="cleanLastInvoice">清空表单</a></div>
-											<div class="col-sm-6 text-center">
+										<div class="text-center" v-if="invoiceMoney>=100">
 												<a class="btn default" data-dismiss="modal">取消</a> <input
 													class="btn green" type="submit" value="申请"/>
-											</div>
 										</div>
 										<div class="text-center" v-else>
 											<a class="btn red" data-dismiss="modal">当前可开发票金额不足100元，无法申请发票</a>
@@ -267,7 +265,7 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="phone" v-model="currentAddress.phone">
+											<input type="number" class="form-control" size="11" required name="phone" v-model="currentAddress.phone">
 										</div>
 									</div>
 									<div class="row">
@@ -298,7 +296,7 @@ dt, dd {
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">联系电话：</label>
 									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="phone">
+										<input type="number" size="11" class="form-control" required name="phone">
 									</div>
 								</div>
 								<div class="text-center">
@@ -316,8 +314,8 @@ dt, dd {
 	<!-- 编辑地址 	end-->
 	
 	
-	<!-- 增值发票详情   begin -->
-	<div class="modal fade" id="consigneeModal" tabindex="-1" role="dialog"
+	<!-- 发票详情   begin -->
+	<div class="modal fade" id="detailInvoiceModal" tabindex="-1" role="dialog"
 		aria-labelledby="consigneeModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -325,53 +323,44 @@ dt, dd {
 					<button type="button" class="close" data-dismiss="modal"
 						aria-hidden="true">&times;</button>
 					<h4 class="modal-title text-center">
-						<strong>增值发票详情</strong>
+						<strong>发票详情</strong>
 					</h4>
 				</div>
 				<div class="modal-body">
 					<dl class="dl-horizontal">
-						<dt>单位名称：</dt>
-						<dd>{{smsticketInfo.header}}</dd>
-						<dt>纳税人识别码：</dt>
-						<dd>{{smsticketInfo.taxpayerCode}}</dd>
-						<dt>注册地址：</dt>
-						<dd>{{smsticketInfo.registeredAddress}}</dd>
-						<dt>注册电话：</dt>
-						<dd>{{smsticketInfo.registeredPhone}}</dd>
-						<dt>开户银行：</dt>
-						<dd>{{smsticketInfo.bankName}}</dd>
-						<dt>银行账户：</dt>
-						<dd>{{smsticketInfo.bankAccount}}</dd>
-						<dt>收件人姓名：</dt>
-						<dd>{{smsticketInfo.name}}</dd>
-						<dt>收件人电话：</dt>
-						<dd>{{smsticketInfo.phone}}</dd>
-						<dt>收件人地址：</dt>
-						<dd>{{smsticketInfo.address}}</dd>
+						<template v-if="smsticketInfo.type==1">
+							<dt>发票类型：</dt>
+							<dd><span class='label' style='background-color: #3598dc'>普通发票</span></dd>
+							<dt>发票抬头：</dt>
+							<dd>{{smsticketInfo.header}}</dd>
+						</template >
+						<template v-else>
+							<dt>发票类型：</dt>
+							<dd><span class='label' style='background-color: #26c281'>增值税发票</span></dd>
+							<dt>单位名称：</dt>
+							<dd>{{smsticketInfo.header}}</dd>
+							<dt>纳税人识别码：</dt>
+							<dd>{{smsticketInfo.taxpayerCode}}</dd>
+							<dt>注册地址：</dt>
+							<dd>{{smsticketInfo.registeredAddress}}</dd>
+							<dt>注册电话：</dt>
+							<dd>{{smsticketInfo.registeredPhone}}</dd>
+							<dt>开户银行：</dt>
+							<dd>{{smsticketInfo.bankName}}</dd>
+							<dt>银行账户：</dt>
+							<dd>{{smsticketInfo.bankAccount}}</dd>
+						</template>
+						<dt>发票金额：</dt>
+						<dd>{{smsticketInfo.money}}&nbsp;元</dd>
+						<dt>申请时间：</dt>
+						<dd>{{smsticketInfo.createTime}}</dd>
+						<dt>完成时间：</dt>
+						<dd>{{smsticketInfo.pushTime?smsticketInfo.pushTime:'审核中'}}</dd>
+						<dt>订单备注：</dt>
+						<dd>{{smsticketInfo.remark ? smsticketInfo.remark : '无'}}</dd>
 					</dl>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">关闭
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- 增值发票详情   end -->
-	
-	<!-- 普通发票详情   begin-->
-	<div class="modal fade" id="generalModal" tabindex="-1" role="dialog"
-		aria-labelledby="generalModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-hidden="true">&times;</button>
-					<h4 class="modal-title text-center">
-						<strong> 普通发票详情</strong>
-					</h4>
-				</div>
-				<div class="modal-body">
+					<hr/>
+					<h4 class="text-center"><strong>收件人信息</strong></h4>
 					<dl class="dl-horizontal">
 						<dt>收件人姓名：</dt>
 						<dd>{{smsticketInfo.name}}</dd>
@@ -388,7 +377,7 @@ dt, dd {
 			</div>
 		</div>
 	</div>
-	<!-- 普通发票详情   end -->
+	<!-- 发票详情   end -->
 	
 	<div class="table-div">
 		<div class="table-operator">
@@ -401,7 +390,7 @@ dt, dd {
 		<div class="clearfix"></div>
 		<div class="table-filter">&nbsp;</div>
 		<div class="table-body">
-			<table class="table table-striped table-hover table-bordered "></table>
+			<table class="table table-striped table-hover table-bordered " ></table>
 		</div>
 	</div>
 </div>
@@ -430,10 +419,6 @@ dt, dd {
 					data : "money",
 				},
 				{
-					title : "备注",
-					data : "remark",
-				},
-				{
 					title : "快递单号",
 					data : "expersage",
 					createdCell : function(td, tdData) {
@@ -444,48 +429,24 @@ dt, dd {
 					title : "发票类型",
 					data : "type",
 					createdCell : function(td, tdData) {
-						$(td).html(tdData == 1 ? "普通发票": "增值税发票");
-					}
-				},
-				{
-					title : "申请时间",
-					data : "createTime",
-					createdCell : function(td, tdData) {
-						$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
-					}
-				},
-				{
-					title : "完成时间",
-					data : "pushTime",
-					createdCell : function(td, tdData) {
-						$(td).html(tdData != null ? new Date(tdData).format("yyyy-MM-dd hh:mm:ss"): "未完成")
+						$(td).html(tdData == 1 ? "<span class='label' style='background-color: #3598dc'>普通发票</span>": "<span class='label' style='background-color: #26c281'>增值税发票</span>");
 					}
 				},
 				{
 					title : "状态",
 					data : "ticketStatus",
 					createdCell : function(td, tdData) {
-						$(td).html(tdData == 0 ? "申请中": "已完成");
+						$(td).html(tdData == 0 ? "<span class='label label-default'>申请中</span>": "<span class='label label-success'>已完成</label>");
 					}
 				},
 				{
 					title : "操作",
 					data : "id",
 					createdCell : function(td, tdData,rowData) {
-						var info = [];
-						if (rowData.type == 2) {
-							var btn = createBtn("查看详情",function() {
-								vueObj.showDetailInfo(rowData);
-								$("#consigneeModal").modal();
-							})
-						} else if (rowData.type == 1) {
-							var btn = createBtn("查看详情",function() {
-								vueObj.showDetailInfo(rowData);
-								$("#generalModal").modal();
-							})
-						}
-						info.push(btn);
-						$(td).html(info);
+						var btn = createBtn("查看详情",function() {
+							vueObj.showDetailInfo(rowData);
+						})
+						$(td).html(btn);
 						if(rowData.type==2 && vueObj.invoice.id== null){
 							vueObj.invoice=rowData;
 						}
@@ -508,8 +469,11 @@ dt, dd {
 			methods : {
 				create : function() {
 				},
-				showDetailInfo : function(smsticketInfo) {
-					this.smsticketInfo = smsticketInfo;
+				showDetailInfo : function(rowData) {
+					rowData.createTime = this.formatDate(rowData.createTime);
+					rowData.pushTime = this.formatDate(rowData.pushTime);
+					this.smsticketInfo = rowData;
+					$("#detailInvoiceModal").modal();
 				},
 				refresh : function() {
 					$("#addressInfoModal").modal("hide");
@@ -518,6 +482,14 @@ dt, dd {
 				cancel:function(){
 					$("#applyInvoice").modal("hide");
 					$("form")[0].reset();
+				},
+				formatDate : function(date){
+					var temp = "";
+					if (date != null && date != "") {
+						temp = new Date(date);
+						temp = temp.format("yyyy-MM-dd hh:mm:ss");
+					}
+					return temp;
 				},
 				addressSave:function(e){
 					var that = this;
@@ -549,9 +521,7 @@ dt, dd {
 				queryInvoiceMoney : function(){
 					var that=this;
 					$.post("smschargeorder/selectInvoiceMoney",function(result){
-						if(result.data!=null&&result.data!=""){
-							that.invoiceMoney = result.data;
-						}
+						that.invoiceMoney = result.data;
 					})
 				},
 				cleanLastInvoice : function(){
@@ -606,12 +576,9 @@ dt, dd {
 			return $('<input />', {
 				value : btnValue,
 				type : "button",
-				class : "btn btn-sm btn-primary",
+				class : "btn btn-sm btn-info",
 				click : btnfunction
 			})
 		}
-
 	});
-
-	
 </script>
