@@ -8,10 +8,9 @@ dt, dd {
 </style>
 
 <div id="control">
-
 	<!-- 申请发票	begin -->
 	<div class="modal fade" id="applyInvoice" tabindex="-1" role="dialog"
-		aria-labelledby="myModlLabel">
+		aria-labelledby="myModlLabel" @click="removeValidated">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -84,11 +83,12 @@ dt, dd {
 												name="name" v-model="currentAddress.name">
 										</div>
 									</div>
-									<div class="form-group">
+									<div class="form-group" :class="{'has-error':validated.invoice_create}">
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
 												name="phone" v-model="currentAddress.phone">
+											<span class="help-block text-danger" v-if="validated.invoice_create">请输入有效联系电话！</span>
 										</div>
 									</div>
 									<div class="form-group">
@@ -195,11 +195,12 @@ dt, dd {
 													name="name" v-model="currentAddress.name">
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group" :class="{'has-error':validated.invoice_create}">
 											<label for="header" class="col-sm-3 control-label">联系电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
 													name="phone" v-model="currentAddress.phone">
+												<span class="help-block text-danger" v-if="validated.invoice_create">请输入有效联系电话！</span>
 											</div>
 										</div>
 										<div class="form-group">
@@ -227,9 +228,9 @@ dt, dd {
 	</div>
 	<!-- 申请发票	end -->
 	
-	<!-- 编辑地址 	begin-->
+	<!-- 地址管理 	begin-->
 	<div class="modal fade" id="addressInfoModal" tabindex="-1"
-		role="dialog" aria-labelledby="addressInfoModal">
+		role="dialog" aria-labelledby="addressInfoModal" @click="removeValidated">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -262,10 +263,11 @@ dt, dd {
 											<input type="text" class="form-control" required name="name" v-model="currentAddress.name">
 										</div>
 									</div>
-									<div class="form-group">
+									<div class="form-group" :class="{'has-error':validated.addressinfo_modify}">
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
-											<input type="number" class="form-control" size="11" required name="phone" v-model="currentAddress.phone">
+											<input type="text" class="form-control" required name="phone" v-model="currentAddress.phone">
+											<span class="help-block text-danger" v-if="validated.addressinfo_modify">请输入有效联系电话！</span>
 										</div>
 									</div>
 									<div class="row">
@@ -293,10 +295,11 @@ dt, dd {
 										<input type="text" class="form-control" required name="name">
 									</div>
 								</div>
-								<div class="form-group">
+								<div class="form-group" :class="{'has-error':validated.addressinfo_create}"> 
 									<label for="header" class="col-sm-3 control-label">联系电话：</label>
 									<div class="col-sm-8">
-										<input type="number" size="11" class="form-control" required name="phone">
+										<input type="text" class="form-control" required name="phone">
+										<span class="help-block text-danger" v-if="validated.addressinfo_create">请输入有效联系电话！</span>
 									</div>
 								</div>
 								<div class="text-center">
@@ -311,7 +314,7 @@ dt, dd {
 			</div>
 		</div>
 	</div>
-	<!-- 编辑地址 	end-->
+	<!-- 地址管理	end-->
 	
 	
 	<!-- 发票详情   begin -->
@@ -394,7 +397,6 @@ dt, dd {
 		</div>
 	</div>
 </div>
-
 <script>
 	$(document).ready(function() {
 	//载入 表格数据
@@ -464,70 +466,35 @@ dt, dd {
 				addressInfo:[],//保存当前品牌的所有地址
 				currentAddress:{},//当前选中的地址信息
 				consigneceId:"",//当前选中的地址的id
-				invoiceMoney:0//当前品牌可开发票的最大金额
+				invoiceMoney:0,//当前品牌可开发票的最大金额
+				validated:{}//手机号码验证
 			},
 			methods : {
-				create : function() {
-				},
-				showDetailInfo : function(rowData) {
-					rowData.createTime = this.formatDate(rowData.createTime);
-					rowData.pushTime = this.formatDate(rowData.pushTime);
-					this.smsticketInfo = rowData;
-					$("#detailInvoiceModal").modal();
-				},
-				refresh : function() {
-					$("#addressInfoModal").modal("hide");
-					this.queryAddress();
-				},
-				cancel:function(){
-					$("#applyInvoice").modal("hide");
-					$("form")[0].reset();
-				},
-				formatDate : function(date){
-					var temp = "";
-					if (date != null && date != "") {
-						temp = new Date(date);
-						temp = temp.format("yyyy-MM-dd hh:mm:ss");
+				addressSave:function(e){//保存地址
+					var that = this;
+					var formDom = e.target;
+					if(this.checkPhone(formDom)){
+						C.ajaxFormEx(formDom,function(){
+							$("#addressInfoModal").modal("hide");
+							that.queryAddress();
+							if($(formDom).attr('action').indexOf("create")>=0){
+								$(formDom)[0].reset();
+							}
+						});
 					}
-					return temp;
 				},
-				addressSave:function(e){
+				invoiceSave : function(e){//申请发票
 					var that = this;
 					var formDom = e.target;
-					C.ajaxFormEx(formDom,function(){
-						$("#addressInfoModal").modal("hide");
-						that.queryAddress();
-						if($(formDom).attr('action').indexOf("create")>=0){
-							$(formDom)[0].reset();
-						}
-					});
+					if(this.checkPhone(formDom)){
+						C.ajaxFormEx(formDom,function(){
+							$("#applyInvoice").modal("hide");
+							that.queryInvoiceMoney();
+							tb.ajax.reload();
+						});
+					}
 				},
-				invoiceSave : function(e){
-					var that = this;
-					var formDom = e.target;
-					C.ajaxFormEx(formDom,function(){
-						$("#applyInvoice").modal("hide");
-						that.queryInvoiceMoney();
-						tb.ajax.reload();
-					});
-				},
-				queryAddress : function(){
-					var that=this;
-					$.post("addressinfo/list_all",function(result){
-						that.addressInfo = result.data;
-						that.consigneceId = result.data!=""?result.data[0].id:"";
-					})
-				},
-				queryInvoiceMoney : function(){
-					var that=this;
-					$.post("smschargeorder/selectInvoiceMoney",function(result){
-						that.invoiceMoney = result.data;
-					})
-				},
-				cleanLastInvoice : function(){
-					this.invoice = {};
-				},
-				addressDelete : function(){
+				addressDelete : function(){//删除地址
 					var that = this;
 					$.post("addressinfo/delete",{"id":this.consigneceId},function(result){
 						if(result){
@@ -539,25 +506,65 @@ dt, dd {
 						}
 					})
 				},
-				addressUpdate : function(e){
-					var that = this;
-					$.post("addressinfo/modify",$(e.target).serialize(),function(result){
-						if(result){
-							$("#addressInfoModal").modal("hide");
-							that.queryAddress();
-							C.simpleMsg("添加成功！");
-						}else{
-							C.errorMsg("添加失败！");
-						}
+				showDetailInfo : function(rowData) {//显示详情
+					rowData.createTime = this.formatDate(rowData.createTime);
+					rowData.pushTime = this.formatDate(rowData.pushTime);
+					this.smsticketInfo = rowData;
+					$("#detailInvoiceModal").modal();
+				},
+				formatDate : function(date){//格式化时间
+					var temp = "";
+					if (date != null && date != "") {
+						temp = new Date(date);
+						temp = temp.format("yyyy-MM-dd hh:mm:ss");
+					}
+					return temp;
+				},
+				queryAddress : function(){//查询地址信息
+					var that=this;
+					$.post("addressinfo/list_all",function(result){
+						that.addressInfo = result.data;
+						that.consigneceId = result.data!=""?result.data[0].id:"";
 					})
-				}
+				},
+				queryInvoiceMoney : function(){//查询可申请金额
+					var that=this;
+					$.post("smschargeorder/selectInvoiceMoney",function(result){
+						that.invoiceMoney = result.data;
+					})
+				},
+				cleanLastInvoice : function(){//清空表单
+					this.invoice = {};
+				},
+				removeValidated : function(){//移除验证的消息
+					 this.validated = {};
+				},
+				checkPhone : function(dom){
+					var phone = dom.phone.value;
+					var teleReg = /^((0\d{2,3})-)(\d{7,8})$/;  
+				    var mobileReg =/^1[358]\d{9}$/;   
+				    if (!teleReg.test(phone) && !mobileReg.test(phone)){
+				    	var src = $(dom).attr('action');
+				    	var m = {};    
+				    	if(src == "addressinfo/create"){
+				    		m.addressinfo_create = true;
+				    	}else if(src == "invoice/create"){
+				    		m.invoice_create = true;
+				    	}else if(src == "addressinfo/modify"){
+				    		m.addressinfo_modify = true;
+				    	}
+				    	this.validated = m;
+				    	return false;
+				    }
+				    return true;
+				},
 			},
-			created : function(){
+			created : function(){//创建时初始化信息
 				this.queryAddress();
 				this.queryInvoiceMoney();
 			},
 			 watch: {
-				 consigneceId: function(val) {
+				 consigneceId: function(val) {//自动切换对应地址信息
 					 var that = this;
 					 if(this.addressInfo!=null&&this.addressInfo.length>0){
 						 $(this.addressInfo).each(function(i,item){

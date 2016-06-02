@@ -32,8 +32,6 @@
 								<dd>${returnParams.subject }</dd>
 								<dt>充值金额：</dt>
 								<dd>${returnParams.total_fee}</dd>
-								<dt>付款时间：</dt>
-								<dd>${returnParams.gmt_payment}</dd>
 								<dt>订单状态：</dt>
 								<dd id="successStatus"></dd>
 							</dl>
