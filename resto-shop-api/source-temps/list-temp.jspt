@@ -58,7 +58,7 @@
 							<s:hasPermission name="{{modelNameLower}}/delete">
 							C.createDelBtn(tdData,"{{modelNameLower}}/delete"),
 							</s:hasPermission>
-							<s:hasPermission name="{{modelNameLower}}/edit">
+							<s:hasPermission name="{{modelNameLower}}/modify">
 							C.createEditBtn(rowData),
 							</s:hasPermission>
 						];

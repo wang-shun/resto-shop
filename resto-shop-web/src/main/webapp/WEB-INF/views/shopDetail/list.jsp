@@ -3,64 +3,62 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 
 <div id="control">
-	<div class="row form-div">
-		<div class="col-md-offset-3 col-md-6">
-			<div class="portlet light bordered">
-				<div class="portlet-title">
-					<div class="caption">
-						<span class="caption-subject bold font-blue-hoki"> 表单</span>
-					</div>
+	<div class="col-md-offset-3 col-md-6">
+		<div class="portlet light bordered">
+			<div class="portlet-title">
+				<div class="caption">
+					<span class="caption-subject bold font-blue-hoki"> 表单</span>
 				</div>
-				<div class="portlet-body">
-					<form role="form" action="{{'shopdetail/modify'}}" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-								<label>店铺名称</label> 
-								<input type="text" class="form-control" name="name" :value="m.name" placeholder="必填" required="required">
-							</div>
-							<div class="form-group">
-								<label>店铺电话</label> 
-								<input type="text" class="form-control" name="phone" :value="m.phone">
-							</div>
-							<div class="form-group">
-								<label>店铺地址</label> 
-								<input type="text" class="form-control" name="address" :value="m.address" @blur="showjwd" placeholder="必填" required="required">
-							</div>
-							<div class="form-group">
-								<label>经度</label> 
-								<input type="text" class="form-control" name="longitude" :value="m.longitude">
-							</div>
-							<div class="form-group">
-								<label>纬度</label> 
-								<input type="text" class="form-control" name="latitude" :value="m.latitude">
-							</div>
-							<div class="form-group">
-                                       <labe>营业时间</label>
-                                          <div class="input-group">
-                                        <input type="text" class="form-control timepicker timepicker-no-seconds" name="openTime" @focus="initTime" :value="m.openTime" readonly="readonly">
-                                        <span class="input-group-btn">
-                                            <button class="btn default" type="button">
-                                                <i class="fa fa-clock-o"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                            </div>
-							<div class="form-group">
-                                       <labe>关门时间</label>
-                                          <div class="input-group">
-                                        <input type="text" class="form-control timepicker timepicker-no-seconds" name="closeTime" :value="m.closeTime" @focus="initTime" readonly="readonly">
-                                        <span class="input-group-btn">
-                                            <button class="btn default" type="button">
-                                                <i class="fa fa-clock-o"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-                             </div>
+			</div>
+			<div class="portlet-body">
+				<form role="form" action="{{'shopdetail/modify'}}" @submit.prevent="save">
+					<div class="form-body">
+						<div class="form-group">
+							<label>店铺名称</label> 
+							<input type="text" class="form-control" name="name" :value="m.name" placeholder="必填" required="required">
 						</div>
-						<input class="btn green" type="submit" value="保存" /> 
-						<a class="btn default" @click="cancel">取消</a>
-					</form>
-				</div>
+						<div class="form-group">
+							<label>店铺电话</label> 
+							<input type="text" class="form-control" name="phone" :value="m.phone">
+						</div>
+						<div class="form-group">
+							<label>店铺地址</label> 
+							<input type="text" class="form-control" name="address" :value="m.address" @blur="showjwd" placeholder="必填" required="required">
+						</div>
+						<div class="form-group">
+							<label>经度</label> 
+							<input type="text" class="form-control" name="longitude" :value="m.longitude">
+						</div>
+						<div class="form-group">
+							<label>纬度</label> 
+							<input type="text" class="form-control" name="latitude" :value="m.latitude">
+						</div>
+						<div class="form-group">
+                                      <labe>营业时间</label>
+                                         <div class="input-group">
+                                       <input type="text" class="form-control timepicker timepicker-no-seconds" name="openTime" @focus="initTime" :value="m.openTime" readonly="readonly">
+                                       <span class="input-group-btn">
+                                           <button class="btn default" type="button">
+                                               <i class="fa fa-clock-o"></i>
+                                           </button>
+                                       </span>
+                                   </div>
+                           </div>
+						<div class="form-group">
+                                      <labe>关门时间</label>
+                                         <div class="input-group">
+                                       <input type="text" class="form-control timepicker timepicker-no-seconds" name="closeTime" :value="m.closeTime" @focus="initTime" readonly="readonly">
+                                       <span class="input-group-btn">
+                                           <button class="btn default" type="button">
+                                               <i class="fa fa-clock-o"></i>
+                                           </button>
+                                       </span>
+                                   </div>
+                            </div>
+					</div>
+					<input class="btn green" type="submit" value="保存" /> 
+					<a class="btn default" @click="cancel">取消</a>
+				</form>
 			</div>
 		</div>
 	</div>

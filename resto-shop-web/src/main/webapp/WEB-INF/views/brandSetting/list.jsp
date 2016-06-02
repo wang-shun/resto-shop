@@ -2,8 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 
-<div id="control">
-	<div class="row form-div">
+<div id="control" class="row">
 		<div class="col-md-offset-3 col-md-6">
 			<div class="portlet light bordered">
 				<div class="portlet-title">
@@ -100,7 +99,6 @@
 				</div>
 			</div>
 		</div>
-	</div>
 </div>
 
 <script>
