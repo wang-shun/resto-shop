@@ -59,12 +59,12 @@
 		    <label for="inputPassword3" class="col-sm-2 control-label">店铺列表：</label>
 		    <div class="col-sm-10">
 		    	<label class="checkbox-inline" v-for="shop in shops">
-				  <input type="checkbox" name="shopId"  value="{{shop.id}}"> {{shop.name}}
+				  <input type="checkbox" name="shopId"  value="{{shop.id}}" > {{shop.name}}
 				</label>
 		    </div>
 		  </div>
 		  		<div class="col-md-6">
-		  			<button type="button" class="btn btn-primary btn-sm btn-block" id="querySms">查询</button>
+		  			<button type="button" class="btn btn-primary btn-sm btn-block" @click="querySms">查询</button>
 		  		</div>
 		</form>
 		
@@ -105,11 +105,6 @@
 			}
 		})
 		
-// 		//时间插件
-
-// 		//时间默认值
-// 		$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-
       	var cid = "#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
@@ -117,11 +112,19 @@
 				url : "smsloginfo/listByShopAndDate",
 				dataSrc : "",
 				type : "POST",
-// 				data : function(d) {
-// 					d.begin = $("#beginDate").val();
-// 					d.end = $("#endDate").val();
-// 					return d;
-// 				},
+				data : function(d) {
+					d.begin = $("#beginDate").val();
+					d.end = $("#endDate").val();
+					var temp="";
+					 $(":checkbox[name='shopId']:checked").each(
+							function() {
+ 								if($(this).attr("checked")){
+ 									temp += $(this).val()+","
+								}
+						})
+					d.shopIds=temp;
+					return d;
+				},
 			},
 			columns : [ {
 				title : "手机号",
@@ -151,7 +154,9 @@
 		var vueObj = new Vue({
 			el:"#control",
 			mixins:[C.formVueMix],
-			data:{},
+			data:{
+				shops:{}
+			},
 			methods:{
 				initTime : function(){
 					$('.form_datetime').datetimepicker({
@@ -170,11 +175,31 @@
 					$.ajax({
 						url:"smsloginfo/shopName",
 						success:function(data){
-								s.shops = data;
+								vueObj.shops = data;
 						}
 					})
 					
 				},
+				querySms : function(){
+					var begin = $("#beginDate").val();
+					var end = $("#endDate").val();
+					//判断时间是否合法
+					if(begin>end){
+						toastr.error("开始时间不能大于结束时间");
+						return ;
+					}
+					//检验是否选择了店铺
+					var checkboxes =$("input[type='checkbox']");
+					if(!checkboxes.is(":checked")){
+						toastr.error("请至少选择一个店铺");
+						return ;
+					}
+					tb.ajax.reload();
+				},
+				checked:function(){
+					$("[name='shopId']").attr("checked","checked");
+				}
+				
 			},
 			
 // 			vue实例化之后执行的方法
@@ -184,23 +209,11 @@
 				$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 				this.initTime();
 				this.initShopName();
+				//默认选中所有的店铺
+				this.checked();
 			},
 			
 		});
 		C.vue=vueObj;
-		
-
-		//查询
-// 				$("#querySms").click(function(){
-// 					var begin = $("#beginDate").val();
-// 					var end = $("#endDate").val();
-// 					//判断时间是否合法
-// 					if(begin>end){
-// 						toastr.error("开始时间不能大于结束时间");
-// 						return ;
-// 					}
-// 					$("#smsForm").serialize();
-// 					tb.ajax.reload();
-// 				})
 	})
 </script>
