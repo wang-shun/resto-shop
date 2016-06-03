@@ -8,15 +8,16 @@
 		</div>
 		<div class="form-group">
 		    <label>分享图标</label>
-		    <input type="text" class="form-control" name="shareIcon" v-model="m.shareIcon">
+		    <input type="hidden" class="form-control" name="shareIcon" v-model="m.shareIcon">
+		    <img-file-upload class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 		</div>
 		<div class="form-group">
 		    <label>最低分享分数</label>
-		    <input type="text" class="form-control" name="minLevel" v-model="m.minLevel">
+		    <input type="number" min="1" max="5" class="form-control" name="minLevel" v-model="m.minLevel">
 		</div>
 		<div class="form-group">
 		    <label>最少分享字数</label>
-		    <input type="text" class="form-control" name="minLength" v-model="m.minLength">
+		    <input type="number" class="form-control" name="minLength" v-model="m.minLength">
 		</div>
 		<div class="form-group">
 		    <label>返利(%)</label>
@@ -48,6 +49,15 @@
 		el:"#share-form",
 		data:{
 			m:{},
+		},
+		methods:{
+			uploadSuccess:function(url){
+				this.m.shareIcon = url;
+				toastr.success("上传图标成功");
+			},
+			uploadError:function(){
+				toastr.error("上传失败");
+			}
 		},
 		created:function(){
 			var that = this;
