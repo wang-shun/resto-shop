@@ -425,6 +425,7 @@ dt, dd {
 				this.chargeMoney = money; 
 			},
 			refresh : function(){
+				this.getbrandInfo();
 				tb.ajax.reload();
 			}
 		},
