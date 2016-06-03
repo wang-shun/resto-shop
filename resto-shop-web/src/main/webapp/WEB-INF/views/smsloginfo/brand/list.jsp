@@ -108,6 +108,7 @@
       	var cid = "#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
+			"order": [[ 3, 'desc' ]],
 			ajax : {
 				url : "smsloginfo/listByShopAndDate",
 				dataSrc : "",
@@ -140,12 +141,15 @@
 				title : "创建时间",
 				data : "createTime",
 				createdCell : function(td, tdData) {
-					$(td).html(new Date().format("yyyy-mm-dd hh:ss"));
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:ss"));
 				}
 			},
 			{
 				title : "是否成功",
 				data : "isSuccess",
+				createdCell : function(td,tdData){
+					$(td).html(tdData==1?'是':'否')			
+				}
 			} ]
 
 		})

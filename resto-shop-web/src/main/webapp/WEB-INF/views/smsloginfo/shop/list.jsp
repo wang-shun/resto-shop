@@ -55,18 +55,14 @@
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button type="button" id="querySms" class="btn btn-primary">查询短信记录</button>
+					<button type="button" id="querySms" class="btn btn-primary" @click="querySms">查询短信记录</button>
 				</div>
 			</div>
-
 		</form>
-		
-		
 	</div>
 </div>
 <br />
 <br />
-	
 <!-- datatable开始 -->
 <div class="panel panel-default">
 	<div class="panel-heading">短信记录详情</div>
@@ -80,7 +76,6 @@
 <!-- datatable结束 -->
 </div>
 <!-- vue对象结束 -->
-
 
 <!-- <!-- 日期框 -->
 <script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
@@ -99,23 +94,19 @@
 			}
 		})
 		
-// 		//时间插件
-
-// 		//时间默认值
-// 		$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-
       	var cid = "#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
+			"order": [[ 3, 'desc' ]],
 			ajax : {
 				url : "smsloginfo/listByShopAndDate",
 				dataSrc : "",
 				type : "POST",
-// 				data : function(d) {
-// 					d.begin = $("#beginDate").val();
-// 					d.end = $("#endDate").val();
-// 					return d;
-// 				},
+				data : function(d) {
+					d.begin = $("#beginDate").val();
+					d.end = $("#endDate").val();
+					return d;
+				},
 			},
 			columns : [ {
 				title : "手机号",
@@ -131,12 +122,16 @@
 				title : "创建时间",
 				data : "createTime",
 				createdCell : function(td, tdData) {
-					$(td).html(new Date().format("yyyy-mm-dd hh:ss"));
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:ss"));
 				}
 			},
 			{
 				title : "是否成功",
 				data : "isSuccess",
+				createdCell : function(td,tdData){
+					$(td).html(tdData==1?'是':'否')					
+				}
+				
 			} ]
 
 		})
@@ -164,11 +159,24 @@
 					$.ajax({
 						url:"smsloginfo/shopName",
 						success:function(data){
-								s.shops = data;
+								vueObj.shops = data;
 						}
 					})
 					
 				},
+				querySms: function(){
+						var begin = $("#beginDate").val();
+						var end = $("#endDate").val();
+						//判断时间是否合法
+						if(begin>end){
+							toastr.error("开始时间不能大于结束时间");
+							return ;
+						}
+						$("#smsForm").serialize();
+						tb.ajax.reload();
+					
+				}
+				
 			},
 			
 // 			vue实例化之后执行的方法
@@ -182,19 +190,6 @@
 			
 		});
 		C.vue=vueObj;
-		
-
-		//查询
-// 				$("#querySms").click(function(){
-// 					var begin = $("#beginDate").val();
-// 					var end = $("#endDate").val();
-// 					//判断时间是否合法
-// 					if(begin>end){
-// 						toastr.error("开始时间不能大于结束时间");
-// 						return ;
-// 					}
-// 					$("#smsForm").serialize();
-// 					tb.ajax.reload();
-// 				})
+				
 	})
 </script>
