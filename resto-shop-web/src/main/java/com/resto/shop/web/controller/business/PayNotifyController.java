@@ -49,8 +49,11 @@ public class PayNotifyController {
 				log.info("支付宝充值成功返回的参数为:"+resultMap);
 				boolean flag = smsChargeOrderService.checkSmsChargeOrder_AliPay(resultMap);
 				returnHtml = flag?"success":"fail";	//请不要修改或删除
+			}else{
+				smsChargeOrderService.saveResultParam(resultMap, "支付宝");//保存参数
 			}
 		}else{//验证失败
+			smsChargeOrderService.saveResultParam(resultMap, "支付宝");//保存参数
 			returnHtml = "fail";
 		}
 		//返回
@@ -102,6 +105,7 @@ public class PayNotifyController {
 					wxResult.put("return_msg", e.toString());
 				}
 			}else{
+				smsChargeOrderService.saveResultParam(resultMap, "微信支付");//保存参数
 				wxResult.put("return_msg", "签名失败");
 			}
 		}

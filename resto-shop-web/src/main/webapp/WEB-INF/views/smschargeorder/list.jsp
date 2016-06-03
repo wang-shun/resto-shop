@@ -10,8 +10,9 @@ dt, dd {
 <div id="control">
 <div class="table-div">
 	<div class="table-operator">
+		<button type="button" class="btn green-meadow" disabled> 短信余额：{{brandInfo.remainderNum}} 条 </button>&nbsp;&nbsp;&nbsp;
 		<s:hasPermission name="notice/add">
-			<button type="button" class="btn green " data-toggle="modal"
+			<button type="button" class="btn green" data-toggle="modal"
 				data-target="#createChargeOrder" id="btn_smsCharge" @click="showChargeBtn">短信充值</button>
 		</s:hasPermission>
 	</div>
@@ -365,18 +366,6 @@ dt, dd {
 							$(td).html(info);
 						}
 					} ],
-// 					bAutoWidth: false,
-// 					aoColumns: [                          //设定各列宽度   
-// 			            {"sWidth": "10%"},   
-// 			            {"sWidth": "10%"},   
-// 			            {"sWidth": "10%"},   
-// 			            {"sWidth": "10%"},   
-// 			            {"sWidth": "10%"},   
-// //		 	            {"sWidth": "10%"},   
-// //		 	            {"sWidth": "10%"},   
-// //		 	            {"sWidth": "10%"},
-// //		 	            {"sWidth": "10%"},
-// 				    ],
 		});
 	}());
 
