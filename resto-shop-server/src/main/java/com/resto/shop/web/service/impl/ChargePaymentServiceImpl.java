@@ -1,5 +1,7 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -22,6 +24,12 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
     @Override
     public GenericDao<ChargePayment, String> getDao() {
         return chargepaymentMapper;
-    } 
+    }
+
+	@Override
+	public List<ChargePayment> selectPayList() {
+		
+		return chargepaymentMapper.selectPayList();
+	} 
 
 }
