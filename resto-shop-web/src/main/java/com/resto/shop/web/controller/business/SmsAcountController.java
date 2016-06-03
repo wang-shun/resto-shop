@@ -29,4 +29,5 @@ public class SmsAcountController extends GenericController{
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(getCurrentBrandId());
 		return getSuccessResult(smsAcount);
 	}
+	
 }

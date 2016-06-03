@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.ShopDetailService;
@@ -40,16 +41,25 @@ public class SmsLogoInfoController extends GenericController{
 	SmsAcountService smsAcountService;
 	
 	
-	@RequestMapping("/list")
-    public ModelAndView list(){
-		ModelAndView mv = new ModelAndView();
-		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
-		SmsAcount smsAcount = smsAcountService.selectByBrandId(getCurrentBrandId());
-		mv.setViewName("smsloginfo/list");;
-		mv.addObject("shopDetails", shopDetails);
-		mv.addObject("smsAcount", smsAcount);
-		return mv;
+//	@RequestMapping("/brand/list")
+//    public ModelAndView list(){
+//		ModelAndView mv = new ModelAndView();
+//		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+//		SmsAcount smsAcount = smsAcountService.selectByBrandId(getCurrentBrandId());
+//		mv.setViewName("smsloginfo/brand/list");;
+//		mv.addObject("shopDetails", shopDetails);
+//		mv.addObject("smsAcount", smsAcount);
+//		return mv;
+//    }
+	
+	@RequestMapping("brand/list")
+    public void listBrand(){
     }
+	
+	@RequestMapping("shop/list")
+	public void listShop(){
+	}
+	
 	
 	/**
 	 * 查询店铺的名字
@@ -67,7 +77,20 @@ public class SmsLogoInfoController extends GenericController{
 	}
 	
 	/**
-	 * 根据时间和店铺id查询短信
+	 * 根据时间和页面传过来的店铺id查询短信
+	 * @param begin
+	 * @param end
+	 * @param shopIds
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/listByShopsAndDate")
+	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
+		return smsLogService.selectListWhere(begin,end,shopIds) ;
+	}
+	
+	/**
+	 * 根据时间和当前店铺id查询短信
 	 * @param begin
 	 * @param end
 	 * @param shopIds
@@ -75,8 +98,8 @@ public class SmsLogoInfoController extends GenericController{
 	 */
 	@ResponseBody
 	@RequestMapping("/listByShopAndDate")
-	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
-		return smsLogService.selectListWhere(begin,end,shopIds) ;
+	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end){
+		return smsLogService.selectListWhere(begin,end,getCurrentShopId()) ;
 	}
 	
 	@ResponseBody

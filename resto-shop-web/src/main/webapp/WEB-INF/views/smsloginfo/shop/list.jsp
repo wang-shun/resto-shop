@@ -8,6 +8,8 @@
 	<strong>短信记录</strong>
 </h2>
 <br />
+<!-- vue对象开始 -->
+<div id="control">
 <div class="row">
      <div class="col-md-4 col-md-offset-2">
          <div class="dashboard-stat blue">
@@ -16,7 +18,7 @@
              </div>
              <div class="details">
                  <div class="number">
-                <span data-counter="counterup" data-value="${smsAcount.usedNum}">${smsAcount.usedNum}</span>条
+                <span data-counter="counterup" id="isUsed"></span>条
                  </div>
                  <div class="desc"> 已经使用的短信数量 </div>
              </div>
@@ -29,14 +31,12 @@
              </div>
              <div class="details">
                  <div class="number">
-                     <span data-counter="counterup" data-value="smsAcount.remainderNum">${smsAcount.remainderNum}</span>条 </div>
+                     <span data-counter="counterup" id="remnant"></span>条 </div>
                  <div class="desc"> 剩余短信数量 </div>
              </div>
          </div>
      </div>
  </div>
-                    
-                    
                     
 <div class="row">
 	<div class="col-md-8 col-md-offset-2">
@@ -53,23 +53,6 @@
 						readonly="readonly">
 				</div>
 			</div>
-			<s:hasPermission name="smsloginfo/isBrand">
-			<div class="form-group">
-				<label for="choiceShop" class="col-sm-2 control-label">店铺选择</label>
-				<div class="col-sm-10" id="choiceShop">
-					<c:if test="${shopDetails}!=null">
-						<c:forEach items="${shopDetails}" var="item">
-							<label class='checkbox-inline'> <input type='checkbox'
-								name='shopIds' value="${item.id}" />${item.name}
-							</label>
-						</c:forEach>
-					</c:if>
-
-				</div>
-			</div>
-			</s:hasPermission>
-
-
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
 					<button type="button" id="querySms" class="btn btn-primary">查询短信记录</button>
@@ -83,6 +66,8 @@
 </div>
 <br />
 <br />
+	
+<!-- datatable开始 -->
 <div class="panel panel-default">
 	<div class="panel-heading">短信记录详情</div>
 	<div class="panel-body">
@@ -92,6 +77,10 @@
 		</div>
 	</div>
 </div>
+<!-- datatable结束 -->
+</div>
+<!-- vue对象结束 -->
+
 
 <!-- <!-- 日期框 -->
 <script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
@@ -100,61 +89,33 @@
 	
 <script>
 	$(function() {
-		//时间插件
-		$('.form_datetime').datetimepicker({
-			endDate : new Date(),
-			minView : "month",
-			maxView : "month",
-			autoclose : true,//选择后自动关闭时间选择器
-			todayBtn : true,//在底部显示 当天日期
-			todayHighlight : true,//高亮当前日期
-			format : "yyyy-mm-dd",
-			startView : "month",
-			language : "zh-CN"
-		});
-
-		//时间默认值
-		$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-
-		//查询店铺
-			$.ajax({
-					url : 'smsloginfo/shopName',
-					success : function(data) {
-						$(data).each(
-									function(i, shop) {
-										var str = "<label class='checkbox-inline'>"
-												+ "<input type='checkbox' name='shopName' value='"+shop.id+"'/>"
-												+ shop.name + "</label>";
-										$("#choiceShop").append(str);
-									})
-						//默认选择所有店铺
-						$(":checkbox[name='shopName']").prop("checked", true);
-					}
-				})
-		var $table = $(".table-body>table");
+		//查询品牌已使用短信和剩余短信
+		$.ajax({
+			url:"smsacount/selectSmsAcount",
+			success:function(result){
+				console.log(result);
+				$("#remnant").html(result.data.remainerAmcount);
+				$("#isUsed").html(result.data.usedAmcount);
+			}
+		})
 		
+// 		//时间插件
+
+// 		//时间默认值
+// 		$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
+
+      	var cid = "#control";
+		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
 			ajax : {
 				url : "smsloginfo/listByShopAndDate",
 				dataSrc : "",
 				type : "POST",
-				data : function(d) {
-					d.begin = $("#beginDate").val();
-					d.end = $("#endDate").val();
-					var temp="";
-					 $(":checkbox[name='shopName']:checked").each(
-							function() {
- 								if($(this).attr("checked")){
- 									temp += $(this).val()+","
-								}
-								temp += $(this).val()+",";
-								
-						})
-						d.shopIds=temp;
-					console.log(temp);
-					return d;
-				},
-
+// 				data : function(d) {
+// 					d.begin = $("#beginDate").val();
+// 					d.end = $("#endDate").val();
+// 					return d;
+// 				},
 			},
 			columns : [ {
 				title : "手机号",
@@ -166,41 +127,74 @@
 				title : "发送类型",
 				data : "smsLogTyPeName",
 			},
-
 			{
 				title : "创建时间",
 				data : "createTime",
 				createdCell : function(td, tdData) {
 					$(td).html(new Date().format("yyyy-mm-dd hh:ss"));
 				}
-
 			},
-
 			{
 				title : "是否成功",
 				data : "isSuccess",
 			} ]
 
 		})
+		
+		var C = new Controller(null,tb);
+		var vueObj = new Vue({
+			el:"#control",
+			mixins:[C.formVueMix],
+			data:{},
+			methods:{
+				initTime : function(){
+					$('.form_datetime').datetimepicker({
+						endDate : new Date(),
+						minView : "month",
+						maxView : "month",
+						autoclose : true,//选择后自动关闭时间选择器
+						todayBtn : true,//在底部显示 当天日期
+						todayHighlight : true,//高亮当前日期
+						format : "yyyy-mm-dd",
+						startView : "month",
+						language : "zh-CN"
+					});
+				},
+				initShopName : function(){
+					$.ajax({
+						url:"smsloginfo/shopName",
+						success:function(data){
+								s.shops = data;
+						}
+					})
+					
+				},
+			},
+			
+// 			vue实例化之后执行的方法
+			created : function(){
+				//初始化多选框按钮 和 时间插件
+				//时间默认值
+				$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
+				this.initTime();
+				this.initShopName();
+			},
+			
+		});
+		C.vue=vueObj;
+		
 
 		//查询
-				$("#querySms").click(function(){
-					var begin = $("#beginDate").val();
-					var end = $("#endDate").val();
-					//判断时间是否合法
-					if(begin>end){
-						toastr.error("开始时间不能大于结束时间");
-						return ;
-					}
-					//检验是否选择了店铺
-					var checkboxes =$("input[type='checkbox']");
-					if(!checkboxes.is(":checked")){
-						toastr.error("请至少选择一个店铺");
-						return ;
-					}
-					
-					$("#smsForm").serialize();
-					tb.ajax.reload();
-				})
+// 				$("#querySms").click(function(){
+// 					var begin = $("#beginDate").val();
+// 					var end = $("#endDate").val();
+// 					//判断时间是否合法
+// 					if(begin>end){
+// 						toastr.error("开始时间不能大于结束时间");
+// 						return ;
+// 					}
+// 					$("#smsForm").serialize();
+// 					tb.ajax.reload();
+// 				})
 	})
 </script>
