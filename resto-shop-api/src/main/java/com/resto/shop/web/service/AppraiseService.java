@@ -35,4 +35,6 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 */
 	List<Appraise> updateAndListAppraise(String currentShopId, Integer currentPage, Integer showCount, Integer maxLevel,
 			Integer minLevel);
+
+	Appraise selectDetailedById(String appraiseId);
 }

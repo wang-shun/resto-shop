@@ -176,5 +176,11 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		return pic ;
 	}
 
+	@Override
+	public Appraise selectDetailedById(String appraiseId) {
+		Appraise appraise = appraiseMapper.selectDetailedById(appraiseId);
+		return appraise;
+	}
+
 
 }

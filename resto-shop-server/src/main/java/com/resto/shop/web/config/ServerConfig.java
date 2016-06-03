@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ImportResource;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.DatabaseConfigService;
+import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.datasource.DynamicDataSource;
@@ -45,7 +46,13 @@ public class ServerConfig {
 	}
 	
 	@Bean
+	public ShareSettingService ShareSettingService(){
+		return proxy.create(ShareSettingService.class);
+	}
+	
+	@Bean
 	public DynamicDataSource dataSource(){
 		return new DynamicDataSource();
 	}
+	
 }
