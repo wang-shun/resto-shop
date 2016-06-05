@@ -1,6 +1,9 @@
 package com.resto.shop.web.dao;
 
+import java.util.Date;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.ChargePayment;
@@ -20,5 +23,5 @@ public interface ChargePaymentMapper  extends GenericDao<ChargePayment,String> {
 
     int updateByPrimaryKey(ChargePayment record);
 
-	List<ChargePayment> selectPayList();
+	List<ChargePayment> selectPayList(@Param("begin")Date begin,@Param("end")Date end);
 }

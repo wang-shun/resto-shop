@@ -62,5 +62,7 @@
 		ON cp.charge_order_id = co.id
 		LEFT JOIN tb_customer tc
 		ON co.customer_id = tc.id
+		where 
+		 <![CDATA[ cp.create_time>#{begin} AND cp.create_time<#{end}]]>
 		  </select>
 </mapper>

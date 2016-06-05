@@ -7,6 +7,6 @@ import com.resto.shop.web.model.ChargePayment;
 
 public interface ChargePaymentService extends GenericService<ChargePayment, String> {
 	
-	List<ChargePayment> selectPayList();
+	List<ChargePayment> selectPayList(String beginDate,String endDate);
     
 }
