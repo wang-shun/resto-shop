@@ -13,7 +13,7 @@ dt, dd {
 		<button type="button" class="btn green-meadow" disabled> 短信余额：{{brandInfo.remainderNum}} 条 </button>&nbsp;&nbsp;&nbsp;
 		<s:hasPermission name="notice/add">
 			<button type="button" class="btn green" data-toggle="modal"
-				data-target="#createChargeOrder" id="btn_smsCharge" @click="showChargeBtn">短信充值</button>
+				data-target="#createChargeOrder" id="btn_smsCharge">短信充值</button>
 		</s:hasPermission>
 	</div>
 	<div class="clearfix"></div>
@@ -24,10 +24,11 @@ dt, dd {
 </div>
 
 <!-- 短信充值 -->
-<div class="modal fade" id="createChargeOrder" tabindex="-1" role="dialog" data-backdrop="static">
+<div class="modal fade" id="createChargeOrder" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title text-center">
 					<strong>短信充值</strong>
 				</h4>
@@ -41,7 +42,7 @@ dt, dd {
 				  <div class="tab-content">
 				    <div role="tabpanel" class="tab-pane active" id="onlinePay">
 				    	<form role="form" class="form-horizontal"
-							action="smschargeorder/smsCharge" method="post" target="_blank" @submit="submit">
+							action="smschargeorder/smsCharge" method="post" target="_blank" @submit="showChargeModal('createChargeOrder')">
 							<div class="form-body">
 								<div class="form-group">
 									<label class="col-sm-3 control-label">充值品牌：</label>
@@ -101,14 +102,10 @@ dt, dd {
 										</div>
 									</div>
 								</div>
-								<input type="hidden" name="chargeOrderId" value="">
 							</div>
-							<div class="text-center" v-if="chargeBtn">
+							<div class="text-center">
 								<a class="btn default" data-dismiss="modal">取消</a> <input
-									class="btn green" type="submit" value="充值" />
-							</div>
-							<div class="text-center" v-else>
-								<button class="btn green" data-dismiss="modal" @click="refresh">操作完成</button>
+									class="btn green" type="submit" value="充值"/>
 							</div>
 						</form>
 				    </div>
@@ -128,7 +125,7 @@ dt, dd {
 									<span class="help-block">银行卡转账需官方确认后，充值才会到账，耗时可能较长，静候佳音！</span>
 								</div>
 						</div>
-						  	<div class="text-center" id="chargeBtn">
+						  	<div class="text-center">
 								<a class="btn default" data-dismiss="modal">取消</a> <input
 									class="btn green" type="submit" value="提交" />
 							</div>
@@ -142,17 +139,18 @@ dt, dd {
 </div>
 
 <!-- 立即支付 -->
-<div class="modal fade" id="payAgainModal" tabindex="-1" role="dialog" data-backdrop="static">
+<div class="modal fade" id="payAgainModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title text-center">
 					<strong>立即支付</strong>
 				</h4>
 			</div>
 			<div class="modal-body">
 				<form role="form" class="form-horizontal"
-					action="smschargeorder/payAgain" method="post" target="_blank" @submit="submit">
+					action="smschargeorder/payAgain" method="post" target="_blank" @submit="showChargeModal('payAgainModal')">
 					<div class="form-body">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">充值品牌：</label>
@@ -205,12 +203,9 @@ dt, dd {
 						</div>
 						<input type="hidden" name="chargeOrderId" v-model="orderInfo.id">
 					</div>
-					<div class="text-center" v-if="chargeBtn">
+					<div class="text-center">
 						<a class="btn default" data-dismiss="modal">取消</a> <input
 							class="btn green" type="submit" value="支付" />
-					</div>
-					<div class="text-center" v-else>
-						<button class="btn green" data-dismiss="modal" @click="refresh">操作完成</button>
 					</div>
 				</form>
 			</div>
@@ -244,7 +239,34 @@ dt, dd {
 		</dl>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-info btn-block" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 充值订单    点击充值后显示订单信息-->
+<div class="modal fade" id="chargeInfoModal" tabindex="-1" role="dialog" aria-labelledby="chargeInfoModal" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-center"><strong>充值详情</strong></h4>
+      </div>
+      <div class="modal-body">
+      	<dl class="dl-horizontal">
+		  <dt>充值品牌:</dt>
+		  <dd>{{ brandInfo.brandName }}</dd> 
+		  <dt>充值金额:</dt>
+		  <dd>{{ chargeMoney }}&nbsp;元</dd>
+		  <dt>短信单价:</dt>
+		  <dd>{{ brandInfo.smsUnitPrice }}&nbsp;元</dd>
+		  <dt>充值数量:</dt>
+		  <dd>{{ smsNumber }}&nbsp;条</dd>
+<!-- 		  <dt>创建时间:</dt> -->
+<!-- 		  <dd>{{ orderInfo.createTime }}</dd> -->
+		</dl>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn green btn-block" data-dismiss="modal" @click="refresh">充值完成</button>
       </div>
     </div>
   </div>
@@ -334,15 +356,14 @@ dt, dd {
 							if (rowData.orderStatus == 1 || rowData.orderStatus == 3) {//订单已完成
 								var btn = createBtn(null, "查看详情", "btn-sm btn-primary", function() {
 									vueObj.orderInfo = rowData;
-									vueObj.orderInfo.payType = vueObj.getPayType(vueObj.orderInfo.payType);
-									vueObj.orderInfo.createTime = vueObj.formatDate(vueObj.orderInfo.createTime)
-									vueObj.orderInfo.pushOrderTime = vueObj.formatDate(vueObj.orderInfo.pushOrderTime)
+									vueObj.orderInfo.payType = vueObj.getPayType(rowData.payType);
+									vueObj.orderInfo.createTime = vueObj.formatDate(rowData.createTime)
+									vueObj.orderInfo.pushOrderTime = vueObj.formatDate(rowData.pushOrderTime)
 									$("#orderInfoModal").modal();
 								})
 								info.push(btn);
 							} else if(rowData.orderStatus == 0){//订单未完成
 								var btn = createBtn(null, "立即支付","btn-sm btn-success",function() {
-											vueObj.chargeBtn = true;
 											vueObj.orderInfo = rowData;
 											$("#payAgainModal").modal();
 										})
@@ -377,7 +398,6 @@ dt, dd {
 			brandInfo:{},
 			chargeMoney:100,
 			smsNumber:0,
-			chargeBtn:true,
 			orderInfo:{}
 		},
 		methods : {
@@ -396,6 +416,8 @@ dt, dd {
 					str = "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;&nbsp;信";
 				}else if(type==3){
 					str = "<img alt=\"银行转账\" src=\"assets/pages/img/bank.png\" width=\"23px\" height=\"18px\">&nbsp;银行转账";
+				}else{
+					str = type;
 				}
 				return str;
 			},
@@ -407,11 +429,9 @@ dt, dd {
 				}
 				return temp;
 			},
-			showChargeBtn : function(){
-				this.chargeBtn = true;
-			},
-			submit : function(){
-				this.chargeBtn = false;
+			showChargeModal : function(modalId){
+				$("#"+modalId).modal("hide");
+				$("#chargeInfoModal").modal();
 			},
 			saveBankOrder : function(e){
 				var that = this;
