@@ -26,7 +26,14 @@
 	<div class="clearfix"></div>
 	<div class="table-filter"></div>
 	<div class="table-body">
-		<table class="table table-striped table-hover table-bordered "></table>
+		<table class="table table-striped table-hover table-bordered ">
+		 <tfoot>
+            <tr>
+                <th colspan="1" style="text-align:right">总共充值金额为:</th>
+                <th></th>
+            </tr>
+       	 </tfoot>
+		</table>
 	</div>
 </div>
 <!-- datatable结束 -->
@@ -38,6 +45,24 @@
 
 <script>
 	(function(){
+		//初始化时间插件
+		$('.form_datetime').datetimepicker({
+			endDate:new Date(),
+			minView:"month",
+			maxView:"month",
+			autoclose:true,//选择后自动关闭时间选择器
+			todayBtn:true,//在底部显示 当天日期
+			todayHighlight:true,//高亮当前日期
+			format:"yyyy-mm-dd",
+			startView:"month",
+			language:"zh-CN"
+		});
+		//给开始和结束时间赋默认初始值
+		$("#endDate").val(new Date().format("yyyy-MM-dd"));
+		$("#beginDate").val(GetDateStr(-7));
+		
+		//定义总的充值金额
+		var sum = 0;
 		var cid="#control";
 		//加载datatable
 		var $table = $(".table-body>table");
@@ -63,6 +88,10 @@
 				{                 
 					title : "充值金额(元)",
 					data : "paymentMoney",
+					createdCell:function(td,tdData,row,rowData){
+						sum+=tdData;
+						console.log(sum);
+					},
 				},                 
 				{                 
 					title : "返还的金额(元)",
@@ -97,39 +126,22 @@
 					//	$(td).html(operator);
 					}
 				}],
+				
+				
+				"footerCallback": function( tfoot, data, start, end, display ) {
+				    $(tfoot).find('th').eq(1).html( " "+sum+"元" );
+				  }
 		});
+	
 		
  		var C = new Controller(cid,tb);
 		var vueObj = new Vue({
 			el:"#control",
 			data:{
-				m:{},
 			},
 			//保留原vue对象中的内容和方法
 			mixins:[C.formVueMix],
 			methods:{
-				initTime : function(){
-					$('.form_datetime').datetimepicker({
-						endDate:new Date(),
-						minView:"month",
-						maxView:"month",
-						autoclose:true,//选择后自动关闭时间选择器
-						todayBtn:true,//在底部显示 当天日期
-						todayHighlight:true,//高亮当前日期
-						format:"yyyy-mm-dd",
-						startView:"month",
-						language:"zh-CN"
-					});
-				},
-				//获取与当前时间相隔n天的日期
-				GetDateStr :function(AddDayCount){
-					var dd = new Date();
-					dd.setDate(dd.getDate()+AddDayCount);
-					var y = dd.getFullYear(); 
-	 				var m = dd.getMonth()+1;//获取当前月份的日期 
-	 				var d = dd.getDate(); 
-	 				return y+"-"+m+"-"+d; 
-	 			},
 	 			queryOrder :function(){
 	 				var beginDate = $("#beginDate").val();
 	 				var endDate = $("#endDate").val();
@@ -140,25 +152,17 @@
 	 				}
 	 				tb.ajax.reload();
 	 			}
-	 			
 			},
-			created:function(){
-				//初始化时间
-				this.initTime();
-				var that = this;
-				//默认赋值开始时间为当前时间前7天 结束时间为当前时间
-				Vue.nextTick(function(){
-					//$("#beginDate").val(new Date().format("yyyy-MM-dd"));
-					var begin = $("#beginDate").val(that.GetDateStr(-7));
-					var end =  $("#endDate").val(new Date().format("yyyy-MM-dd"));
-					//赋值给m对象
-					vueObj.$set("m",{"begin":begin,"end":end});
-					
-				})
-				
-			}
 		})
 		
+		function GetDateStr(AddDayCount){
+			var dd = new Date();
+			dd.setDate(dd.getDate()+AddDayCount);
+			var y = dd.getFullYear(); 
+			var m = dd.getMonth()+1;//获取当前月份的日期 
+			var d = dd.getDate(); 
+			return y+"-"+m+"-"+d; 
+		}
 		
 	}());
 	
