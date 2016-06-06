@@ -19,13 +19,12 @@ public class UploadController {
 	@RequestMapping("file")
 	public String uploadFile(MultipartFile file,HttpServletRequest request){
 		String type = request.getParameter("type");
-		System.out.println(type);
 		String systemPath = request.getServletContext().getRealPath("");
 		systemPath = systemPath.replaceAll("\\\\", "/");
 		int lastR = systemPath.lastIndexOf("/");
 		systemPath = systemPath.substring(0,lastR)+"/";
 		String filePath = "upload/files/"+DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-		File finalFile = FileUpload.fileUp(file, systemPath+filePath,UUID.randomUUID().toString());
+		File finalFile = FileUpload.fileUp(file, systemPath+filePath,UUID.randomUUID().toString(),type);
 		return filePath+"/"+finalFile.getName();
 	}
 }

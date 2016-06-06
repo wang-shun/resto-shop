@@ -37,7 +37,7 @@
 							    <div class="col-sm-8">
 							    	<img src="" id="noticeImage"/>
 								    <input type="hidden" name="noticeImage" v-model="m.noticeImage">
-								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError" cut="false"></img-file-upload>
 							    </div>
 							</div>
 			           		<div class="form-group">
