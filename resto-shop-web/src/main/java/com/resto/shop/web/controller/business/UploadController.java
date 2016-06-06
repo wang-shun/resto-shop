@@ -18,6 +18,8 @@ import com.resto.brand.core.util.FileUpload;
 public class UploadController {
 	@RequestMapping("file")
 	public String uploadFile(MultipartFile file,HttpServletRequest request){
+		String type = request.getParameter("type");
+		System.out.println(type);
 		String systemPath = request.getServletContext().getRealPath("");
 		systemPath = systemPath.replaceAll("\\\\", "/");
 		int lastR = systemPath.lastIndexOf("/");

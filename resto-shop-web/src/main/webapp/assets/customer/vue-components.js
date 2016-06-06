@@ -1,6 +1,6 @@
 Vue.component('img-file-upload', {
-	props:["type"],
-	template:'<input type="file" @change="uploadFile" type={{type}}>',
+	props:["cut"],
+	template:'<input type="file" @change="uploadFile" cut={{cut}}>',
 	data:function(){
 		return {
 			types:[".jpg",".png",".gif",".bmp"]
@@ -15,10 +15,14 @@ Vue.component('img-file-upload', {
 			if(this.imageNameVailed(filename)){
 				var formdata = new FormData(); 
 				formdata.append("file",file);
-				var cut = $(that).attr("type");
-				if(cut==1){//不压缩   (如过为申明type属性，则默认为压缩)
-					formdata.append("type","se");
-				} 
+				var cut = $(that).attr("cut");
+				if(cut=="false"){//不压缩   (如过未申明type属性，则默认为压缩)
+					formdata.append("type","false");
+					console.log("不压缩");
+				}else{
+					formdata.append("type","true");
+					console.log("压缩");
+				}
 				$.ajax({
 					 type: 'POST', 
 					 url:"upload/file",
