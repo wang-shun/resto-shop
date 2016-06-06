@@ -3,8 +3,10 @@ package com.resto.shop.web.service;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.ShareSetting;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Order;
 
 public interface CustomerService extends GenericService<Customer, String> {
 
@@ -32,4 +34,8 @@ public interface CustomerService extends GenericService<Customer, String> {
 	void unbindphone(String currentCustomerId);
 
 	void updateNewNoticeTime(String id);
+
+	void updateFirstOrderTime(String id);
+
+	void rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
 }

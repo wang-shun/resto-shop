@@ -37,6 +37,7 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Account;
+import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.Coupon;
@@ -251,7 +252,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		// 使用余额
 		if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
 			Account account = accountService.selectById(customer.getAccountId());
-			BigDecimal payValue = accountService.useAccount(payMoney, account);
+			BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
 			if (payValue.doubleValue() > 0) {
 				OrderPaymentItem item = new OrderPaymentItem();
 				item.setId(ApplicationUtils.randomUUID());
@@ -388,7 +389,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				couponService.refundCoupon(item.getResultData());
 				break;
 			case PayMode.ACCOUNT_PAY:
-				accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还");
+				accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还",AccountLog.SOURCE_CANCEL_ORDER);
 				break;
 			case PayMode.WEIXIN_PAY:
 				WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());

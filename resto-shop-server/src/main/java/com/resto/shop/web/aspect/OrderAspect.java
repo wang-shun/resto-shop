@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShareSetting;
 import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
@@ -51,6 +53,8 @@ public class OrderAspect {
 	OrderItemService orderItemService;
 	@Resource
 	ShopDetailService shopDetailService;
+	@Resource
+	ShareSettingService shareSettingService;
 	
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
@@ -162,8 +166,9 @@ public class OrderAspect {
 	
 	@AfterReturning(value="confirmOrder()",returning="order")
 	public void confirmOrderAfter(Order order){
+		log.info("确认订单成功后回调:"+order.getId());
+		Customer customer = customerService.selectById(order.getCustomerId());
 		if(order.getAllowAppraise()){
-			Customer customer = customerService.selectById(order.getCustomerId());
 			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 			BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
@@ -172,6 +177,19 @@ public class OrderAspect {
 			
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+msg+result);
+		}
+		if(customer.getFirstOrderTime()==null){
+			customerService.updateFirstOrderTime(customer.getId());
+			if(customer.getShareCustomer()!=null){
+				Customer shareCustomer= customerService.selectById(customer.getShareCustomer());
+				if(shareCustomer!=null){
+					ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+					if(shareSetting!=null){
+						log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
+						customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+					}
+				}
+			}
 		}
 	}
 	

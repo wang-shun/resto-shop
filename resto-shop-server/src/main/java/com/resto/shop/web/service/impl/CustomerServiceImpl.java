@@ -9,10 +9,13 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.ShareSetting;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Account;
+import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.CustomerService;
 
@@ -121,6 +124,20 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public void updateNewNoticeTime(String id){
 		customerMapper.updateNewNoticeTime(id);
+	}
+
+	@Override
+	public void updateFirstOrderTime(String id) {
+		customerMapper.updateFirstOrderTime(id);
+	}
+
+	@Override
+	public void rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer) {
+		BigDecimal rebate = shareSetting.getRebate();
+		BigDecimal money = order.getOrderMoney();
+		BigDecimal rewardMoney = money.multiply(rebate).divide(new BigDecimal(100)).setScale(BigDecimal.ROUND_HALF_DOWN, 2);
+		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD);
+		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 	}
 
 }

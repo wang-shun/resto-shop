@@ -48,6 +48,8 @@ public class Customer implements Serializable{
     
     private Date newNoticeTime;
     
+    private String shareCustomer;
+    
     public String getId() {
         return id;
     }
@@ -198,5 +200,13 @@ public class Customer implements Serializable{
 
 	public void setNewNoticeTime(Date newNoticeTime) {
 		this.newNoticeTime = newNoticeTime;
+	}
+
+	public String getShareCustomer() {
+		return shareCustomer;
+	}
+
+	public void setShareCustomer(String shareCustomer) {
+		this.shareCustomer = shareCustomer;
 	}
 }

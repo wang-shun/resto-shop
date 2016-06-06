@@ -13,9 +13,9 @@ public interface AccountService extends GenericService<Account, String> {
 	 * @param account
 	 * @return
 	 */
-	BigDecimal useAccount(BigDecimal maxUseAccount, Account account);
+	BigDecimal useAccount(BigDecimal maxUseAccount, Account account,Integer source);
 
-	void addAccount(BigDecimal value, String accountId, String remark);
+	void addAccount(BigDecimal value, String accountId, String remark,Integer source);
     
 	/**
 	 * 根据用户查询 余额 和 交易明细
@@ -25,5 +25,6 @@ public interface AccountService extends GenericService<Account, String> {
 	Account selectAccountAndLogByCustomerId(String customerId);
 
 	Account createCustomerAccount(Customer cus);
+
 
 }

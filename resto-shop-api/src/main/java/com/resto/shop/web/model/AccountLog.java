@@ -4,6 +4,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class AccountLog {
+	public static final Integer SOURCE_PAYMENT = -1;  //支付订 单
+	public static final Integer SOURCE_RED_PACKAGE=1; //红包奖励余额
+	public static final Integer SOURCE_CHARGE=2;	  //充值余额
+	public static final Integer SOURCE_CHARGE_REWARD=3; //充值赠送余额
+	public static final Integer SOURCE_SHARE_REWARD=4;  //分享返利余额
+	public static final Integer SOURCE_CANCEL_ORDER = 5; //取消订单返还余额
+	
     private String id;
 
     private BigDecimal money;
@@ -17,6 +24,8 @@ public class AccountLog {
     private String remark;
 
     private String accountId;
+    
+    private Integer source;
 
     public String getId() {
         return id;
@@ -73,4 +82,12 @@ public class AccountLog {
     public void setAccountId(String accountId) {
         this.accountId = accountId == null ? null : accountId.trim();
     }
+
+	public Integer getSource() {
+		return source;
+	}
+
+	public void setSource(Integer source) {
+		this.source = source;
+	}
 }

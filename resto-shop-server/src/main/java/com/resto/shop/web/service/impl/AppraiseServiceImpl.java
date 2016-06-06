@@ -15,6 +15,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.dao.AppraiseMapper;
 import com.resto.shop.web.exception.AppException;
+import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.Customer;
@@ -136,8 +137,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money);
-			log.info("评论奖励红包: "+money+" 元");
+			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.SOURCE_RED_PACKAGE);
+			log.info("评论奖励红包: "+money+" 元"+order.getId());
 		}
 		return money;
 	}

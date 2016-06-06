@@ -41,7 +41,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     }
 
 	@Override
-	public BigDecimal useAccount(BigDecimal payMoney, Account account) {
+	public BigDecimal useAccount(BigDecimal payMoney, Account account,Integer source) {
 		if(account.getRemain().equals(BigDecimal.ZERO)||payMoney.equals(BigDecimal.ZERO)){
 			return BigDecimal.ZERO;
 		}
@@ -54,20 +54,20 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		}
 		account.setRemain(account.getRemain().subtract(useAccountValue));
 		String remark= "使用余额:"+useAccountValue+"元";
-		addLog(useAccountValue, account, remark, AccountLogType.PAY);
+		addLog(useAccountValue, account, remark, AccountLogType.PAY,source);
 		update(account);
 		return useAccountValue;
 	}
 
 	@Override
-	public void addAccount(BigDecimal value, String accountId, String remark) {
+	public void addAccount(BigDecimal value, String accountId, String remark,Integer source) {
 		Account account = selectById(accountId);
 		account.setRemain(account.getRemain().add(value));
-		addLog(value, account, remark, AccountLogType.INCOME);
+		addLog(value, account, remark, AccountLogType.INCOME,source);
 		update(account);
 	} 
 
-	private void addLog(BigDecimal money,Account account,String remark,int type){
+	private void addLog(BigDecimal money,Account account,String remark,int type,int source){
 		AccountLog acclog = new AccountLog();
 		acclog.setCreateTime(new Date());
 		acclog.setId(ApplicationUtils.randomUUID());
@@ -76,6 +76,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		acclog.setPaymentType(type);
 		acclog.setRemark(remark);
 		acclog.setAccountId(account.getId());
+		acclog.setSource(source);
 		accountLogService.insert(acclog);
 	}
 
