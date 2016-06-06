@@ -24,7 +24,7 @@
 								<div class="col-sm-8">
 									<img src="" id="pictureUrl"/>
 								    <input type="hidden" name="pictureUrl" v-model="m.pictureUrl">
-								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError" type="1"></img-file-upload>
 								</div>
 							</div>
 							<div class="form-group">
