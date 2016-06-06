@@ -91,6 +91,28 @@
 					</label>
 				</div>
 				
+				<div class="form-group">
+					<div class="control-label">是否红包弹窗</div>
+					<label >
+						<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="1">
+						是
+					</label>
+					<label>
+						<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="0"> 
+						否
+					</label>
+				</div>
+				
+				<div class="form-group">
+				    <label>好评最少字数</label>
+				    <input type="number" class="form-control" name="goodAppraiseLength" v-model="m.goodAppraiseLength">
+				</div>
+				
+				<div class="form-group">
+				    <label>差评最少字数</label>
+				    <input type="number" class="form-control" name="badAppraiseLength" v-model="m.badAppraiseLength">
+				</div>
+				
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>

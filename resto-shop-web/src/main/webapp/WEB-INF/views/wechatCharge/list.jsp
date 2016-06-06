@@ -28,9 +28,9 @@
 	<div class="table-body">
 		<table class="table table-striped table-hover table-bordered ">
 		 <tfoot>
-            <tr>
-                <th colspan="1" style="text-align:right">总共充值金额为:</th>
-                <th></th>
+            <tr class="success">
+                <th>当前页:</th><td colspan="2"></td>
+                <th>总计:</th><td colspan="2"></td>
             </tr>
        	 </tfoot>
 		</table>
@@ -76,22 +76,32 @@
 					return d;
 				},
 			},
+			footerCallback: function () {
+				var api = this.api();
+	            // Total over all pages
+	            total = api.column( 1 ).data().reduce( function (a, b) {
+							return a+b;
+						}, 0 );
+	            // Total over this page
+	            pageTotal = api.column( 1, { page: 'current'} ).data().reduce( function (a, b) {
+								return a+b;
+							}, 0 );
+	            // Update footer
+	            $(api.column(1).footer()).html(pageTotal+" 元");
+	            $(api.column(4).footer()).html(total +' 元');
+
+	        },
 			columns : [
 				{                 
 					title : "充值时间",
 					data : "createTime",
 					createdCell:function(td,tdData){
 						$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
-						
 					}
 				},                 
 				{                 
 					title : "充值金额(元)",
 					data : "paymentMoney",
-					createdCell:function(td,tdData,row,rowData){
-						sum+=tdData;
-						console.log(sum);
-					},
 				},                 
 				{                 
 					title : "返还的金额(元)",
@@ -110,27 +120,7 @@
 					title:"充值的店铺",
 					data:"shopDetailName",
 				},
-				
-				{
-					title : "操作",
-					data : "id",
-					createdCell:function(td,tdData,rowData,row){
-// 						var operator=[
-// 							<s:hasPermission name="kitchen/delete">
-// 							C.createDelBtn(tdData,"kitchen/delete"),
-// 							</s:hasPermission>
-// 							<s:hasPermission name="kitchen/edit">
-// 							C.createEditBtn(rowData),
-// 							</s:hasPermission>
-			//			];
-					//	$(td).html(operator);
-					}
-				}],
-				
-				
-				"footerCallback": function( tfoot, data, start, end, display ) {
-				    $(tfoot).find('th').eq(1).html( " "+sum+"元" );
-				  }
+				],
 		});
 	
 		
