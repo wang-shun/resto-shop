@@ -103,7 +103,7 @@
 		var vueObj = new Vue({
 			el:"#control",
 			data:{
-				
+				m:{},
 			},
 			//保留原vue对象中的内容和方法
 			mixins:[C.formVueMix],
@@ -149,8 +149,11 @@
 				//默认赋值开始时间为当前时间前7天 结束时间为当前时间
 				Vue.nextTick(function(){
 					//$("#beginDate").val(new Date().format("yyyy-MM-dd"));
-					$("#beginDate").val(that.GetDateStr(-7));
-					$("#endDate").val(new Date().format("yyyy-MM-dd"));
+					var begin = $("#beginDate").val(that.GetDateStr(-7));
+					var end =  $("#endDate").val(new Date().format("yyyy-MM-dd"));
+					//赋值给m对象
+					vueObj.$set("m",{"begin":begin,"end":end});
+					
 				})
 				
 			}
