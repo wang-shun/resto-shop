@@ -60,7 +60,7 @@ dt, dd {
 									<label class="col-sm-3 control-label">充值金额：</label>
 									<div class="col-sm-4">
 										<div class="input-group">
-											<input type="number" class="form-control" max="10000"
+											<input type="number" class="form-control"
 												placeholder="请输入要充值的金额" required name="chargeMoney" min="100" v-model="chargeMoney">
 											<div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
 										</div>
