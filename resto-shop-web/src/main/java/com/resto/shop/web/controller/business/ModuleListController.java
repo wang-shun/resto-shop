@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.ModuleList;
+import com.resto.brand.web.model.RewardSetting;
 import com.resto.brand.web.model.ShareSetting;
 import com.resto.brand.web.service.ModuleListService;
+import com.resto.brand.web.service.RewardSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.shop.web.controller.GenericController;
 
@@ -25,6 +27,9 @@ public class ModuleListController extends GenericController{
 	
 	@Resource
 	ShareSettingService shareSettingService;
+	
+	@Resource
+	RewardSettingService rewardSettingService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -59,6 +64,21 @@ public class ModuleListController extends GenericController{
 	public Result editshare(ShareSetting setting){
 		setting.setBrandId(getCurrentBrandId());
 		shareSettingService.updateByBrandId(setting);
+		return getSuccessResult();
+	}
+	
+	@RequestMapping("data_reward")
+	@ResponseBody
+	public Result data_reward(){
+		RewardSetting setting = rewardSettingService.selectByBrandId(getCurrentBrandId());
+		return getSuccessResult(setting);
+	}
+	
+	@RequestMapping("edit_reward")
+	@ResponseBody
+	public Result data_reward(RewardSetting setting){
+		setting.setBrandId(getCurrentBrandId());
+		rewardSettingService.updateSetting(setting);
 		return getSuccessResult();
 	}
 }
