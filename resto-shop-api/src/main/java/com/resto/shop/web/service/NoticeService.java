@@ -21,7 +21,7 @@ public interface NoticeService extends GenericService<Notice, String> {
 	 */
     void create(Notice notice);
 
-	List<Notice> selectListByShopId(String currentShopId);
-
 	void addNoticeHistory(String customerId, String noticeId);
+
+	List<Notice> selectListAllByShopId(String currentShopId);
 }

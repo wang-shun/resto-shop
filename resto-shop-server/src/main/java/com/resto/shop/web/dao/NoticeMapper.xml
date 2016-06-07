@@ -72,6 +72,11 @@
 	and status=1
 	order by sort
   </select>
+  <select id="selectListAllByShopId" resultType="Notice">
+  	select * from tb_notice
+	where shop_detail_id = #{shopId}
+	order by sort
+  </select>
   <update id="addNoticeHistory">
   	insert into tb_customer_notice_history (customer_id,notice_id)values(#{0},#{1})
   </update>

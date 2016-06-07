@@ -95,7 +95,12 @@
 				url : "notice/list_all",
 				dataSrc : ""
 			},
+			order:[[6,"desc"],[0,"asc"]],
 			columns : [
+				{                 
+					title : "排序",
+					data : "sort",
+				},    
 				{                 
 					title : "通知标题",
 					data : "title",
@@ -105,16 +110,12 @@
 					data : "content",
 				},                 
 				{                 
-					title : "排序",
-					data : "sort",
-				},                 
-				{                 
-					title : "图片",
-					data : "noticeImage",
-					defaultContent:'',
-					createdCell:function(td,tdData){
-						$(td).html("<image src='/"+tdData+"' style='height:40px;width:80px;'/>")
-					}
+				title : "图片",
+				data : "noticeImage",
+				defaultContent:'',
+				createdCell:function(td,tdData){
+					$(td).html("<image src='/"+tdData+"' style='height:40px;width:80px;'/>")
+				}
 				},                 
 				{                 
 					title : "通知类型",
