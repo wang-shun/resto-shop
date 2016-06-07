@@ -29,7 +29,4 @@
 		</div>
 
 	</div>
-	<input type="hidden" name="id" v-model="m.id" />
-	<input class="btn green"  type="submit"  value="保存"/>
-	<a class="btn default" @click="cancel" >取消</a>
 </form>

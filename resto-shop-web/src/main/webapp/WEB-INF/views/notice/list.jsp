@@ -48,6 +48,17 @@
 									</label>
 							    </div>
 							</div>
+							<div class="form-group">
+			           			<label class="col-sm-3 control-label">是否启用：</label>
+							    <div class="col-sm-8 radio-list">
+									<label class="radio-inline">
+									  <input type="radio" name="status" v-model="m.status" value="1"> 启用
+									</label>
+									<label class="radio-inline">
+									  <input type="radio" name="status" v-model="m.status" value="0"> 不启用
+									</label>
+							    </div>
+							</div>
 						</div>
 						<div class="text-center">
 							<input type="hidden" name="id" v-model="m.id" />
@@ -119,6 +130,17 @@
 						var temp = new Date(tdData);
 						temp  = temp.format("yyyy-MM-dd hh:mm:ss");
 						$(td).html(temp);
+					}
+				}, 
+				{                 
+					title : "是否启用",
+					data : "status",
+					createdCell:function(td,tdData){
+						var content = {text:"未启用",style:"label label-danger"}
+						if(tdData==1){
+							content={text:"已启用",style:"label label-success"};
+						}
+						$(td).html($("<span>").html(content.text).addClass(content.style));
 					}
 				},  
 				{
