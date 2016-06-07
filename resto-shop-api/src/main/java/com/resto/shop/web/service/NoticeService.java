@@ -10,9 +10,10 @@ public interface NoticeService extends GenericService<Notice, String> {
 	/**
 	 * 根据店铺ID查询信息
 	 * @param noticeType 
+	 * @param customerId 
 	 * @return
 	 */
-	List<Notice> selectListByShopId(String shopId, Integer noticeType);
+	List<Notice> selectListByShopId(String shopId, String customerId, Integer noticeType);
 	
 	/**
 	 * 添加通知
@@ -21,4 +22,6 @@ public interface NoticeService extends GenericService<Notice, String> {
     void create(Notice notice);
 
 	List<Notice> selectListByShopId(String currentShopId);
+
+	void addNoticeHistory(String customerId, String noticeId);
 }

@@ -28,6 +28,8 @@ public class Notice {
     private Byte noticeType;
 
     private String shopDetailId;
+    
+    private Boolean isRead;
 
     public String getId() {
         return id;
@@ -100,4 +102,12 @@ public class Notice {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public Boolean getIsRead() {
+		return isRead;
+	}
+
+	public void setIsRead(Boolean isRead) {
+		this.isRead = isRead;
+	}
 }
