@@ -177,6 +177,7 @@
 						sort:0,
 						noticeType:1,
 						title:"通知"+new Date().getTime(),
+						status:1
 					};
 					this.showform=true;
 				},
