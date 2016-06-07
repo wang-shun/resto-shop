@@ -60,9 +60,6 @@
 		//给开始和结束时间赋默认初始值
 		$("#endDate").val(new Date().format("yyyy-MM-dd"));
 		$("#beginDate").val(GetDateStr(-7));
-		
-		//定义总的充值金额
-		var sum = 0;
 		var cid="#control";
 		//加载datatable
 		var $table = $(".table-body>table");
