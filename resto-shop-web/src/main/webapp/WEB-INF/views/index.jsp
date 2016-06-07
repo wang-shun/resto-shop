@@ -153,7 +153,7 @@
         <script src="<%=resourcePath%>/assets/customer/datatable_lang_ch.js" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/dialog/customer_dialog.js" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/utils.js" type="text/javascript" charset="utf-8"></script>
-        <script src="<%=resourcePath%>/assets/customer/vue-components.js" type="text/javascript" charset="utf-8"></script>
+        <script src="<%=resourcePath%>/assets/customer/vue-components.js?v=1" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/controller.js" type="text/javascript" charset="utf-8"></script>
 
 		<!-- 百度编辑器 -->
