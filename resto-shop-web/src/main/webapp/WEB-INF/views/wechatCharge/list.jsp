@@ -4,8 +4,8 @@
 
 <!-- vue对象开始 -->
 <div id="control">
-<h2 class="text-center"><strong>结算报表</strong></h2><br/>
-<div class="row" id="searchTools">
+<br>
+<div class="row text-center" id="searchTools">
 	<div class="col-md-12">
 		<form role="form" class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
@@ -86,7 +86,6 @@
 	            // Update footer
 	            $(api.column(1).footer()).html(pageTotal+" 元");
 	            $(api.column(4).footer()).html(total +' 元');
-
 	        },
 			columns : [
 				{                 
