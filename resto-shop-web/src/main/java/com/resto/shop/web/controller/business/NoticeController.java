@@ -55,6 +55,13 @@ public class NoticeController extends GenericController{
 		return Result.getSuccess();
 	}
 	
+	@RequestMapping("chageStatus")
+	@ResponseBody
+	public Result chageStatus(Notice notice){
+		noticeService.update(notice);
+		return Result.getSuccess();
+	}
+	
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(String id){

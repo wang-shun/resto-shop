@@ -136,12 +136,19 @@
 				{                 
 					title : "是否启用",
 					data : "status",
-					createdCell:function(td,tdData){
-						var content = {text:"未启用",style:"label label-danger"}
-						if(tdData==1){
-							content={text:"已启用",style:"label label-success"};
+					createdCell:function(td,tdData,rowData){
+						var content = {text:"禁用",style:"btn btn-danger",fun:function(){
+							var data = { id : rowData.id, status : "0" };
+							vueObj.chageStatus(data);
+						}}
+						if(tdData==0){
+							content={text:"启用",style:"btn btn-success",fun:function(){
+								var data = { id : rowData.id, status : "1" };
+								vueObj.chageStatus(data);
+							}};
 						}
-						$(td).html($("<span>").html(content.text).addClass(content.style));
+						var button = $("<button>").html(content.text).addClass(content.style).click(content.fun);
+						$(td).html(button);
 					}
 				},  
 				{
@@ -190,6 +197,16 @@
 				uploadError:function(msg){
 					C.errorMsg(msg);
 				},
+				chageStatus : function(data){
+					$.post("notice/chageStatus",data,function(result){
+						if(result.success){
+							C.simpleMsg("操作成功");
+						}else{
+							C.errorMsg("操作失败");
+						}
+						tb.ajax.reload();
+					})
+				}
 			}
 		});
 		C.vue=vueObj;

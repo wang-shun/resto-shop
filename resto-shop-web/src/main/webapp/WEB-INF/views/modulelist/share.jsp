@@ -25,9 +25,14 @@
 		</div>
 		<div class="form-group">
 			<label for="">是否启用</label>
-		    <label class="radio-inline">
-		    	<input type="checkbox"  v-bind:true-value="true" v-bind:false-value="false" v-model="m.isActivity">启用
-		    </label>
+		    <div class="radio-list">
+				<label class="radio-inline">
+				  <input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 启用
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 不启用
+				</label>
+		    </div>
 		</div>
 		<div class="form-group">
 		    <label>分享弹窗文本</label>
@@ -62,13 +67,7 @@
 		created:function(){
 			var that = this;
 			$.post("modulelist/data_share",null,function(result){
-				var shareSetting = result.data;
-				if(!shareSetting){
-					shareSetting={
-						isActivity:true
-					};
-				}
-				that.m=shareSetting;
+				that.m = result.data;
 				Vue.nextTick(function(){
 					var randomId = "ueditor_id_"+new Date().getTime();
 					$(".ueditor-textarea").attr("id",randomId);
