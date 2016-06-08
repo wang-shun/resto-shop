@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.IncomeReportDto;
 import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,String> {
@@ -35,6 +36,22 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 	 * @author lmx
 	 * @return
 	 */
-	OrderPaymentItem selectChargeOrderByDate(@Param("shopId")String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);;
+	OrderPaymentItem selectChargeOrderByDate(@Param("shopId")String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
+	
+	/**
+	 * 查询品牌不同支付类型的支付收入
+	 * @param brandId
+	 * @return
+	 */
+	List<OrderPaymentItem> selectIncomeBybrandId(@Param("brandId")String brandId,@Param("begin") Date begin,@Param("end") Date end);
+	/**
+	 * 查询店铺不同支付类型的支付收入
+	 * @param shopId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+
+	List<OrderPaymentItem> selectIncomeByShopId(@Param("shopId")String shopId,@Param("begin") Date begin,@Param("end") Date end);;
 	
 }

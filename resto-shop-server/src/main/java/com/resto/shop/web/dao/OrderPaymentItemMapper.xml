@@ -72,4 +72,22 @@
   	SELECT SUM(charge_money) payValue from tb_charge_order where order_state = 1 and shop_detail_id = #{shopId} and 
   	<![CDATA[ create_time >= #{beginDate} AND create_time < #{endDate} ]]>
   </select>
+  
+ 
+  <!-- 查询品牌不同类型支付的营业收入统计 -->
+  <select id="selectIncomeBybrandId" resultType="OrderPaymentItem">
+  	SELECT SUM(op.pay_value) pay_value, op.payment_mode_id ,o.shop_detail_id  FROM tb_order_payment_item op LEFT JOIN  tb_order o ON  op.order_id=o.id  
+  	WHERE o.brand_id=#{brandId} 
+  	and <![CDATA[ op.pay_time >= #{begin} AND op.pay_time < #{end} ]]>
+    GROUP BY payment_mode_id 
+  </select>
+  
+  <!-- 根据店铺的营业收入 -->
+  <select id="selectIncomeByShopId" resultType="OrderPaymentItem">
+  	SELECT SUM(op.pay_value) pay_value, op.payment_mode_id FROM tb_order_payment_item op LEFT JOIN  tb_order o ON  op.order_id=o.id  
+  	WHERE o.shop_detail_id=#{shopId} 
+  	and <![CDATA[ op.pay_time >= #{begin} AND op.pay_time < #{end} ]]>
+  	GROUP BY payment_mode_id 
+  </select>
+  
 </mapper>

@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.dto.IncomeReportDto;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.OrderPaymentItemMapper;
@@ -55,6 +56,20 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 			list.add(chargeOrder);
 		}
 		return orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
+	}
+
+	@Override
+	public List<OrderPaymentItem> selectIncomeBybrandId(String brandId,String beginDate,String endDate) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderpaymentitemMapper.selectIncomeBybrandId(brandId,begin,end);
+	}
+
+	@Override
+	public List<OrderPaymentItem> selectIncomeByShopId(String shopId, String beginDate, String endDate) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderpaymentitemMapper.selectIncomeBybrandId(shopId,begin,end);
 	}
 
 
