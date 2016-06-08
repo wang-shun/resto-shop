@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -118,6 +119,7 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> selectByParentId(String parentOrderId);
 
 	public Order findCustomerNewPackage(String currentCustomerId, String currentShopId);
-
-
+	
+	
+	List<SaleReportDto> selectArticleSumCountByData(String beginDate,String endDate);
 }

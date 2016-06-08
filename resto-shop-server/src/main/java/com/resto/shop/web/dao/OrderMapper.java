@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.shop.web.model.Order;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
@@ -104,4 +105,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<Order> selectReadyList(String currentShopId);
 	
+	
+	/**
+	 * 根据时间查询已完成的订单(orderSatus = 2,10,11,12)
+	 * 根据 店铺分组，查询该时间内完成的订单的菜品数量
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<SaleReportDto> selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 }

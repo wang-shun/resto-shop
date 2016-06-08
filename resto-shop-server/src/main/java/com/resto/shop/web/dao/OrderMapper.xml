@@ -627,6 +627,11 @@
 	and closed=0
 	ORDER BY print_order_time 
   </select>
+  <select id="selectArticleSumCountByData" resultType="com.resto.brand.web.dto.SaleReportDto">
+  	SELECT shop_detail_id shopId,brand_id brandId,SUM(article_count) sellNum from tb_order where
+ 		order_state in (2,10,11,12) and confirm_time <![CDATA[ >= #{beginDate} and confirm_time <= #{endDate}]]>
+ 		 GROUP BY shop_detail_id
+  </select>
 </mapper>
 
 
