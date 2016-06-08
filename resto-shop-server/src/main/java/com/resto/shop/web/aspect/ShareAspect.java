@@ -57,7 +57,7 @@ public class ShareAspect {
 			ShareSetting setting = shareSettingService.selectValidSettingByBrandId(DataSourceContextHolder.getDataSourceName());
 			if(setting!=null){
 				boolean isCanShare = isCanShare(setting,appraise);			
-				log.info("拥有分享好评设置ID:"+setting.getId());
+				log.info("拥有分享好评设置,ID:"+setting.getId());
 				if(isCanShare){
 					//发送分享通知!
 					sendShareMsg(appraise);

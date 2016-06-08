@@ -49,6 +49,11 @@ public class Appraise {
      */
     private String articleName;
     
+    /**
+     * 是否能打赏
+     */
+    private Boolean canReward;
+    
     
     public String getId() {
         return id;
@@ -176,5 +181,13 @@ public class Appraise {
 
 	public void setArticleName(String articleName) {
 		this.articleName = articleName;
+	}
+
+	public Boolean getCanReward() {
+		return canReward;
+	}
+
+	public void setCanReward(Boolean canReward) {
+		this.canReward = canReward;
 	}
 }
