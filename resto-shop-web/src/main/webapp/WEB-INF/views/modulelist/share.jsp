@@ -53,7 +53,9 @@
 	var obj = new Vue({
 		el:"#share-form",
 		data:{
-			m:{},
+			m:{
+				isActivity : 1,
+			},
 		},
 		methods:{
 			uploadSuccess:function(url){
@@ -67,7 +69,9 @@
 		created:function(){
 			var that = this;
 			$.post("modulelist/data_share",null,function(result){
-				that.m = result.data;
+				if(result.data){
+					that.m = result.data;
+				}
 				Vue.nextTick(function(){
 					var randomId = "ueditor_id_"+new Date().getTime();
 					$(".ueditor-textarea").attr("id",randomId);

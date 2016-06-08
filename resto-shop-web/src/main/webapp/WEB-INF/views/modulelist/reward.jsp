@@ -36,12 +36,16 @@
 	var obj = new Vue({
 		el:"#reward-form",
 		data:{
-			m:{},
+			m:{
+				isActivty : 1,
+			},
 		},
 		created:function(){
 			var that = this;
 			$.post("modulelist/data_reward",null,function(result){
-				that.m = result.data;
+				if(result.data){
+					that.m = result.data;
+				}
 			});
 		}
 	});
