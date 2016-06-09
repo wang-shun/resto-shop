@@ -1,53 +1,59 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
+<style>
+th {
+	width: 30%;
+}
+</style>
 <div id="control">
 	<h2 class="text-center">
 		<strong>品牌菜品销售</strong>
 	</h2>
 	<br />
-	<div class="row" id="searchTools">
+	<div class="row">
 		<div class="col-md-12">
 			<form class="form-inline">
 				<div class="form-group" style="margin-right: 50px;">
 					<label for="beginDate">开始时间：</label> <input type="text"
-						class="form-control form_datetime" v-model="beginDate"
-						id="beginDate" readonly="readonly">
+						class="form-control form_datetime" v-model="searchDate.beginDate"
+						readonly="readonly">
 				</div>
 				<div class="form-group" style="margin-right: 50px;">
 					<label for="endDate">结束时间：</label> <input type="text"
-						class="form-control form_datetime" id="endDate" v-model="endDate"
+						class="form-control form_datetime" v-model="searchDate.endDate"
 						readonly="readonly">
 				</div>
-				<button type="button" class="btn btn-primary" @click="search">查询报表</button>
+				<button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
 			</form>
 		</div>
 	</div>
 	<br /> <br />
-	<!-- 品牌菜品销售总量  -->
-	<!-- 		<div class="panel panel-info"> -->
-	<!-- 			<div class="panel-heading text-center" style="font-size: 22px;"> -->
-	<%-- 				<strong>品牌菜品销售总量</strong> --%>
-	<!-- 			</div> -->
-	<!-- 			<div class="panel-body"> -->
-	<!-- 				<table class="table table-hover"> -->
-	<!-- 					<thead> -->
-	<!-- 						<tr> -->
-	<!-- 							<th>品牌名称</th> -->
-	<!-- 							<th>菜品总销量(份)</th> -->
-	<!-- 							<th>销售详情</th> -->
-	<!-- 						</tr> -->
-	<!-- 					</thead> -->
-	<!-- 					<tbody> -->
-	<!-- 						<tr> -->
-	<%-- 							<td><strong>{{brandReport.brandName}}</strong></td> --%>
-	<!-- 							<td>{{getSumNum}}</td> -->
-	<!-- 							<td><button class="btn btn-success" @click="showBrandReport">查看详情</button></td> -->
-	<!-- 						</tr> -->
-	<!-- 					</tbody> -->
-	<!-- 				</table> -->
-	<!-- 			</div> -->
-	<!-- 		</div> -->
+	<!-- 品牌菜品销售总量 -->
+	<div class="panel panel-info">
+		<div class="panel-heading text-center" style="font-size: 22px;">
+			<strong>品牌菜品销售总量</strong>
+		</div>
+		<div class="panel-body">
+			<table class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>品牌名称</th>
+						<th>菜品总销量(份)</th>
+						<th>销售详情</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>{{brandReport.brandName}}</strong></td>
+						<td>{{brandReport.totalNum}}</td>
+						<td><button class="btn btn-success"
+								@click="showBrandReport(brandReport.brandName)">查看详情</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 	<!-- 店铺菜品销售总量  -->
 	<div class="panel panel-info">
@@ -55,7 +61,7 @@
 			<strong>菜品销售总量 </strong>
 		</div>
 		<div class="panel-body">
-			<table class="table table-hover">
+			<table class="table table-striped table-bordered table-hover">
 				<thead>
 					<tr>
 						<th>店铺名称</th>
@@ -65,37 +71,37 @@
 				</thead>
 				<tbody>
 					<tr v-for="shop in shopReportList">
-						<td><strong>{{shop.shopName}}</strong></td>
-						<td>{{shop.sellNum}}</td>
+						<td><strong>{{shop.name}}</strong></td>
+						<td>{{shop.articleSellNum}}</td>
 						<td><button class="btn btn-sm btn-success"
-								@click="showBrandReport">查看详情</button></td>
-					</tr>
-					<tr class="success">
-						<td><strong>【{{brandReport.brandName}}】 总计：</strong></td>
-						<td>{{getSumNum}}</td>
-						<td><button class="btn btn-sm btn-success"
-								@click="showBrandReport">查看详情</button></td>
+								@click="showShopReport(shop.name,shop.id)">查看详情</button></td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
-	
-	<!-- 品牌报表 -->
-	<div class="modal fade" id="brandReortModal" tabindex="-1" role="dialog" aria-labelledby="brandReortModal">
-	  <div class="modal-dialog" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 class="modal-title text-center"><strong>菜品销售详情</strong></h4>
-	      </div>
-	      <div class="modal-body">
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-	      </div>
-	    </div>
-	  </div>
+
+	<!-- 报表详情 -->
+	<div class="modal fade bs-example-modal-lg" id="reportModal"
+		tabindex="-1" role="dialog" aria-labelledby="reportModal"
+		data-backdrop="static">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title text-center">
+						<strong>菜品销售详情</strong>
+					</h4>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info btn-block" @click="closeModal">关闭</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 </div>
@@ -112,102 +118,70 @@
 		startView : "month",
 		language : "zh-CN"
 	});
-	//文本框默认值
-	// 	$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-
-	// var $table = $("#testTable");
-	// tb = $table.DataTable({
-	// 	ajax : {
-	// 		url : "articleSell/list_all",
-	// 		dataSrc : "data"
-	// 	},
-	// 	columns : [
-	// 	    {
-	// 			title : "店铺名称",
-	// 			data : "shopName",
-	// 		},                 
-	// 		{                 
-	// 			title : "菜品总销量(份)",
-	// 			data : "sellNum",
-	// 		},                 
-
-	// 		{                 
-	// 			title : "销售详情",
-	// 			data : "shopId",
-	// 			createdCell : function(td,tdData){
-	// 				var btn = $("<button>").html("查看详情").addClass("btn green");
-	// 				$(td).html(btn);
-	// 			}
-	// 		},                 
-	// 		],
-	// 		footerCallback: function () {
-	//            var api = this.api();
-	//            // 总计
-	//            total = api.column(1).data().reduce( function (a, b) {
-	//                return a+b;
-	//            } , 0 );
-	//            $( api.column(1).footer()).html(total);
-	//        }
-	// });
 
 	var vueObj = new Vue({
 		el : "#control",
 		data : {
 			brandReport : {
 				brandName : "",
-				sumNum : 0
+				totalNum : 0
 			},
 			shopReportList : [],
-			beginDate : "",
-			endDate : ""
-		},
-		computed : {
-			getSumNum : function() {
-				var sumNum = 0;
-				$(this.shopReportList).each(function(i, item) {
-					sumNum += item.sellNum;
-				})
-				return sumNum;
-			}
+			searchDate : {
+				beginDate : "",
+				endDate : "",
+			},
+			modalInfo:{
+				title:"",
+				content:""
+			},
 		},
 		methods : {
-			showBrandReport : function() {
-// 				$("#brandReortModal").modal();
-				this.openModal("articleSell/show/brandReport",$("#brandReortModal"));
+			showBrandReport : function(brandName) {
+				this.openModal("articleSell/show/brandReport", brandName,null);
 			},
-			showShopReport : function() {
-				alert("---shop");
+			showShopReport : function(shopName,shopId) {
+				this.openModal("articleSell/show/shopReport", shopName,shopId);
 			},
-			search : function() {
-				console.log("begin:" + this.beginDate);
-				console.log("end:" + this.endDate);
-				this.getSellInfo(this.beginDate, this.endDate);
-			},
-			getSellInfo : function(beginDate, endDate) {
+			searchInfo : function(beginDate, endDate) {
+				console.log("begin:" + this.searchDate.beginDate);
+				console.log("end:" + this.searchDate.endDate);
 				App.startPageLoading();
 				var that = this;
-				var data = {
-					beginDate : beginDate,
-					endDate : endDate
-				};
-				$.post("articleSell/list_all", data, function(result) {
-					that.brandReport.brandName = result.data[0].brandName;
-					that.shopReportList = result.data;
+				$.post("articleSell/list_all", this.getDate(null), function(result) {
+					that.brandReport.brandName = result.brandName;
+					that.brandReport.totalNum = result.totalNum;
+					that.shopReportList = result.shopReportList;
 					App.stopPageLoading();
 				});
 			},
-			openModal : function(url,modal){
-				$.post(url,function(result){
+			openModal : function(url, modalTitle,shopId) {
+				$.post(url, this.getDate(shopId),function(result) {
+					var modal = $("#reportModal");
 					modal.find(".modal-body").html(result);
+					modal.find(".modal-title > strong").html(modalTitle);
 					modal.modal();
 				})
+			},
+			closeModal : function(){
+				var modal = $("#reportModal");
+				modal.find(".modal-body").html("");
+				modal.modal("hide");
+			},
+			getDate : function(shopId){
+				var data = {
+					beginDate : this.searchDate.beginDate,
+					endDate : this.searchDate.endDate,
+					shopId : shopId
+				};
+				return data;
 			}
 		},
 		created : function() {
 			var date = new Date().format("yyyy-MM-dd");
-			this.beginDate = date;
-			this.endDate = date;
-			this.getSellInfo(date, date);
+			this.searchDate.beginDate = date;
+			this.searchDate.endDate = date;
+			this.searchInfo();
 		}
 	})
 </script>

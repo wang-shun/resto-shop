@@ -18,6 +18,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -822,23 +823,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<SaleReportDto> selectArticleSumCountByData(String beginDate,String endDate) {
+	public SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		List<SaleReportDto> list_saleReport = orderMapper.selectArticleSumCountByData(begin, end);
-		if(list_saleReport!=null && list_saleReport.size()>0){
-			List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(list_saleReport.get(0).getBrandId());
-			for(SaleReportDto temp_saleReport : list_saleReport){
-				for(ShopDetail temp_shop : list_shopDetail){
-					if(temp_saleReport.getShopId().equals(temp_shop.getId())){
-						temp_saleReport.setShopName(temp_shop.getName());
-						temp_saleReport.setBrandName(temp_shop.getBrandName());
-						break;
-					}
-				}
-			}
+		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+		int totalNum = 0;
+		for(ShopDetail shop : list_shopDetail){
+			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
+			totalNum += sellNum;
+			shop.setArticleSellNum(sellNum);
 		}
-		return list_saleReport;
+		SaleReportDto saleReport = new SaleReportDto(list_shopDetail.get(0).getBrandName(), totalNum, list_shopDetail);
+		return saleReport;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate, String endDate, String shopId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId);
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end);
+		return list;
 	}
 
 }

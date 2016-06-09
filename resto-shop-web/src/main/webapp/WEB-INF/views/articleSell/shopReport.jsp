@@ -42,7 +42,7 @@ var tbApi = null;
 var isFirst = true;
 var shopTable = $("#shopTable").DataTable({
 	ajax : {
-		url : "articleSell/brand_data",
+		url : "articleSell/shop_data",
 		dataSrc : "data",
 		data:function(d){
 			d.beginDate = $("#beginDate").val();
@@ -51,7 +51,7 @@ var shopTable = $("#shopTable").DataTable({
 			return d;
 		}
 	},
-	order: [[ 2, "desc" ]],//默认以菜品销量降序
+	order: [[ 2, "desc" ]],//默认以店铺销量降序
 	columns : [
 		{
 			title : "菜品分类",
@@ -80,7 +80,18 @@ var shopTable = $("#shopTable").DataTable({
 		},  
 		{
 			title : "菜品销量(份)",
+			data : "shopSellNum",
+		},
+		{                 
+			title : "品牌菜品总销量(份)",
 			data : "brandSellNum",
+		},                 
+		{                 
+			title : "销售占比",
+			data : "salesRatio",
+			createdCell:function(td,tdData){
+				$(td).html((tdData*100).toFixed(2)+"%");
+			}
 		},
 	],
 	initComplete: function () {//列筛选

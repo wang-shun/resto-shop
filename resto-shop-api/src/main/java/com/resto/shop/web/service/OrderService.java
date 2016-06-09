@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
@@ -120,6 +121,29 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order findCustomerNewPackage(String currentCustomerId, String currentShopId);
 	
+	/**
+	 * 根据时间 和指定 店铺ID 查询已完成的订单(orderSatus = 2,10,11,12)
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopId
+	 * @return
+	 */
+	SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId);
 	
-	List<SaleReportDto> selectArticleSumCountByData(String beginDate,String endDate);
+	/**
+	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopId
+	 * @return
+	 */
+	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate,String endDate,String shopId);
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate);
 }

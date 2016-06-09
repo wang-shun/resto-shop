@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.model.Order;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
@@ -107,11 +107,31 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	
 	
 	/**
-	 * 根据时间查询已完成的订单(orderSatus = 2,10,11,12)
-	 * 根据 店铺分组，查询该时间内完成的订单的菜品数量
+	 * 根据时间 和指定 店铺ID 查询已完成的订单(orderSatus = 2,10,11,12)
+	 * 的菜品销售总和。
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopId
+	 * @return
+	 */
+	int selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId);
+	
+	
+	/**
+	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopId
+	 * @return
+	 */
+	public List<ArticleSellDto> selectShopArticleSellByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId);
+	
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 */
-	List<SaleReportDto> selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
+	public List<ArticleSellDto> selectBrandArticleSellByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 }
