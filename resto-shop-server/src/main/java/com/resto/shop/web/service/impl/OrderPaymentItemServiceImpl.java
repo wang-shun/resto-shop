@@ -58,19 +58,10 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 		return orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
 	}
 
-	@Override
-	public List<OrderPaymentItem> selectIncomeBybrandId(String brandId,String beginDate,String endDate) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		return orderpaymentitemMapper.selectIncomeBybrandId(brandId,begin,end);
-	}
-
-	@Override
-	public List<OrderPaymentItem> selectIncomeByShopId(String shopId, String beginDate, String endDate) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		return orderpaymentitemMapper.selectIncomeBybrandId(shopId,begin,end);
-	}
+    @Override
+    public List<IncomeReportDto> selectIncomeReportList(String brandId) {
+        return orderpaymentitemMapper.selectIncomeReportList(brandId);
+    }
 
 
 

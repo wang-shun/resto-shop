@@ -75,19 +75,16 @@
   
  
   <!-- 查询品牌不同类型支付的营业收入统计 -->
-  <select id="selectIncomeBybrandId" resultType="OrderPaymentItem">
-  	SELECT SUM(op.pay_value) pay_value, op.payment_mode_id ,o.shop_detail_id  FROM tb_order_payment_item op LEFT JOIN  tb_order o ON  op.order_id=o.id  
-  	WHERE o.brand_id=#{brandId} 
-  	and <![CDATA[ op.pay_time >= #{begin} AND op.pay_time < #{end} ]]>
-    GROUP BY payment_mode_id 
+  <select id="selectIncomeReportList" resultType="com.resto.brand.web.dto.IncomeReportDto">
+	SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
+(SELECT
+	o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value
+FROM
+	tb_order o
+ LEFT JOIN  tb_order_payment_item oi ON oi.order_id = o.id
+WHERE o.brand_id = #{brandId}  ORDER BY o.shop_detail_id , oi.payment_mode_id
+) as ap
+WHERE ap.payment_mode_id IS NOT NULL
+GROUP BY ap.shop_detail_id,ap.payment_mode_id 
   </select>
-  
-  <!-- 根据店铺的营业收入 -->
-  <select id="selectIncomeByShopId" resultType="OrderPaymentItem">
-  	SELECT SUM(op.pay_value) pay_value, op.payment_mode_id FROM tb_order_payment_item op LEFT JOIN  tb_order o ON  op.order_id=o.id  
-  	WHERE o.shop_detail_id=#{shopId} 
-  	and <![CDATA[ op.pay_time >= #{begin} AND op.pay_time < #{end} ]]>
-  	GROUP BY payment_mode_id 
-  </select>
-  
 </mapper>

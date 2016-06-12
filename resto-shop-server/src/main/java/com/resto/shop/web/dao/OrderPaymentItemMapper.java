@@ -43,15 +43,5 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 	 * @param brandId
 	 * @return
 	 */
-	List<OrderPaymentItem> selectIncomeBybrandId(@Param("brandId")String brandId,@Param("begin") Date begin,@Param("end") Date end);
-	/**
-	 * 查询店铺不同支付类型的支付收入
-	 * @param shopId
-	 * @param begin
-	 * @param end
-	 * @return
-	 */
-
-	List<OrderPaymentItem> selectIncomeByShopId(@Param("shopId")String shopId,@Param("begin") Date begin,@Param("end") Date end);;
-	
+	List<IncomeReportDto> selectIncomeReportList(@Param("brandId")String brandId);
 }
