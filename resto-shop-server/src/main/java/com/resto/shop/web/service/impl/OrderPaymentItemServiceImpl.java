@@ -58,10 +58,10 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 		return orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
 	}
 
-    @Override
-    public List<IncomeReportDto> selectIncomeReportList(String brandId) {
-        return orderpaymentitemMapper.selectIncomeReportList(brandId);
-    }
+	@Override
+	public List<IncomeReportDto> selectIncomeList(String brandId) {
+		return orderpaymentitemMapper.selectIncomeList(brandId);
+	}
 
 
 

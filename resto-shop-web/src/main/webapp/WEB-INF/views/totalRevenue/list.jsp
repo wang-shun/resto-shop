@@ -55,7 +55,7 @@ $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 var tb1 = $("#brandReportTable").DataTable({
 	dom: '',
 	ajax : {
-		url : "totalRevenue/reportIncome",
+		url : "totalRevenue/brandIncome",
 		dataSrc : "",
 // 		data:function(d){
 // 			d.beginDate=$("#beginDate").val();
@@ -69,71 +69,61 @@ var tb1 = $("#brandReportTable").DataTable({
 			data : "brandName",
 		},       
 		{                 
-			title : "店铺",
-			data : "shopName",
-		},       
-		{                 
 			title : "营收总额(元)",
-			data : "totalValue",
-		},       
-// 		{                 
-// 			title : "系统账户收入(元)",
-// 			data : "accountValue",
-// 		},       
-// 		{                 
-// 			title : "优惠券支付收入(元)",
-// 			data : "couponValue",
-// 		},       
-// 		{                 
-// 			title : "微信支付收入(元)",
-// 			data : "wechatValue",
-// 		},       
-		{                 
-			title : "收入(元)",
-			data : "payValue",
+			data : "totalIncome",
 		},       
 		{                 
-			title : "支付方式",
-			data : "paymentModeId",
+			title : "系统账户收入(元)",
+			data : "accountIncome",
+		},       
+		{                 
+			title : "优惠券支付收入(元)",
+			data : "couponIncome",
+		},       
+		{                 
+			title : "微信支付收入(元)",
+			data : "wechatIncome",
 		},       
 	]
 	
 });
 
-// var tb2 = $("#shopReportTable").DataTable({
-// 	ajax : {
-// 		url : "totalRevenue/shopIncome",
-// 		dataSrc : "",
-// 	},
+
+var tb2 = $("#shopReportTable").DataTable({
+	ajax : {
+		url : "totalRevenue/shopIncome",
+		dataSrc : "",
+	},
 // 	data:function(d){
 // 		d.beginDate=$("#beginDate").val();
 // 		d.endDate=$("#endDate").val();
 // 		return d;
 // 	},
-// 	columns : [
-// 		{                 
-// 			title : "店铺",
-// 			data : "shopName",
-// 		},       
-// 		{                 
-// 			title : "营收总额(元)",
-// 			data : "totalIncome",
-// 		},       
-// 		{                 
-// 			title : "系统账户收入(元)",
-// 			data : "accountIncome",
-// 		},       
-// 		{                 
-// 			title : "优惠券支付收入(元)",
-// 			data : "couponIncome",
-// 		},       
-// 		{                 
-// 			title : "微信支付收入(元)",
-// 			data : "wechatIncome",
-// 		},       
-// 	]
+	columns : [
+		{                 
+			title : "店铺",
+			data : "shopName",
+		},       
+		{                 
+			title : "营收总额(元)",
+			data : "totalIncome",
+		},       
+		{                 
+			title : "系统账户收入(元)",
+			data : "accountIncome",
+		},       
+		{                 
+			title : "优惠券支付收入(元)",
+			data : "couponIncome",
+			defaultContent:'0.00'
+		},       
+		{                 
+			title : "微信支付收入(元)",
+			data : "wechatIncome",
+		},       
+	]
 	
-// });
+});
 
 $("#searchReport").click(function(){
 	var beginDate = $("#beginDate").val();

@@ -74,8 +74,8 @@
   </select>
   
  
-  <!-- 查询品牌不同类型支付的营业收入统计 -->
-  <select id="selectIncomeReportList" resultType="com.resto.brand.web.dto.IncomeReportDto">
+  <!-- 查询店铺不同类型支付的营业收入统计 -->
+  <select id="selectShopIncomeReportList" resultType="com.resto.brand.web.dto.ShopIncomeReportDto">
 	SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
 (SELECT
 	o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value
@@ -87,4 +87,35 @@ WHERE o.brand_id = #{brandId}  ORDER BY o.shop_detail_id , oi.payment_mode_id
 WHERE ap.payment_mode_id IS NOT NULL
 GROUP BY ap.shop_detail_id,ap.payment_mode_id 
   </select>
+  
+  <!-- 查询品牌不同类型支付的营业收入统计 -->
+  <select id="selectBrandIncomeReportList" resultType="com.resto.brand.web.dto.BrandIncomeReportDto">
+	SELECT ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
+(SELECT
+	 o.brand_id,oi.payment_mode_id ,oi.pay_value
+FROM
+	tb_order o
+ LEFT JOIN  tb_order_payment_item oi ON oi.order_id = o.id
+WHERE o.brand_id = #{brandId}  ORDER BY oi.payment_mode_id
+) as ap
+WHERE ap.payment_mode_id IS NOT NULL
+GROUP BY ap.payment_mode_id 
+  </select>
+  
+  
+  
+  <select id="selectIncomeList" resultType="com.resto.brand.web.dto.IncomeReportDto">
+	SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
+(SELECT
+	o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value
+FROM
+	tb_order o
+ LEFT JOIN  tb_order_payment_item oi ON oi.order_id = o.id
+WHERE o.brand_id = #{brandId}  ORDER BY o.shop_detail_id , oi.payment_mode_id
+) as ap
+WHERE ap.payment_mode_id IS NOT NULL
+GROUP BY ap.shop_detail_id,ap.payment_mode_id 
+  </select>
+  
+  
 </mapper>
