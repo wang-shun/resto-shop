@@ -74,16 +74,22 @@
   </select>
   
   <select id="selectIncomeList" resultType="com.resto.brand.web.dto.IncomeReportDto">
-	SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
-(SELECT
-	o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value
-FROM
-	tb_order o
- LEFT JOIN  tb_order_payment_item oi ON oi.order_id = o.id
-WHERE o.brand_id = #{brandId}  ORDER BY o.shop_detail_id , oi.payment_mode_id
-) as ap
-WHERE ap.payment_mode_id IS NOT NULL  AND <![CDATA[ oi.pay_time>#{begin} AND oi.pay_time<#{end}]]>
-GROUP BY ap.shop_detail_id,ap.payment_mode_id 
+		 <![CDATA[  
+		SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
+		(SELECT
+			o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value,oi.pay_time
+		FROM
+			tb_order o
+		 LEFT JOIN  tb_order_payment_item oi ON oi.order_id = o.id
+		WHERE 
+			o.brand_id = #{brandId} and 
+			oi.pay_time>#{begin} and 
+			oi.pay_time <#{end}
+			 ORDER BY o.shop_detail_id , oi.payment_mode_id
+		) as ap
+		WHERE ap.payment_mode_id IS NOT NULL
+		GROUP BY ap.shop_detail_id,ap.payment_mode_id ]]>
+  
   </select>
   
 </mapper>

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -37,86 +36,73 @@ public class TotalRevenueController extends GenericController{
 	@Resource
 	OrderPaymentItemService orderpaymentitemService;
 	
-	//获取数据封装在map中
-	private static final Map<String,List<IncomeReportDto>> incomeMap=new ConcurrentHashMap<>(); //存放查询出来的数据
-	
-	
-	private  List<IncomeReportDto> getIncomeList(String beginDate,String endDate){
-		return orderpaymentitemService.selectIncomeList(getCurrentBrandId(),beginDate,endDate);
-	}
-	
-	
 	@RequestMapping("/list")
         public void list(){
         }
+	//封装品牌和店铺收入需要的数据
 	
-	/**
-	 * 封装店铺报表数据
-	 * @return
-	 */
-	@RequestMapping("shopIncome")
+	@RequestMapping("reportIncome")
 	@ResponseBody
-	public List<ShopIncomeDto> selectShopReportList(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
+	public Map<String,Object> selectIncomeReportList(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
+		//查询品牌和店铺的收入情况
+		List<IncomeReportDto> incomeReportList = orderpaymentitemService.selectIncomeList(getCurrentBrandId(),beginDate,endDate);
+		//封装店铺所需要的数据结构
 		List<ShopDetail> listShop = shopDetailService.selectByBrandId(getCurrentBrandId());
 		List<ShopIncomeDto> shopIncomeList = new ArrayList<>();
 		Map<String,ShopIncomeDto> hm = new HashMap<>();
-		for (int i = 0; i < listShop.size(); i++) {
+		for (int i = 0; i < listShop.size(); i++) {//实际有多少个店铺显示多少个数据
 			ShopIncomeDto sin = new ShopIncomeDto();
 			sin.setShopDetailId(listShop.get(i).getId());
 			sin.setShopName(listShop.get(i).getName());
+			//设置每个店铺初始营业额为零
+			BigDecimal temp = BigDecimal.ZERO;
+			sin.setWechatIncome(temp);
+			sin.setAccountIncome(temp);
+			sin.setCouponIncome(temp);
+			sin.setTotalIncome(temp, temp, temp);
 			String s = ""+i;
 			hm.put(s, sin);
-			if(incomeMap.isEmpty()){
-				incomeMap.put("income", this.getIncomeList(beginDate,endDate));
+			if(!incomeReportList.isEmpty()){
+				for(IncomeReportDto in : incomeReportList){
+			        if(hm.get(s).getShopDetailId().equals(in.getShopDetailId())){
+			            switch (in.getPayMentModeId()) {
+						case 1:
+							hm.get(s).setWechatIncome(in.getPayValue());
+							break;
+						case 2:
+							hm.get(s).setAccountIncome(in.getPayValue());
+							break;
+						case 3:
+							hm.get(s).setCouponIncome(in.getPayValue());
+							break;
+						default:
+							break;
+						}
+			            hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(),hm.get(s).getAccountIncome(),hm.get(s).getCouponIncome());
+			        }
+				}
 			}
-			for(IncomeReportDto in : incomeMap.get("income")){
-		        if(hm.get(s).getShopDetailId().equals(in.getShopDetailId())){
-		            switch (in.getPayMentModeId()) {
-					case 1:
-						hm.get(s).setWechatIncome(in.getPayValue());
-						break;
-					case 2:
-						hm.get(s).setAccountIncome(in.getPayValue());
-						break;
-					case 3:
-						hm.get(s).setCouponIncome(in.getPayValue());
-						break;
-					default:
-						break;
-					}
-		            hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(), hm.get(s).getAccountIncome(), hm.get(s).getCouponIncome());
-		        }
-		}
 			shopIncomeList.add(hm.get(s));
-		
 		}
-		return shopIncomeList;
-	}
-	/**
-	 * 封装品牌报表数据
-	 * @return
-	 */
-	@RequestMapping("brandIncome")
-	@ResponseBody
-	public List<BrandIncomeDto> selectBrandReportList(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
+		//封装brand所需要的数据结构
+		
 		Brand brand = brandService.selectById(getCurrentBrandId());
-		//品牌报表数据
 		List<BrandIncomeDto> brandIncomeList = new ArrayList<>();
 		BrandIncomeDto in = new BrandIncomeDto();
 		//初始化品牌的信息
 		BigDecimal wechatIncome = BigDecimal.ZERO;
 		BigDecimal accountIncome = BigDecimal.ZERO;
 		BigDecimal couponIncome = BigDecimal.ZERO;
-		if(incomeMap.isEmpty()){
-			incomeMap.put("income", this.getIncomeList(beginDate,endDate));
-		}
-		for(IncomeReportDto income : incomeMap.get("income")){
-			if(income.getPaymentModeId()==1){
-				wechatIncome=wechatIncome.add(income.getPayValue()).setScale(2);
-			}else if(income.getPayMentModeId()==2){
-				accountIncome=accountIncome.add(income.getPayValue()).setScale(2);
-			}else if(income.getPayMentModeId()==3){
-				couponIncome=couponIncome.add(income.getPayValue()).setScale(2);
+		
+		if(!incomeReportList.isEmpty()){
+			for(IncomeReportDto income : incomeReportList){
+				if(income.getPaymentModeId()==1){
+					wechatIncome=wechatIncome.add(income.getPayValue()).setScale(2);
+				}else if(income.getPayMentModeId()==2){
+					accountIncome=accountIncome.add(income.getPayValue()).setScale(2);
+				}else if(income.getPayMentModeId()==3){
+					couponIncome=couponIncome.add(income.getPayValue()).setScale(2);
+				}
 			}
 		}
 		in.setBrandName(brand.getBrandName());
@@ -125,7 +111,11 @@ public class TotalRevenueController extends GenericController{
 		in.setCouponIncome(couponIncome);
 		in.setTotalIncome(in.getWechatIncome(), in.getAccountIncome(), in.getCouponIncome());
 		brandIncomeList.add(in);
-		return brandIncomeList;
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("shopIncome", shopIncomeList);
+		map.put("brandIncome", brandIncomeList);
+		return map;
 	}
 
 }

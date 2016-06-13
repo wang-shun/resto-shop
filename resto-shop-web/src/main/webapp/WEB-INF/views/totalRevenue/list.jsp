@@ -51,12 +51,13 @@ $('.form_datetime').datetimepicker({
 
 //文本框默认值
 $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
+//$('.form_datetime').val(new Date().format("2016-05-25"));
 
 var tb1 = $("#brandReportTable").DataTable({
 	dom: '',
 	ajax : {
-		url : "totalRevenue/brandIncome",
-		dataSrc : "",
+		url : "totalRevenue/reportIncome",
+		dataSrc : "brandIncome",
 		data:function(d){
 			d.beginDate=$("#beginDate").val();
 			d.endDate=$("#endDate").val();
@@ -88,20 +89,19 @@ var tb1 = $("#brandReportTable").DataTable({
 	
 });
 
-
 var tb2 = $("#shopReportTable").DataTable({
 	ajax : {
-		url : "totalRevenue/shopIncome",
-		dataSrc : "",
-	},
-	data:function(d){
-		d.beginDate=$("#beginDate").val();
-		d.endDate=$("#endDate").val();
-		return d;
+		url : "totalRevenue/reportIncome",
+		dataSrc : "shopIncome",
+		data:function(d){
+			d.beginDate=$("#beginDate").val();
+			d.endDate=$("#endDate").val();
+			return d;
+		},
 	},
 	columns : [
 		{                 
-			title : "店铺",
+			title : "店铺名称",
 			data : "shopName",
 		},       
 		{                 
@@ -115,15 +115,15 @@ var tb2 = $("#shopReportTable").DataTable({
 		{                 
 			title : "优惠券支付收入(元)",
 			data : "couponIncome",
-			defaultContent:'0.00'
 		},       
 		{                 
 			title : "微信支付收入(元)",
 			data : "wechatIncome",
-		},       
+		}     
 	]
 	
 });
+
 
 $("#searchReport").click(function(){
 	var beginDate = $("#beginDate").val();
