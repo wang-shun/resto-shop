@@ -20,6 +20,7 @@ import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.OrderPaymentItemService;
 
@@ -66,13 +67,13 @@ public class TotalRevenueController extends GenericController{
 				for(IncomeReportDto in : incomeReportList){
 			        if(hm.get(s).getShopDetailId().equals(in.getShopDetailId())){
 			            switch (in.getPayMentModeId()) {
-						case 1:
+						case PayMode.WEIXIN_PAY:
 							hm.get(s).setWechatIncome(in.getPayValue());
 							break;
-						case 2:
+						case PayMode.ACCOUNT_PAY:
 							hm.get(s).setAccountIncome(in.getPayValue());
 							break;
-						case 3:
+						case PayMode.COUPON_PAY:
 							hm.get(s).setCouponIncome(in.getPayValue());
 							break;
 						default:
@@ -96,11 +97,11 @@ public class TotalRevenueController extends GenericController{
 		
 		if(!incomeReportList.isEmpty()){
 			for(IncomeReportDto income : incomeReportList){
-				if(income.getPaymentModeId()==1){
+				if(income.getPaymentModeId()==PayMode.WEIXIN_PAY){
 					wechatIncome=wechatIncome.add(income.getPayValue()).setScale(2);
-				}else if(income.getPayMentModeId()==2){
+				}else if(income.getPayMentModeId()==PayMode.ACCOUNT_PAY){
 					accountIncome=accountIncome.add(income.getPayValue()).setScale(2);
-				}else if(income.getPayMentModeId()==3){
+				}else if(income.getPayMentModeId()==PayMode.COUPON_PAY){
 					couponIncome=couponIncome.add(income.getPayValue()).setScale(2);
 				}
 			}
@@ -111,7 +112,6 @@ public class TotalRevenueController extends GenericController{
 		in.setCouponIncome(couponIncome);
 		in.setTotalIncome(in.getWechatIncome(), in.getAccountIncome(), in.getCouponIncome());
 		brandIncomeList.add(in);
-		
 		Map<String,Object> map = new HashMap<>();
 		map.put("shopIncome", shopIncomeList);
 		map.put("brandIncome", brandIncomeList);

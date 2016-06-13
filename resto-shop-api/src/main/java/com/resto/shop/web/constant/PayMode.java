@@ -23,8 +23,6 @@ public class PayMode {
             default:
                 return "未知";
             }
-	    
-	    
 	}
 
 }

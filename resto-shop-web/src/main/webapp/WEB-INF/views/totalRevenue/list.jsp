@@ -51,19 +51,28 @@ $('.form_datetime').datetimepicker({
 
 //文本框默认值
 $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-//$('.form_datetime').val(new Date().format("2016-05-25"));
+
+var beginDate = $("#beginDate").val();
+var endDate = $("#endDate").val();
+var dataSource;
+$.ajax( {  
+    url:'totalRevenue/reportIncome',
+    async:false,
+    data:{  
+    	'beginDate':beginDate,
+    	'endDate':endDate
+    },  
+    success:function(data) { 
+    	dataSource=data;
+     },  
+     error : function() { 
+    	 toastr.error("系统异常请重新刷新");
+     }  
+});
 
 var tb1 = $("#brandReportTable").DataTable({
-	dom: '',
-	ajax : {
-		url : "totalRevenue/reportIncome",
-		dataSrc : "brandIncome",
-		data:function(d){
-			d.beginDate=$("#beginDate").val();
-			d.endDate=$("#endDate").val();
-			return d;
-		},
-	},
+	dom: 'i',
+	data:dataSource.brandIncome,
 	columns : [
 		{                 
 			title : "品牌",
@@ -90,15 +99,7 @@ var tb1 = $("#brandReportTable").DataTable({
 });
 
 var tb2 = $("#shopReportTable").DataTable({
-	ajax : {
-		url : "totalRevenue/reportIncome",
-		dataSrc : "shopIncome",
-		data:function(d){
-			d.beginDate=$("#beginDate").val();
-			d.endDate=$("#endDate").val();
-			return d;
-		},
-	},
+	data:dataSource.shopIncome,
 	columns : [
 		{                 
 			title : "店铺名称",
@@ -124,14 +125,26 @@ var tb2 = $("#shopReportTable").DataTable({
 	
 });
 
-
 $("#searchReport").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	var data = {"beginDate":beginDate,"endDate":endDate};
-	//更新数据
-	tb1.ajax.reload();
-	tb2.ajax.reload();
+	 beginDate = $("#beginDate").val();
+	 endDate = $("#endDate").val();
+	//更新数据源
+	 $.ajax( {  
+		    url:'totalRevenue/reportIncome',
+		    data:{  
+		    	'beginDate':beginDate,
+		    	'endDate':endDate
+		    },  
+		    success:function(result) {
+		    	tb1.clear().draw();
+		    	tb2.clear().draw();
+		    	tb1.rows.add(result.brandIncome).draw();
+		    	tb2.rows.add(result.shopIncome).draw();
+		     },  
+		     error : function() { 
+		    	 toastr.error("系统异常请重新刷新");
+		     }  
+		});
 })
 	
 	
