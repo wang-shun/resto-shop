@@ -57,11 +57,11 @@ var tb1 = $("#brandReportTable").DataTable({
 	ajax : {
 		url : "totalRevenue/brandIncome",
 		dataSrc : "",
-// 		data:function(d){
-// 			d.beginDate=$("#beginDate").val();
-// 			d.endDate=$("#endDate").val();
-// 			return d;
-// 		},
+		data:function(d){
+			d.beginDate=$("#beginDate").val();
+			d.endDate=$("#endDate").val();
+			return d;
+		},
 	},
 	columns : [
 		{                 
@@ -94,11 +94,11 @@ var tb2 = $("#shopReportTable").DataTable({
 		url : "totalRevenue/shopIncome",
 		dataSrc : "",
 	},
-// 	data:function(d){
-// 		d.beginDate=$("#beginDate").val();
-// 		d.endDate=$("#endDate").val();
-// 		return d;
-// 	},
+	data:function(d){
+		d.beginDate=$("#beginDate").val();
+		d.endDate=$("#endDate").val();
+		return d;
+	},
 	columns : [
 		{                 
 			title : "店铺",

@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.web.dto.BrandIncomeDto;
@@ -40,9 +41,8 @@ public class TotalRevenueController extends GenericController{
 	private static final Map<String,List<IncomeReportDto>> incomeMap=new ConcurrentHashMap<>(); //存放查询出来的数据
 	
 	
-	private  List<IncomeReportDto> getIncomeList(){
-		
-		return orderpaymentitemService.selectIncomeList(getCurrentBrandId());
+	private  List<IncomeReportDto> getIncomeList(String beginDate,String endDate){
+		return orderpaymentitemService.selectIncomeList(getCurrentBrandId(),beginDate,endDate);
 	}
 	
 	
@@ -56,7 +56,7 @@ public class TotalRevenueController extends GenericController{
 	 */
 	@RequestMapping("shopIncome")
 	@ResponseBody
-	public List<ShopIncomeDto> selectShopReportList(){
+	public List<ShopIncomeDto> selectShopReportList(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
 		List<ShopDetail> listShop = shopDetailService.selectByBrandId(getCurrentBrandId());
 		List<ShopIncomeDto> shopIncomeList = new ArrayList<>();
 		Map<String,ShopIncomeDto> hm = new HashMap<>();
@@ -67,7 +67,7 @@ public class TotalRevenueController extends GenericController{
 			String s = ""+i;
 			hm.put(s, sin);
 			if(incomeMap.isEmpty()){
-				incomeMap.put("income", this.getIncomeList());
+				incomeMap.put("income", this.getIncomeList(beginDate,endDate));
 			}
 			for(IncomeReportDto in : incomeMap.get("income")){
 		        if(hm.get(s).getShopDetailId().equals(in.getShopDetailId())){
@@ -98,7 +98,7 @@ public class TotalRevenueController extends GenericController{
 	 */
 	@RequestMapping("brandIncome")
 	@ResponseBody
-	public List<BrandIncomeDto> selectBrandReportList(){
+	public List<BrandIncomeDto> selectBrandReportList(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
 		Brand brand = brandService.selectById(getCurrentBrandId());
 		//品牌报表数据
 		List<BrandIncomeDto> brandIncomeList = new ArrayList<>();
@@ -108,7 +108,7 @@ public class TotalRevenueController extends GenericController{
 		BigDecimal accountIncome = BigDecimal.ZERO;
 		BigDecimal couponIncome = BigDecimal.ZERO;
 		if(incomeMap.isEmpty()){
-			incomeMap.put("income", this.getIncomeList());
+			incomeMap.put("income", this.getIncomeList(beginDate,endDate));
 		}
 		for(IncomeReportDto income : incomeMap.get("income")){
 			if(income.getPaymentModeId()==1){
@@ -118,7 +118,6 @@ public class TotalRevenueController extends GenericController{
 			}else if(income.getPayMentModeId()==3){
 				couponIncome=couponIncome.add(income.getPayValue()).setScale(2);
 			}
-			
 		}
 		in.setBrandName(brand.getBrandName());
 		in.setWechatIncome(wechatIncome);

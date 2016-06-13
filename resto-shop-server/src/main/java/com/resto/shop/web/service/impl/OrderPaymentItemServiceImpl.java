@@ -59,8 +59,10 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 	}
 
 	@Override
-	public List<IncomeReportDto> selectIncomeList(String brandId) {
-		return orderpaymentitemMapper.selectIncomeList(brandId);
+	public List<IncomeReportDto> selectIncomeList(String brandId, String beginDate, String endDate) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end =  DateUtil.getformatEndDate(endDate);
+		return orderpaymentitemMapper.selectIncomeList(brandId,begin,end);
 	}
 
 

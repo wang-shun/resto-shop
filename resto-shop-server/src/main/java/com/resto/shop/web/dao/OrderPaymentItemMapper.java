@@ -43,6 +43,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 	 * @param brandId
 	 * @return
 	 */
-	List<IncomeReportDto> selectIncomeList(@Param("brandId")String brandId);
+	List<IncomeReportDto> selectIncomeList(@Param("brandId")String brandId,@Param("begin")Date begin,@Param("end")Date end);
 
 }
