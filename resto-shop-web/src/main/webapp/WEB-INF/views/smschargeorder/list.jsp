@@ -6,7 +6,6 @@ dt, dd {
 	line-height: 35px;
 }
 </style>
-
 <div id="control">
 <div class="table-div">
 	<div class="table-operator">

@@ -100,8 +100,8 @@
 			url:"smsacount/selectSmsAcount",
 			success:function(result){
 				console.log(result);
-				$("#remnant").html(result.data.remainerAmcount);
-				$("#isUsed").html(result.data.usedAmcount);
+				$("#remnant").html(result.data.remainderNum);
+				$("#isUsed").html(result.data.usedNum);
 			}
 		})
 		

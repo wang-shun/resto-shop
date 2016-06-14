@@ -113,7 +113,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		if(this.isHave(arrs, remindNum+"")){
 			//提醒商家充值
 			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),remindNum, brandUser.getPhone());
-			
 		}
 	}
 
