@@ -162,15 +162,6 @@ $(document).ready(function(){
 				data : "name",
 			}, 
 			{                 
-				title : "开始日期时间",
-				data : "beginDateTime",
-			}, 
-			{                 
-				title : "结束日期时间",
-				data : "endDateTime",
-			}, 
-			
-			{                 
 				title : "优惠券价值",
 				data : "couponValue",
 			}, 
