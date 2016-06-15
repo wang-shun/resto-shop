@@ -160,7 +160,16 @@ $(document).ready(function(){
 			{                 
 				title : "活动名称",
 				data : "name",
-			},                 
+			}, 
+			{                 
+				title : "开始日期时间",
+				data : "beginDateTime",
+			}, 
+			{                 
+				title : "结束日期时间",
+				data : "endDateTime",
+			}, 
+			
 			{                 
 				title : "优惠券价值",
 				data : "couponValue",
@@ -275,7 +284,7 @@ $(document).ready(function(){
 					begin=new Date(tem1).format("hh:mm");
 					end = new Date(tem2).format("hh:mm");
 					beginDate = new Date(tem3).format("yyyy-MM-dd hh:mm:ss");
-					endDate = new Date(tem3).format("yyyy-MM-dd hh:mm:ss");
+					endDate = new Date(tem4).format("yyyy-MM-dd hh:mm:ss");
 					if(begin=='aN:aN'){
 						begin = tem1;
 					}
@@ -350,12 +359,26 @@ $(document).ready(function(){
 					this.showDateTime=true;
 				},
 				initCouponTime: function(){
-					$(".form_datetime").datetimepicker({
-			            autoclose: true,
-			            isRTL: App.isRTL(),
-			            format: "yyyy-mm-dd HH:mm:ss",
-			            pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left")
-			        });
+// 					$(".form_datetime").datetimepicker({
+// 			            autoclose: true,
+// 			            isRTL: App.isRTL(),
+// 			            format: "yyyy-mm-dd HH:mm:ss",
+// 			            pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left")
+// 			        });
+
+					$('.form_datetime').datetimepicker({
+						 format: "yyyy-mm-dd hh:ii:ss",
+					        autoclose: true,
+					        todayBtn: true,
+					        todayHighlight: true,
+					        showMeridian: true,
+					        pickerPosition: "bottom-left",
+					        language: 'zh-CN',//中文，需要引用zh-CN.js包
+					        startView: 2,//月视图
+					        //minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
+					});
+
+
 				}
 				
 			},
