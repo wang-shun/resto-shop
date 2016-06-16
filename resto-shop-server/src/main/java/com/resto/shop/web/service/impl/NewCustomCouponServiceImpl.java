@@ -50,8 +50,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
 	@Override
 	public void giftCoupon(Customer cus) {
-		//根据 品牌id 查询该品牌的优惠卷配置
-	    List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandId(cus.getBrandId());
+		//根据 品牌id 查询该品牌的优惠卷配置 查询已经启用的优惠券
+	    List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId());
 		//根据优惠卷配置，添加对应数量的优惠卷
 		
 	    Date beginDate  = new Date();
@@ -75,7 +75,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	        	coupon.setBeginDate(cfg.getBeginDateTime());
 	        	coupon.setEndDate(cfg.getEndDateTime());
 	        }
-	        
 	        
 	        for(int i=0;i<cfg.getCouponNumber();i++){
 	            couponService.insertCoupon(coupon);

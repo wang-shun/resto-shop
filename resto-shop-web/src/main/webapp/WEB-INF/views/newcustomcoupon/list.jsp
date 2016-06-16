@@ -183,6 +183,20 @@ $(document).ready(function(){
 				}
 			}, 
 			{                 
+				title : "优惠券开始时间",
+				data : "beginDateTime",
+				createdCell:function(td,tdData){
+					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+				}
+			},  
+			{                 
+				title : "优惠券结束时间",
+				data : "endDateTime",
+				createdCell:function(td,tdData){
+					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+				}
+			},     
+			{                 
 				title : "优惠券数量",
 				data : "couponNumber",
 			},                 
@@ -231,9 +245,6 @@ $(document).ready(function(){
 			data:{
 				m:{},
 				showform:false,
-				showDateNum:false,
-				showDateTime:false,
-				
 			},
 			methods:{
 				openForm:function(){
@@ -252,8 +263,8 @@ $(document).ready(function(){
 							timeConsType:1,
 							useWithAccount:1,
 					};
-					this.showDateNum=false;
-					this.showDateTime=false;
+// 					this.showDateNum=false;
+// 					this.showDateTime=false;
 					this.openForm();
 					Vue.nextTick(function () {
 						vueObj.initdistributionMode();
@@ -309,8 +320,8 @@ $(document).ready(function(){
 					var that = this;
 					var formDom = e.target;
 					C.ajaxFormEx(formDom,function(){
-										that.cancel();
-										tb.ajax.reload();
+						that.cancel();
+						tb.ajax.reload();
 					});
 				},
 				initdistributionMode :function(){
@@ -342,21 +353,15 @@ $(document).ready(function(){
 					    });
 				},
 				showNum: function(){
-					this.showDateTime=false;
-					this.showDateNum=true;
+					//点击优惠券时间类型按天算 清空天数
+					vueObj.m.couponValiday='';
 				},
 				showTime : function(){
-					this.showDateNum=false;
-					this.showDateTime=true;
+					//点击优惠券的时间类型为时间范围  清空开始时间和结束时间
+					vueObj.m.beginDateTime='';
+					vueObj.m.endDateTime='';
 				},
 				initCouponTime: function(){
-// 					$(".form_datetime").datetimepicker({
-// 			            autoclose: true,
-// 			            isRTL: App.isRTL(),
-// 			            format: "yyyy-mm-dd HH:mm:ss",
-// 			            pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left")
-// 			        });
-
 					$('.form_datetime').datetimepicker({
 						 format: "yyyy-mm-dd hh:ii:ss",
 					        autoclose: true,

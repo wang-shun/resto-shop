@@ -19,4 +19,6 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
     int updateByPrimaryKey(NewCustomCoupon record);
 
     List<NewCustomCoupon> selectListByBrandId(String brandId);
+
+	List<NewCustomCoupon> selectListByBrandIdAndIsActive(String brandId);
 }
