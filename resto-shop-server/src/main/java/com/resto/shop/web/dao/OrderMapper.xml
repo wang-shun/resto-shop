@@ -741,6 +741,7 @@
 	<select id="selectChildIdsByParentId" resultType="String">
 		select id from
 		tb_order where parent_order_id=#{0}
+		where order_state in (2,10,11,12)
 	</select>
 	<select id="selectNewCustomerPackageId" resultType="String">
 		SELECT id
