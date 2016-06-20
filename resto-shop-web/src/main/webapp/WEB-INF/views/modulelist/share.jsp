@@ -24,6 +24,18 @@
 		    <input type="text" class="form-control" name="rebate" v-model="m.rebate">
 		</div>
 		<div class="form-group">
+		    <label>最小金额</label>
+		    <input type="text" class="form-control" name="minMoney" v-model="m.minMoney">
+		</div>
+		<div class="form-group">
+		    <label>最大金额</label>
+		    <input type="text" class="form-control" name="maxMoney" v-model="m.maxMoney">
+		</div>
+		<div class="form-group">
+		    <label>注册按钮文字</label>
+		    <input type="text" class="form-control" name=registerButton v-model="m.registerButton">
+		</div>
+		<div class="form-group">
 			<label for="">是否启用</label>
 		    <div class="radio-list">
 				<label class="radio-inline">
@@ -55,6 +67,8 @@
 		data:{
 			m:{
 				isActivity : 1,
+				minMoney:2,
+				maxMoney:100,
 			},
 		},
 		methods:{
