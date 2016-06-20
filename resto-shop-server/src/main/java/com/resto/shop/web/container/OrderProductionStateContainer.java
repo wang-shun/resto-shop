@@ -35,23 +35,6 @@ public class OrderProductionStateContainer {
 	private static final Map<String,Map<String,Order>> CALL_NOW_MAP = new ConcurrentHashMap<>();     //正在叫号的队列
 	private static final Map<String,Boolean> INIT_SHOP = new ConcurrentHashMap<>();
 	
-	static {
-		Date date = DateUtil.getDateBegin(new Date());
-	    long daySpan = 24 * 60 * 60 * 1000;
-	    Timer t = new Timer();
-	    t.schedule(new TimerTask() {
-	    	Logger log = LoggerFactory.getLogger(getClass());
-			@Override
-			public void run() {
-				log.info("清理订单容器定时器开始执行，清空所有缓存信息");
-				PUSH_ORDER_MAP.clear();
-				READY_ORDER_MAP.clear();
-				CALL_NOW_MAP.clear();
-				INIT_SHOP.clear();
-				log.info("清理订单状态容器成功！");
-			}
-		}, date.getTime(),daySpan);
-	}
 	
 	@Resource
 	OrderService orderService;
@@ -106,31 +89,31 @@ public class OrderProductionStateContainer {
 		return newList;
 	}
 	
-	public void addOrder(Order order){
-		String shopId = order.getShopDetailId();
-		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){
-			Map<String,Order> orderMap = getOrderMap(PUSH_ORDER_MAP,shopId);
-			orderMap.put(order.getId(), order);
-		}else if(order.getProductionStatus()==ProductionStatus.HAS_CALL){
-			Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
-			orderMap.put(order.getId(), order);
-			if(order.getCustomer()==null){
-				Customer cus = customerService.selectById(order.getCustomerId());
-				order.setCustomer(cus);
-			}
-			Map<String,Order> readyOrder = getOrderMap(READY_ORDER_MAP, shopId);
-			if(readyOrder.containsKey(order.getId())){ //如果准备中的队列中有该订单，则删除该订单
-				readyOrder.remove(order.getId());
-			}
-		}else if(order.getProductionStatus()==ProductionStatus.PRINTED){
-			Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP,shopId);
-			orderMap.put(order.getId(), order);
-			Map<String,Order> pushOrderMap = getOrderMap(PUSH_ORDER_MAP, shopId);
-			if(pushOrderMap.containsKey(order.getId())){
-				pushOrderMap.remove(order.getId());
-			}
-		}
-	}
+//	public void addOrder(Order order){
+//		String shopId = order.getShopDetailId();
+//		if(order.getProductionStatus()==ProductionStatus.HAS_ORDER){
+//			Map<String,Order> orderMap = getOrderMap(PUSH_ORDER_MAP,shopId);
+//			orderMap.put(order.getId(), order);
+//		}else if(order.getProductionStatus()==ProductionStatus.HAS_CALL){
+//			Map<String,Order> orderMap = getOrderMap(CALL_NOW_MAP, shopId);
+//			orderMap.put(order.getId(), order);
+//			if(order.getCustomer()==null){
+//				Customer cus = customerService.selectById(order.getCustomerId());
+//				order.setCustomer(cus);
+//			}
+//			Map<String,Order> readyOrder = getOrderMap(READY_ORDER_MAP, shopId);
+//			if(readyOrder.containsKey(order.getId())){ //如果准备中的队列中有该订单，则删除该订单
+//				readyOrder.remove(order.getId());
+//			}
+//		}else if(order.getProductionStatus()==ProductionStatus.PRINTED){
+//			Map<String,Order> orderMap = getOrderMap(READY_ORDER_MAP,shopId);
+//			orderMap.put(order.getId(), order);
+//			Map<String,Order> pushOrderMap = getOrderMap(PUSH_ORDER_MAP, shopId);
+//			if(pushOrderMap.containsKey(order.getId())){
+//				pushOrderMap.remove(order.getId());
+//			}
+//		}
+//	}
 
 
 	private void initShop(String shopId) {
@@ -138,7 +121,7 @@ public class OrderProductionStateContainer {
 			INIT_SHOP.put(shopId, true);
 			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
 			for (Order o: order) {
-				addOrder(o);
+//				addOrder(o);
 			}
 		}
 	}
