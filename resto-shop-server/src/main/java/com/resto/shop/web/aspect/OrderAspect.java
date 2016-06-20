@@ -178,7 +178,7 @@ public class OrderAspect {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+msg+result);
 		}
-		if(customer.getFirstOrderTime()==null){
+		if(customer.getFirstOrderTime()==null){ //分享判定
 			customerService.updateFirstOrderTime(customer.getId());
 			if(customer.getShareCustomer()!=null){
 				Customer shareCustomer= customerService.selectById(customer.getShareCustomer());

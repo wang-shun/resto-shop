@@ -136,6 +136,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		BigDecimal rebate = shareSetting.getRebate();
 		BigDecimal money = order.getOrderMoney();
 		BigDecimal rewardMoney = money.multiply(rebate).divide(new BigDecimal(100)).setScale(BigDecimal.ROUND_HALF_DOWN, 2);
+		if(rewardMoney.compareTo(shareSetting.getMinMoney())<0){
+			rewardMoney = shareSetting.getMinMoney();
+		}else if(rewardMoney.compareTo(shareSetting.getMaxMoney())>0){
+			rewardMoney = shareSetting.getMaxMoney();
+		}
 		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD);
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 	}
