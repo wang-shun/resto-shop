@@ -104,8 +104,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	}
 
 	@Override
-	public List<Map<String, Object>> appraiseMonthCount(String surrentShopId) {
-		return appraiseMapper.appraiseMonthCount(surrentShopId);
+	public List<Map<String, Object>> appraiseMonthCount(String currentShopId) {
+		return appraiseMapper.appraiseMonthCount(currentShopId);
 	}
 
 	@Override
