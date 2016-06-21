@@ -699,7 +699,7 @@
 		customer_id
 		from tb_order o LEFT JOIN tb_customer c on o.customer_id =
 		c.id
-		where order_state = 2 and production_status=0 and shop_detail_id =
+		where order_state = 2 and production_status=0 and o.shop_detail_id =
 		#{shopId} and ver_code = #{vercode}
 		ORDER BY push_order_time DESC
 	</select>
@@ -710,7 +710,7 @@
 		o.id,o.order_state,o.production_status,o.article_count,o.create_time,o.serial_number,o.order_money,c.nickname,c.telephone,o.customer_id
 		from tb_order o LEFT JOIN tb_customer c on o.customer_id = c.id
 		where
-		order_state = 2 and production_status=0 and shop_detail_id =
+		order_state = 2 and production_status=0 and o.shop_detail_id =
 		#{shopId}
 		and table_number = #{tableNumber}
 		ORDER BY push_order_time DESC
