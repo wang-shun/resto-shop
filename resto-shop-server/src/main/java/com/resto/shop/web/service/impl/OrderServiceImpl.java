@@ -120,6 +120,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     MealItemService mealItemService;
     
+    
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -641,7 +642,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("DISTRIBUTION_MODE", modeText);
 		data.put("ARTICLE_COUNT", order.getArticleCount());
 		data.put("RESTAURANT_NAME", shopDetail.getName());
-
 		data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
 		data.put("RESTAURANT_TEL", shopDetail.getPhone());
 		data.put("TABLE_NUMBER", order.getTableNumber());
@@ -651,6 +651,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
 		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+		//添加小票的打印的序号
+		data.put("NUMBER", nextNumber(shopDetail.getId(),order.getId()));
 
 		// 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
 		Map<String, Object> print = new HashMap<>();
@@ -668,6 +670,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		print.put("TICKET_TYPE", TicketType.RECEIPT);
 		return print;
 	}
+
 
 	@Override
 	public Order confirmOrder(Order order) {
@@ -851,6 +854,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end);
 		return list;
+	}
+	
+	//根据店铺id和订单id获取订单序号的方法
+	private String nextNumber(String sid, String oid) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
