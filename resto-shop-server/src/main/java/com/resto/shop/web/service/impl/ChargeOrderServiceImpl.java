@@ -101,11 +101,11 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		
 	}
 
-	private void useBalance(BigDecimal[] result, BigDecimal rewardPay, String customerId, Order order) {
+	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order) {
 		ChargeOrder chargeOrder = chargeorderMapper.selectFirstBalanceOrder(customerId);
 		if(chargeOrder!=null){
-			BigDecimal useReward = useReward(chargeOrder,rewardPay);  //使用返利支付
-			BigDecimal useCharge = useCharge(chargeOrder,rewardPay.subtract(useReward).setScale(2, BigDecimal.ROUND_HALF_UP));  //使用充值支付
+			BigDecimal useReward = useReward(chargeOrder,remindPay);  //使用返利支付
+			BigDecimal useCharge = useCharge(chargeOrder,remindPay.subtract(useReward).setScale(2, BigDecimal.ROUND_HALF_UP));  //使用充值支付
 			result[0] = result[0].add(useCharge);
 			result[1] = result[1].add(useReward);
 			chargeorderMapper.updateBalance(chargeOrder.getId(),useCharge,useReward);
@@ -132,8 +132,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setResultData(chargeOrder.getId());
 				orderPaymentItemService.insert(item); 
 			}
-			if(rewardPay.compareTo(totalPay)>0){
-				useBalance(result,rewardPay,customerId,order);
+			if(remindPay.compareTo(totalPay)>0){
+				remindPay = remindPay.subtract(totalPay).setScale(2, BigDecimal.ROUND_HALF_UP);
+				useBalance(result,remindPay,customerId,order);
 			}
 		}
 	}

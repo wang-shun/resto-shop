@@ -128,7 +128,8 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			if(redPackageMoney.compareTo(realPay)>=0){ //如果红包金额足够支付所有金额，则只添加红包金额支付项
 				redPay = realPay;
 			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
-				BigDecimal remainPay = realPay.subtract(redPackageMoney).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
+				redPay = redPackageMoney;
+				BigDecimal remainPay = realPay.subtract(redPay).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
 				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
 			}
 		}
