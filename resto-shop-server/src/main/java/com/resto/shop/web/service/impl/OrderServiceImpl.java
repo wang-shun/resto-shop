@@ -904,7 +904,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				number=1;
 			}
 		}
-		//int转string类型 '001'
 		return numberToString(number);
 	}
 	
@@ -914,24 +913,4 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return f.format(num);
 	}
 	
-//	@Test
-//	public  void getNumber(){
-//		
-//		//订单map
-//		Map<String,Integer> ordermap = new HashMap<>();
-//		ordermap.put("oid1", 2);
-//		ordermap.put("oid2", 3);
-//		
-//		//NUMBER_ORDER_MAP.put("2016-06-21", ordermap);假设今天的单子
-//		NUMBER_ORDER_MAP.put("2016-06-21", ordermap);//假设昨天的单子
-//		
-//		Map<String,Integer> shopmap = new HashMap<>();
-//		shopmap.put("111", 1);
-//		shopmap.put("111", 3);
-//		NUMBER_SHOP_MAP.put("2016-06-21", shopmap);
-//		
-//		String s = nextNumber("111","oid1");
-//		System.out.println(s);
-//	}
-
 }
