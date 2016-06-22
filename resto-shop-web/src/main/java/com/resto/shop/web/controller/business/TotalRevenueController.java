@@ -58,9 +58,11 @@ public class TotalRevenueController extends GenericController{
 			//设置每个店铺初始营业额为零
 			BigDecimal temp = BigDecimal.ZERO;
 			sin.setWechatIncome(temp);
-			sin.setAccountIncome(temp);
+			sin.setRedIncome(temp);
 			sin.setCouponIncome(temp);
-			sin.setTotalIncome(temp, temp, temp);
+			sin.setChargeAccountIncome(temp);
+			sin.setChargeGifAccountIncome(temp);
+			sin.setTotalIncome(temp, temp, temp,temp,temp);
 			String s = ""+i;
 			hm.put(s, sin);
 			if(!incomeReportList.isEmpty()){
@@ -71,15 +73,22 @@ public class TotalRevenueController extends GenericController{
 							hm.get(s).setWechatIncome(in.getPayValue());
 							break;
 						case PayMode.ACCOUNT_PAY:
-							hm.get(s).setAccountIncome(in.getPayValue());
+							hm.get(s).setRedIncome(in.getPayValue());
 							break;
 						case PayMode.COUPON_PAY:
 							hm.get(s).setCouponIncome(in.getPayValue());
 							break;
+						case PayMode.CHARGE_PAY:
+							hm.get(s).setChargeAccountIncome(in.getPayValue());
+							break;
+						case PayMode.REWARD_PAY:
+							hm.get(s).setChargeGifAccountIncome(in.getPayValue());
+							break;
+							
 						default:
 							break;
 						}
-			            hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(),hm.get(s).getAccountIncome(),hm.get(s).getCouponIncome());
+			            hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(),hm.get(s).getRedIncome(),hm.get(s).getCouponIncome(),hm.get(s).getChargeAccountIncome(),hm.get(s).getChargeGifAccountIncome());
 			        }
 				}
 			}
@@ -92,25 +101,33 @@ public class TotalRevenueController extends GenericController{
 		BrandIncomeDto in = new BrandIncomeDto();
 		//初始化品牌的信息
 		BigDecimal wechatIncome = BigDecimal.ZERO;
-		BigDecimal accountIncome = BigDecimal.ZERO;
+		BigDecimal redIncome = BigDecimal.ZERO;
 		BigDecimal couponIncome = BigDecimal.ZERO;
+		BigDecimal chargeAccountIncome = BigDecimal.ZERO;
+		BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
 		
 		if(!incomeReportList.isEmpty()){
 			for(IncomeReportDto income : incomeReportList){
 				if(income.getPaymentModeId()==PayMode.WEIXIN_PAY){
 					wechatIncome=wechatIncome.add(income.getPayValue()).setScale(2);
 				}else if(income.getPayMentModeId()==PayMode.ACCOUNT_PAY){
-					accountIncome=accountIncome.add(income.getPayValue()).setScale(2);
+					redIncome=redIncome.add(income.getPayValue()).setScale(2);
 				}else if(income.getPayMentModeId()==PayMode.COUPON_PAY){
 					couponIncome=couponIncome.add(income.getPayValue()).setScale(2);
+				}else if(income.getPaymentModeId()==PayMode.CHARGE_PAY){
+					chargeAccountIncome=chargeAccountIncome.add(income.getPayValue()).setScale(2);
+				}else if (income.getPayMentModeId()==PayMode.REWARD_PAY){
+					chargeGifAccountIncome=chargeGifAccountIncome.add(income.getPayValue()).setScale(2);
 				}
 			}
 		}
 		in.setBrandName(brand.getBrandName());
 		in.setWechatIncome(wechatIncome);
-		in.setAccountIncome(accountIncome);
+		in.setRedIncome(redIncome);
 		in.setCouponIncome(couponIncome);
-		in.setTotalIncome(in.getWechatIncome(), in.getAccountIncome(), in.getCouponIncome());
+		in.setChargeAccountIncome(chargeAccountIncome);
+		in.setChargeGifAccountIncome(chargeGifAccountIncome);
+		in.setTotalIncome(in.getWechatIncome(), in.getRedIncome(), in.getCouponIncome(),in.getChargeAccountIncome(),in.getChargeGifAccountIncome());
 		brandIncomeList.add(in);
 		Map<String,Object> map = new HashMap<>();
 		map.put("shopIncome", shopIncomeList);

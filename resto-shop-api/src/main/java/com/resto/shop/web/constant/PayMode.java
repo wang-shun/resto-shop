@@ -22,6 +22,11 @@ public class PayMode {
                 return "现金支付";
             case BANK_CART_PAY:
                 return "银行卡支付";
+            case CHARGE_PAY:
+            	return "充值金额支付";
+            case REWARD_PAY:
+            	return "充值赠送的金额支付";
+             
             default:
                 return "未知";
             }

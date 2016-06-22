@@ -83,8 +83,8 @@ var tb1 = $("#brandReportTable").DataTable({
 			data : "totalIncome",
 		},       
 		{                 
-			title : "系统账户收入(元)",
-			data : "accountIncome",
+			title : "红包支付(元)",
+			data : "redIncome",
 		},       
 		{                 
 			title : "优惠券支付收入(元)",
@@ -93,6 +93,14 @@ var tb1 = $("#brandReportTable").DataTable({
 		{                 
 			title : "微信支付收入(元)",
 			data : "wechatIncome",
+		},       
+		{                 
+			title : "充值账户支付(元)",
+			data : "chargeAccountIncome",
+		},       
+		{                 
+			title : "充值赠送账户支付(元)",
+			data : "chargeGifAccountIncome",
 		},       
 	]
 	
@@ -110,8 +118,8 @@ var tb2 = $("#shopReportTable").DataTable({
 			data : "totalIncome",
 		},       
 		{                 
-			title : "系统账户收入(元)",
-			data : "accountIncome",
+			title : "红包支付收入(元)",
+			data : "redIncome",
 		},       
 		{                 
 			title : "优惠券支付收入(元)",
@@ -120,6 +128,14 @@ var tb2 = $("#shopReportTable").DataTable({
 		{                 
 			title : "微信支付收入(元)",
 			data : "wechatIncome",
+		},     
+		{                 
+			title : "充值账户支付(元)",
+			data : "chargeAccountIncome",
+		},     
+		{                 
+			title : "充值赠送账户支付(元)",
+			data : "chargeGifAccountIncome",
 		}     
 	]
 	
