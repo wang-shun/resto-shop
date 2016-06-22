@@ -116,6 +116,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	public BigDecimal payOrder(Order order,BigDecimal payMoney, Customer customer) {
 		Account account = selectById(customer.getAccountId());  //找到用户帐户
 		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
+		if(balance==null){
+			balance = BigDecimal.ZERO;
+		}
 		//计算剩余红包金额
 		BigDecimal redPackageMoney = account.getRemain().subtract(balance);
 		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT);  //得出真实支付的值
