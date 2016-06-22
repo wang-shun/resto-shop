@@ -1,17 +1,21 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
+import org.junit.Test;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -71,6 +75,12 @@ import cn.restoplus.rpc.server.RpcService;
  */
 @RpcService
 public class OrderServiceImpl extends GenericServiceImpl<Order, String> implements OrderService {
+	
+	//用来添加打印小票的序号
+	//添加两个Map 一个是订单纬度,一个是店铺纬度
+	private static final Map<String,Map<String,Integer>> NUMBER_ORDER_MAP=new ConcurrentHashMap<>();  
+	
+	private static final Map<String,Map<String,Integer>> NUMBER_SHOP_MAP =new ConcurrentHashMap<>();    
 
     @Resource
     private OrderMapper orderMapper;
@@ -579,6 +589,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				data.put("ORDER_ID", serialNumber);
 				data.put("DATE",DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
 				data.put("ITEMS", items);
+				//添加当天打印订单的序号
+				data.put("NUMBER", nextNumber(order.getShopDetailId(),order.getId()));
 				//保存打印配置信息
 				Map<String,Object> print = new HashMap<String,Object>();
 				String print_id = ApplicationUtils.randomUUID();
@@ -652,7 +664,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("DISTRIBUTION_MODE", modeText);
 		data.put("ARTICLE_COUNT", order.getArticleCount());
 		data.put("RESTAURANT_NAME", shopDetail.getName());
-
 		data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
 		data.put("RESTAURANT_TEL", shopDetail.getPhone());
 		data.put("TABLE_NUMBER", order.getTableNumber());
@@ -662,6 +673,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
 		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+		//添加当天小票的打印的序号
+		data.put("NUMBER", nextNumber(shopDetail.getId(),order.getId()));
 
 		// 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
 		Map<String, Object> print = new HashMap<>();
@@ -679,6 +692,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		print.put("TICKET_TYPE", TicketType.RECEIPT);
 		return print;
 	}
+
 
 	@Override
 	public Order confirmOrder(Order order) {
@@ -863,5 +877,50 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end);
 		return list;
 	}
-
+	
+	//根据店铺id和订单id获取订单序号的方法
+	private String nextNumber(String sid, String oid) {
+		//定义number
+		int number;
+		//先从订单map中查找
+		String key = DateUtil.formatDate(new Date(), "yyyy-MM-dd");
+		//查看orderMap中是否有值
+		Map<String,Integer> ordermap = NUMBER_ORDER_MAP.get(key);
+		if(ordermap==null){
+			NUMBER_ORDER_MAP.clear();
+			ordermap = new HashMap<>();
+			NUMBER_ORDER_MAP.put(key,ordermap);
+		}
+		Map<String,Integer>shopmap = NUMBER_SHOP_MAP.get(key);
+		if(shopmap==null){
+			NUMBER_SHOP_MAP.clear();
+			shopmap = new HashMap<>();
+			NUMBER_SHOP_MAP.put(key, shopmap);
+		}
+		//从ordermap里面找有没有number，有就返回
+		//没有的话，找shopmap里面的数字是多少，如果没有就是1，如果有就+1 并分别存入shopmap和ordermap
+		Integer num1 = ordermap.get(oid);
+		if(num1!=null){
+			number = num1.intValue();
+		}else{
+			Integer num2 = shopmap.get(sid);
+			if(num2!=null){
+				number = num2.intValue()+1;
+				ordermap.put(oid, number);
+				shopmap.put(sid, number);
+			}else{
+				shopmap.put(sid, 1);
+				ordermap.put(oid, 1);
+				number=1;
+			}
+		}
+		return numberToString(number);
+	}
+	
+	//int转String('001')
+	public String numberToString(int num){
+		Format f = new DecimalFormat("000");
+		return f.format(num);
+	}
+	
 }
