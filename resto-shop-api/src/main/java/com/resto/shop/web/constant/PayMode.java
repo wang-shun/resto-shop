@@ -7,6 +7,8 @@ public class PayMode {
 	public static final int COUPON_PAY=3;    //优惠券支付
 	public static final int MONEY_PAY = 4;	//现金支付
 	public static final int BANK_CART_PAY=5; //银行卡支付
+	public static final int CHARGE_PAY = 6; //充值金额支付
+	public static final int REWARD_PAY = 7; //
 	
 	public static String getPayModeName(int state){
 	    switch (state) {

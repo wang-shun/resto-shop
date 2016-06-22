@@ -38,7 +38,6 @@ import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
@@ -54,6 +53,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
+import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.KitchenService;
@@ -119,6 +119,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     MealItemService mealItemService;
+    
+    @Resource
+    ChargeOrderService chargeOrderService;
     
     @Override
     public GenericDao<Order, String> getDao() {
@@ -253,19 +256,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 		// 使用余额
 		if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
-			Account account = accountService.selectById(customer.getAccountId());
-			BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
+			BigDecimal payValue = accountService.payOrder(order,payMoney,customer);
+//			BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
 			if (payValue.doubleValue() > 0) {
-				OrderPaymentItem item = new OrderPaymentItem();
-				item.setId(ApplicationUtils.randomUUID());
-				item.setOrderId(orderId);
-				item.setPaymentModeId(PayMode.ACCOUNT_PAY);
-				item.setPayTime(order.getCreateTime());
-				item.setPayValue(payValue);
-				item.setRemark("余额支付:" + item.getPayValue());
-				item.setResultData(account.getId());
-				orderPaymentItemService.insert(item);
-				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+				payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
+				
+//				OrderPaymentItem item = new OrderPaymentItem();
+//				item.setId(ApplicationUtils.randomUUID());
+//				item.setOrderId(orderId);
+//				item.setPaymentModeId(PayMode.ACCOUNT_PAY);
+//				item.setPayTime(order.getCreateTime());
+//				item.setPayValue(payValue);
+//				item.setRemark("余额支付:" + item.getPayValue());
+//				item.setResultData(account.getId());
+//				orderPaymentItemService.insert(item);
+//				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 		}
 		
@@ -392,6 +397,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				break;
 			case PayMode.ACCOUNT_PAY:
 				accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还",AccountLog.SOURCE_CANCEL_ORDER);
+				break;
+			case PayMode.CHARGE_PAY:
+				chargeOrderService.refundCharge(item.getPayValue(),item.getResultData());
+				break;
+			case PayMode.REWARD_PAY:
+				chargeOrderService.refundReward(item.getPayValue(),item.getResultData());
 				break;
 			case PayMode.WEIXIN_PAY:
 				WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());

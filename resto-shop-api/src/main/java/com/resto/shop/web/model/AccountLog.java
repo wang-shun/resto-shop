@@ -10,6 +10,8 @@ public class AccountLog {
 	public static final Integer SOURCE_CHARGE_REWARD=3; //充值赠送余额
 	public static final Integer SOURCE_SHARE_REWARD=4;  //分享返利余额
 	public static final Integer SOURCE_CANCEL_ORDER = 5; //取消订单返还余额
+	public static final Integer CHARGE_PAY_REFUND = 6;  //取消订单返回充值的金额
+	public static final Integer REWARD_PAY_REFUND = 7;  //取消订单返回充值赠送的金额
 	
     private String id;
 

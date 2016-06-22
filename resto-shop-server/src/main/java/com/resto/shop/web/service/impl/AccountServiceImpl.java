@@ -10,13 +10,18 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.constant.AccountLogType;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.AccountMapper;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.AccountLogService;
 import com.resto.shop.web.service.AccountService;
+import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.OrderPaymentItemService;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -30,10 +35,16 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     private AccountMapper accountMapper;
 
     @Resource
+    OrderPaymentItemService orderPaymentItemService;
+    
+    @Resource
     CustomerService customerService;
     
     @Resource
     AccountLogService accountLogService;
+    
+    @Resource
+    ChargeOrderService chargeOrderService;
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -99,6 +110,37 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		cus.setAccountId(acc.getId());
 		customerService.update(cus);
 		return acc;
+	}
+
+	@Override
+	public BigDecimal payOrder(Order order,BigDecimal payMoney, Customer customer) {
+		Account account = selectById(customer.getAccountId());  //找到用户帐户
+		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
+		//计算剩余红包金额
+		BigDecimal redPackageMoney = account.getRemain().subtract(balance);
+		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT);  //得出真实支付的值
+		//算出 支付比例
+		BigDecimal redPay = BigDecimal.ZERO;
+		if(realPay.compareTo(BigDecimal.ZERO)>0){ //如果支付金额大于0
+			if(redPackageMoney.compareTo(realPay)>=0){ //如果红包金额足够支付所有金额，则只添加红包金额支付项
+				redPay = realPay;
+			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
+				BigDecimal remainPay = realPay.subtract(redPackageMoney).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
+				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
+			}
+		}
+		if(redPay.compareTo(BigDecimal.ZERO)>0){
+			OrderPaymentItem item = new OrderPaymentItem();
+			item.setId(ApplicationUtils.randomUUID());
+			item.setOrderId(order.getId());
+			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
+			item.setPayTime(new Date());
+			item.setPayValue(redPay);
+			item.setRemark("余额(红包)支付:" + item.getPayValue());
+			item.setResultData(account.getId());
+			orderPaymentItemService.insert(item); 
+		}
+		return realPay;
 	}
 
 }

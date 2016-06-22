@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Order;
 
 public interface AccountService extends GenericService<Account, String> {
 
@@ -25,6 +26,8 @@ public interface AccountService extends GenericService<Account, String> {
 	Account selectAccountAndLogByCustomerId(String customerId);
 
 	Account createCustomerAccount(Customer cus);
+
+	BigDecimal payOrder(Order order, BigDecimal payMoney, Customer customer);
 
 
 }

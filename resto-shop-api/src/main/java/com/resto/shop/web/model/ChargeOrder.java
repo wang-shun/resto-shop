@@ -22,6 +22,12 @@ public class ChargeOrder {
     
     private String brandId;
     
+    private BigDecimal chargeBalance;
+
+    private BigDecimal rewardBalance;
+
+    private BigDecimal totalBalance;
+    
 	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
 			String customerId, String shopDetailId, String brandId) {
 		super();
@@ -113,5 +119,41 @@ public class ChargeOrder {
 
 	public void setBrandId(String brandId) {
 		this.brandId = brandId;
+	}
+
+
+
+	public BigDecimal getChargeBalance() {
+		return chargeBalance;
+	}
+
+
+
+	public BigDecimal getRewardBalance() {
+		return rewardBalance;
+	}
+
+
+
+	public BigDecimal getTotalBalance() {
+		return totalBalance;
+	}
+
+
+
+	public void setChargeBalance(BigDecimal chargeBalance) {
+		this.chargeBalance = chargeBalance;
+	}
+
+
+
+	public void setRewardBalance(BigDecimal rewardBalance) {
+		this.rewardBalance = rewardBalance;
+	}
+
+
+
+	public void setTotalBalance(BigDecimal totalBalance) {
+		this.totalBalance = totalBalance;
 	}
 }
