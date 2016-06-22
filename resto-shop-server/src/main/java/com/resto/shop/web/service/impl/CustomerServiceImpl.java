@@ -61,6 +61,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public Customer selectById(String id) {
 		Customer cus = customerMapper.selectByPrimaryKey(id);
+		if(cus==null){
+			return null;
+		}
 		Account account = accountService.selectById(cus.getAccountId());
 		if(account==null){
 			account = accountService.createCustomerAccount(cus);
