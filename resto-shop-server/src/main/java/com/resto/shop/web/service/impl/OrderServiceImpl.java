@@ -892,14 +892,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Integer num1 = ordermap.get(oid);
 		if(num1!=null){
 			number = num1.intValue();
-			ordermap.put(oid, number+1);
-			shopmap.put(sid, number+1);
 		}else{
 			Integer num2 = shopmap.get(sid);
 			if(num2!=null){
 				number = num2.intValue()+1;
-				ordermap.put(oid, number+1);
-				shopmap.put(sid, number+1);
+				ordermap.put(oid, number);
+				shopmap.put(sid, number);
 			}else{
 				shopmap.put(sid, 1);
 				ordermap.put(oid, 1);
