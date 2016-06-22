@@ -15,7 +15,7 @@ public class PayMode {
             case WEIXIN_PAY:
                 return "微信支付";
             case ACCOUNT_PAY:
-                return "账户支付";
+                return "红包支付";
             case COUPON_PAY:
                 return "优惠券支付";
             case MONEY_PAY:
@@ -23,10 +23,9 @@ public class PayMode {
             case BANK_CART_PAY:
                 return "银行卡支付";
             case CHARGE_PAY:
-            	return "充值金额支付";
+            	return "充值账户支付";
             case REWARD_PAY:
-            	return "充值赠送的金额支付";
-             
+            	return "充值赠送支付";
             default:
                 return "未知";
             }
