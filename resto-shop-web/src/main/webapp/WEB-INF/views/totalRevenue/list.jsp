@@ -171,10 +171,11 @@ $("#searchReport").click(function(){
 
 $("#reportExcel").click(function(){
 	var reportData = dataSource;
+	console.log(reportData)
 	$.ajax({
 		type:"post",
 		url:'totalRevenue/reportExcel',
-		data:{'reportData':reportData},
+		data:{"reportData":reportData},
 	})
 	
 })
