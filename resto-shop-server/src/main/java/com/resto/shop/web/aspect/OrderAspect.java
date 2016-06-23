@@ -189,6 +189,7 @@ public class OrderAspect {
 						if(shareSetting!=null){
 							log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
 							BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+							log.info("准备发送返利通知");
 							sendRewardShareMsg(customer,config,setting,rewardMoney);
 						}
 					}
