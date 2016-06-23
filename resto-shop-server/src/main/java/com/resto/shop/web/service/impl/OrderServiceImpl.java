@@ -435,6 +435,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if(historyItem==null){
 			orderPaymentItemService.insert(item);
 			payOrderSuccess(order);
+		}else{
+			log.warn("该笔支付记录已经处理过:"+item.getId());
 		}
 		return order;
 	}
