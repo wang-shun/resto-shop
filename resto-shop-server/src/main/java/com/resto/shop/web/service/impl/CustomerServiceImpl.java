@@ -135,7 +135,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public void rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer) {
+	public BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer) {
 		BigDecimal rebate = shareSetting.getRebate();
 		BigDecimal money = order.getOrderMoney();
 		BigDecimal rewardMoney = money.multiply(rebate).divide(new BigDecimal(100)).setScale(BigDecimal.ROUND_HALF_DOWN, 2);
@@ -146,6 +146,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		}
 		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD);
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
+		return rewardMoney;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
@@ -37,5 +38,5 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 	void updateFirstOrderTime(String id);
 
-	void rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
+	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
 }

@@ -1,5 +1,6 @@
 package com.resto.shop.web.aspect;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -168,9 +169,9 @@ public class OrderAspect {
 	public void confirmOrderAfter(Order order){
 		log.info("确认订单成功后回调:"+order.getId());
 		Customer customer = customerService.selectById(order.getCustomerId());
+		WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+		BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 		if(order.getAllowAppraise()){
-			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-			BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
 			msg.append("您有一个红包未领取\n");
 			msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&&dialog=redpackage&&orderId="+order.getId()+"'>点击领取</a>");
@@ -178,21 +179,36 @@ public class OrderAspect {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+msg+result);
 		}
-		if(customer.getFirstOrderTime()==null){ //分享判定
-			customerService.updateFirstOrderTime(customer.getId());
-			if(customer.getShareCustomer()!=null){
-				Customer shareCustomer= customerService.selectById(customer.getShareCustomer());
-				if(shareCustomer!=null){
-					ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
-					if(shareSetting!=null){
-						log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
-						customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+		try {
+			if(customer.getFirstOrderTime()==null){ //分享判定
+				customerService.updateFirstOrderTime(customer.getId());
+				if(customer.getShareCustomer()!=null){
+					Customer shareCustomer= customerService.selectById(customer.getShareCustomer());
+					if(shareCustomer!=null){
+						ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+						if(shareSetting!=null){
+							log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
+							BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+							sendRewardShareMsg(customer,config,setting,rewardMoney);
+						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			log.error("分享功能出错:"+e.getMessage());
+			e.printStackTrace();
 		}
+		
 	}
 	
+	private void sendRewardShareMsg(Customer customer, WechatConfig config, BrandSetting setting, BigDecimal rewardMoney) {
+		StringBuffer msg = new StringBuffer();
+		msg.append("感谢您的分享，您的好友已在餐厅消费，我们赠送了 "+rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP)+" 元的红包到您的账户\n");
+		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&&dialog=account'>点击查看余额</a>");
+		String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+		log.info("发送返利通知成功:"+customer.getId()+" MSG: "+msg+result);
+	}
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
 	public void cancelOrderPos(){};
 	
