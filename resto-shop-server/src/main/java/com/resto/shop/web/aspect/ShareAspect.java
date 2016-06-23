@@ -68,11 +68,11 @@ public class ShareAspect {
 	}
 
 	private void sendShareMsg(Appraise appraise) {
-		StringBuffer msg = new StringBuffer("感谢您的五星评价，分享好友再次领取红包\n");
+		StringBuffer msg = new StringBuffer("感谢您的五星评价，分享好友\n");
 		BrandSetting setting = brandSettingService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 		WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 		Customer customer = customerService.selectById(appraise.getCustomerId());
-		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=home&dialog=share&appraiseId="+appraise.getId()+"'>领取红包</a>");
+		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=home&dialog=share&appraiseId="+appraise.getId()+"'>再次领取红包</a>");
 		log.info("异步发送分享好评微信通知ID:"+appraise.getId()+" 内容:"+msg);
 		WeChatUtils.sendCustomerMsgASync(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
 	}
