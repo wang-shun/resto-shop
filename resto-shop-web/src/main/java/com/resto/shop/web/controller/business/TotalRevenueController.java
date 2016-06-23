@@ -134,7 +134,6 @@ public class TotalRevenueController extends GenericController{
 		map.put("brandIncome", brandIncomeList);
 		return map;
 	}
-
 }
 	
 	

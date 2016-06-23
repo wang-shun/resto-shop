@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
-<h2 class="text-center"><strong>结算报表</strong></h2><br/>
+<h2 class="text-center"><strong>结算报表</strong></h2>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -13,12 +13,17 @@
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
-		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>
+		  <br></div>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button><form>
+			<input type="hidden" id="brandDataTable">
+			<input type="hidden" id="shopDataTable">
+		</form>&nbsp;&nbsp;&nbsp;
 		</form>
+		
+		
 	</div>
 </div>
-<br/>
+<button type="button" class="btn btn-primary" id="reportExcel">导出excel</button><br/>
 <br/>
 <div>
   	<!-- 每日报表 -->
@@ -152,6 +157,7 @@ $("#searchReport").click(function(){
 		    	'endDate':endDate
 		    },  
 		    success:function(result) {
+		    	dataSource=result;
 		    	tb1.clear().draw();
 		    	tb2.clear().draw();
 		    	tb1.rows.add(result.brandIncome).draw();
@@ -162,7 +168,15 @@ $("#searchReport").click(function(){
 		     }  
 		});
 })
-	
-	
 
+$("#reportExcel").click(function(){
+	var reportData = dataSource;
+	$.ajax({
+		type:"post",
+		url:'totalRevenue/reportExcel',
+		data:{'reportData':reportData},
+	})
+	
+})
+	
 </script>
