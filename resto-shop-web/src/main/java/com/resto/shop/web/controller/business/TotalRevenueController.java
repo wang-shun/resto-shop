@@ -1,6 +1,5 @@
  package com.resto.shop.web.controller.business;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -149,79 +148,72 @@ public class TotalRevenueController extends GenericController{
 		return map;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@ResponseBody
 	@RequestMapping("reportExcel")
 	public void reportExcel() throws IOException{
-		 // 创建Excel的工作书册 Workbook,对应到一个excel文档  
-	    HSSFWorkbook wb = new HSSFWorkbook();  
+		
+		//品牌数据
+		BrandIncomeDto brandIncomeDto = new BrandIncomeDto(new BigDecimal("100"), new BigDecimal("50"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), null, null, null, "测试品牌");
+		
+		//店铺数据
+		List<ShopIncomeDto> list = new ArrayList<>();
+		ShopIncomeDto shopIncomeDto = new ShopIncomeDto(new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), null, "测试店铺1", null, null, null);
+		ShopIncomeDto shopIncomeDto2 = new ShopIncomeDto(new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("100"), null, "测试店铺2", null, null, null);
+		list.add(shopIncomeDto);
+		list.add(shopIncomeDto2);
+		
+		
+		//第一创建一个webbook,对应一个Excel文件
+		HSSFWorkbook wb = new HSSFWorkbook();
+		//第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+		HSSFSheet sheet = wb.createSheet("品牌表");
+		//第三步，在sheet中添加表头第0行
+		HSSFRow row = sheet.createRow(0);
+		//第四步，创建单元格,并设置值表头,设置表头居中
+		HSSFCellStyle style = wb.createCellStyle();
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);//创建一个居中格式
+		
+		HSSFCell cell = row.createCell(0);
+		cell.setCellValue("品牌名称");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(1);
+		cell.setCellValue("总收入");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(2);
+		cell.setCellValue("红包收入");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(3);
+		cell.setCellValue("系统账户收入");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(4);
+		cell.setCellValue("优惠券收入");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(5);
+		cell.setCellValue("充值金额支付");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(6);
+		cell.setCellValue("充值赠送的金额支付");
+		cell.setCellStyle(style);
+		
+		//第五步写入实体数据
+		row = sheet.createRow(1);
+		row.createCell(0).setCellValue(brandIncomeDto.getBrandName());
+		row.createCell(0).setCellValue(brandIncomeDto.getBrandName());
+		row.createCell(0).setCellValue(brandIncomeDto.getBrandName());
+		row.createCell(0).setCellValue(brandIncomeDto.getBrandName());
+		
+	    
+	    
+	    
+	    
 	  
-	    // 创建Excel的工作sheet,对应到一个excel文档的tab  
-	    HSSFSheet sheet = wb.createSheet("sheet1");  
-	  
-	    // 设置excel每列宽度  
-	    sheet.setColumnWidth(0, 4000);  
-	    sheet.setColumnWidth(1, 3500);  
-	  
-	    // 创建字体样式  
-	    HSSFFont font = wb.createFont();  
-	    font.setFontName("Verdana");  
-	    font.setBoldweight((short) 100);  
-	    font.setFontHeight((short) 300);  
-	    font.setColor(HSSFColor.BLUE.index);  
-	  
-	    // 创建单元格样式  
-	    HSSFCellStyle style = wb.createCellStyle();  
-	    style.setAlignment(HSSFCellStyle.ALIGN_CENTER);  
-	    style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);  
-	    style.setFillForegroundColor(HSSFColor.LIGHT_TURQUOISE.index);  
-	    style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);  
-	  
-	    // 设置边框  
-	    style.setBottomBorderColor(HSSFColor.RED.index);  
-	    style.setBorderBottom(HSSFCellStyle.BORDER_THIN);  
-	    style.setBorderLeft(HSSFCellStyle.BORDER_THIN);  
-	    style.setBorderRight(HSSFCellStyle.BORDER_THIN);  
-	    style.setBorderTop(HSSFCellStyle.BORDER_THIN);  
-	  
-	    style.setFont(font);// 设置字体  
-	  
-	    // 创建Excel的sheet的一行  
-	    HSSFRow row = sheet.createRow(0);  
-	    row.setHeight((short) 500);// 设定行的高度  
-	    // 创建一个Excel的单元格  
-	    HSSFCell cell = row.createCell(0);  
-	  
-	    // 合并单元格(startRow，endRow，startColumn，endColumn)  
-	    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));  
-	  
-	    // 给Excel的单元格设置样式和赋值  
-	    cell.setCellStyle(style);  
-	    cell.setCellValue("hello world");  
-	  
-	    // 设置单元格内容格式  
-	    HSSFCellStyle style1 = wb.createCellStyle();  
-	    style1.setDataFormat(HSSFDataFormat.getBuiltinFormat("h:mm:ss"));  
-	  
-	    style1.setWrapText(true);// 自动换行  
-	  
-	    row = sheet.createRow(1);  
-	  
-	    // 设置单元格的样式格式  
-	  
-	    cell = row.createCell(0);  
-	    cell.setCellStyle(style1);  
-	    cell.setCellValue(new Date());  
-	  
-	    // 创建超链接  
-	    HSSFHyperlink link = new HSSFHyperlink(HSSFHyperlink.LINK_URL);  
-	    link.setAddress("http://www.baidu.com");  
-	    cell = row.createCell(1);  
-	    cell.setCellValue("百度");  
-	    cell.setHyperlink(link);// 设定单元格的链接  
-	  
-	    FileOutputStream os = new FileOutputStream("D:\\report\\workbook.xls");  
-	    wb.write(os);  
-	    os.close();  
 	}  
 	
 }
