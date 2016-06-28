@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -174,11 +173,12 @@ public class TotalRevenueController extends GenericController{
 		  String[]columns={ "brandName", "totalIncome", "redIncome", "couponIncome", "wechatIncome", "chargeAccountIncome", "chargeGifAccountIncome"};
 		  List<BrandIncomeDto> result=(List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
 		  ExcelUtil<BrandIncomeDto> excelUtil=new ExcelUtil<BrandIncomeDto>();
-		  excelUtil.download(path, response);
+		  String [] params = new String[]{beginDate,endDate};
 		  try{
 				OutputStream out = new FileOutputStream(path);
-				excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "");
+				excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "",params);
 				out.close();
+				excelUtil.download(path, response);
 				JOptionPane.showMessageDialog(null, "导出成功！");
 				log.info("excel导出成功");
 			}catch(Exception e){
@@ -202,16 +202,16 @@ public class TotalRevenueController extends GenericController{
 		//导出文件名
 		String str = "shopInCome.xls";
 		String path = request.getSession().getServletContext().getRealPath(str);
-		
-		String[][] headers ={ { "店铺", "12" }, { "营收总额", "15" }, { "红包支付", "12" }, { "优惠券支付", "12" }, { "微信支付", "12" },{ "充值账户支付", "15" },{ "充值赠送账户支付", "19" }};
+		String[][] headers ={ { "店铺", "20" }, { "营收总额", "15" }, { "红包支付", "12" }, { "优惠券支付", "12" }, { "微信支付", "12" },{ "充值账户支付", "15" },{ "充值赠送账户支付", "19" }};
 		String[]columns={ "shopName", "totalIncome", "redIncome", "couponIncome", "wechatIncome", "chargeAccountIncome", "chargeGifAccountIncome"};
 		List<ShopIncomeDto> result=(List<ShopIncomeDto>) getIncomeReportList(beginDate, endDate).get("shopIncome");
+		String [] params = new String[]{beginDate,endDate};
 		ExcelUtil<ShopIncomeDto> excelUtil=new ExcelUtil<ShopIncomeDto>();
-		excelUtil.download(path, response);
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "");
+			excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "",params);
 			out.close();
+			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
 		}catch(Exception e){
