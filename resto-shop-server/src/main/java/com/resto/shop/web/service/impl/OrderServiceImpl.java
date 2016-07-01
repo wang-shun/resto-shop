@@ -921,5 +921,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Format f = new DecimalFormat("000");
 		return f.format(num);
 	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
+			String articleFamilyId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectBrandArticleSellByDateAndArticleFamilyId(begin,end,articleFamilyId);
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
+			String shopId, String articleFamilyId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId);
+	}
 	
 }

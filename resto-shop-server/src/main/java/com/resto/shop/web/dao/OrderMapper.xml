@@ -822,6 +822,65 @@
 		tb_article_family f on
 		a.article_family_id = f.id
 	</select>
+	
+	<select id="selectBrandArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+		SELECT
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		articleName,a.article_family_id articleFamilyId,f.name
+		articleFamilyName
+		from
+		(
+		SELECT left(article_id,32) articleId ,SUM(count)
+		brandSellNum
+		,article_name from tb_order_item where order_id in
+		(SELECT
+		id from tb_order where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>)
+		GROUP BY
+		left(article_id,32)
+		) as brand_report
+		LEFT JOIN tb_article a on
+		a.id = brand_report.articleId inner JOIN
+		tb_article_family f on
+		a.article_family_id = f.id and f.id=#{articleFamilyId}
+	</select>
+	
+	
+	<select id="selectShopArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+		SELECT
+		shop_report.articleId,shop_report.shopSellNum,brand_report.brandSellNum,cast(shop_report.shopSellNum/brand_report.brandSellNum
+		as decimal(10,2)) salesRatio,
+		IFNULL(a.name,shop_report.article_name)
+		articleName,a.article_family_id articleFamilyId,f.name
+		articleFamilyName
+		from (
+		SELECT left(article_id,32) articleId
+		,SUM(count) shopSellNum
+		,article_name from tb_order_item where order_id
+		in
+		(SELECT id from tb_order where order_state in (2,10,11,12) and
+		shop_detail_id
+		= #{shopId} and
+	 			<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>
+		) GROUP BY left(article_id,32)
+		) as shop_report LEFT JOIN
+		(
+		SELECT
+		left(article_id,32) articleId ,SUM(count) brandSellNum ,article_name
+		from tb_order_item where order_id in
+		(SELECT id from tb_order where
+		order_state in (2,10,11,12) and
+	 		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>)
+		GROUP BY left(article_id,32)
+		) as brand_report on shop_report.articleId
+		= brand_report.articleId
+		LEFT JOIN tb_article a on a.id =
+		shop_report.articleId INNER JOIN
+		tb_article_family f on
+		a.article_family_id = f.id AND f.id=#{articleFamilyId}
+	</select>
+	
+	
 </mapper>
 
 

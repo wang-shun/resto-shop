@@ -157,11 +157,13 @@ th {
 			},
 			openModal : function(url, modalTitle,shopId) {
 				$.post(url, this.getDate(shopId),function(result) {
+					console.log(result)
 					var modal = $("#reportModal");
 					modal.find(".modal-body").html(result);
 					modal.find(".modal-title > strong").html(modalTitle);
 					modal.modal();
 				})
+				
 			},
 			closeModal : function(){
 				var modal = $("#reportModal");

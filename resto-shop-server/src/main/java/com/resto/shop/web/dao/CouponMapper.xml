@@ -87,7 +87,7 @@
   select id,name,value,min_amount,begin_date,end_date,begin_time,end_time,is_used,using_time,
   coupon_source,use_with_account,remark,distribution_mode_id,customer_id
    from tb_coupon where is_used=#{isUsed} and distribution_mode_id=#{distributionModeId} and customer_id=#{customerId}
-   <![CDATA[AND begin_date<NOW() AND end_date >NOW() AND begin_time<NOW() AND end_time>NOW()]]>
+   <![CDATA[AND begin_date<current_date AND end_date >current_date AND begin_time<NOW() AND end_time>NOW()]]>
    order by value DESC
   </select>
   
@@ -99,10 +99,10 @@
 			and is_used= #{status}
 		</if>
 		<if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
-			<![CDATA[AND (begin_date<NOW() AND end_date >NOW())]]> 
+			<![CDATA[AND (begin_date<=current_date()  AND end_date >=current_date() )]]> 
 		</if>
 		<if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
-			<![CDATA[AND (begin_date>NOW() OR end_date <NOW())]]>
+			<![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
 		</if>
 		order by VALUE DESC
   </select>

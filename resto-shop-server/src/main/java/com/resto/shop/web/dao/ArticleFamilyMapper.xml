@@ -60,4 +60,9 @@
   		select * from tb_article_family where shop_detail_id=#{currentShopId}
   		 and distribution_mode_id=#{distributionModeId} ORDER BY peference
   </select>
+  
+  <select id="selectByName" resultType="java.lang.String">
+  		SELECT id from tb_article_family WHERE name=#{name}
+  </select>
+  
 </mapper>

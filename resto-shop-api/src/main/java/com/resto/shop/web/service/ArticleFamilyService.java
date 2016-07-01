@@ -10,4 +10,6 @@ public interface ArticleFamilyService extends GenericService<ArticleFamily, Stri
 	List<ArticleFamily> selectList(String currentShopId);
     
 	List<ArticleFamily> selectListByDistributionModeId(String currentShopId,Integer distributionModeId);
+
+	String selectByName(String Name);
 }

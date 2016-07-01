@@ -174,9 +174,10 @@ public class TotalRevenueController extends GenericController{
 		  List<BrandIncomeDto> result=(List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
 		  ExcelUtil<BrandIncomeDto> excelUtil=new ExcelUtil<BrandIncomeDto>();
 		  String [] params = new String[]{beginDate,endDate};
+		  int num = 5;
 		  try{
 				OutputStream out = new FileOutputStream(path);
-				excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "",params);
+				excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "",params,num,null,null);
 				out.close();
 				excelUtil.download(path, response);
 				JOptionPane.showMessageDialog(null, "导出成功！");
@@ -198,7 +199,7 @@ public class TotalRevenueController extends GenericController{
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/shopExprotExcel")
 	@ResponseBody
-	public  void exprotShopExcel(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,HttpServletRequest request, HttpServletResponse response) throws IOException, Exception{
+	public  void exprotShopExcel(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String str = "shopInCome.xls";
 		String path = request.getSession().getServletContext().getRealPath(str);
@@ -206,10 +207,11 @@ public class TotalRevenueController extends GenericController{
 		String[]columns={ "shopName", "totalIncome", "redIncome", "couponIncome", "wechatIncome", "chargeAccountIncome", "chargeGifAccountIncome"};
 		List<ShopIncomeDto> result=(List<ShopIncomeDto>) getIncomeReportList(beginDate, endDate).get("shopIncome");
 		String [] params = new String[]{beginDate,endDate};
+		int num = 5;
 		ExcelUtil<ShopIncomeDto> excelUtil=new ExcelUtil<ShopIncomeDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "",params);
+			excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "",params,num,null,null);
 			out.close();
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
