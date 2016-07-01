@@ -143,7 +143,7 @@ public class ArticleSellController extends GenericController{
 		//定义数据
 		List<ArticleSellDto> result = null;
 		//定义首行日期占的位置
-		int num = 2;
+		int num = 3;
 		//定义时间参数用来在第一行上显示日期
 		String [] params = new String[]{beginDate,endDate};
 		//定义excel表格的表头下拉框(选择全部出现下拉框)
@@ -152,6 +152,10 @@ public class ArticleSellController extends GenericController{
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
 			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId);
+			for (ArticleSellDto articleSellDto : result) {
+				articleSellDto.setSalesRatio(articleSellDto.getSalesRatio()*100);
+			}
+			
 			//设置下拉框加载的位置(1,0单元格) 第一个是行 第二个是列
 			params = new String[]{beginDate,endDate};
 			//设置下拉框的内容
@@ -161,7 +165,7 @@ public class ArticleSellController extends GenericController{
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);
 			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId);
 		}
-		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比","20"}};
+		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
 		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
