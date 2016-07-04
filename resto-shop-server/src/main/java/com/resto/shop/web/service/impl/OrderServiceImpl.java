@@ -870,11 +870,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate,String order) {
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate,String sort) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		
-		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end,order);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end,sort);
 		return list;
 	}
 	
@@ -925,10 +931,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
 	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
-			String articleFamilyId) {
+			String articleFamilyId,String sort) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		return orderMapper.selectBrandArticleSellByDateAndArticleFamilyId(begin,end,articleFamilyId);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		return orderMapper.selectBrandArticleSellByDateAndArticleFamilyId(begin,end,articleFamilyId,sort);
 	}
 
 	@Override

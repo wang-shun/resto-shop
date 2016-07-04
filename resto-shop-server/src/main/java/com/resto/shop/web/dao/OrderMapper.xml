@@ -821,13 +821,7 @@
 		a.id = brand_report.articleId LEFT JOIN
 		tb_article_family f on
 		a.article_family_id = f.id 
-		ORDER BY(
-		 CASE
-		 WHEN ${ORDER}=0 THEN f.peference ,a.sort
-		 WHEN ${ORDER}=1 THEN  brand_report.brandSellNum desc
-		 WHEN ${ORDER}=2 THEN  brand_report.brandSellNum asc
-		 END
-		)
+		ORDER BY ${sort}
 		
 	</select>
 	
@@ -851,6 +845,7 @@
 		a.id = brand_report.articleId inner JOIN
 		tb_article_family f on
 		a.article_family_id = f.id and f.id=#{articleFamilyId}
+		order by ${sort}
 	</select>
 	
 	

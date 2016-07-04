@@ -1,10 +1,5 @@
  package com.resto.shop.web.controller.business;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -169,7 +164,7 @@ public class TotalRevenueController extends GenericController{
 		  String str = "brandInCome.xls";
 		  String path = request.getSession().getServletContext().getRealPath(str);
 		  
-	  	  String[][] headers ={ { "品牌", "12" }, { "营收总额", "15" }, { "红包支付", "12" }, { "优惠券支付", "12" }, { "微信支付", "12" },{ "充值账户支付", "15" },{ "充值赠送账户支付", "19" }};
+	  	  String[][] headers ={ { "品牌", "12" }, { "营收总额(元)", "16" }, { "红包支付(元)", "13" }, { "优惠券支付(元)", "13" }, { "微信支付(元)", "13" },{ "充值账户支付(元)", "16" },{ "充值赠送账户支付(元)", "20" }};
 		  String[]columns={ "brandName", "totalIncome", "redIncome", "couponIncome", "wechatIncome", "chargeAccountIncome", "chargeGifAccountIncome"};
 		  List<BrandIncomeDto> result=(List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
 		  ExcelUtil<BrandIncomeDto> excelUtil=new ExcelUtil<BrandIncomeDto>();
@@ -203,7 +198,7 @@ public class TotalRevenueController extends GenericController{
 		//导出文件名
 		String str = "shopInCome.xls";
 		String path = request.getSession().getServletContext().getRealPath(str);
-		String[][] headers ={ { "店铺", "20" }, { "营收总额", "15" }, { "红包支付", "12" }, { "优惠券支付", "12" }, { "微信支付", "12" },{ "充值账户支付", "15" },{ "充值赠送账户支付", "19" }};
+		String[][] headers ={ { "店铺", "20" }, { "营收总额(元)", "16" }, { "红包支付(元)", "13" }, { "优惠券支付(元)", "13" }, { "微信支付(元)", "13" },{ "充值账户支付(元)", "16" },{ "充值赠送账户支付(元)", "20" }};
 		String[]columns={ "shopName", "totalIncome", "redIncome", "couponIncome", "wechatIncome", "chargeAccountIncome", "chargeGifAccountIncome"};
 		List<ShopIncomeDto> result=(List<ShopIncomeDto>) getIncomeReportList(beginDate, endDate).get("shopIncome");
 		String [] params = new String[]{beginDate,endDate};

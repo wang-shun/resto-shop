@@ -148,7 +148,7 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate,String order);
 
 	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
-			String articleFamilyId);
+			String articleFamilyId,String sort);
 	/**
 	 * 根据时间,指定店铺，指定菜品分类，查询已完成订单的销售详情
 	 * @param beginDate

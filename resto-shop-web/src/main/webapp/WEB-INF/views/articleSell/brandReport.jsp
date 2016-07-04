@@ -143,18 +143,16 @@ $("#ExcelReport").click(function(){
 		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
 	}
 	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
-	
 	//获取select选中的值
 	var selectValue = select[0].value;
-	var order;
-	var sort = shopTable.order();
-	if(sort[0][0]==2){
-		order=sort[0][1]
+	var sort=0;
+	var order = shopTable.order();
+	if(order[0][0]==2){
+		sort=order[0][1]
 	}
-	
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
-	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&str="+str2+"&&selectValue="+selectValue+"&&order="+order;
+	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&str="+str2+"&&selectValue="+selectValue+"&&sort="+sort;
 })
 
 </script>

@@ -87,7 +87,7 @@ public class ArticleSellController extends GenericController{
 	
 	@RequestMapping("/brand_excel")
 	@ResponseBody
-	public void reportBrandExcel(String beginDate,String endDate,String str,String selectValue,String order,HttpServletRequest request, HttpServletResponse response){
+	public void reportBrandExcel(String beginDate,String endDate,String str,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "ArticleSellBrand.xls";
 		//定义读取文件的路径
@@ -105,7 +105,7 @@ public class ArticleSellController extends GenericController{
 		String [] list=null;	
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
-			result = orderService.selectBrandArticleSellByDate(beginDate, endDate,order);
+			result = orderService.selectBrandArticleSellByDate(beginDate, endDate,sort);
 			//设置下拉框加载的位置(1,0单元格) 第一个是行 第二个是列
 			params = new String[]{beginDate,endDate};
 			//设置下拉框的内容
@@ -113,7 +113,7 @@ public class ArticleSellController extends GenericController{
 		}else{
 			//根据菜品分类的名称获取菜品分类的id
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectBrandArticleSellByDateAndArticleFamilyId(beginDate, endDate,articleFamilyId);
+			result = orderService.selectBrandArticleSellByDateAndArticleFamilyId(beginDate, endDate,articleFamilyId,sort);
 		}
 		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"}};
 		
