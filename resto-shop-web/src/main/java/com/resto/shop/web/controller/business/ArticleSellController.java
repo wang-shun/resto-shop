@@ -81,7 +81,7 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/brand_data")
 	@ResponseBody
 	public Result brand_data(String beginDate,String endDate){
-		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate,null);
+		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate,"0");
 		return getSuccessResult(list);
 	}
 	

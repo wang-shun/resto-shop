@@ -873,6 +873,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate,String order) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
+		
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end,order);
 		return list;
 	}

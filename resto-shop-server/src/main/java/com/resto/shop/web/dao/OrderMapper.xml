@@ -823,8 +823,9 @@
 		a.article_family_id = f.id 
 		ORDER BY(
 		 CASE
-		 WHEN !${ORDER} THEN f.peference ,a.sort
-		 WHEN ${ORDER} THEN  brand_report.brandSellNum ${order}
+		 WHEN ${ORDER}=0 THEN f.peference ,a.sort
+		 WHEN ${ORDER}=1 THEN  brand_report.brandSellNum desc
+		 WHEN ${ORDER}=2 THEN  brand_report.brandSellNum asc
 		 END
 		)
 		
