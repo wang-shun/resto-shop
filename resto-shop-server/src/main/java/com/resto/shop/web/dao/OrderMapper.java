@@ -133,7 +133,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<ArticleSellDto> selectBrandArticleSellByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
+	public List<ArticleSellDto> selectBrandArticleSellByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("order")String order);
 	
 	/**
 	 * 根据时间 查询当前品牌已完成订单的某个餐品分类的销售详情

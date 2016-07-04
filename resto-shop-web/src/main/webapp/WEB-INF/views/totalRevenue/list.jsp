@@ -186,6 +186,4 @@ $("#shopreportExcel").click(function(){
 	location.href="totalRevenue/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
 })
 
-
-
 </script>

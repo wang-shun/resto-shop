@@ -820,7 +820,14 @@
 		LEFT JOIN tb_article a on
 		a.id = brand_report.articleId LEFT JOIN
 		tb_article_family f on
-		a.article_family_id = f.id
+		a.article_family_id = f.id 
+		ORDER BY(
+		 CASE
+		 WHEN !${ORDER} THEN f.peference ,a.sort
+		 WHEN ${ORDER} THEN  brand_report.brandSellNum ${order}
+		 END
+		)
+		
 	</select>
 	
 	<select id="selectBrandArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">

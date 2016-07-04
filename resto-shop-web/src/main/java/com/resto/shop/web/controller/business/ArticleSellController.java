@@ -81,13 +81,13 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/brand_data")
 	@ResponseBody
 	public Result brand_data(String beginDate,String endDate){
-		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate);
+		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate,null);
 		return getSuccessResult(list);
 	}
 	
 	@RequestMapping("/brand_excel")
 	@ResponseBody
-	public void reportBrandExcel(String beginDate,String endDate,String str,String selectValue,HttpServletRequest request, HttpServletResponse response){
+	public void reportBrandExcel(String beginDate,String endDate,String str,String selectValue,String order,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "ArticleSellBrand.xls";
 		//定义读取文件的路径
@@ -105,7 +105,7 @@ public class ArticleSellController extends GenericController{
 		String [] list=null;	
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
-			result = orderService.selectBrandArticleSellByDate(beginDate, endDate);
+			result = orderService.selectBrandArticleSellByDate(beginDate, endDate,order);
 			//设置下拉框加载的位置(1,0单元格) 第一个是行 第二个是列
 			params = new String[]{beginDate,endDate};
 			//设置下拉框的内容

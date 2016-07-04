@@ -145,7 +145,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate);
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate,String order);
 
 	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
 			String articleFamilyId);
