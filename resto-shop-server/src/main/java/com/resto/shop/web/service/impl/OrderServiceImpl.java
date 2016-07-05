@@ -400,7 +400,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public boolean autoRefundOrder(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getOrderState()==OrderState.PAYMENT &&
+		if(order.getAllowCancel() && order.getOrderState()==OrderState.PAYMENT &&
 				order.getProductionStatus() == ProductionStatus.PRINTED){
 			order.setAllowCancel(false);
 			order.setClosed(true);
