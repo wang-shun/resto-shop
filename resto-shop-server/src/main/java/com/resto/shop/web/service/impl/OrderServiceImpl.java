@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
+import com.aliyun.openservices.ons.api.Action;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
@@ -394,6 +395,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false"+order.getId());
 			return false;
 		}
+	}
+
+	@Override
+	public boolean autoRefundOrder(String orderId) {
+		Order order = selectById(orderId);
+		if(order.getOrderState()==OrderState.PAYMENT &&
+				order.getProductionStatus() == ProductionStatus.PRINTED){
+			order.setAllowCancel(false);
+			order.setClosed(true);
+			order.setAllowAppraise(false);
+			order.setAllowContinueOrder(false);
+			order.setOrderState(OrderState.CANCEL);
+			update(order);
+			refundOrder(order);
+			log.info("自动退款成功:" + order.getId());
+			return true;
+		}else{
+			log.warn("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单"+order.getId());
+			return false;
+		}
+
 	}
 
 	private void refundOrder(Order order) {

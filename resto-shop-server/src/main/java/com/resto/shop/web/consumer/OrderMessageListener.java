@@ -9,6 +9,7 @@ import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
@@ -69,8 +70,28 @@ public class OrderMessageListener implements MessageListener{
 			return executeNotAllowContinue(message);
 		}else if(tag.equals(MQSetting.TAG_SHOW_ORDER)){
 			return executeShowComment(message);
+		}else if(tag.equals(MQSetting.TAG_AUTO_REFUND_ORDER)){
+			return executeAutoRefundOrder(message);
 		}
 		return Action.CommitMessage;
+	}
+
+	private Action executeAutoRefundOrder(Message message) throws UnsupportedEncodingException {
+		String 	msg = new String(message.getBody(),MQSetting.DEFAULT_CHAT_SET);
+		JSONObject obj =JSONObject.parseObject(msg);
+		String brandId = obj.getString("brandId");
+		DataSourceContextHolder.setDataSourceName(brandId);
+		Order order = orderService.selectById(obj.getString("orderId"));
+		if(order.getOrderState()==OrderState.PAYMENT &&
+				order.getProductionStatus() == ProductionStatus.PRINTED){
+			log.info("款项自动退还到相应账户:"+obj.getString("orderId"));
+			orderService.autoRefundOrder(obj.getString("orderId"));
+		}else{
+			log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
+		}
+		return Action.CommitMessage;
+
+
 	}
 
 	private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {

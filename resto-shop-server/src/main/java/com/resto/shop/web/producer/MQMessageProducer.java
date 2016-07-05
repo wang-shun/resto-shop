@@ -1,5 +1,7 @@
 package com.resto.shop.web.producer;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 import com.resto.shop.web.model.Appraise;
@@ -36,6 +38,18 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendAutoRefundMsg(final String brandId,final String orderId){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("orderId", orderId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_REFUND_ORDER, obj.toJSONString().getBytes());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.set(Calendar.HOUR_OF_DAY,23);
+		calendar.set(Calendar.MINUTE,59);
+		message.setStartDeliverTime(calendar.getTime().getTime());
+		sendMessageASync(message);
+	}
 
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {

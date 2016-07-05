@@ -37,6 +37,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public boolean cancelOrder(String string);
 
+	public boolean autoRefundOrder(String string);
+
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
 	public Order pushOrder(String orderId) throws AppException;

@@ -66,6 +66,7 @@ public class OrderAspect {
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			long delay = 1000*60*15;//15分钟后自动取消订单
 			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+			MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getBrandId());
 		}else if(order.getOrderState().equals((OrderState.PAYMENT))&&order.getOrderMode()!=ShopMode.TABLE_MODE){ //坐下点餐模式不发送
 			sendPaySuccessMsg(order);
 		}
