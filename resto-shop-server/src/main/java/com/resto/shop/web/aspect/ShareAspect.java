@@ -2,10 +2,6 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
-import com.alibaba.fastjson.JSONObject;
-import com.aliyun.openservices.ons.api.Message;
-import com.resto.brand.core.util.MQSetting;
-import com.resto.shop.web.producer.MQMessageProducer;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -13,16 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.AppraiseService;
 import com.resto.shop.web.service.CustomerService;
 
