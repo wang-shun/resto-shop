@@ -52,7 +52,11 @@ var shopTable = $("#shopTable").DataTable({
 			return d;
 		}
 	},
-	order: [[ 2, "desc" ]],//默认以店铺销量降序
+	//order: [[ 2, "desc" ]],//默认以店铺销量降序
+	columnDefs:[{
+                 orderable:false,//禁用排序
+                 targets:[0,1]   //指定的列
+             }],
 	columns : [
 		{
 			title : "菜品分类",
@@ -153,10 +157,12 @@ $("#ExcelReport").click(function(){
 	//获取select选中的值
 	var selectValue = select[0].value;
 	
+	var order = shopTable.order();
+	sort = order[0][0]+''+order[0][1];
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	var shopId = "${shopId}"
-	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&str="+str2+"&&selectValue="+selectValue+"&&shopId="+shopId;
+	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&str="+str2+"&&selectValue="+selectValue+"&&sort="+sort+"&&shopId="+shopId;
 })
 
 

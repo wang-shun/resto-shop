@@ -161,4 +161,9 @@ public abstract class GenericController{
 	public String getCurrentUserId(){
 		return getCurrentBrandUser().getId();
 	}
+	
+	public String getBrandName(){
+		
+		return getCurrentBrandUser().getBrandName();
+	}
 }

@@ -2,7 +2,9 @@
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -15,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.SaleReportDto;
-import com.resto.brand.web.dto.ShopIncomeDto;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.ArticleFamilyService;
@@ -43,6 +45,9 @@ public class ArticleSellController extends GenericController{
 	
 	@Resource
 	ShopDetailService shopDetailService;
+	
+	@Resource
+	BrandService brandServie;
 	
 	@Resource
 	ArticleFamilyService articleFamilyService;
@@ -74,7 +79,7 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/shop_data")
 	@ResponseBody
 	public Result shop_data(String beginDate,String endDate,String shopId){
-		List<ArticleSellDto> list = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId);
+		List<ArticleSellDto> list = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,"0asc");
 		return getSuccessResult(list);
 	}
 	
@@ -96,20 +101,30 @@ public class ArticleSellController extends GenericController{
 		String[]columns={"articleFamilyName","articleName","brandSellNum"};
 		//定义数据
 		List<ArticleSellDto> result = null;
-		//定义首行日期占的位置
-		int num = 2;
-		//定义时间参数用来在第一行上显示日期
-		String [] params = new String[]{beginDate,endDate};
-		//定义excel表格的表头下拉框(选择全部出现下拉框)
-		Integer[] palce = null;
-		String [] list=null;	
+		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+		Map<String,String> map = new HashMap<>();
+		Brand brand = brandServie.selectById(getCurrentBrandId());
+		//获取店铺名称
+		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+		String shopName="";
+		for (ShopDetail shopDetail : shops) {
+			shopName += shopDetail.getName()+",";
+		}
+		//去掉最后一个逗号
+		shopName.substring(0, shopName.length()-1);
+		map.put("brandName", brand.getBrandName());
+		map.put("shops", shopName);
+		map.put("beginDate", beginDate);
+		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "2");//显示的位置
+		map.put("reportTitle", "品牌菜品销售");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+		
+		//定义excel表格的表头
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
 			result = orderService.selectBrandArticleSellByDate(beginDate, endDate,sort);
-			//设置下拉框加载的位置(1,0单元格) 第一个是行 第二个是列
-			params = new String[]{beginDate,endDate};
-			//设置下拉框的内容
-			list=str.split(",");
 		}else{
 			//根据菜品分类的名称获取菜品分类的id
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);
@@ -121,7 +136,7 @@ public class ArticleSellController extends GenericController{
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel("品牌菜品销售", headers, columns, result, out, "",params,num,palce,list);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
@@ -133,7 +148,7 @@ public class ArticleSellController extends GenericController{
 	}
 	@RequestMapping("/shop_excel")
 	@ResponseBody
-	public void reportShopExcel(String beginDate,String endDate,String str,String selectValue,String shopId,HttpServletRequest request, HttpServletResponse response){
+	public void reportShopExcel(String beginDate,String endDate,String str,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "ArticleSellShop.xls";
 		//定义读取文件的路径
@@ -142,36 +157,36 @@ public class ArticleSellController extends GenericController{
 		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum","salesRatio"};
 		//定义数据
 		List<ArticleSellDto> result = null;
-		//定义首行日期占的位置
-		int num = 3;
-		//定义时间参数用来在第一行上显示日期
-		String [] params = new String[]{beginDate,endDate};
-		//定义excel表格的表头下拉框(选择全部出现下拉框)
-		Integer[] palce = null;
-		String [] list=null;	
+		Brand brand = brandServie.selectById(getCurrentBrandId());
+		//获取店铺名称
+		ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+		Map<String,String> map = new HashMap<>();
+		map.put("brandName", brand.getBrandName());
+		map.put("shops", shopDetail.getName());
+		map.put("beginDate", beginDate);
+		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "4");//显示的位置
+		map.put("reportTitle", "店铺菜品销售");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+		
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
-			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId);
-			for (ArticleSellDto articleSellDto : result) {
-				articleSellDto.setSalesRatio(articleSellDto.getSalesRatio()*100);
-			}
-			
-			//设置下拉框加载的位置(1,0单元格) 第一个是行 第二个是列
-			params = new String[]{beginDate,endDate};
-			//设置下拉框的内容
-			list=str.split(",");
+			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,sort);
 		}else{
 			//根据菜品分类的名称获取菜品分类的id
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId);
+			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
+		}
+		for (ArticleSellDto articleSellDto : result) {
+			articleSellDto.setSalesRatio( Double.parseDouble(articleSellDto.getSalesRatio())*100+"%");
 		}
 		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel("店铺菜品销售", headers, columns, result, out, "",params,num,palce,list);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");

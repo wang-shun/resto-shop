@@ -799,6 +799,7 @@
 		shop_report.articleId LEFT JOIN
 		tb_article_family f on
 		a.article_family_id = f.id
+		order by ${sort}
 	</select>
 
 	<select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -881,6 +882,7 @@
 		shop_report.articleId INNER JOIN
 		tb_article_family f on
 		a.article_family_id = f.id AND f.id=#{articleFamilyId}
+		order by ${sort}
 	</select>
 	
 	

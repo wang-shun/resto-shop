@@ -172,7 +172,7 @@ public class TotalRevenueController extends GenericController{
 		  int num = 5;
 		  try{
 				OutputStream out = new FileOutputStream(path);
-				excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "",params,num,null,null);
+			//	excelUtil.ExportExcel("品牌收入报表", headers, columns, result, out, "",params,num,null,null);
 				out.close();
 				excelUtil.download(path, response);
 				JOptionPane.showMessageDialog(null, "导出成功！");
@@ -206,7 +206,7 @@ public class TotalRevenueController extends GenericController{
 		ExcelUtil<ShopIncomeDto> excelUtil=new ExcelUtil<ShopIncomeDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "",params,num,null,null);
+		//	excelUtil.ExportExcel("店铺收入报表", headers, columns, result, out, "",params,num,null,null);
 			out.close();
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
