@@ -35,7 +35,7 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-  	<button class="btn btn-info" id="showPreview">查看报表预览</button>
+<!--   	<button class="btn btn-info" id="showPreview">查看报表预览</button> -->
   	<!-- 每日报表 -->
     <div role="tabpanel" class="tab-pane active" id="dayReport">
     	<div id="report-editor">
@@ -168,9 +168,9 @@ $("#searchReport").click(function(){
 })
 
 //显示预览信息
-$("#showPreview").click(function(){
-	$("#report-editor").toggle();
-	$("#report-preview").toggle();
-})
+// $("#showPreview").click(function(){
+// 	$("#report-editor").toggle();
+// 	$("#report-preview").toggle();
+// })
 
 </script>
