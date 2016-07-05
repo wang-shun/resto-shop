@@ -58,6 +58,7 @@ public class ShareAspect {
 				if(isCanShare){
 					//发送分享通知!
 					Long delayTime = setting.getDelayTime() == null ? 120000 : setting.getDelayTime() * 1000L;
+					log.info("可以分享 "+delayTime+"ms 后发送通知");
 					appraise.setBrandId(setting.getBrandId());
 					MQMessageProducer.sendShareMsg(appraise,delayTime);
 				}
