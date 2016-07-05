@@ -206,8 +206,9 @@ public class OrderAspect {
 	
 	private void sendRewardShareMsg(Customer customer, WechatConfig config, BrandSetting setting, BigDecimal rewardMoney) {
 		StringBuffer msg = new StringBuffer();
+		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&dialog=account'>");
 		msg.append("感谢你的好评分享，你邀请的好友已到店消费，我们赠送你 "+rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP)+" 元的红包\n");
-		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&dialog=account'>点击查看余额</a>");
+		msg.append("</a>");
 		String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 		log.info("发送返利通知成功:"+customer.getId()+" MSG: "+msg+result);
 	}

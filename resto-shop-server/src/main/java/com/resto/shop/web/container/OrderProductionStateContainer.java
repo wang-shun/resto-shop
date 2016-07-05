@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
-import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderService;
@@ -112,10 +111,10 @@ public class OrderProductionStateContainer {
 	private void initShop(String shopId) {
 		if(!INIT_SHOP.containsKey(shopId)){
 			INIT_SHOP.put(shopId, true);
-			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
-			for (Order o: order) {
+//			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
+//			for (Order o: order) {
 //				addOrder(o);
-			}
+//			}
 		}
 	}
 
