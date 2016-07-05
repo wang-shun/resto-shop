@@ -2,6 +2,10 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSONObject;
+import com.aliyun.openservices.ons.api.Message;
+import com.resto.brand.core.util.MQSetting;
+import com.resto.shop.web.producer.MQMessageProducer;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -51,7 +55,7 @@ public class ShareAspect {
 	public void saveAppraise(){};
 	
 	@AfterReturning(value="saveAppraise()",returning="appraise")
-	public void saveAppraiseSuccess(Appraise appraise){
+	public void saveAppraiseSuccess(Appraise appraise) throws InterruptedException {
 		log.info("保存评论成功,触发分享判定:"+appraise.getId());
 		if(appraise!=null){
 			ShareSetting setting = shareSettingService.selectValidSettingByBrandId(DataSourceContextHolder.getDataSourceName());
@@ -60,22 +64,16 @@ public class ShareAspect {
 				log.info("拥有分享好评设置,ID:"+setting.getId());
 				if(isCanShare){
 					//发送分享通知!
-					sendShareMsg(appraise);
+					Long delayTime = setting.getDelayTime() == null ? 120000 : setting.getDelayTime() * 1000L;
+					appraise.setBrandId(setting.getBrandId());
+					MQMessageProducer.sendShareMsg(appraise,delayTime);
 				}
 			}
 		}
 		
 	}
 
-	private void sendShareMsg(Appraise appraise) {
-		StringBuffer msg = new StringBuffer("感谢您的五星评价，分享好友\n");
-		BrandSetting setting = brandSettingService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
-		WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
-		Customer customer = customerService.selectById(appraise.getCustomerId());
-		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=home&dialog=share&appraiseId="+appraise.getId()+"'>再次领取红包</a>");
-		log.info("异步发送分享好评微信通知ID:"+appraise.getId()+" 内容:"+msg);
-		WeChatUtils.sendCustomerMsgASync(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
-	}
+
 
 	private boolean isCanShare(ShareSetting setting, Appraise appraise) {
 		if(setting.getMinLevel()<=appraise.getLevel()&&setting.getMinLength()<=appraise.getContent().length()){

@@ -2,6 +2,7 @@ package com.resto.shop.web.producer;
 
 import java.util.Properties;
 
+import com.resto.shop.web.model.Appraise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+
+
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());
@@ -59,6 +62,17 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
+
+	public static void sendShareMsg(final Appraise appraise,final long delayTime){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", appraise.getBrandId());
+		obj.put("id", appraise.getId());
+		obj.put("customerId", appraise.getCustomerId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOW_ORDER,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+
 
 	public static void sendMessageASync(final Message message) {
 		new Thread(new Runnable() {

@@ -33,6 +33,8 @@ public class Appraise {
     private String articleId;
 
     private String shopDetailId;
+
+    private String brandId;
     
     /**
      * 评论者昵称
@@ -53,8 +55,15 @@ public class Appraise {
      * 是否能打赏
      */
     private Boolean canReward;
-    
-    
+
+    final public String getBrandId() {
+        return brandId;
+    }
+
+    final public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
     public String getId() {
         return id;
     }
