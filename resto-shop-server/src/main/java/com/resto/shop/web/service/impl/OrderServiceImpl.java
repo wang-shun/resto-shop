@@ -959,7 +959,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0asc".equals(sort)){
-			sort="";
+			sort="f.peference ,a.sort";
 		}else if("2".equals(sort.substring(0, 1))){
 			sort="shop_report.shopSellNum"+sort.substring(1, sort.length());
 		}else if("3".equals(sort.subSequence(0, 1))){
