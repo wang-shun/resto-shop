@@ -210,7 +210,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					OrderItem child = new OrderItem();
 					Article ca = articleMap.get(mealItem.getArticleId());
 					child.setId(ApplicationUtils.randomUUID());
-					child.setArticleName(ca.getName());
+					child.setArticleName(mealItem.getName());
 					child.setArticleId(ca.getId());
 					child.setCount(item.getCount());
 					child.setArticleDesignation(ca.getDescription());
@@ -570,17 +570,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						articleId = price.getArticleId();
 					}
 				}
+			}else if(item.getType()==OrderItemType.MEALS_CHILDREN){
+				continue;
 			}
-			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
-			for(Kitchen kitchen : kitchenList){
-				String kitchenId = kitchen.getId().toString();
-				kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-				//判断 厨房集合中 是否已经包含当前厨房信息
-				if(!kitchenArticleMap.containsKey(kitchenId)){
-					//如果没有 则新建
-					kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+			
+			if(OrderItemType.SETMEALS==item.getType()){
+				Kitchen kitchen = kitchenService.selectMealKitchen(item);
+				if(kitchen!=null){
+					String kitchenId = kitchen.getId().toString();
+					kitchenMap.put(kitchenId, kitchen);
+					if(!kitchenArticleMap.containsKey(kitchenId)){
+						//如果没有 则新建
+						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+					}
+					kitchenArticleMap.get(kitchenId).add(item);
 				}
-				kitchenArticleMap.get(kitchenId).add(item);
+			}else{
+				List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+				for(Kitchen kitchen : kitchenList){
+					String kitchenId = kitchen.getId().toString();
+					kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+					//判断 厨房集合中 是否已经包含当前厨房信息
+					if(!kitchenArticleMap.containsKey(kitchenId)){
+						//如果没有 则新建
+						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+					}
+					kitchenArticleMap.get(kitchenId).add(item);
+				}
 			}
 		}
 		
@@ -607,6 +623,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				item.put("ARTICLE_NAME", article.getArticleName());
 				item.put("ARTICLE_COUNT",article.getCount());
 				items.add(item);
+				if(article.getType()==OrderItemType.SETMEALS){
+					if(article.getChildren()!=null&&!article.getChildren().isEmpty()){
+						for (OrderItem child: article.getChildren()) {
+							Map<String,Object> child_item = new HashMap<String,Object>();
+							child_item.put("ARTICLE_NAME",child.getArticleName());
+							child_item.put("ARTICLE_COUNT",child.getCount());
+							items.add(child_item);
+						}
+					}
+				}
 				//保存基本信息
 				Map<String,Object> data = new HashMap<String,Object>();
 				data.put("KITCHEN_NAME",kitchen.getName());

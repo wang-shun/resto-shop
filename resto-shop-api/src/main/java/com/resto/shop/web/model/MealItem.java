@@ -20,6 +20,8 @@ public class MealItem {
     private String photoSmall;
     
     private boolean isDefault;
+
+    private Integer kitchenId;
     
     public Integer getId() {
         return id;
@@ -91,5 +93,13 @@ public class MealItem {
 
 	public void setIsDefault(boolean isDefault) {
 		this.isDefault = isDefault;
+	}
+
+	public Integer getKitchenId() {
+		return kitchenId;
+	}
+
+	public void setKitchenId(Integer kitchenId) {
+		this.kitchenId = kitchenId;
 	}
 }

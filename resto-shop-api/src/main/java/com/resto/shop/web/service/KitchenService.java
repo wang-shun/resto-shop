@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Kitchen;
+import com.resto.shop.web.model.OrderItem;
 
 public interface KitchenService extends GenericService<Kitchen, Integer> {
 	/**
@@ -32,4 +33,7 @@ public interface KitchenService extends GenericService<Kitchen, Integer> {
 	 * @return
 	 */
 	List<Kitchen> selectInfoByArticleId(String articleId);
+
+
+	Kitchen selectMealKitchen(OrderItem mealItems);
 }

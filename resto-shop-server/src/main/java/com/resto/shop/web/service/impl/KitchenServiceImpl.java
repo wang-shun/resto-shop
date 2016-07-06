@@ -8,6 +8,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.KitchenMapper;
 import com.resto.shop.web.model.Kitchen;
+import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.KitchenService;
 
 import cn.restoplus.rpc.server.RpcService;
@@ -52,6 +53,12 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	@Override
 	public List<Kitchen> selectInfoByArticleId(String articleId) {
 		return kitchenMapper.selectInfoByArticleId(articleId);
+	}
+
+	@Override
+	public Kitchen selectMealKitchen(OrderItem mealItems) {
+		Kitchen kitchen = kitchenMapper.selectKitchenByMealsItemId(mealItems.getId());
+		return kitchen;
 	} 
 
 }

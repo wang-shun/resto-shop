@@ -59,9 +59,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public Article save(Article article) {
 		article.setId(ApplicationUtils.randomUUID());
 		this.insert(article);
+		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
 			articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
-			kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		}else if(article.getArticleType()==Article.ARTICLE_TYPE_MEALS){
 			mealAttrService.insertBatch(article.getMealAttrs(),article.getId());
 		}
@@ -71,9 +71,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	
 	@Override
 	public int update(Article article) {
+		kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
 			articlePriceServer.saveArticlePrices(article.getId(),article.getArticlePrices());
-			kitchenService.saveArticleKitchen(article.getId(), article.getKitchenList());
 		}else if(article.getArticleType()==Article.ARTICLE_TYPE_MEALS){
 			mealAttrService.insertBatch(article.getMealAttrs(),article.getId());
 		}
@@ -84,11 +84,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	@Override
 	public Article selectFullById(String id) {
 		Article article  = selectById(id);
+		List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
+		article.setKitchenList(kitchenList.toArray(new Integer[0]));
 		if(article.getArticleType()==Article.ARTICLE_TYPE_SIGNLE){
 			List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
 			article.setArticlePrices(prices);
-			List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
-			article.setKitchenList(kitchenList.toArray(new Integer[0]));
 		}else{
 			List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(id);
 			article.setMealAttrs(mealAttrs);
