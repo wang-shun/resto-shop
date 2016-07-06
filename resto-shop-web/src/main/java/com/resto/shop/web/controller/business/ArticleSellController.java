@@ -92,7 +92,7 @@ public class ArticleSellController extends GenericController{
 	
 	@RequestMapping("/brand_excel")
 	@ResponseBody
-	public void reportBrandExcel(String beginDate,String endDate,String str,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
+	public void reportBrandExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "ArticleSellBrand.xls";
 		//定义读取文件的路径
@@ -148,7 +148,7 @@ public class ArticleSellController extends GenericController{
 	}
 	@RequestMapping("/shop_excel")
 	@ResponseBody
-	public void reportShopExcel(String beginDate,String endDate,String str,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
+	public void reportShopExcel(String beginDate,String endDate,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "ArticleSellShop.xls";
 		//定义读取文件的路径

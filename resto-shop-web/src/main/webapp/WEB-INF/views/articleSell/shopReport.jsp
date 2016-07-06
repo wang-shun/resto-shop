@@ -148,21 +148,20 @@ function appendSelect(api){
 }
 
 $("#ExcelReport").click(function(){
-	var str = [];
-	for(var i=0;i<select[0].length;i++){
-		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
-	}
-	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
+// 	var str = [];
+// 	for(var i=0;i<select[0].length;i++){
+// 		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
+// 	}
+// 	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
 	
 	//获取select选中的值
 	var selectValue = select[0].value;
-	
 	var order = shopTable.order();
 	sort = order[0][0]+''+order[0][1];
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	var shopId = "${shopId}"
-	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&str="+str2+"&&selectValue="+selectValue+"&&sort="+sort+"&&shopId="+shopId;
+	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort+"&&shopId="+shopId;
 })
 
 
