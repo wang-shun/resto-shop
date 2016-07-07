@@ -87,7 +87,7 @@
   select id,name,value,min_amount,begin_date,end_date,begin_time,end_time,is_used,using_time,
   coupon_source,use_with_account,remark,distribution_mode_id,customer_id
    from tb_coupon where is_used=#{isUsed} and distribution_mode_id=#{distributionModeId} and customer_id=#{customerId}
-   <![CDATA[AND begin_date<=current_date AND end_date >=current_date AND begin_time<NOW() AND end_time>NOW()]]>
+   <![CDATA[AND begin_date<=current_date AND end_date >=current_date AND begin_time=<NOW() AND end_time>=NOW()]]>
    order by value DESC
   </select>
   
