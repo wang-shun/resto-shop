@@ -49,12 +49,6 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 		for(OrderPaymentItem item : list){
 			item.setPaymentModeVal(PayMode.getPayModeName(item.getPaymentModeId()));
 		}
-		//查询 红包充值记录
-		OrderPaymentItem chargeOrder = orderpaymentitemMapper.selectChargeOrderByDate(shopId, begin, end);
-		if(chargeOrder!=null){
-			chargeOrder.setPaymentModeVal("充值记录");//设置类型
-			list.add(chargeOrder);
-		}
 		return orderpaymentitemMapper.selectpaymentByPaymentMode(shopId,begin,end);
 	}
 

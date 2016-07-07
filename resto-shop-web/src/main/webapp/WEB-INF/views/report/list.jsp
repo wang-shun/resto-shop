@@ -1,8 +1,3 @@
-
-
-
-
-
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
@@ -29,9 +24,9 @@
 <br/>
 <div>
   <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="#dayReport" aria-controls="dayReport" role="tab" data-toggle="tab"><strong>每日报表</strong></a></li>
-  </ul>
+<!--   <ul class="nav nav-tabs" role="tablist"> -->
+<%--     <li role="presentation" class="active"><a href="#dayReport" aria-controls="dayReport" role="tab" data-toggle="tab"><strong>每日报表</strong></a></li> --%>
+<!--   </ul> -->
 
   <!-- Tab panes -->
   <div class="tab-content">
@@ -45,7 +40,8 @@
 			  	<strong style="margin-right:100px;font-size:22px">收入条目</strong>
 			  </div>
 			  <div class="panel-body">
-			  	<table id="dayReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+			  	<table id="dayReportTable" class="table table-striped table-bordered table-hover" width="100%">
+			  	</table>
 			  </div>
 			</div>
 			<!-- 菜品销售记录 -->
@@ -101,13 +97,9 @@ var tb1 = $("#dayReportTable").DataTable({
 	},
 	columns : [
 		{ title : "支付类型", data : "paymentModeVal" },                 
-		{ title : "支付金额", data : "payValue" ,
-			createdCell:function(td,tdData,rowData){
-				orderPaymentItemsCount += tdData;//计算 预览信息
-				$("#report-preview > .col-md-4:first").append("<p>"+rowData.paymentModeVal+"："+tdData+" 元<p/>");
-			}
-		}
+		{ title : "支付金额", data : "payValue"} ,
 	],
+
 	fnFooterCallback: function() {
 		if(!isFirst){
 			$("#report-preview > .col-md-4:first").append("---------------------<br/>");
