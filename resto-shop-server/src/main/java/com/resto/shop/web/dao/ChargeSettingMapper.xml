@@ -61,6 +61,6 @@
   <select id="selectList" resultType="ChargeSetting">select * from tb_charge_setting</select>
   <select id="selectListByShopId" resultType="ChargeSetting">
   select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id from tb_charge_setting
-  where shop_detail_id=#{shopId} and state=1 ORDER BY sort DESC
+  where shop_detail_id=#{shopId} ORDER BY sort DESC
   </select>
 </mapper>

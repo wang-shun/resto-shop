@@ -139,7 +139,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param shopId
 	 * @return
 	 */
-	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate,String endDate,String shopId);
+	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate,String endDate,String shopId,String sort);
 	
 	/**
 	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情
@@ -147,5 +147,18 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate);
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate,String endDate,String order);
+
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
+			String articleFamilyId,String sort);
+	/**
+	 * 根据时间,指定店铺，指定菜品分类，查询已完成订单的销售详情
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopId
+	 * @param articleFamilyId
+	 * @return
+	 */
+	public List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
+			String shopId, String articleFamilyId,String sort);
 }

@@ -915,18 +915,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate, String endDate, String shopId) {
+	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate, String endDate, String shopId,String sort) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId);
+		if("0asc".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("2".equals(sort.substring(0, 1))){
+			sort="shop_report.shopSellNum"+" "+sort.substring(1, sort.length());
+		}else if("3".equals(sort.subSequence(0, 1))){
+			sort="brand_report.brandSellNum"+" "+sort.substring(1,sort.length());
+		}else if("4".equals(sort.substring(0,1))){
+			sort="salesRatio"+" "+sort.substring(1,sort.length());
+		}
+		
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,sort);
 		return list;
 	}
 
 	@Override
-	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate) {
+	public List<ArticleSellDto> selectBrandArticleSellByDate(String beginDate, String endDate,String sort) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDate(begin, end,sort);
 		return list;
 	}
 	
@@ -973,6 +990,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public String numberToString(int num){
 		Format f = new DecimalFormat("000");
 		return f.format(num);
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
+			String articleFamilyId,String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){ 
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		return orderMapper.selectBrandArticleSellByDateAndArticleFamilyId(begin,end,articleFamilyId,sort);
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,String shopId, String articleFamilyId,String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0asc".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("2".equals(sort.substring(0, 1))){
+			sort="shop_report.shopSellNum"+sort.substring(1, sort.length());
+		}else if("3".equals(sort.subSequence(0, 1))){
+			sort="brand_report.brandSellNum"+sort.substring(1,sort.length());
+		}else if("4".equals(sort.substring(0,1))){
+			sort="salesRatio"+sort.substring(1,sort.length());
+		}
+		
+		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
 	}
 	
 }

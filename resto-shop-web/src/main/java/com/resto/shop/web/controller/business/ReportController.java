@@ -41,5 +41,4 @@ public class ReportController extends GenericController{
 		return getSuccessResult(orderItemService.selectSaleArticleByDate(getCurrentShopId() ,beginDate, endDate));
 	}
 	
-	
 }

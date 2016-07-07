@@ -232,6 +232,8 @@
 			<artifactId>google-collections</artifactId>
 		</dependency>
 		
+		
+		
 		<!-- UEditor -->
 		<dependency>
 	      <groupId>com.baidu.ueditor</groupId>
@@ -240,6 +242,13 @@
 	      <scope>system</scope>
 	      <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ueditor.jar</systemPath>
 	    </dependency>
+	    
+	    <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+	<dependency>
+    	<groupId>org.apache.poi</groupId>
+    	<artifactId>poi</artifactId>
+    <version>3.9</version>
+</dependency>
 	    
 	</dependencies>
 </project>

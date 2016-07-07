@@ -1,8 +1,7 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
-
-<h2 class="text-center"><strong>结算报表</strong></h2>
+<h2 class="text-center"><strong>营业总额报表</strong></h2>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -19,11 +18,10 @@
 			<input type="hidden" id="shopDataTable">
 		</form>&nbsp;&nbsp;&nbsp;
 		</form>
-		
-		
 	</div>
 </div>
-<button type="button" class="btn btn-primary" id="reportExcel">导出excel</button><br/>
+<button type="button" class="btn btn-primary" id="brandreportExcel">品牌数据导出excel</button><br/>
+<button type="button" class="btn btn-primary" id="shopreportExcel">店铺数据导出excel</button><br/>
 <br/>
 <div>
   	<!-- 每日报表 -->
@@ -40,6 +38,7 @@
 			</div>
     	</div>
     </div>
+ 
 <script>
 //时间插件
 $('.form_datetime').datetimepicker({
@@ -76,8 +75,8 @@ $.ajax( {
 });
 
 var tb1 = $("#brandReportTable").DataTable({
-	dom: 'i',
 	data:dataSource.brandIncome,
+	dom:'i',
 	columns : [
 		{                 
 			title : "品牌",
@@ -113,6 +112,7 @@ var tb1 = $("#brandReportTable").DataTable({
 
 var tb2 = $("#shopReportTable").DataTable({
 	data:dataSource.shopIncome,
+	bSort:false,
 	columns : [
 		{                 
 			title : "店铺名称",
@@ -162,6 +162,7 @@ $("#searchReport").click(function(){
 		    	tb2.clear().draw();
 		    	tb1.rows.add(result.brandIncome).draw();
 		    	tb2.rows.add(result.shopIncome).draw();
+		    	toastr.success('查询成功');
 		     },  
 		     error : function() { 
 		    	 toastr.error("系统异常请重新刷新");
@@ -169,14 +170,20 @@ $("#searchReport").click(function(){
 		});
 })
 
-$("#reportExcel").click(function(){
-	var reportData = dataSource;
-	$.ajax({
-		type:"post",
-		url:'totalRevenue/reportExcel',
-		data:{'reportData':reportData},
-	})
+//导出品牌数据
+$("#brandreportExcel").click(function(){
+	 beginDate = $("#beginDate").val();
+	 endDate = $("#endDate").val();
+	location.href="totalRevenue/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
 	
 })
-	
+
+//导出店铺数据
+
+$("#shopreportExcel").click(function(){
+	beginDate=$("#beginDate").val();
+	endDate = $("#endDate").val();
+	location.href="totalRevenue/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+})
+
 </script>

@@ -12,7 +12,8 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button></br>
+		  <button type="button" class="btn btn-primary" id="ExcelReport">导出excel</button>
 		</form>
 	</div>
 </div>
@@ -51,7 +52,12 @@ var shopTable = $("#shopTable").DataTable({
 			return d;
 		}
 	},
-	order: [[ 2, "desc" ]],//默认以菜品销量降序
+	//order: [[ 2, "desc" ]],//默认以菜品销量降序
+	 columnDefs:[{
+                 orderable:false,//禁用排序
+                 targets:[0,1]   //指定的列
+             }],
+	
 	columns : [
 		{
 			title : "菜品分类",
@@ -104,13 +110,14 @@ function isEmpty(str){
 }
 
 //添加分类下拉框
+var select;
 function appendSelect(api){
 	api.columns().indexes().flatten().each(function (i) {
         if (i == 0) {
             var column = api.column(i);
             $(column.header()).html("菜品分类");
             var $span = $('<span class="addselect">▾</span>').appendTo($(column.header()))
-            var select = $('<select><option value="">全部</option></select>')
+             select = $('<select><option value="">全部</option></select>')
                     .appendTo($(column.header()))
                     .on('click', function (evt) {
                         evt.stopPropagation();
@@ -129,5 +136,23 @@ function appendSelect(api){
         }
     });
 }
+
+$("#ExcelReport").click(function(){
+// 	var str = [];
+// 	for(var i=0;i<select[0].length;i++){
+// 		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
+// 	}
+// 	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
+	//获取select选中的值
+	var selectValue = select[0].value;
+	var sort=0;//排序
+	var order = shopTable.order();
+	if(order[0][0]==2){
+		sort=order[0][1]
+	}
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+})
 
 </script>
