@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +129,17 @@ public class MQMessageProducer {
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 		
+	}
+
+
+	public static void sendNoticeShareMessage(Customer customer){
+		JSONObject obj  = new JSONObject();
+		obj.put("id", customer.getId());
+		obj.put("shareCustomer", customer.getShareCustomer());
+		obj.put("brandId", customer.getBrandId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_SHARE_CUSTOMER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+
 	}
 
 	public static void sendNotAllowContinueMessage(Order order, long delay) {
