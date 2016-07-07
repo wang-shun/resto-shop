@@ -99,18 +99,21 @@ public class OrderMessageListener implements MessageListener {
     private void noticeShareCustomer(Customer customer) {
         Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
         ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
-        BigDecimal sum = new BigDecimal(0);
-        List<Coupon> couponList = couponService.listCouponByStatus("0", customer.getId());
-        for (Coupon coupon : couponList) {
-            sum = sum.add(coupon.getValue());
+        if (shareCustomer != null && shareSetting != null) {
+            BigDecimal sum = new BigDecimal(0);
+            List<Coupon> couponList = couponService.listCouponByStatus("0", customer.getId());
+            for (Coupon coupon : couponList) {
+                sum = sum.add(coupon.getValue());
+            }
+            StringBuffer msg = new StringBuffer("亲，感谢你的分享，你的好友");
+            msg.append(customer.getNickname()).append("已领取").append(sum).append("元红包，")
+                    .append(customer.getNickname()).append("如到店消费你将获得").append(shareSetting.getMinMoney())
+                    .append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
+            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            log.info("异步发送分享注册微信通知ID:" + customer.getShareCustomer() + " 内容:" + msg);
+            WeChatUtils.sendCustomerMsgASync(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
-        StringBuffer msg = new StringBuffer("亲，感谢你的分享，你的好友");
-        msg.append(customer.getNickname()).append("已领取").append(sum).append("元红包，")
-                .append(customer.getNickname()).append("如到店消费你将获得").append(shareSetting.getMinMoney())
-                .append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
-        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-        log.info("异步发送分享注册微信通知ID:" + customer.getShareCustomer() + " 内容:" + msg);
-        WeChatUtils.sendCustomerMsgASync(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+
     }
 
     private Action executeAutoRefundOrder(Message message) throws UnsupportedEncodingException {
