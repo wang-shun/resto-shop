@@ -23,7 +23,7 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @param shopId
 	 * @return
 	 */
-	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate);
+	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate,String sort);
 
 	public List<OrderItem> listByOrderIds(List<String> childIds);
 }

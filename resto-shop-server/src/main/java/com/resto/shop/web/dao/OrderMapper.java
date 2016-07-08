@@ -146,5 +146,27 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(@Param("beginDate")Date begin,@Param("endDate")Date end,@Param("shopId")String shopId,@Param("articleFamilyId")String articleFamilyId ,@Param("sort")String sort);
+	
+	/**
+	 * 根据时间查询店铺已完成订单的菜品销售详情
+	 * @param shopId
+	 * @param begin
+	 * @param end
+	 * @param sort
+	 * @return
+	 */
+	List<ArticleSellDto> selectShopArticleByDate(@Param("shopId")String shopId,@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("sort") String sort);
+
+	/**
+	 * 根据时间  菜品分类id  查询店铺已完成订单的菜品销售详情
+	 * @param begin
+	 * @param end
+	 * @param shopId
+	 * @param articleFamilyId
+	 * @param sort
+	 * @return
+	 */
+	List<ArticleSellDto> selectShopArticleByDateAndArticleFamilyId(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("shopId")String shopId,
+			@Param("articleFamilyId")String articleFamilyId,@Param("sort") String sort);
 		
 }

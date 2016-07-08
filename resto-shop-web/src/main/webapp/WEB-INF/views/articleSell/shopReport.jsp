@@ -12,8 +12,8 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button> </br>
-		  <button type="button" class="btn btn-primary" id="ExcelReport">导出excel</button>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button> &nbsp;
+		  <button type="button" class="btn btn-primary" id="ExcelReport">下载报表</button>
 		</form>
 	</div>
 </div>

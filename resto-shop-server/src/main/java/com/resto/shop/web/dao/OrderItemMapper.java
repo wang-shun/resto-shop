@@ -34,7 +34,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 	 * @param shopId
 	 * @return
 	 */
-	public List<OrderItem> selectSaleArticleByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId);
+	public List<OrderItem> selectSaleArticleByDate(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId,@Param("sort")String sort);
 
 	List<OrderItem> listByOrderIds(List<String> childIds);
 }

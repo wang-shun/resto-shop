@@ -1,7 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
-<!-- <link rel="stylesheet" type="text/css" href="assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"> -->
 
 <h2 class="text-center"><strong>结算报表</strong></h2><br/>
 <div class="row" id="searchTools">
@@ -15,9 +14,12 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="shopIncomExcel">下载收入报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="shopArticleExcel">下载餐品销售报表</button>
 		</form>
 	</div>
+		
 </div>
 <br/>
 <p class="text-danger text-center" hidden="true"><strong>开始时间不能大于结束时间！</strong></p>
@@ -30,7 +32,6 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-<!--   	<button class="btn btn-info" id="showPreview">查看报表预览</button> -->
   	<!-- 每日报表 -->
     <div role="tabpanel" class="tab-pane active" id="dayReport">
     	<div id="report-editor">
@@ -62,11 +63,6 @@
   </div>
 </div>
 
-<!-- <!-- 日期框 --> 
-<%-- <script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script> --%>
-<%-- <script src="assets/global/plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script> --%>
-
-
 <script>
 //时间插件
 $('.form_datetime').datetimepicker({
@@ -95,21 +91,17 @@ var tb1 = $("#dayReportTable").DataTable({
 			return d;
 		}
 	},
+	ordering:false,
 	columns : [
 		{ title : "支付类型", data : "paymentModeVal" },                 
 		{ title : "支付金额", data : "payValue"} ,
 	],
-
-	fnFooterCallback: function() {
-		if(!isFirst){
-			$("#report-preview > .col-md-4:first").append("---------------------<br/>");
-			$("#report-preview > .col-md-4:first").append("<strong>统计实收："+orderPaymentItemsCount.toFixed(2)+" </strong><br/>");
-			orderPaymentItemsCount = 0 ;//初始化
-		}
-	} 
 });
 
-var orderArticleItemsCount = 0;
+var sort = "desc"
+var tbApi=null;
+var select;
+var isFirst = true;//是否是第一次进入
 var tb2 = $("#articleSaleTable").DataTable({
 	ajax : {
 		url : "report/orderArticleItems",
@@ -117,27 +109,80 @@ var tb2 = $("#articleSaleTable").DataTable({
 		data:function(d){
 			d.beginDate=$("#beginDate").val();
 			d.endDate=$("#endDate").val();
+			d.sort=sort;
 			return d;
 		}
 	},
 	columns : [
-		{ title : "菜品名称", data : "articleName" },                 
-		{ title : "菜品销量", data : "articleSum",
-			createdCell:function(td,tdData,rowData){
-				orderArticleItemsCount += tdData;
-				$("#report-preview > .col-md-8:last").append(""+rowData.articleName+"："+tdData+"<br/>");
-			}	
-		}
-	],
-	fnFooterCallback: function() {
-		if(!isFirst){
-			$("#report-preview > .col-md-8:last").append("---------------------<br/>");
-			$("#report-preview > .col-md-8:last").append("<strong>统计实收："+orderArticleItemsCount.toFixed(2)+"  份</strong><br/>");
-			orderArticleItemsCount = 0;//初始化
-		}
-		isFirst = false;//用于判断是否为第一次加载
-	} 
-});
+	   		{
+	   			title : "菜品分类",
+	   			data : "articleFamilyName",
+	   			createdCell:function(td,tdData,rowData){
+	   				if(isEmpty(tdData)){
+	   					var lab = $("<span>");
+	   					if(isEmpty(rowData.articleFamilyId)){
+	   						lab.html("分类不详").addClass("label label-warning");
+	   					}else{
+	   						lab.html("该分类已不存在").addClass("label label-warning");
+	   					}
+	   					$(td).html(lab);
+	   				}
+	   			}
+	   		},  
+	   		{
+	   			title : "菜品名称",
+	   			data : "articleName",
+	   			createdCell:function(td,tdData,rowData){
+	   				if(isEmpty(rowData.articleFamilyId) && isEmpty(rowData.articleFamilyName)){
+	   					$(td).html(tdData+"&nbsp;<span class='label label-danger'>已被删除</span>");
+	   				}
+	   			}
+	   		},  
+	   		{
+	   			title : "菜品销量(份)",
+	   			data : "shopSellNum",
+	   		},
+	   	],
+	   	initComplete: function () {//列筛选
+			tbApi = this.api();
+	   		appendSelect(tbApi);
+	   		isFirst =false;
+	       },
+}).on('xhr.dt',function(e){
+	if(!isFirst){
+		appendSelect(tbApi)		
+	}
+})
+
+
+function isEmpty(str){
+	return str == null || str == "" ? true:false;
+}
+
+function appendSelect(api){
+	api.columns().indexes().flatten().each(function (i) {
+        if (i == 0) {
+            var column = api.column(i);
+            $(column.header()).html("菜品分类");
+            var $span =  $('<span class="addselect">▾</span>').appendTo($(column.header()))
+             select = $('<select><option value="">全部</option></select>')
+                    .appendTo($(column.header()))
+                    .on('click', function (e) {
+                    	e.stopPropagation();
+                        var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                        );
+                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+                    });
+            	column.data().unique().sort().each(function (d, j) {
+            	if(d!=null && d!=""){
+            		select.append('<option value="' + d + '">' + d + '</option>')
+                    $span.append(select)
+            	}
+            });
+        }
+    });
+}
 
 //搜索
 $("#searchReport").click(function(){
@@ -149,20 +194,37 @@ $("#searchReport").click(function(){
 		return ;
 	}
 	$(".text-danger").hide();//隐藏提示
-	
 	var data = {"beginDate":beginDate,"endDate":endDate};
-	//清空预览信息
-	$("#report-preview > .col-md-4:first").html("<p><strong>收入条目</strong></p>");
-	$("#report-preview > .col-md-8:last").html("<p><strong>菜品销售记录</strong></p>");
 	//更新数据
 	tb1.ajax.reload();
 	tb2.ajax.reload();
 })
 
-//显示预览信息
-// $("#showPreview").click(function(){
-// 	$("#report-editor").toggle();
-// 	$("#report-preview").toggle();
-// })
+//店铺收入报表下载
+$("#shopIncomExcel").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	location.href="report/income_excel?beginDate="+beginDate+"&&endDate="+endDate;
+})
+
+
+//店铺菜品报表下载
+
+$("#shopArticleExcel").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	var selectValue = select[0].value;
+	var sort='desc';//排序
+	var order = tb2.order();
+	if(order[0][0]==2){
+		sort=order[0][1]
+	}
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	location.href="report/article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+	
+})
+
+
 
 </script>

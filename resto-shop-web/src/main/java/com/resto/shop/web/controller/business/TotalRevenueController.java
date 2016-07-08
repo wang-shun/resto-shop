@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.BrandIncomeDto;
 import com.resto.brand.web.dto.IncomeReportDto;
+import com.resto.brand.web.dto.ReportIncomeDto;
 import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -167,11 +169,12 @@ public class TotalRevenueController extends GenericController {
 	@ResponseBody
 	public void exprotBrandExcel(@RequestParam("beginDate") String beginDate, @RequestParam("endDate") String endDate,
 			HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {
-		// 导出文件名
-		String str = "brandInCome.xls";
-		String path = request.getSession().getServletContext().getRealPath(str);
+		
 		Brand brand = brandService.selectById(getCurrentBrandId());
 		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+		// 导出文件名
+				String str = "营业总额报表"+beginDate+"至"+endDate+".xls";
+				String path = request.getSession().getServletContext().getRealPath(str);
 		String shopName = "";
 		for (ShopDetail shopDetail : shopDetails) {
 			shopName += shopDetail.getName() + ",";
@@ -191,10 +194,35 @@ public class TotalRevenueController extends GenericController {
 
 		String[][] headers = { { "品牌", "20" }, { "营收总额(元)", "16" }, { "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
 				{ "微信支付(元)", "16" }, { "充值账户支付(元)", "19" }, { "充值赠送账户支付(元)", "23" } };
-		String[] columns = { "brandName", "totalIncome", "redIncome", "couponIncome", "wechatIncome",
+		String[] columns = { "name", "totalIncome", "redIncome", "couponIncome", "wechatIncome",
 				"chargeAccountIncome", "chargeGifAccountIncome" };
-		List<BrandIncomeDto> result = (List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
-		ExcelUtil<BrandIncomeDto> excelUtil = new ExcelUtil<BrandIncomeDto>();
+		
+		List<ReportIncomeDto> result = new LinkedList<>();
+		List<BrandIncomeDto> brandresult = (List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
+		List<ShopIncomeDto> shopresult = (List<ShopIncomeDto>) getIncomeReportList(beginDate, endDate).get("shopIncome");
+		for (ShopIncomeDto shopIncomeDto : shopresult) {
+			ReportIncomeDto rt = new ReportIncomeDto();
+			rt.setTotalIncome(shopIncomeDto.getTotalIncome());
+			rt.setWechatIncome(shopIncomeDto.getWechatIncome());
+			rt.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome());
+			rt.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome());
+			rt.setCouponIncome(shopIncomeDto.getCouponIncome());
+			rt.setName(shopIncomeDto.getShopName());
+			rt.setRedIncome(shopIncomeDto.getRedIncome());
+			result.add(rt);
+		}
+		for (BrandIncomeDto brandIncomeDto : brandresult) {
+			ReportIncomeDto rt = new ReportIncomeDto();
+			rt.setTotalIncome(brandIncomeDto.getTotalIncome());
+			rt.setWechatIncome(brandIncomeDto.getWechatIncome());
+			rt.setChargeAccountIncome(brandIncomeDto.getChargeAccountIncome());
+			rt.setChargeGifAccountIncome(brandIncomeDto.getChargeGifAccountIncome());
+			rt.setCouponIncome(brandIncomeDto.getCouponIncome());
+			rt.setName(brandIncomeDto.getBrandName());
+			rt.setRedIncome(brandIncomeDto.getRedIncome());
+			result.add(rt);
+		}
+		ExcelUtil<ReportIncomeDto> excelUtil = new ExcelUtil<ReportIncomeDto>();
 		try {
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out,map);

@@ -4,17 +4,24 @@
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
-		  <div class="form-group" style="margin-right: 50px;">
+		  <div class="form-group" style="margin-right: 33px;">
 		    <label for="beginDate">开始时间：</label>
 		    <input type="text" class="form-control form_datetime" id="beginDate" readonly="readonly">
 		  </div>
-		  <div class="form-group" style="margin-right: 50px;">
+		  <div class="form-group" style="margin-right: 33px;">
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button></br>
-		  <button type="button" class="btn btn-primary" id="ExcelReport">导出excel</button>
+		  <div class="form-group" style="margin-right: 33px;">
+		  	<button type="button" class="btn btn-primary" id="searchReport">查询报表</button>
+		  	<button type="button" class="btn btn-primary" id="ExcelReport">下载报表</button>
+		  </div>
 		</form>
+		<br/>
+		<div>
+			<button type="button" class="btn green-haze" id="sortById">按菜品序号排序</button>
+			<button type="button" class="btn green-haze" id="sortByNum">按销量排序</button>
+		</div>
 	</div>
 </div>
 <br/>
@@ -41,6 +48,7 @@ $("#endDate").val("${endDate}");
 
 var tbApi = null;
 var isFirst = true;
+var sort =  "desc";//默认按销量排序
 var shopTable = $("#shopTable").DataTable({
 	ajax : {
 		url : "articleSell/brand_data",
@@ -49,10 +57,11 @@ var shopTable = $("#shopTable").DataTable({
 			d.beginDate = $("#beginDate").val();
 			d.endDate = $("#endDate").val();
 			d.shopId = "${shopId}";
+			d.sort = sort;
 			return d;
 		}
 	},
-	//order: [[ 2, "desc" ]],//默认以菜品销量降序
+	// order: [[ 2, "desc" ]],//默认以菜品销量降序
 	 columnDefs:[{
                  orderable:false,//禁用排序
                  targets:[0,1]   //指定的列
@@ -72,7 +81,6 @@ var shopTable = $("#shopTable").DataTable({
 					}
 					$(td).html(lab);
 				}
-				
 			}
 		},  
 		{
@@ -132,20 +140,14 @@ function appendSelect(api){
                     $span.append(select)
             	}
             });
-
         }
     });
 }
 
 $("#ExcelReport").click(function(){
-// 	var str = [];
-// 	for(var i=0;i<select[0].length;i++){
-// 		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
-// 	}
-// 	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
 	//获取select选中的值
 	var selectValue = select[0].value;
-	var sort=0;//排序
+	var sort='desc';//排序
 	var order = shopTable.order();
 	if(order[0][0]==2){
 		sort=order[0][1]
@@ -154,5 +156,19 @@ $("#ExcelReport").click(function(){
 	var endDate = $("#endDate").val();
 	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
 })
+
+//按菜品序号排序
+$("#sortById").click(function(){
+	sort="0";
+	shopTable.ajax.reload;
+})
+
+//按销量排序
+
+$("#sortByNum").click(function(){
+	sort="desc";
+	shopTable.ajax.reload();
+})
+
 
 </script>
