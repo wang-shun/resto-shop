@@ -137,6 +137,7 @@ public class MQMessageProducer {
 		obj.put("id", customer.getId());
 		obj.put("shareCustomer", customer.getShareCustomer());
 		obj.put("brandId", customer.getBrandId());
+		obj.put("nickname",customer.getNickname());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_SHARE_CUSTOMER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 
