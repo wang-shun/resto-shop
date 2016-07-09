@@ -53,7 +53,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		Customer cus = customerMapper.selectByOpenId(openid);
 		if(cus!=null){
 			Account account = accountService.selectById(cus.getAccountId());
-			cus.setAccount(account.getRemain());
+			cus.setAccount(account == null ? new BigDecimal(0) : account.getRemain());
 		}
 		return cus;
 	}
