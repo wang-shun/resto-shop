@@ -13,13 +13,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.core.util.ExcelUtilSheetsUtil;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ExcelReportDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -192,7 +195,96 @@ public class ReportController extends GenericController{
 					
 		}
 		
-	
-	
+		
+		//店铺数据导出excel（包含菜品和收入的信息放在同一excel表格不同的sheet对象上）
+		
+		@RequestMapping("shop_excel")
+		@ResponseBody
+		public void reportShopExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
+					//导出文件名
+					String fileName = "结算报表"+beginDate+"至"+endDate+".xls";
+					//定义读取文件的路径
+					String path = request.getSession().getServletContext().getRealPath(fileName);
+					
+					Brand brand = brandService.selectById(getCurrentBrandId());
+					//获取店铺名称
+					String shopId = getCurrentShopId();
+					ShopDetail shop = shopDetailService.selectById(shopId);
+					List<ExcelReportDto> list = new LinkedList<>();
+					ExcelUtilSheetsUtil ui = new ExcelUtilSheetsUtil();
+					
+					
+					//定义第一个sheet里的内容
+					ExcelReportDto excel = new ExcelReportDto();
+					String[] columns  = {"paymentModeVal","payValue"};
+					excel.setColumns(columns);
+					Map<String,String> map = new HashMap<>();
+					map.put("brandName", brand.getBrandName());
+					map.put("shops", shop.getName());
+					map.put("beginDate", beginDate);
+					map.put("reportType", "店铺收入报表");//表的头，第一行内容
+					map.put("endDate", endDate);
+					map.put("num", "1");//显示的位置
+					map.put("reportTitle", "店铺收入");//表的名字
+					map.put("timeType", "yyyy-MM-dd");
+					excel.setMap(map);
+					String[][] headers = {{"支付类型","25"},{"支付金额(元)","25"}};
+					excel.setHeaders(headers);
+					//定义数据
+					List<OrderPaymentItem> result = this.getResult(beginDate, endDate);
+					excel.setResult(result);
+					list.add(excel);
+					
+					//定义第二个sheet里的内容
+					ExcelReportDto excel2 = new ExcelReportDto();
+					String[]columns2={"articleFamilyName","articleName","shopSellNum"};
+					excel2.setColumns(columns2);//列
+					
+					//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+					Map<String,String> map2 = new HashMap<>();
+					map2.put("brandName", brand.getBrandName());
+					map2.put("shops", shop.getName());
+					map2.put("beginDate", beginDate);
+					map2.put("reportType", "菜品销售报表");//表的头，第一行内容
+					map2.put("endDate", endDate);
+					map2.put("num", "2");//显示的位置
+					map2.put("reportTitle", "菜品销售");//表的名字
+					map2.put("timeType", "yyyy-MM-dd");
+					excel2.setMap(map2);//map对象
+					
+					//定义数据
+					List<ArticleSellDto> result2 = new LinkedList<>();
+					//定义excel表格的表头
+					if(selectValue==null||"".equals(selectValue)){
+						selectValue="全部";
+						result2 = orderService.selectShopArticleByDate(shopId, beginDate, endDate, sort);
+					}else{
+						//根据菜品分类的名称获取菜品分类的id
+						String articleFamilyId = articleFamilyService.selectByName(selectValue);
+						result2 = orderService.selectShopArticleByDateAndArcticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
+					}
+					String[][] headers2 = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"}};
+					
+					excel2.setHeaders(headers2);//表格的头
+					excel2.setResult(result2);//获取数据
+					list.add(excel2);
+					
+					//定义excel工具类对象
+					ExcelUtilSheetsUtil ex = new ExcelUtilSheetsUtil();
+					try{
+						OutputStream out = new FileOutputStream(path);
+						HSSFWorkbook workbook = new HSSFWorkbook();
+						
+						for ( ExcelReportDto er : list) {
+							ex.ExportExcel(workbook, er.getColumns(), er.getHeaders(), er.getMap(), er.getResult(),out);
+						}
+						
+						JOptionPane.showMessageDialog(null, "导出成功！");
+						log.info("excel导出成功");
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					
+		}
 	
 }

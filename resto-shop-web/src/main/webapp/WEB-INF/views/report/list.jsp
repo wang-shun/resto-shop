@@ -15,6 +15,7 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="shopExcel">下载报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="shopArticleExcel">下载餐品销售报表</button>
 		</form>
 	</div>
@@ -225,6 +226,23 @@ $("#shopArticleExcel").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	location.href="report/article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+	
+})
+
+//下载全部
+
+$("#shopExcel").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	var selectValue = select[0].value;
+	var sort='desc';//排序
+	var order = tb2.order();
+	if(order[0][0]==2){
+		sort=order[0][1]
+	}
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	location.href="report/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
 	
 })
 
