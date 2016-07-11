@@ -15,7 +15,6 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="shopIncomExcel">下载收入报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="shopArticleExcel">下载餐品销售报表</button>
 		</form>
 	</div>
@@ -38,7 +37,8 @@
     		<!-- 收入条目 -->
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
-			  	<strong style="margin-right:100px;font-size:22px">收入条目</strong>
+			  	<strong style="font-size:22px;position:absolute;display:block;left:52%;">收入条目</strong>
+			  	<button type="button" class="btn btn-primary" id="shopIncomExcel" style="margin-left:1450px;">下载收入报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="dayReportTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -113,6 +113,8 @@ var tb2 = $("#articleSaleTable").DataTable({
 			return d;
 		}
 	},
+	
+	ordering:false,
 	columns : [
 	   		{
 	   			title : "菜品分类",
@@ -198,6 +200,7 @@ $("#searchReport").click(function(){
 	//更新数据
 	tb1.ajax.reload();
 	tb2.ajax.reload();
+	toastr.success("查询成功");
 })
 
 //店铺收入报表下载

@@ -48,7 +48,7 @@ $("#endDate").val("${endDate}");
 
 var tbApi = null;
 var isFirst = true;
-var sort =  "desc";//默认按销量排序
+var sort = "desc";
 var shopTable = $("#shopTable").DataTable({
 	ajax : {
 		url : "articleSell/brand_data",
@@ -56,17 +56,11 @@ var shopTable = $("#shopTable").DataTable({
 		data:function(d){
 			d.beginDate = $("#beginDate").val();
 			d.endDate = $("#endDate").val();
-			d.shopId = "${shopId}";
-			d.sort = sort;
+			d.sort = sort;//默认按销量排序
 			return d;
 		}
 	},
-	// order: [[ 2, "desc" ]],//默认以菜品销量降序
-	 columnDefs:[{
-                 orderable:false,//禁用排序
-                 targets:[0,1]   //指定的列
-             }],
-	
+	ordering:false,
 	columns : [
 		{
 			title : "菜品分类",
@@ -110,7 +104,14 @@ var shopTable = $("#shopTable").DataTable({
 
 //搜索
 $("#searchReport").click(function(){
+	
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "desc";
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
 	shopTable.ajax.reload();
+ 	toastr.success("查询成功");
+	
 })
 
 function isEmpty(str){
@@ -144,14 +145,10 @@ function appendSelect(api){
     });
 }
 
+//下载报表
 $("#ExcelReport").click(function(){
 	//获取select选中的值
 	var selectValue = select[0].value;
-	var sort='desc';//排序
-	var order = shopTable.order();
-	if(order[0][0]==2){
-		sort=order[0][1]
-	}
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
@@ -159,15 +156,23 @@ $("#ExcelReport").click(function(){
 
 //按菜品序号排序
 $("#sortById").click(function(){
-	sort="0";
-	shopTable.ajax.reload;
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "0";
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+	shopTable.ajax.reload();
+
 })
 
 //按销量排序
 
 $("#sortByNum").click(function(){
-	sort="desc";
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "desc";
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
 	shopTable.ajax.reload();
+	toastr.success("排序成功");
 })
 
 

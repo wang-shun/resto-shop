@@ -113,6 +113,7 @@ var shopTable = $("#shopTable").DataTable({
 //搜索
 $("#searchReport").click(function(){
 	shopTable.ajax.reload();
+	toastr.success("查询成功")
 })
 
 function isEmpty(str){
@@ -163,6 +164,7 @@ $("#ExcelReport").click(function(){
 	var shopId = "${shopId}"
 	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort+"&&shopId="+shopId;
 })
+
 
 
 </script>

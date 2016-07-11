@@ -153,6 +153,7 @@ th {
 					that.brandReport.totalNum = result.totalNum;
 					that.shopReportList = result.shopReportList;
 					App.stopPageLoading();
+					toastr.success("查询成功");
 				});
 			},
 			openModal : function(url, modalTitle,shopId) {
