@@ -1023,5 +1023,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
 	}
-	
+
+
+	@Override
+	public Boolean checkShop(String orderId, String shopId) {
+		Order order = orderMapper.selectByPrimaryKey(orderId);
+		if(order == null){
+			return false;
+		}else{
+			return order.getShopDetailId().equals(shopId);
+		}
+	}
 }

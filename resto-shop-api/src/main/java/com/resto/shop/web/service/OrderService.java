@@ -161,4 +161,13 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
 			String shopId, String articleFamilyId,String sort);
+
+
+	/**
+	 * 比较订单的店铺id 和 二维码的店铺id
+	 * @param orderId 订单号
+	 * @param shopId 二维码的店铺id
+	 * @return 相等返回true 返回返回false
+     */
+	Boolean checkShop(String orderId,String shopId);
 }
