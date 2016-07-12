@@ -59,13 +59,13 @@ public class ReportController extends GenericController{
 	@RequestMapping("/shopIncome/list")
     public String getIncomelist(){
 		
-		return "shopIncome/list";
+		return "report/shopIncome/list";
     }
 	
 	@RequestMapping("/articleSell/list")
 	public String getArticleSellList(){
 		
-		return "articleSell/list";
+		return "report/articleSell/list";
 	}
 	
 	@RequestMapping("/orderPaymentItems")

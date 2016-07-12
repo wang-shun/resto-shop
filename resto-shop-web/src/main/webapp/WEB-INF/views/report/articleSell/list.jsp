@@ -15,11 +15,11 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="shopExcel">下载报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="shopArticleExcel">下载报表</button>&nbsp;
 		</form>
 	</div>
-		
 </div>
+	</br></br>
 <div>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="dayReport">
@@ -28,7 +28,6 @@
 	    	<div class="panel panel-info">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">菜品销售记录</strong>
-			  	 <button type="button" class="btn btn-primary" id="shopArticleExcel">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="articleSaleTable" class="table table-striped table-bordered table-hover" width="100%"></table>
