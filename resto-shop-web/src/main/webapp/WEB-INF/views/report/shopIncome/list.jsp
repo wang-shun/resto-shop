@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
-<h2 class="text-center"><strong>结算报表</strong></h2><br/>
+<h2 class="text-center"><strong>店铺收入报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -15,10 +15,9 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="shopExcel">下载报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="shopIncomExcel">下载报表</button>&nbsp;
 		</form>
 	</div>
-		
 </div>
 <br/>
 <br/>
@@ -31,7 +30,7 @@
     		<!-- 收入条目 -->
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
-			  	<strong style="font-size:22px;position:absolute;display:block;left:52%;">收入条目</strong>
+			  	<strong style="margin-right:100px;font-size:22px">收入条目记录</strong>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="dayReportTable" class="table table-striped table-bordered table-hover" width="100%">

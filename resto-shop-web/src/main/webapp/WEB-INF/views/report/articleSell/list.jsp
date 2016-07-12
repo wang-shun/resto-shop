@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
-<h2 class="text-center"><strong>结算报表</strong></h2><br/>
+<h2 class="text-center"><strong>菜品销售报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -19,6 +19,12 @@
 		</form>
 	</div>
 </div>
+
+<br>
+	<div>
+		<button type="button" class="btn green-haze" id="sortById">按菜品序号排序</button>
+		<button type="button" class="btn green-haze" id="sortByNum">按销量排序</button>
+	</div>
 	</br></br>
 <div>
   <div class="tab-content">
@@ -173,7 +179,7 @@ $("#searchReport").click(function(){
 		toastr.error("开始时间不能大于结束时间");
 		return ;
 	}
-	var data = {"beginDate":beginDate,"endDate":endDate};
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
 	//更新数据
 	shoptable.ajax.reload();
 	toastr.success("查询成功");
@@ -184,14 +190,29 @@ $("#shopArticleExcel").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	var selectValue = select[0].value;
-	var sort='desc';//排序
-	var order = tb2.order();
-	if(order[0][0]==2){
-		sort=order[0][1]
-	}
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	location.href="report/article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+})
+
+//按菜品序号排序
+$("#sortById").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "0";
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+	shoptable.ajax.reload();
+	toastr.success("排序成功");
+})
+//按销量排序
+
+$("#sortByNum").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "desc";
+	var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+	shoptable.ajax.reload();
+	toastr.success("排序成功");
 })
 
 </script>
