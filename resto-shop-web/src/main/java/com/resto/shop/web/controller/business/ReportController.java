@@ -56,10 +56,17 @@ public class ReportController extends GenericController{
 	@Resource
 	ShopDetailService shopDetailService;
 	
-	@RequestMapping("/list")
-    public void list(){
+	@RequestMapping("/shopIncome/list")
+    public String getIncomelist(){
+		
+		return "shopIncome/list";
     }
 	
+	@RequestMapping("/articleSell/list")
+	public String getArticleSellList(){
+		
+		return "articleSell/list";
+	}
 	
 	@RequestMapping("/orderPaymentItems")
 	@ResponseBody
@@ -100,7 +107,6 @@ public class ReportController extends GenericController{
 	
 	
 	//店铺收入报表导出
-	
 		@RequestMapping("income_excel")
 		@ResponseBody
 		public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
@@ -139,7 +145,6 @@ public class ReportController extends GenericController{
 						e.printStackTrace();
 					}
 		}
-		
 		
 		//店铺 菜品  销售报表
 		
@@ -211,8 +216,6 @@ public class ReportController extends GenericController{
 					String shopId = getCurrentShopId();
 					ShopDetail shop = shopDetailService.selectById(shopId);
 					List<ExcelReportDto> list = new LinkedList<>();
-					ExcelUtilSheetsUtil ui = new ExcelUtilSheetsUtil();
-					
 					
 					//定义第一个sheet里的内容
 					ExcelReportDto excel = new ExcelReportDto();
@@ -251,7 +254,6 @@ public class ReportController extends GenericController{
 					map2.put("reportTitle", "菜品销售");//表的名字
 					map2.put("timeType", "yyyy-MM-dd");
 					excel2.setMap(map2);//map对象
-					
 					//定义数据
 					List<ArticleSellDto> result2 = new LinkedList<>();
 					//定义excel表格的表头
@@ -278,7 +280,8 @@ public class ReportController extends GenericController{
 						for ( ExcelReportDto er : list) {
 							ex.ExportExcel(workbook, er.getColumns(), er.getHeaders(), er.getMap(), er.getResult(),out);
 						}
-						
+						workbook.write(out);
+						out.close();
 						JOptionPane.showMessageDialog(null, "导出成功！");
 						log.info("excel导出成功");
 					}catch(Exception e){

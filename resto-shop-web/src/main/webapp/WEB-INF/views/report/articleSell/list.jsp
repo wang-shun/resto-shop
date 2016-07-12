@@ -16,40 +16,19 @@
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="shopExcel">下载报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="shopArticleExcel">下载餐品销售报表</button>
 		</form>
 	</div>
 		
 </div>
-<br/>
-<p class="text-danger text-center" hidden="true"><strong>开始时间不能大于结束时间！</strong></p>
-<br/>
 <div>
-  <!-- Nav tabs -->
-<!--   <ul class="nav nav-tabs" role="tablist"> -->
-<%--     <li role="presentation" class="active"><a href="#dayReport" aria-controls="dayReport" role="tab" data-toggle="tab"><strong>每日报表</strong></a></li> --%>
-<!--   </ul> -->
-
-  <!-- Tab panes -->
   <div class="tab-content">
-  	<!-- 每日报表 -->
     <div role="tabpanel" class="tab-pane active" id="dayReport">
     	<div id="report-editor">
-    		<!-- 收入条目 -->
-	    	<div class="panel panel-success">
-			  <div class="panel-heading text-center">
-			  	<strong style="font-size:22px;position:absolute;display:block;left:52%;">收入条目</strong>
-			  	<button type="button" class="btn btn-primary" id="shopIncomExcel" style="margin-left:1450px;">下载收入报表</button>
-			  </div>
-			  <div class="panel-body">
-			  	<table id="dayReportTable" class="table table-striped table-bordered table-hover" width="100%">
-			  	</table>
-			  </div>
-			</div>
 			<!-- 菜品销售记录 -->
 	    	<div class="panel panel-info">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">菜品销售记录</strong>
+			  	 <button type="button" class="btn btn-primary" id="shopArticleExcel">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="articleSaleTable" class="table table-striped table-bordered table-hover" width="100%"></table>
@@ -57,7 +36,6 @@
 			</div>
     	</div>
     	<div id="report-preview" class="row" style="display:none">
-			  <div class="col-md-4"><p><strong>收入条目</strong></p></div>
 			  <div class="col-md-8"><p><strong>菜品销售记录</strong></p></div>
     	</div>
     </div>
@@ -103,7 +81,7 @@ var sort = "desc"
 var tbApi=null;
 var select;
 var isFirst = true;//是否是第一次进入
-var tb2 = $("#articleSaleTable").DataTable({
+var shoptable = $("#articleSaleTable").DataTable({
 	ajax : {
 		url : "report/orderArticleItems",
 		dataSrc : "data",
@@ -193,27 +171,16 @@ $("#searchReport").click(function(){
 	var endDate = $("#endDate").val();
 	//判断 时间范围是否合法
 	if(beginDate>endDate){
-		$(".text-danger").show();
+		toastr.error("开始时间不能大于结束时间");
 		return ;
 	}
-	$(".text-danger").hide();//隐藏提示
 	var data = {"beginDate":beginDate,"endDate":endDate};
 	//更新数据
-	tb1.ajax.reload();
-	tb2.ajax.reload();
+	shoptable.ajax.reload();
 	toastr.success("查询成功");
 })
 
-//店铺收入报表下载
-$("#shopIncomExcel").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	location.href="report/income_excel?beginDate="+beginDate+"&&endDate="+endDate;
-})
-
-
 //店铺菜品报表下载
-
 $("#shopArticleExcel").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
@@ -226,26 +193,6 @@ $("#shopArticleExcel").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	location.href="report/article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
-	
 })
-
-//下载全部
-
-$("#shopExcel").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	var selectValue = select[0].value;
-	var sort='desc';//排序
-	var order = tb2.order();
-	if(order[0][0]==2){
-		sort=order[0][1]
-	}
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	location.href="report/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
-	
-})
-
-
 
 </script>
