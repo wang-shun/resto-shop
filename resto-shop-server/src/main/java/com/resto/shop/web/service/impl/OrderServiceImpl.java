@@ -22,6 +22,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -1001,6 +1002,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			sort="shop_report.shopSellNum asc";
 		}
 		return orderMapper.selectShopArticleByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
+	}
+
+	@Override
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectBytimeAndState(begin,end,brandId);
 	}
 	
 }

@@ -964,6 +964,26 @@ INNER JOIN tb_article_family f ON a.article_family_id = f.id and f.id=#{articleF
 order by ${sort}
 	</select>
 	
+<select id="selectBytimeAndState" resultType="com.resto.brand.web.dto.OrderPayDto">
+SELECT
+	SUM(oi.pay_value) payValue,
+	COUNT(oi.order_id) orderNum
+FROM
+	(
+		SELECT
+			pay_value,
+			order_id,
+			pay_time
+		FROM
+			tb_order_payment_item
+		WHERE
+		<![CDATA[ pay_time >= #{beginDate} and pay_time <= #{endDate}]]>
+	) AS oi
+LEFT JOIN tb_order o ON oi.order_id = o.id
+WHERE
+	o.brand_id = #{brandId}
+</select>
+	
 </mapper>
 
 

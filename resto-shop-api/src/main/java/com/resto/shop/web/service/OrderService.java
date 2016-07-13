@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
@@ -183,4 +184,13 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<ArticleSellDto> selectShopArticleByDateAndArcticleFamilyId(String beginDate, String endDate,String shopId,
 			String articleFamilyId, String sort);
+	
+	
+	/**
+	 * 根据时间查询已消费订单的订单数目和订单总额
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId);
 }
