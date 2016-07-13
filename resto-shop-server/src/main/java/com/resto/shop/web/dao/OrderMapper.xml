@@ -983,6 +983,24 @@ LEFT JOIN tb_order o ON oi.order_id = o.id
 WHERE
 	o.brand_id = #{brandId}
 </select>
+
+
+
+
+<select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+	SELECT
+	SUM(o.order_money) sellIncome,
+	SUM(o.article_count) totalNum,
+	o.shop_detail_id shopId
+FROM
+	tb_order o
+LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
+
+WHERE
+	o.brand_id = '31946c940e194311b117e3fff5327215'
+AND o.order_state IN (2, 10, 11, 12) GROUP BY o.shop_detail_id
+
+</select>
 	
 </mapper>
 

@@ -13,7 +13,6 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="shopReport">下载报表</button>
 		</form>
 		<br/>
 	<div>
@@ -61,6 +60,28 @@
 		</div>
     </div>
   </div>
+  
+  <div class="modal fade bs-example-modal-lg" id="reportModal" 
+		tabindex="-1" role="dialog" aria-labelledby="reportModal" 
+		data-backdrop="static"> 
+		<div class="modal-dialog modal-lg"> 
+			<div class="modal-content"> 
+				<div class="modal-header"> 
+					<button type="button" class="close" data-dismiss="modal" 
+						aria-label="Close"> 
+						<span aria-hidden="true">&times;</span> 
+					</button> 
+					<h4 class="modal-title text-center"> 
+						<strong>菜品销售详情</strong> 
+					</h4> 
+				</div> 
+				<div class="modal-body"></div> 
+				<div class="modal-footer"> 
+					<button type="button" class="btn btn-info btn-block" @click="closeModal">关闭</button> 
+				</div> 
+			</div> 
+		</div> 
+	</div> 
 </div>
 
 <script>
@@ -81,13 +102,9 @@ $('.form_datetime').datetimepicker({
 //文本框默认值
 $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 
-function isEmpty(str){
-	return str == null || str == "" ? true:false;
-}
-
 var brandTable = $("#brandArticleTable").DataTable({
 	language:language,
-	dom:'',
+	dom:'i',
 	ajax : {
 		url : "articleSell/list_brand",   
 		dataSrc : "",
@@ -111,8 +128,8 @@ var brandTable = $("#brandArticleTable").DataTable({
 			title : "销售详情", 
 			data : "brandName" ,
 			createdCell:function(td,tdData){
-				$(td).html("<button class=\"btn btn-success\" onclick=\"showBrandReport(td)\">查看详情</button>");
-														
+				console.log(tdData);
+				$(td).html("<button class='btn btn-succes' onclick='showBrandReport("+tdData+")'>查看详情</button>");
 			}
 		}
 	]
@@ -120,7 +137,7 @@ var brandTable = $("#brandArticleTable").DataTable({
 
 var shopTable = $("#shopArticleTable").DataTable({
 	language:language,
-	dom:'',
+	dom:'i',
 	ajax : {
 		url : "articleSell/list_shop",   
 		dataSrc : "",
@@ -130,6 +147,13 @@ var shopTable = $("#shopArticleTable").DataTable({
 			return d;
 		}
 	},
+	
+	"columnDefs":[{
+		 "targets":[0],
+		   "visible":false
+		},
+	  
+	 ],
 	ordering:false,
 	columns : [
 		{ 
@@ -150,20 +174,18 @@ var shopTable = $("#shopArticleTable").DataTable({
 		},
 		{ 
 			title : "品牌销售占比", 
-			data : "proportion" 
+			data : "occupy" ,
+			
 		},
 		{ 
 			title : "销售详情", 
 			data : "shopName" ,
 			createdCell:function(td,tdData){
-				$(td).html("<button class=\"btn btn-success\" onclick=\"showShopReport(td)\">查看详情</button>");
-														
+				$(td).html("<button class='btn btn-success' onclick=\"showShopReport(td)\">查看详情</button>");
 			}
 		}
 	]
 });
-
-
 
 //搜索
 $("#searchReport").click(function(){
@@ -176,17 +198,17 @@ $("#searchReport").click(function(){
 	}
 	
 	var num = getNumActive();
+	console.log(num);
 	switch (num)
 	{
 	case 1:
 		var data = {"beginDate":beginDate,"endDate":endDate};
-		tb1.ajax.reload();
+		brandTable.ajax.reload();
 		toastr.success("查询成功");
 	  break;
 	case 2:
-		var selectValue = select[0].value;
-		var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
-		tb2.ajax.reload();
+		var data = {"beginDate":beginDate,"endDate":endDate}
+		shopTable.ajax.reload();
 		toastr.success("查询成功");
 	  break;
 	}
@@ -197,26 +219,27 @@ $("#searchReport").click(function(){
 function getNumActive(){
 	var value = $("#ulTab li.active a").text();
 	value  = Trim(value)//去空格
-	if(value=='营业收入报表'){
+	if(value=='品牌菜品报表'){
 		return 1;
-	}else if(value=="菜品销售报表"){
+	}else if(value=="店铺菜品销售报表"){
 		return 2;
 	}
 }
 
 $('#ulTab a').click(function (e) {
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
 	  e.preventDefault()
 	  $(this).tab('show')
 	  var num = getNumActive()
 	  switch(num){
 	  case 1:
 			var data = {"beginDate":beginDate,"endDate":endDate};
-			tb1.ajax.reload();
+			brandTable.ajax.reload();
 		  break;
 		case 2:
-			var selectValue = select[0].value;
-			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
-			tb2.ajax.reload();
+			var data = {"beginDate":beginDate,"endDate":endDate}
+			shopTable.ajax.reload();
 		  break;
 	  }
 	})
@@ -246,11 +269,26 @@ var language = {
         "sSortDescending": ": 以降序排列此列"
     }
 };
-
+function Trim(str)
+{ 
+    return str.replace(/(^\s*)|(\s*$)/g, ""); 
+}
 
 function showBrandReport(brandName){
-	
-	alert("显示品牌菜品销售详情");
+	console.log(brandName)
+	alert(brandName)
+	//this.openModal("articleSell/show/brandReport", brandName,null);
 }
+
+function openModal(url,modalTitle,shopId){
+	$.post(url, this.getDate(shopId),function(result) {
+		console.log(result)
+		var modal = $("#reportModal");
+		modal.find(".modal-body").html(result);
+		modal.find(".modal-title > strong").html(modalTitle);
+		modal.modal();
+	})
+}
+
 </script>
 

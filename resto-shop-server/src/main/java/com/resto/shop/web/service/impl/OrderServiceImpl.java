@@ -1103,12 +1103,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		Brand brand = brandService.selectById(brandId);
 		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
-		
+		BigDecimal temp = BigDecimal.ZERO;
 		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
+		for (ShopArticleReportDto shopArticleReportDto : list) {
+			for (ShopDetail shop : list_shopDetail) {
+				if(shop.getId().equals(shopArticleReportDto.getShopId())){
+					shopArticleReportDto.setShopName(shop.getName());
+				}
+			}
+			temp = add(temp,shopArticleReportDto.getSellIncome());
+		}
 		
+		for (ShopArticleReportDto shopArticleReportDto : list) {
+			shopArticleReportDto.setOccupy(shopArticleReportDto.getSellIncome().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue()*100+"%");
+		}
 		
-		return null;
+		return list;
 	}
+
+	private BigDecimal add(BigDecimal temp, BigDecimal sellIncome) {
+		// TODO Auto-generated method stub
+		return temp.add(sellIncome);
+	}
+
 }
