@@ -104,8 +104,18 @@ public class Order {
      */
     private String shopName;
     
+    //新增內容
+    private Integer level; //查询评价的的等級
+    
+    public Integer getLevel() {
+		return level;
+	}
 
-    public boolean isUseAccount() {
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	public boolean isUseAccount() {
 		return useAccount;
 	}
 

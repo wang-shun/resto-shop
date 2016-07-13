@@ -12,8 +12,8 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button> </br>
-		  <button type="button" class="btn btn-primary" id="ExcelReport">导出excel</button>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button> &nbsp;
+		  <button type="button" class="btn btn-primary" id="ExcelReport">下载报表</button>
 		</form>
 	</div>
 </div>
@@ -113,6 +113,7 @@ var shopTable = $("#shopTable").DataTable({
 //搜索
 $("#searchReport").click(function(){
 	shopTable.ajax.reload();
+	toastr.success("查询成功")
 })
 
 function isEmpty(str){
@@ -163,6 +164,7 @@ $("#ExcelReport").click(function(){
 	var shopId = "${shopId}"
 	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort+"&&shopId="+shopId;
 })
+
 
 
 </script>

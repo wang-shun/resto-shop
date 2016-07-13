@@ -86,6 +86,17 @@ public class OrderPaymentItem {
 	public void setPaymentModeVal(String paymentModeVal) {
 		this.paymentModeVal = paymentModeVal;
 	}
+
+	public OrderPaymentItem(BigDecimal payValue, Integer paymentModeId, String paymentModeVal) {
+		super();
+		this.payValue = payValue;
+		this.paymentModeId = paymentModeId;
+		this.paymentModeVal = paymentModeVal;
+	}
+	
+	public OrderPaymentItem(){
+		
+	}
     
     
 }

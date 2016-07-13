@@ -13,15 +13,15 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  <br></div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button><form>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+		  <form>
 			<input type="hidden" id="brandDataTable">
 			<input type="hidden" id="shopDataTable">
 		</form>&nbsp;&nbsp;&nbsp;
 		</form>
 	</div>
 </div>
-<button type="button" class="btn btn-primary" id="brandreportExcel">品牌数据导出excel</button><br/>
-<button type="button" class="btn btn-primary" id="shopreportExcel">店铺数据导出excel</button><br/>
 <br/>
 <div>
   	<!-- 每日报表 -->

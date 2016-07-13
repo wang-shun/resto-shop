@@ -2,6 +2,7 @@
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,8 @@ public class ArticleSellController extends GenericController{
 	
 	@RequestMapping("/brand_data")
 	@ResponseBody
-	public Result brand_data(String beginDate,String endDate){
-		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate,"0");
+	public Result brand_data(String beginDate,String endDate,String sort){
+		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDate(beginDate, endDate,sort);
 		return getSuccessResult(list);
 	}
 	
@@ -94,7 +95,7 @@ public class ArticleSellController extends GenericController{
 	@ResponseBody
 	public void reportBrandExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
-		String fileName = "ArticleSellBrand.xls";
+		String fileName = "菜品销售报表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
@@ -130,7 +131,7 @@ public class ArticleSellController extends GenericController{
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);
 			result = orderService.selectBrandArticleSellByDateAndArticleFamilyId(beginDate, endDate,articleFamilyId,sort);
 		}
-		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"}};
+		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"}};
 		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -149,17 +150,17 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/shop_excel")
 	@ResponseBody
 	public void reportShopExcel(String beginDate,String endDate,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
+		//获取店铺名称
+		ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
 		//导出文件名
-		String fileName = "ArticleSellShop.xls";
+		String fileName = shopDetail.getName()+"菜品销售报表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum","salesRatio"};
 		//定义数据
-		List<ArticleSellDto> result = null;
+		List<ArticleSellDto> result = new ArrayList<>();
 		Brand brand = brandServie.selectById(getCurrentBrandId());
-		//获取店铺名称
-		ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", brand.getBrandName());
 		map.put("shops", shopDetail.getName());
@@ -172,7 +173,7 @@ public class ArticleSellController extends GenericController{
 		
 		if(selectValue==null||"".equals(selectValue)){
 			selectValue="全部";
-			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,sort);
+			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
 		}else{
 			//根据菜品分类的名称获取菜品分类的id
 			String articleFamilyId = articleFamilyService.selectByName(selectValue);

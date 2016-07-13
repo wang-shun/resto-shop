@@ -22,6 +22,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.dto.SaleReportDto;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -573,7 +574,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}else if(item.getType()==OrderItemType.MEALS_CHILDREN){
 				continue;
 			}
-			
+
 			if(OrderItemType.SETMEALS==item.getType()){
 				Kitchen kitchen = kitchenService.selectMealKitchen(item);
 				if(kitchen!=null){
@@ -1023,6 +1024,46 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
 	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleByDate(String shopId, String beginDate, String endDate,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="shop_report.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="shop_report.shopSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
+		return list;
+
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleByDateAndArcticleFamilyId(String beginDate, String endDate,String shopId,
+			String articleFamilyId, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="shop_report.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="shop_report.shopSellNum asc";
+		}
+		return orderMapper.selectShopArticleByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
+	}
+
+	@Override
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectBytimeAndState(begin,end,brandId);
+	}
+
 
 
 	@Override
