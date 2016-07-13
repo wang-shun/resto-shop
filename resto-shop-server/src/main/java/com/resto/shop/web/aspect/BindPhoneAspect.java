@@ -2,6 +2,8 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.alibaba.druid.util.StringUtils;
+import com.resto.shop.web.producer.MQMessageProducer;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,12 +37,15 @@ public class BindPhoneAspect {
 		Object obj = pj.proceed();
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus);
+			//如果有分享者，那么给分享者发消息
+			if(!StringUtils.isEmpty(cus.getShareCustomer())){
+				MQMessageProducer.sendNoticeShareMessage(cus);
+			}
 			log.info("首次绑定手机，执行指定动作");
 		}else{
 			log.info("不是首次绑定，无任何动作");
 		}
 		return obj;
 	}
-	
-	
+
 }

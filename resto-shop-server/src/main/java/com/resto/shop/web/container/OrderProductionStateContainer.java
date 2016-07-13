@@ -1,23 +1,15 @@
 package com.resto.shop.web.container;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.resto.brand.core.util.DateUtil;
-import com.resto.shop.web.constant.ProductionStatus;
-import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderService;
@@ -119,10 +111,10 @@ public class OrderProductionStateContainer {
 	private void initShop(String shopId) {
 		if(!INIT_SHOP.containsKey(shopId)){
 			INIT_SHOP.put(shopId, true);
-			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
-			for (Order o: order) {
+//			List<Order> order = orderService.selectTodayOrder(shopId,new int[]{ProductionStatus.HAS_ORDER,ProductionStatus.PRINTED});
+//			for (Order o: order) {
 //				addOrder(o);
-			}
+//			}
 		}
 	}
 

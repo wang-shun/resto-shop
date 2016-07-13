@@ -38,6 +38,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public boolean cancelOrder(String string);
 
+	public boolean autoRefundOrder(String string);
+
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
 	public Order pushOrder(String orderId) throws AppException;
@@ -160,8 +162,8 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(String beginDate, String endDate,
 			String shopId, String articleFamilyId,String sort);
-	
-	
+
+
 	/**
 	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情(店铺端显示)
 	 * @param currentShopId
@@ -172,7 +174,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<ArticleSellDto> selectShopArticleByDate(String currentShopId, String beginDate, String endDate, String sort);
 
-	
+
 	/**
 	 * 根据时间 和 指定 店铺  指定分类的  查询 已完成的订单的 菜品销售详情(店铺端显示)
 	 * @param beginDate
@@ -181,11 +183,11 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param sort
 	 * @return
 	 */
-	
+
 	public List<ArticleSellDto> selectShopArticleByDateAndArcticleFamilyId(String beginDate, String endDate,String shopId,
 			String articleFamilyId, String sort);
-	
-	
+
+
 	/**
 	 * 根据时间查询已消费订单的订单数目和订单总额
 	 * @param beginDate
@@ -193,4 +195,13 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId);
+
+
+	/**
+	 * 比较订单的店铺id 和 二维码的店铺id
+	 * @param orderId 订单号
+	 * @param shopId 二维码的店铺id
+	 * @return 相等返回true 返回返回false
+     */
+	Boolean checkShop(String orderId,String shopId);
 }

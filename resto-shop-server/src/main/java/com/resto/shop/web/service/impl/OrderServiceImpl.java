@@ -211,7 +211,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					OrderItem child = new OrderItem();
 					Article ca = articleMap.get(mealItem.getArticleId());
 					child.setId(ApplicationUtils.randomUUID());
-					child.setArticleName(ca.getName());
+					child.setArticleName(mealItem.getName());
 					child.setArticleId(ca.getId());
 					child.setCount(item.getCount());
 					child.setArticleDesignation(ca.getDescription());
@@ -397,6 +397,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 	}
 
+	@Override
+	public boolean autoRefundOrder(String orderId) {
+		Order order = selectById(orderId);
+		if(order.getAllowCancel() && order.getOrderState()==OrderState.PAYMENT &&
+				order.getProductionStatus() == ProductionStatus.PRINTED){
+			order.setAllowCancel(false);
+			order.setClosed(true);
+			order.setAllowAppraise(false);
+			order.setAllowContinueOrder(false);
+			order.setOrderState(OrderState.CANCEL);
+			update(order);
+			refundOrder(order);
+			log.info("自动退款成功:" + order.getId());
+			return true;
+		}else{
+			log.warn("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单"+order.getId());
+			return false;
+		}
+
+	}
+
 	private void refundOrder(Order order) {
 		List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
 		for (OrderPaymentItem item : payItemsList) {
@@ -432,8 +453,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public Order orderWxPaySuccess(OrderPaymentItem item) {
 		Order order = selectById(item.getOrderId());
-		orderPaymentItemService.insert(item);
-		return payOrderSuccess(order);
+		OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
+		if(historyItem==null){
+			orderPaymentItemService.insert(item);
+			payOrderSuccess(order);
+		}else{
+			log.warn("该笔支付记录已经处理过:"+item.getId());
+		}
+		return order;
 	}
 
 	@Override
@@ -544,17 +571,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						articleId = price.getArticleId();
 					}
 				}
+			}else if(item.getType()==OrderItemType.MEALS_CHILDREN){
+				continue;
 			}
-			List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
-			for(Kitchen kitchen : kitchenList){
-				String kitchenId = kitchen.getId().toString();
-				kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-				//判断 厨房集合中 是否已经包含当前厨房信息
-				if(!kitchenArticleMap.containsKey(kitchenId)){
-					//如果没有 则新建
-					kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+
+			if(OrderItemType.SETMEALS==item.getType()){
+				Kitchen kitchen = kitchenService.selectMealKitchen(item);
+				if(kitchen!=null){
+					String kitchenId = kitchen.getId().toString();
+					kitchenMap.put(kitchenId, kitchen);
+					if(!kitchenArticleMap.containsKey(kitchenId)){
+						//如果没有 则新建
+						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+					}
+					kitchenArticleMap.get(kitchenId).add(item);
 				}
-				kitchenArticleMap.get(kitchenId).add(item);
+			}else{
+				List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+				for(Kitchen kitchen : kitchenList){
+					String kitchenId = kitchen.getId().toString();
+					kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+					//判断 厨房集合中 是否已经包含当前厨房信息
+					if(!kitchenArticleMap.containsKey(kitchenId)){
+						//如果没有 则新建
+						kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+					}
+					kitchenArticleMap.get(kitchenId).add(item);
+				}
 			}
 		}
 		
@@ -581,6 +624,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				item.put("ARTICLE_NAME", article.getArticleName());
 				item.put("ARTICLE_COUNT",article.getCount());
 				items.add(item);
+				if(article.getType()==OrderItemType.SETMEALS){
+					if(article.getChildren()!=null&&!article.getChildren().isEmpty()){
+						for (OrderItem child: article.getChildren()) {
+							Map<String,Object> child_item = new HashMap<String,Object>();
+							child_item.put("ARTICLE_NAME",child.getArticleName());
+							child_item.put("ARTICLE_COUNT",child.getCount());
+							items.add(child_item);
+						}
+					}
+				}
 				//保存基本信息
 				Map<String,Object> data = new HashMap<String,Object>();
 				data.put("KITCHEN_NAME",kitchen.getName());
@@ -962,11 +1015,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if("0asc".equals(sort)){
 			sort="f.peference ,a.sort";
 		}else if("2".equals(sort.substring(0, 1))){
-			sort="shop_report.shopSellNum"+" "+sort.substring(1, sort.length());
+			sort="shop_report.shopSellNum"+sort.substring(1, sort.length());
 		}else if("3".equals(sort.subSequence(0, 1))){
-			sort="brand_report.brandSellNum"+" "+sort.substring(1,sort.length());
+			sort="brand_report.brandSellNum"+sort.substring(1,sort.length());
 		}else if("4".equals(sort.substring(0,1))){
-			sort="salesRatio"+" "+sort.substring(1,sort.length());
+			sort="salesRatio"+sort.substring(1,sort.length());
 		}
 		
 		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
@@ -986,7 +1039,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
 		return list;
-		
+
 	}
 
 	@Override
@@ -1010,5 +1063,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		return orderMapper.selectBytimeAndState(begin,end,brandId);
 	}
-	
+
+
+
+	@Override
+	public Boolean checkShop(String orderId, String shopId) {
+		Order order = orderMapper.selectByPrimaryKey(orderId);
+		if(order == null){
+			return false;
+		}else{
+			return order.getShopDetailId().equals(shopId);
+		}
+	}
 }

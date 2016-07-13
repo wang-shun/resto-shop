@@ -1,17 +1,5 @@
 package com.resto.shop.web.aspect;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
@@ -32,16 +20,27 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.ShopCartService;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 @Aspect
 public class OrderAspect {
-	
+
 	Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	@Resource
 	ShopCartService shopCartService;
-	@Resource 
+	@Resource
 	CustomerService customerService;
 	@Resource
 	WechatConfigService wechatConfigService;
@@ -55,21 +54,23 @@ public class OrderAspect {
 	ShopDetailService shopDetailService;
 	@Resource
 	ShareSettingService shareSettingService;
-	
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
-	
+
 	@AfterReturning(value="createOrder()",returning="order")
 	public void createOrderAround(Order order) throws Throwable{
 		shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 			long delay = 1000*60*15;//15分钟后自动取消订单
 			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+			//订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
+			MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getBrandId());
 		}else if(order.getOrderState().equals((OrderState.PAYMENT))&&order.getOrderMode()!=ShopMode.TABLE_MODE){ //坐下点餐模式不发送
 			sendPaySuccessMsg(order);
 		}
 	}
-	
+
 	private void sendPaySuccessMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -106,22 +107,22 @@ public class OrderAspect {
 
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.orderWxPaySuccess(..))")
 	public void orderWxPaySuccess(){};
-	
+
 	@AfterReturning(value="orderWxPaySuccess()",returning="order")
 	public void orderPayAfter(Order order){
 		if(order!=null&&order.getOrderState().equals(OrderState.PAYMENT)&&ShopMode.TABLE_MODE!=order.getOrderMode()){//坐下点餐模式不发送该消息
 			sendPaySuccessMsg(order);
 		}
 	}
-	
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
 	public void pushOrder(){};
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.callNumber(..))")
 	public void callNumber(){};
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
 	public void printSuccess(){};
-	
-	
+
+
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter(Order order){
 		if(order!=null){
@@ -150,52 +151,71 @@ public class OrderAspect {
 				}
 				log.info("发送打印信息");
 				MQMessageProducer.sendPlaceOrderMessage(order);
-				
+
 				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");
 				MQMessageProducer.sendPlaceOrderMessage(order);
-				
+
 			}
 		}
 	}
 
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmOrder(..))")
 	public void confirmOrder(){};
-	
+
 	@AfterReturning(value="confirmOrder()",returning="order")
 	public void confirmOrderAfter(Order order){
 		log.info("确认订单成功后回调:"+order.getId());
 		Customer customer = customerService.selectById(order.getCustomerId());
+		WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+		BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 		if(order.getAllowAppraise()){
-			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-			BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
 			msg.append("您有一个红包未领取\n");
-			msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&&dialog=redpackage&&orderId="+order.getId()+"'>点击领取</a>");
-			
+			msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&dialog=redpackage&orderId="+order.getId()+"'>点击领取</a>");
+
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送评论通知成功:"+msg+result);
 		}
-		if(customer.getFirstOrderTime()==null){ //分享判定
-			customerService.updateFirstOrderTime(customer.getId());
-			if(customer.getShareCustomer()!=null){
-				Customer shareCustomer= customerService.selectById(customer.getShareCustomer());
-				if(shareCustomer!=null){
-					ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
-					if(shareSetting!=null){
-						log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
-						customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+		try {
+			if(customer.getFirstOrderTime()==null){ //分享判定
+				customerService.updateFirstOrderTime(customer.getId());
+				if(customer.getShareCustomer()!=null){
+					Customer shareCustomer= customerService.selectById(customer.getShareCustomer());
+					if(shareCustomer!=null){
+						ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+						if(shareSetting!=null){
+							log.info("是被分享用户，并且分享设置已启用:"+customer.getId()+" oid:"+order.getId()+" setting:"+shareSetting.getId());
+							BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting,order,shareCustomer,customer);
+							log.info("准备发送返利通知");
+							sendRewardShareMsg(shareCustomer,customer,config,setting,rewardMoney);
+						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			log.error("分享功能出错:"+e.getMessage());
+			e.printStackTrace();
 		}
+
 	}
-	
+
+	private void sendRewardShareMsg(Customer shareCustomer,Customer customer, WechatConfig config,
+									BrandSetting setting, BigDecimal rewardMoney) {
+		StringBuffer msg = new StringBuffer();
+		rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
+		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&dialog=account'>");
+		msg.append("你邀请的好友").append(customer.getNickname()).append("已到店消费，你已获得")
+		.append(rewardMoney).append("元红包返利").append("\n</a>");
+		String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+		log.info("发送返利通知成功:"+shareCustomer.getId()+" MSG: "+msg+result);
+	}
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
 	public void cancelOrderPos(){};
-	
+
 	@AfterReturning(value="cancelOrderPos()",returning="order")
 	public void cancelOrderPosAfter(Order order){
 		if(order!=null){
@@ -208,7 +228,7 @@ public class OrderAspect {
 			MQMessageProducer.sendNoticeOrderMessage(order);
 		}
 	}
-	
+
 	private void sendVerCodeMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -218,6 +238,6 @@ public class OrderAspect {
 		String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 		log.info("发送取餐信息成功:"+result);
 	}
-	
-	
+
+
 }

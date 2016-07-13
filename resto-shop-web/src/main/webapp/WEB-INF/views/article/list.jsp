@@ -136,10 +136,10 @@
 						</div>
 						<div class="form-group col-md-7">
 							<div class="row">
-								<div class="form-group col-md-12" v-if="m.articleType==1">
+								<div class="form-group col-md-12">
 								    <label class="col-md-2 text-right">出餐厨房</label>
 								    <div class="col-md-8">
-									    <label v-for="kitchen in kitchenList">
+									    <label v-for="kitchen in kitchenList"> 
 									    	<input type="checkbox" name="kitchenList" :value="kitchen.id"  v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
 									    </label>
 								    </div>
@@ -240,6 +240,7 @@
 													<div class="flex-2">差价</div>
 													<div class="flex-1">排序</div>
 													<div class="flex-1">默认</div>
+													<div class="flex-1">指定厨房出单</div>
 													<div class="flex-1">移除</div>
 												</div>
 												<div class="flex-row" v-for="item in attr.mealItems | orderBy 'sort' ">
@@ -260,6 +261,14 @@
 															<input type="radio" :name="attr.name" :value="true" v-model="item.isDefault" @change="itemDefaultChange(attr,item)"/>
 															设为默认
 														</label>
+													</div>
+													<div class="flex-1 radio-list">
+														<select class="form-control" name="kitchenId" v-model="item.kitchenId">
+															<option value="-1">(选择厨房)</option>
+													    	<option :value="k.id" v-for="k in kitchenList">
+													    		{{k.name}}
+													    	</option>
+													    </select>
 													</div>
 													<div class="flex-1">
 														<button class="btn red" type="button" @click="removeMealItem(attr,item)">移除</button>
@@ -641,6 +650,9 @@
 							}
 						}
 						that.unitPrices = article.articlePrices;
+						if(!article.kitchenList){
+							article.kitchenList = [];
+						}
 					});
 					
 				},

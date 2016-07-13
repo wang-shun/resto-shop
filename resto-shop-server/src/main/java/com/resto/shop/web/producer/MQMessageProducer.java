@@ -1,7 +1,11 @@
 package com.resto.shop.web.producer;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
+import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +39,20 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendAutoRefundMsg(final String brandId,final String orderId){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("orderId", orderId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_REFUND_ORDER, obj.toJSONString().getBytes());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.set(Calendar.HOUR_OF_DAY,23);
+		calendar.set(Calendar.MINUTE,59);
+		message.setStartDeliverTime(calendar.getTime().getTime());
+		sendMessageASync(message);
+	}
+
+
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());
@@ -59,6 +77,17 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
+
+	public static void sendShareMsg(final Appraise appraise,final long delayTime){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", appraise.getBrandId());
+		obj.put("id", appraise.getId());
+		obj.put("customerId", appraise.getCustomerId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOW_ORDER,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+
 
 	public static void sendMessageASync(final Message message) {
 		new Thread(new Runnable() {
@@ -100,6 +129,18 @@ public class MQMessageProducer {
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 		
+	}
+
+
+	public static void sendNoticeShareMessage(Customer customer){
+		JSONObject obj  = new JSONObject();
+		obj.put("id", customer.getId());
+		obj.put("shareCustomer", customer.getShareCustomer());
+		obj.put("brandId", customer.getBrandId());
+		obj.put("nickname",customer.getNickname());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_SHARE_CUSTOMER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+
 	}
 
 	public static void sendNotAllowContinueMessage(Order order, long delay) {

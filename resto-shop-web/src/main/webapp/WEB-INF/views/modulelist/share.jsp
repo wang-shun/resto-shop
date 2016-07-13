@@ -36,6 +36,10 @@
 		    <input type="text" class="form-control" name=registerButton v-model="m.registerButton">
 		</div>
 		<div class="form-group">
+			<label>延迟提醒时间(秒)</label>
+			<input type="text" class="form-control" name="delayTime" v-model="m.delayTime">
+		</div>
+		<div class="form-group">
 			<label for="">是否启用</label>
 		    <div class="radio-list">
 				<label class="radio-inline">
