@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -69,12 +70,34 @@ public class ArticleSellController extends GenericController{
 		return "articleSell/"+type;
 	}
 	
-	@RequestMapping("/list_all")
+//	@RequestMapping("/list_all")
+//	@ResponseBody
+//	public List<SaleReportDto>  list_all(String beginDate,String endDate){
+//		List<SaleReportDto> list = new ArrayList<>();
+//		SaleReportDto saleReportDto = orderService.selectArticleSumCountByData(beginDate, endDate,getCurrentBrandId());
+//		list.add(saleReportDto);
+//		return list;
+//	}
+	
+	@RequestMapping("/list_brand")
 	@ResponseBody
-	public SaleReportDto list_all(String beginDate,String endDate){
-		SaleReportDto saleReportDto = orderService.selectArticleSumCountByData(beginDate, endDate,getCurrentBrandId());
-		return saleReportDto;
+	public List<brandArticleReportDto> list_brand(String beginDate,String endDate){
+		List<brandArticleReportDto> list = new ArrayList<>();
+		brandArticleReportDto bo = orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId());
+		list.add(bo);
+		return list;
 	}
+	
+	
+	@RequestMapping("/list_shop")
+	@ResponseBody
+	public List<ShopArticleReportDto> list_shop(String beginDate,String endDate){
+		List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId());
+		return list;
+	}
+	
+	
+	
 	
 	
 	@RequestMapping("/shop_data")

@@ -34,8 +34,8 @@ import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.OrderPaymentItemService;
 
 @Controller
-@RequestMapping("totalRevenue")
-public class TotalRevenueController extends GenericController {
+@RequestMapping("totalIncome")
+public class TotalIncomeController extends GenericController {
 
 	@Resource
 	BrandService brandService;

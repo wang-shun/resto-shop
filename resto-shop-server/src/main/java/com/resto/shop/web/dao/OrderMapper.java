@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
@@ -178,5 +179,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	OrderPayDto selectBytimeAndState(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
+	
+	/**
+	 * 查询品牌下所有店铺的菜品销售情况
+	 * @param beginDate
+	 * @param endDate
+	 * @param brandId
+	 * @return
+	 */
+	List<ShopArticleReportDto> selectShopArticleDetails(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
 		
 }

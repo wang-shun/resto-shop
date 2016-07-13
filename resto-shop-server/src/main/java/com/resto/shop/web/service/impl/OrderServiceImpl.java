@@ -23,11 +23,14 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
@@ -117,6 +120,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     BrandSettingService brandSettingService;
+    
+    @Resource
+    BrandService brandService;
     
     @Resource
     ShopDetailService shopDetailService;
@@ -900,20 +906,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
-	@Override
-	public SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
-		int totalNum = 0;
-		for(ShopDetail shop : list_shopDetail){
-			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
-			totalNum += sellNum;
-			shop.setArticleSellNum(sellNum);
-		}
-		SaleReportDto saleReport = new SaleReportDto(list_shopDetail.get(0).getBrandName(), totalNum, list_shopDetail);
-		return saleReport;
-	}
+//	@Override
+//	public SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId) {
+//		Date begin = DateUtil.getformatBeginDate(beginDate);
+//		Date end = DateUtil.getformatEndDate(endDate);
+//		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+//		int totalNum = 0;
+//		for(ShopDetail shop : list_shopDetail){
+//			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
+//			totalNum += sellNum;
+//			shop.setArticleSellNum(sellNum);
+//		}
+//		SaleReportDto saleReport = new SaleReportDto(list_shopDetail.get(0).getBrandName(), totalNum, list_shopDetail);
+//		return saleReport;
+//	}
 
 	@Override
 	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate, String endDate, String shopId,String sort) {
@@ -1074,5 +1080,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}else{
 			return order.getShopDetailId().equals(shopId);
 		}
+	}
+
+
+	@Override
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		Brand brand = brandService.selectById(brandId);
+		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+		int totalNum = 0;
+		for(ShopDetail shop : list_shopDetail){
+			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
+			totalNum += sellNum;
+			shop.setArticleSellNum(sellNum);
+		}
+		brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
+		return bo;
+	}
+
+	@Override
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		Brand brand = brandService.selectById(brandId);
+		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+		
+		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
+		
+		
+		return null;
 	}
 }

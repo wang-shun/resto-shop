@@ -7,7 +7,8 @@ import java.util.Map;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -131,7 +132,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param shopId
 	 * @return
 	 */
-	SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId);
+	//SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId);
 	
 	/**
 	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情
@@ -204,4 +205,20 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return 相等返回true 返回返回false
      */
 	Boolean checkShop(String orderId,String shopId);
+	
+	/**
+	 * 获取品牌菜品的销售数量
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId);
+	
+	/**
+	 * 获取店铺菜品的销售数据
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId);
 }
