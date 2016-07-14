@@ -99,7 +99,28 @@ public class Article {
     private Integer [] supportTimes;
     private Integer [] kitchenList;
 
-    
+    //工作日库存
+    private Integer stockWorkingDay;
+
+    //周末库存
+    private Integer stockWeekend;
+
+    final public Integer getStockWorkingDay() {
+        return stockWorkingDay;
+    }
+
+    final public void setStockWorkingDay(Integer stockWorkingDay) {
+        this.stockWorkingDay = stockWorkingDay;
+    }
+
+    final public Integer getStockWeekend() {
+        return stockWeekend;
+    }
+
+    final public void setStockWeekend(Integer stockWeekend) {
+        this.stockWeekend = stockWeekend;
+    }
+
     public ArticleFamily getArticleFamily() {
   		return articleFamily;
   	}

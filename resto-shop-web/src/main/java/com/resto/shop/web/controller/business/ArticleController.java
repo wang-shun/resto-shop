@@ -1,21 +1,21 @@
  package com.resto.shop.web.controller.business;
 
-import java.util.Date;
-import java.util.List;
+ import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.service.BrandService;
+ import com.resto.brand.web.service.BrandSettingService;
+ import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.model.Article;
+ import com.resto.shop.web.service.ArticleService;
+ import org.apache.commons.lang3.StringUtils;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.resto.shop.web.controller.GenericController;
-import com.resto.brand.core.entity.Result;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.service.ArticleService;
+ import javax.annotation.Resource;
+ import javax.validation.Valid;
+ import java.util.Date;
+ import java.util.List;
 
 @Controller
 @RequestMapping("article")
@@ -23,6 +23,13 @@ public class ArticleController extends GenericController{
 
 	@Resource
 	ArticleService articleService;
+
+
+	@Resource
+	BrandSettingService brandSettingService;
+
+	@Resource
+	BrandService brandService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -31,7 +38,8 @@ public class ArticleController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<Article> listData(){
-		return articleService.selectList(getCurrentShopId());
+		List<Article> articles =  articleService.selectList(getCurrentShopId());
+		return articles;
 	}
 	
 	@RequestMapping("list_one")
@@ -47,7 +55,8 @@ public class ArticleController extends GenericController{
 		Article article = articleService.selectFullById(id);
 		return getSuccessResult(article);
 	}
-	
+
+
 	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid @RequestBody Article article){
