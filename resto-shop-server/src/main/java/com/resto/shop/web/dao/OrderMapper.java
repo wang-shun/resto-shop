@@ -146,5 +146,27 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(@Param("beginDate")Date begin,@Param("endDate")Date end,@Param("shopId")String shopId,@Param("articleFamilyId")String articleFamilyId ,@Param("sort")String sort);
+
+
+	/**
+	 * 更新该餐品库存 （-1）（无规格）
+	 * @param articleId 餐品id
+	 * @return
+     */
+	Boolean updateArticleStock(String articleId);
+
+	/**
+	 * 更新该餐品库存 （-1）（有规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticlePriceStock(String articleId);
+
+	/**
+	 * 库存为0时设置沽清
+	 * @param articleId
+	 * @return
+     */
+	Boolean setEmpty(String articleId);
 		
 }

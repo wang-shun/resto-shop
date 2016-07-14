@@ -22,6 +22,7 @@ public class AppException extends Exception{
 	public static final ErrorMsg PHONE_IS_BIND = new ErrorMsg(14, "该手机号已被绑定！");
 	public static final ErrorMsg ORDER_IS_CLOSED = new ErrorMsg(15, "订单已经被取消!");
 	public static final ErrorMsg ORDER_IS_PRINTED = new ErrorMsg(16, "该订单已经打印过了！");
+	public static final ErrorMsg ORDER_IS_NULL = new ErrorMsg(17, "该订单不存在或无商品信息！");
 	
 	
 	public AppException(ErrorMsg msg) {

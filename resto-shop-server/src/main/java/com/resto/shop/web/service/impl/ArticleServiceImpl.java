@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,10 +8,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.model.Article;
@@ -163,5 +166,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void updateLikes(String articleId, Long likes) {
         articleMapper.updateLikes(articleId, likes);
     }
+
 
 }

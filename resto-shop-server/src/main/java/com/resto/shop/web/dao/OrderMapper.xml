@@ -884,7 +884,25 @@
 		a.article_family_id = f.id AND f.id=#{articleFamilyId}
 		order by ${sort}
 	</select>
-	
+
+	<update id="updateArticleStock">
+		update tb_article
+		set current_working_stock = current_working_stock - 1
+		where id = #{articleId}
+	</update>
+
+	<update id="updateArticlePriceStock">
+		update tb_article_price
+		set current_working_stock = current_working_stock - 1
+		where id = #{articleId}
+	</update>
+
+	<update id="setEmpty">
+		update tb_article
+		set is_empty = 1
+		where id = #{articleId}
+		and current_working_stock = 0
+	</update>
 	
 </mapper>
 

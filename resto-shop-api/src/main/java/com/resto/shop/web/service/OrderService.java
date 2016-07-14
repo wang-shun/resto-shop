@@ -170,4 +170,11 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return 相等返回true 返回返回false
      */
 	Boolean checkShop(String orderId,String shopId);
+
+	/**
+	 * 订单消费后更新库存
+	 * @param order  被消费的订单信息
+	 * @return
+     */
+	Boolean updateStock(Order order) throws AppException;
 }

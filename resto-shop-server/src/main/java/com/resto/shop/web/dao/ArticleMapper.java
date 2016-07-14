@@ -42,4 +42,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void updateLikes(String articleId, Long likes);
 
 	void addLikes(String articleId);
+
+
 }

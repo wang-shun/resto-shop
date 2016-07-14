@@ -19,6 +19,7 @@ import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
+import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -55,6 +56,9 @@ public class OrderAspect {
 	@Resource
 	ShareSettingService shareSettingService;
 
+	@Resource
+	OrderService orderService;
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
 
@@ -70,6 +74,8 @@ public class OrderAspect {
 			sendPaySuccessMsg(order);
 		}
 	}
+
+
 
 	private void sendPaySuccessMsg(Order order) {
 		Customer customer = customerService.selectById(order.getCustomerId());
@@ -100,9 +106,15 @@ public class OrderAspect {
 		try {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(),customer.getWechatId(),config.getAppid(),config.getAppsecret());
 			log.info("订单支付完成后，发送客服消息:"+order.getId()+" -- "+result);
+			Boolean updateStockSuccess  = false;
+			updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+			if(!updateStockSuccess){
+				log.info("库存变更失败:"+order.getId());
+			}
 		} catch (Exception e) {
 			log.error("发送客服消息失败:"+e.getMessage());
 		}
+
 	}
 
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.orderWxPaySuccess(..))")
@@ -124,7 +136,7 @@ public class OrderAspect {
 
 
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
-	public void pushOrderAfter(Order order){
+	public void pushOrderAfter(Order order) throws Throwable{
 		if(order!=null){
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
 				log.info("客户下单,发送成功下单通知"+order.getId());
@@ -159,6 +171,8 @@ public class OrderAspect {
 				MQMessageProducer.sendPlaceOrderMessage(order);
 
 			}
+			log.info("消费订单后减掉该库存:"+order.getId());
+
 		}
 	}
 
@@ -166,8 +180,9 @@ public class OrderAspect {
 	public void confirmOrder(){};
 
 	@AfterReturning(value="confirmOrder()",returning="order")
-	public void confirmOrderAfter(Order order){
+	public void confirmOrderAfter(Order order) {
 		log.info("确认订单成功后回调:"+order.getId());
+
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 		BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
