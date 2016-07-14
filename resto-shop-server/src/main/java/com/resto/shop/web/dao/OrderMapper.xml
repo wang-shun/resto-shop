@@ -762,9 +762,28 @@
 		and closed=0 ORDER BY print_order_time
 	</select>
 	<select id="selectArticleSumCountByData" resultType="Integer">
-		SELECT IFNULL(SUM(article_count),0) sellNum from tb_order where
-		order_state in (2,10,11,12) and shop_detail_id = #{shopId} and
- 		 <![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>
+		SELECT SUM(brand_article_report.brandSellNum) totalNum FROM
+(SELECT
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		articleName,a.article_family_id articleFamilyId,f.name
+		articleFamilyName
+		from
+		(
+		SELECT left(article_id,32) articleId ,SUM(count)
+		brandSellNum
+		,article_name from tb_order_item where order_id in
+		(SELECT
+		id from tb_order where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and brand_id=#{brandId}
+		)
+		GROUP BY
+		left(article_id,32)
+		) as brand_report
+		LEFT JOIN tb_article a on
+		a.id = brand_report.articleId INNER  JOIN
+		tb_article_family f on
+		a.article_family_id = f.id AND a.article_type=1
+)as brand_article_report
 	</select>
 	
 	
@@ -780,8 +799,9 @@
 		brandSellNum
 		,article_name from tb_order_item where order_id in
 		(SELECT
-		id from tb_order where order_state in (2,10,11,12) and
-		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>)
+		id from tb_order  where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]>
+		)
 		GROUP BY
 		left(article_id,32)
 		) as brand_report
@@ -990,17 +1010,46 @@ WHERE
 <select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
 	SELECT
 	SUM(o.order_money) sellIncome,
-	SUM(o.article_count) totalNum,
 	o.shop_detail_id shopId
 FROM
 	tb_order o
 LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
-
 WHERE
-	o.brand_id = '31946c940e194311b117e3fff5327215'
-AND o.order_state IN (2, 10, 11, 12) GROUP BY o.shop_detail_id
+	o.brand_id = #{brandId}
+AND o.order_state IN (2, 10, 11, 12) 
+and <![CDATA[ oi.pay_time >= #{beginDate} and oi.pay_time <= #{endDate}]]>
+GROUP BY o.shop_detail_id
+</select>
+
+<select id="selectShopArticleNum" resultType="Integer">
+
+SELECT SUM(shop_article_report.shopSellNum) totalNum FROM
+(SELECT
+		shop_report.articleId,shop_report.shopSellNum,IFNULL(a.name,shop_report.article_name)
+		articleName,a.article_family_id articleFamilyId,f.name
+		articleFamilyName
+		from
+		(
+		SELECT left(article_id,32) articleId ,SUM(count)
+		shopSellNum
+		,article_name from tb_order_item where order_id in
+		(SELECT
+		id from tb_order where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and shop_detail_id=#{shopId}
+		)
+		GROUP BY
+		left(article_id,32)
+		) as shop_report
+		LEFT JOIN tb_article a on
+		a.id =shop_report.articleId INNER  JOIN
+		tb_article_family f on
+		a.article_family_id = f.id AND a.article_type=1
+)as shop_article_report
+
 
 </select>
+
+
 	
 </mapper>
 

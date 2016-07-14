@@ -1,8 +1,6 @@
  package com.resto.shop.web.controller.business;
 
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class OrderController extends GenericController{
 	@RequestMapping("orderPaymentItems")
 	public List<OrderPayDto> orderPaymentItems(String beginDate,String endDate){
 		
-		//茶品牌名字
+		//品牌名字
 		Brand brand = brandService.selectById(getCurrentBrandId());
 		OrderPayDto op= orderService.selectBytimeAndState(beginDate,endDate,getCurrentBrandId());
 		op.setBrandName(brand.getBrandName());

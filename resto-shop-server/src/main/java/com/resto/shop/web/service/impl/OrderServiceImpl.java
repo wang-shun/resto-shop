@@ -1088,13 +1088,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		Brand brand = brandService.selectById(brandId);
-		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
 		int totalNum = 0;
-		for(ShopDetail shop : list_shopDetail){
-			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
-			totalNum += sellNum;
-			shop.setArticleSellNum(sellNum);
-		}
+		totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
 		brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
 		return bo;
 	}
@@ -1109,6 +1104,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		for (ShopArticleReportDto shopArticleReportDto : list) {
 			for (ShopDetail shop : list_shopDetail) {
 				if(shop.getId().equals(shopArticleReportDto.getShopId())){
+					int totalNum = orderMapper.selectShopArticleNum(begin,end,shop.getId());
+					shopArticleReportDto.setTotalNum(totalNum);
 					shopArticleReportDto.setShopName(shop.getName());
 				}
 			}
@@ -1116,7 +1113,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		
 		for (ShopArticleReportDto shopArticleReportDto : list) {
-			shopArticleReportDto.setOccupy(shopArticleReportDto.getSellIncome().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue()*100+"%");
+			double c = shopArticleReportDto.getSellIncome().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			shopArticleReportDto.setOccupy(str);
 		}
 		
 		return list;

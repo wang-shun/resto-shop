@@ -1,18 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<h2 class="text-center"><strong>结算报表</strong></h2><br/>
+<div id="control">
+<h2 class="text-center"><strong>菜品销售报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" id="beginDate" readonly="readonly">
+		    <input type="text" class="form-control form_datetime" v-model="searchDate.beginDate" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
+		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		</form>
 		<br/>
 	<div>
@@ -40,7 +41,23 @@
 		  	</strong>
 		  </div>
 		  <div class="panel-body">
-		  	<table id="brandArticleTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  	<table id="brandArticleTable" class="table table-striped table-bordered table-hover" width="100%">
+		  		<thead> 
+					<tr>
+						<th>品牌名称</th>
+						<th>菜品总销量(份)</th>
+						<th>销售详情</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><strong>{{brandReport.brandName}}</strong></td>
+						<td>{{brandReport.totalNum}}</td>
+						<td><button class="btn btn-success"
+								@click="showBrandReport(brandReport.brandName)">查看详情</button></td>
+					</tr>
+				</tbody>
+		  	</table>
 		  </div>
 		</div>
     </div>
@@ -53,7 +70,27 @@
 		  	<strong style="margin-right:100px;font-size:22px">店铺菜品销售记录</strong>
 		  </div>
 		  <div class="panel-body">
-		  	<table id="shopArticleTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  	<table id="shopArticleTable" class="table table-striped table-bordered table-hover" width="100%">
+		  			<thead>
+					<tr>
+						<th>店铺名称</th>
+						<th>菜品销量(份)</th>
+						<th>菜品销售额</th>
+						<th>品牌销售占比</th>
+						<th>销售详情</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="shop in shopReportList">
+						<td><strong>{{shop.shopName}}</strong></td>
+						<td>{{shop.totalNum}}</td>	
+						<td>{{shop.sellIncome}}</td>
+						<td>{{shop.occupy}}</td>
+						<td><button class="btn btn-sm btn-success"
+								@click="showShopReport(shop.shopName,shop.shopId)">查看详情</button></td>
+					</tr>
+				</tbody>
+		  	</table>
 		  </div>
 		</div>
 		  </div>
@@ -61,6 +98,7 @@
     </div>
   </div>
   
+  <!-- 报表详情 -->
   <div class="modal fade bs-example-modal-lg" id="reportModal" 
 		tabindex="-1" role="dialog" aria-labelledby="reportModal" 
 		data-backdrop="static"> 
@@ -83,7 +121,7 @@
 		</div> 
 	</div> 
 </div>
-
+</div>
 <script>
 
 //时间插件
@@ -98,148 +136,115 @@ $('.form_datetime').datetimepicker({
 		startView:"month",
 		language:"zh-CN"
 	});
-
-//文本框默认值
-$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-
-var brandTable = $("#brandArticleTable").DataTable({
-	language:language,
-	dom:'i',
-	ajax : {
-		url : "articleSell/list_brand",   
-		dataSrc : "",
-		data:function(d){
-			d.beginDate=$("#beginDate").val();
-			d.endDate=$("#endDate").val();
-			return d;
-		}
-	},
-	ordering:false,
-	columns : [
-		{ 
-			title : "品牌", 
-			data : "brandName"
-		},                 
-		{ 
-			title : "菜品总销量(份)", 
-			data : "totalNum" 
+var vueObj = new Vue({
+		el : "#control",
+		data : {
+			brandReport : {
+				brandName : "",
+				totalNum : 0
+			},
+			shopReportList : [],
+			searchDate : {
+				beginDate : "",
+				endDate : "",
+			},
+			modalInfo:{
+				title:"",
+				content:""
+			},
 		},
-		{ 
-			title : "销售详情", 
-			data : "brandName" ,
-			createdCell:function(td,tdData){
-				console.log(tdData);
-				$(td).html("<button class='btn btn-succes' onclick='showBrandReport("+tdData+")'>查看详情</button>");
-			}
-		}
-	]
-});
-
-var shopTable = $("#shopArticleTable").DataTable({
-	language:language,
-	dom:'i',
-	ajax : {
-		url : "articleSell/list_shop",   
-		dataSrc : "",
-		data:function(d){
-			d.beginDate=$("#beginDate").val();
-			d.endDate=$("#endDate").val();
-			return d;
-		}
-	},
-	
-	"columnDefs":[{
-		 "targets":[0],
-		   "visible":false
-		},
-	  
-	 ],
-	ordering:false,
-	columns : [
-		{ 
-			title : "id", 
-			data : "shopId"
-		},              
-		{ 
-			title : "店铺", 
-			data : "shopName"
-		},                 
-		{ 
-			title : "菜品总销量(份)", 
-			data : "totalNum" 
-		},
-		{ 
-			title : "菜品销售额(元)", 
-			data : "sellIncome" 
-		},
-		{ 
-			title : "品牌销售占比", 
-			data : "occupy" ,
+		methods : {
+			showBrandReport : function(brandName) {
+				this.openModal("articleSell/show/brandReport", brandName,null);
+			},
+			showShopReport : function(shopName,shopId) {
+				this.openModal("articleSell/show/shopReport", shopName,shopId);
+			},
+			searchInfo : function(beginDate, endDate) {
+				var that = this;
+				//判断 时间范围是否合法
+				if(beginDate>endDate){
+					toastr.error("开始时间不能大于结束时间")
+					return ;
+				}
+				var num = this.getNumActive();
+				console.log(num);
+				switch (num)
+				{
+				case 1:
+					$.post("articleSell/list_brand", this.getDate(null), function(result) {
+	 					that.brandReport.brandName = result.brandName;
+	 					that.brandReport.totalNum = result.totalNum;
+	 					toastr.success("查询成功");
+	 				});
+				  break;
+				case 2:
+					$.post("articleSell/list_shop", this.getDate(null), function(result) {
+						that.shopReportList = result;
+	 					toastr.success("查询成功");
+	 				});
+				  break;
+				}
+			},
+			openModal : function(url, modalTitle,shopId) {
+				$.post(url, this.getDate(shopId),function(result) {
+					console.log(result)
+					var modal = $("#reportModal");
+					modal.find(".modal-body").html(result);
+					modal.find(".modal-title > strong").html(modalTitle);
+					modal.modal();
+				})
 			
+			},
+			closeModal : function(){
+				var modal = $("#reportModal");
+				modal.find(".modal-body").html("");
+				modal.modal("hide");
+			},
+			getDate : function(shopId){
+				var data = {
+					beginDate : this.searchDate.beginDate,
+					endDate : this.searchDate.endDate,
+					shopId : shopId
+				};
+				return data;
+			},
+			getNumActive:function(){
+				var value = $("#ulTab li.active a").text();
+				value  = Trim(value)//去空格
+				if(value=='品牌菜品报表'){
+					return 1;
+				}else if(value=="店铺菜品销售报表"){
+					return 2;
+				}
+				
+			},
 		},
-		{ 
-			title : "销售详情", 
-			data : "shopName" ,
-			createdCell:function(td,tdData){
-				$(td).html("<button class='btn btn-success' onclick=\"showShopReport(td)\">查看详情</button>");
-			}
+		created : function() {
+			var date = new Date().format("yyyy-MM-dd");
+			this.searchDate.beginDate = date;
+			this.searchDate.endDate = date;
+			this.searchInfo();
 		}
-	]
-});
-
-//搜索
-$("#searchReport").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	//判断 时间范围是否合法
-	if(beginDate>endDate){
-		toastr.error("开始时间不能大于结束时间")
-		return ;
-	}
-	
-	var num = getNumActive();
-	console.log(num);
-	switch (num)
-	{
-	case 1:
-		var data = {"beginDate":beginDate,"endDate":endDate};
-		brandTable.ajax.reload();
-		toastr.success("查询成功");
-	  break;
-	case 2:
-		var data = {"beginDate":beginDate,"endDate":endDate}
-		shopTable.ajax.reload();
-		toastr.success("查询成功");
-	  break;
-	}
-	
-})
-
-//判断活动的选项卡是第几个
-function getNumActive(){
-	var value = $("#ulTab li.active a").text();
-	value  = Trim(value)//去空格
-	if(value=='品牌菜品报表'){
-		return 1;
-	}else if(value=="店铺菜品销售报表"){
-		return 2;
-	}
-}
+	})
 
 $('#ulTab a').click(function (e) {
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	  e.preventDefault()
 	  $(this).tab('show')
-	  var num = getNumActive()
+	  var num = vueObj.getNumActive()
 	  switch(num){
 	  case 1:
-			var data = {"beginDate":beginDate,"endDate":endDate};
-			brandTable.ajax.reload();
+		  $.post("articleSell/list_brand", vueObj.getDate(null), function(result) {
+				vueObj.brandReport.brandName = result.brandName;
+				vueObj.brandReport.totalNum = result.totalNum;
+			});
 		  break;
 		case 2:
-			var data = {"beginDate":beginDate,"endDate":endDate}
-			shopTable.ajax.reload();
+			$.post("articleSell/list_shop", vueObj.getDate(null), function(result) {
+					vueObj.shopReportList =result;
+				});
 		  break;
 	  }
 	})
@@ -272,22 +277,6 @@ var language = {
 function Trim(str)
 { 
     return str.replace(/(^\s*)|(\s*$)/g, ""); 
-}
-
-function showBrandReport(brandName){
-	console.log(brandName)
-	alert(brandName)
-	//this.openModal("articleSell/show/brandReport", brandName,null);
-}
-
-function openModal(url,modalTitle,shopId){
-	$.post(url, this.getDate(shopId),function(result) {
-		console.log(result)
-		var modal = $("#reportModal");
-		modal.find(".modal-body").html(result);
-		modal.find(".modal-title > strong").html(modalTitle);
-		modal.modal();
-	})
 }
 
 </script>
