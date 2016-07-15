@@ -887,13 +887,28 @@
 
 	<update id="updateArticleStock">
 		update tb_article
-		set current_working_stock = current_working_stock - 1
+		<set>
+			<if test="type='minus'">
+			  current_working_stock = current_working_stock - 1
+			</if>
+			<if test="type = 'add'">
+				current_working_stock = current_working_stock + 1
+			</if>
+		</set>
+
 		where id = #{articleId}
 	</update>
 
 	<update id="updateArticlePriceStock">
 		update tb_article_price
-		set current_working_stock = current_working_stock - 1
+		<set>
+			<if test="type ='minus'">
+				current_working_stock = current_working_stock - 1
+			</if>
+			<if test="type ='add'">
+				current_working_stock = current_working_stock + 1
+			</if>
+		</set>
 		where id = #{articleId}
 	</update>
 
