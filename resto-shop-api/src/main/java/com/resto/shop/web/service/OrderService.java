@@ -221,4 +221,27 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId);
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(String currentBrandId, String beginDate,
+			String endDate, String sort);
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndId(String brandId ,String beginDate, String endDate, String sort);
+
+	
+
+	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
 }

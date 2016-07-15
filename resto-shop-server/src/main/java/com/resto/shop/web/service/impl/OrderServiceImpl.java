@@ -1128,4 +1128,89 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return temp.add(sellIncome);
 	}
 
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(String brandid,String beginDate, String endDate, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="ap.peference";
+		}else if("desc".equals(sort)){
+			sort="ap.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="ap.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandid, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndId(String brandId, String beginDate, String endDate,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference , a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String brandId ,String beginDate, String endDate,String articleFamilyId, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="ap.peference";
+		}else if("desc".equals(sort)){
+			sort="ap.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="ap.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandFamilyArticleSellByDateAndArticleFamilyId(brandId ,articleFamilyId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
 }
