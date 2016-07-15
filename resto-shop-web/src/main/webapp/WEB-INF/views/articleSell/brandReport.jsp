@@ -4,22 +4,66 @@
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
-		  <div class="form-group" style="margin-right: 50px;">
+		  <div class="form-group" style="margin-right: 33px;">
 		    <label for="beginDate">开始时间：</label>
 		    <input type="text" class="form-control form_datetime" id="beginDate" readonly="readonly">
 		  </div>
-		  <div class="form-group" style="margin-right: 50px;">
+		  <div class="form-group" style="margin-right: 33px;">
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button></br>
-		  <button type="button" class="btn btn-primary" id="ExcelReport">导出excel</button>
+		  <div class="form-group" style="margin-right: 33px;">
+		  	<button type="button" class="btn btn-primary" id="searchReport">查询报表</button>
+		  	<button type="button" class="btn btn-primary" id="ExcelReport">下载报表</button>
+		  </div>
 		</form>
+		<br/>
+		<div>
+			<button type="button" class="btn green-haze" id="sortById">按菜品序号排序</button>
+			<button type="button" class="btn green-haze" id="sortByNum">按销量排序</button>
+		</div>
 	</div>
 </div>
-<br/>
-<br/>
-<table id="shopTable" class="table table-striped table-bordered table-hover"></table>
+
+
+<!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist" id="articleTab">
+    <li role="presentation" class="active">
+    	<a href="#articleDayReport" aria-controls="articleDayReport" role="tab" data-toggle="tab"><strong>分类销售记录</strong>
+    </a>
+    </li>
+    <li role="presentation"><a href="#aritcleRevenueCount" aria-controls="aritcleRevenueCount" role="tab" data-toggle="tab"><strong>菜品销售记录</strong></a></li>
+  </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="articleDayReport">
+    	<!-- 收入条目 -->
+    	<div class="panel panel-success">
+		  <div class="panel-heading text-center">
+		  	<strong style="margin-right:100px;font-size:22px">分类销售记录
+		  	</strong>
+		  </div>
+		  <div class="panel-body">
+		  	<table id="aritcleFamilySellTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  </div>
+		</div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="aritcleRevenueCount">
+    	<div class="panel panel-primary" style="border-color:write;">
+		  	<!-- 菜品销售记录 -->
+    	<div class="panel panel-info">
+		  <div class="panel-heading text-center">
+		  	<strong style="margin-right:100px;font-size:22px">菜品销售记录</strong>
+		  </div>
+		  <div class="panel-body">
+		  	<table id="articleSellTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  </div>
+		</div>
+		  </div>
+		</div>
+    </div>
+  </div>
+</div>
 
 <script>
 //时间插件
@@ -39,25 +83,50 @@ $('.form_datetime').datetimepicker({
 $("#beginDate").val("${beginDate}");
 $("#endDate").val("${endDate}");
 
-var tbApi = null;
+
+//判断活动的选项卡是第几个
+function getNumActive(){
+	var value = $("#articleTab li.active a").text();
+	value  = Trim(value)//去空格
+	if(value=='分类销售记录'){
+		return 1;
+	}else if(value=="菜品销售记录"){
+		return 2;
+	}
+}
+
+$('#articleTab a').click(function (e) {
+	  e.preventDefault()
+	  var num = getNumActive()
+	  $(this).tab('show')
+	  switch(num){
+	  case 1:
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+			tb1.ajax.reload();
+		  break;
+		case 2:
+			var selectValue = select[0].value;
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
+			tb2.ajax.reload();
+		  break;
+	  }
+	})
+
+var tb1Api = null;
 var isFirst = true;
-var shopTable = $("#shopTable").DataTable({
+var sort = "desc";
+var tb1 = $("#aritcleFamilySellTable").DataTable({
 	ajax : {
-		url : "articleSell/brand_data",
+		url : "articleSell/brand_familyId_data",
 		dataSrc : "data",
 		data:function(d){
 			d.beginDate = $("#beginDate").val();
 			d.endDate = $("#endDate").val();
-			d.shopId = "${shopId}";
+			d.sort = sort;//默认按销量排序
 			return d;
 		}
 	},
-	//order: [[ 2, "desc" ]],//默认以菜品销量降序
-	 columnDefs:[{
-                 orderable:false,//禁用排序
-                 targets:[0,1]   //指定的列
-             }],
-	
+	ordering:false,
 	columns : [
 		{
 			title : "菜品分类",
@@ -72,7 +141,62 @@ var shopTable = $("#shopTable").DataTable({
 					}
 					$(td).html(lab);
 				}
-				
+			}
+		}, 
+		{
+			title : "菜品销量(份)",
+			data : "brandSellNum",
+		},
+		{
+			title : "菜品销售额(元)",
+			data : "salles",
+		},  
+		{
+			title : "菜品销售占比",
+			data : "salesRatio",
+			
+		},  
+		
+	],
+	initComplete: function () {//列筛选
+		tbApi = this.api();
+		appendSelect(tbApi);
+		isFirst = false;
+    }
+}).on( 'xhr.dt', function (e) { 
+	if(!isFirst){
+		appendSelect(tbApi);
+	}
+} );
+
+
+
+var tb2 = $("#articleSellTable").DataTable({
+	ajax : {
+		url : "articleSell/brand_id_data",
+		dataSrc : "data",
+		data:function(d){
+			d.beginDate = $("#beginDate").val();
+			d.endDate = $("#endDate").val();
+			d.sort = sort;//默认按销量排序
+			return d;
+		}
+	},
+	ordering:false,
+	columns : [
+		{
+			title : "菜品分类",
+			data : "articleFamilyName",
+			createdCell:function(td,tdData,rowData){
+				if(isEmpty(tdData)){
+					var lab = $("<span>");
+					if(isEmpty(rowData.articleFamilyId)){
+						lab.html("分类不详").addClass("label label-warning");
+					}else{
+						lab.html("该分类已不存在").addClass("label label-warning");
+					}
+					$(td).html(lab);
+				}
 			}
 		},  
 		{
@@ -88,6 +212,14 @@ var shopTable = $("#shopTable").DataTable({
 			title : "菜品销量(份)",
 			data : "brandSellNum",
 		},
+		{
+			title : "菜品销售额",
+			data : "salles",
+		},
+		{
+			title : "占比",
+			data : "salesRatio",
+		},
 	],
 	initComplete: function () {//列筛选
 		tbApi = this.api();
@@ -100,9 +232,29 @@ var shopTable = $("#shopTable").DataTable({
 	}
 } );
 
+
+
+
 //搜索
 $("#searchReport").click(function(){
-	shopTable.ajax.reload();
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "desc";
+	var num = getNumActive()
+	 switch(num){
+	  case 1:
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+			tb1.ajax.reload();
+			toastr.success("查询成功");
+		  break;
+		case 2:
+			var selectValue = select[0].value;
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
+			tb2.ajax.reload();
+			toastr.success("查询成功")
+		  break;
+	  }
+	
 })
 
 function isEmpty(str){
@@ -110,7 +262,7 @@ function isEmpty(str){
 }
 
 //添加分类下拉框
-var select;
+var select = $(select);
 function appendSelect(api){
 	api.columns().indexes().flatten().each(function (i) {
         if (i == 0) {
@@ -132,27 +284,72 @@ function appendSelect(api){
                     $span.append(select)
             	}
             });
-
         }
     });
 }
 
+//下载报表
 $("#ExcelReport").click(function(){
-// 	var str = [];
-// 	for(var i=0;i<select[0].length;i++){
-// 		str[i] = select[0].options[i].text; // str = ["全部", "我是单品", "甜品"]
-// 	}
-// 	var str2 = str.join(",");//str2 = "全部,我是单品,甜品"
-	//获取select选中的值
-	var selectValue = select[0].value;
-	var sort=0;//排序
-	var order = shopTable.order();
-	if(order[0][0]==2){
-		sort=order[0][1]
-	}
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
-	location.href="articleSell/brand_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+	var num = getNumActive()
+	 switch(num){
+	  case 1:
+		  debugger;
+		  //获取tr第一个td
+		  var selectValue = tb1.table().row().data().articleFamilyName;
+		  location.href="articleSell/brand_articlefamily_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+		  break;
+		case 2:
+			 var selectValue = tb1.table().row().data().articleFamilyName;
+			location.href="articleSell/brand_article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+		  break;
+	  }
 })
+
+//按菜品序号排序
+$("#sortById").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "0";
+	var num = getNumActive()
+	 switch(num){
+	  case 1:
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+			tb1.ajax.reload();
+			toastr.success("查询成功");
+		  break;
+		case 2:
+			var selectValue = select[0].value;
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
+			tb2.ajax.reload();
+			toastr.success("查询成功")
+		  break;
+	  }
+
+})
+
+//按销量排序
+
+$("#sortByNum").click(function(){
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
+	sort = "desc";
+	var num = getNumActive()
+	 switch(num){
+	  case 1:
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort};
+			tb1.ajax.reload();
+			toastr.success("查询成功");
+		  break;
+		case 2:
+			var selectValue = select[0].value;
+			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
+			tb2.ajax.reload();
+			toastr.success("查询成功")
+		  break;
+	  }
+})
+
 
 </script>

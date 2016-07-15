@@ -6,7 +6,9 @@ import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -130,7 +132,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param shopId
 	 * @return
 	 */
-	SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId);
+	//SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId);
 	
 	/**
 	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情
@@ -142,7 +144,7 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate,String endDate,String shopId,String sort);
 	
 	/**
-	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情(品牌端显示)
 	 * @param beginDate
 	 * @param endDate
 	 * @return
@@ -164,10 +166,82 @@ public interface OrderService extends GenericService<Order, String> {
 
 
 	/**
+	 * 根据时间 和 指定 店铺 查询 已完成的订单的 菜品销售详情(店铺端显示)
+	 * @param currentShopId
+	 * @param beginDate
+	 * @param endDate
+	 * @param sort
+	 * @return
+	 */
+	public List<ArticleSellDto> selectShopArticleByDate(String currentShopId, String beginDate, String endDate, String sort);
+
+
+	/**
+	 * 根据时间 和 指定 店铺  指定分类的  查询 已完成的订单的 菜品销售详情(店铺端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @param articleFamilyId
+	 * @param sort
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectShopArticleByDateAndArcticleFamilyId(String beginDate, String endDate,String shopId,
+			String articleFamilyId, String sort);
+
+
+	/**
+	 * 根据时间查询已消费订单的订单数目和订单总额
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId);
+
+
+	/**
 	 * 比较订单的店铺id 和 二维码的店铺id
 	 * @param orderId 订单号
 	 * @param shopId 二维码的店铺id
 	 * @return 相等返回true 返回返回false
      */
 	Boolean checkShop(String orderId,String shopId);
+	
+	/**
+	 * 获取品牌菜品的销售数量
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId);
+	
+	/**
+	 * 获取店铺菜品的销售数据
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId);
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(String currentBrandId, String beginDate,
+			String endDate, String sort);
+	
+	/**
+	 * 根据时间 查询 当前品牌已完成的订单的 菜品销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndId(String brandId ,String beginDate, String endDate, String sort);
+
+	
+
+	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
 }

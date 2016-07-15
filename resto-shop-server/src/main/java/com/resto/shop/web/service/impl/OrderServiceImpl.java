@@ -22,11 +22,15 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.SaleReportDto;
+import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
@@ -116,6 +120,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     
     @Resource
     BrandSettingService brandSettingService;
+    
+    @Resource
+    BrandService brandService;
     
     @Resource
     ShopDetailService shopDetailService;
@@ -573,7 +580,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}else if(item.getType()==OrderItemType.MEALS_CHILDREN){
 				continue;
 			}
-			
+
 			if(OrderItemType.SETMEALS==item.getType()){
 				Kitchen kitchen = kitchenService.selectMealKitchen(item);
 				if(kitchen!=null){
@@ -899,20 +906,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return order;
 	}
 
-	@Override
-	public SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
-		int totalNum = 0;
-		for(ShopDetail shop : list_shopDetail){
-			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
-			totalNum += sellNum;
-			shop.setArticleSellNum(sellNum);
-		}
-		SaleReportDto saleReport = new SaleReportDto(list_shopDetail.get(0).getBrandName(), totalNum, list_shopDetail);
-		return saleReport;
-	}
+//	@Override
+//	public SaleReportDto selectArticleSumCountByData(String beginDate,String endDate,String brandId) {
+//		Date begin = DateUtil.getformatBeginDate(beginDate);
+//		Date end = DateUtil.getformatEndDate(endDate);
+//		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+//		int totalNum = 0;
+//		for(ShopDetail shop : list_shopDetail){
+//			int sellNum = orderMapper.selectArticleSumCountByData(begin, end, shop.getId());
+//			totalNum += sellNum;
+//			shop.setArticleSellNum(sellNum);
+//		}
+//		SaleReportDto saleReport = new SaleReportDto(list_shopDetail.get(0).getBrandName(), totalNum, list_shopDetail);
+//		return saleReport;
+//	}
 
 	@Override
 	public List<ArticleSellDto> selectShopArticleSellByDate(String beginDate, String endDate, String shopId,String sort) {
@@ -1024,6 +1031,46 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.selectShopArticleSellByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
 	}
 
+	@Override
+	public List<ArticleSellDto> selectShopArticleByDate(String shopId, String beginDate, String endDate,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="shop_report.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="shop_report.shopSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
+		return list;
+
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleByDateAndArcticleFamilyId(String beginDate, String endDate,String shopId,
+			String articleFamilyId, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference ,a.sort";
+		}else if("desc".equals(sort)){
+			sort="shop_report.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="shop_report.shopSellNum asc";
+		}
+		return orderMapper.selectShopArticleByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
+	}
+
+	@Override
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectBytimeAndState(begin,end,brandId);
+	}
+
+
 
 	@Override
 	public Boolean checkShop(String orderId, String shopId) {
@@ -1034,4 +1081,136 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			return order.getShopDetailId().equals(shopId);
 		}
 	}
+
+
+	@Override
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		Brand brand = brandService.selectById(brandId);
+		int totalNum = 0;
+		totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
+		brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
+		return bo;
+	}
+
+	@Override
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+		BigDecimal temp = BigDecimal.ZERO;
+		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
+		for (ShopArticleReportDto shopArticleReportDto : list) {
+			for (ShopDetail shop : list_shopDetail) {
+				if(shop.getId().equals(shopArticleReportDto.getShopId())){
+					int totalNum = orderMapper.selectShopArticleNum(begin,end,shop.getId());
+					shopArticleReportDto.setTotalNum(totalNum);
+					shopArticleReportDto.setShopName(shop.getName());
+				}
+			}
+			temp = add(temp,shopArticleReportDto.getSellIncome());
+		}
+		
+		for (ShopArticleReportDto shopArticleReportDto : list) {
+			double c = shopArticleReportDto.getSellIncome().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			shopArticleReportDto.setOccupy(str);
+		}
+		
+		return list;
+	}
+
+	private BigDecimal add(BigDecimal temp, BigDecimal sellIncome) {
+		// TODO Auto-generated method stub
+		return temp.add(sellIncome);
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(String brandid,String beginDate, String endDate, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="ap.peference";
+		}else if("desc".equals(sort)){
+			sort="ap.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="ap.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandid, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandArticleSellByDateAndId(String brandId, String beginDate, String endDate,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference , a.sort";
+		}else if("desc".equals(sort)){
+			sort="brand_report.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="brand_report.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String brandId ,String beginDate, String endDate,String articleFamilyId, String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="ap.peference";
+		}else if("desc".equals(sort)){
+			sort="ap.brandSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="ap.brandSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectBrandFamilyArticleSellByDateAndArticleFamilyId(brandId ,articleFamilyId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
 }

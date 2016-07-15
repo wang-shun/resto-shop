@@ -13,15 +13,15 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  <br></div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button><form>
+		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+		  <form>
 			<input type="hidden" id="brandDataTable">
 			<input type="hidden" id="shopDataTable">
 		</form>&nbsp;&nbsp;&nbsp;
 		</form>
 	</div>
 </div>
-<button type="button" class="btn btn-primary" id="brandreportExcel">品牌数据导出excel</button><br/>
-<button type="button" class="btn btn-primary" id="shopreportExcel">店铺数据导出excel</button><br/>
 <br/>
 <div>
   	<!-- 每日报表 -->
@@ -60,7 +60,7 @@ var beginDate = $("#beginDate").val();
 var endDate = $("#endDate").val();
 var dataSource;
 $.ajax( {  
-    url:'totalRevenue/reportIncome',
+    url:'totalIncome/reportIncome',
     async:false,
     data:{  
     	'beginDate':beginDate,
@@ -151,7 +151,7 @@ $("#searchReport").click(function(){
 	 endDate = $("#endDate").val();
 	//更新数据源
 	 $.ajax( {  
-		    url:'totalRevenue/reportIncome',
+		    url:'totalIncome/reportIncome',
 		    data:{  
 		    	'beginDate':beginDate,
 		    	'endDate':endDate
@@ -174,7 +174,7 @@ $("#searchReport").click(function(){
 $("#brandreportExcel").click(function(){
 	 beginDate = $("#beginDate").val();
 	 endDate = $("#endDate").val();
-	location.href="totalRevenue/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+	location.href="totalIncome/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
 	
 })
 
@@ -183,7 +183,7 @@ $("#brandreportExcel").click(function(){
 $("#shopreportExcel").click(function(){
 	beginDate=$("#beginDate").val();
 	endDate = $("#endDate").val();
-	location.href="totalRevenue/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+	location.href="totalIncome/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
 })
 
 </script>

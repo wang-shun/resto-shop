@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
@@ -114,7 +116,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param shopId
 	 * @return
 	 */
-	int selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("shopId")String shopId);
+	int selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("brandId")String brandId);
 	
 	
 	/**
@@ -146,5 +148,61 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndArticleFamilyId(@Param("beginDate")Date begin,@Param("endDate")Date end,@Param("shopId")String shopId,@Param("articleFamilyId")String articleFamilyId ,@Param("sort")String sort);
+	
+	/**
+	 * 根据时间查询店铺已完成订单的菜品销售详情
+	 * @param shopId
+	 * @param begin
+	 * @param end
+	 * @param sort
+	 * @return
+	 */
+	List<ArticleSellDto> selectShopArticleByDate(@Param("shopId")String shopId,@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("sort") String sort);
+
+	/**
+	 * 根据时间  菜品分类id  查询店铺已完成订单的菜品销售详情
+	 * @param begin
+	 * @param end
+	 * @param shopId
+	 * @param articleFamilyId
+	 * @param sort
+	 * @return
+	 */
+	List<ArticleSellDto> selectShopArticleByDateAndArticleFamilyId(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("shopId")String shopId,
+			@Param("articleFamilyId")String articleFamilyId,@Param("sort") String sort);
+	
+	/**
+	 * 查询已消费订单的订单数目和订单总额
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	OrderPayDto selectBytimeAndState(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
+	
+	/**
+	 * 查询品牌下所有店铺的菜品销售情况
+	 * @param beginDate
+	 * @param endDate
+	 * @param brandId
+	 * @return
+	 */
+	List<ShopArticleReportDto> selectShopArticleDetails(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
+
+	/**
+	 * 查询店铺的菜品销售总量
+	 * @param begin
+	 * @param end
+	 * @param id
+	 * @return
+	 */
+	int selectShopArticleNum(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("shopId")String shopId);
+
+	List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(@Param("brandId")String brandId,@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("sort") String sort);
+
+	List<ArticleSellDto> selectBrandArticleSellByDateAndId(@Param("brandId")String brandId,@Param("beginDate") Date begin, @Param("endDate")Date end,@Param("sort") String sort);
+
+	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyId")String articleFamilyId, @Param("beginDate")Date begin,
+			 @Param("endDate")Date end, @Param("sort") String sort);
 		
 }
