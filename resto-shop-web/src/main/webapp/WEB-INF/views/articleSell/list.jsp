@@ -232,10 +232,11 @@ $('#ulTab a').click(function (e) {
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	  e.preventDefault()
-	  $(this).tab('show')
+	 $(this).tab('show');
 	  var num = vueObj.getNumActive()
 	  switch(num){
 	  case 1:
+		  
 		  $.post("articleSell/list_brand", vueObj.getDate(null), function(result) {
 				vueObj.brandReport.brandName = result.brandName;
 				vueObj.brandReport.totalNum = result.totalNum;

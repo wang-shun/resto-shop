@@ -1011,21 +1011,24 @@ WHERE
 
 <select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
 	SELECT
-	SUM(o.order_money) sellIncome,
+	SUM(oi.final_price) sellIncome,
 	o.shop_detail_id shopId
 FROM
 	tb_order o
-LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
+LEFT JOIN tb_order_item oi
+on oi.order_id = o.id
+LEFT JOIN tb_article ot ON
+oi.article_id=ot.id
 WHERE
 	o.brand_id = #{brandId}
 AND o.order_state IN (2, 10, 11, 12) 
-and <![CDATA[ oi.pay_time >= #{beginDate} and oi.pay_time <= #{endDate}]]>
+and  <![CDATA[ o.confirm_time >= #{beginDate} and o.confirm_time <= #{endDate}]]> 
 GROUP BY o.shop_detail_id
 </select>
 
 <select id="selectShopArticleNum" resultType="Integer">
 
-SELECT SUM(shop_article_report.shopSellNum) totalNum FROM
+SELECT IFNULL(SUM(shop_article_report.shopSellNum),0) totalNum FROM
 (SELECT
 		shop_report.articleId,shop_report.shopSellNum,IFNULL(a.name,shop_report.article_name)
 		articleName,a.article_family_id articleFamilyId,f.name
@@ -1108,7 +1111,7 @@ ORDER BY ${sort}
 
 <select id="selectBrandFamilyArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
-SELECT SUM(ap.brandSellNum)brandSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference from 
+SELECT SUM(ap.brandSellNum)brandSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference ,ap.articleName from 
 (
 SELECT
 		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
@@ -1130,7 +1133,7 @@ SELECT
 		a.id = brand_report.articleId LEFT JOIN
 		tb_article_family f on
 		a.article_family_id = f.id 
-) as ap GROUP BY ap.articleFamilyId where ap.articleFamilyId = #{articleFamilyId}
+) as ap  where ap.articleFamilyId = #{articleFamilyId}
 ORDER BY ${sort}
 
 </select>

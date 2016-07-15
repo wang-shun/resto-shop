@@ -1100,27 +1100,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
 		BigDecimal temp = BigDecimal.ZERO;
+		int totalNum =0;
 		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
-		for (ShopArticleReportDto shopArticleReportDto : list) {
-			for (ShopDetail shop : list_shopDetail) {
-				if(shop.getId().equals(shopArticleReportDto.getShopId())){
-					int totalNum = orderMapper.selectShopArticleNum(begin,end,shop.getId());
-					shopArticleReportDto.setTotalNum(totalNum);
-					shopArticleReportDto.setShopName(shop.getName());
+		
+		List<ShopArticleReportDto> listArticles = new ArrayList<>();
+		
+		for(ShopDetail shop : list_shopDetail){
+			ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
+			listArticles.add(st);
+		}
+		
+		if(!list.isEmpty()){
+			for (ShopArticleReportDto shopArticleReportDto : listArticles) {
+				for (ShopArticleReportDto shopArticleReportDto2 : list) {
+					if(shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())){
+						totalNum = orderMapper.selectShopArticleNum(begin,end,shopArticleReportDto.getShopId());
+						shopArticleReportDto.setTotalNum(totalNum);
+						shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
+					}
 				}
+				temp = add(temp,shopArticleReportDto.getSellIncome());
 			}
-			temp = add(temp,shopArticleReportDto.getSellIncome());
+			
 		}
 		
-		for (ShopArticleReportDto shopArticleReportDto : list) {
-			double c = shopArticleReportDto.getSellIncome().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
-			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
-			String str = myformat.format(c);
-			str = str+"%";
-			shopArticleReportDto.setOccupy(str);
+		for (ShopArticleReportDto shopArticleReportDto : listArticles) {
+			if(shopArticleReportDto.getSellIncome().compareTo(BigDecimal.ZERO)>0){
+				double c = shopArticleReportDto.getSellIncome().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+				java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+				String str = myformat.format(c);
+				str = str+"%";
+				shopArticleReportDto.setOccupy(str);
+			}
 		}
 		
-		return list;
+		return listArticles;
 	}
 
 	private BigDecimal add(BigDecimal temp, BigDecimal sellIncome) {
@@ -1199,7 +1213,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		List<ArticleSellDto> list = orderMapper.selectBrandFamilyArticleSellByDateAndArticleFamilyId(brandId ,articleFamilyId, begin, end,sort);
 		//计算总菜品销售额
 		BigDecimal temp = BigDecimal.ZERO;
-		for (ArticleSellDto articleSellDto : list) {
+		
+		List<ArticleSellDto> articleList = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandId, begin, end, sort);
+		for (ArticleSellDto articleSellDto : articleList) {
 			temp = add(temp,articleSellDto.getSalles());
 		}
 		for (ArticleSellDto articleSellDto : list) {

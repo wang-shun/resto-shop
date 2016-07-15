@@ -295,14 +295,15 @@ $("#ExcelReport").click(function(){
 	var num = getNumActive()
 	 switch(num){
 	  case 1:
-		  debugger;
 		  //获取tr第一个td
 		  var selectValue = tb1.table().row().data().articleFamilyName;
+		 // var selectValue='';
 		  location.href="articleSell/brand_articlefamily_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
 		  break;
 		case 2:
 			 var selectValue = tb1.table().row().data().articleFamilyName;
-			location.href="articleSell/brand_article_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
+			// var selectValue='';
+			location.href="articleSell/brand_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
 		  break;
 	  }
 })

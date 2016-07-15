@@ -106,7 +106,11 @@ th {
 		columns : [
 			{ title : "品牌", data : "brandName" },                 
 			{ title : "已消费订单份数(份)", data : "orderNum" },
-			{ title : "已消费订单金额(元)", data : "payValue" }
+			{ 
+				title : "已消费订单金额(元)",
+				data : "payValue",
+				defaultContent:'0'	
+			}
 		]
 	});
 	
