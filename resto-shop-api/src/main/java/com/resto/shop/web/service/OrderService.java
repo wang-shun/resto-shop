@@ -189,14 +189,6 @@ public interface OrderService extends GenericService<Order, String> {
 			String articleFamilyId, String sort);
 
 
-	/**
-	 * 根据时间查询已消费订单的订单数目和订单总额
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId);
-
 
 	/**
 	 * 比较订单的店铺id 和 二维码的店铺id
@@ -244,4 +236,15 @@ public interface OrderService extends GenericService<Order, String> {
 	
 
 	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
+	
+	
+	/**
+	 * 查询订单数目和订单金额
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentBrandId
+	 * @return
+	 */
+	
+	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
 }

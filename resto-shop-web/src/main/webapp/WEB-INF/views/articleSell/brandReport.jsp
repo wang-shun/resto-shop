@@ -217,7 +217,7 @@ var tb2 = $("#articleSellTable").DataTable({
 			data : "salles",
 		},
 		{
-			title : "占比",
+			title : "销售占比",
 			data : "salesRatio",
 		},
 	],

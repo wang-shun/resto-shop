@@ -1063,14 +1063,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.selectShopArticleByDateAndArticleFamilyId(begin,end,shopId,articleFamilyId,sort);
 	}
 
-	@Override
-	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		return orderMapper.selectBytimeAndState(begin,end,brandId);
-	}
-
-
 
 	@Override
 	public Boolean checkShop(String orderId, String shopId) {
@@ -1227,6 +1219,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 		
 		return list;
+	}
+
+	@Override
+	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		//查询出所有店铺并设置默认值
+		List<ShopDetail> shopLists = shopDetailService.selectByBrandId(brandId);
+		List<OrderPayDto> orderList = new ArrayList<>();
+		DecimalFormat df = new DecimalFormat("0.00"); // 保留几位小数
+		for (ShopDetail shopDetail : shopLists) {
+			OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), new BigDecimal(df.format(0)), 0,new BigDecimal(df.format(0)));
+			orderList.add(ot);
+		}
+		//查询后台数据
+		List<OrderPayDto> list = orderMapper.selectMoneyAndNumByDate(begin,end,brandId);
+		
+		//如果查询出来有店铺数据则更新这个店铺的数据
+		for (OrderPayDto orderPayDto : list) {
+			for (OrderPayDto orderPayDto2 : orderList) {
+				if(orderPayDto.getShopDetailId().equals(orderPayDto2.getShopDetailId())){
+					orderPayDto2.setNumber(orderPayDto.getNumber());
+					orderPayDto2.setOrderMoney(orderPayDto.getOrderMoney());
+					BigDecimal v = new BigDecimal(orderPayDto2.getNumber());
+					//orderPayDto2.setAverage(orderPayDto2.getOrderMoney().divide(v).setScale(2, BigDecimal.ROUND_HALF_UP));
+					//theNum.divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP);
+					orderPayDto2.setAverage(orderPayDto2.getOrderMoney().divide(v,2,BigDecimal.ROUND_HALF_UP));
+				}
+			}
+		}
+		
+		return orderList;
 	}
 
 }

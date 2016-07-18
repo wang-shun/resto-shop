@@ -986,25 +986,6 @@ INNER JOIN tb_article_family f ON a.article_family_id = f.id and f.id=#{articleF
 order by ${sort}
 	</select>
 	
-<select id="selectBytimeAndState" resultType="com.resto.brand.web.dto.OrderPayDto">
-SELECT
-	SUM(oi.pay_value) payValue,
-	COUNT(oi.order_id) orderNum
-FROM
-	(
-		SELECT
-			pay_value,
-			order_id,
-			pay_time
-		FROM
-			tb_order_payment_item
-		WHERE
-		<![CDATA[ pay_time >= #{beginDate} and pay_time <= #{endDate}]]>
-	) AS oi
-LEFT JOIN tb_order o ON oi.order_id = o.id
-WHERE
-	o.brand_id = #{brandId}
-</select>
 
 
 
@@ -1084,10 +1065,8 @@ ORDER BY ${sort}
 </select>
 
 <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
-
-
 SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name articleFamilyName ,brand_report.salles,f.peference 
 		from
 		(
@@ -1138,7 +1117,17 @@ ORDER BY ${sort}
 
 </select>
 
-	
+
+<select id="selectMoneyAndNumByDate" resultType="com.resto.brand.web.dto.OrderPayDto">
+SELECT IFNULL(SUM(ap.order_money),0)orderMoney,IFNULL(COUNT(ap.id),0) number,ap.shop_detail_id   FROM
+(
+SELECT id ,shop_detail_id,order_money  from tb_order WHERE order_state in (2,10,11,12) and 
+<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and brand_id=#{brandId}
+ ) as ap
+GROUP BY ap.shop_detail_id
+
+</select>
+
 </mapper>
 
 
