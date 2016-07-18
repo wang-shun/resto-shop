@@ -69,6 +69,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<Order> selectHistoryOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
+	/**
+	 * 查询某天的异常订单
+	 * @param currentShopId
+	 * @param dateBegin
+	 * @param dateEnd
+	 * @return
+	 */
+	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
 	void clearPushOrder(String id, int notOrder);
 
 	void setOrderNumber(String orderId, String tableNumber);
@@ -204,5 +213,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyId")String articleFamilyId, @Param("beginDate")Date begin,
 			 @Param("endDate")Date end, @Param("sort") String sort);
-		
+
+	int setOrderPrintFail(String orderId);
 }

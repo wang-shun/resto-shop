@@ -88,6 +88,10 @@ public class OrderMessageListener implements MessageListener {
         return Action.CommitMessage;
     }
 
+
+
+
+
     private Action executeNoticeShareCustomer(Message message) throws UnsupportedEncodingException {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
         Customer customer = JSONObject.parseObject(msg, Customer.class);
@@ -122,13 +126,14 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
-        if (order.getOrderState() == OrderState.PAYMENT &&
-                order.getProductionStatus() == ProductionStatus.PRINTED) {
-            log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
+
+        if (orderService.checkRefundLimit(order)) {
             orderService.autoRefundOrder(obj.getString("orderId"));
+            log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
+
         return Action.CommitMessage;
 
 

@@ -403,6 +403,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 	}
 
+
+	@Override
+	public Boolean checkRefundLimit(Order order) {
+		Integer orderMode = order.getOrderMode();
+		Boolean result = false;
+		switch (orderMode){
+			case ShopMode.MANUAL_ORDER: //验证码下单
+			case ShopMode.CALL_NUMBER: //电视叫号
+			case ShopMode.TABLE_MODE: //坐下点餐
+				result =  ( order.getOrderState().equals(OrderState.CONFIRM) &&
+						order.getProductionStatus().equals(ProductionStatus.NOT_PRINT) )
+						|| (order.getOrderState().equals(OrderState.PAYMENT) &&
+						order.getProductionStatus().equals(ProductionStatus.NOT_ORDER));
+				break;
+			default:
+				log.info("未知的店铺模式:" + orderMode);
+				break;
+		}
+
+		return result;
+	}
+
 	@Override
 	public boolean autoRefundOrder(String orderId) {
 		Order order = selectById(orderId);
@@ -792,6 +814,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end  = DateUtil.getDateEnd(date);
 	 return  orderMapper.selectHistoryOrderList(currentShopId,begin,end);
 		
+	}
+
+	@Override
+	public List<Order> selectErrorOrderList(String currentShopId, Date date) {
+		Date begin = DateUtil.getDateBegin(date);
+		Date end  = DateUtil.getDateEnd(date);
+		return  orderMapper.selectErrorOrderList(currentShopId,begin,end);
 	}
 
 	@Override
@@ -1213,4 +1242,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return list;
 	}
 
+	@Override
+	public Boolean setOrderPrintFail(String orderId) {
+		return orderMapper.setOrderPrintFail(orderId) > 0;
+	}
 }

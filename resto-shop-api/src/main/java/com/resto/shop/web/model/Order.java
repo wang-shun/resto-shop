@@ -103,10 +103,20 @@ public class Order {
      * 用于保存 店铺的名称
      */
     private String shopName;
+
+    private Boolean timeOut;
     
     //新增內容
     private Integer level; //查询评价的的等級
-    
+
+    final public Boolean getTimeOut() {
+        return timeOut;
+    }
+
+    final public void setTimeOut(Boolean timeOut) {
+        this.timeOut = timeOut;
+    }
+
     public Integer getLevel() {
 		return level;
 	}

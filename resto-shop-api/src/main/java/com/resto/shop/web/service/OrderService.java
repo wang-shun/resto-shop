@@ -41,6 +41,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public boolean autoRefundOrder(String string);
 
+	Boolean checkRefundLimit(Order order);
+
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
 	public Order pushOrder(String orderId) throws AppException;
@@ -80,6 +82,9 @@ public interface OrderService extends GenericService<Order, String> {
 	public Order getOrderInfo(String orderId);
 
 	public List<Order> selectHistoryOrderList(String currentShopId, Date date);
+
+	public List<Order> selectErrorOrderList(String currentShopId, Date date);
+
 
 	public Order cancelOrderPos(String orderId) throws AppException;
 
@@ -244,4 +249,6 @@ public interface OrderService extends GenericService<Order, String> {
 	
 
 	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
+
+	Boolean setOrderPrintFail(String orderId);
 }

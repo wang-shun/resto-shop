@@ -26,5 +26,10 @@ public class ProductionStatus {
 	 */
 	public final static int GET_IT=4;
 
+	/**
+	 * 已下单未打印
+	 */
+	public final static int NOT_PRINT = 5;
+
 	
 }

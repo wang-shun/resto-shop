@@ -114,6 +114,16 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void checkPlaceOrderMessage(Order order,Long delayTime,Long limitTime) {
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		obj.put("timeOut",delayTime.equals(limitTime));
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CHECK_ORDER, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+
 
 	public static void sendNoticeOrderMessage(Order order) {
 		JSONObject obj  = new JSONObject();
