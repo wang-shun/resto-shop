@@ -648,7 +648,7 @@
 		shop_detail_id=#{shopId}
 		AND
 		<![CDATA[ push_order_time>#{dateBegin} AND push_order_time<#{dateEnd}]]>
-		and production_status = 5
+		and production_status = 5 and order_state != 9 and print_times = 0
 		order by push_order_time DESC;
 	</select>
 
