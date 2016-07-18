@@ -1156,7 +1156,7 @@ ORDER BY ${sort}
 
 	<update id="setOrderPrintFail">
 		update tb_order
-		set product_status = 5
+		set production_status = 5
 		where id = #{orderId}
 	</update>
 
