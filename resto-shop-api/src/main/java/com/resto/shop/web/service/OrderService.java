@@ -270,4 +270,6 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
 			String sort);
+
+	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
 }

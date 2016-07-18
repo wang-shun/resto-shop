@@ -29,17 +29,6 @@ th {
 		</div>
 	</div>
 	<br /> <br />
-	<!-- 品牌订单列表 -->
-	<div class="panel panel-info">
-		<div class="panel-heading text-center" style="font-size: 22px;">
-			<strong>品牌订单列表</strong>
-		</div>
-		<div class="panel-body">
-			<table class="table table-striped table-bordered table-hover" id="brandOrder">
-			</table>
-		</div>
-	</div>
-
 	<!-- 店铺订单列表  -->
 	<div class="panel panel-info">
 		<div class="panel-heading text-center" style="font-size: 22px;">
@@ -50,29 +39,6 @@ th {
 			</table>
 		</div>
 	</div>
-
-	<!-- 报表详情 -->
-<!-- 	<div class="modal fade bs-example-modal-lg" id="reportModal" -->
-<!-- 		tabindex="-1" role="dialog" aria-labelledby="reportModal" -->
-<!-- 		data-backdrop="static"> -->
-<!-- 		<div class="modal-dialog modal-lg"> -->
-<!-- 			<div class="modal-content"> -->
-<!-- 				<div class="modal-header"> -->
-<!-- 					<button type="button" class="close" data-dismiss="modal" -->
-<!-- 						aria-label="Close"> -->
-<%-- 						<span aria-hidden="true">&times;</span> --%>
-<!-- 					</button> -->
-<!-- 					<h4 class="modal-title text-center"> -->
-<%-- 						<strong>菜品销售详情</strong> --%>
-<!-- 					</h4> -->
-<!-- 				</div> -->
-<!-- 				<div class="modal-body"></div> -->
-<!-- 				<div class="modal-footer"> -->
-<!-- 					<button type="button" class="btn btn-info btn-block" @click="closeModal">关闭</button> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
-<!-- 		</div> -->
-<!-- 	</div> -->
 
 </div>
 <script>
@@ -88,34 +54,14 @@ th {
 		startView : "month",
 		language : "zh-CN"
 	});
+	debugger;
 
-	//文本框默认值
-	$('.form_datetime').val(new Date().format("yyyy-MM-dd"));
+	$("#beginDate").val("${beginDate}");
+	$("#endDate").val("${endDate}");
+
+	var shopId = "${shopId}"
 	
-	var tb1 = $("#brandOrder").DataTable({
-		dom:'',
-		ajax : {
-			url : "orderReport/orderPaymentItems",   
-			dataSrc : "",
-			data:function(d){
-				d.beginDate=$("#beginDate").val();
-				d.endDate=$("#endDate").val();
-				return d;
-			}
-		},
-		columns : [
-			{ title : "品牌", data : "brandName" },                 
-			{ title : "已消费订单份数(份)", data : "orderNum" },
-			{ 
-				title : "已消费订单金额(元)",
-				data : "payValue",
-				defaultContent:'0'	
-			}
-		]
-	});
-	
-	
-	var tb2 = $("#shopOrder").DataTable({
+	var tb1 = $("#shopOrder").DataTable({
 		dom:'',
 		ajax : {
 			url : "orderReport/AllOrder",   
@@ -123,6 +69,7 @@ th {
 			data:function(d){
 				d.beginDate=$("#beginDate").val();
 				d.endDate=$("#endDate").val();
+				d.shopId = shopId;
 				return d;
 			}
 		},
@@ -130,6 +77,7 @@ th {
 			{ 
 				title : "店铺",
 				data : "shopName" 
+				
 			},                 
 			{ 
 				title : "订单编号",

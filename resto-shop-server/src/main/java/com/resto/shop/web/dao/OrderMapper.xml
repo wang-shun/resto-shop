@@ -1179,6 +1179,23 @@ ORDER BY ${sort}
 
 </select>
 
+<select id="selectListByTime" resultType="com.resto.shop.web.model.Order">
+	SELECT
+	o.id,
+	o.create_time,
+	o.distribution_mode_id,
+	o.ver_code,
+	o.order_money,
+	o.order_state,
+	c.telephone,
+	p. LEVEL
+FROM
+	tb_order o
+LEFT JOIN tb_customer c ON o.customer_id = c.id
+LEFT JOIN tb_appraise p ON o.id = p.order_id
+where 
+<![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+</select>
 
 </mapper>
 
