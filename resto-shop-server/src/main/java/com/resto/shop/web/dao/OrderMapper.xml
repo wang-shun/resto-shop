@@ -764,7 +764,7 @@
 	<select id="selectArticleSumCountByData" resultType="Integer">
 		SELECT IFNULL(SUM(brand_article_report.brandSellNum),0) totalNum FROM
 (SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from
@@ -790,7 +790,7 @@
 	<!-- 品牌菜品销售 -->
 	<select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from
@@ -817,7 +817,7 @@
 	<!-- 品牌菜品销售 按菜品分类的数据 -->
 	<select id="selectBrandArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from
@@ -843,7 +843,7 @@
 		SELECT
 		shop_report.articleId,shop_report.shopSellNum,brand_report.brandSellNum,cast(shop_report.shopSellNum/brand_report.brandSellNum
 		as decimal(10,2)) salesRatio,
-		IFNULL(a.name,shop_report.article_name)
+		IFNULL(shop_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from (
@@ -877,9 +877,9 @@
 	<!-- 品牌菜品销售中 店铺菜品按菜品分类的数据   品牌端显示 -->
 	<select id="selectShopArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		SELECT
-		shop_report.articleId,shop_report.shopSellNum,brand_report.brandSellNum,cast(shop_report.shopSellNum/brand_report.brandSellNum
+		shop_report.articleId,shop_report.shopSellNum,shop_report.shopSellNum,cast(shop_report.shopSellNum/shop_report.shopSellNum
 		as decimal(10,2)) salesRatio,
-		IFNULL(a.name,shop_report.article_name)
+		IFNULL(shop_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from (
@@ -895,7 +895,7 @@
 		) as shop_report LEFT JOIN
 		(
 		SELECT
-		left(article_id,32) articleId ,SUM(count) brandSellNum ,article_name
+		left(article_id,32) articleId ,SUM(count) shopSellNum ,article_name
 		from tb_order_item where order_id in
 		(SELECT id from tb_order where
 		order_state in (2,10,11,12) and
@@ -917,8 +917,8 @@
 	shop_report.articleId,
 	shop_report.shopSellNum,
 	IFNULL(
-		a. NAME,
-		shop_report.article_name
+		shop_report.article_name,
+		a. NAME
 	) articleName,
 	a.article_family_id articleFamilyId,
 	f. NAME articleFamilyName
@@ -955,8 +955,8 @@ order by ${sort}
 	shop_report.articleId,
 	shop_report.shopSellNum,
 	IFNULL(
-		a. NAME,
-		shop_report.article_name
+		shop_report.article_name,
+		a. NAME
 	) articleName,
 	a.article_family_id articleFamilyId,
 	f. NAME articleFamilyName
@@ -1011,7 +1011,7 @@ GROUP BY o.shop_detail_id
 
 SELECT IFNULL(SUM(shop_article_report.shopSellNum),0) totalNum FROM
 (SELECT
-		shop_report.articleId,shop_report.shopSellNum,IFNULL(a.name,shop_report.article_name)
+		shop_report.articleId,shop_report.shopSellNum,IFNULL(shop_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name
 		articleFamilyName
 		from
@@ -1040,7 +1040,7 @@ SELECT IFNULL(SUM(shop_article_report.shopSellNum),0) totalNum FROM
 SELECT SUM(ap.brandSellNum)brandSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference from 
 (
 SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name articleFamilyName ,brand_report.salles,f.peference 
 		
 		from
@@ -1093,7 +1093,7 @@ ORDER BY ${sort}
 SELECT SUM(ap.brandSellNum)brandSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference ,ap.articleName from 
 (
 SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
+		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
 		articleName,a.article_family_id articleFamilyId,f.name articleFamilyName ,brand_report.salles,f.peference 
 		
 		from
@@ -1127,6 +1127,58 @@ SELECT id ,shop_detail_id,order_money  from tb_order WHERE order_state in (2,10,
 GROUP BY ap.shop_detail_id
 
 </select>
+
+<select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+
+SELECT SUM(ap.shopSellNum)shopSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference from 
+(
+SELECT
+		shop_report.articleId,shop_report.shopSellNum,IFNULL(shop_report.article_name,a.name)
+		articleName,a.article_family_id articleFamilyId,f.name articleFamilyName ,shop_report.salles,f.peference 
+		from
+		(
+		SELECT left(article_id,32) articleId ,SUM(count)shopSellNum, SUM(final_price) salles
+		,article_name from tb_order_item where order_id in
+		(SELECT
+		id from tb_order  where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and shop_detail_id=#{shopId}
+		)
+		GROUP BY
+		left(article_id,32)
+		) as shop_report
+		LEFT JOIN tb_article a on
+		a.id = shop_report.articleId LEFT JOIN
+		tb_article_family f on
+		a.article_family_id = f.id 
+) as ap GROUP BY ap.articleFamilyId
+ORDER BY ${sort}
+
+</select>
+
+
+<select id="selectShopArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+SELECT
+		shop_report.articleId,shop_report.shopSellNum,IFNULL(shop_report.article_name,a.name)
+		articleName,a.article_family_id articleFamilyId,f.name articleFamilyName ,shop_report.salles,f.peference 
+		from
+		(
+		SELECT left(article_id,32) articleId ,SUM(count)shopSellNum, SUM(final_price) salles
+		,article_name from tb_order_item where order_id in
+		(SELECT
+		id from tb_order  where order_state in (2,10,11,12) and
+		<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and shop_detail_id=#{shopId}
+		)
+		GROUP BY
+		left(article_id,32)
+		) as shop_report
+		LEFT JOIN tb_article a on
+		a.id = shop_report.articleId LEFT JOIN
+		tb_article_family f on
+		a.article_family_id = f.id 
+ORDER BY ${sort}
+
+</select>
+
 
 </mapper>
 

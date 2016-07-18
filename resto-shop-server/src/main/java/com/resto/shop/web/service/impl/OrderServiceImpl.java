@@ -1254,4 +1254,61 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderList;
 	}
 
+	@Override
+	public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="ap.peference";
+		}else if("desc".equals(sort)){
+			sort="ap.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="ap.shopSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDateAndFamilyId(shopId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		return list;
+	}
+
+	@Override
+	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
+			String sort) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		if("0".equals(sort)){
+			sort="f.peference , a.sort";
+		}else if("desc".equals(sort)){
+			sort="shop_report.shopSellNum desc";
+		}else if ("asc".equals(sort)){
+			sort="shop_report.shopSellNum asc";
+		}
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDateAndId(shopId, begin, end,sort);
+		//计算总菜品销售额
+		BigDecimal temp = BigDecimal.ZERO;
+		for (ArticleSellDto articleSellDto : list) {
+			temp = add(temp,articleSellDto.getSalles());
+		}
+		for (ArticleSellDto articleSellDto : list) {
+			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
+			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
+			String str = myformat.format(c);
+			str = str+"%";
+			articleSellDto.setSalesRatio(str);
+		}
+		
+		return list;
+	}
+
 }

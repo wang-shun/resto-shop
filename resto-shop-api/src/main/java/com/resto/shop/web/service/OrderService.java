@@ -247,4 +247,27 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	
 	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
+
+	
+	/**
+	 * 根据时间 查询 当前选择店铺已完成的订单的 菜品分类销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	
+	public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId,
+			String sort);
+	
+	
+	/**
+	 * 根据时间 查询 选中店铺已完成的订单的 菜品销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	
+	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
+			String sort);
 }
