@@ -263,6 +263,7 @@ function isEmpty(str){
 
 //添加分类下拉框
 var select = $(select);
+var selectValue='';
 function appendSelect(api){
 	api.columns().indexes().flatten().each(function (i) {
         if (i == 0) {
@@ -295,9 +296,15 @@ $("#ExcelReport").click(function(){
 	var num = getNumActive()
 	 switch(num){
 	  case 1:
-		  //获取tr第一个td
-		  var selectValue = tb1.table().row().data().articleFamilyName;
-		 // var selectValue='';
+		  var length = tb1.table().body().childElementCount
+		  var selectValue='';
+		  if(length==1){
+			  //获取选择的值
+			  var c = $(tb1.table().body());
+			  c.attr("id","articleTableFamily");
+			  selectValue = $("#articleTableFamily tr td").html();
+		  }
+		  console.log(selectValue);
 		  location.href="articleSell/brand_articlefamily_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&selectValue="+selectValue+"&&sort="+sort;
 		  break;
 		case 2:

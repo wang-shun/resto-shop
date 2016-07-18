@@ -762,7 +762,7 @@
 		and closed=0 ORDER BY print_order_time
 	</select>
 	<select id="selectArticleSumCountByData" resultType="Integer">
-		SELECT SUM(brand_article_report.brandSellNum) totalNum FROM
+		SELECT IFNULL(SUM(brand_article_report.brandSellNum),0) totalNum FROM
 (SELECT
 		brand_report.articleId,brand_report.brandSellNum,IFNULL(a.name,brand_report.article_name)
 		articleName,a.article_family_id articleFamilyId,f.name
