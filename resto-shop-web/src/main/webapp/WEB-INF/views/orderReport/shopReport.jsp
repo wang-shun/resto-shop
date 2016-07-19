@@ -94,6 +94,7 @@ th {
 
 <script>
 	//时间插件
+
 	$('.form_datetime2').datetimepicker({
 		endDate : new Date(),
 		minView : "month",
@@ -110,138 +111,142 @@ th {
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
 	
-	 var tb1 = $("#shopOrder").DataTable({
-		ajax : {
-			url : "orderReport/AllOrder",   
-			dataSrc : "",
-			data:function(d){
-				d.beginDate=$("#beginDate2").val();
-				d.endDate=$("#endDate2").val();
-				d.shopId = shopId;
-				return d;
-			}
-		},
-		columns : [
-			{ 
-				title : "店铺",
-				data : "shopName" ,
-				
-			},                 
-			{ 
-				title : "订单编号",
-				data : "id" 
-			},
-			{ 
-				title : "下单时间", 
-				data : "createTime",
-				createdCell:function(td,tdData){
-					$(td).html( new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
-				}
-				
-			},
-			{ 
-				title : "就餐模式",
-			    data : "distributionModeId",
-			    createdCell:function(td,tdData){
-			    	switch(tdData)
-			    	{
-			    	case 1:
-			    	  $(td).html("堂吃");
-			    	  break;
-			    	case 2:
-			    	  $(td).html("自提外卖");
-			    	case 3:
-			    	  $(td).html("外带");
-			    	  break;
-			    	default:
-			    	 $(td).html("未知")
-			    	}
-			    	
-			    }
-			    
-			},
-			{ 
-			    title : "验证码", 
-			    data : "verCode" 
-			},
-			{
-				title : "手机号", 
-				data : "telephone" 
-			},
-			{ 
-				title : "订单金额", 
-				data : "orderMoney" 
-			},
-			{ 
-			  title : "评价", 
-			  data : "level" ,
-			  createdCell:function(td,tdData){
-				  switch(tdData)
-			    	{
-			    	case 5:
-			    	  $(td).html("非常满意");
-			    	  break;
-			    	case 4:
-			    	  $(td).html("基本满意");
-			    	case 3:
-			    	  $(td).html("一般");
-			    	  break;
-			    	case 2:
-			    	  $(td).html("差");
-			    	  break;
-			    	case 1:
-			    	  $(td).html("非常满意");
-			    	  break;
-			    	default:
-			    	 $(td).html("未评价")
-			    	}
-			  }
-			  
-			},
-			{
-			 title : "订单状态", 
-			 data : "orderState",
-			 createdCell:function(td,tdData){
-				  switch(tdData)
-			    	{
-			    	case 2:
-			    	  $(td).html("已付款");
-			    	  break;
-			    	case 9:
-			    	  $(td).html("基本满意");
-			    	case 3:
-			    	  $(td).html("已取消");
-			    	  break;
-			    	case 10:
-			    	  $(td).html("已确认");
-			    	  break;
-			    	case 11:
-			    	  $(td).html("已评价");
-			    	  break;
-			    	case 12:
-			    	  $(td).html("已分享");
-			    	  break;
-			    	default:
-			    	 $(td).html("未评价")
-			    	}
-			  }
-			  
-			 
-			 
-			 },
-			{
-			 title : "操作", 
-			 data : "id",
-			 createdCell:function(td,tdData){
-				 var button = $("<button class='btn'>点击查看详情</button>");
-					button.click(function(){
-						$("#orderShopdetail").modal();
-					});
-					$(td).html(button);
-			 }
-			 }
-		]
-	});
+		 var tb1 = $("#shopOrder").DataTable({
+				ajax : {
+					url : "orderReport/AllOrder",   
+					dataSrc : "",
+					data:function(d){
+						d.beginDate=$("#beginDate2").val();
+						d.endDate=$("#endDate2").val();
+						d.shopId = shopId;
+						return d;
+					}
+				},
+				columns : [
+					{ 
+						title : "店铺",
+						data : "shopName" ,
+						
+					},                 
+					{ 
+						title : "订单编号",
+						data : "id" 
+					},
+					{ 
+						title : "下单时间", 
+						data : "createTime",
+						createdCell:function(td,tdData){
+							$(td).html( new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
+						}
+						
+					},
+					{ 
+						title : "就餐模式",
+					    data : "distributionModeId",
+					    createdCell:function(td,tdData){
+					    	switch(tdData)
+					    	{
+					    	case 1:
+					    	  $(td).html("堂吃");
+					    	  break;
+					    	case 2:
+					    	  $(td).html("自提外卖");
+					    	case 3:
+					    	  $(td).html("外带");
+					    	  break;
+					    	default:
+					    	 $(td).html("未知")
+					    	}
+					    	
+					    }
+					    
+					},
+					{ 
+					    title : "验证码", 
+					    data : "verCode" 
+					},
+					{
+						title : "手机号", 
+						data : "telephone" 
+					},
+					{ 
+						title : "订单金额", 
+						data : "orderMoney" 
+					},
+					{ 
+					  title : "评价", 
+					  data : "level" ,
+					  createdCell:function(td,tdData){
+						  switch(tdData)
+					    	{
+					    	case 5:
+					    	  $(td).html("非常满意");
+					    	  break;
+					    	case 4:
+					    	  $(td).html("基本满意");
+					    	case 3:
+					    	  $(td).html("一般");
+					    	  break;
+					    	case 2:
+					    	  $(td).html("差");
+					    	  break;
+					    	case 1:
+					    	  $(td).html("非常满意");
+					    	  break;
+					    	default:
+					    	 $(td).html("未评价")
+					    	}
+					  }
+					  
+					},
+					{
+					 title : "订单状态", 
+					 data : "orderState",
+					 createdCell:function(td,tdData){
+						  switch(tdData)
+					    	{
+					    	case 2:
+					    	  $(td).html("已付款");
+					    	  break;
+					    	case 9:
+					    	  $(td).html("基本满意");
+					    	case 3:
+					    	  $(td).html("已取消");
+					    	  break;
+					    	case 10:
+					    	  $(td).html("已确认");
+					    	  break;
+					    	case 11:
+					    	  $(td).html("已评价");
+					    	  break;
+					    	case 12:
+					    	  $(td).html("已分享");
+					    	  break;
+					    	default:
+					    	 $(td).html("未评价")
+					    	}
+					  }
+					  
+					 
+					 
+					 },
+					{
+					 title : "操作", 
+					 data : "id",
+					 createdCell:function(td,tdData){
+						 var button = $("<button class='btn'>点击查看详情</button>");
+							button.click(function(){
+								$("#orderShopdetail").modal();
+							});
+							$(td).html(button);
+					 }
+					 }
+				]
+			});
+		
+	
+		
+	
 	 
 	 //查询
 	 $("#searchInfo2").click(function(){
