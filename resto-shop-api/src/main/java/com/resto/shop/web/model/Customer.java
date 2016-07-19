@@ -209,4 +209,32 @@ public class Customer implements Serializable{
 	public void setShareCustomer(String shareCustomer) {
 		this.shareCustomer = shareCustomer;
 	}
+
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Customer{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", wechatId='").append(wechatId).append('\'');
+        sb.append(", nickname='").append(nickname).append('\'');
+        sb.append(", telephone='").append(telephone).append('\'');
+        sb.append(", headPhoto='").append(headPhoto).append('\'');
+        sb.append(", defaultDeliveryPoint=").append(defaultDeliveryPoint);
+        sb.append(", isBindPhone=").append(isBindPhone);
+        sb.append(", regiestTime=").append(regiestTime);
+        sb.append(", firstOrderTime=").append(firstOrderTime);
+        sb.append(", lastLoginTime=").append(lastLoginTime);
+        sb.append(", accountId='").append(accountId).append('\'');
+        sb.append(", brandId='").append(brandId).append('\'');
+        sb.append(", sex=").append(sex);
+        sb.append(", province='").append(province).append('\'');
+        sb.append(", city='").append(city).append('\'');
+        sb.append(", country='").append(country).append('\'');
+        sb.append(", account=").append(account);
+        sb.append(", lastOrderShop='").append(lastOrderShop).append('\'');
+        sb.append(", newNoticeTime=").append(newNoticeTime);
+        sb.append(", shareCustomer='").append(shareCustomer).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
