@@ -1,3 +1,4 @@
+
 package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
@@ -104,14 +105,26 @@ public class Order {
      */
     private String shopName;
     
-    //新增內容
-    private Integer level; //查询评价的的等級
+    //
+    private String telephone;
     
-    public Integer getLevel() {
+    public String getTelephone() {
+		return telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	//新增內容
+    private int level; //查询评价的的等級
+    
+	
+	public int getLevel() {
 		return level;
 	}
 
-	public void setLevel(Integer level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
 

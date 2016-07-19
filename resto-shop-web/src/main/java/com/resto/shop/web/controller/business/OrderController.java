@@ -115,7 +115,15 @@ public class OrderController extends GenericController{
 	@RequestMapping("AllOrder")
 	@ResponseBody
 	public List<Order> selectAllOrder(String beginDate,String endDate,String shopId){
-		return orderService.selectListByTime(beginDate,endDate,shopId);
+		//return orderService.selectListByTime(beginDate,endDate,shopId);
+		//查询店铺名称
+		ShopDetail shop = shopDetailService.selectById(shopId);
+		
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
+		for (Order order : list) {
+			order.setShopName(shop.getName());
+		}
+		return list;
 	}
 	
 	

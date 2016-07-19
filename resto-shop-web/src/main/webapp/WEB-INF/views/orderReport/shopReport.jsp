@@ -6,7 +6,6 @@ th {
 	width: 30%;
 }
 </style>
-<div id="control">
 	<h2 class="text-center">
 		<strong>订单列表</strong>
 	</h2>
@@ -15,16 +14,15 @@ th {
 		<div class="col-md-12">
 			<form class="form-inline">
 				<div class="form-group" style="margin-right: 50px;">
-					<label for="beginDate">开始时间：</label> <input type="text"
-						class="form-control form_datetime" id="beginDate"
-						readonly="readonly">
+					<label for="beginDate2">开始时间：</label> <input type="text"
+						class="form-control form_datetime2" id="beginDate2" readonly="readonly">
 				</div>
 				<div class="form-group" style="margin-right: 50px;">
-					<label for="endDate">结束时间：</label> <input type="text"
-						class="form-control form_datetime" id="endDate"
+					<label for="endDate2">结束时间：</label> <input type="text"
+						class="form-control form_datetime2" id="endDate2" 
 						readonly="readonly">
 				</div>
-				<button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
+				<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
 			</form>
 		</div>
 	</div>
@@ -39,11 +37,64 @@ th {
 			</table>
 		</div>
 	</div>
+	
+	<!-- 查看 订单的详细信息-->
+	<div class="modal fade" id="orderShopdetail" tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title text-center"><strong>订单详情</strong></h4>
+	      </div>
+	      <div class="modal-body">
+	      	<dl class="dl-horizontal">
+				<dt>店铺名称：</dt><dd id="shopName"></dd><br/>
+				<dt>订单编号：</dt><dd id="orderNumber"></dd><br/>
+				<dt>订单时间：</dt><dd id="createTime"></dd><br/>
+				<dt>就餐模式：</dt><dd id="distributionMode"></dd><br/>
+				<dt>验证码：</dt><dd id="verCode"></dd><br/>
+				<dt>手机号：</dt><dd id="telePhone"></dd><br/>
+				<dt>订单金额：</dt><dd id="orderMoney"></dd><br/>
+				<dt>评价：</dt><dd id="appraise"></dd><br/>
+				<dt>评价内容：</dt><dd id="content"></dd><br/>
+				<dt>状态：</dt><dd id="orderState"></dd><br/>
+			</dl>
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>餐品类型</th>
+						<th>餐品类别</th>
+						<th>餐品名称</th>
+						<th>餐品单价(元)</th>
+						<th>餐品数量</th>
+						<th>小计(元)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="shop in shopOrderList">
+						<td><strong>{{shop.shopName}}</strong></td>
+						<td>{{shop.number}}</td>	
+						<td>{{shop.orderMoney}}</td>
+						<td>{{shop.average}}</td>
+						<td>1</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
+	        <button type="button" class="btn btn-danger" data-dismiss="modal">退款</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
 
-</div>
 <script>
 	//时间插件
-	$('.form_datetime').datetimepicker({
+	$('.form_datetime2').datetimepicker({
 		endDate : new Date(),
 		minView : "month",
 		maxView : "month",
@@ -54,21 +105,18 @@ th {
 		startView : "month",
 		language : "zh-CN"
 	});
-	debugger;
-
-	$("#beginDate").val("${beginDate}");
-	$("#endDate").val("${endDate}");
-
-	var shopId = "${shopId}"
 	
-	var tb1 = $("#shopOrder").DataTable({
-		dom:'',
+	var shopId = "${shopId}"
+	$("#beginDate2").val("${beginDate}");
+	$("#endDate2").val("${endDate}");
+	
+	 var tb1 = $("#shopOrder").DataTable({
 		ajax : {
 			url : "orderReport/AllOrder",   
 			dataSrc : "",
 			data:function(d){
-				d.beginDate=$("#beginDate").val();
-				d.endDate=$("#endDate").val();
+				d.beginDate=$("#beginDate2").val();
+				d.endDate=$("#endDate2").val();
 				d.shopId = shopId;
 				return d;
 			}
@@ -76,7 +124,7 @@ th {
 		columns : [
 			{ 
 				title : "店铺",
-				data : "shopName" 
+				data : "shopName" ,
 				
 			},                 
 			{ 
@@ -85,15 +133,36 @@ th {
 			},
 			{ 
 				title : "下单时间", 
-				data : "createTime" 
+				data : "createTime",
+				createdCell:function(td,tdData){
+					$(td).html( new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
+				}
+				
 			},
 			{ 
 				title : "就餐模式",
-			    data : "distributionModeId"
+			    data : "distributionModeId",
+			    createdCell:function(td,tdData){
+			    	switch(tdData)
+			    	{
+			    	case 1:
+			    	  $(td).html("堂吃");
+			    	  break;
+			    	case 2:
+			    	  $(td).html("自提外卖");
+			    	case 3:
+			    	  $(td).html("外带");
+			    	  break;
+			    	default:
+			    	 $(td).html("未知")
+			    	}
+			    	
+			    }
+			    
 			},
 			{ 
 			    title : "验证码", 
-			    data : "vercode" 
+			    data : "verCode" 
 			},
 			{
 				title : "手机号", 
@@ -101,21 +170,89 @@ th {
 			},
 			{ 
 				title : "订单金额", 
-				data : "paymentAmount" 
+				data : "orderMoney" 
 			},
 			{ 
 			  title : "评价", 
-			  data : "level" 
+			  data : "level" ,
+			  createdCell:function(td,tdData){
+				  switch(tdData)
+			    	{
+			    	case 5:
+			    	  $(td).html("非常满意");
+			    	  break;
+			    	case 4:
+			    	  $(td).html("基本满意");
+			    	case 3:
+			    	  $(td).html("一般");
+			    	  break;
+			    	case 2:
+			    	  $(td).html("差");
+			    	  break;
+			    	case 1:
+			    	  $(td).html("非常满意");
+			    	  break;
+			    	default:
+			    	 $(td).html("未评价")
+			    	}
+			  }
+			  
 			},
 			{
 			 title : "订单状态", 
-			 data : "orderState"
+			 data : "orderState",
+			 createdCell:function(td,tdData){
+				  switch(tdData)
+			    	{
+			    	case 2:
+			    	  $(td).html("已付款");
+			    	  break;
+			    	case 9:
+			    	  $(td).html("基本满意");
+			    	case 3:
+			    	  $(td).html("已取消");
+			    	  break;
+			    	case 10:
+			    	  $(td).html("已确认");
+			    	  break;
+			    	case 11:
+			    	  $(td).html("已评价");
+			    	  break;
+			    	case 12:
+			    	  $(td).html("已分享");
+			    	  break;
+			    	default:
+			    	 $(td).html("未评价")
+			    	}
+			  }
+			  
+			 
+			 
 			 },
 			{
 			 title : "操作", 
-			 data : "id"
+			 data : "id",
+			 createdCell:function(td,tdData){
+				 var button = $("<button class='btn'>点击查看详情</button>");
+					button.click(function(){
+						$("#orderShopdetail").modal();
+					});
+					$(td).html(button);
+			 }
 			 }
 		]
 	});
+	 
+	 //查询
+	 $("#searchInfo2").click(function(){
+		 var beginDate = $("#beginDate2").val();
+		 var endDate = $("#endDate2").val();
+		 var data = {"beginDate":beginDate,"endDate":endDate,"shopId":shopId};
+		 tb1.ajax.reload();
+		 toastr.success("查询成功");
+	 })
+	 
+	 
+	 
 
 </script>

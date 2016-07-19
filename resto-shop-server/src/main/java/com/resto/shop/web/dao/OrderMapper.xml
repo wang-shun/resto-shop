@@ -1188,11 +1188,11 @@ ORDER BY ${sort}
 	o.order_money,
 	o.order_state,
 	c.telephone,
-	p. LEVEL
+	a.level
 FROM
 	tb_order o
 LEFT JOIN tb_customer c ON o.customer_id = c.id
-LEFT JOIN tb_appraise p ON o.id = p.order_id
+LEFT JOIN tb_appraise a ON o.id = a.order_id
 where 
 <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
 </select>

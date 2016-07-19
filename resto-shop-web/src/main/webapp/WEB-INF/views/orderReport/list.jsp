@@ -104,7 +104,6 @@ $('.form_datetime').datetimepicker({
 var vueObj =  new Vue({
 	el:"#control",
 	data:{
-		
 		shopOrderList : [],
 		searchDate : {
 			beginDate : "",
@@ -141,7 +140,7 @@ var vueObj =  new Vue({
 		},
 		openModal : function(url, modalTitle,shopId) {
 			$.post(url, this.getDate(shopId),function(result) {
-				console.log(result)
+				//console.log(result)
 				var modal = $("#reportModal");
 				modal.find(".modal-body").html(result);
 				modal.find(".modal-title > strong").html(modalTitle);
