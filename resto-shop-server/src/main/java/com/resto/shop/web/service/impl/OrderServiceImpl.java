@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.ArrayList;
@@ -955,16 +956,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0asc".equals(sort)){
-			sort="f.peference ,a.sort";
+			sort="r.peference ,r.sort";
 		}else if("2".equals(sort.substring(0, 1))){
-			sort="shop_report.shopSellNum"+" "+sort.substring(1, sort.length());
+			sort="r.shopSellNum"+" "+sort.substring(1, sort.length());
 		}else if("3".equals(sort.subSequence(0, 1))){
-			sort="brand_report.brandSellNum"+" "+sort.substring(1,sort.length());
-		}else if("4".equals(sort.substring(0,1))){
-			sort="salesRatio"+" "+sort.substring(1,sort.length());
+			sort="r.brandSellNum"+" "+sort.substring(1,sort.length());
 		}
+		ShopDetail shop = shopDetailService.selectById(shopId);
 		
-		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,sort);
+		
+//		else if("4".equals(sort.substring(0,1))){
+//			sort="salesRatio"+" "+sort.substring(1,sort.length());
+//		}
+		
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,shop.getBrandId(),sort);
 		return list;
 	}
 
@@ -1120,40 +1125,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
-		BigDecimal temp = BigDecimal.ZERO;
-		int totalNum =0;
 		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
-
 		List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
 		for(ShopDetail shop : list_shopDetail){
 			ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
 			listArticles.add(st);
 		}
+		
+		BigDecimal sum = new BigDecimal(0);
+		for (ShopArticleReportDto shopArticleReportDto2 : list) {
+			sum = sum.add(shopArticleReportDto2.getSellIncome());
+		}
+		
 
 		if(!list.isEmpty()){
 			for (ShopArticleReportDto shopArticleReportDto : listArticles) {
 				for (ShopArticleReportDto shopArticleReportDto2 : list) {
 					if(shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())){
-						totalNum = orderMapper.selectShopArticleNum(begin,end,shopArticleReportDto.getShopId());
-						shopArticleReportDto.setTotalNum(totalNum);
 						shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
+						shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
+						BigDecimal current = shopArticleReportDto2.getSellIncome();
+						
+						String occupy =  current == null ? "0" : current.divide(sum,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))
+								.toString();
+						shopArticleReportDto.setOccupy(occupy + "%");
 					}
 				}
-				temp = add(temp,shopArticleReportDto.getSellIncome());
 			}
 
 		}
 		
-		for (ShopArticleReportDto shopArticleReportDto : listArticles) {
-			if(shopArticleReportDto.getSellIncome().compareTo(BigDecimal.ZERO)>0){
-				double c = shopArticleReportDto.getSellIncome().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
-				java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
-				String str = myformat.format(c);
-				str = str+"%";
-				shopArticleReportDto.setOccupy(str);
-			}
-		}
+		
 		
 		return listArticles;
 	}
@@ -1168,11 +1171,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="ap.peference";
+			sort="r.peference";
 		}else if("desc".equals(sort)){
-			sort="ap.brandSellNum desc";
+			sort="r.brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="ap.brandSellNum asc";
+			sort="r.brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandid, begin, end,sort);
 		//计算总菜品销售额
@@ -1197,11 +1200,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="f.peference , a.sort";
+			sort="r.peference , r.sort";
 		}else if("desc".equals(sort)){
-			sort="brand_report.brandSellNum desc";
+			sort="r.brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="brand_report.brandSellNum asc";
+			sort="r.brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
 		//计算总菜品销售额
@@ -1365,6 +1368,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		return orderMapper.selectBytimeAndState(begin,end,brandId);
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
 	}
 
 }

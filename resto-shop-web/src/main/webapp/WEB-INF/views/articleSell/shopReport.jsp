@@ -91,13 +91,13 @@ var shopTable = $("#shopTable").DataTable({
 			title : "品牌菜品总销量(份)",
 			data : "brandSellNum",
 		},                 
-		{                 
-			title : "销售占比",
-			data : "salesRatio",
-			createdCell:function(td,tdData){
-				$(td).html((tdData*100).toFixed(2)+"%");
-			}
-		},
+// 		{                 
+// 			title : "销售占比",
+// 			data : "salesRatio",
+// 			createdCell:function(td,tdData){
+// 				$(td).html((tdData*100).toFixed(2)+"%");
+// 			}
+// 		},
 	],
 	initComplete: function () {//列筛选
 		tbApi = this.api();
