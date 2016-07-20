@@ -92,8 +92,13 @@ public class Order {
 
     private Date lastOrderTime;
     
+    //顾客
     private Customer customer;
     
+    //评价
+    private Appraise appraise;
+
+
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
@@ -105,23 +110,27 @@ public class Order {
     private String shopName;
 
     private Boolean timeOut;
-    
-    //新增內容
-    private Integer level; //查询评价的的等級
 
-    final public Boolean getTimeOut() {
-        return timeOut;
-    }
+    //
+    private String telephone;
 
-    final public void setTimeOut(Boolean timeOut) {
-        this.timeOut = timeOut;
-    }
+    public String getTelephone() {
+		return telephone;
+	}
 
-    public Integer getLevel() {
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	//新增內容
+    private int level; //查询评价的的等級
+
+
+	public int getLevel() {
 		return level;
 	}
 
-	public void setLevel(Integer level) {
+	public void setLevel(int level) {
 		this.level = level;
 	}
 
@@ -468,4 +477,15 @@ public class Order {
 	public void setLastOrderTime(Date lastOrderTime) {
 		this.lastOrderTime = lastOrderTime;
 	}
+
+	public Appraise getAppraise() {
+		return appraise;
+	}
+
+	public void setAppraise(Appraise appraise) {
+		this.appraise = appraise;
+	}
+
+
+
 }

@@ -179,16 +179,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<ArticleSellDto> selectShopArticleByDateAndArticleFamilyId(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("shopId")String shopId,
 			@Param("articleFamilyId")String articleFamilyId,@Param("sort") String sort);
-	
-	/**
-	 * 查询已消费订单的订单数目和订单总额
-	 * @param begin
-	 * @param end
-	 * @param brandId
-	 * @return
-	 */
-	OrderPayDto selectBytimeAndState(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
-	
+
 	/**
 	 * 查询品牌下所有店铺的菜品销售情况
 	 * @param beginDate
@@ -213,6 +204,17 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyId")String articleFamilyId, @Param("beginDate")Date begin,
 			 @Param("endDate")Date end, @Param("sort") String sort);
+
+	List<OrderPayDto> selectMoneyAndNumByDate(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
+
+	List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(@Param("shopId")String shopId,@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("sort")String sort);
+
+	List<ArticleSellDto> selectShopArticleSellByDateAndId(@Param("shopId")String shopId,@Param("beginDate") Date begin, @Param("endDate")Date end,@Param("sort") String sort);
+
+	List<Order> selectListByTime(@Param("beginDate")Date begin, @Param("endDate")Date end,@Param("shopId") String shopId);
+
+	Order selectOrderDetails(String orderId);
+
 
 	int setOrderPrintFail(String orderId);
 }

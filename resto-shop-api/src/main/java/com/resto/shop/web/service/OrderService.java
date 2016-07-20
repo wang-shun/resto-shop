@@ -250,5 +250,44 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
 
+
+	/**
+	 * 查询订单数目和订单金额
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentBrandId
+	 * @return
+	 */
+
+	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
+
+
+	/**
+	 * 根据时间 查询 当前选择店铺已完成的订单的 菜品分类销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+
+	public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId,
+			String sort);
+
+
+	/**
+	 * 根据时间 查询 选中店铺已完成的订单的 菜品销售详情(品牌端显示)
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+
+	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
+			String sort);
+
+	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
+
+	//查询订单的详细信息(客户和菜品以及菜品信息分类)
+	public Order selectOrderDetails(String orderId);
+
 	Boolean setOrderPrintFail(String orderId);
 }
