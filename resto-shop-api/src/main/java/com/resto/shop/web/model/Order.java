@@ -122,7 +122,15 @@ public class Order {
 		this.telephone = telephone;
 	}
 
-	//新增內容
+    final public Boolean getTimeOut() {
+        return timeOut;
+    }
+
+    final public void setTimeOut(Boolean timeOut) {
+        this.timeOut = timeOut;
+    }
+
+    //新增內容
     private int level; //查询评价的的等級
 
 
