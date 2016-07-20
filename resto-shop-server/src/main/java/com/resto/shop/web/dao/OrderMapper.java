@@ -88,7 +88,17 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectOrderByVercode(@Param("vercode")String vercode,@Param("shopId")String shopId);
-	
+
+	/**
+	 * 查询已消费订单的订单数目和订单总额
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	OrderPayDto selectBytimeAndState(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
+
+
 	/**
 	 * 根据桌号查询店铺已支付的订单
 	 * @param tableNumber

@@ -1360,4 +1360,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return o;
 	}
 
+	@Override
+	public OrderPayDto selectBytimeAndState(String beginDate, String endDate,String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectBytimeAndState(begin,end,brandId);
+	}
+
 }
