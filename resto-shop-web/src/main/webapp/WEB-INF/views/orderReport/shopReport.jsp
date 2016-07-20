@@ -38,60 +38,63 @@ th {
 		</div>
 	</div>
 	
-	<!-- 查看 订单的详细信息-->
-	<div class="modal fade" id="orderShopdetail" tabindex="-1" role="dialog">
+	<!-- 查看 数据库配置 详细信息  Modal  start-->
+	<div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <button type="button" class="close" data-dismiss="modal" id="closeModal2" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	        <h4 class="modal-title text-center"><strong>订单详情</strong></h4>
 	      </div>
 	      <div class="modal-body">
 	      	<dl class="dl-horizontal">
 				<dt>店铺名称：</dt><dd id="shopName"></dd><br/>
-				<dt>订单编号：</dt><dd id="orderNumber"></dd><br/>
+				<dt>订单编号：</dt><dd id="orderId"></dd><br/>
 				<dt>订单时间：</dt><dd id="createTime"></dd><br/>
 				<dt>就餐模式：</dt><dd id="distributionMode"></dd><br/>
 				<dt>验证码：</dt><dd id="verCode"></dd><br/>
-				<dt>手机号：</dt><dd id="telePhone"></dd><br/>
+				<dt>手机号：</dt><dd id="telephone"></dd><br/>
 				<dt>订单金额：</dt><dd id="orderMoney"></dd><br/>
-				<dt>评价：</dt><dd id="appraise"></dd><br/>
+				<dt>评价：</dt><dd id="appriase"></dd><br/>
 				<dt>评价内容：</dt><dd id="content"></dd><br/>
 				<dt>状态：</dt><dd id="orderState"></dd><br/>
 			</dl>
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th>餐品类型</th>
-						<th>餐品类别</th>
-						<th>餐品名称</th>
-						<th>餐品单价(元)</th>
-						<th>餐品数量</th>
-						<th>小计(元)</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="shop in shopOrderList">
-						<td><strong>{{shop.shopName}}</strong></td>
-						<td>{{shop.number}}</td>	
-						<td>{{shop.orderMoney}}</td>
-						<td>{{shop.average}}</td>
-						<td>1</td>
-					</tr>
-				</tbody>
-			</table>
-			
-			
 	      </div>
+	      
+	      <div class="table-scrollable">
+               <table class="table table-condensed table-hover">
+                   <thead>
+                       <tr>
+<!--                            <th>餐品类型</th> -->
+                           <th>餐品类别 </th>
+                           <th>餐品名称 </th>
+                           <th>餐品单价 </th>
+                           <th> 餐品数量 </th>
+                           <th> 小记 </th>
+                       </tr>
+                   </thead>
+                   <tbody id="articleList">
+<!--                        <tr> -->
+<!--                            <td> 1 </td> -->
+<!--                            <td> Mark </td> -->
+<!--                            <td> Otto </td> -->
+<!--                            <td> makr124 </td> -->
+<!--                            <td> -->
+<%--                                <span class="label label-sm label-success"> Approved </span> --%>
+<!--                            </td> -->
+<!--                            <td>2</td> -->
+<!--                        </tr> -->
+                   </tbody>
+               </table>
+           </div>
+	      
 	      <div class="modal-footer">
-	      	<button type="button" class="btn btn-success" data-dismiss="modal">关闭</button>
-	        <button type="button" class="btn btn-danger" data-dismiss="modal">退款</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal" id="closeModal">关闭</button>
 	      </div>
 	    </div>
 	  </div>
 	</div>
 	
-
 <script>
 	//时间插件
 
@@ -209,8 +212,6 @@ th {
 					    	  $(td).html("已付款");
 					    	  break;
 					    	case 9:
-					    	  $(td).html("基本满意");
-					    	case 3:
 					    	  $(td).html("已取消");
 					    	  break;
 					    	case 10:
@@ -227,28 +228,23 @@ th {
 					    	}
 					  }
 					  
-					 
-					 
 					 },
 					{
 					 title : "操作", 
 					 data : "id",
 					 createdCell:function(td,tdData){
-						 var button = $("<button class='btn'>点击查看详情</button>");
+						 var button = $("<button class='btn green'>详情</button>");
 							button.click(function(){
-								$("#orderShopdetail").modal();
-							});
-							$(td).html(button);
+								showDetails(tdData);
+							})
+							$(td).html(button);		
+							
 					 }
 					 }
 				]
 			});
 		
-	
-		
-	
 	 
-	 //查询
 	 $("#searchInfo2").click(function(){
 		 var beginDate = $("#beginDate2").val();
 		 var endDate = $("#endDate2").val();
@@ -257,7 +253,126 @@ th {
 		 toastr.success("查询成功");
 	 })
 	 
+	$("#closeModal").click(function(e){
+		e.stopPropagation();
+		var modal = $("#orderDetail");
+		//modal.find(".modal-body").html("");
+		modal.modal("hide");
+	}) 
+	 
+	function showDetails(orderId){
+		$.ajax({
+			 url:'orderReport/detailInfo',
+			 method:'post',
+			 data:{ "orderId":orderId},
+			 success:function(result){
+				// alert(JSON.stringify(result));
+	
+				if(result){
+					var data = result.data;
+					 $("#shopName").html(data.shopName);
+					 $("#orderId").html(data.id);
+					 $("#createTime").html(new Date(data.createTime).format("yyyy-MM-dd mm:hh:ss"));
+					 $("#distributionMode").html(getDistriubtioMode(data.distributionModeId));
+					 $("#verCode").html(data.verCode);
+					 $("#telephone").html(data.customer.telephone);
+					 $("#orderMoney").html(data.orderMoney);
+					 if(data.appraise){
+						 $("#appriase").html(getLevel(data.appraise.level));
+						 $("#content").html(data.appraise.content);
+					 }
+					
+					 $("#orderState").html(getState(data.orderState));
+					 $('#articleList').text("");
+					
+					 for(var i = 0;i< data.orderItems.length;i++){
+						 var obj = data.orderItems[i];
+						 var article = "<tr><td>"+obj.articleFamily.name+"</td><td>"+obj.articleName+"</td><td>"+
+						 obj.unitPrice+"</td><td>"+obj.count+"</td><td>"
+						 +obj.finalPrice+"</td></tr>";
+						 $('#articleList').append(article);
+					 }
+					
+					 $("#orderDetail").modal();
+				}
+				 
+			 }
+		}); 
+		 
+	 }
+	 
+	 function getLevel(level){
+		 var levelName = '';
+		 switch (level)
+		 {
+		 case 1:
+		   levelName="非常不满意";
+		   break;
+		 case 2:
+		   levelName="不满意";
+		   break;
+		 case 3:
+		   levelName="一般";
+		   break;
+		 case 4:
+		   levelName="满意";
+		   break;
+		 case 5:
+		   levelName="非常满意";
+		   break;
+		 
+		 }
+		 return levelName; 
+	 }
 	 
 	 
-
+	 function getState(state){
+		 var orderState = '';
+		 switch(state)
+	    	{
+	    	case 2:
+	    	 orderState = "已支付"
+	    	  break;
+	    	case 9:
+	    	  orderState="已取消";
+	    	case 10:
+	    	  orderState="已确认";
+	    	  break;
+	    	case 11:
+	    	  orderState="已评价";
+	    	  break;
+	    	case 12:
+	    	 orderState="已分享";
+	    	  break;
+	    	}
+		 return orderState;
+	 }
+	 
+	 
+	 function getDistriubtioMode(mode){
+		 var distributionMode = ''
+				switch(mode)
+		    	{
+		    	case 1:
+		    	  distributionMode ="堂吃";
+		    	  break;
+		    	case 2:
+		    		distributionMode="自提外卖";
+		    		break;
+		    	case 3:
+		    		distributionMode="外带";
+		    	  break;
+		    	
+		    	}
+		 return distributionMode;
+	 }
+	 
+	 $("#closeModal2").click(function(e){
+		 e.stopPropagation();
+			var modal = $("#orderDetail");
+			//modal.find(".modal-body").html("");
+			modal.modal("hide");
+	 })
+	
+	
 </script>

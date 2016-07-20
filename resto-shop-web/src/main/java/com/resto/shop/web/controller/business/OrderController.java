@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.model.Brand;
@@ -124,6 +125,13 @@ public class OrderController extends GenericController{
 			order.setShopName(shop.getName());
 		}
 		return list;
+	}
+	
+	@RequestMapping("detailInfo")
+	@ResponseBody
+	public Result showDetail(String orderId){
+		Order o = orderService.selectOrderDetails(orderId);
+		return getSuccessResult(o);
 	}
 	
 	

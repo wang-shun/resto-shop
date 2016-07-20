@@ -93,7 +93,12 @@ public class Order {
 
     private Date lastOrderTime;
     
+    //顾客
     private Customer customer;
+    
+    //评价
+    private Appraise appraise;
+    
     
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
@@ -471,4 +476,15 @@ public class Order {
 	public void setLastOrderTime(Date lastOrderTime) {
 		this.lastOrderTime = lastOrderTime;
 	}
+
+	public Appraise getAppraise() {
+		return appraise;
+	}
+
+	public void setAppraise(Appraise appraise) {
+		this.appraise = appraise;
+	}
+
+	
+	
 }

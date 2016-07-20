@@ -1037,11 +1037,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="f.peference ,a.sort";
+			sort="r.peference ,r.sort";
 		}else if("desc".equals(sort)){
-			sort="shop_report.shopSellNum desc";
+			sort="r.shopSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="shop_report.shopSellNum asc";
+			sort="r.shopSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
 		return list;
@@ -1317,6 +1317,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		return orderMapper.selectListByTime(begin,end,shopId);
 		
+	}
+
+	@Override
+	public Order selectOrderDetails(String orderId) {
+		Order o = orderMapper.selectOrderDetails(orderId);
+		ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
+		o.setShopName(shop.getName());
+		return o;
 	}
 
 }

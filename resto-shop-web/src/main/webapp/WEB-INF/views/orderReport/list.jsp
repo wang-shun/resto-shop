@@ -15,7 +15,7 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
 		</form>
 	</div>
@@ -58,7 +58,7 @@
 		  </div>
 		</div>
 		
-		<div class="modal fade bs-example-modal-lg" id="reportModal" 
+	<div class="modal fade bs-example-modal-lg" id="reportModal" 
 		tabindex="-1" role="dialog" aria-labelledby="reportModal" 
 		data-backdrop="static"> 
 		<div class="modal-dialog modal-lg"> 
@@ -79,8 +79,6 @@
 			</div> 
 		</div> 
 	</div> 
-		
-		
     </div>
   </div>
 
@@ -152,7 +150,7 @@ var vueObj =  new Vue({
 			var modal = $("#reportModal");
 			modal.find(".modal-body").html("");
 			modal.modal("hide");
-		},
+		}
 	},
 	created : function() {
 		var date = new Date().format("yyyy-MM-dd");
@@ -163,22 +161,6 @@ var vueObj =  new Vue({
 	
 })
 
-
-//查询报表
-$("#searchReport").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	//判断 时间范围是否合法
-	if(beginDate>endDate){
-		toastr.error("开始时间不能大于结束时间");
-		return ;
-	}
-	var data = {"beginDate":beginDate,"endDate":endDate};
-	//更新数据
-	tb1.ajax.reload();
-	toastr.success("查询成功");
-	
-})
 
 //下载报表
 
@@ -194,11 +176,6 @@ $("#brandreportExcel").click(function(){
 	location.href="orderReport/brand_excel?beginDate="+beginDate+"&&endDate="+endDate;
 	
 })
-
-
-$("")
-
-
 
 
 </script>

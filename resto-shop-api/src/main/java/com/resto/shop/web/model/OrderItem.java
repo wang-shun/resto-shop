@@ -45,7 +45,18 @@ public class OrderItem {
     
     private Integer articleSum;
     
-    public String getId() {
+    //关联菜品类别
+    private ArticleFamily articleFamily;
+    
+    public ArticleFamily getArticleFamily() {
+		return articleFamily;
+	}
+
+	public void setArticleFamily(ArticleFamily articleFamily) {
+		this.articleFamily = articleFamily;
+	}
+
+	public String getId() {
         return id;
     }
 
