@@ -973,13 +973,10 @@ order by ${sort}
 	
 	<!-- 店铺菜品销售记录 店铺端-->
 	<select id="selectShopArticleByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
-	SELECT
- sum(r.shopSellNum) as shopSellNum,r.articleId,r.article_name,r.articleFamilyId,r.articleFamilyName
-FROM
-	(
+	SELECT r.* FROM(
 		SELECT
 			LEFT (t.article_id, 32) AS articleId,
-			t.count as shopSellNum,
+			sum(t.count) as shopSellNum,
 			t.article_name,
 			t5.id AS articleFamilyId,
 			t5. NAME AS articleFamilyName,
@@ -994,13 +991,12 @@ FROM
 		INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
 		WHERE
 			t2.order_state in (2,10,11,12)
-		AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
-		AND t2.shop_detail_id = #{shopId}
-		GROUP BY t.order_id,t.article_name
+			and 
+   <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
+		
+		GROUP BY t.article_name
+) as r ORDER BY ${sort}
 
-	) AS r
-GROUP BY r.article_name
-order by ${sort}
 	</select>
 	
 	<!-- 店铺菜品销售按菜品分类的数据  -->
