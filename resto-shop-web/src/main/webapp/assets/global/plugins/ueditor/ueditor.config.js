@@ -21,7 +21,7 @@
      */
     var URL = window.UEDITOR_HOME_URL || getUEBasePath();
 
-    
+
     /**
      * 配置项主体。注意，此处所有涉及到路径的配置别遗漏URL变量。
      */
@@ -29,7 +29,7 @@
 
         //为编辑器实例添加一个路径，这个不能被注释
         UEDITOR_HOME_URL: URL
-      
+
         // 服务器统一请求接口路径
         , serverUrl: URL + "jsp/controller.jsp"
 
@@ -46,7 +46,7 @@
             'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
             'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
             'print', 'preview', 'searchreplace', 'help', 'drafts'
-        ]]
+        ]],
         //当鼠标放在工具栏上时显示的tooltip提示,留空支持自动多语言配置，否则以配置值为准
         //,labelMap:{
         //    'anchor':'', 'undo':''
@@ -91,7 +91,7 @@
         //,indentValue:'2em'
 
         //,initialFrameWidth:1000  //初始化编辑器宽度,默认1000
-        //,initialFrameHeight:320  //初始化编辑器高度,默认320
+        initialFrameHeight:620,  //初始化编辑器高度,默认320
 
         //,readonly : false //编辑器初始化结束后,编辑区域是否是只读的，默认是false
 
@@ -275,76 +275,79 @@
         //,maxUndoCount:20
         //当输入的字符数超过该值时，保存一次现场
         //,maxInputCount:1
+        //autoHeightEnabled: false,
 
-        //autoHeightEnabled
-        // 是否自动长高,默认true
-        //,autoHeightEnabled:true
+    //autoHeightEnabled
+    // 是否自动长高,默认true
+    autoHeightEnabled:false,
+        height:800
 
-        //scaleEnabled
-        //是否可以拉伸长高,默认true(当开启时，自动长高失效)
-        //,scaleEnabled:false
-        //,minFrameWidth:800    //编辑器拖动时最小宽度,默认800
-        //,minFrameHeight:220  //编辑器拖动时最小高度,默认220
+    //scaleEnabled
+    //是否可以拉伸长高,默认true(当开启时，自动长高失效)
+    //,scaleEnabled:false
+    //,minFrameWidth:800    //编辑器拖动时最小宽度,默认800
+    //,minFrameHeight:220  //编辑器拖动时最小高度,默认220
 
-        //autoFloatEnabled
-        //是否保持toolbar的位置不动,默认true
-        //,autoFloatEnabled:true
-        //浮动时工具栏距离浏览器顶部的高度，用于某些具有固定头部的页面
-        //,topOffset:30
-        //编辑器底部距离工具栏高度(如果参数大于等于编辑器高度，则设置无效)
-        //,toolbarTopOffset:400
+    //autoFloatEnabled
+    //是否保持toolbar的位置不动,默认true
+    //,autoFloatEnabled:true
+    //浮动时工具栏距离浏览器顶部的高度，用于某些具有固定头部的页面
+    //,topOffset:30
+    //编辑器底部距离工具栏高度(如果参数大于等于编辑器高度，则设置无效)
+    //,toolbarTopOffset:400
 
-        //pageBreakTag
-        //分页标识符,默认是_ueditor_page_break_tag_
-        //,pageBreakTag:'_ueditor_page_break_tag_'
+    //pageBreakTag
+    //分页标识符,默认是_ueditor_page_break_tag_
+    //,pageBreakTag:'_ueditor_page_break_tag_'
 
-        //autotypeset
-        //自动排版参数
-        //,autotypeset: {
-        //    mergeEmptyline: true,           //合并空行
-        //    removeClass: true,              //去掉冗余的class
-        //    removeEmptyline: false,         //去掉空行
-        //    textAlign:"left",               //段落的排版方式，可以是 left,right,center,justify 去掉这个属性表示不执行排版
-        //    imageBlockLine: 'center',       //图片的浮动方式，独占一行剧中,左右浮动，默认: center,left,right,none 去掉这个属性表示不执行排版
-        //    pasteFilter: false,             //根据规则过滤没事粘贴进来的内容
-        //    clearFontSize: false,           //去掉所有的内嵌字号，使用编辑器默认的字号
-        //    clearFontFamily: false,         //去掉所有的内嵌字体，使用编辑器默认的字体
-        //    removeEmptyNode: false,         // 去掉空节点
-        //    //可以去掉的标签
-        //    removeTagNames: {标签名字:1},
-        //    indent: false,                  // 行首缩进
-        //    indentValue : '2em',            //行首缩进的大小
-        //    bdc2sb: false,
-        //    tobdc: false
-        //}
+    //autotypeset
+    //自动排版参数
+    //,autotypeset: {
+    //    mergeEmptyline: true,           //合并空行
+    //    removeClass: true,              //去掉冗余的class
+    //    removeEmptyline: false,         //去掉空行
+    //    textAlign:"left",               //段落的排版方式，可以是 left,right,center,justify 去掉这个属性表示不执行排版
+    //    imageBlockLine: 'center',       //图片的浮动方式，独占一行剧中,左右浮动，默认: center,left,right,none 去掉这个属性表示不执行排版
+    //    pasteFilter: false,             //根据规则过滤没事粘贴进来的内容
+    //    clearFontSize: false,           //去掉所有的内嵌字号，使用编辑器默认的字号
+    //    clearFontFamily: false,         //去掉所有的内嵌字体，使用编辑器默认的字体
+    //    removeEmptyNode: false,         // 去掉空节点
+    //    //可以去掉的标签
+    //    removeTagNames: {标签名字:1},
+    //    indent: false,                  // 行首缩进
+    //    indentValue : '2em',            //行首缩进的大小
+    //    bdc2sb: false,
+    //    tobdc: false
+    //}
 
-        //tableDragable
-        //表格是否可以拖拽
-        //,tableDragable: true
+    //tableDragable
+    //表格是否可以拖拽
+    //,tableDragable: true
 
-        //,disabledTableInTable:true  //禁止表格嵌套
+    //,disabledTableInTable:true  //禁止表格嵌套
 
-        //sourceEditor
-        //源码的查看方式,codemirror 是代码高亮，textarea是文本框,默认是codemirror
-        //注意默认codemirror只能在ie8+和非ie中使用
-        //,sourceEditor:"codemirror"
-        //如果sourceEditor是codemirror，还用配置一下两个参数
-        //codeMirrorJsUrl js加载的路径，默认是 URL + "third-party/codemirror/codemirror.js"
-        //,codeMirrorJsUrl:URL + "third-party/codemirror/codemirror.js"
-        //codeMirrorCssUrl css加载的路径，默认是 URL + "third-party/codemirror/codemirror.css"
-        //,codeMirrorCssUrl:URL + "third-party/codemirror/codemirror.css"
-        //编辑器初始化完成后是否进入源码模式，默认为否。
-        //,sourceEditorFirst:false
+    //sourceEditor
+    //源码的查看方式,codemirror 是代码高亮，textarea是文本框,默认是codemirror
+    //注意默认codemirror只能在ie8+和非ie中使用
+    //,sourceEditor:"codemirror"
+    //如果sourceEditor是codemirror，还用配置一下两个参数
+    //codeMirrorJsUrl js加载的路径，默认是 URL + "third-party/codemirror/codemirror.js"
+    //,codeMirrorJsUrl:URL + "third-party/codemirror/codemirror.js"
+    //codeMirrorCssUrl css加载的路径，默认是 URL + "third-party/codemirror/codemirror.css"
+    //,codeMirrorCssUrl:URL + "third-party/codemirror/codemirror.css"
+    //编辑器初始化完成后是否进入源码模式，默认为否。
+    //,sourceEditorFirst:false
 
-        //iframeUrlMap
-        //dialog内容的路径 ～会被替换成URL,垓属性一旦打开，将覆盖所有的dialog的默认路径
-        //,iframeUrlMap:{
-        //    'anchor':'~/dialogs/anchor/anchor.html',
-        //}
+    //iframeUrlMap
+    //dialog内容的路径 ～会被替换成URL,垓属性一旦打开，将覆盖所有的dialog的默认路径
+    //,iframeUrlMap:{
+    //    'anchor':'~/dialogs/anchor/anchor.html',
+    //}
 
-        //webAppKey 百度应用的APIkey，每个站长必须首先去百度官网注册一个key后方能正常使用app功能，注册介绍，http://app.baidu.com/static/cms/getapikey.html
-        //, webAppKey: ""
-    };
+    //webAppKey 百度应用的APIkey，每个站长必须首先去百度官网注册一个key后方能正常使用app功能，注册介绍，http://app.baidu.com/static/cms/getapikey.html
+    //, webAppKey: ""
+}
+    ;
 
     function getUEBasePath(docUrl, confUrl) {
 
@@ -356,7 +359,7 @@
 
         var configPath = document.getElementsByTagName('script');
 
-        return configPath[ configPath.length - 1 ].src;
+        return configPath[configPath.length - 1].src;
 
     }
 
@@ -383,7 +386,7 @@
 
     function optimizationPath(path) {
 
-        var protocol = /^[a-z]+:\/\//.exec(path)[ 0 ],
+        var protocol = /^[a-z]+:\/\//.exec(path)[0],
             tmp = null,
             res = [];
 
@@ -391,7 +394,7 @@
 
         path = path.replace(/\\/g, '/').split(/\//);
 
-        path[ path.length - 1 ] = "";
+        path[path.length - 1] = "";
 
         while (path.length) {
 

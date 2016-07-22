@@ -12,25 +12,27 @@
 				</div>
 				<div class="portlet-body">
 					<form role="form" class="form-horizontal" action="{{m.id?'advert/modify':'advert/create'}}" @submit.prevent="save">
-						<div class="form-body">
+						<div class="form-body" style="overflow-y: hidden; overflow-x: hidden;" >
 							<div class="form-group">
 			           			<label class="col-sm-2 control-label">标题：</label>
 							    <div class="col-sm-8">
 									<input type="text" class="form-control" required name="slogan" v-model="m.slogan">
 							    </div>
 							</div>
-							<div class="form-group">
+							<div class="form-group " >
 			           			<label class="col-sm-2 control-label">描述：</label>
-							    <div class="col-sm-8">
-							    	<textarea :id="randomId" name="description" v-model="m.description"></textarea>
+							    <div class="col-sm-8" >
+							    	<textarea :id="randomId" name="description" v-model="m.description"
+											    ></textarea>
 							    </div>
 							</div>
-							<div class="validataMsg"></div>
-							<div class="text-center">
-								<input type="hidden" name="id" v-model="m.id" />
-								<input class="btn green"  type="submit"  value="保存"/>
-								<a class="btn default" @click="cancel" >取消</a>
-							</div>
+							<div class="validataMsg" ></div>
+
+						</div>
+						<div class="text-center">
+							<input type="hidden" name="id" v-model="m.id" />
+							<input class="btn green"  type="submit"  value="保存"/>
+							<a class="btn default" @click="cancel" >取消</a>
 						</div>
 					</form>
 				</div>

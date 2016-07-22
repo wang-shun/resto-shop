@@ -17384,7 +17384,7 @@ UE.plugins['autoheight'] = function () {
             return;
         }
         var doc = me.document;
-        me.autoHeightEnabled = true;
+        me.autoHeightEnabled = false;
         bakOverflow = doc.body.style.overflowY;
         doc.body.style.overflowY = 'hidden';
         me.addListener('contentchange afterinserthtml keyup mouseup',adjustHeight);
@@ -28957,7 +28957,7 @@ UE.ui = baidu.editor.ui = {};
                     this.getDom().style.cssText = this._bakCssText;
                     this.getDom('iframeholder').style.cssText = this._bakCssText1;
                     if (this._bakAutoHeight) {
-                        editor.autoHeightEnabled = true;
+                        editor.autoHeightEnabled = false;
                         this.editor.enableAutoHeight();
                     }
 
