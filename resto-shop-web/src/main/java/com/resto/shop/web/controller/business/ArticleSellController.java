@@ -236,14 +236,15 @@ public class ArticleSellController extends GenericController{
 		map.put("timeType", "yyyy-MM-dd");
 		
 		//定义excel表格的表头
-		if(selectValue==null||"".equals(selectValue)){
-			selectValue="全部";
-			result = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(), beginDate, endDate, sort);
-		}else{
-			//根据菜品分类的名称获取菜品分类的id
-			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-		}
+//		if(selectValue==null||"".equals(selectValue)){
+//			selectValue="全部";
+//			result = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(), beginDate, endDate, sort);
+//		}else{
+//			result = orderService.selectArticleFamilyByBrandAndFamilyName(getCurrentBrandId(),beginDate, endDate,selectValue);
+//		}
+		
+		//暂时先做下载全部
+		result = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(), beginDate, endDate, sort);
 		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
 		
 		//定义excel工具类对象
@@ -292,14 +293,16 @@ public class ArticleSellController extends GenericController{
 		map.put("timeType", "yyyy-MM-dd");
 		
 		//定义excel表格的表头
-		if(selectValue==null||"".equals(selectValue)){
-			selectValue="全部";
-			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		}else{
-			//根据菜品分类的名称获取菜品分类的id
-			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-		}
+//		if(selectValue==null||"".equals(selectValue)){
+//			selectValue="全部";
+//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
+//		}else{
+//			//根据菜品分类的名称获取菜品分类的id
+//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
+//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
+//		}
+		//暂时查全部
+		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
 		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
 		
 		//定义excel工具类对象
@@ -327,7 +330,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum","salesRatio"};
+		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum"};
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<>();
 		Brand brand = brandServie.selectById(getCurrentBrandId());
@@ -341,18 +344,28 @@ public class ArticleSellController extends GenericController{
 		map.put("reportTitle", "店铺菜品销售");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		if(selectValue==null||"".equals(selectValue)){
-			selectValue="全部";
-			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
-		}else{
-			//根据菜品分类的名称获取菜品分类的id
-			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
-		}
-		for (ArticleSellDto articleSellDto : result) {
-			articleSellDto.setSalesRatio( Double.parseDouble(articleSellDto.getSalesRatio())*100+"%");
-		}
-		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
+		
+		
+//		if(selectValue==null||"".equals(selectValue)){
+//			selectValue="全部";
+//			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
+//		}else{
+//			//根据菜品分类的名称获取菜品分类的id
+//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
+//			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
+//		}
+		//暂时先查全部
+		result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
+		
+//		for (ArticleSellDto articleSellDto : result) {
+//			articleSellDto.setSalesRatio( Double.parseDouble(articleSellDto.getSalesRatio())*100+"%");
+//		}
+		
+		
+		//String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
+		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"}};
+		
+		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{
@@ -400,21 +413,21 @@ public class ArticleSellController extends GenericController{
 		map.put("timeType", "yyyy-MM-dd");
 		
 		//定义excel表格的表头
-		if(selectValue==null||"".equals(selectValue)){
-			selectValue="全部";
-			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		}else{
-			//根据菜品分类的名称获取菜品分类的id
-			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-		}
-		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
-		
+//		if(selectValue==null||"".equals(selectValue)){
+//			selectValue="全部";
+//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
+//		}else{
+//			//根据菜品分类的名称获取菜品分类的id
+//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
+//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
+//		}
+//		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
+//		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
+			//excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");

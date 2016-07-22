@@ -248,9 +248,6 @@ public interface OrderService extends GenericService<Order, String> {
 
 	
 
-	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String currentBrandId,String beginDate, String endDate, String articleFamilyId, String sort);
-
-
 	/**
 	 * 查询订单数目和订单金额
 	 * @param beginDate
@@ -290,4 +287,7 @@ public interface OrderService extends GenericService<Order, String> {
 	public Order selectOrderDetails(String orderId);
 
 	Boolean setOrderPrintFail(String orderId);
+
+	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String currentBrandId, String beginDate,
+			String endDate, String selectValue);
 }

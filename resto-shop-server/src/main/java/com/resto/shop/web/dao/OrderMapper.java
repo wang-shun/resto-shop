@@ -212,7 +212,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectBrandArticleSellByDateAndId(@Param("brandId")String brandId,@Param("beginDate") Date begin, @Param("endDate")Date end,@Param("sort") String sort);
 
-	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyId")String articleFamilyId, @Param("beginDate")Date begin,
+	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyName")String articleFamilyName, @Param("beginDate")Date begin,
 			 @Param("endDate")Date end, @Param("sort") String sort);
 
 	List<OrderPayDto> selectMoneyAndNumByDate(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
@@ -227,4 +227,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 	int setOrderPrintFail(String orderId);
+
+	List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(@Param("brandId")String brandId,@Param("beginDate") Date begin, @Param("endDate")Date end,
+			@Param("articleFamilyName")String articleFamilyName);
 }

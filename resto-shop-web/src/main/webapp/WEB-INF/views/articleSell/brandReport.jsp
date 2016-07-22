@@ -105,7 +105,6 @@ $('#articleTab a').click(function (e) {
 			tb1.ajax.reload();
 		  break;
 		case 2:
-			var selectValue = select[0].value;
 			var data = {"beginDate":beginDate,"endDate":endDate,"sort":sort}
 			tb2.ajax.reload();
 		  break;
@@ -240,6 +239,7 @@ $("#searchReport").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	sort = "desc";
+	debugger;
 	var num = getNumActive()
 	 switch(num){
 	  case 1:

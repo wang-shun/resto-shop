@@ -1224,22 +1224,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
 	@Override
-	public List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(String brandId ,String beginDate, String endDate,String articleFamilyId, String sort) {
+	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String brandId ,String beginDate, String endDate,String articleFamilyName) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		if("0".equals(sort)){
-			sort="ap.peference";
-		}else if("desc".equals(sort)){
-			sort="ap.brandSellNum desc";
-		}else if ("asc".equals(sort)){
-			sort="ap.brandSellNum asc";
-		}
-		List<ArticleSellDto> list = orderMapper.selectBrandFamilyArticleSellByDateAndArticleFamilyId(brandId ,articleFamilyId, begin, end,sort);
+		List<ArticleSellDto> list = orderMapper.selectArticleFamilyByBrandAndFamilyName(brandId, begin, end,articleFamilyName);
 		//计算总菜品销售额
 		BigDecimal temp = BigDecimal.ZERO;
-
-		List<ArticleSellDto> articleList = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandId, begin, end, sort);
-		for (ArticleSellDto articleSellDto : articleList) {
+		for (ArticleSellDto articleSellDto : list) {
 			temp = add(temp,articleSellDto.getSalles());
 		}
 		for (ArticleSellDto articleSellDto : list) {

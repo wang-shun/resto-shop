@@ -115,6 +115,7 @@ th {
 	$("#endDate2").val("${endDate}");
 	
 		 var tb1 = $("#shopOrder").DataTable({
+			 "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
 				ajax : {
 					url : "orderReport/AllOrder",   
 					dataSrc : "",
@@ -183,21 +184,22 @@ th {
 						  switch(tdData)
 					    	{
 					    	case 5:
-					    	  $(td).html("非常满意");
+					    	  $(td).html("五星");
 					    	  break;
 					    	case 4:
-					    	  $(td).html("基本满意");
+					    	  $(td).html("四星");
 					    	case 3:
-					    	  $(td).html("一般");
+					    	  $(td).html("三星");
 					    	  break;
 					    	case 2:
-					    	  $(td).html("差");
+					    	  $(td).html("二星");
 					    	  break;
 					    	case 1:
-					    	  $(td).html("非常满意");
+					    	  $(td).html("一星");
 					    	  break;
 					    	default:
-					    	 $(td).html("未评价")
+					    		$(td).html("");
+					    	 break;
 					    	}
 					  }
 					  
@@ -205,9 +207,13 @@ th {
 					{
 					 title : "订单状态", 
 					 data : "orderState",
-					 createdCell:function(td,tdData){
+					 createdCell:function(td,tdData,row,rowData){
 						  switch(tdData)
 					    	{
+					    	case 1:
+						    	  $(td).html("未付款");
+						    	  break;
+						  
 					    	case 2:
 					    	  $(td).html("已付款");
 					    	  break;
@@ -215,7 +221,12 @@ th {
 					    	  $(td).html("已取消");
 					    	  break;
 					    	case 10:
-					    	  $(td).html("已确认");
+					    		if(row.productionStatus==1){
+					    			$(td).html("已确认");
+					    		}else if(row.productionStatus==2){
+					    			$(td).html("已消费");
+					    		}
+					    	  
 					    	  break;
 					    	case 11:
 					    	  $(td).html("已评价");
@@ -224,7 +235,7 @@ th {
 					    	  $(td).html("已分享");
 					    	  break;
 					    	default:
-					    	 $(td).html("未评价")
+					    	 break;
 					    	}
 					  }
 					  
@@ -256,7 +267,7 @@ th {
 	$("#closeModal").click(function(e){
 		e.stopPropagation();
 		var modal = $("#orderDetail");
-		//modal.find(".modal-body").html("");
+		modal.find(".modal-body").html("");
 		modal.modal("hide");
 	}) 
 	 
@@ -276,7 +287,7 @@ th {
 					 $("#distributionMode").html(getDistriubtioMode(data.distributionModeId));
 					 $("#verCode").html(data.verCode);
 					 $("#telephone").html(data.customer.telephone);
-					 $("#orderMoney").html(data.orderMoney);
+					 $("#orderMoney").html(data.orderMoney+"元");
 					 if(data.appraise){
 						 $("#appriase").html(getLevel(data.appraise.level));
 						 $("#content").html(data.appraise.content);

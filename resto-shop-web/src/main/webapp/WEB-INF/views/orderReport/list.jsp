@@ -15,9 +15,32 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+		  	
+		   	 <button type="button" class="btn red" @click="today"> 今日</button>
+                 
+             <button type="button" class="btn green" @click="yesterDay">昨日</button>
+          
+             <button type="button" class="btn yellow" @click="benxun">本询</button>
+             
+             <button type="button" class="btn purple" @click="week">本周</button>
+             <div class="btn-group btn-group-solid">
+                 <button type="button" class="btn blue dropdown-toggle" data-toggle="dropdown">
+                     <i class="fa fa-ellipsis-horizontal"></i> 月
+                     <i class="fa fa-angle-down"></i>
+                 </button>
+                 <ul class="dropdown-menu">
+                     <li>
+                         <a href="javascript:;"> 1月 </a>
+                     </li>
+                     <li>
+                         <a href="javascript:;"> 2月 </a>
+                     </li>
+                 </ul>
+              
+                  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+		 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
 		</form>
+		
 	</div>
 </div>
 <br/>
@@ -58,29 +81,30 @@
 		  </div>
 		</div>
 		
-	<div class="modal fade bs-example-modal-lg" id="reportModal" 
-		tabindex="-1" role="dialog" aria-labelledby="reportModal" 
-		data-backdrop="static"> 
-		<div class="modal-dialog modal-lg"> 
-			<div class="modal-content"> 
-				<div class="modal-header"> 
-					<button type="button" class="close" data-dismiss="modal" 
-						aria-label="Close" @click="closeModal"> 
-						<span aria-hidden="true">&times;</span> 
-					</button> 
-					<h4 class="modal-title text-center"> 
-						<strong>店铺充值记录</strong> 
-					</h4> 
-				</div> 
-				<div class="modal-body"></div> 
-				<div class="modal-footer"> 
-					<button type="button" class="btn btn-info btn-block" @click="closeModal">关闭</button> 
-				</div> 
-			</div> 
-		</div> 
-	</div> 
+	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
+           <div class="modal-dialog modal-full">
+               <div class="modal-content">
+                   <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+                   </div>
+                   <div class="modal-body"> </div>
+                   <div class="modal-footer">
+<!--                        <button type="button" class="btn btn-info btn-block"  @click="closeModal">关闭</button> -->
+                        <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
+                   </div>
+               </div>
+               <!-- /.modal-content -->
+           </div>
+           <!-- /.modal-dialog -->
+       </div>
+
     </div>
   </div>
+  
+  <p v-for="count in countlist">                                                   
+	{{count.YEARMONTH}}
+	</p>     
+ <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
 
@@ -102,6 +126,8 @@ $('.form_datetime').datetimepicker({
 var vueObj =  new Vue({
 	el:"#control",
 	data:{
+		countlist :[],
+		appraiseCount:{},
 		shopOrderList : [],
 		searchDate : {
 			beginDate : "",
@@ -142,20 +168,48 @@ var vueObj =  new Vue({
 				var modal = $("#reportModal");
 				modal.find(".modal-body").html(result);
 				modal.find(".modal-title > strong").html(modalTitle);
-				modal.modal();
+				modal.modal()
 			})
 		
 		},
 		closeModal : function(){
 			var modal = $("#reportModal");
 			modal.find(".modal-body").html("");
-			modal.modal("hide");
+			modal.modal({show:false});
+		},
+		today : function(){
+			date = new Date().format("yyyy-MM-dd");
+			this.searchDate.beginDate = date
+			this.searchDate.endDate = date
+			this.searchInfo();
+		},
+		yesterDay : function(){
+			
+			this.searchDate.beginDate = GetDateStr(-1);
+			this.searchDate.endDate  = GetDateStr(-1);
+			this.searchInfo();
+		},
+		
+		week : function(){
+			this.searchDate.beginDate  = getWeekStartDate();
+			this.searchDate.beginDate  = getWeekEndDate();
+			this.searchIfno();
 		}
+		
+		
+		
 	},
+	
 	created : function() {
+		var that = this;
 		var date = new Date().format("yyyy-MM-dd");
 		this.searchDate.beginDate = date;
 		this.searchDate.endDate = date;
+		
+		getAppraiseCount(function(appraiseCount,countList){
+			that.appraiseCount = appraiseCount;
+			that.countList = countList;
+		});
 		this.searchInfo();
 	}
 	
