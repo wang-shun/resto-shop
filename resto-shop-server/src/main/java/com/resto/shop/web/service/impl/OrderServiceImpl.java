@@ -1126,6 +1126,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
 		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
+		List<ShopArticleReportDto> pFood = orderMapper.selectShopArticleCom(begin,end,brandId);
+
 		List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
 		for(ShopDetail shop : list_shopDetail){
@@ -1135,8 +1137,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		BigDecimal sum = new BigDecimal(0);
 		for (ShopArticleReportDto shopArticleReportDto2 : list) {
+			for(ShopArticleReportDto shopArticleReportDto : pFood){
+				if(shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())){
+					shopArticleReportDto2.setSellIncome(shopArticleReportDto2.getSellIncome().add(shopArticleReportDto.getSellIncome()));
+					shopArticleReportDto2.setTotalNum(shopArticleReportDto2.getTotalNum() + shopArticleReportDto.getTotalNum());
+				}
+			}
 			sum = sum.add(shopArticleReportDto2.getSellIncome());
 		}
+
 		
 
 		if(!list.isEmpty()){
@@ -1147,7 +1156,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
 						BigDecimal current = shopArticleReportDto2.getSellIncome();
 						
-						String occupy =  current == null ? "0" : current.divide(sum,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))
+						String occupy =  current == null ? "0" : current.divide(sum,4,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP)
 								.toString();
 						shopArticleReportDto.setOccupy(occupy + "%");
 					}
@@ -1171,11 +1180,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference";
+			sort="peference";
 		}else if("desc".equals(sort)){
-			sort="r.brandSellNum desc";
+			sort="brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.brandSellNum asc";
+			sort="brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandid, begin, end,sort);
 		//计算总菜品销售额
@@ -1200,11 +1209,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference , r.sort";
+			sort="peference , sort";
 		}else if("desc".equals(sort)){
-			sort="r.brandSellNum desc";
+			sort="brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.brandSellNum asc";
+			sort="brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
 		//计算总菜品销售额
@@ -1371,7 +1380,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),4, RoundingMode.HALF_UP));
 	}
 
 }

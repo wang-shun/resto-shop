@@ -199,6 +199,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<ShopArticleReportDto> selectShopArticleDetails(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
 
+	List<ShopArticleReportDto> selectShopArticleCom(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
+
 	/**
 	 * 查询店铺的菜品销售总量
 	 * @param begin
