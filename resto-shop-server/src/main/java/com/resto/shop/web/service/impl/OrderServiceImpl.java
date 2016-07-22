@@ -1071,11 +1071,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference ,r.sort";
+			sort="peference ,sort";
 		}else if("desc".equals(sort)){
-			sort="r.shopSellNum desc";
+			sort="shopSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.shopSellNum asc";
+			sort="shopSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
 		return list;
