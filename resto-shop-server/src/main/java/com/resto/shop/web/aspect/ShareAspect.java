@@ -75,8 +75,10 @@ public class ShareAspect {
 		log.info("Setting,getMinLength:"+setting.getMinLength());
 		log.info("appraise,getContent:"+appraise.getContent().length());
 		if(setting.getMinLevel()<=appraise.getLevel()&&setting.getMinLength()<=appraise.getContent().length()){
+			log.info("开始分享:");
 			return true;
 		}
+		log.info("不可分享:");
 		return false;
 	}
 }
