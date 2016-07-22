@@ -1353,10 +1353,10 @@ WHERE
 
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
-         select count(1) as orderCount ,sum(t.payment_amount) as orderTotal from tb_order t
+         select count(1) as orderCount ,sum(t.original_amount) as orderTotal from tb_order t
 INNER JOIN  tb_order_payment_item t2 on t2.order_id = t.id
          where shop_detail_id = #{shopId}
-        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
 and t.order_state in (2,12,11,10)
     </select>
 </mapper>
