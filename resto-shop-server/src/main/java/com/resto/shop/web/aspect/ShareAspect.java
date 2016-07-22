@@ -73,7 +73,7 @@ public class ShareAspect {
 		log.info("Setting,minLevel:"+setting.getMinLevel());
 		log.info("appraise,minLevel:"+appraise.getLevel());
 		log.info("Setting,getMinLength:"+setting.getMinLength());
-		log.info("appraise,getContent:"+appraise.getContent());
+		log.info("appraise,getContent:"+appraise.getContent().length());
 		if(setting.getMinLevel()<=appraise.getLevel()&&setting.getMinLength()<=appraise.getContent().length()){
 			return true;
 		}
