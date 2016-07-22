@@ -754,7 +754,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("ITEMS", items);
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
-		data.put("PAYMENT_AMOUNT", order.getOriginalAmount().subtract(order.getReductionAmount()));
+		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
 		//添加当天小票的打印的序号
 		data.put("NUMBER", nextNumber(shopDetail.getId(),order.getId()));
 
