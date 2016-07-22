@@ -53,6 +53,8 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public Order printSuccess(String orderId) throws AppException;
 
+	Order getOrderAccount(String shopId);
+
 	/**
 	 * 查询当天某些状态的订单
 	 * @param shopId

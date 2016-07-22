@@ -1383,4 +1383,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),4, RoundingMode.HALF_UP));
 	}
 
+
+	@Override
+	public Order getOrderAccount(String shopId) {
+		Order order =  orderMapper.getOrderAccount(shopId);
+		return order;
+	}
 }

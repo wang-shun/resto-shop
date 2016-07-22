@@ -60,6 +60,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
 	List<Order> selectShopOrderByDateAndProductionStates(@Param("shopId")String shopId,@Param("date") Date date,@Param("proStatus") int[] proStatus);
 
+
+	/**
+	 *  根据店铺id得到店铺当日的订单情况
+	 * @param shopId
+	 * @return
+     */
+	Order getOrderAccount(String shopId);
+
+
 	/**
 	 * 查询某天的历史订单
 	 * @param currentShopId

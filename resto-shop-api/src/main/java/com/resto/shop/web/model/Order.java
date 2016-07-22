@@ -114,6 +114,26 @@ public class Order {
     //
     private String telephone;
 
+    private int orderCount;
+
+    private BigDecimal orderTotal;
+
+    final public int getOrderCount() {
+        return orderCount;
+    }
+
+    final public void setOrderCount(int orderCount) {
+        this.orderCount = orderCount;
+    }
+
+    final public BigDecimal getOrderTotal() {
+        return orderTotal;
+    }
+
+    final public void setOrderTotal(BigDecimal orderTotal) {
+        this.orderTotal = orderTotal;
+    }
+
     public String getTelephone() {
 		return telephone;
 	}
