@@ -159,7 +159,7 @@ public class OrderMessageListener implements MessageListener {
 
     private void sendShareMsg(Appraise appraise) {
 
-        StringBuffer msg = new StringBuffer("感谢您的五星评价，分享好友\n");
+        StringBuffer msg = new StringBuffer("感谢你的好评 ，分享好友\n");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());
