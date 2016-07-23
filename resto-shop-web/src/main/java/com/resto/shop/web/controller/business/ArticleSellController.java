@@ -116,13 +116,13 @@ public class ArticleSellController extends GenericController{
 //		return getSuccessResult(list);
 //	}
 //	
-	@RequestMapping("/shop_familyId_data")
-	@ResponseBody
-	public Result shop_family_data(String beginDate,String endDate,String shopId,String sort){
-		List<ArticleSellDto> list = orderService.selectShopArticleSellByDateAndFamilyId(beginDate, endDate, shopId,sort);
-		return getSuccessResult(list);
-		
-	}
+//	@RequestMapping("/shop_familyId_data")
+//	@ResponseBody
+//	public Result shop_family_data(String beginDate,String endDate,String shopId,String sort){
+//		List<ArticleSellDto> list = orderService.selectShopArticleSellByDateAndFamilyId(beginDate, endDate, shopId,sort);
+//		return getSuccessResult(list);
+//		
+//	}
 	@RequestMapping("/shop_id_data")
 	@ResponseBody
 	public Result shop_id_data(String beginDate,String endDate,String shopId,String sort){
@@ -138,14 +138,14 @@ public class ArticleSellController extends GenericController{
 		return getSuccessResult(list);
 	}
 	
-	@RequestMapping("/brand_familyId_data")
-	@ResponseBody
-	
-	public Result brand_familyId_data(String beginDate,String endDate,String sort){
-		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(),beginDate, endDate, sort);
-		return getSuccessResult(list);
-	}
-	
+//	@RequestMapping("/brand_familyId_data")
+//	@ResponseBody
+//	
+//	public Result brand_familyId_data(String beginDate,String endDate,String sort){
+//		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(),beginDate, endDate, sort);
+//		return getSuccessResult(list);
+//	}
+//	
 	
 	
 	@RequestMapping("/brand_excel")
