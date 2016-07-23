@@ -14,17 +14,17 @@
 					<form role="form" class="form-horizontal" action="{{m.id?'advert/modify':'advert/create'}}" @submit.prevent="save">
 						<div class="form-body" style="overflow-y: hidden; overflow-x: hidden;" >
 							<div class="form-group">
-			           			<label class="col-sm-2 control-label">标题：</label>
-							    <div class="col-sm-8">
+								<label class="col-sm-2 control-label">标题：</label>
+								<div class="col-sm-8">
 									<input type="text" class="form-control" required name="slogan" v-model="m.slogan">
-							    </div>
+								</div>
 							</div>
 							<div class="form-group " >
-			           			<label class="col-sm-2 control-label">描述：</label>
-							    <div class="col-sm-8" >
+								<label class="col-sm-2 control-label">描述：</label>
+								<div class="col-sm-8" >
 							    	<textarea :id="randomId" name="description" v-model="m.description"
-											    ></textarea>
-							    </div>
+									></textarea>
+								</div>
 							</div>
 							<div class="validataMsg" ></div>
 
@@ -55,24 +55,24 @@
 </div>
 
 <div class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title text-center"><strong></strong></h4>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title text-center"><strong></strong></h4>
+			</div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 
 	(function(){
-		
+
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
@@ -81,11 +81,11 @@
 				dataSrc : ""
 			},
 			columns : [
-				{                 
+				{
 					title : "标题",
 					data : "slogan",
-				},             
-				{                 
+				},
+				{
 					title : "详情",
 					defaultContent:"",
 					createdCell:function(td,tdData,rowData){
@@ -95,8 +95,8 @@
 						})
 						$(td).html(button);
 					}
-				},                  
-				{                 
+				},
+				{
 					title : "状态",
 					data : "state",
 				},
@@ -116,7 +116,7 @@
 					}
 				}],
 		});
-		
+
 		var ue=null;
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
@@ -171,7 +171,7 @@
 				save:function(e){
 					if(ue.getContent().length<=0){
 						if($(".validataMsg").html().length<=0){
-							$(".validataMsg").append("<p class='text-danger text-center'><strong>店铺描述不能为空！</strong></p>");	
+							$(".validataMsg").append("<p class='text-danger text-center'><strong>店铺描述不能为空！</strong></p>");
 						}
 						return;
 					}
@@ -187,12 +187,12 @@
 		});
 		C.vue=vueObj;
 	}());
-	
+
 	//用于显示描述详情
 	function showDetails(obj){
- 		$(".modal-title > strong").html(obj.slogan);
- 		$(".modal-body").html(obj.description);
+		$(".modal-title > strong").html(obj.slogan);
+		$(".modal-body").html(obj.description);
 		$(".modal").modal();
 	}
-	
+
 </script>
