@@ -13,6 +13,12 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  <br></div>
+		  	 <button type="button" class="btn red" id="today"> 今日</button>
+             <button type="button" class="btn green" id="yesterDay">昨日</button>
+             <button type="button" class="btn yellow" id="benxun">本询</button>
+             <button type="button" class="btn purple" id="week">本周</button>
+             <button type="button" class="btn purple" id="month">本月</button>
+		  
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
 		  <form>
@@ -38,7 +44,8 @@
 			</div>
     	</div>
     </div>
- 
+ </div>
+ <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 //时间插件
 $('.form_datetime').datetimepicker({
@@ -146,9 +153,67 @@ var tb2 = $("#shopReportTable").DataTable({
 	
 });
 
+//查询
 $("#searchReport").click(function(){
 	 beginDate = $("#beginDate").val();
 	 endDate = $("#endDate").val();
+	 searchInfo(beginDate,endDate);
+	
+})
+
+//今日
+
+$("#today").click(function(){
+	date = new Date().format("yyyy-MM-dd");
+	beginDate = date;
+	endDate = date;
+	 searchInfo(beginDate,endDate);
+});
+
+//昨日
+$("#yesterDay").click(function(){
+	alert();
+	beginDate = GetDateStr(-1);
+	endDate = GetDateStr(-1);
+	$("#beginDate").val(beginDate);
+	$("#endDate").val(endDate);
+    searchInfo(beginDate,endDate);
+	
+});
+
+
+//本周
+$("#week").click(function(){
+	beginDate = getWeekStartDate();
+	endDate = new Date().format("yyyy-MM-dd");
+	$("#beginDate").val(beginDate);
+	$("#endDate").val(endDate);
+	searchInfo(beginDate,endDate);
+	
+});
+
+
+//本旬
+$("#benxun").click(function(){
+	
+	
+	
+});
+
+
+//本月
+$("#month").click(function(){
+	beginDate = getMonthStartDate();
+	endDate = new Date().format("yyyy-MM-dd");
+	$("#beginDate").val(beginDate);
+	$("#endDate").val(endDate);
+	searchInfo(beginDate,endDate);
+	
+});
+
+
+
+function searchInfo(beginDate,endDate){
 	//更新数据源
 	 $.ajax( {  
 		    url:'totalIncome/reportIncome',
@@ -168,7 +233,8 @@ $("#searchReport").click(function(){
 		    	 toastr.error("系统异常请重新刷新");
 		     }  
 		});
-})
+}
+
 
 //导出品牌数据
 $("#brandreportExcel").click(function(){

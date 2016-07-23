@@ -123,6 +123,9 @@ public class OrderController extends GenericController{
 		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 		for (Order order : list) {
 			order.setShopName(shop.getName());
+			if(order.getTelephone()==null){
+				order.setTelephone("");
+			}
 		}
 		return list;
 	}

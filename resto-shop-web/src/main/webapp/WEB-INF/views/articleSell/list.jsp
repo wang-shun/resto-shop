@@ -46,20 +46,32 @@
 					<tr>
 						<th>品牌名称</th>
 						<th>菜品总销量(份)</th>
-						<th>销售详情</th>
+						<th>菜品销售总额</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td><strong>{{brandReport.brandName}}</strong></td>
 						<td>{{brandReport.totalNum}}</td>
-						<td><button class="btn btn-success"
-								@click="showBrandReport(brandReport.brandName)">查看详情</button></td>
+						<td>{{brandReport.totalNum}}</td>
 					</tr>
 				</tbody>
 		  	</table>
 		  </div>
 		</div>
+		
+		
+		<div class="panel panel-success">
+		  <div class="panel-heading text-center">
+		  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表详细
+		  	</strong>
+		  </div>
+		  <div class="panel-body">
+		  	<table id="articleSellTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  	</table>
+		  </div>
+		</div>
+		
     </div>
     <!-- 店铺菜品销售表 -->
     <div role="tabpanel" class="tab-pane" id="revenueCount">
@@ -98,30 +110,6 @@
     </div>
   </div>
   
-  <!-- 报表详情 -->
-  <div class="modal fade bs-example-modal-lg" id="reportModal" 
-		tabindex="-1" role="dialog" aria-labelledby="reportModal" 
-		data-backdrop="static"> 
-		<div class="modal-dialog modal-lg"> 
-			<div class="modal-content"> 
-				<div class="modal-header"> 
-					<button type="button" class="close" data-dismiss="modal" 
-						aria-label="Close"> 
-						<span aria-hidden="true">&times;</span> 
-					</button> 
-					<h4 class="modal-title text-center"> 
-						<strong>菜品销售详情</strong> 
-					</h4> 
-				</div> 
-				<div class="modal-body"></div> 
-				<div class="modal-footer"> 
-					<button type="button" class="btn btn-info btn-block" @click="closeModal">关闭</button> 
-				</div> 
-			</div> 
-		</div> 
-	</div> 
-</div>
-</div>
 <script>
 
 //时间插件
@@ -136,6 +124,7 @@ $('.form_datetime').datetimepicker({
 		startView:"month",
 		language:"zh-CN"
 	});
+	
 var vueObj = new Vue({
 		el : "#control",
 		data : {
@@ -175,6 +164,9 @@ var vueObj = new Vue({
 					$.post("articleSell/list_brand", this.getDate(null), function(result) {
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
+	 					
+	 					tb2.ajax.reload();
+	 					
 	 					toastr.success("查询成功");
 	 				});
 				  break;
@@ -227,11 +219,55 @@ var vueObj = new Vue({
 			this.searchInfo();
 		}
 	})
+	
+var sort = "desc";	
+var tb2 = $("#articleSellTable").DataTable({
+	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+	ajax : {
+		url : "articleSell/brand_id_data",
+		dataSrc : "data",
+		data:function(d){
+			d.beginDate = vueObj.searchDate.beginDate;
+			d.endDate = vueObj.searchDate.endDate ;
+			d.sort = sort;//默认按销量排序
+			return d;
+		}
+	},
+	ordering:false,
+	columns : [
+		{
+			title : "菜品分类",
+			data : "articleFamilyName",
+		},  
+		{
+			title : "菜品名称",
+			data : "articleName",
+		},  
+		{
+			title : "菜品销量(份)",
+			data : "brandSellNum",
+		},
+		{
+			title : "菜品销量占比",
+			data : "brandSellNum",
+		},
+		{
+			title : "菜品销售额(元)",
+			data : "salles",
+		},
+		{
+			title : "菜品销售额占比",
+			data : "salesRatio",
+		},
+	],
+	
+})
+	
 
 $('#ulTab a').click(function (e) {
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	  e.preventDefault()
+	var beginDate = vueObj.searchDate.beginDate;
+	var endDate = vueObj.searchDate.endDate;
+	e.preventDefault()
 	 $(this).tab('show');
 	  var num = vueObj.getNumActive()
 	  switch(num){

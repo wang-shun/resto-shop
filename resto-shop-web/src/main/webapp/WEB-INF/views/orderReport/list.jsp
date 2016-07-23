@@ -23,22 +23,10 @@
              <button type="button" class="btn yellow" @click="benxun">本询</button>
              
              <button type="button" class="btn purple" @click="week">本周</button>
-             <div class="btn-group btn-group-solid">
-                 <button type="button" class="btn blue dropdown-toggle" data-toggle="dropdown">
-                     <i class="fa fa-ellipsis-horizontal"></i> 月
-                     <i class="fa fa-angle-down"></i>
-                 </button>
-                 <ul class="dropdown-menu">
-                     <li>
-                         <a href="javascript:;"> 1月 </a>
-                     </li>
-                     <li>
-                         <a href="javascript:;"> 2月 </a>
-                     </li>
-                 </ul>
-              
-                  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-		 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+             <button type="button" class="btn purple" @click="month">本月</button>
+             
+             <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
 		</form>
 		
 	</div>
@@ -97,13 +85,25 @@
            </div>
            <!-- /.modal-dialog -->
        </div>
+       
+       
+       <div role="tabpanel" class="tab-pane" id="aritcleRevenueCount">
+    	<div class="panel panel-primary" style="border-color:write;">
+		  	<!-- 菜品销售记录 -->
+    	<div class="panel panel-info">
+		  <div class="panel-heading text-center">
+		  	<strong style="margin-right:100px;font-size:22px">菜品销售记录</strong>
+		  </div>
+		  <div class="panel-body">
+		  	<table id="articleSellTable" class="table table-striped table-bordered table-hover" width="100%"></table>
+		  </div>
+		</div>
+		  </div>
+		</div>
 
     </div>
   </div>
   
-  <p v-for="count in countlist">                                                   
-	{{count.YEARMONTH}}
-	</p>     
  <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
@@ -192,11 +192,14 @@ var vueObj =  new Vue({
 		
 		week : function(){
 			this.searchDate.beginDate  = getWeekStartDate();
-			this.searchDate.beginDate  = getWeekEndDate();
-			this.searchIfno();
-		}
-		
-		
+			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+			this.searchInfo();
+		},
+		month : function(){
+			this.searchDate.beginDate  = getMonthStartDate();
+			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+			this.searchInfo();
+		},
 		
 	},
 	
@@ -206,10 +209,10 @@ var vueObj =  new Vue({
 		this.searchDate.beginDate = date;
 		this.searchDate.endDate = date;
 		
-		getAppraiseCount(function(appraiseCount,countList){
-			that.appraiseCount = appraiseCount;
-			that.countList = countList;
-		});
+// 		getAppraiseCount(function(appraiseCount,countList){
+// 			that.appraiseCount = appraiseCount;
+// 			that.countList = countList;
+// 		});
 		this.searchInfo();
 	}
 	

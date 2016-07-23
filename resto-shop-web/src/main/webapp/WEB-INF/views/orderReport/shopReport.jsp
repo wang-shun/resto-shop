@@ -74,16 +74,6 @@ th {
                        </tr>
                    </thead>
                    <tbody id="articleList">
-<!--                        <tr> -->
-<!--                            <td> 1 </td> -->
-<!--                            <td> Mark </td> -->
-<!--                            <td> Otto </td> -->
-<!--                            <td> makr124 </td> -->
-<!--                            <td> -->
-<%--                                <span class="label label-sm label-success"> Approved </span> --%>
-<!--                            </td> -->
-<!--                            <td>2</td> -->
-<!--                        </tr> -->
                    </tbody>
                </table>
            </div>
@@ -277,8 +267,6 @@ th {
 			 method:'post',
 			 data:{ "orderId":orderId},
 			 success:function(result){
-				// alert(JSON.stringify(result));
-	
 				if(result){
 					var data = result.data;
 					 $("#shopName").html(data.shopName);
@@ -381,7 +369,7 @@ th {
 	 $("#closeModal2").click(function(e){
 		 e.stopPropagation();
 			var modal = $("#orderDetail");
-			//modal.find(".modal-body").html("");
+			modal.find(".modal-body").html("");
 			modal.modal("hide");
 	 })
 	
