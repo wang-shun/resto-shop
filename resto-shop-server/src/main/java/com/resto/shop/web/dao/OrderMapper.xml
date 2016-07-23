@@ -895,13 +895,16 @@
 	<!-- 品牌菜品销售记录中的(店铺菜品)的销售的详情    相对于店铺端多了品牌菜品销售总量,销售占比这两行-->
 	<select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
 	
-select r.* from ( SELECT
+select r.articleFamilyName,r.articleName,sum(r.count) as shopSellNum,
+  r.brandSellNum ,r.peference,r.sort from ( SELECT
+    DISTINCT t.order_id,
 	t5. NAME AS articleFamilyName,
 	t.article_name AS articleName,
-	sum(t.count) AS shopSellNum,
+	t.count AS count,
   t6.count AS brandSellNum,
    t5.peference,
-t4.sort
+t4.sort,
+t.article_name
 FROM
 	tb_order_item t
 INNER JOIN tb_order t2 ON t2.id = t.order_id
@@ -909,8 +912,15 @@ INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
 INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
 INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
 LEFT JOIN (
+
+  select  sum(s.count) as count,sum(s.count) * s.final_price as total,s.article_name from   (
 	SELECT
-		sum(t.count) as count ,t.article_name,t.final_price * t.count as total
+		DISTINCT (t.order_id),
+	t5. NAME AS articleFamilyName,
+	t.article_name AS articleName,
+	t.count AS count,
+  t.article_name,
+  t.final_price
 	FROM
 		tb_order_item t
 	INNER JOIN tb_order t2 ON t2.id = t.order_id
@@ -921,17 +931,18 @@ LEFT JOIN (
 		t2.order_state IN (2, 10, 12, 11)
 	AND
 	<![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.brand_id=#{brandId}
-	GROUP BY
-		t.article_name
+	) as s
+	GROUP BY  s.article_name
 ) as t6 on t6.article_name = t.article_name
 WHERE
 	t2.order_state IN (2, 10, 12, 11)
 	AND 
 <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
-GROUP BY
-	t.article_name
+
 ) as r
+GROUP BY r.article_name
 order by ${sort}
+
 	</select>
 	
 	<!-- 品牌菜品销售中 店铺菜品按菜品分类的数据   品牌端显示 -->
@@ -1061,41 +1072,20 @@ WHERE
 
 
 <select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-	SELECT
-	t2.shop_detail_id AS shopId,
-	sum(t.count) AS totalNum,
-		sum(t.final_price) + IFNULL(
-			(
-				SELECT
-					sum(t.final_price)
-				FROM
-					tb_order_item t
-				INNER JOIN tb_order t2 ON t2.id = t.order_id
-				INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-				INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-				WHERE
-				t2.order_state IN (2, 10, 11, 12)
-				AND t.type = 3
-				AND 
-				<![CDATA[t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.brand_id=#{brandId}
-				GROUP BY
-					t2.shop_detail_id
-			),
-			0
-		) AS sellIncome
-		FROM
-			tb_order_item t
-		INNER JOIN tb_order t2 ON t2.id = t.order_id
-		INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-		INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-		WHERE
-			t2.brand_id = #{brandId}
-		AND t2.order_state IN (2, 10, 11, 12)
-		AND t.type != 3
-		AND 
-		<![CDATA[t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
-		GROUP BY
-			t2.shop_detail_id
+	select sum(r.count) as totalNum,sum(r.final_price) as sellIncome,r.shopId from (SELECT
+        DISTINCT(t.order_id),t.article_name,t.count,t.final_price,t2.shop_detail_id as shopId
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        WHERE
+        t2.brand_id = #{brandId}
+        AND t2.order_state IN (2, 10, 11, 12)
+        AND t.type != 3
+        AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
+        ) as r
+        GROUP BY r.shopId
 </select>
 
 <select id="selectShopArticleNum" resultType="Integer">
@@ -1146,36 +1136,29 @@ order by ${sort}
 </select>
 
 <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
-SELECT
- r.*
-FROM
-	(
-		SELECT
-			LEFT (t.article_id, 32) AS articleId,
-			SUM(t.count) as brandSellNum,
-			t.article_name,
-			t5.id AS articleFamilyId,
-			t5. NAME AS articleFamilyName,
-			t5.peference,
-			t4.sort,
-      		t.order_id,
-      		sum(t.final_price) salles
-		FROM
-			tb_order_item t
-		INNER JOIN tb_order t2 ON t2.id = t.order_id
-		INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-		INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-		INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
-		WHERE
-			t2.order_state in (2,10,11,12)
-			and 
-		<![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.brand_id=#{brandId}
-		
-		GROUP BY t.article_name
+select r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
+        DISTINCT(t.order_id),
+        LEFT (t.article_id, 32) AS articleId,
+        t.count,
+        t.article_name,
+        t5.id AS articleFamilyId,
+        t5. NAME AS articleFamilyName,
+        t5.peference,
+        t4.sort,
 
-	) AS r
-order by ${sort}
-
+        t.final_price
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+        WHERE
+        t2.order_state in (2,10,11,12)
+        and
+      <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
+        ) as r
+        GROUP BY r.article_name
 
 </select>
 

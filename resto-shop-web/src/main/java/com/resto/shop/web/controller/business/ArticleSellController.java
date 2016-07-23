@@ -156,7 +156,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","brandSellNum"};
+		String[]columns={"articleFamilyName","articleName","brandSellNum","","",""};
 		//定义数据
 		List<ArticleSellDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -265,11 +265,11 @@ public class ArticleSellController extends GenericController{
 	@ResponseBody
 	public void reportBrandArticleIdExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
-		String fileName = "菜品销售记录报表"+beginDate+"至"+endDate+".xls";
+		String fileName = "品牌菜品销售记录详情报表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","brandSellNum","salles","salesRatio"};
+		String[]columns={"articleFamilyName","articleName","brandSellNum","numRatio","salles","salesRatio"};
 		//定义数据
 		List<ArticleSellDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -286,10 +286,10 @@ public class ArticleSellController extends GenericController{
 		map.put("brandName", brand.getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
+		map.put("reportType", "品牌菜品销售详情报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "2");//显示的位置
-		map.put("reportTitle", "品牌菜品销售");//表的名字
+		map.put("num", "5");//显示的位置
+		map.put("reportTitle", "品牌菜品销售详情");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
 		//定义excel表格的表头
@@ -303,7 +303,7 @@ public class ArticleSellController extends GenericController{
 //		}
 		//暂时查全部
 		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
+		String[][] headers = {{"菜品分类","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销量占比","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
 		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -318,6 +318,67 @@ public class ArticleSellController extends GenericController{
 			e.printStackTrace();
 		}
 	}
+	
+	
+	@RequestMapping("/shop_articleId_excel")
+	@ResponseBody
+	public void reportShopSumArticleIdExcel(String beginDate,String endDate,String sort,HttpServletRequest request, HttpServletResponse response){
+		//导出文件名
+		String fileName = "店铺菜品销售记录报表"+beginDate+"至"+endDate+".xls";
+		//定义读取文件的路径
+		String path = request.getSession().getServletContext().getRealPath(fileName);
+		//定义列
+		String[]columns={"shopName","totalNum","sellIncome","occupy"};
+		//定义数据
+		List<ShopArticleReportDto> result = null;
+		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+		Map<String,String> map = new HashMap<>();
+		Brand brand = brandServie.selectById(getCurrentBrandId());
+		//获取店铺名称
+		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+		String shopName="";
+		for (ShopDetail shopDetail : shops) {
+			shopName += shopDetail.getName()+",";
+		}
+		//去掉最后一个逗号
+		shopName.substring(0, shopName.length()-1);
+		map.put("brandName", brand.getBrandName());
+		map.put("shops", shopName);
+		map.put("beginDate", beginDate);
+		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "3");//显示的位置
+		map.put("reportTitle", "店铺菜品销售");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+		
+		//定义excel表格的表头
+//		if(selectValue==null||"".equals(selectValue)){
+//			selectValue="全部";
+//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
+//		}else{
+//			//根据菜品分类的名称获取菜品分类的id
+//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
+//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
+//		}
+		//暂时查全部
+		result = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId());
+		String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"}};
+		
+		//定义excel工具类对象
+		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
+		try{
+			OutputStream out = new FileOutputStream(path);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
+			out.close();
+			excelUtil.download(path, response);
+			JOptionPane.showMessageDialog(null, "导出成功！");
+			log.info("excel导出成功");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 	
 	@RequestMapping("/shop_excel")
@@ -381,63 +442,63 @@ public class ArticleSellController extends GenericController{
 		
 	}
 	
-	@RequestMapping("/shop_articleId_excel")
-	@ResponseBody
-	public void reportShopArticleIdExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
-		//导出文件名
-		String fileName = "菜品销售记录报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"articleFamilyName","articleName","shopSellNum","salles","salesRatio"};
-		//定义数据
-		List<ArticleSellDto> result = null;
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-		String shopName="";
-		for (ShopDetail shopDetail : shops) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "2");//显示的位置
-		map.put("reportTitle", "品牌菜品销售");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义excel表格的表头
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-//		}else{
-//			//根据菜品分类的名称获取菜品分类的id
-//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
+//	@RequestMapping("/shop_articleId_excel")
+//	@ResponseBody
+//	public void reportShopArticleIdExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
+//		//导出文件名
+//		String fileName = "菜品销售记录报表"+beginDate+"至"+endDate+".xls";
+//		//定义读取文件的路径
+//		String path = request.getSession().getServletContext().getRealPath(fileName);
+//		//定义列
+//		String[]columns={"articleFamilyName","articleName","shopSellNum","salles","salesRatio"};
+//		//定义数据
+//		List<ArticleSellDto> result = null;
+//		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+//		Map<String,String> map = new HashMap<>();
+//		Brand brand = brandServie.selectById(getCurrentBrandId());
+//		//获取店铺名称
+//		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+//		String shopName="";
+//		for (ShopDetail shopDetail : shops) {
+//			shopName += shopDetail.getName()+",";
 //		}
-//		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
+//		//去掉最后一个逗号
+//		shopName.substring(0, shopName.length()-1);
+//		map.put("brandName", brand.getBrandName());
+//		map.put("shops", shopName);
+//		map.put("beginDate", beginDate);
+//		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
+//		map.put("endDate", endDate);
+//		map.put("num", "2");//显示的位置
+//		map.put("reportTitle", "品牌菜品销售");//表的名字
+//		map.put("timeType", "yyyy-MM-dd");
 //		
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			//excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	
+//		//定义excel表格的表头
+////		if(selectValue==null||"".equals(selectValue)){
+////			selectValue="全部";
+////			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
+////		}else{
+////			//根据菜品分类的名称获取菜品分类的id
+////			String articleFamilyId = articleFamilyService.selectByName(selectValue);
+////			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
+////		}
+////		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
+////		
+//		//定义excel工具类对象
+//		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+//		try{
+//			OutputStream out = new FileOutputStream(path);
+//			//excelUtil.ExportExcel(headers, columns, result, out, map);
+//			out.close();
+//			excelUtil.download(path, response);
+//			JOptionPane.showMessageDialog(null, "导出成功！");
+//			log.info("excel导出成功");
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
+//	}
+//	
+//	
 	
 	
 	

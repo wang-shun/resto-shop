@@ -86,21 +86,6 @@
            <!-- /.modal-dialog -->
        </div>
        
-       
-       <div role="tabpanel" class="tab-pane" id="aritcleRevenueCount">
-    	<div class="panel panel-primary" style="border-color:write;">
-		  	<!-- 菜品销售记录 -->
-    	<div class="panel panel-info">
-		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">菜品销售记录</strong>
-		  </div>
-		  <div class="panel-body">
-		  	<table id="articleSellTable" class="table table-striped table-bordered table-hover" width="100%"></table>
-		  </div>
-		</div>
-		  </div>
-		</div>
-
     </div>
   </div>
   
@@ -160,11 +145,14 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
+			$("#reportModal").modal('show');
 			this.openModal("orderReport/show/shopReport", shopName,shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
+			debugger;
 			$.post(url, this.getDate(shopId),function(result) {
 				//console.log(result)
+				
 				var modal = $("#reportModal");
 				modal.find(".modal-body").html(result);
 				modal.find(".modal-title > strong").html(modalTitle);

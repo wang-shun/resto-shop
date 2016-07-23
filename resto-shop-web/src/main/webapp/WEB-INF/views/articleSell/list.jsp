@@ -13,7 +13,19 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
-		  <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+		  
+		 	 <button type="button" class="btn red" @click="today"> 今日</button>
+                 
+             <button type="button" class="btn green" @click="yesterDay">昨日</button>
+          
+<!--              <button type="button" class="btn yellow" @click="benxun">本询</button> -->
+             
+             <button type="button" class="btn yellow" @click="week">本周</button>
+             <button type="button" class="btn purple" @click="month">本月</button>
+             
+             <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
+		  
 		</form>
 		<br/>
 	<div>
@@ -63,7 +75,7 @@
 		
 		<div class="panel panel-success">
 		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表详细
+		  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表详情
 		  	</strong>
 		  </div>
 		  <div class="panel-body">
@@ -73,6 +85,24 @@
 		</div>
 		
     </div>
+    
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
+           <div class="modal-dialog modal-full">
+               <div class="modal-content">
+                   <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+                   </div>
+                   <div class="modal-body"> </div>
+                   <br/>
+                   <div class="modal-footer">
+<!--                        <button type="button" class="btn btn-info btn-block"  @click="closeModal">关闭</button> -->
+                        <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
+                   </div>
+               </div>
+               <!-- /.modal-content -->
+           </div>
+           <!-- /.modal-dialog -->
+       </div>
     <!-- 店铺菜品销售表 -->
     <div role="tabpanel" class="tab-pane" id="revenueCount">
     	<div class="panel panel-primary" style="border-color:write;">
@@ -110,6 +140,7 @@
     </div>
   </div>
   
+<script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 
 //时间插件
@@ -164,9 +195,7 @@ var vueObj = new Vue({
 					$.post("articleSell/list_brand", this.getDate(null), function(result) {
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
-	 					
 	 					tb2.ajax.reload();
-	 					
 	 					toastr.success("查询成功");
 	 				});
 				  break;
@@ -180,7 +209,6 @@ var vueObj = new Vue({
 			},
 			openModal : function(url, modalTitle,shopId) {
 				$.post(url, this.getDate(shopId),function(result) {
-					console.log(result)
 					var modal = $("#reportModal");
 					modal.find(".modal-body").html(result);
 					modal.find(".modal-title > strong").html(modalTitle);
@@ -211,6 +239,47 @@ var vueObj = new Vue({
 				}
 				
 			},
+			brandreportExcel : function(){
+				debugger;
+				var that = this;
+				var beginDate = that.searchDate.beginDate;
+				var endDate = that.searchDate.endDate;
+				var num = this.getNumActive()
+				 switch(num){
+				  case 1:
+					  location.href="articleSell/brand_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+					  break;
+					case 2:
+						location.href="articleSell/shop_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+					  break;
+				  }
+			},
+			
+			today : function(){
+				date = new Date().format("yyyy-MM-dd");
+				this.searchDate.beginDate = date
+				this.searchDate.endDate = date
+				this.searchInfo();
+			},
+			yesterDay : function(){
+				
+				this.searchDate.beginDate = GetDateStr(-1);
+				this.searchDate.endDate  = GetDateStr(-1);
+				this.searchInfo();
+			},
+			
+			week : function(){
+				this.searchDate.beginDate  = getWeekStartDate();
+				this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+				this.searchInfo();
+			},
+			month : function(){
+				this.searchDate.beginDate  = getMonthStartDate();
+				this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+				this.searchInfo();
+			},
+			
+			
 		},
 		created : function() {
 			var date = new Date().format("yyyy-MM-dd");
@@ -249,7 +318,7 @@ var tb2 = $("#articleSellTable").DataTable({
 		},
 		{
 			title : "菜品销量占比",
-			data : "brandSellNum",
+			data : "numRatio",
 		},
 		{
 			title : "菜品销售额(元)",

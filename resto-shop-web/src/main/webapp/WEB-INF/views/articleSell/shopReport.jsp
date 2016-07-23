@@ -52,6 +52,7 @@ var shopTable = $("#shopTable").DataTable({
 			return d;
 		}
 	},
+	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
 	//order: [[ 2, "desc" ]],//默认以店铺销量降序
 	columnDefs:[{
                  orderable:false,//禁用排序
@@ -61,53 +62,32 @@ var shopTable = $("#shopTable").DataTable({
 		{
 			title : "菜品分类",
 			data : "articleFamilyName",
-			createdCell:function(td,tdData,rowData){
-				if(isEmpty(tdData)){
-					var lab = $("<span>");
-					if(isEmpty(rowData.articleFamilyId)){
-						lab.html("分类不详").addClass("label label-warning");
-					}else{
-						lab.html("该分类已不存在").addClass("label label-warning");
-					}
-					$(td).html(lab);
-				}
-				
-			}
 		},  
 		{
 			title : "菜品名称",
 			data : "articleName",
-			createdCell:function(td,tdData,rowData){
-				if(isEmpty(rowData.articleFamilyId) && isEmpty(rowData.articleFamilyName)){
-					$(td).html(tdData+"&nbsp;<span class='label label-danger'>已被删除</span>");
-				}
-			}
-		},  
+		},	
 		{
 			title : "菜品销量(份)",
 			data : "shopSellNum",
 		},
+		{
+			title : "销量占比",
+			data : "shopSellNum",
+		},
+		
 		{                 
-			title : "品牌菜品总销量(份)",
+			title : "菜品销售额(元)",
 			data : "brandSellNum",
 		},                 
-// 		{                 
-// 			title : "销售占比",
-// 			data : "salesRatio",
-// 			createdCell:function(td,tdData){
-// 				$(td).html((tdData*100).toFixed(2)+"%");
-// 			}
-// 		},
+		{                 
+			title : "销售占比",
+			data : "salesRatio",
+			createdCell:function(td,tdData){
+				$(td).html((tdData*100).toFixed(2)+"%");
+			}
+		},
 	],
-	initComplete: function () {//列筛选
-		tbApi = this.api();
-		appendSelect(tbApi);
-		isFirst = false;
-    }
-}).on( 'xhr.dt', function (e) { 
-	if(!isFirst){
-		appendSelect(tbApi);
-	}
 } );
 
 //搜索

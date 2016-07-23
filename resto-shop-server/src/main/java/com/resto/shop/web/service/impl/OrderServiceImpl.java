@@ -1207,17 +1207,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			sort="r.brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
-		//计算总菜品销售额
+		//计算总菜品销售额,//菜品总销售额
+		double num = 0;
+		
+		
 		BigDecimal temp = BigDecimal.ZERO;
 		for (ArticleSellDto articleSellDto : list) {
 			temp = add(temp,articleSellDto.getSalles());
+			num+=articleSellDto.getBrandSellNum().doubleValue();
 		}
+		
 		for (ArticleSellDto articleSellDto : list) {
-			double c = articleSellDto.getSalles().divide(temp,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
-			java.text.DecimalFormat myformat=new java.text.DecimalFormat("0.00");
-			String str = myformat.format(c);
-			str = str+"%";
-			articleSellDto.setSalesRatio(str);
+			BigDecimal d = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+			articleSellDto.setSalesRatio(d+"%");
+			
+			BigDecimal   b   =   new   BigDecimal(((articleSellDto.getBrandSellNum().doubleValue()/num)*100));  
+			double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
+			articleSellDto.setNumRatio(f1+"%");
 		}
 		
 		return list;
