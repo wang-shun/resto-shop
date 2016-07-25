@@ -113,8 +113,42 @@ public class Order {
 
     //
     private String telephone;
+    
+    
+    private BigDecimal payValue;
+    
+    private int paymentModeId;
+    
+  
 
-    public String getTelephone() {
+    private List<OrderPaymentItem> orderPaymentItems;
+    
+    
+	public List<OrderPaymentItem> getOrderPaymentItems() {
+		return orderPaymentItems;
+	}
+
+	public void setOrderPaymentItems(List<OrderPaymentItem> orderPaymentItems) {
+		this.orderPaymentItems = orderPaymentItems;
+	}
+
+	public BigDecimal getPayValue() {
+		return payValue;
+	}
+
+	public void setPayValue(BigDecimal payValue) {
+		this.payValue = payValue;
+	}
+
+	public int getPaymentModeId() {
+		return paymentModeId;
+	}
+
+	public void setPaymentModeId(int paymentModeId) {
+		this.paymentModeId = paymentModeId;
+	}
+
+	public String getTelephone() {
 		return telephone;
 	}
 

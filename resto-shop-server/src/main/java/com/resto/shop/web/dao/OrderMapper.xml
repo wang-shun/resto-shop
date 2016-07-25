@@ -98,6 +98,36 @@
 	</collection>
 </resultMap>
 
+
+
+<resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
+	<id column="id" property="id" jdbcType="VARCHAR" />
+	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+	<result column="order_state" property="orderState" jdbcType="INTEGER" />
+	<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	<result column="ver_code" property="verCode" jdbcType="VARCHAR" />
+	<result column="order_state" property="orderState" jdbcType="VARCHAR" />
+	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
+	<result column="production_status" property="productionStatus" />
+
+	<association property="customer" javaType="com.resto.shop.web.model.Customer">
+		<id column="customer_id" property="id" />
+		<result column="telephone" property="telephone" />
+	</association>
+
+	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+		<id column="appraise_id" property="id" />
+		<result column="level" property="level" />
+	</association>
+
+	<collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+		<id column="orderPaymentItem_id" property="id" />
+		<result column="pay_value" property="payValue" />
+		<result column="payment_mode_id" property="paymentModeId" />
+	</collection>
+</resultMap>
+
+
 	<sql id="Base_Column_List">
 		id, table_number, customer_count, accounting_time,
 		order_state,
@@ -1241,7 +1271,7 @@ ORDER BY ${sort}
 
 </select>
 
-<select id="selectListByTime" resultType="com.resto.shop.web.model.Order">
+<select id="selectListByTime" resultMap="selectOrdersMap">
 	SELECT
 	o.id,
 	o.create_time,
@@ -1251,11 +1281,14 @@ ORDER BY ${sort}
 	o.order_state,
 	o.production_status,
 	c.telephone,
-	a.level
+	a.level,
+	oi.pay_value,
+	oi.payment_mode_id
 FROM
 	tb_order o
 LEFT JOIN tb_customer c ON o.customer_id = c.id
 LEFT JOIN tb_appraise a ON o.id = a.order_id
+LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
 where
 <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
 </select>

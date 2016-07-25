@@ -59,6 +59,12 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 		return orderpaymentitemMapper.selectIncomeList(brandId,begin,end);
 	}
 
+	@Override
+	public List<OrderPaymentItem> selectListByShopId(String shopId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 }

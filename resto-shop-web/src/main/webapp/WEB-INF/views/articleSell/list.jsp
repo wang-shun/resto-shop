@@ -240,7 +240,6 @@ var vueObj = new Vue({
 				
 			},
 			brandreportExcel : function(){
-				debugger;
 				var that = this;
 				var beginDate = that.searchDate.beginDate;
 				var endDate = that.searchDate.endDate;

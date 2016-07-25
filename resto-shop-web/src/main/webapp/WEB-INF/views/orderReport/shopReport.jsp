@@ -122,117 +122,57 @@ th {
 						data : "shopName" ,
 						
 					},                 
-					{ 
-						title : "订单编号",
-						data : "id" 
-					},
+					
 					{ 
 						title : "下单时间", 
-						data : "createTime",
+						data : "beginTime",
 						createdCell:function(td,tdData){
 							$(td).html( new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
 						}
 						
 					},
-					{ 
-						title : "就餐模式",
-					    data : "distributionModeId",
-					    createdCell:function(td,tdData){
-					    	switch(tdData)
-					    	{
-					    	case 1:
-					    	  $(td).html("堂吃");
-					    	  break;
-					    	case 2:
-					    	  $(td).html("自提外卖");
-					    	case 3:
-					    	  $(td).html("外带");
-					    	  break;
-					    	default:
-					    	 $(td).html("未知")
-					    	}
-					    	
-					    }
-					    
-					},
-					{ 
-					    title : "验证码", 
-					    data : "verCode" 
-					},
 					{
 						title : "手机号", 
 						data : "telephone" 
+					},
+					
+					
+					{ 
+						title : "订单金额", 
+						data : "orderMoney" 
 					},
 					{ 
 						title : "订单金额", 
 						data : "orderMoney" 
 					},
 					{ 
+						title : "微信支付", 
+						data : "weChatPay" 
+					},
+					{ 
+						title : "红包支付", 
+						data : "accountPay" 
+					},
+					{ 
+						title : "充值金额支付", 
+						data : "chargePay" 
+					},
+					{ 
+						title : "充值赠送金额支付", 
+						data : "rewardPay" 
+					},
+					{ 
 					  title : "评价", 
 					  data : "level" ,
-					  createdCell:function(td,tdData){
-						  switch(tdData)
-					    	{
-					    	case 5:
-					    	  $(td).html("五星");
-					    	  break;
-					    	case 4:
-					    	  $(td).html("四星");
-					    	case 3:
-					    	  $(td).html("三星");
-					    	  break;
-					    	case 2:
-					    	  $(td).html("二星");
-					    	  break;
-					    	case 1:
-					    	  $(td).html("一星");
-					    	  break;
-					    	default:
-					    		$(td).html("");
-					    	 break;
-					    	}
-					  }
 					  
 					},
 					{
 					 title : "订单状态", 
 					 data : "orderState",
-					 createdCell:function(td,tdData,row,rowData){
-						  switch(tdData)
-					    	{
-					    	case 1:
-						    	  $(td).html("未付款");
-						    	  break;
-						  
-					    	case 2:
-					    	  $(td).html("已付款");
-					    	  break;
-					    	case 9:
-					    	  $(td).html("已取消");
-					    	  break;
-					    	case 10:
-					    		if(row.productionStatus==1){
-					    			$(td).html("已确认");
-					    		}else if(row.productionStatus==2){
-					    			$(td).html("已消费");
-					    		}
-					    	  
-					    	  break;
-					    	case 11:
-					    	  $(td).html("已评价");
-					    	  break;
-					    	case 12:
-					    	  $(td).html("已分享");
-					    	  break;
-					    	default:
-					    	 break;
-					    	}
-					  }
-					  
 					 },
 					{
 					 title : "操作", 
-					 data : "id",
+					 data : "orderId",
 					 createdCell:function(td,tdData){
 						 var button = $("<button class='btn green'>详情</button>");
 							button.click(function(){
@@ -257,7 +197,7 @@ th {
 	$("#closeModal").click(function(e){
 		e.stopPropagation();
 		var modal = $("#orderDetail");
-		modal.find(".modal-body").html("");
+		//modal.find(".modal-body").html("");
 		modal.modal("hide");
 	}) 
 	 

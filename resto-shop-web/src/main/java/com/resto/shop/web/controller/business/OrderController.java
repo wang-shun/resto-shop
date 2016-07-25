@@ -3,6 +3,8 @@
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -25,6 +28,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.OrderService;
 
 @Controller
@@ -115,19 +119,131 @@ public class OrderController extends GenericController{
 	
 	@RequestMapping("AllOrder")
 	@ResponseBody
-	public List<Order> selectAllOrder(String beginDate,String endDate,String shopId){
+	public List<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
 		//return orderService.selectListByTime(beginDate,endDate,shopId);
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		
+		List<OrderDetailDto> listDto = new ArrayList<>();
+		
+	
 		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
-		for (Order order : list) {
-			order.setShopName(shop.getName());
-			if(order.getTelephone()==null){
-				order.setTelephone("");
+		for (Order o : list) {
+			OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "");			
+			
+			//手机号
+			if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
+				ot.setTelephone(o.getCustomer().getTelephone());
 			}
+			//订单状态
+			if(o.getOrderState()!=null){
+				switch (o.getOrderState()) {
+				case 1:
+					ot.setOrderState("未支付");
+					break;
+				case 2:
+					ot.setOrderState("已支付");
+					break;
+				case 9:
+					ot.setOrderState("已取消");
+					break;
+				case 10:
+					if(o.getProductionStatus()==2){
+						ot.setOrderState("已确认");
+					}else if(o.getProductionStatus()==3){
+						ot.setOrderState("已消费");
+					}
+					break;
+				case 11:
+					ot.setOrderState("已评价");
+					break;
+				case 12:
+					ot.setOrderState("已分享");
+					break;
+
+				default:
+					break;
+				}
+				
+				
+			}
+			
+			//订单评价
+			//判断是否为空，不是所有订单都评价
+			
+			if(null!=o.getAppraise()){
+				switch (o.getAppraise().getLevel()) {
+				case 1:
+					ot.setLevel("一星");
+					break;
+				case 2:
+					ot.setLevel("二星");
+					break;
+				case 3:
+					ot.setLevel("三星");
+					break;
+				case 4:
+					ot.setLevel("四星");
+					break;
+				case 5:
+					ot.setLevel("五星");
+					break;
+
+				default:
+					break;
+				}
+				
+			}
+		
+				
+			//订单支付
+			
+			if(o.getOrderPaymentItems()!=null){
+				
+				if(!o.getOrderPaymentItems().isEmpty()){
+					
+
+					for(OrderPaymentItem oi : o.getOrderPaymentItems()){
+						
+						if(null!=oi.getPaymentModeId()){
+							switch (oi.getPaymentModeId()) {
+							case 1:
+								ot.setWeChatPay(oi.getPayValue());
+								break;
+							case 2:
+								ot.setAccountPay(oi.getPayValue());
+								break;
+							case 3:
+								ot.setCouponPay(oi.getPayValue());
+								break;
+							case 6:
+								ot.setChargePay(oi.getPayValue());
+								break;
+							case 7:
+								ot.setRewardPay(oi.getPayValue());
+								break;
+							default:
+								break;
+							}
+						}
+						
+					}
+				
+					
+				}
+					
+				
+			}
+			
+			
+			
+		
+			listDto.add(ot);
+			
+			
+			
 		}
-		return list;
+		return listDto;
 	}
 	
 	@RequestMapping("detailInfo")
