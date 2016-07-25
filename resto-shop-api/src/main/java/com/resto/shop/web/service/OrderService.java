@@ -290,4 +290,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String currentBrandId, String beginDate,
 			String endDate, String selectValue);
+	
+	//查询品牌所有已消费的订单
+	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
 }

@@ -1,0 +1,245 @@
+ package com.resto.shop.web.controller.business;
+
+
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.dto.AppraiseDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.service.OrderService;
+
+@Controller
+@RequestMapping("appraiseReport")
+public class appraiseReportController extends GenericController{
+	
+	@Resource
+	private OrderService orderService;
+	
+	@Resource
+	private BrandService brandService;
+	@Resource
+	private ShopDetailService shopDetailService;
+	
+	@RequestMapping("/list")
+    public void list(){
+    }
+	
+	
+	@RequestMapping("/brand_data")
+	@ResponseBody
+	public Result selectMoneyAndNumByDate(String beginDate,String endDate){
+		
+		return this.getResult(beginDate, endDate);
+	}
+
+
+	private Result getResult(String beginDate, String endDate) {
+		// TODO Auto-generated method stub
+		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId());
+		Brand brand = brandService.selectById(getCurrentBrandId());
+		
+		int appraiseNum=0;//评价单数
+		int totalNum = 0;//已消费订单数
+		
+		BigDecimal orderMoney = BigDecimal.ZERO;//订单总额
+		BigDecimal redMoney = BigDecimal.ZERO;//评论红包总额
+		
+		int oneStart=0;
+		int twoStart=0;
+		int threeStart=0;
+		int fourStart=0;
+		int fiveStart=0;
+		
+		//品牌数据
+		AppraiseDto brandAppraise = new AppraiseDto();
+		
+		for (Order o : olist) {
+			//评价的的单数 //评价红包
+			if(o.getAppraise()!=null){
+				appraiseNum++;
+				redMoney = add(redMoney, o.getAppraise().getRedMoney());
+				
+				if(o.getAppraise().getLevel()==1){
+					oneStart++;
+				}
+				if(o.getAppraise().getLevel()==2){
+					twoStart++;
+				}
+				if(o.getAppraise().getLevel()==3){
+					threeStart++;
+				}
+				if(o.getAppraise().getLevel()==4){
+					fourStart++;
+				}
+				if(o.getAppraise().getLevel()==5){
+					fiveStart++;
+				}
+			}
+			//消费的总单数
+			totalNum++;
+			//消费的总金额
+			orderMoney = add(orderMoney,o.getOrderMoney());
+			
+		}
+		
+		//设置品牌
+		brandAppraise.setBrandName(brand.getBrandName());
+		
+		//设置评价单数
+		brandAppraise.setAppraiseNum(appraiseNum);
+		
+		//设置评价率
+		brandAppraise.setAppraiseRatio(topercent(appraiseNum, totalNum));
+		
+		//设置订单的总额
+		brandAppraise.setTotalMoney(orderMoney);
+		
+		//设置红包的总额
+		
+		brandAppraise.setRedMoney(redMoney);
+		
+		//设置五星,四星...的数量
+		brandAppraise.setOnestar(oneStart);
+		brandAppraise.setTwostar(twoStart);
+		brandAppraise.setThreestar(threeStart);
+		brandAppraise.setFourstar(fourStart);
+		brandAppraise.setFivestar(fiveStart);
+		
+		
+		//店铺数据
+		
+		List<ShopDetail> shoplist =  shopDetailService.selectByBrandId(getCurrentBrandId());
+		
+		List<AppraiseDto> shopAppraiseList = new ArrayList<>();
+		
+		for (ShopDetail s : shoplist) {
+			AppraiseDto shopAppraise = new AppraiseDto(s.getName(), appraiseNum, "", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
+			//每个店铺设置默认值
+			int appraiseNum2=0;//评价单数
+			int totalNum2 = 0;//已消费订单数
+			
+			BigDecimal orderMoney2 = BigDecimal.ZERO;//订单总额
+			BigDecimal redMoney2 = BigDecimal.ZERO;//评论红包总额
+			
+			int oneStart2=0;
+			int twoStart2=0;
+			int threeStart2=0;
+			int fourStart2=0;
+			int fiveStart2=0;
+			
+			for (Order o : olist) {
+				if(o.getShopDetailId().equals(s.getId())){
+					//评价的的单数 //评价红包
+					if(o.getAppraise()!=null){
+						appraiseNum2++;
+						redMoney2 = add(redMoney2, o.getAppraise().getRedMoney());
+						
+						if(o.getAppraise().getLevel()==1){
+							oneStart2++;
+						}
+						if(o.getAppraise().getLevel()==2){
+							twoStart2++;
+						}
+						if(o.getAppraise().getLevel()==3){
+							threeStart2++;
+						}
+						if(o.getAppraise().getLevel()==4){
+							fourStart2++;
+						}
+						if(o.getAppraise().getLevel()==5){
+							fiveStart2++;
+						}
+					}
+					//消费的总金额
+					orderMoney2 = add(orderMoney2,o.getOrderMoney());
+					//
+					totalNum2++;
+				}
+				
+			}
+			
+			//设置评价单数
+			shopAppraise.setAppraiseNum(appraiseNum2);
+			//设置评价率
+			shopAppraise.setAppraiseRatio(topercent(appraiseNum2, totalNum2));
+			//设置订单总额
+			shopAppraise.setTotalMoney(orderMoney2);
+			
+			//设置红包的总额
+			shopAppraise.setRedMoney(redMoney2);
+			
+			//设置星的数量
+			shopAppraise.setOnestar(oneStart2);
+			shopAppraise.setTwostar(twoStart2);
+			shopAppraise.setThreestar(threeStart2);
+			shopAppraise.setFourstar(fourStart2);
+			shopAppraise.setFivestar(fiveStart2);
+			
+			shopAppraiseList.add(shopAppraise);
+			
+			
+		}
+
+		//把店铺和品牌的数据封装成map返回给前台
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("brandAppraise", brandAppraise);
+		map.put("shopAppraise", shopAppraiseList);
+		
+		
+		return getSuccessResult(map);
+		
+		
+	}
+
+
+	private BigDecimal add(BigDecimal orderMoney, BigDecimal orderMoney2) {
+		
+		return orderMoney.add(orderMoney2);
+	}
+	
+	//两个int类型的数据相除并得到百分比数据
+	private static String topercent(int num1,int num2){
+		double d1 = num1;
+		double d2 = num2;
+		double d3 = d1/d2;
+		NumberFormat num = NumberFormat.getPercentInstance();   
+	    num.setMaximumIntegerDigits(3);   
+	    num.setMaximumFractionDigits(2);   
+	    String result=num.format(d3);  
+	    return result;
+	}
+	
+
+		
+	
+		
+				
+			
+			
+			
+			
+		
+
+	
+	
+	
+	
+}

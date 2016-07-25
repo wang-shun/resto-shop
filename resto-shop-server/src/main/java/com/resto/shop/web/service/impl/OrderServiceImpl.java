@@ -1367,8 +1367,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.selectBytimeAndState(begin,end,brandId);
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+
+	@Override
+	public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		 return orderMapper.selectListBybrandId(begin,end,brandId);
 	}
 
 }

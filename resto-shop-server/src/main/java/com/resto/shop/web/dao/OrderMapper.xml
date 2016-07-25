@@ -127,6 +127,20 @@
 	</collection>
 </resultMap>
 
+<resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
+	<id column="id" property="id" jdbcType="VARCHAR" />
+	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+	<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
+
+	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+		<id column="appraise_id" property="id" />
+		<result column="level" property="level" />
+		<result column="red_money" property="redMoney" />
+	</association>
+
+</resultMap>
+
 
 	<sql id="Base_Column_List">
 		id, table_number, customer_count, accounting_time,
@@ -1327,12 +1341,27 @@ WHERE
 
 </select>
 
-	<update id="setOrderPrintFail">
-		update tb_order
-		set production_status = 5
-		where id = #{orderId}
-	</update>
-
+<update id="setOrderPrintFail">
+	update tb_order
+	set production_status = 5
+	where id = #{orderId}
+</update>
+	
+	
+	
+<select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
+	SELECT 
+	o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money from tb_order o 
+	INNER JOIN tb_order_payment_item oi 
+	on o.id = oi.order_id 
+	LEFT JOIN  tb_appraise a
+	on o.id = a.order_id
+	WHERE o.order_state in (10,11,12) and o.production_status in (2,3)
+	and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+	and o.brand_id = #{brandId}
+GROUP BY o.id
+</select>
+	
 </mapper>
 
 
