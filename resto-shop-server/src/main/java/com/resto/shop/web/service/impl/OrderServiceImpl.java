@@ -1,7 +1,6 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.ArrayList;
@@ -962,15 +961,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}else if("3".equals(sort.subSequence(0, 1))){
 			sort="r.brandSellNum"+" "+sort.substring(1,sort.length());
 		}
-		ShopDetail shop = shopDetailService.selectById(shopId);
+		//ShopDetail shop = shopDetailService.selectById(shopId);
 		
 		
 //		else if("4".equals(sort.substring(0,1))){
 //			sort="salesRatio"+" "+sort.substring(1,sort.length());
 //		}
 		
-		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,shop.getBrandId(),sort);
-		return list;
+		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,sort);
+		
+		
+		//计算总菜品销售额,//菜品总销售额
+				double num = 0;
+				
+				BigDecimal temp = BigDecimal.ZERO;
+				for (ArticleSellDto articleSellDto : list) {
+					//计算总销量 不能加上套餐的数量
+					if(articleSellDto.getType()!=3){
+						num+=articleSellDto.getShopSellNum().doubleValue();
+					}
+					//计算总销售额
+					temp = add(temp,articleSellDto.getSalles());
+				}
+				
+				for (ArticleSellDto articleSellDto : list) {
+					//销售额占比
+					BigDecimal d = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+					articleSellDto.setSalesRatio(d+"%");
+					
+					if(num!=0){
+						double d1  = articleSellDto.getShopSellNum().doubleValue();
+						double d2 = d1/num*100;
+						
+						//保留两位小数
+						BigDecimal   b   =   new   BigDecimal(d2);  
+						double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
+						articleSellDto.setNumRatio(f1+"%");
+					}
+					
+				}
+				
+				return list;
+		
 	}
 
 	@Override

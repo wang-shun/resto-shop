@@ -383,7 +383,7 @@ public class ArticleSellController extends GenericController{
 	
 	@RequestMapping("/shop_excel")
 	@ResponseBody
-	public void reportShopArticleExcel(String beginDate,String endDate,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
+	public void reportShopArticleExcel(String beginDate,String endDate,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
 		//获取店铺名称
 		ShopDetail shopDetail = shopDetailService.selectById(shopId);
 		//导出文件名
@@ -391,7 +391,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum"};
+		String[]columns={"articleFamilyName","articleName","shopSellNum","numRatio","salles","salesRatio"};
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<>();
 		Brand brand = brandServie.selectById(getCurrentBrandId());
@@ -424,7 +424,7 @@ public class ArticleSellController extends GenericController{
 		
 		
 		//String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"}};
+		String[][] headers = {{"菜品分类","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"销量占比","20"},{"菜品销售额","20"},{"销售额占比","20"}};
 		
 		
 		//定义excel工具类对象
