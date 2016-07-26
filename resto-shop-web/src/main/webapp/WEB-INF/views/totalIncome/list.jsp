@@ -92,6 +92,14 @@ var tb1 = $("#brandReportTable").DataTable({
 		{                 
 			title : "营收总额(元)",
 			data : "totalIncome",
+		},  
+		{                 
+			title : "微信支付收入(元)",
+			data : "wechatIncome",
+		},  
+		{                 
+			title : "充值账户支付(元)",
+			data : "chargeAccountIncome",
 		},       
 		{                 
 			title : "红包支付(元)",
@@ -101,16 +109,9 @@ var tb1 = $("#brandReportTable").DataTable({
 			title : "优惠券支付收入(元)",
 			data : "couponIncome",
 		},       
+		
 		{                 
-			title : "微信支付收入(元)",
-			data : "wechatIncome",
-		},       
-		{                 
-			title : "充值账户支付(元)",
-			data : "chargeAccountIncome",
-		},       
-		{                 
-			title : "充值赠送账户支付(元)",
+			title : "充值赠送支付(元)",
 			data : "chargeGifAccountIncome",
 		},       
 	]
@@ -128,27 +129,28 @@ var tb2 = $("#shopReportTable").DataTable({
 		{                 
 			title : "营收总额(元)",
 			data : "totalIncome",
+		},  
+		{                 
+			title : "微信支付收入(元)",
+			data : "wechatIncome",
+		},  
+		{                 
+			title : "充值账户支付(元)",
+			data : "chargeAccountIncome",
 		},       
 		{                 
-			title : "红包支付收入(元)",
+			title : "红包支付(元)",
 			data : "redIncome",
 		},       
 		{                 
 			title : "优惠券支付收入(元)",
 			data : "couponIncome",
 		},       
+		
 		{                 
-			title : "微信支付收入(元)",
-			data : "wechatIncome",
-		},     
-		{                 
-			title : "充值账户支付(元)",
-			data : "chargeAccountIncome",
-		},     
-		{                 
-			title : "充值赠送账户支付(元)",
+			title : "充值赠送支付(元)",
 			data : "chargeGifAccountIncome",
-		}     
+		},       
 	]
 	
 });

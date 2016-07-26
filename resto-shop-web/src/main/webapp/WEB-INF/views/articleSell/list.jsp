@@ -284,6 +284,7 @@ var vueObj = new Vue({
 			var date = new Date().format("yyyy-MM-dd");
 			this.searchDate.beginDate = date;
 			this.searchDate.endDate = date;
+			debugger;
 			this.searchInfo();
 		}
 	})

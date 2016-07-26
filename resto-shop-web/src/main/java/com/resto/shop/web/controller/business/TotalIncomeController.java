@@ -192,10 +192,10 @@ public class TotalIncomeController extends GenericController {
 		map.put("reportTitle", "品牌收入条目");// 表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = { { "品牌", "20" }, { "营收总额(元)", "16" }, { "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
-				{ "微信支付(元)", "16" }, { "充值账户支付(元)", "19" }, { "充值赠送账户支付(元)", "23" } };
-		String[] columns = { "name", "totalIncome", "redIncome", "couponIncome", "wechatIncome",
-				"chargeAccountIncome", "chargeGifAccountIncome" };
+		String[][] headers = { { "品牌", "20" }, { "营收总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
+				 { "充值赠送支付(元)", "23" } };
+		String[] columns = { "name", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome", 
+				 "chargeGifAccountIncome" };
 		
 		List<ReportIncomeDto> result = new LinkedList<>();
 		List<BrandIncomeDto> brandresult = (List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");

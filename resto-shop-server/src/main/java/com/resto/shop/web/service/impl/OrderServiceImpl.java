@@ -1210,20 +1210,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//计算总菜品销售额,//菜品总销售额
 		double num = 0;
 		
-		
 		BigDecimal temp = BigDecimal.ZERO;
 		for (ArticleSellDto articleSellDto : list) {
+			//计算总销量 不能加上套餐的数量
+			if(articleSellDto.getType()!=3){
+				num+=articleSellDto.getBrandSellNum().doubleValue();
+			}
+			//计算总销售额
 			temp = add(temp,articleSellDto.getSalles());
-			num+=articleSellDto.getBrandSellNum().doubleValue();
 		}
 		
 		for (ArticleSellDto articleSellDto : list) {
+			//销售额占比
 			BigDecimal d = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
 			articleSellDto.setSalesRatio(d+"%");
 			
-			BigDecimal   b   =   new   BigDecimal(((articleSellDto.getBrandSellNum().doubleValue()/num)*100));  
-			double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
-			articleSellDto.setNumRatio(f1+"%");
+			if(num!=0){
+				double d1  = articleSellDto.getBrandSellNum().doubleValue();
+				double d2 = d1/num*100;
+				
+				//保留两位小数
+				BigDecimal   b   =   new   BigDecimal(d2);  
+				double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
+				articleSellDto.setNumRatio(f1+"%");
+			}
+			
+			
+			
 		}
 		
 		return list;

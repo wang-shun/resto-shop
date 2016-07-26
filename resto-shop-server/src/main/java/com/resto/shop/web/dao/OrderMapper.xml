@@ -1203,7 +1203,7 @@ order by ${sort}
 </select>
 
 <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
-select r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
+select r.articleId,r.type, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
         DISTINCT(t.order_id),
         LEFT (t.article_id, 32) AS articleId,
         t.count,
@@ -1212,7 +1212,7 @@ select r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyI
         t5. NAME AS articleFamilyName,
         t5.peference,
         t4.sort,
-
+		t.type,
         t.final_price
         FROM
         tb_order_item t
