@@ -142,6 +142,29 @@
 </resultMap>
 
 
+
+<resultMap id="selectListByshopIdmap" type="com.resto.shop.web.model.Order">
+	<id column="id" property="id" jdbcType="VARCHAR" />
+	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
+
+	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+		<id column="appraise_id" property="id" />
+		<result column="level" property="level" />
+		<result column="red_money" property="redMoney" />
+		<result column="content" property="content" />
+		<result column="feedback" property="feedback" />
+	</association>
+	
+	<association property="customer" javaType="com.resto.shop.web.model.Customer">
+		<id column="customer_id" property="id" />
+		<result column="telephone" property="telephone" />
+	</association>
+</resultMap>
+
+
+
+
 	<sql id="Base_Column_List">
 		id, table_number, customer_count, accounting_time,
 		order_state,
@@ -1361,6 +1384,25 @@ WHERE
 	and o.brand_id = #{brandId}
 GROUP BY o.id
 </select>
+
+
+
+<select id="selectAppraiseByShopId" resultMap="selectListByshopIdmap">
+	SELECT 
+	o.id , o.order_money ,a.level,a.red_money,a.content,a.feedback ,c.telephone  from tb_order o 
+	INNER JOIN tb_order_payment_item oi 
+	on o.id = oi.order_id 
+	LEFT JOIN  tb_appraise a
+	on o.id = a.order_id
+	LEFT JOIN tb_customer c
+	on o.customer_id = c.id
+	WHERE o.order_state in (10,11,12) and o.production_status in (2,3)
+	and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+	and o.shop_detail_id = #{shopId} and a.level in(1,2,3,4,5)
+GROUP BY o.id
+
+</select>
+
 	
 </mapper>
 

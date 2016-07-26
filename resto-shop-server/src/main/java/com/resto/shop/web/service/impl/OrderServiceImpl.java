@@ -1375,4 +1375,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		 return orderMapper.selectListBybrandId(begin,end,brandId);
 	}
 
+	@Override
+	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		return orderMapper.selectAppraiseByShopId(begin,end,shopId);
+	}
+
 }

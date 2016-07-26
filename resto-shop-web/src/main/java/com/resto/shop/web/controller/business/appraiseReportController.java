@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -130,7 +131,7 @@ public class appraiseReportController extends GenericController{
 		List<AppraiseDto> shopAppraiseList = new ArrayList<>();
 		
 		for (ShopDetail s : shoplist) {
-			AppraiseDto shopAppraise = new AppraiseDto(s.getName(), appraiseNum, "", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
+			AppraiseDto shopAppraise = new AppraiseDto(s.getId(),s.getName(), appraiseNum, "", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
 			//每个店铺设置默认值
 			int appraiseNum2=0;//评价单数
 			int totalNum2 = 0;//已消费订单数
@@ -227,10 +228,27 @@ public class appraiseReportController extends GenericController{
 	    return result;
 	}
 	
-
-		
 	
+	@RequestMapping("shopReport")
+	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
+		request.setAttribute("beginDate", beginDate);
+		request.setAttribute("endDate", endDate);
+		ShopDetail shop = shopDetailService.selectById(shopId);
+		if(shopId!=null){
+			request.setAttribute("shopId", shopId);
+			request.setAttribute("shopName", shop.getName());
+		}
+		return "appraiseReport/shopReport";
+	}
+	
+	
+	
+	@RequestMapping("shop_data")
+	@ResponseBody
+	public List<Order> selectAppraiseByShopId(String beginDate,String endDate,String shopId){
 		
+		return orderService.selectAppraiseByShopId(beginDate,endDate,shopId);
+	}
 				
 			
 			

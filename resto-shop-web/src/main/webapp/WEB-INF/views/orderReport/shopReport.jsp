@@ -22,7 +22,19 @@ th {
 						class="form-control form_datetime2" id="endDate2" 
 						readonly="readonly">
 				</div>
-				<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
+				
+				<button type="button" class="btn red" id="today"> 今日</button>
+                 
+             <button type="button" class="btn green" id="yesterDay">昨日</button>
+          
+<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
+             
+             <button type="button" class="btn yellow" id="week">本周</button>
+             <button type="button" class="btn purple" id="month">本月</button>
+             
+             <button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>&nbsp;
+		  	 <button type="button" class="btn btn-primary" id="shopreportExcel">下载报表</button><br/>
+				
 			</form>
 		</div>
 	</div>
@@ -84,7 +96,7 @@ th {
 	    </div>
 	  </div>
 	</div>
-	
+ <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 	//时间插件
 
@@ -135,12 +147,6 @@ th {
 						title : "手机号", 
 						data : "telephone" 
 					},
-					
-					
-					{ 
-						title : "订单金额", 
-						data : "orderMoney" 
-					},
 					{ 
 						title : "订单金额", 
 						data : "orderMoney" 
@@ -154,6 +160,11 @@ th {
 						data : "accountPay" 
 					},
 					{ 
+						title : "优惠券支付", 
+						data : "couponPay" 
+					},
+					
+					{ 
 						title : "充值金额支付", 
 						data : "chargePay" 
 					},
@@ -161,6 +172,11 @@ th {
 						title : "充值赠送金额支付", 
 						data : "rewardPay" 
 					},
+					{
+						title:"营销撬动率",
+						data:'incomePrize'
+					},
+					
 					{ 
 					  title : "评价", 
 					  data : "level" ,
@@ -189,10 +205,16 @@ th {
 	 $("#searchInfo2").click(function(){
 		 var beginDate = $("#beginDate2").val();
 		 var endDate = $("#endDate2").val();
+		 search(beginDate,endDate);
+	 })
+	 
+	 function search(beginDate,endDate){
 		 var data = {"beginDate":beginDate,"endDate":endDate,"shopId":shopId};
 		 tb1.ajax.reload();
 		 toastr.success("查询成功");
-	 })
+	 }
+	 
+	 
 	 
 	$("#closeModal").click(function(e){
 		e.stopPropagation();
@@ -312,6 +334,76 @@ th {
 			modal.find(".modal-body").html("");
 			modal.modal("hide");
 	 })
+	 
+	 //查询今日
+	 
+	$("#today").click(function(){
+		var date = new Date().format("yyyy-MM-dd");
+		//赋值插件上的时间
+		$("#beginDate2").val(date);
+		$("#endDate2").val(date);
+		
+		//查询
+		search(date,date);
+		
+	})
+	 
+	//查询昨日
+	$("#yesterDay").click(function(){
+		var beginDate = GetDateStr(-1);
+		var endDate  = GetDateStr(-1);
+		
+		//赋值插件上时间
+		$("#beginDate2").val(beginDate);
+		$("#endDate2").val(endDate);
+		//查询
+		search(beginDate,endDate);
+		
+	})
+	
+	
+	//查询本周
+	$("#week").click(function(){
+		var beginDate = getWeekStartDate();;
+		var endDate  = new Date().format("yyyy-MM-dd");
+		
+		//赋值插件上时间
+		$("#beginDate2").val(beginDate);
+		$("#endDate2").val(endDate);
+		//查询
+		search(beginDate,endDate);
+		
+	})
+	
+	//查询本月
+	$("#month").click(function(){
+		var beginDate = getMonthStartDate();
+		var endDate  = new Date().format("yyyy-MM-dd");
+		
+		//赋值插件上时间
+		$("#beginDate2").val(beginDate);
+		$("#endDate2").val(endDate);
+		//查询
+		search(beginDate,endDate);
+		
+	})
+	
+	 //下载报表
+	 $("#shopreportExcel").click(function(){
+		 var beginDate = $("#beginDate2").val();
+			var endDate = $("#endDate2").val();
+			//判断 时间范围是否合法
+			if(beginDate>endDate){
+				toastr.error("开始时间不能大于结束时间");
+				return ;
+			}
+			
+			location.href="orderReport/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&shopId="+shopId;
+		 
+		 
+	 })
+	 
+	 
 	
 	
 </script>

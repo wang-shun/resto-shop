@@ -120,7 +120,8 @@
 						<td>{{shopAppraise.threestar}}</td>
 						<td>{{shopAppraise.twostar}}</td>
 						<td>{{shopAppraise.onestar}}</td>
-						<td>2</td>
+						<td><button class="btn btn-sm btn-success"
+								@click="showShopReport(shopAppraise.shopName , shopAppraise.shopId)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -205,14 +206,12 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
+			debugger;
 			$("#reportModal").modal('show');
-			this.openModal("orderReport/show/shopReport", shopName,shopId);
+			this.openModal("appraiseReport/shopReport",shopName,shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
-			debugger;
 			$.post(url, this.getDate(shopId),function(result) {
-				//console.log(result)
-				
 				var modal = $("#reportModal");
 				modal.find(".modal-body").html(result);
 				modal.find(".modal-title > strong").html(modalTitle);
