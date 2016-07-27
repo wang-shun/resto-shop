@@ -126,7 +126,6 @@ function appendSelect(api){
 }
 
 $("#ExcelReport").click(function(){
-	console.log("1");
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	var shopId = "${shopId}"
