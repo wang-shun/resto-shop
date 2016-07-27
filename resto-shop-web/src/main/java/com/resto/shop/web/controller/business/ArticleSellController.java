@@ -401,7 +401,7 @@ public class ArticleSellController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "4");//显示的位置
+		map.put("num", "5");//显示的位置
 		map.put("reportTitle", "店铺菜品销售");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		

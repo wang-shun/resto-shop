@@ -294,7 +294,7 @@ public class OrderController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "3");//显示的位置
+		map.put("num", "11");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		

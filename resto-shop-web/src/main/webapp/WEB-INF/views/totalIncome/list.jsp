@@ -13,11 +13,11 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
 		  <br></div>
-		  	 <button type="button" class="btn red" id="today"> 今日</button>
-             <button type="button" class="btn green" id="yesterDay">昨日</button>
-             <button type="button" class="btn yellow" id="benxun">本询</button>
-             <button type="button" class="btn purple" id="week">本周</button>
-             <button type="button" class="btn purple" id="month">本月</button>
+		  	 <button type="button" class="btn btn-primary" id="today"> 今日</button>
+             <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
+<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
+             <button type="button" class="btn btn-primary" id="week">本周</button>
+             <button type="button" class="btn btn-primary" id="month">本月</button>
 		  
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
@@ -174,7 +174,6 @@ $("#today").click(function(){
 
 //昨日
 $("#yesterDay").click(function(){
-	alert();
 	beginDate = GetDateStr(-1);
 	endDate = GetDateStr(-1);
 	$("#beginDate").val(beginDate);
