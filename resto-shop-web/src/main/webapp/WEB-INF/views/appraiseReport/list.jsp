@@ -16,17 +16,17 @@
 		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
 		  </div>
 		  	
-		   	 <button type="button" class="btn red" @click="today"> 今日</button>
+		   	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
                  
-             <button type="button" class="btn green" @click="yesterDay">昨日</button>
+             <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
           
-             <button type="button" class="btn yellow" @click="benxun">本询</button>
+             <button type="button" class="btn btn-primary" @click="benxun">本询</button>
              
-             <button type="button" class="btn purple" @click="week">本周</button>
-             <button type="button" class="btn purple" @click="month">本月</button>
+             <button type="button" class="btn btn-primary" @click="week">本周</button>
+             <button type="button" class="btn btn-primary" @click="month">本月</button>
              
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+<!-- 		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/> -->
 		</form>
 		
 	</div>
@@ -206,7 +206,6 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
-			debugger;
 			$("#reportModal").modal('show');
 			this.openModal("appraiseReport/shopReport",shopName,shopId);
 		},
