@@ -113,17 +113,17 @@ public class Order {
 
     //
     private String telephone;
-    
-    
+
+
     private BigDecimal payValue;
-    
+
     private int paymentModeId;
-    
-  
+
+
 
     private List<OrderPaymentItem> orderPaymentItems;
-    
-    
+
+
 	public List<OrderPaymentItem> getOrderPaymentItems() {
 		return orderPaymentItems;
 	}
@@ -149,6 +149,28 @@ public class Order {
 	}
 
 	public String getTelephone() {
+
+    private int orderCount;
+
+    private BigDecimal orderTotal;
+
+    final public int getOrderCount() {
+        return orderCount;
+    }
+
+    final public void setOrderCount(int orderCount) {
+        this.orderCount = orderCount;
+    }
+
+    final public BigDecimal getOrderTotal() {
+        return orderTotal;
+    }
+
+    final public void setOrderTotal(BigDecimal orderTotal) {
+        this.orderTotal = orderTotal;
+    }
+
+    public String getTelephone() {
 		return telephone;
 	}
 

@@ -428,8 +428,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public boolean autoRefundOrder(String orderId) {
 		Order order = selectById(orderId);
-		if(order.getAllowCancel() && order.getOrderState()==OrderState.PAYMENT &&
-				order.getProductionStatus() == ProductionStatus.PRINTED){
+		if(order.getAllowCancel()){
 			order.setAllowCancel(false);
 			order.setClosed(true);
 			order.setAllowAppraise(false);
@@ -753,7 +752,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		data.put("ITEMS", items);
 		data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
 		data.put("REDUCTION_AMOUNT", order.getReductionAmount());
-		data.put("PAYMENT_AMOUNT", order.getOriginalAmount().subtract(order.getReductionAmount()));
+		data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
 		//添加当天小票的打印的序号
 		data.put("NUMBER", nextNumber(shopDetail.getId(),order.getId()));
 
@@ -969,11 +968,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //		}
 		
 		List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDate(begin, end, shopId,sort);
-		
-		
+
+
 		//计算总菜品销售额,//菜品总销售额
 				double num = 0;
-				
+
 				BigDecimal temp = BigDecimal.ZERO;
 				for (ArticleSellDto articleSellDto : list) {
 					//计算总销量 不能加上套餐的数量
@@ -983,26 +982,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					//计算总销售额
 					temp = add(temp,articleSellDto.getSalles());
 				}
-				
+
 				for (ArticleSellDto articleSellDto : list) {
 					//销售额占比
 					BigDecimal d = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
 					articleSellDto.setSalesRatio(d+"%");
-					
+
 					if(num!=0){
 						double d1  = articleSellDto.getShopSellNum().doubleValue();
 						double d2 = d1/num*100;
-						
+
 						//保留两位小数
-						BigDecimal   b   =   new   BigDecimal(d2);  
-						double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
+						BigDecimal   b   =   new   BigDecimal(d2);
+						double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
 						articleSellDto.setNumRatio(f1+"%");
 					}
-					
+
 				}
-				
+
 				return list;
-		
+
 	}
 
 	@Override
@@ -1103,11 +1102,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference ,r.sort";
+			sort="peference ,sort";
 		}else if("desc".equals(sort)){
-			sort="r.shopSellNum desc";
+			sort="shopSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.shopSellNum asc";
+			sort="shopSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectShopArticleByDate(shopId,begin, end,sort);
 		return list;
@@ -1158,6 +1157,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date end = DateUtil.getformatEndDate(endDate);
 		List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
 		List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin,end,brandId);
+		List<ShopArticleReportDto> pFood = orderMapper.selectShopArticleCom(begin,end,brandId);
+
 		List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
 		for(ShopDetail shop : list_shopDetail){
@@ -1167,9 +1168,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		
 		BigDecimal sum = new BigDecimal(0);
 		for (ShopArticleReportDto shopArticleReportDto2 : list) {
+			for(ShopArticleReportDto shopArticleReportDto : pFood){
+				if(shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())){
+					shopArticleReportDto2.setSellIncome(shopArticleReportDto2.getSellIncome().add(shopArticleReportDto.getSellIncome()));
+					shopArticleReportDto2.setTotalNum(shopArticleReportDto2.getTotalNum() + shopArticleReportDto.getTotalNum());
+				}
+			}
 			sum = sum.add(shopArticleReportDto2.getSellIncome());
 		}
-		
+
+
 
 		if(!list.isEmpty()){
 			for (ShopArticleReportDto shopArticleReportDto : listArticles) {
@@ -1179,7 +1187,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
 						BigDecimal current = shopArticleReportDto2.getSellIncome();
 						
-						String occupy =  current == null ? "0" : current.divide(sum,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))
+						String occupy =  current == null ? "0" : current.divide(sum,4,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP)
 								.toString();
 						shopArticleReportDto.setOccupy(occupy + "%");
 					}
@@ -1203,11 +1211,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference";
+			sort="peference";
 		}else if("desc".equals(sort)){
-			sort="r.brandSellNum desc";
+			sort="brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.brandSellNum asc";
+			sort="brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndFamilyId(brandid, begin, end,sort);
 		//计算总菜品销售额
@@ -1232,16 +1240,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		if("0".equals(sort)){
-			sort="r.peference , r.sort";
+			sort="peference , sort";
 		}else if("desc".equals(sort)){
-			sort="r.brandSellNum desc";
+			sort="brandSellNum desc";
 		}else if ("asc".equals(sort)){
-			sort="r.brandSellNum asc";
+			sort="brandSellNum asc";
 		}
 		List<ArticleSellDto> list = orderMapper.selectBrandArticleSellByDateAndId(brandId, begin, end,sort);
 		//计算总菜品销售额,//菜品总销售额
 		double num = 0;
-		
+
 		BigDecimal temp = BigDecimal.ZERO;
 		for (ArticleSellDto articleSellDto : list) {
 			//计算总销量 不能加上套餐的数量
@@ -1251,24 +1259,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			//计算总销售额
 			temp = add(temp,articleSellDto.getSalles());
 		}
-		
+
 		for (ArticleSellDto articleSellDto : list) {
 			//销售额占比
 			BigDecimal d = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
 			articleSellDto.setSalesRatio(d+"%");
-			
+
 			if(num!=0){
 				double d1  = articleSellDto.getBrandSellNum().doubleValue();
 				double d2 = d1/num*100;
-				
+
 				//保留两位小数
-				BigDecimal   b   =   new   BigDecimal(d2);  
-				double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
+				BigDecimal   b   =   new   BigDecimal(d2);
+				double   f1   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
 				articleSellDto.setNumRatio(f1+"%");
 			}
-			
-			
-			
+
+
+
 		}
 		
 		return list;
@@ -1425,6 +1433,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
 		return orderMapper.selectAppraiseByShopId(begin,end,shopId);
+	public static void main(String[] args) {
+		System.out.println(new BigDecimal(1).divide(new BigDecimal(3),4, RoundingMode.HALF_UP));
 	}
 
+
+	@Override
+	public Order getOrderAccount(String shopId) {
+		Order order =  orderMapper.getOrderAccount(shopId);
+		return order;
+	}
 }

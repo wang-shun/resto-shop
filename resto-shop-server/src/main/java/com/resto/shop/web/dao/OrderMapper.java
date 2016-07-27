@@ -60,6 +60,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
 	List<Order> selectShopOrderByDateAndProductionStates(@Param("shopId")String shopId,@Param("date") Date date,@Param("proStatus") int[] proStatus);
 
+
+	/**
+	 *  根据店铺id得到店铺当日的订单情况
+	 * @param shopId
+	 * @return
+     */
+	Order getOrderAccount(String shopId);
+
+
 	/**
 	 * 查询某天的历史订单
 	 * @param currentShopId
@@ -198,6 +207,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<ShopArticleReportDto> selectShopArticleDetails(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
+
+	List<ShopArticleReportDto> selectShopArticleCom(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
 
 	/**
 	 * 查询店铺的菜品销售总量

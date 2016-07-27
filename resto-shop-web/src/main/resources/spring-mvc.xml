@@ -16,6 +16,8 @@
 
     <!-- 扫描controller（controller层注入） -->
     <context:component-scan base-package="com.resto.shop.web.controller"/>
+
+    <context:component-scan base-package="com.resto.shop.web.task"/>
     
 	<!-- 解决ApplicationContext 和WebApplicationContext 不同域的问题 -->
     <context:component-scan base-package="com.resto.shop.web.aspect"/>
