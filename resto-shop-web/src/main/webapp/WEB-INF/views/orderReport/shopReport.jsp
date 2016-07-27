@@ -99,7 +99,7 @@ th {
  <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 	//时间插件
-
+	
 	$('.form_datetime2').datetimepicker({
 		endDate : new Date(),
 		minView : "month",
@@ -253,7 +253,24 @@ th {
 						 +obj.finalPrice+"</td></tr>";
 						 $('#articleList').append(article);
 					 }
+					 //-----------------------------------------------------------------------
+						 
+// 					 var oLogin = $("#orderDetail").html();
+// 					 console.log(oLogin);
+				
+// 					 $('body').append( oLogin );
+
+					 
+// 					oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
+// 					oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 );
 					
+// 					$(window).on('scroll',function(){
+						
+// 						oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
+// 						oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 + $(window).scrollTop() );
+			
+// 					});
+			//----------------------------------------------------------------					 					
 					 $("#orderDetail").modal();
 				}
 				 
