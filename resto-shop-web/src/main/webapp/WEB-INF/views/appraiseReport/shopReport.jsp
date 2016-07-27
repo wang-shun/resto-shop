@@ -61,7 +61,7 @@ th {
 			 "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
 			 "autoWidth": false,
 			 "columnDefs": [
-			                { "width": "30%", "targets": 5 }
+			                { "width": "5%", "targets":0  }
 			              ],
 				ajax : {
 					url : "appraiseReport/shop_data",   

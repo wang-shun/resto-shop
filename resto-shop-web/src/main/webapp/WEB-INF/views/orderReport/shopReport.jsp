@@ -23,14 +23,14 @@ th {
 						readonly="readonly">
 				</div>
 				
-				<button type="button" class="btn red" id="today"> 今日</button>
+				<button type="button" class="btn btn-primary" id="today"> 今日</button>
                  
-             <button type="button" class="btn green" id="yesterDay">昨日</button>
+             <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
           
 <!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
              
-             <button type="button" class="btn yellow" id="week">本周</button>
-             <button type="button" class="btn purple" id="month">本月</button>
+             <button type="button" class="btn btn-primary" id="week">本周</button>
+             <button type="button" class="btn btn-primary" id="month">本月</button>
              
              <button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>&nbsp;
 		  	 <button type="button" class="btn btn-primary" id="shopreportExcel">下载报表</button><br/>
