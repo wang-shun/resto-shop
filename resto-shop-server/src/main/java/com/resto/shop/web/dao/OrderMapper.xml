@@ -100,75 +100,70 @@
         </collection>
     </resultMap>
 
+
+    <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
+        <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus"/>
+
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customer_id" property="id"/>
+            <result column="telephone" property="telephone"/>
+        </association>
+
+        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+        </association>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+
+        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+            <result column="red_money" property="redMoney"/>
+        </association>
+
+    </resultMap>
+
+
+    <resultMap id="selectListByshopIdmap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+
+        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+            <result column="red_money" property="redMoney"/>
+            <result column="content" property="content"/>
+            <result column="feedback" property="feedback"/>
+        </association>
+
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customer_id" property="id"/>
+            <result column="telephone" property="telephone"/>
+        </association>
+    </resultMap>
+
+
     <sql id="Base_Column_List">
-
-
-<resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
-	<id column="id" property="id" jdbcType="VARCHAR" />
-	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
-	<result column="order_state" property="orderState" jdbcType="INTEGER" />
-	<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-	<result column="ver_code" property="verCode" jdbcType="VARCHAR" />
-	<result column="order_state" property="orderState" jdbcType="VARCHAR" />
-	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
-	<result column="production_status" property="productionStatus" />
-
-	<association property="customer" javaType="com.resto.shop.web.model.Customer">
-		<id column="customer_id" property="id" />
-		<result column="telephone" property="telephone" />
-	</association>
-
-	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-		<id column="appraise_id" property="id" />
-		<result column="level" property="level" />
-	</association>
-
-	<collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-		<id column="orderPaymentItem_id" property="id" />
-		<result column="pay_value" property="payValue" />
-		<result column="payment_mode_id" property="paymentModeId" />
-	</collection>
-</resultMap>
-
-<resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
-	<id column="id" property="id" jdbcType="VARCHAR" />
-	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
-	<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
-
-	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-		<id column="appraise_id" property="id" />
-		<result column="level" property="level" />
-		<result column="red_money" property="redMoney" />
-	</association>
-
-</resultMap>
-
-
-
-<resultMap id="selectListByshopIdmap" type="com.resto.shop.web.model.Order">
-	<id column="id" property="id" jdbcType="VARCHAR" />
-	<result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
-	<result column="order_money" property="orderMoney" jdbcType="DECIMAL" />
-
-	<association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-		<id column="appraise_id" property="id" />
-		<result column="level" property="level" />
-		<result column="red_money" property="redMoney" />
-		<result column="content" property="content" />
-		<result column="feedback" property="feedback" />
-	</association>
-
-	<association property="customer" javaType="com.resto.shop.web.model.Customer">
-		<id column="customer_id" property="id" />
-		<result column="telephone" property="telephone" />
-	</association>
-</resultMap>
-
-
-
-
-	<sql id="Base_Column_List">
 		id, table_number, customer_count, accounting_time,
 		order_state,
 		production_status,
@@ -959,9 +954,9 @@
 		a.article_family_id = f.id and f.id=#{articleFamilyId}
 		order by ${sort}
 	</select>
-	
-	<!-- 品牌菜品销售记录中的(店铺菜品)的销售的详情    相对于店铺端多了品牌菜品销售总量,销售占比这两行-->
-	<select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
+
+    <!-- 品牌菜品销售记录中的(店铺菜品)的销售的详情    相对于店铺端多了品牌菜品销售总量,销售占比这两行-->
+    <select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
 	
 select r.articleFamilyName,r.articleName,sum(r.count) as shopSellNum,
   r.brandSellNum ,r.peference,r.sort from ( SELECT
@@ -1140,9 +1135,7 @@ WHERE
 </select>
 
 
-
-
-<select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+    <select id="selectShopArticleDetails" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
 	 select sum(r.count) as totalNum,sum(r.final_price) as sellIncome,r.shopId from (SELECT
         DISTINCT(t.order_id),t.article_name,t.count,t.final_price,t2.shop_detail_id as shopId
         FROM
@@ -1237,7 +1230,7 @@ order by ${sort}
 
 </select>
 
-<select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+    <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
         select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
         DISTINCT(t.order_id),
@@ -1267,7 +1260,8 @@ order by ${sort}
 </select>
 
 
-<select id="selectBrandFamilyArticleSellByDateAndArticleFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+    <select id="selectBrandFamilyArticleSellByDateAndArticleFamilyId"
+            resultType="com.resto.brand.web.dto.ArticleSellDto">
 
 SELECT SUM(ap.brandSellNum)brandSellNum,SUM(ap.salles)salles ,ap.articleFamilyId ,ap.articleFamilyName ,ap.peference ,ap.articleName from
 (
@@ -1414,7 +1408,7 @@ WHERE
 
 </select>
 
-	<update id="setOrderPrintFail">
+    <update id="setOrderPrintFail">
 		update tb_order
 		set production_status = 5
 		where id = #{orderId}
