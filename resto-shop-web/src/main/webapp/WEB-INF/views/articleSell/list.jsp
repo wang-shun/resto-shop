@@ -14,14 +14,14 @@
 		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
 		  
-		 	 <button type="button" class="btn red" @click="today"> 今日</button>
+		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
                  
-             <button type="button" class="btn green" @click="yesterDay">昨日</button>
+             <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
           
 <!--              <button type="button" class="btn yellow" @click="benxun">本询</button> -->
              
-             <button type="button" class="btn yellow" @click="week">本周</button>
-             <button type="button" class="btn purple" @click="month">本月</button>
+             <button type="button" class="btn btn-primary" @click="week">本周</button>
+             <button type="button" class="btn btn-primary" @click="month">本月</button>
              
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
