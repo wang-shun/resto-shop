@@ -373,7 +373,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             case ShopMode.MANUAL_ORDER: //验证码下单
             case ShopMode.CALL_NUMBER: //电视叫号
             case ShopMode.TABLE_MODE: //坐下点餐
-                result = (order.getOrderState().equals(OrderState.CONFIRM) &&
+                result = ((order.getOrderState().equals(OrderState.CONFIRM) ||
+                        order.getOrderState().equals(OrderState.PAYMENT))
+                        &&
                         order.getProductionStatus().equals(ProductionStatus.NOT_PRINT))
                         || (order.getOrderState().equals(OrderState.PAYMENT) &&
                         order.getProductionStatus().equals(ProductionStatus.NOT_ORDER));
@@ -1398,5 +1400,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order getOrderAccount(String shopId) {
         Order order = orderMapper.getOrderAccount(shopId);
         return order;
+    }
+
+    @Override
+    public void autoRefundMoney() {
+       log.debug("开始退款");
     }
 }

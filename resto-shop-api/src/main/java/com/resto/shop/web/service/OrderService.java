@@ -298,4 +298,6 @@ public interface OrderService extends GenericService<Order, String> {
 
 	//查询订单关联评论的内容
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
+
+	void autoRefundMoney();
 }

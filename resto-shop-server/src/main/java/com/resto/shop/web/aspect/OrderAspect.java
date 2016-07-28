@@ -55,15 +55,17 @@ public class OrderAspect {
 	@Resource
 	ShareSettingService shareSettingService;
 
+
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
 	public void createOrder(){};
+
 
 	@AfterReturning(value="createOrder()",returning="order")
 	public void createOrderAround(Order order) throws Throwable{
 		shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
 		//订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
-//		log.info("当天24小时开启自动退款:"+order.getId());
-//		MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getBrandId());
+		log.info("当天24小时开启自动退款:"+order.getId());
+		MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 //			long delay = 1000*60*15;//15分钟后自动取消订单
 //			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
