@@ -44,11 +44,11 @@ public class MQMessageProducer {
 		obj.put("brandId", brandId);
 		obj.put("orderId", orderId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_REFUND_ORDER, obj.toJSONString().getBytes());
-//		Calendar calendar = Calendar.getInstance();
-//		calendar.setTime(new Date());
-//		calendar.set(Calendar.HOUR_OF_DAY,23);
-//		calendar.set(Calendar.MINUTE,59);
-//		message.setStartDeliverTime(calendar.getTime().getTime());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.set(Calendar.HOUR_OF_DAY,23);
+		calendar.set(Calendar.MINUTE,59);
+		message.setStartDeliverTime(calendar.getTime().getTime());
 		sendMessageASync(message);
 	}
 
