@@ -128,7 +128,7 @@ var tb1 = $("#aritcleFamilySellTable").DataTable({
 	ordering:false,
 	columns : [
 		{
-			title : "菜品分类",
+			title : "分类",
 			data : "articleFamilyName",
 			createdCell:function(td,tdData,rowData){
 				if(isEmpty(tdData)){
@@ -143,15 +143,15 @@ var tb1 = $("#aritcleFamilySellTable").DataTable({
 			}
 		}, 
 		{
-			title : "菜品销量(份)",
+			title : "销量(份)",
 			data : "brandSellNum",
 		},
 		{
-			title : "菜品销售额(元)",
+			title : "销售额(元)",
 			data : "salles",
 		},  
 		{
-			title : "菜品销售占比",
+			title : "销售额占比",
 			data : "salesRatio",
 			
 		},  
@@ -184,7 +184,7 @@ var tb2 = $("#articleSellTable").DataTable({
 	ordering:false,
 	columns : [
 		{
-			title : "菜品分类",
+			title : "分类",
 			data : "articleFamilyName",
 			createdCell:function(td,tdData,rowData){
 				if(isEmpty(tdData)){
@@ -199,7 +199,7 @@ var tb2 = $("#articleSellTable").DataTable({
 			}
 		},  
 		{
-			title : "菜品名称",
+			title : "菜名",
 			data : "articleName",
 			createdCell:function(td,tdData,rowData){
 				if(isEmpty(rowData.articleFamilyId) && isEmpty(rowData.articleFamilyName)){
@@ -208,15 +208,15 @@ var tb2 = $("#articleSellTable").DataTable({
 			}
 		},  
 		{
-			title : "菜品销量(份)",
+			title : "销量(份)",
 			data : "brandSellNum",
 		},
 		{
-			title : "菜品销售额",
+			title : "销售额",
 			data : "salles",
 		},
 		{
-			title : "销售占比",
+			title : "销售额占比",
 			data : "salesRatio",
 		},
 	],

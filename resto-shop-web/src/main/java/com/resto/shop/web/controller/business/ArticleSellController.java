@@ -303,7 +303,7 @@ public class ArticleSellController extends GenericController{
 //		}
 		//暂时查全部
 		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		String[][] headers = {{"菜品分类","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销量占比","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
+		String[][] headers = {{"分类","25"},{"菜名","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"}};
 		
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -424,7 +424,7 @@ public class ArticleSellController extends GenericController{
 		
 		
 		//String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-		String[][] headers = {{"菜品分类","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"销量占比","20"},{"菜品销售额","20"},{"销售额占比","20"}};
+		String[][] headers = {{"分类","22"},{"菜名","20"},{"销量(份)","20"},{"销量占比","20"},{"销售额","20"},{"销售额占比","20"}};
 		
 		
 		//定义excel工具类对象

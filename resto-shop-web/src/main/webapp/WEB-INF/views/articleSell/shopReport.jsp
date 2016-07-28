@@ -69,15 +69,15 @@ var shopTable = $("#shopTable").DataTable({
              }],
 	columns : [
 		{
-			title : "菜品分类",
+			title : "分类",
 			data : "articleFamilyName",
 		},  
 		{
-			title : "菜品名称",
+			title : "菜名",
 			data : "articleName",
 		},	
 		{
-			title : "菜品销量(份)",
+			title : "销量(份)",
 			data : "shopSellNum",
 		},
 		{
@@ -86,11 +86,11 @@ var shopTable = $("#shopTable").DataTable({
 		},
 		
 		{                 
-			title : "菜品销售额(元)",
+			title : "销售额(元)",
 			data : "salles",
 		},                 
 		{                 
-			title : "销售占比",
+			title : "销售额占比",
 			data : "salesRatio",
 		},
 	],
