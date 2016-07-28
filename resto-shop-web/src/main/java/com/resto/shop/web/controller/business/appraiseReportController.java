@@ -2,21 +2,28 @@
 
 
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.JOptionPane;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.AppraiseDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -52,7 +59,11 @@ public class appraiseReportController extends GenericController{
 
 
 	private Result getResult(String beginDate, String endDate) {
-		// TODO Auto-generated method stub
+		
+		return getSuccessResult(this.getSuccess(beginDate, endDate));
+	}
+
+	private Map<String,Object> getSuccess(String beginDate,String endDate){
 		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId());
 		Brand brand = brandService.selectById(getCurrentBrandId());
 		
@@ -192,10 +203,7 @@ public class appraiseReportController extends GenericController{
 			shopAppraise.setThreestar(threeStart2);
 			shopAppraise.setFourstar(fourStart2);
 			shopAppraise.setFivestar(fiveStart2);
-			
 			shopAppraiseList.add(shopAppraise);
-			
-			
 		}
 
 		//把店铺和品牌的数据封装成map返回给前台
@@ -203,13 +211,8 @@ public class appraiseReportController extends GenericController{
 		Map<String,Object> map = new HashMap<>();
 		map.put("brandAppraise", brandAppraise);
 		map.put("shopAppraise", shopAppraiseList);
-		
-		
-		return getSuccessResult(map);
-		
-		
+		return map;
 	}
-
 
 	private BigDecimal add(BigDecimal orderMoney, BigDecimal orderMoney2) {
 		
@@ -249,15 +252,73 @@ public class appraiseReportController extends GenericController{
 		
 		return orderService.selectAppraiseByShopId(beginDate,endDate,shopId);
 	}
-				
-			
-			
-			
-			
+	
+	
+	@RequestMapping("brand_excel")
+	@ResponseBody
+	public void report_brandExcel (String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
 		
-
+		//导出文件名
+				String fileName = "评论报表"+beginDate+"至"+endDate+".xls";
+				//定义读取文件的路径
+				String path = request.getSession().getServletContext().getRealPath(fileName);
+				//定义列
+				String[]columns={"name","appraiseNum","appraiseRatio","redMoney","orderMoney","redRatio","fivestar","fourstar","threestar","twostar","onestar"};
+				//定义数据
+				 
+				//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+				Map<String,String> map = new HashMap<>();
+				Brand brand = brandService.selectById(getCurrentBrandId());
+				//获取店铺名称
+				List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+				String shopName="";
+				for (ShopDetail shopDetail : shops) {
+					shopName += shopDetail.getName()+",";
+				}
+				//去掉最后一个逗号
+				shopName.substring(0, shopName.length()-1);
+				map.put("brandName", brand.getBrandName());
+				map.put("shops", shopName);
+				map.put("beginDate", beginDate);
+				map.put("reportType", "品牌评论报表");//表的头，第一行内容
+				map.put("endDate", endDate);
+				map.put("num", "10");//显示的位置
+				map.put("reportTitle", "品牌评论");//表的名字
+				map.put("timeType", "yyyy-MM-dd");
+				Map<String, Object> appraiseMap = this.getSuccess(beginDate, endDate);
+				List<AppraiseDto> result = new LinkedList<>();
+				@SuppressWarnings("unchecked")
+				List<AppraiseDto> list  =  (List<AppraiseDto>) appraiseMap.get("shopAppraise");
+				for (AppraiseDto appraiseDto : list) {
+					appraiseDto.setName(appraiseDto.getShopName());
+				}
+				result.addAll(list);
+				AppraiseDto a = (AppraiseDto) appraiseMap.get("brandAppraise");
+				a.setName(a.getBrandName());
+				result.add(a);
+				String[][] headers = {{"品牌","25"},{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"评论红包撬动率","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
+				//定义excel工具类对象
+				ExcelUtil<AppraiseDto> excelUtil=new ExcelUtil<AppraiseDto>();
+				OutputStream out  = null;
+				try{
+					out = new FileOutputStream(path);
+					excelUtil.ExportExcel(headers, columns, result, out, map);
+					out.close();
+					excelUtil.download(path, response);
+					JOptionPane.showMessageDialog(null, "导出成功！");
+					log.info("excel导出成功");
+				}catch(Exception e){
+					e.printStackTrace();
+				}finally {  
+		            if (out != null) {  
+		                try {  
+		                    out.close();  
+		                } catch (IOException io) {  
+		//log  
+		                }  
+		            }  
+		
+				}
 	
-	
-	
-	
+	  }
 }

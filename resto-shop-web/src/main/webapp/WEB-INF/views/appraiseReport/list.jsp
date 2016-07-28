@@ -20,13 +20,13 @@
                  
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
           
-             <button type="button" class="btn btn-primary" @click="benxun">本询</button>
+<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
              
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
              
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-<!-- 		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/> -->
+		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/> 
 		</form>
 		
 	</div>
@@ -246,6 +246,12 @@ var vueObj =  new Vue({
 			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
 			this.searchInfo();
 		},
+		//下载
+		brandreportExcel : function (){
+			var beginDate = this.searchDate.beginDate;
+			var endDate = this.searchDate.endDate;
+			location.href="appraiseReport/brand_excel?beginDate="+beginDate+"&&endDate="+endDate;
+		}
 		
 	},
 	

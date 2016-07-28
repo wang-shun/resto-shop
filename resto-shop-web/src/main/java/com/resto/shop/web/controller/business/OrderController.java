@@ -136,10 +136,13 @@ public class OrderController extends GenericController{
 				for (Order o : list) {
 					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "");			
 					
-					//手机号
-					if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
-						ot.setTelephone(o.getCustomer().getTelephone());
+					if(o.getCustomer()!=null){
+						//手机号
+						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
+							ot.setTelephone(o.getCustomer().getTelephone());
+						}
 					}
+					
 					//订单状态
 					if(o.getOrderState()!=null){
 						switch (o.getOrderState()) {
