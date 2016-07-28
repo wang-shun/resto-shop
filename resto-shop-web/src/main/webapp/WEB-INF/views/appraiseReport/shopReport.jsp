@@ -22,6 +22,15 @@ th {
 						class="form-control form_datetime2" id="endDate2" 
 						readonly="readonly">
 				</div>
+				<button type="button" class="btn btn-primary" id="today"> 今日</button>
+                 
+             <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
+          
+<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button>  -->
+             
+             <button type="button" class="btn btn-primary" id="week">本周</button>
+             <button type="button" class="btn btn-primary" id="month">本月</button>
+				
 				<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
 			</form>
 		</div>
@@ -37,7 +46,7 @@ th {
 			</table>
 		</div>
 	</div>
-	
+<script src="assets/customer/date.js" type="text/javascript"></script>	
 <script>
 	//时间插件
 
@@ -117,10 +126,14 @@ th {
 	 $("#searchInfo2").click(function(){
 		 var beginDate = $("#beginDate2").val();
 		 var endDate = $("#endDate2").val();
+		 searchInfo(beginDate,endDate);
+	 })
+	 
+	 function searchInfo(beginDate,endDate){
 		 var data = {"beginDate":beginDate,"endDate":endDate,"shopId":shopId};
 		 tb1.ajax.reload();
 		 toastr.success("查询成功");
-	 })
+	 }
 	 
 	 
 	 function getLevel(level){
@@ -146,6 +159,37 @@ th {
 		 }
 		 return levelName; 
 	 }
+	 
+	 
+	 $("#today").click(function(){
+		 var date  = new Date().format("yyyy-MM-dd");
+		 //更新插件的时间
+		 $("#beginDate2").val(date);
+		 $("#endDate2").val(date);
+		 searchInfo(date, date);
+	 });
+	 
+	 $("#yesterDay").click(function(){
+		 //更新插件的时间
+		 $("#beginDate2").val(GetDateStr(-1));
+		 $("#endDate2").val(new Date().format("yyyy-MM-dd")); 
+		 searchInfo(GetDateStr(-1), new Date().format("yyyy-MM-dd"));		 
+	 });
+	 
+	 $("#week").click(function(){
+		//更新插件的时间
+		 $("#beginDate2").val(getWeekStartDate());
+		 $("#endDate2").val(new Date().format("yyyy-MM-dd")); 
+		 searchInfo(getWeekStartDate(), new Date().format("yyyy-MM-dd"));		
+	 })
+	 
+	 $("#month").click(function(){
+		//更新插件的时间
+		 $("#beginDate2").val(getMonthStartDate());
+		 $("#endDate2").val(new Date().format("yyyy-MM-dd")); 
+		 searchInfo(getMonthStartDate(), new Date().format("yyyy-MM-dd"));		
+	 })
+	 
 	 
 	
 </script>

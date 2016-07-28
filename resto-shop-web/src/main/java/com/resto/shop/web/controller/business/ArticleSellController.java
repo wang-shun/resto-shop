@@ -212,7 +212,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","brandSellNum","salles","salesRatio"};
+		String[]columns={"articleFamilyName","brandSellNum","salles","salesRatio","totalMoney"};
 		//定义数据
 		List<ArticleSellDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
