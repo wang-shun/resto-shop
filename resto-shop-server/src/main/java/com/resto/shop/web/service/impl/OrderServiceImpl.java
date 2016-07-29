@@ -626,6 +626,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //保存 菜品的名称和数量
                 List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
                 Map<String, Object> item = new HashMap<String, Object>();
+                item.put("SUBTOTAL", article.getFinalPrice());
                 item.put("ARTICLE_NAME", article.getArticleName());
                 item.put("ARTICLE_COUNT", article.getCount());
                 items.add(item);
@@ -642,29 +643,68 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                     }
                 }
+                ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
                 //保存基本信息
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("KITCHEN_NAME", kitchen.getName());
-                data.put("DISTRIBUTION_MODE", modeText);
-                data.put("TABLE_NUMBER", tableNumber);
-                data.put("ORDER_ID", serialNumber);
-                data.put("DATE", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
-                data.put("ITEMS", items);
-                //添加当天打印订单的序号
-                data.put("NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-                //保存打印配置信息
+
+
+
+
+
+
                 Map<String, Object> print = new HashMap<String, Object>();
+                print.put("TABLE_NO", tableNumber);
+
+                print.put("KITCHEN_NAME", kitchen.getName());
+                print.put("PORT", printer.getPort());
+                print.put("ORDER_ID", serialNumber);
+                print.put("IP", printer.getIp());
                 String print_id = ApplicationUtils.randomUUID();
                 print.put("PRINT_TASK_ID", print_id);
-                print.put("STATUS", 0);
-                print.put("ORDER_ID", serialNumber);
-                print.put("KITCHEN_NAME", kitchen.getName());
-                print.put("DATA", data);
-                print.put("TABLE_NO", tableNumber);
-                print.put("IP", printer.getIp());
-                print.put("PORT", printer.getPort());
                 print.put("ADD_TIME", new Date());
+
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("ORDER_ID", serialNumber);
+                data.put("ITEMS", items);
+                data.put("DISTRIBUTION_MODE", modeText);
+                data.put("ORIGINAL_AMOUNT",order.getOriginalAmount());
+                data.put("RESTAURANT_ADDRESS", shop.getAddress());
+                data.put("REDUCTION_AMOUNT", order.getReductionAmount());
+                data.put("RESTAURANT_TEL", shop.getPhone());
+                data.put("TABLE_NUMBER", tableNumber);
+                data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+                data.put("RESTAURANT_NAME", shop.getName());
+
+
+                data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
+                data.put("ARTICLE_COUNT", order.getArticleCount());
+                print.put("DATA", data);
+
+                print.put("STATUS", 0);
+
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
+
+
+
+
+
+
+//
+//                //添加当天打印订单的序号
+//                data.put("NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+//                //保存打印配置信息
+//
+//
+//
+//
+//
+//                print.put("ORDER_ID", serialNumber);
+//                print.put("KITCHEN_NAME", kitchen.getName());
+//
+//                print.put("TABLE_NO", tableNumber);
+
+
+
+
                 //添加到 打印集合
                 printTask.add(print);
             }
@@ -713,44 +753,61 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> items = new ArrayList<>();
         for (OrderItem article : orderItems) {
             Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", article.getFinalPrice());
             item.put("ARTICLE_NAME", article.getArticleName());
             item.put("ARTICLE_COUNT", article.getCount());
-            item.put("SUBTOTAL", article.getFinalPrice());
+
             items.add(item);
         }
 
-        Map<String, Object> data = new HashMap<>();
-        String modeText = getModeText(order);
-        data.put("DISTRIBUTION_MODE", modeText);
-
-        data.put("ARTICLE_COUNT", order.getArticleCount());
-        data.put("RESTAURANT_NAME", shopDetail.getName());
-        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
-        data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber());
-        data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
-        data.put("ITEMS", items);
-        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
-        data.put("REDUCTION_AMOUNT", order.getReductionAmount());
-        data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
-        //添加当天小票的打印的序号
-        data.put("NUMBER", nextNumber(shopDetail.getId(), order.getId()));
-
-        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
         Map<String, Object> print = new HashMap<>();
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        print.put("TABLE_NO", tableNumber);
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
-        print.put("STATUS", 0);
-        print.put("ORDER_ID", order.getSerialNumber());
-
-        print.put("KITCHEN_NAME", printer.getName());
-        print.put("DATA", data);
-        print.put("TABLE_NO", order.getTableNumber());
-        print.put("IP", printer.getIp());
-        print.put("PORT", printer.getPort());
         print.put("ADD_TIME", new Date());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
+        data.put("ITEMS", items);
+
+        String modeText = getModeText(order);
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", order.getReductionAmount());
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
+        data.put("ARTICLE_COUNT", order.getArticleCount());
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+
         print.put("TICKET_TYPE", TicketType.RECEIPT);
+
+
+//
+//        //添加当天小票的打印的序号
+//        data.put("NUMBER", nextNumber(shopDetail.getId(), order.getId()));
+//
+//        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
+//
+//
+//
+//
+//
+//
+//
+//        print.put("TABLE_NO", order.getTableNumber());
+//
+
+
         return print;
     }
 
