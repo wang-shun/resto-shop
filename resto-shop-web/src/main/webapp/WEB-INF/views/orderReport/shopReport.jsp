@@ -242,7 +242,6 @@ th {
 						 $("#appriase").html(getLevel(data.appraise.level));
 						 $("#content").html(data.appraise.content);
 					 }
-					
 					 $("#orderState").html(getState(data.orderState));
 					 $('#articleList').text("");
 					
@@ -284,19 +283,19 @@ th {
 		 switch (level)
 		 {
 		 case 1:
-		   levelName="非常不满意";
+		   levelName="一星";
 		   break;
 		 case 2:
-		   levelName="不满意";
+		   levelName="二星";
 		   break;
 		 case 3:
-		   levelName="一般";
+		   levelName="三星";
 		   break;
 		 case 4:
-		   levelName="满意";
+		   levelName="四星";
 		   break;
 		 case 5:
-		   levelName="非常满意";
+		   levelName="五星";
 		   break;
 		 
 		 }
@@ -313,6 +312,7 @@ th {
 	    	  break;
 	    	case 9:
 	    	  orderState="已取消";
+	    	  break;
 	    	case 10:
 	    	  orderState="已确认";
 	    	  break;

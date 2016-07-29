@@ -351,11 +351,13 @@ public class Order {
         this.verCode = verCode;
     }
 
+
     public String getUseCoupon() {
         return useCoupon;
     }
 
-    public void setUseCoupon(String useCoupon) {
+     public void setUseCoupon(String useCoupon) {
+
         this.useCoupon = useCoupon;
     }
 
