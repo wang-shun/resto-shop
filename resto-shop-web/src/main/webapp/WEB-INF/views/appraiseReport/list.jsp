@@ -66,7 +66,7 @@
 						<td>{{brandAppraise.appraiseRatio}}</td>
 						<td>{{brandAppraise.redMoney}}</td>
 						<td>{{brandAppraise.totalMoney}}</td>
-						<td>1</td>
+						<td>{{brandAppraise.redRatio}}</td>
 						<td>{{brandAppraise.fivestar}}</td>
 						<td>{{brandAppraise.fourstar}}</td>
 						<td>{{brandAppraise.threestar}}</td>
@@ -114,7 +114,7 @@
 						<td>{{shopAppraise.appraiseRatio}}</td>
 						<td>{{shopAppraise.redMoney}}</td>
 						<td>{{shopAppraise.totalMoney}}</td>
-						<td>1</td>
+						<td>{{shopAppraise.redRatio}}</td>
 						<td>{{shopAppraise.fivestar}}</td>
 						<td>{{shopAppraise.fourstar}}</td>
 						<td>{{shopAppraise.threestar}}</td>

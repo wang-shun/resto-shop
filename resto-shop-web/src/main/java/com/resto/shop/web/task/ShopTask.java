@@ -21,7 +21,7 @@ public class ShopTask extends GenericController {
 	@Autowired
 	private OrderService orderService;
  
-	@Scheduled(cron = "00 50 13 * * ?")   //每天12点执行
+	@Scheduled(cron = "00 56 14 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException {
         String url = null;
         String driver = null;
@@ -43,7 +43,7 @@ public class ShopTask extends GenericController {
  			    sta = con.prepareStatement(sql); 
  			    
  			    //查询出店铺菜品的数据(今天的数据 )
- 			    List<ArticleSellDto> list = orderService.selectShopArticleSellByDate("2016-07-20", "2016-07-20",getCurrentShopId() ,"0asc");
+ 			    List<ArticleSellDto> list = orderService.selectShopArticleSellByDate("2016-07-20", "2016-07-20","f48a0a35e0be4dd8aaeb7cf727603958" ,"0asc");
  			    
  			    for (ArticleSellDto articleSellDto : list) {
  			    	 sta.setString(1,ApplicationUtils.randomUUID()); 

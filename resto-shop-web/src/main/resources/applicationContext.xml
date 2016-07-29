@@ -68,5 +68,8 @@
         <constructor-arg ref="redisTemplate"></constructor-arg>
     </bean>
 
-
+	<task:annotation-driven/>
+	<context:annotation-config/>
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	<context:component-scan base-package=" com.resto.shop.web.task"/>
 </beans>
