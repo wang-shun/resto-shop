@@ -17,6 +17,8 @@ public interface FreedayService extends GenericService<FreeDay, String> {
     void setYearWeekend(FreeDay day) throws Exception;
 
 	boolean selectExists(Date date,String shopid);
+
+
     
     
 }

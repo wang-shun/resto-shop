@@ -38,4 +38,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	void addLikes(String articleId);
 	
 	void updateLikes(String articleId,Long likes);
+
+
 }
