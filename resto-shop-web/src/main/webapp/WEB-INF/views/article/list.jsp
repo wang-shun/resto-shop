@@ -15,6 +15,9 @@
         max-height: 80vh;
         overflow-y: auto;
     }
+    .print-sort{
+
+    }
 </style>
 <div id="control">
 
@@ -172,20 +175,22 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row" v-if="m.articleType!=2">
                                     <div class="form-group  col-md-12">
                                         <label class="col-md-2 text-right" style="margin-top: 20px">库存</label>
                                         <div class="col-md-8">
                                             <div>
                                                 <label>
                                                     <input name="stockWorkingDay"
-                                                           class="form-control"  v-model="m.stockWorkingDay"/> (工作日)
+                                                           class="form-control" v-model="m.stockWorkingDay"
+                                                           id="stockWorkingDay"/> (工作日)
                                                 </label>
                                             </div>
                                             <div>
                                                 <label>
                                                     <input name="stockWeekend"
-                                                           class="form-control"  v-model="m.stockWeekend"/> (假期)
+                                                           class="form-control" v-model="m.stockWeekend"
+                                                           id="stockWeekend"/> (假期)
                                                 </label>
                                             </div>
                                         </div>
@@ -216,8 +221,10 @@
                                         <div class="flex-2">价格</div>
                                         <div class="flex-2">粉丝价</div>
                                         <div class="flex-2">编号</div>
+                                        <div class="flex-2">工作日库存</div>
+                                        <div class="flex-2">周末库存</div>
                                     </div>
-                                    <div class="flex-row" v-for="u in unitPrices">
+                                    <div class="flex-row " v-for="u in unitPrices">
                                         <label class="flex-1 control-label">{{u.name}}</label>
                                         <div class="flex-2">
                                             <input type="hidden" name="unitNames" :value="u.name"/>
@@ -232,6 +239,15 @@
                                         <div class="flex-2">
                                             <input type="text" class="form-control" name="unitPeferences"
                                                    v-model="u.peference"/>
+                                        </div>
+                                        <div class="flex-2">
+                                            <input type="text" class="form-control" name="stockWorkingDay"
+                                                   id="workingDay" v-model="u.stockWorkingDay"
+                                                   onchange="changeStockWeekend()"  />
+                                        </div>
+                                        <div class="flex-2">
+                                            <input type="text" class="form-control" name="stockWeekend"
+                                                   v-model="u.stockWeekend" onchange="changeStockWeekend()"/>
                                         </div>
                                     </div>
                                 </div>
@@ -254,7 +270,7 @@
                                     <div class="portlet-body">
                                         <div class="portlet box blue-hoki"
                                              v-for="attr in m.mealAttrs | orderBy  'sort'">
-                                            <div class="portlet-title">
+                                            <div class="portlet-title" >
                                                 <div class="caption">
                                                     <label class="control-label">&nbsp;</label>
                                                     <div class="pull-right">
@@ -268,6 +284,16 @@
                                                         <input class="form-control" type="text" v-model="attr.sort"
                                                                required="required" lazy>
                                                     </div>
+
+                                                </div>
+
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4" style="width:120px">打印排序&nbsp;</label>
+                                                    <div class="col-md-4">
+                                                        <input class="form-control" type="text" v-model="attr.printSort"
+                                                               required="required"  name="printSort" lazy onblur="checkSort(this)">
+                                                    </div>
+
                                                 </div>
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
@@ -351,7 +377,7 @@
                     <div class="modal-footer">
                         <input type="hidden" name="id" v-model="m.id"/>
                         <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="submit" class="btn btn-primary" >保存</button>
                     </div>
                 </form>
             </div>
@@ -436,6 +462,28 @@
 
 
 <script>
+
+    function checkSort(t){
+        if($(t).val() == ''){
+            return;
+        }
+        var v = $(t).val();
+        var count = 0;
+        var attr = document.getElementsByName("printSort");
+        for(var i = 0;i< attr.length;i++){
+            if(v == attr[i].value){
+                count ++;
+            }
+        }
+
+        if(count > 1){
+            alert("打印排序添加重复");
+            $(t).val('');
+        }
+
+    }
+
+
     Vue.config.debug = true;
     (function () {
         var cid = "#control";
@@ -520,12 +568,12 @@
                 {
                     title: "工作日库存",
                     data: "stockWorkingDay",
-                    defaultContent: "0",
+                    defaultContent: "0"
                 },
                 {
                     title: "周末库存",
                     data: "stockWeekend",
-                    defaultContent: "0",
+                    defaultContent: "0"
                 },
                 {
                     title: "操作",
@@ -572,373 +620,389 @@
         });
         var C = new Controller(null, tb);
         var vueObj = new Vue({
-            el: "#control",
-            mixins: [C.formVueMix],
-            data: {
-                articlefamilys: [],
-                supportTimes: [],
-                kitchenList: [],
-                checkedUnit: [],
-                articleattrs: [],
-                articleunits: {},
-                unitPrices: [],
-                mealtempList: [],
-                choiceTemp: "",
-                lastChoiceTemp: "",
-                allArticles: allArticles,
-                choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
-            },
-            methods: {
-                itemDefaultChange: function (attr, item) {
-                    for (var i in attr.mealItems) {
-                        var m = attr.mealItems[i];
-                        if (m != item) {
-                            m.isDefault = false;
-                        }
-                    }
-                },
-                updateAttrItems: function () {
-                    this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
-                    $("#article-choice-dialog").modal('hide');
-                },
-                removeMealItem: function (attr, item) {
-                    attr.mealItems.$remove(item);
-                },
-                removeArticleItem: function (mealItem) {
-                    this.choiceArticleShow.items.$remove(mealItem);
-                },
-                addArticleItem: function (art) {
-                    var item = {
-                        name: art.name,
-                        sort: art.sort,
-                        articleName: art.name,
-                        priceDif: 0,
-                        articleId: art.id,
-                        photoSmall: art.photoSmall,
-                        isDefault: false,
-                    };
-                    console.log(this.choiceArticleShow.items.length);
-                    if (!this.choiceArticleShow.items.length) {
-                        item.isDefault = true;
-                    }
-                    this.choiceArticleShow.items.push(item);
-                },
-                addMealItem: function (meal) {
-                    this.choiceArticleShow.show = true;
-                    this.choiceArticleShow.mealAttr = meal;
-                    this.choiceArticleShow.items = $.extend(true, {}, meal).mealItems || [];
-                    this.$nextTick(function () {
-                        $("#article-choice-dialog").modal('show');
-                        var that = this;
-                        $("#article-choice-dialog").on('hidden.bs.modal', function () {
-                            that.choiceArticleShow.show = false;
-                        });
-                    })
-                },
-                delMealAttr: function (meal) {
-                    this.m.mealAttrs.$remove(meal);
-                },
-                addMealAttr: function () {
-                    var sort = this.maxMealAttrSort + 1;
-                    this.m.mealAttrs.push({
-                        name: "套餐属性" + sort,
-                        sort: sort,
-                        mealItems: [],
-                    });
-                },
-                choiceMealTemp: function (e) {
-                    var that = this;
-                    C.confirmDialog("切换模板后，所有套餐编辑的内容将被清空，你确定要切换模板吗?", "提示", function () {
-                        that.lastChoiceTemp = $(e.target).val();
-                        var mealAttrs = [];
-                        for (var i = 0; i < that.mealtempList.length; i++) {
-                            var temp = that.mealtempList[i];
-                            if (temp.id == that.lastChoiceTemp) {
-                                for (var n = 0; n < temp.attrs.length; n++) {
-                                    var attr = temp.attrs[n];
-                                    mealAttrs.push({
-                                        name: attr.name,
-                                        sort: attr.sort,
-                                        mealItems: [],
-                                    });
-                                }
-                                that.m.mealAttrs = mealAttrs;
-                                return false;
-                            }
-                        }
-                        that.m.mealAttrs = [];
-                    }, function () {
-                        that.choiceTemp = that.lastChoiceTemp.toString();
-                    });
-                },
-                selectAllTimes: function (m, e) {
-                    var isCheck = $(e.target).is(":checked");
-                    if (isCheck) {
-                        for (var i = 0; i < this.supportTimes.length; i++) {
-                            var t = this.supportTimes[i];
-                            m.supportTimes.push(t.id);
-                        }
-                    } else {
-                        m.supportTimes = [];
-                    }
-                },
-                create: function (article_type) {
-                    this.m = {
-                        articleFamilyId: this.articlefamilys[0].id,
+                    el: "#control",
+                    mixins: [C.formVueMix],
+                    data: {
+                        articlefamilys: [],
                         supportTimes: [],
                         kitchenList: [],
-                        mealAttrs: [],
-                        isRemind: false,
-                        activated: true,
-                        showDesc: true,
-                        showBig: true,
-                        isEmpty: false,
-                        sort: 0,
-                        articleType: article_type,
-                    };
-                    this.checkedUnit = [];
-                    this.showform = true;
-                },
-                uploadSuccess: function (url) {
-                    console.log(url);
-                    $("[name='photoSmall']").val(url).trigger("change");
-                    C.simpleMsg("上传成功");
-                    $("#photoSmall").attr("src", "/" + url);
-                },
-                uploadError: function (msg) {
-                    C.errorMsg(msg);
-                },
-                edit: function (model) {
-                    var that = this;
-                    that.showform = true;
-                    that.checkedUnit = [];
-                    $.post("article/list_one_full", {id: model.id}, function (result) {
-                        var article = result.data;
-                        article.mealAttrs || (article.mealAttrs = []);
-                        that.m = article;
-                        if (article.hasUnit && article.hasUnit != " " && article.hasUnit.length) {
-                            var unit = article.hasUnit.split(",");
-                            unit = $.unique(unit);
-                            for (var i in  unit) {
-                                that.checkedUnit.push(parseInt(unit[i]));
-                            }
-                        }
-                        that.unitPrices = article.articlePrices;
-                        if (!article.kitchenList) {
-                            article.kitchenList = [];
-                        }
-                    });
-
-                },
-                filterTable: function (e) {
-                    var s = $(e.target);
-                    var val = s.val();
-                    if (val == "-1") {
-                        tb.search("").draw();
-                        return;
-                    }
-                    tb.search(val).draw();
-                },
-                changeColor: function (val) {
-                    $(".color-mini").minicolors("value", val);
-                },
-                save: function (e) {
-                    var that = this;
-                    var action = $(e.target).attr("action");
-                    this.m.articlePrices = this.unitPrices;
-                    this.m.hasUnit = this.checkedUnit.join() || " ";
-                    var m = this.m;
-
-                    var jsonData = JSON.stringify(this.m);
-                    $.ajax({
-                        contentType: "application/json",
-                        type: "post",
-                        url: action,
-                        data: jsonData,
-                        success: function (result) {
-                            if (result.success) {
-                                that.showform = false;
-                                that.m = {};
-                                C.simpleMsg("保存成功");
-                                tb.ajax.reload(null, false);
-                            } else {
-                                C.errorMsg(result.message);
+                        checkedUnit: [],
+                        articleattrs: [],
+                        articleunits: {},
+                        unitPrices: [],
+                        mealtempList: [],
+                        choiceTemp: "",
+                        lastChoiceTemp: "",
+                        allArticles: allArticles,
+                        choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
+                    },
+                    methods: {
+                        itemDefaultChange: function (attr, item) {
+                            for (var i in attr.mealItems) {
+                                var m = attr.mealItems[i];
+                                if (m != item) {
+                                    m.isDefault = false;
+                                }
                             }
                         },
-                        error: function (xhr, msg, e) {
-                            var errorText = xhr.status + " " + xhr.statusText + ":" + action;
-                            C.errorMsg(errorText);
-                        }
-                    });
-                }
-            },
-            computed: {
-                choiceArticleCanChoice: function () {
-                    var arts = [];
-                    for (var i in this.allArticles) {
-                        var art = this.allArticles[i];
-                        var has = false;
-                        for (var n in this.choiceArticleShow.items) {
-                            var mealItem = this.choiceArticleShow.items[n];
-                            if (mealItem.articleId == art.id) {
-                                has = true;
-                                break;
+                        updateAttrItems: function () {
+                            this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
+                            $("#article-choice-dialog").modal('hide');
+                        },
+                        removeMealItem: function (attr, item) {
+                            attr.mealItems.$remove(item);
+                        },
+                        removeArticleItem: function (mealItem) {
+                            this.choiceArticleShow.items.$remove(mealItem);
+                        },
+                        addArticleItem: function (art) {
+                            var item = {
+                                name: art.name,
+                                sort: art.sort,
+                                articleName: art.name,
+                                priceDif: 0,
+                                articleId: art.id,
+                                photoSmall: art.photoSmall,
+                                isDefault: false,
+                            };
+                            console.log(this.choiceArticleShow.items.length);
+                            if (!this.choiceArticleShow.items.length) {
+                                item.isDefault = true;
                             }
+                            this.choiceArticleShow.items.push(item);
+                        },
+                        addMealItem: function (meal) {
+                            this.choiceArticleShow.show = true;
+                            this.choiceArticleShow.mealAttr = meal;
+                            this.choiceArticleShow.items = $.extend(true, {}, meal).mealItems || [];
+                            this.$nextTick(function () {
+                                $("#article-choice-dialog").modal('show');
+                                var that = this;
+                                $("#article-choice-dialog").on('hidden.bs.modal', function () {
+                                    that.choiceArticleShow.show = false;
+                                });
+                            })
+                        },
+
+                        delMealAttr: function (meal) {
+                            this.m.mealAttrs.$remove(meal);
                         }
-                        if (!has && art.articleType == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
-                            arts.push(art);
+                        ,
+                        addMealAttr: function () {
+                            var sort = this.maxMealAttrSort + 1;
+                            this.m.mealAttrs.push({
+                                name: "套餐属性" + sort,
+                                sort: sort,
+                                mealItems: [],
+                            });
                         }
-                    }
-                    return arts;
-                },
-                maxMealAttrSort: function () {
-                    var sort = 0;
-                    for (var i in this.m.mealAttrs) {
-                        var meal = this.m.mealAttrs[i];
-                        if (meal.sort > sort) {
-                            sort = meal.sort;
-                        }
-                    }
-                    return parseInt(sort);
-                },
-                allUnitPrice: function () {
-                    var result = [];
-                    console.log(this.checkedUnit);
-                    for (var i = 0; i < this.articleattrs.length; i++) {
-                        var attr = this.articleattrs[i];
-                        var checked = [];
-                        if (!attr.articleUnits) {
-                            continue;
-                        }
-                        for (var j = 0; j < attr.articleUnits.length; j++) {
-                            var c = attr.articleUnits[j];
-                            for (var n in this.checkedUnit) {
-                                if (c.id == this.checkedUnit[n]) {
-                                    checked.push({
-                                        unitIds: c.id,
-                                        name: "(" + c.name + ")"
-                                    })
-                                    break;
+                        ,
+                        choiceMealTemp: function (e) {
+                            var that = this;
+                            C.confirmDialog("切换模板后，所有套餐编辑的内容将被清空，你确定要切换模板吗?", "提示", function () {
+                                that.lastChoiceTemp = $(e.target).val();
+                                var mealAttrs = [];
+                                for (var i = 0; i < that.mealtempList.length; i++) {
+                                    var temp = that.mealtempList[i];
+                                    if (temp.id == that.lastChoiceTemp) {
+                                        for (var n = 0; n < temp.attrs.length; n++) {
+                                            var attr = temp.attrs[n];
+                                            mealAttrs.push({
+                                                name: attr.name,
+                                                sort: attr.sort,
+                                                mealItems: [],
+                                            });
+                                        }
+                                        that.m.mealAttrs = mealAttrs;
+                                        return false;
+                                    }
                                 }
-                            }
+                                that.m.mealAttrs = [];
+                            }, function () {
+                                that.choiceTemp = that.lastChoiceTemp.toString();
+                            });
                         }
-                        checked.length && result.push(checked);
-                    }
-
-
-                    function getAll(allData) {
-                        var root = [];
-                        for (var i in allData) {
-                            var currentData = allData[i];
-                            if (i > 0) {
-                                for (var p  in allData[i - 1]) {
-                                    var parent = allData[i - 1][p];
-                                    parent.children = currentData;
+                        ,
+                        selectAllTimes: function (m, e) {
+                            var isCheck = $(e.target).is(":checked");
+                            if (isCheck) {
+                                for (var i = 0; i < this.supportTimes.length; i++) {
+                                    var t = this.supportTimes[i];
+                                    m.supportTimes.push(t.id);
                                 }
                             } else {
-                                root = currentData;
+                                m.supportTimes = [];
                             }
                         }
-                        var allItems = [];
-                        for (var n in root) {
-                            var r = root[n];
-                            getTreeAll(r, allItems);
+                        ,
+                        create: function (article_type) {
+                            this.m = {
+                                articleFamilyId: this.articlefamilys[0].id,
+                                supportTimes: [],
+                                kitchenList: [],
+                                mealAttrs: [],
+                                isRemind: false,
+                                activated: true,
+                                showDesc: true,
+                                showBig: true,
+                                isEmpty: false,
+                                sort: 0,
+                                articleType: article_type,
+                            };
+                            this.checkedUnit = [];
+                            this.showform = true;
                         }
-                        return allItems;
-                    }
+                        ,
+                        uploadSuccess: function (url) {
+                            console.log(url);
+                            $("[name='photoSmall']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#photoSmall").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadError: function (msg) {
+                            C.errorMsg(msg);
+                        }
+                        ,
+                        edit: function (model) {
+                            var that = this;
+                            that.showform = true;
+                            that.checkedUnit = [];
+                            $.post("article/list_one_full", {id: model.id}, function (result) {
+                                var article = result.data;
+                                article.mealAttrs || (article.mealAttrs = []);
+                                that.m = article;
+                                if (article.hasUnit && article.hasUnit != " " && article.hasUnit.length) {
+                                    var unit = article.hasUnit.split(",");
+                                    unit = $.unique(unit);
+                                    for (var i in  unit) {
+                                        that.checkedUnit.push(parseInt(unit[i]));
+                                    }
+                                }
+                                that.unitPrices = article.articlePrices;
+                                if (!article.kitchenList) {
+                                    article.kitchenList = [];
+                                }
+                            });
 
-                    function getTreeAll(tree, allItems) {
-                        tree = $.extend({}, tree);
-                        if (!tree.children) {
-                            allItems.push($.extend({}, tree));
+                        }
+                        ,
+                        filterTable: function (e) {
+                            var s = $(e.target);
+                            var val = s.val();
+                            if (val == "-1") {
+                                tb.search("").draw();
+                                return;
+                            }
+                            tb.search(val).draw();
+                        }
+                        ,
+                        changeColor: function (val) {
+                            $(".color-mini").minicolors("value", val);
+                        }
+                        ,
+                        save: function (e) {
+                            var that = this;
+                            var action = $(e.target).attr("action");
+                            this.m.articlePrices = this.unitPrices;
+                            this.m.hasUnit = this.checkedUnit.join() || " ";
+                            var m = this.m;
+
+                            var jsonData = JSON.stringify(this.m);
+                            $.ajax({
+                                contentType: "application/json",
+                                type: "post",
+                                url: action,
+                                data: jsonData,
+                                success: function (result) {
+                                    if (result.success) {
+                                        that.showform = false;
+                                        that.m = {};
+                                        C.simpleMsg("保存成功");
+                                        tb.ajax.reload(null, false);
+                                    } else {
+                                        C.errorMsg(result.message);
+                                    }
+                                },
+                                error: function (xhr, msg, e) {
+                                    var errorText = xhr.status + " " + xhr.statusText + ":" + action;
+                                    C.errorMsg(errorText);
+                                }
+                            });
+                        }
+                    },
+                    computed: {
+                        choiceArticleCanChoice: function () {
+                            var arts = [];
+                            for (var i in this.allArticles) {
+                                var art = this.allArticles[i];
+                                var has = false;
+                                for (var n in this.choiceArticleShow.items) {
+                                    var mealItem = this.choiceArticleShow.items[n];
+                                    if (mealItem.articleId == art.id) {
+                                        has = true;
+                                        break;
+                                    }
+                                }
+                                if (!has && art.articleType == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
+                                    arts.push(art);
+                                }
+                            }
+                            return arts;
+                        }
+                        ,
+                        maxMealAttrSort: function () {
+                            var sort = 0;
+                            for (var i in this.m.mealAttrs) {
+                                var meal = this.m.mealAttrs[i];
+                                if (meal.sort > sort) {
+                                    sort = meal.sort;
+                                }
+                            }
+                            return parseInt(sort);
+                        }
+                        ,
+                        allUnitPrice: function () {
+                            var result = [];
+                            console.log(this.checkedUnit);
+                            for (var i = 0; i < this.articleattrs.length; i++) {
+                                var attr = this.articleattrs[i];
+                                var checked = [];
+                                if (!attr.articleUnits) {
+                                    continue;
+                                }
+                                for (var j = 0; j < attr.articleUnits.length; j++) {
+                                    var c = attr.articleUnits[j];
+                                    for (var n in this.checkedUnit) {
+                                        if (c.id == this.checkedUnit[n]) {
+                                            checked.push({
+                                                unitIds: c.id,
+                                                name: "(" + c.name + ")"
+                                            })
+                                            break;
+                                        }
+                                    }
+                                }
+                                checked.length && result.push(checked);
+                            }
+
+
+
+                            function getAll(allData) {
+                                var root = [];
+                                for (var i in allData) {
+                                    var currentData = allData[i];
+                                    if (i > 0) {
+                                        for (var p  in allData[i - 1]) {
+                                            var parent = allData[i - 1][p];
+                                            parent.children = currentData;
+                                        }
+                                    } else {
+                                        root = currentData;
+                                    }
+                                }
+                                var allItems = [];
+                                for (var n in root) {
+                                    var r = root[n];
+                                    getTreeAll(r, allItems);
+                                }
+                                return allItems;
+                            }
+
+                            function getTreeAll(tree, allItems) {
+                                tree = $.extend({}, tree);
+                                if (!tree.children) {
+                                    allItems.push($.extend({}, tree));
+                                    return allItems;
+                                }
+                                for (var i in tree.children) {
+                                    var c = tree.children[i];
+                                    c = $.extend({}, c);
+                                    c.unitIds = tree.unitIds + "," + c.unitIds;
+                                    c.name = tree.name + c.name;
+                                    if (!c.children) {
+                                        allItems.push(c);
+                                    } else {
+                                        getTreeAll(c, allItems);
+                                    }
+                                }
+                                return allItems;
+                            }
+
+                            var allItems = getAll(result);
+                            for (var i in allItems) {
+                                var item = allItems[i];
+                                for (var i in this.unitPrices) {
+                                    var p = this.unitPrices[i];
+                                    if (item.unitIds == p.unitIds) {
+                                        item = $.extend(item, p);
+                                    }
+                                }
+                            }
+                            this.unitPrices = allItems;
                             return allItems;
                         }
-                        for (var i in tree.children) {
-                            var c = tree.children[i];
-                            c = $.extend({}, c);
-                            c.unitIds = tree.unitIds + "," + c.unitIds;
-                            c.name = tree.name + c.name;
-                            if (!c.children) {
-                                allItems.push(c);
+                    }
+                    ,
+                    created: function () {
+                        tb.search("").draw();
+                        var that = this;
+                        this.$watch("showform", function () {
+                            if (this.showform) {
+                                $("#article-dialog").modal("show");
+                                var n = $('.color-mini').minicolors({
+                                    change: function (hex, opacity) {
+                                        if (!hex) return;
+                                        if (typeof console === 'object') {
+                                            $(this).attr("value", hex);
+                                        }
+                                    },
+                                    theme: 'bootstrap'
+                                });
+                                $("#article-dialog").on("hidden.bs.modal", function () {
+                                    that.showform = false;
+                                });
                             } else {
-                                getTreeAll(c, allItems);
+                                $("#article-dialog").modal("hide");
+                                $(".modal-backdrop.fade.in").remove();
                             }
-                        }
-                        return allItems;
-                    }
+                        });
+                        this.$watch("m", function () {
+                            if (this.m.id) {
+                                $('.color-mini').minicolors("value", this.m.controlColor);
+                            }
+                        });
 
-                    var allItems = getAll(result);
-                    for (var i in allItems) {
-                        var item = allItems[i];
-                        for (var i in this.unitPrices) {
-                            var p = this.unitPrices[i];
-                            if (item.unitIds == p.unitIds) {
-                                item = $.extend(item, p);
-                            }
-                        }
-                    }
-                    this.unitPrices = allItems;
-                    return allItems;
-                }
-            },
-            created: function () {
-                tb.search("").draw();
-                var that = this;
-                this.$watch("showform", function () {
-                    if (this.showform) {
-                        $("#article-dialog").modal("show");
-                        var n = $('.color-mini').minicolors({
-                            change: function (hex, opacity) {
-                                if (!hex) return;
-                                if (typeof console === 'object') {
-                                    $(this).attr("value", hex);
+                        $.post("articlefamily/list_all", null, function (data) {
+                            that.articlefamilys = data;
+                        });
+                        $.post("supporttime/list_all", null, function (data) {
+                            that.supportTimes = data;
+                        });
+                        $.post("kitchen/list_all", null, function (data) {
+                            that.kitchenList = data;
+                        });
+                        $.post("mealtemp/list_all", null, function (data) {
+                            that.mealtempList = data;
+                        });
+                        $.post("articleattr/list_all", null, function (data) {
+                            var article_units = {};
+                            for (var i in data) {
+                                var attr = data[i];
+                                attr.checkedUnit = [];
+                                var units = attr.articleUnits;
+                                for (var i in units) {
+                                    var unit = units[i];
+                                    unit.attr = attr;
+                                    article_units[unit.id] = unit;
                                 }
-                            },
-                            theme: 'bootstrap'
+                            }
+                            that.articleunits = article_units;
+                            that.articleattrs = data;
                         });
-                        $("#article-dialog").on("hidden.bs.modal", function () {
-                            that.showform = false;
-                        });
-                    } else {
-                        $("#article-dialog").modal("hide");
-                        $(".modal-backdrop.fade.in").remove();
                     }
-                });
-                this.$watch("m", function () {
-                    if (this.m.id) {
-                        $('.color-mini').minicolors("value", this.m.controlColor);
-                    }
-                });
-
-                $.post("articlefamily/list_all", null, function (data) {
-                    that.articlefamilys = data;
-                });
-                $.post("supporttime/list_all", null, function (data) {
-                    that.supportTimes = data;
-                });
-                $.post("kitchen/list_all", null, function (data) {
-                    that.kitchenList = data;
-                });
-                $.post("mealtemp/list_all", null, function (data) {
-                    that.mealtempList = data;
-                });
-                $.post("articleattr/list_all", null, function (data) {
-                    var article_units = {};
-                    for (var i in data) {
-                        var attr = data[i];
-                        attr.checkedUnit = [];
-                        var units = attr.articleUnits;
-                        for (var i in units) {
-                            var unit = units[i];
-                            unit.attr = attr;
-                            article_units[unit.id] = unit;
-                        }
-                    }
-                    that.articleunits = article_units;
-                    that.articleattrs = data;
-                });
-            }
-        });
+                })
+                ;
         C.vue = vueObj;
 
     }());

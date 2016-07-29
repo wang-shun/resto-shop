@@ -32,73 +32,78 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         return orderitemMapper;
     }
 
-	@Override
-	public List<OrderItem> listByOrderId(String orderId) {
-		List<OrderItem> orderItems = orderitemMapper.listByOrderId(orderId);
-		return getOrderItemsWithChild(orderItems);
-	}
-	
-	List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems){
-		Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
-		for(OrderItem item : orderItems){
-			if(item.getType()==OrderItemType.MEALS_CHILDREN){
-				OrderItem parent = idItems.get(item.getParentId());
-				if(parent.getChildren()==null){
-					parent.setChildren(new ArrayList<OrderItem>());
-				}
-				parent.getChildren().add(item);
-				idItems.remove(item.getId());
-			}
-		}
-		List<OrderItem> items= new ArrayList<>();
-		for (OrderItem orderItem : idItems.values()) {
-			items.add(orderItem);
-			if(orderItem.getChildren()!=null&&!orderItem.getChildren().isEmpty()){
-				for (OrderItem childItem:orderItem.getChildren()) {
-					childItem.setArticleName("|__"+childItem.getArticleName());
-					items.add(childItem);
-				}
-			}
-		}
-		return items;
-	}
+    @Override
+    public List<OrderItem> listByOrderId(String orderId) {
+        List<OrderItem> orderItems = orderitemMapper.listByOrderId(orderId);
+        return getOrderItemsWithChild(orderItems);
+    }
 
-	@Override
-	public void insertItems(List<OrderItem> orderItems) {
-		orderitemMapper.insertBatch(orderItems);
-		List<OrderItem> allChildren = new ArrayList<>();
-		for (OrderItem orderItem : orderItems) {
-			if(orderItem.getChildren()!=null&&!orderItem.getChildren().isEmpty()){
-				allChildren.addAll(orderItem.getChildren());
-			}
-		}
-		if(!allChildren.isEmpty()){
-			orderitemMapper.insertBatch(allChildren);
-		}
-	}
+    List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
+        Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
+        for (OrderItem item : orderItems) {
+            if (item.getType() == OrderItemType.MEALS_CHILDREN) {
+                OrderItem parent = idItems.get(item.getParentId());
+                if (parent.getChildren() == null) {
+                    parent.setChildren(new ArrayList<OrderItem>());
+                }
+                parent.getChildren().add(item);
+                idItems.remove(item.getId());
+            }
+        }
+        List<OrderItem> items = new ArrayList<>();
+        for (OrderItem orderItem : idItems.values()) {
+            items.add(orderItem);
+            if (orderItem.getChildren() != null && !orderItem.getChildren().isEmpty()) {
+//				for (OrderItem childItem:orderItem.getChildren()) {
+                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId());
+                for(OrderItem obj : item){
+                    obj.setArticleName("|__" + obj.getArticleName());
+                    items.add(obj);
+                }
+//                childItem.setArticleName("|__" + childItem.getArticleName());
+//                items.add(childItem);
+//				}
+            }
+        }
+        return items;
+    }
 
-	@Override
-	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate,String sort) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-		if("0".equals(sort)){
-			sort="f.peference ,a.sort";
-		}else if("desc".equals(sort)){
-			sort="brand_report.brandSellNum desc";
-		}else if ("asc".equals(sort)){
-			sort="brand_report.brandSellNum asc";
-		}
-		return orderitemMapper.selectSaleArticleByDate(begin, end, shopId,sort);
-	}
+    @Override
+    public void insertItems(List<OrderItem> orderItems) {
+        orderitemMapper.insertBatch(orderItems);
+        List<OrderItem> allChildren = new ArrayList<>();
+        for (OrderItem orderItem : orderItems) {
+            if (orderItem.getChildren() != null && !orderItem.getChildren().isEmpty()) {
+                allChildren.addAll(orderItem.getChildren());
+            }
+        }
+        if (!allChildren.isEmpty()) {
+            orderitemMapper.insertBatch(allChildren);
+        }
+    }
 
-	@Override
-	public List<OrderItem> listByOrderIds(List<String> childIds) {
-		if(childIds==null||childIds.isEmpty()){
-			return new ArrayList<>();
-		}
-		List<OrderItem> orderItems = orderitemMapper.listByOrderIds(childIds);
-		
-		return getOrderItemsWithChild(orderItems);
-	} 
+    @Override
+    public List<OrderItem> selectSaleArticleByDate(String shopId, String beginDate, String endDate, String sort) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        if ("0".equals(sort)) {
+            sort = "f.peference ,a.sort";
+        } else if ("desc".equals(sort)) {
+            sort = "brand_report.brandSellNum desc";
+        } else if ("asc".equals(sort)) {
+            sort = "brand_report.brandSellNum asc";
+        }
+        return orderitemMapper.selectSaleArticleByDate(begin, end, shopId, sort);
+    }
+
+    @Override
+    public List<OrderItem> listByOrderIds(List<String> childIds) {
+        if (childIds == null || childIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<OrderItem> orderItems = orderitemMapper.listByOrderIds(childIds);
+
+        return getOrderItemsWithChild(orderItems);
+    }
 
 }

@@ -17,6 +17,8 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
+import com.resto.shop.web.dao.ArticlePriceMapper;
+import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
@@ -99,6 +101,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     ChargeOrderService chargeOrderService;
+
+    @Resource
+    MealAttrMapper mealAttrMapper;
+
+    @Resource
+    ArticlePriceMapper articlePriceMapper;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -704,6 +712,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
+
         data.put("ARTICLE_COUNT", order.getArticleCount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
@@ -1185,7 +1194,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         for (ArticleSellDto articleSellDto : list) {
             double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            java.text.DecimalFormat myformat = new java.text.DecimalFormat("0.00");
+            DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
             articleSellDto.setSalesRatio(str);
@@ -1253,7 +1262,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         for (ArticleSellDto articleSellDto : list) {
             double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            java.text.DecimalFormat myformat = new java.text.DecimalFormat("0.00");
+            DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
             articleSellDto.setSalesRatio(str);
@@ -1315,7 +1324,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         for (ArticleSellDto articleSellDto : list) {
             double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            java.text.DecimalFormat myformat = new java.text.DecimalFormat("0.00");
+            DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
             articleSellDto.setSalesRatio(str);
@@ -1348,7 +1357,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         for (ArticleSellDto articleSellDto : list) {
             double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            java.text.DecimalFormat myformat = new java.text.DecimalFormat("0.00");
+            DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
             articleSellDto.setSalesRatio(str);
@@ -1404,6 +1413,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void autoRefundMoney() {
-       log.debug("开始退款");
+        log.debug("开始退款");
     }
+
+
 }
