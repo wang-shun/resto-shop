@@ -51,7 +51,7 @@
 						<th>评价率</th>
 						<th>评论红包总额(元)</th>
 						<th>订单总额(元)</th>
-						<th>评论红包撬动率</th>
+<!-- 						<th>评论红包撬动率</th> -->
 						<th>五星评价数</th>
 						<th>四星评价数</th>
 						<th>三星评价数</th>
@@ -66,7 +66,7 @@
 						<td>{{brandAppraise.appraiseRatio}}</td>
 						<td>{{brandAppraise.redMoney}}</td>
 						<td>{{brandAppraise.totalMoney}}</td>
-						<td>{{brandAppraise.redRatio}}</td>
+<!-- 						<td>{{brandAppraise.redRatio}}</td> -->
 						<td>{{brandAppraise.fivestar}}</td>
 						<td>{{brandAppraise.fourstar}}</td>
 						<td>{{brandAppraise.threestar}}</td>
@@ -97,7 +97,7 @@
 						<th>评价率</th>
 						<th>评论红包总额(元)</th>
 						<th>订单总额(元)</th>
-						<th>评论红包撬动率</th>
+<!-- 						<th>评论红包撬动率</th> -->
 						<th>五星评价数</th>
 						<th>四星评价数</th>
 						<th>三星评价数</th>
@@ -114,7 +114,7 @@
 						<td>{{shopAppraise.appraiseRatio}}</td>
 						<td>{{shopAppraise.redMoney}}</td>
 						<td>{{shopAppraise.totalMoney}}</td>
-						<td>{{shopAppraise.redRatio}}</td>
+<!-- 						<td>{{shopAppraise.redRatio}}</td> -->
 						<td>{{shopAppraise.fivestar}}</td>
 						<td>{{shopAppraise.fourstar}}</td>
 						<td>{{shopAppraise.threestar}}</td>

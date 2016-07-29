@@ -150,6 +150,10 @@ public class appraiseReportController extends GenericController{
 			BigDecimal orderMoney2 = BigDecimal.ZERO;//订单总额
 			BigDecimal redMoney2 = BigDecimal.ZERO;//评论红包总额
 			
+			//设置红包撬动率
+			
+			
+			
 			int oneStart2=0;
 			int twoStart2=0;
 			int threeStart2=0;
@@ -263,7 +267,7 @@ public class appraiseReportController extends GenericController{
 				//定义读取文件的路径
 				String path = request.getSession().getServletContext().getRealPath(fileName);
 				//定义列
-				String[]columns={"name","appraiseNum","appraiseRatio","redMoney","orderMoney","redRatio","fivestar","fourstar","threestar","twostar","onestar"};
+				String[]columns={"name","appraiseNum","appraiseRatio","redMoney","orderMoney","fivestar","fourstar","threestar","twostar","onestar"};
 				//定义数据
 				 
 				//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -282,7 +286,7 @@ public class appraiseReportController extends GenericController{
 				map.put("beginDate", beginDate);
 				map.put("reportType", "品牌评论报表");//表的头，第一行内容
 				map.put("endDate", endDate);
-				map.put("num", "10");//显示的位置
+				map.put("num", "9");//显示的位置
 				map.put("reportTitle", "品牌评论");//表的名字
 				map.put("timeType", "yyyy-MM-dd");
 				Map<String, Object> appraiseMap = this.getSuccess(beginDate, endDate);
@@ -296,7 +300,7 @@ public class appraiseReportController extends GenericController{
 				AppraiseDto a = (AppraiseDto) appraiseMap.get("brandAppraise");
 				a.setName(a.getBrandName());
 				result.add(a);
-				String[][] headers = {{"品牌","25"},{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"评论红包撬动率","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
+				String[][] headers = {{"品牌","25"},{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
 				//定义excel工具类对象
 				ExcelUtil<AppraiseDto> excelUtil=new ExcelUtil<AppraiseDto>();
 				OutputStream out  = null;
