@@ -18,6 +18,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
+import com.resto.shop.web.dao.ArticlePriceMapper;
 import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
@@ -105,6 +106,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     MealAttrMapper mealAttrMapper;
+
+    @Resource
+    ArticlePriceMapper articlePriceMapper;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -1462,5 +1466,83 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 break;
         }
         return result;
+    }
+
+
+    @Override
+    public Boolean updateStock(Order order) throws AppException {
+        //首先验证订单信息
+        if (order == null || CollectionUtils.isEmpty(order.getOrderItems())) {
+            throw new AppException(AppException.ORDER_IS_NULL);
+        }
+        //遍历订单商品
+        for (OrderItem orderItem : order.getOrderItems()) {
+            switch (orderItem.getType()) {
+                case OrderItemType.ARTICLE:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.setEmpty(orderItem.getArticleId());
+                    break;
+                case OrderItemType.UNITPRICE:
+                    //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
+                    ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.setEmpty(articlePrice.getArticleId());
+                    break;
+                case OrderItemType.SETMEALS:
+                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.setEmpty(orderItem.getArticleId());
+                    //如果是套餐，那么更新套餐库存
+                    break;
+                case OrderItemType.MEALS_CHILDREN:
+                    //如果是套餐子项，那么更新子项库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.setEmpty(orderItem.getArticleId());
+                    break;
+                default:
+                    throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
+            }
+
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public Boolean addStock(Order order) throws AppException {
+        //首先验证订单信息
+        if (order == null || CollectionUtils.isEmpty(order.getOrderItems())) {
+            throw new AppException(AppException.ORDER_IS_NULL);
+        }
+        //遍历订单商品
+        for (OrderItem orderItem : order.getOrderItems()) {
+            switch (orderItem.getType()) {
+                case OrderItemType.ARTICLE:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
+                    break;
+                case OrderItemType.UNITPRICE:
+                    //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
+                    ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(),StockType.STOCK_ADD);
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    break;
+                case OrderItemType.SETMEALS:
+                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    //如果是套餐，那么更新套餐库存
+                    break;
+                case OrderItemType.MEALS_CHILDREN:
+                    //如果是套餐子项，那么更新子项库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    break;
+                default:
+                    throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
+            }
+
+        }
+
+        return true;
     }
 }

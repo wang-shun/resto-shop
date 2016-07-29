@@ -308,4 +308,20 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
      */
 	Result checkArticleCount(String orderId);
+
+
+	/**
+	 * 出单时更新库存
+	 * @param order
+	 * @return
+     */
+	Boolean updateStock(Order order) throws AppException;
+
+
+	/**
+	 * 出单时还原库存
+	 * @param order
+	 * @return
+	 */
+	Boolean addStock(Order order) throws AppException;
 }
