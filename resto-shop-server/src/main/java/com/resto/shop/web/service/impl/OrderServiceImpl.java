@@ -34,6 +34,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,6 +76,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     OrderItemService orderItemService;
+
+
 
     @Resource
     ShopCartService shopCartService;
@@ -620,7 +623,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
 
-
             //生成厨房小票
             for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
@@ -632,8 +634,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 items.add(item);
                 if (article.getType() == OrderItemType.SETMEALS) {
                     if (article.getChildren() != null && !article.getChildren().isEmpty()) {
-                        List<OrderItem> list = orderitemMapper.getListBySort(article.getId(),article.getArticleId());
-                        for(OrderItem obj : list){
+                        List<OrderItem> list = orderitemMapper.getListBySort(article.getId(), article.getArticleId());
+                        for (OrderItem obj : list) {
                             Map<String, Object> child_item = new HashMap<String, Object>();
                             child_item.put("ARTICLE_NAME", obj.getArticleName());
                             child_item.put("ARTICLE_COUNT", obj.getCount());
@@ -645,10 +647,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
                 //保存基本信息
-
-
-
-
 
 
                 Map<String, Object> print = new HashMap<String, Object>();
@@ -666,7 +664,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 data.put("ORDER_ID", serialNumber);
                 data.put("ITEMS", items);
                 data.put("DISTRIBUTION_MODE", modeText);
-                data.put("ORIGINAL_AMOUNT",order.getOriginalAmount());
+                data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
                 data.put("RESTAURANT_ADDRESS", shop.getAddress());
                 data.put("REDUCTION_AMOUNT", order.getReductionAmount());
                 data.put("RESTAURANT_TEL", shop.getPhone());
@@ -684,10 +682,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
 
 
-
-
-
-
 //
 //                //添加当天打印订单的序号
 //                data.put("NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
@@ -701,8 +695,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                print.put("KITCHEN_NAME", kitchen.getName());
 //
 //                print.put("TABLE_NO", tableNumber);
-
-
 
 
                 //添加到 打印集合
@@ -1484,4 +1476,95 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+    @Override
+    public List<Map<String, Object>> printTotal(String shopId) {
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        ShopDetail shop = shopDetailService.selectById(shopId);
+        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+        for (Printer printer : ticketPrinter) {
+            Map<String, Object> ticket = printTotal(shop, printer);
+            if (ticket != null) {
+                printTask.add(ticket);
+            }
+
+        }
+        return printTask;
+    }
+
+
+    public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
+        if (printer == null) {
+            return null;
+        }
+
+        Order order = orderMapper.getOrderAccount(shopDetail.getId());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<OrderPaymentItem> olist = orderPaymentItemService
+                .selectpaymentByPaymentMode(shopDetail.getId(), sdf.format(calendar.getTime()), sdf.format(calendar2.getTime()));
+        List<Map<String, Object>> items = new ArrayList<>();
+
+        for (OrderPaymentItem od : olist) {
+            Map<String, Object> item = new HashMap<>();
+            if (PayMode.WEIXIN_PAY == od.getPaymentModeId().intValue()) {
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "微信支付");
+                items.add(item);
+            } else if (PayMode.CHARGE_PAY == od.getPaymentModeId().intValue()) {
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "充值支付");
+                items.add(item);
+            } else if (PayMode.ACCOUNT_PAY == od.getPaymentModeId().intValue()) {
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "红包支付");
+                items.add(item);
+            } else if (PayMode.COUPON_PAY == od.getPaymentModeId().intValue()) {
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "优惠券支付");
+                items.add(item);
+            } else if (PayMode.REWARD_PAY == od.getPaymentModeId().intValue()) {
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "充值赠送支付");
+                items.add(item);
+            }
+        }
+
+
+        List<ArticleSellDto> productCount = selectShopArticleByDate(shopDetail.getId(), sdf.format(calendar.getTime()), sdf.format(calendar2.getTime()), "desc");
+        int sum = 0;
+        for (ArticleSellDto product : productCount) {
+            sum += product.getShopSellNum();
+        }
+        Map<String, Object> print = new HashMap<>();
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date());
+        Map<String, Object> data = new HashMap<>();
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+
+        data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
+        data.put("PAYMENT_AMOUNT", order.getOrderTotal());
+        data.put("PAYMENT_ITEMS", items);
+        data.put("ORIGINAL_AMOUNT", order.getOrderCount());
+        data.put("ORDER_AVERAGE", order.getOrderTotal().divide(new BigDecimal(order.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP));
+        data.put("PRODUCT_AMOUNT", sum);
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+        print.put("TICKET_TYPE", TicketType.DAILYREPORT);
+
+        return print;
+    }
 }

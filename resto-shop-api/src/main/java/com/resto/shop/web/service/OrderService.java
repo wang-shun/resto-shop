@@ -300,4 +300,6 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 
 	void autoRefundMoney();
+
+	List<Map<String, Object>> printTotal(String shopId);
 }

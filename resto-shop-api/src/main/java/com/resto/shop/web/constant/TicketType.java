@@ -7,5 +7,6 @@ public class TicketType {
 	public static final String RECEIPT = "RestaurantReceipt"; //前台小票类型
 	public static final String DeliveryTicket = "DeliveryTickets"; //外卖小票
 	public static final String DeliveryCount = "DeliveryCount";  //外卖统计
+	public static final String DAILYREPORT = "DailyReport"; //日报
 
 }
