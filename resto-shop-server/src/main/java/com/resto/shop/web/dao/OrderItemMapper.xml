@@ -252,4 +252,12 @@
   	  and create_time <=#{endDate} ]]> )
   	  GROUP BY article_id
   </select>
+
+  <select id="getListBySort" resultType="OrderItem" >
+select * from tb_order_item t
+left JOIN tb_meal_attr t2 on t2.article_id = t.parent_id
+where t.parent_id =  #{parentid}
+ORDER BY t2.print_sort
+
+  </select>
 </mapper>

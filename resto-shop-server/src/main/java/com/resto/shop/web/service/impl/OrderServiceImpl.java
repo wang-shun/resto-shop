@@ -714,6 +714,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
+
         data.put("ARTICLE_COUNT", order.getArticleCount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());

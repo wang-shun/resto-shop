@@ -11,8 +11,18 @@ public class MealAttr {
 
     private String articleId;
 
+    private Integer printSort;
+
     private List<MealItem> mealItems;
-    
+
+    final public Integer getPrintSort() {
+        return printSort;
+    }
+
+    final public void setPrintSort(Integer printSort) {
+        this.printSort = printSort;
+    }
+
     public Integer getId() {
         return id;
     }

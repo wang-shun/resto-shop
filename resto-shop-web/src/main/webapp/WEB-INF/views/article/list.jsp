@@ -15,6 +15,9 @@
         max-height: 80vh;
         overflow-y: auto;
     }
+    .print-sort{
+
+    }
 </style>
 <div id="control">
 
@@ -267,7 +270,7 @@
                                     <div class="portlet-body">
                                         <div class="portlet box blue-hoki"
                                              v-for="attr in m.mealAttrs | orderBy  'sort'">
-                                            <div class="portlet-title">
+                                            <div class="portlet-title" >
                                                 <div class="caption">
                                                     <label class="control-label">&nbsp;</label>
                                                     <div class="pull-right">
@@ -281,6 +284,16 @@
                                                         <input class="form-control" type="text" v-model="attr.sort"
                                                                required="required" lazy>
                                                     </div>
+
+                                                </div>
+
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4" style="width:120px">打印排序&nbsp;</label>
+                                                    <div class="col-md-4">
+                                                        <input class="form-control" type="text" v-model="attr.printSort"
+                                                               required="required"  name="printSort" lazy onblur="checkSort(this)">
+                                                    </div>
+
                                                 </div>
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
@@ -364,7 +377,7 @@
                     <div class="modal-footer">
                         <input type="hidden" name="id" v-model="m.id"/>
                         <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="submit" class="btn btn-primary" >保存</button>
                     </div>
                 </form>
             </div>
@@ -449,12 +462,28 @@
 
 
 <script>
-    function changeStockWeekend() {
+
+    function checkSort(t){
+        if($(t).val() == ''){
+            return;
+        }
+        var v = $(t).val();
+        var count = 0;
+        var attr = document.getElementsByName("printSort");
+        for(var i = 0;i< attr.length;i++){
+            if(v == attr[i].value){
+                count ++;
+            }
+        }
+
+        if(count > 1){
+           alert("打印排序添加重复");
+            $(t).val('');
+        }
 
     }
-    function changeStockWorkingDay() {
 
-    }
+
     Vue.config.debug = true;
     (function () {
         var cid = "#control";
@@ -856,6 +885,7 @@
                                 }
                                 checked.length && result.push(checked);
                             }
+
 
 
                             function getAll(allData) {
