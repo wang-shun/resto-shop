@@ -1431,14 +1431,14 @@ GROUP BY o.id
 
 
     <!--根据菜品id查找菜品库存(无规格)-->
-    <select id="selectArticleCount" resultMap="java.lang.Integer">
+    <select id="selectArticleCount" resultType="java.lang.Integer">
         select current_working_stock from tb_article
         where id = #{articleId}
     </select>
 
 
     <!--根据菜品id查找菜品库存(有规格)-->
-    <select id="selectArticlePriceCount" resultMap="java.lang.Integer">
+    <select id="selectArticlePriceCount" resultType="java.lang.Integer">
         select current_working_stock from tb_article_price
         where id = #{articleId}
     </select>
