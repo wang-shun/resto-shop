@@ -105,6 +105,16 @@ public class Article {
     //周末库存
     private Integer stockWeekend;
 
+    private Integer currentWorkingStock;
+
+    final public Integer getCurrentWorkingStock() {
+        return currentWorkingStock;
+    }
+
+    final public void setCurrentWorkingStock(Integer currentWorkingStock) {
+        this.currentWorkingStock = currentWorkingStock;
+    }
+
     final public Integer getStockWorkingDay() {
         return stockWorkingDay;
     }

@@ -12,8 +12,11 @@
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
     <result column="stock_working_day" property="stockWorkDay" jdbcType="INTEGER"/>
     <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
+    <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
   </resultMap>
-  <sql id="Base_Column_List">id, price, fans_price, name, peference, sort, article_id</sql>
+  <sql id="Base_Column_List">id, price, fans_price, name, peference, sort, article_id,current_working_stock
+  ,stock_working_day,stock_weekend
+</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_article_price where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -56,6 +59,7 @@
       <if test="unitIds != null">unit_ids = #{unitIds,jdbcType=VARCHAR},</if>
       <if test="stockWorkingDay != null">stock_working_day = #{stockWorkingDay,jdbcType=INTEGER}</if>
       <if test="stockWeekend != null">stock_weekend = #{stockWeekend,jdbcType=INTEGER}</if>
+      <if test="currentWorkingStock != null">current_working_stock = #{currentWorkingStock,jdbcType=INTEGER}</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ArticlePrice">update tb_article_price set price = #{price,jdbcType=DECIMAL}, fans_price = #{fansPrice,jdbcType=DECIMAL}, name = #{name,jdbcType=VARCHAR}, peference = #{peference,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, article_id = #{articleId,jdbcType=VARCHAR},unit_ids=#{unitIds}  where id = #{id,jdbcType=VARCHAR}</update>

@@ -289,4 +289,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	Boolean setEmpty(String articleId);
 
+	/**
+	 * 还原库存时重置售罄状态
+	 * @param articleId
+	 * @return
+     */
+	Boolean setEmptyFail(String articleId);
+
 }

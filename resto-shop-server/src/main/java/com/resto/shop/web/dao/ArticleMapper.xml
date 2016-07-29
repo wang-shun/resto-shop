@@ -36,13 +36,14 @@
     <result column="article_type" property="articleType" jdbcType="INTEGER" />
     <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
     <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
+    <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend
+      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
@@ -387,6 +388,9 @@
       <if test="stockWeekend != null">
         stock_weekend = #{stockWeekend},
       </if>
+      <if test="currentWorkingStock != null">
+        current_working_stock = #{currentWorkingStock},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -423,8 +427,9 @@
       show_desc = #{showDesc,jdbcType=BIT},
       is_remind = #{isRemind,jdbcType=BIT},
       article_type = #{articleType},
-      stock_working_day = #{stockWorkingDay},
-      stock_weekend = #{stockWeekend}
+      stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
+      stock_weekend = #{stockWeekend,jdbcType=INTEGER},
+      current_working_stock = #{currentWorkingStock,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 

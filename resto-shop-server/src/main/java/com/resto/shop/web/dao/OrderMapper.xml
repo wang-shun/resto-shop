@@ -1478,6 +1478,12 @@ GROUP BY o.id
         where id = #{articleId}
         and current_working_stock = 0
     </update>
+
+    <update id="setEmptyFail">
+        update tb_article
+        set is_empty = 0
+        where id = #{articleId}
+    </update>
 </mapper>
 
 
