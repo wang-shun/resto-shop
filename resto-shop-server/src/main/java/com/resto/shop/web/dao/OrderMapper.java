@@ -251,4 +251,20 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
 	List<Order> selectAppraiseByShopId(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("shopId")String shopId);
+
+	/**
+	 * 根据菜品id查看菜品库存
+	 * @param articleId
+	 * @return
+     */
+	Integer selectArticleCount(String articleId);
+
+	/**
+	 * 查看有规格的菜品库存
+	 * @param articleId
+	 * @return
+     */
+	Integer selectArticlePriceCount(String articleId);
+
+
 }

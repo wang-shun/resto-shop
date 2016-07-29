@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.OrderPayDto;
@@ -300,4 +301,11 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 
 	void autoRefundMoney();
+
+	/**
+	 * 检查此订单的菜品是否有库存
+	 * @param oderId 订单号
+	 * @return
+     */
+	Result checkArticleCount(String orderId);
 }

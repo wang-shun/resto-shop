@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -17,6 +18,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
+import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
@@ -26,6 +28,7 @@ import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -99,6 +102,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     ChargeOrderService chargeOrderService;
+
+    @Resource
+    MealAttrMapper mealAttrMapper;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -1404,6 +1410,57 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void autoRefundMoney() {
-       log.debug("开始退款");
+        log.debug("开始退款");
+    }
+
+    @Override
+    public Result checkArticleCount(String orderId) {
+        Order order = getOrderInfo(orderId);
+        if (order == null || CollectionUtils.isEmpty(order.getOrderItems())) {
+            return new Result("订单数据异常,请速与服务员联系", false);
+        }
+
+        Boolean result = true;
+
+        String articleName = "";
+
+        //订单菜品不可为空
+        for (OrderItem orderItem : order.getOrderItems()) {
+            //有任何一个菜品售罄则不能出单
+            if (!checkStock(orderItem)) {
+                result = false;
+                articleName = orderItem.getArticleName() + "已售罄,请取消订单后重新下单";
+                break;
+            }
+        }
+
+        return new Result(articleName, result);
+
+    }
+
+    private Boolean checkStock(OrderItem orderItem) {
+        Boolean result = false;
+        switch (orderItem.getType()) {
+            case OrderItemType.ARTICLE:
+                //如果是单品无规格，直接判断菜品是否有库存
+                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > 0;
+                break;
+            case OrderItemType.UNITPRICE:
+                //如果是有规则菜品，则判断该规则是否有库存
+                result = orderMapper.selectArticlePriceCount(orderItem.getArticleId()) > 0;
+                break;
+            case OrderItemType.SETMEALS:
+                //如果是套餐,不做判断，只判断套餐下的子品是否有库存
+                result = true;
+                break;
+            case OrderItemType.MEALS_CHILDREN:
+                //如果是套餐下的子品 当成单品来判断
+                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > 0;
+                break;
+            default:
+                log.debug("未知菜品分类");
+                break;
+        }
+        return result;
     }
 }
