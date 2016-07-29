@@ -19,6 +19,7 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.ArticlePriceMapper;
 import com.resto.shop.web.dao.MealAttrMapper;
+import com.resto.shop.web.dao.OrderItemMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
@@ -50,6 +51,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapper orderMapper;
+
+    @Resource
+    private OrderItemMapper orderitemMapper;
 
     @Resource
     private CustomerService customerService;
@@ -614,6 +618,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (printer == null) {
                 continue;
             }
+
+
+
             //生成厨房小票
             for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
@@ -624,12 +631,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 items.add(item);
                 if (article.getType() == OrderItemType.SETMEALS) {
                     if (article.getChildren() != null && !article.getChildren().isEmpty()) {
-                        for (OrderItem child : article.getChildren()) {
+                        List<OrderItem> list = orderitemMapper.getListBySort(article.getId(),article.getArticleId());
+                        for(OrderItem obj : list){
                             Map<String, Object> child_item = new HashMap<String, Object>();
-                            child_item.put("ARTICLE_NAME", child.getArticleName());
-                            child_item.put("ARTICLE_COUNT", child.getCount());
+                            child_item.put("ARTICLE_NAME", obj.getArticleName());
+                            child_item.put("ARTICLE_COUNT", obj.getCount());
                             items.add(child_item);
                         }
+
+
                     }
                 }
                 //保存基本信息
