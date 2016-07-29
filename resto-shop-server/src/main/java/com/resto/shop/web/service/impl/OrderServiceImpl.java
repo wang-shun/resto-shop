@@ -614,26 +614,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (printer == null) {
                 continue;
             }
-            List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-            Map<String, Object> item = new HashMap<String, Object>();
-
-
-            for(OrderItem orderItem : articleList){
-                if(OrderItemType.MEALS_CHILDREN != orderItem.getType()){
-                    continue;
-                }
-                item.put("ARTICLE_NAME", orderItem.getArticleName());
-                item.put("ARTICLE_COUNT", orderItem.getCount());
-                items.add(item);
-            }
-
-
-
-
             //生成厨房小票
             for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
-
+                List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+                Map<String, Object> item = new HashMap<String, Object>();
+                item.put("ARTICLE_NAME", article.getArticleName());
+                item.put("ARTICLE_COUNT", article.getCount());
+                items.add(item);
                 if (article.getType() == OrderItemType.SETMEALS) {
                     if (article.getChildren() != null && !article.getChildren().isEmpty()) {
                         for (OrderItem child : article.getChildren()) {
