@@ -296,4 +296,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
 	Boolean setEmptyFail(String articleId);
 
+	/**
+	 * 将单品最低库存设置为 套餐库存
+	 * @return
+	 */
+	Boolean setStockBySuit();
+
 }

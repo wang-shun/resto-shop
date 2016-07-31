@@ -1484,6 +1484,18 @@ GROUP BY o.id
         set is_empty = 0
         where id = #{articleId}
     </update>
+
+    <update id="setStockBySuit">
+
+update tb_article t,tb_meal_attr t2,tb_meal_item t3,(select id, min(current_working_stock) as count from tb_article
+) as  t4
+set t.current_working_stock  =
+t4.count
+where t.article_type = 2
+and t2.article_id = t.id
+and t3.meal_attr_id = t2.id
+and t4.id = t3.article_id
+    </update>
 </mapper>
 
 

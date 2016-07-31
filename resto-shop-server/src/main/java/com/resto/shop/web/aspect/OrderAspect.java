@@ -252,7 +252,6 @@ public class OrderAspect {
 			MQMessageProducer.sendNoticeOrderMessage(order);
 
 			//拒绝订单后还原库存
-			//出单时减少库存
 			Boolean addStockSuccess  = false;
 			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));
 			if(!addStockSuccess){
