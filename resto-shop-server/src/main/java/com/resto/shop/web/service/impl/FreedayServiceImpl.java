@@ -81,4 +81,5 @@ public class FreedayServiceImpl extends GenericServiceImpl<FreeDay, String> impl
 		return day!=null;
 	}
 
+
 }

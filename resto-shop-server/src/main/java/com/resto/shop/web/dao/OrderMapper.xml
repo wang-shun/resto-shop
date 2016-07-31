@@ -1430,6 +1430,72 @@ GROUP BY o.id
 </select>
 
 
+    <!--根据菜品id查找菜品库存(无规格)-->
+    <select id="selectArticleCount" resultType="java.lang.Integer">
+        select current_working_stock from tb_article
+        where id = #{articleId}
+    </select>
+
+
+    <!--根据菜品id查找菜品库存(有规格)-->
+    <select id="selectArticlePriceCount" resultType="java.lang.Integer">
+        select current_working_stock from tb_article_price
+        where id = #{articleId}
+    </select>
+
+
+
+    <update id="updateArticleStock">
+        update tb_article
+        <set>
+            <if test="type='minus'">
+                current_working_stock = current_working_stock - 1
+            </if>
+            <if test="type = 'add'">
+                current_working_stock = current_working_stock + 1
+            </if>
+        </set>
+
+        where id = #{articleId}
+    </update>
+
+    <update id="updateArticlePriceStock">
+        update tb_article_price
+        <set>
+            <if test="type ='minus'">
+                current_working_stock = current_working_stock - 1
+            </if>
+            <if test="type ='add'">
+                current_working_stock = current_working_stock + 1
+            </if>
+        </set>
+        where id = #{articleId}
+    </update>
+
+    <update id="setEmpty">
+        update tb_article
+        set is_empty = 1
+        where id = #{articleId}
+        and current_working_stock = 0
+    </update>
+
+    <update id="setEmptyFail">
+        update tb_article
+        set is_empty = 0
+        where id = #{articleId}
+    </update>
+
+    <update id="setStockBySuit">
+
+update tb_article t,tb_meal_attr t2,tb_meal_item t3,(select id, min(current_working_stock) as count from tb_article
+) as  t4
+set t.current_working_stock  =
+t4.count
+where t.article_type = 2
+and t2.article_id = t.id
+and t3.meal_attr_id = t2.id
+and t4.id = t3.article_id
+    </update>
 </mapper>
 
 

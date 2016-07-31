@@ -19,6 +19,36 @@ public class ArticlePrice {
 
     private String articleId;
 
+    private Integer stockWorkingDay;
+
+    private Integer stockWeekend;
+
+    private Integer currentWorkingStock;
+
+    final public Integer getCurrentWorkingStock() {
+        return currentWorkingStock;
+    }
+
+    final public void setCurrentWorkingStock(Integer currentWorkingStock) {
+        this.currentWorkingStock = currentWorkingStock;
+    }
+
+    final public Integer getStockWorkingDay() {
+        return stockWorkingDay;
+    }
+
+    final public void setStockWorkingDay(Integer stockWorkingDay) {
+        this.stockWorkingDay = stockWorkingDay;
+    }
+
+    final public Integer getStockWeekend() {
+        return stockWeekend;
+    }
+
+    final public void setStockWeekend(Integer stockWeekend) {
+        this.stockWeekend = stockWeekend;
+    }
+
     public String getId() {
         return id;
     }

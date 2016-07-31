@@ -55,7 +55,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
             items.add(orderItem);
             if (orderItem.getChildren() != null && !orderItem.getChildren().isEmpty()) {
 //				for (OrderItem childItem:orderItem.getChildren()) {
-                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId(),orderItem.getArticleId());
+                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId());
                 for(OrderItem obj : item){
                     obj.setArticleName("|__" + obj.getArticleName());
                     items.add(obj);

@@ -36,16 +36,17 @@
     <result column="article_type" property="articleType" jdbcType="INTEGER" />
     <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
     <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
+    <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend
+      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from tb_article
     where id = #{id,jdbcType=VARCHAR}
@@ -355,14 +356,14 @@
       <if test="price != null" >
         price = #{price,jdbcType=DECIMAL},
       </if>
-        fans_price = #{fansPrice,jdbcType=DECIMAL},
+      fans_price = #{fansPrice,jdbcType=DECIMAL},
       <if test="hasMultPrice != null" >
         has_mult_price = #{hasMultPrice,jdbcType=BIT},
       </if>
       <if test="hasUnit != null" >
         has_unit = #{hasUnit,jdbcType=VARCHAR},
       </if>
-        peference = #{peference,jdbcType=VARCHAR},
+      peference = #{peference,jdbcType=VARCHAR},
       <if test="unit != null" >
         unit = #{unit,jdbcType=VARCHAR},
       </if>
@@ -386,6 +387,9 @@
       </if>
       <if test="stockWeekend != null">
         stock_weekend = #{stockWeekend},
+      </if>
+      <if test="currentWorkingStock != null">
+        current_working_stock = #{currentWorkingStock},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
@@ -423,24 +427,26 @@
       show_desc = #{showDesc,jdbcType=BIT},
       is_remind = #{isRemind,jdbcType=BIT},
       article_type = #{articleType},
-      stock_working_day = #{stockWorkingDay},
-      stock_weekend = #{stockWeekend}
+      stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
+      stock_weekend = #{stockWeekend,jdbcType=INTEGER},
+      current_working_stock = #{currentWorkingStock,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  
+
   <resultMap type="com.resto.shop.web.model.Article" id="selectResultMap" autoMapping="true">
-  	<id column="id" jdbcType="VARCHAR" property="id" />
-  	<association property="articleFamily" javaType="com.resto.shop.web.model.ArticleFamily">
-  		<result column="articleFamilyName" property="name"/>
-  	</association>
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <association property="articleFamily" javaType="com.resto.shop.web.model.ArticleFamily">
+      <result column="articleFamilyName" property="name"/>
+    </association>
   </resultMap>
-  
+
   <select id="selectList" resultMap="selectResultMap">
-      select ar.*,arf.name as articleFamilyName from tb_article ar  left join tb_article_family arf on ar.article_family_id=arf.id
-      where state=1
-	  	<if test="shopId!=null and shopId!=''">
-	  		and ar.shop_detail_id = #{shopId} 
-	  	</if>
+    select ar.*,arf.name as articleFamilyName from tb_article ar
+    left join tb_article_family arf on ar.article_family_id=arf.id
+    where state=1
+    <if test="shopId!=null and shopId!=''">
+      and ar.shop_detail_id = #{shopId}
+    </if>
   </select>
   <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
@@ -453,35 +459,71 @@
 	ORDER BY sort
   </select>
   <select id="selectBySupportTimeId" resultType="Article">
-  	select a.id,a.name,a.description from tb_article a
-  	where a.id in (
-  		select article_id from tb_article_support_time
-  		where support_time_id in 
-		<foreach collection="times" separator="," item="id" open="(" close=")">
-			#{id}
-		</foreach>
-  	) and a.shop_detail_id=#{shopId}
-  	and a.state=1
+    select a.id,a.name,a.description from tb_article a
+    where a.id in (
+    select article_id from tb_article_support_time
+    where support_time_id in
+    <foreach collection="times" separator="," item="id" open="(" close=")">
+      #{id}
+    </foreach>
+    ) and a.shop_detail_id=#{shopId}
+    and a.state=1
   </select>
-  
+
   <!-- 根据是否谷清查询菜品信息 -->
   <select id="selectListByIsEmpty" resultType="Article">
   	SELECT a.id,a.peference,a.name,a.is_empty,f.name articleFamilyName from tb_article a LEFT JOIN tb_article_family f on
   	 a.article_family_id = f.id where a.activated = 1 and a.is_empty = #{isEmpty} and a.shop_detail_id = #{shopId}
   	 and a.state=1
   </select>
-  
-  
-  
+
+
+
   <!-- 根据菜品Id 设置谷清 -->
   <update id="setEmpty">
 	update tb_article set is_empty = #{isEmpty} where id = #{articleId}
   </update>
-  
+
   <update id="addLikes" >
   	update tb_article set likes = likes+1 where id=#{0}
   </update>
   <update id="updateLikes" >
   	update tb_article set likes = #{1} where id=#{0}
   </update>
+
+  <update id="initSuitStock">
+update tb_article t,tb_meal_attr t2,tb_meal_item t3,(select id, min(stock_working_day) as stock_working_day_count
+,min(stock_weekend) as stock_weekend_count from tb_article
+) as  t4
+set t.stock_working_day  =
+t4.stock_working_day_count, t.stock_weekend  =
+t4.stock_weekend_count
+where t.article_type = 2
+and t2.article_id = t.id
+and t3.meal_attr_id = t2.id
+and t4.id = t3.article_id
+  </update>
+
+
+  <update id="initSize">
+    update tb_article t ,(
+select article_id, sum(stock_working_day) as stock_working_day_count,
+sum(stock_weekend) as stock_weekend_count
+ from tb_article_price
+GROUP BY article_id
+) as t2
+set t.stock_weekend = t2.stock_weekend_count,
+t.stock_working_day = t2.stock_working_day_count
+where t.id = t2.article_id
+  </update>
+
+
+  <select id="getStock" resultType="ArticleStock">
+		select CONCAT(t.name,ifnull( t2.name,"")) as name,t.id,t3.name as familyName,
+ifnull(t2.current_working_stock,t.current_working_stock) as currentStock from tb_article t
+	left join tb_article_price t2 on t.id = t2.article_id
+	left join tb_article_family t3 on t.article_family_id = t3.id
+	where t.activated = 1 and t.state = 1
+	and t.shop_detail_id = #{shopId}
+  </select>
 </mapper>

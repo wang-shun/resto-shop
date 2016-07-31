@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
+import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -42,4 +43,12 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void updateLikes(String articleId, Long likes);
 
 	void addLikes(String articleId);
+
+	void initSuitStock();
+
+	void initSize();
+
+	List<ArticleStock> getStock(@Param("shopId") String shopId);
+
+
 }

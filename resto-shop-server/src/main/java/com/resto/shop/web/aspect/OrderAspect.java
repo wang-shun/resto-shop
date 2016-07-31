@@ -19,6 +19,7 @@ import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
+import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -54,6 +55,9 @@ public class OrderAspect {
 	ShopDetailService shopDetailService;
 	@Resource
 	ShareSettingService shareSettingService;
+
+	@Resource
+	OrderService orderService;
 
 
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
@@ -127,7 +131,7 @@ public class OrderAspect {
 
 
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
-	public void pushOrderAfter(Order order){
+	public void pushOrderAfter (Order order) throws Throwable{
 		if(order!=null){
 			if(ProductionStatus.HAS_ORDER==order.getProductionStatus()){
 				BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -166,6 +170,14 @@ public class OrderAspect {
 
 				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
+
+				//出单时减少库存
+				Boolean updateStockSuccess  = false;
+				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+				if(!updateStockSuccess){
+					log.info("库存变更失败:"+order.getId());
+				}
+
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");
 				MQMessageProducer.sendPlaceOrderMessage(order);
@@ -229,7 +241,7 @@ public class OrderAspect {
 	public void cancelOrderPos(){};
 
 	@AfterReturning(value="cancelOrderPos()",returning="order")
-	public void cancelOrderPosAfter(Order order){
+	public void cancelOrderPosAfter(Order order) throws Throwable{
 		if(order!=null){
 			Customer customer = customerService.selectById(order.getCustomerId());
 			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -238,6 +250,14 @@ public class OrderAspect {
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送订单取消通知成功:"+msg+result);
 			MQMessageProducer.sendNoticeOrderMessage(order);
+
+			//拒绝订单后还原库存
+			Boolean addStockSuccess  = false;
+			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));
+			if(!addStockSuccess){
+				log.info("库存还原失败:"+order.getId());
+			}
+
 		}
 	}
 

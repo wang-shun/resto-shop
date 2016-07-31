@@ -5,6 +5,7 @@ import java.util.List;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.model.Article;
+import com.resto.shop.web.model.ArticleStock;
 
 public interface ArticleService extends GenericService<Article, String> {
 
@@ -38,4 +39,12 @@ public interface ArticleService extends GenericService<Article, String> {
 	void addLikes(String articleId);
 	
 	void updateLikes(String articleId,Long likes);
+
+	/**
+	 * 初始化库存
+	 */
+	void initStock();
+
+	List<ArticleStock> getStock(String shopId);
+
 }

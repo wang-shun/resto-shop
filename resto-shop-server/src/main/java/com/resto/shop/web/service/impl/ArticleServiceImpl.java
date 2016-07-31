@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,16 +8,15 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.ArticleMapper;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.ArticlePrice;
-import com.resto.shop.web.model.MealAttr;
-import com.resto.shop.web.model.SupportTime;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.KitchenService;
@@ -164,4 +164,19 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.updateLikes(articleId, likes);
     }
 
+
+    @Override
+    public void initStock() {
+        /**
+         * 餐品套餐库存 默认为 最低的单品
+         */
+        //多规格商品 库存之和 等于该品库存
+        articleMapper.initSuitStock();
+        articleMapper.initSize();
+    }
+
+    @Override
+    public List<ArticleStock> getStock(String shopId) {
+        return articleMapper.getStock(shopId);
+    }
 }
