@@ -168,4 +168,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
 
+    @Override
+    public void initStock() {
+        /**
+         * 餐品套餐库存 默认为 最低的单品
+         */
+        //多规格商品 库存之和 等于该品库存
+        articleMapper.initSuitStock();
+        articleMapper.initSize();
+    }
+
 }

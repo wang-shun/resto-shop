@@ -491,4 +491,29 @@
   	update tb_article set likes = #{1} where id=#{0}
   </update>
 
+  <update id="initSuitStock">
+update tb_article t,tb_meal_attr t2,tb_meal_item t3,(select id, min(stock_working_day) as stock_working_day_count
+,min(stock_weekend) as stock_weekend_count from tb_article
+) as  t4
+set t.stock_working_day  =
+t4.stock_working_day_count, t.stock_weekend  =
+t4.stock_weekend_count
+where t.article_type = 2
+and t2.article_id = t.id
+and t3.meal_attr_id = t2.id
+and t4.id = t3.article_id
+  </update>
+
+
+  <update id="initSize">
+    update tb_article t ,(
+select article_id, sum(stock_working_day) as stock_working_day_count,
+sum(stock_weekend) as stock_weekend_count
+ from tb_article_price
+GROUP BY article_id
+) as t2
+set t.stock_weekend = t2.stock_weekend_count,
+t.stock_working_day = t2.stock_working_day_count
+where t.id = t2.article_id
+  </update>
 </mapper>

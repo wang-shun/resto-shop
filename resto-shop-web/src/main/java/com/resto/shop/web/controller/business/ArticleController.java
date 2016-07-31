@@ -69,6 +69,7 @@ public class ArticleController extends GenericController{
 		}else{
 			articleService.update(article);
 		}
+
 		return Result.getSuccess();
 	}
 	

@@ -39,5 +39,9 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	void updateLikes(String articleId,Long likes);
 
+	/**
+	 * 初始化库存
+	 */
+	void initStock();
 
 }

@@ -43,5 +43,9 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	void addLikes(String articleId);
 
+	void initSuitStock();
+
+	void initSize();
+
 
 }
