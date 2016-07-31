@@ -16,10 +16,7 @@ import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.ArticleMapper;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.ArticlePrice;
-import com.resto.shop.web.model.MealAttr;
-import com.resto.shop.web.model.SupportTime;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.KitchenService;
@@ -178,4 +175,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.initSize();
     }
 
+    @Override
+    public List<ArticleStock> getStock(String shopId) {
+        return articleMapper.getStock(shopId);
+    }
 }
