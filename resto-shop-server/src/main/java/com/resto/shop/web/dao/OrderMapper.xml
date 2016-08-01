@@ -1448,10 +1448,10 @@ GROUP BY o.id
     <update id="updateArticleStock">
         update tb_article
         <set>
-            <if test="type='minus'">
+            <if test="type=='minus'">
                 current_working_stock = current_working_stock - 1
             </if>
-            <if test="type = 'add'">
+            <if test="type == 'add'">
                 current_working_stock = current_working_stock + 1
             </if>
         </set>
@@ -1462,10 +1462,10 @@ GROUP BY o.id
     <update id="updateArticlePriceStock">
         update tb_article_price
         <set>
-            <if test="type ='minus'">
+            <if test="type =='minus'">
                 current_working_stock = current_working_stock - 1
             </if>
-            <if test="type ='add'">
+            <if test="type =='add'">
                 current_working_stock = current_working_stock + 1
             </if>
         </set>

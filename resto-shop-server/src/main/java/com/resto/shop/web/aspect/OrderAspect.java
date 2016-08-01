@@ -169,15 +169,16 @@ public class OrderAspect {
 
 
 
+
 				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
 //				//出单时减少库存
-//				Boolean updateStockSuccess  = false;
-//				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
-//				if(!updateStockSuccess){
-//					log.info("库存变更失败:"+order.getId());
-//				}
+				Boolean updateStockSuccess  = false;
+				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+				if(!updateStockSuccess){
+					log.info("库存变更失败:"+order.getId());
+				}
 
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");
