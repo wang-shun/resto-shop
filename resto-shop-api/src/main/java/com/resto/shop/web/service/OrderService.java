@@ -325,5 +325,5 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	Boolean addStock(Order order) throws AppException;
 
-	List<Map<String, Object>> printTotal(String shopId);
+	Map<String, Object> printTotal(String shopId,Integer printerId);
 }

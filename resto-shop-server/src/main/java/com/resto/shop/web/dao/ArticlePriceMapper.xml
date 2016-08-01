@@ -10,7 +10,7 @@
     <result column="peference" property="peference" jdbcType="VARCHAR"/>
     <result column="sort" property="sort" jdbcType="INTEGER"/>
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
-    <result column="stock_working_day" property="stockWorkDay" jdbcType="INTEGER"/>
+    <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
     <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
     <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
   </resultMap>

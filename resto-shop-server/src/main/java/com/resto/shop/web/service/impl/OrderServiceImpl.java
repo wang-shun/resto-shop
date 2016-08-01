@@ -20,8 +20,6 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.ArticlePriceMapper;
 import com.resto.shop.web.dao.MealAttrMapper;
-import com.resto.shop.web.dao.ArticlePriceMapper;
-import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.dao.OrderItemMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
@@ -80,7 +78,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     OrderItemService orderItemService;
-
 
 
     @Resource
@@ -1481,17 +1478,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Map<String, Object>> printTotal(String shopId) {
-        List<Map<String, Object>> printTask = new ArrayList<>();
-        ShopDetail shop = shopDetailService.selectById(shopId);
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
-        for (Printer printer : ticketPrinter) {
-            Map<String, Object> ticket = printTotal(shop, printer);
-            if (ticket != null) {
-                printTask.add(ticket);
-            }
+    public Map<String, Object> printTotal(String shopId, Integer printerId) {
 
+        Map<String, Object> printTask = new HashMap<>();
+        ShopDetail shop = shopDetailService.selectById(shopId);
+
+
+        if (printerId == null) {
+            List<Printer> printer = printerService.selectByShopAndType(shopId, PrinterType.RECEPTION);
+            if (printer.size() > 0) {
+                return printTotal(shop, printer.get(0));
+            }
+        } else {
+            Printer p = printerService.selectById(printerId);
+            return printTotal(shop, p);
         }
+
+
         return printTask;
     }
 
@@ -1570,7 +1573,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.DAILYREPORT);
 
         return print;
-        
+
     }
 
     @Override
@@ -1644,18 +1647,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(),StockType.STOCK_MINUS);
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
                     orderMapper.setEmpty(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
                     orderMapper.setEmpty(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
                     orderMapper.setEmpty(orderItem.getArticleId());
                     break;
                 default:
@@ -1685,18 +1688,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(),StockType.STOCK_ADD);
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD);
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD);
                     orderMapper.setEmptyFail(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(),StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 default:
