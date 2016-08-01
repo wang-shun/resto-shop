@@ -186,4 +186,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.clearPriceStock(articleId);
         return true;
     }
+
+    @Override
+    public Boolean editStock(String articleId, Integer count) {
+        articleMapper.editStock(articleId, count);
+        articleMapper.editPriceStock(articleId,count);
+        return true;
+    }
 }

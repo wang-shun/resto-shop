@@ -49,4 +49,6 @@ public interface ArticleService extends GenericService<Article, String> {
 
 	Boolean clearStock(String articleId);
 
+	Boolean editStock(String articleId,Integer count);
+
 }

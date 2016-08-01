@@ -539,4 +539,16 @@ ifnull(t2.current_working_stock,t.current_working_stock) as currentStock from tb
         set current_working_stock = 0
         where id = #{articleId}
   </update>
+
+  <update id="editStock">
+    update tb_article
+    set current_working_stock = #{count}
+      where id = #{articleId}
+  </update>
+
+  <update id="editPriceStock">
+    update tb_article_price
+    set current_working_stock = #{count}
+    where id = #{articleId}
+  </update>
 </mapper>
