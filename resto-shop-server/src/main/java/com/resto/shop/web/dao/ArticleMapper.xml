@@ -529,7 +529,7 @@ ifnull(t2.current_working_stock,t.current_working_stock) as currentStock from tb
 
   <update id="clearStock">
     update tb_article
-        set is_empty = 1  and current_working_stock = 0
+        set is_empty = 1  , current_working_stock = 0
         where id = #{articleId}
 
   </update>
