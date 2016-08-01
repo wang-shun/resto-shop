@@ -179,4 +179,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<ArticleStock> getStock(String shopId) {
         return articleMapper.getStock(shopId);
     }
+
+    @Override
+    public Boolean clearStock(String articleId) {
+        articleMapper.clearStock(articleId);
+        articleMapper.clearPriceStock(articleId);
+        return true;
+    }
 }
