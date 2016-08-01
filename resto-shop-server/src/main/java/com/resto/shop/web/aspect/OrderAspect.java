@@ -174,11 +174,11 @@ public class OrderAspect {
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
 //				//出单时减少库存
-				Boolean updateStockSuccess  = false;
-				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
-				if(!updateStockSuccess){
-					log.info("库存变更失败:"+order.getId());
-				}
+//				Boolean updateStockSuccess  = false;
+//				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+//				if(!updateStockSuccess){
+//					log.info("库存变更失败:"+order.getId());
+//				}
 
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");
