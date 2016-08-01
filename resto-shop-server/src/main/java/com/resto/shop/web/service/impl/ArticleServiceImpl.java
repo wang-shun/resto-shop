@@ -16,6 +16,7 @@ import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.ArticleMapper;
+import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
@@ -36,6 +37,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     private ArticleMapper articleMapper;
 
     @Resource
+    private OrderMapper orderMapper;
+
+
+    @Resource
     private ArticlePriceService articlePriceServer;
 
     @Resource
@@ -49,6 +54,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Resource
     private BrandSettingService brandSettingService;
+
 
     @Override
     public GenericDao<Article, String> getDao() {
@@ -184,6 +190,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean clearStock(String articleId) {
         articleMapper.clearStock(articleId);
         articleMapper.clearPriceStock(articleId);
+        articleMapper.cleanPriceAll(articleId);
+        //如果有规格的
+        articleMapper.initSizeCurrent();
         return true;
     }
 
@@ -191,6 +200,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean editStock(String articleId, Integer count) {
         articleMapper.editStock(articleId, count);
         articleMapper.editPriceStock(articleId,count);
+        orderMapper.setStockBySuit();
         return true;
     }
 }

@@ -551,4 +551,20 @@ ifnull(t2.current_working_stock,t.current_working_stock) as currentStock from tb
     set current_working_stock = #{count}
     where id = #{articleId}
   </update>
+
+  <update id="initSizeCurrent">
+    update tb_article t ,(
+    select article_id, sum(current_working_stock) as current_working_stock_count
+    from tb_article_price
+    GROUP BY article_id
+    ) as t2
+    set t.current_working_stock = t2.current_working_stock_count
+    where t.id = t2.article_id
+  </update>
+
+  <update id="cleanPriceAll">
+    update tb_article_price
+    set current_working_stock = 0
+    where article_id = #{articleId}
+  </update>
 </mapper>
