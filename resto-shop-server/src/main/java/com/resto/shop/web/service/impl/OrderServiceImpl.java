@@ -1478,22 +1478,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Map<String, Object> printTotal(String shopId, Integer printerId) {
+    public List<Map<String, Object>> printTotal(String shopId) {
 
-        Map<String, Object> printTask = new HashMap<>();
+        List<Map<String, Object>> printTask = new ArrayList<>();
         ShopDetail shop = shopDetailService.selectById(shopId);
 
-
-        if (printerId == null) {
-            List<Printer> printer = printerService.selectByShopAndType(shopId, PrinterType.RECEPTION);
-            if (printer.size() > 0) {
-                return printTotal(shop, printer.get(0));
+        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+        for (Printer printer : ticketPrinter) {
+            Map<String, Object> ticket = printTotal(shop, printer);
+            if (ticket != null) {
+                printTask.add(ticket);
             }
-        } else {
-            Printer p = printerService.selectById(printerId);
-            return printTotal(shop, p);
-        }
 
+        }
 
         return printTask;
     }
@@ -1565,7 +1562,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
         data.put("PAYMENT_AMOUNT", order.getOrderTotal());
         data.put("PAYMENT_ITEMS", items);
-        data.put("ORIGINAL_AMOUNT", order.getOrderCount());
+        data.put("ORDER_AMOUNT", order.getOrderCount());
         data.put("ORDER_AVERAGE", order.getOrderTotal().divide(new BigDecimal(order.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP));
         data.put("PRODUCT_AMOUNT", sum);
         print.put("DATA", data);
