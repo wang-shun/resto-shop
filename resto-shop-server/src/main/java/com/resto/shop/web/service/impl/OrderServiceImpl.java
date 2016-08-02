@@ -1806,7 +1806,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (orderItem.getType()) {
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     //同时更新套餐库存(套餐库存为 最小库存的单品)
                     orderMapper.setStockBySuit();
@@ -1814,18 +1814,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS);
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     break;
                 default:
@@ -1849,24 +1849,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (orderItem.getType()) {
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD);
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD);
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 default:

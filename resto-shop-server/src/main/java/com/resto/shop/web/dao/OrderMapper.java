@@ -274,14 +274,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param articleId 餐品id
 	 * @return
 	 */
-	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type);
+	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
 	/**
 	 * 更新该餐品库存 （-1）（有规格）
 	 * @param articleId 餐品id
 	 * @return
 	 */
-	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type);
+	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
 	/**
 	 * 库存为0时设置沽清
