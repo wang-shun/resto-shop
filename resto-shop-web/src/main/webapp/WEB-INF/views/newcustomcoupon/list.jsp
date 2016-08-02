@@ -357,11 +357,20 @@ $(document).ready(function(){
 					vueObj.m.couponValiday='';
 				},
 				showTime : function(){
+					
+					//如果是新建则默认选择当天，如果是编辑则选择清空
 					//点击优惠券的时间类型为时间范围  清空开始时间和结束时间
-					vueObj.m.beginDateTime='';
-					vueObj.m.endDateTime='';
+					if(vueObj.m.brandId){
+						vueObj.m.beginDateTime='';
+						vueObj.m.endDateTime='';
+					}
 				},
 				initCouponTime: function(){
+			
+					//初始化当前为当前时间
+// 					$("").val(new Date().format("yyyy-MM-dd hh:mm:ss"))
+// 					$("input[name='newsletter']") 
+					
 					$('.form_datetime').datetimepicker({
 						 format: "yyyy-mm-dd hh:ii:ss",
 					        autoclose: true,
@@ -373,8 +382,6 @@ $(document).ready(function(){
 					        startView: 2,//月视图
 					        //minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
 					});
-
-
 				}
 				
 			},
