@@ -194,6 +194,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         //如果有规格的
         orderMapper.setStockBySuit();
         articleMapper.initSizeCurrent();
+        articleMapper.clearMain(articleId);
         return true;
     }
 
@@ -203,6 +204,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.editPriceStock(articleId,count);
         orderMapper.setStockBySuit();
         articleMapper.initSizeCurrent();
+        articleMapper.initEmpty();
         return true;
     }
 }

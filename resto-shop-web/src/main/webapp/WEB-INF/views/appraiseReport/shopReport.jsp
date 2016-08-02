@@ -32,6 +32,7 @@ th {
              <button type="button" class="btn btn-primary" id="month">本月</button>
 				
 				<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
+				<button type="button" class="btn btn-primary" id="excelReport">下载报表</button>
 			</form>
 		</div>
 	</div>
@@ -88,13 +89,26 @@ th {
 				},
 				columns : [
 					{
-						title:'评论等级',
+						title:'评分',
 						data:'appraise.level',
 						createdCell:function(td,tdData){
 							
 							$(td).html(getLevel(tdData))
 						}
 						
+					},
+					{ 
+						title : "评论对象", 
+						data : "appraise.feedback" 
+					},
+					{
+						title :"评论时间",
+						data : "appraise.createTime",
+						createdCell:function(td,tdData){
+							
+							$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
+						}
+					
 					},
 					
 					{
@@ -111,10 +125,7 @@ th {
 						title : "评论金额", 
 						data : "appraise.redMoney" 
 					},
-					{ 
-						title : "评论对象", 
-						data : "appraise.feedback" 
-					},
+					
 					{ 
 						title : "评论内容", 
 						data : "appraise.content" 
@@ -190,6 +201,13 @@ th {
 		 searchInfo(getMonthStartDate(), new Date().format("yyyy-MM-dd"));		
 	 })
 	 
+	 $("#excelReport").click(function(){
+		//下载报表 
+		 var beginDate = $("#beginDate2").val();
+		 var endDate = $("#endDate2").val();
+		 location.href="appraiseReport/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&shopId="+shopId;
+		 
+	 })
 	 
 	
 </script>

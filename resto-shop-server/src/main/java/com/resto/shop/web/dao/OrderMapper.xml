@@ -154,6 +154,7 @@
             <result column="red_money" property="redMoney"/>
             <result column="content" property="content"/>
             <result column="feedback" property="feedback"/>
+            <result column="create_time" property="createTime"/>
         </association>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
@@ -1266,14 +1267,18 @@ ORDER BY ${sort}
 </select>
 
 
-    <select id="selectMoneyAndNumByDate" resultType="com.resto.brand.web.dto.OrderPayDto">
-SELECT IFNULL(SUM(ap.order_money),0)orderMoney,IFNULL(COUNT(ap.id),0) number,ap.shop_detail_id   FROM
-(
-SELECT id ,shop_detail_id,order_money  from tb_order WHERE order_state in (2,10,11,12) and
-<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and brand_id=#{brandId}
- ) as ap
-GROUP BY ap.shop_detail_id
-
+    <select id="selectMoneyAndNumByDate" resultType="com.resto.shop.web.model.Order">
+SELECT
+	o.shop_detail_id,
+	o.id,
+	oi.payment_mode_id,
+	oi.pay_value
+FROM
+	tb_order o
+INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+WHERE
+o.order_state IN (10, 11, 12) and 
+	<![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
 </select>
 
     <select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -1415,7 +1420,7 @@ WHERE
 
     <select id="selectAppraiseByShopId" resultMap="selectListByshopIdmap">
 	SELECT
-	o.id , o.order_money ,a.level,a.red_money,a.content,a.feedback ,c.telephone  from tb_order o
+	o.id , o.order_money ,a.level,a.red_money,a.content,a.feedback ,a.create_time,c.telephone  from tb_order o
 	INNER JOIN tb_order_payment_item oi
 	on o.id = oi.order_id
 	LEFT JOIN  tb_appraise a
@@ -1448,10 +1453,10 @@ GROUP BY o.id
     <update id="updateArticleStock">
         update tb_article
         <set>
-            <if test="type='minus'">
+            <if test="type=='minus'">
                 current_working_stock = current_working_stock - 1
             </if>
-            <if test="type = 'add'">
+            <if test="type == 'add'">
                 current_working_stock = current_working_stock + 1
             </if>
         </set>
@@ -1462,10 +1467,10 @@ GROUP BY o.id
     <update id="updateArticlePriceStock">
         update tb_article_price
         <set>
-            <if test="type ='minus'">
+            <if test="type =='minus'">
                 current_working_stock = current_working_stock - 1
             </if>
-            <if test="type ='add'">
+            <if test="type =='add'">
                 current_working_stock = current_working_stock + 1
             </if>
         </set>
@@ -1496,6 +1501,51 @@ and t2.article_id = t.id
 and t3.meal_attr_id = t2.id
 and t4.id = t3.article_id
     </update>
+
+
+
+    <select id="getPayment" resultType="java.math.BigDecimal">
+       select ifnull(sum(t2.pay_value),0) from tb_order t
+INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}
+    </select>
+
+
+    <select id="getArticleCount" resultType="java.lang.Integer">
+
+select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id,r.article_name,r.articleFamilyName FROM(
+        SELECT
+        DISTINCT(t.order_id),
+        LEFT (t.article_id, 32) AS articleId,
+        t.count,
+        t.article_name,
+        t5.id AS articleFamilyId,
+        t5. NAME AS articleFamilyName,
+        t5.peference,
+        t4.sort,
+        t5.id
+
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+        WHERE
+        t2.order_state in (2,10,11,12)
+        and
+         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
+
+
+        ) as r
+        GROUP BY r.article_name
+) as g
+where g.id = #{familyId}
+GROUP BY g.articleFamilyName
+
+    </select>
+
 </mapper>
 
 

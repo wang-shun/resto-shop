@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -226,7 +227,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<ArticleSellDto> selectBrandFamilyArticleSellByDateAndArticleFamilyId(@Param("brandId")String brandId,@Param("articleFamilyName")String articleFamilyName, @Param("beginDate")Date begin,
 			 @Param("endDate")Date end, @Param("sort") String sort);
 
-	List<OrderPayDto> selectMoneyAndNumByDate(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
+	List<Order> selectMoneyAndNumByDate(@Param("beginDate")Date begin, @Param("endDate")Date end, @Param("brandId")String brandId);
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(@Param("shopId")String shopId,@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("sort")String sort);
 
@@ -301,5 +302,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	Boolean setStockBySuit();
+
+	BigDecimal getPayment(@Param("type") Integer type,@Param("shopId") String shopId);
+
+	Integer getArticleCount(@Param("shopId") String shopId,@Param("familyId") String familyId);
 
 }

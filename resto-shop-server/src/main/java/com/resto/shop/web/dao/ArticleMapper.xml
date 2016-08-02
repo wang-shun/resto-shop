@@ -567,4 +567,20 @@ ifnull(t2.current_working_stock,t.current_working_stock) as currentStock from tb
     set current_working_stock = 0
     where article_id = #{articleId}
   </update>
+
+  <update id="clearMain">
+    update tb_article ,
+ (select article_id from tb_article_price where id = #{articleId} ) as b
+set current_working_stock = 0
+, is_empty = 1
+where id = b.article_id
+and (select count(1) from tb_article_price where article_id = b.article_id ) = (select count(1) from
+tb_article_price where article_id = b.article_id  and current_working_stock = 0)
+  </update>
+
+  <update id="initEmpty">
+    update tb_article
+    set is_empty = 0 where current_working_stock > 0
+  </update>
+
 </mapper>

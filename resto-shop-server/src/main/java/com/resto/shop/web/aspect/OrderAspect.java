@@ -130,6 +130,7 @@ public class OrderAspect {
 	public void printSuccess(){};
 
 
+
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter (Order order) throws Throwable{
 		if(order!=null){
@@ -168,10 +169,11 @@ public class OrderAspect {
 
 
 
+
 				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
-				//出单时减少库存
+//				//出单时减少库存
 				Boolean updateStockSuccess  = false;
 				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
 				if(!updateStockSuccess){

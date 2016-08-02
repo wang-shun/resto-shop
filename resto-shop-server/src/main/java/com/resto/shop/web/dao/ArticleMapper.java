@@ -61,4 +61,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count);
 
 	void initSizeCurrent();
+
+	void clearMain(String articleId);
+
+	void initEmpty();
 }
