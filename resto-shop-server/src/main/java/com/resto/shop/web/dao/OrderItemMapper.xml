@@ -257,8 +257,9 @@
 select t.print_sort,t3.* from tb_meal_attr  t
 INNER JOIN tb_meal_item t2 on t2.meal_attr_id = t.id
 left join tb_order_item t3 on t3.article_id = t2.article_id
-and t3.parent_id = #{parentid}
+
 where  t.article_id =  #{articleid}
+and t3.parent_id = #{parentid}
 GROUP BY t.name
 order by t.print_sort asc
 
