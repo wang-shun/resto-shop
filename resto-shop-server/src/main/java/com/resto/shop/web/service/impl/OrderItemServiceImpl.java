@@ -35,10 +35,12 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     @Override
     public List<OrderItem> listByOrderId(String orderId) {
         List<OrderItem> orderItems = orderitemMapper.listByOrderId(orderId);
+
         return getOrderItemsWithChild(orderItems);
     }
 
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
+        log.debug("这里查看套餐子项: ");
         Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
         for (OrderItem item : orderItems) {
             if (item.getType() == OrderItemType.MEALS_CHILDREN) {
