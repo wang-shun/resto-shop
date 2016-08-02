@@ -1603,19 +1603,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
-                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > 0;
+                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
-                result = orderMapper.selectArticlePriceCount(orderItem.getArticleId()) > 0;
+                result = orderMapper.selectArticlePriceCount(orderItem.getArticleId()) > orderItem.getCount();
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
-                result = true;
+                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
-                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > 0;
+                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
                 break;
             default:
                 log.debug("未知菜品分类");
