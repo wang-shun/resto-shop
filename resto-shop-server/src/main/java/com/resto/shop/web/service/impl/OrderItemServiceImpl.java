@@ -12,6 +12,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.OrderItemType;
+import com.resto.shop.web.dao.ArticleFamilyMapper;
 import com.resto.shop.web.dao.OrderItemMapper;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.OrderItemService;
@@ -26,6 +27,8 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 
     @Resource
     private OrderItemMapper orderitemMapper;
+
+
 
     @Override
     public GenericDao<OrderItem, String> getDao() {
@@ -59,7 +62,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 //				for (OrderItem childItem:orderItem.getChildren()) {
                 List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId(),orderItem.getArticleId());
                 for(OrderItem obj : item){
-                    obj.setArticleName("|__" + obj.getArticleName());
+                    obj.setArticleName("|_" + obj.getArticleName());
                     items.add(obj);
                 }
 //                childItem.setArticleName("|__" + childItem.getArticleName());

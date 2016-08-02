@@ -1501,6 +1501,51 @@ and t2.article_id = t.id
 and t3.meal_attr_id = t2.id
 and t4.id = t3.article_id
     </update>
+
+
+
+    <select id="getPayment" resultType="java.math.BigDecimal">
+       select ifnull(sum(t2.pay_value),0) from tb_order t
+INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}
+    </select>
+
+
+    <select id="getArticleCount" resultType="java.lang.Integer">
+
+select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id,r.article_name,r.articleFamilyName FROM(
+        SELECT
+        DISTINCT(t.order_id),
+        LEFT (t.article_id, 32) AS articleId,
+        t.count,
+        t.article_name,
+        t5.id AS articleFamilyId,
+        t5. NAME AS articleFamilyName,
+        t5.peference,
+        t4.sort,
+        t5.id
+
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+        WHERE
+        t2.order_state in (2,10,11,12)
+        and
+         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
+
+
+        ) as r
+        GROUP BY r.article_name
+) as g
+where g.id = #{familyId}
+GROUP BY g.articleFamilyName
+
+    </select>
+
 </mapper>
 
 

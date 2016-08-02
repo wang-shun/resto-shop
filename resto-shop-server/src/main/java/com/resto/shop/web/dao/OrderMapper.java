@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -301,5 +302,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	Boolean setStockBySuit();
+
+	BigDecimal getPayment(@Param("type") Integer type,@Param("shopId") String shopId);
+
+	Integer getArticleCount(@Param("shopId") String shopId,@Param("familyId") String familyId);
 
 }
