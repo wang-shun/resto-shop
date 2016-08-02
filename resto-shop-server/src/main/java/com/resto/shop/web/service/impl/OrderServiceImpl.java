@@ -459,9 +459,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order orderWxPaySuccess(OrderPaymentItem item) {
         Order order = selectById(item.getOrderId());
+        log.debug("微信支付订单号为: " + order.getId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
+        log.debug("查找微信支付记录: " + order.getId());
         if (historyItem == null) {
+            log.debug("开始插入支付记录: " + order.getId());
             orderPaymentItemService.insert(item);
+            log.debug("付款成功: " + order.getId());
             payOrderSuccess(order);
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
