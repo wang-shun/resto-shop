@@ -63,4 +63,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void initSizeCurrent();
 
 	void clearMain();
+
+	void initEmpty();
 }
