@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,17 +52,19 @@ public class OrderController extends GenericController{
 	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
 	@RequestMapping("brand_data")
-	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate,String endDate){
+	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
+		
 		return this.getResult(beginDate, endDate);
 	}
 	
-	private List<OrderPayDto> getResult(String beginDate,String endDate){
+	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId());
 	}
 	
 	
 	//下载品牌订单报表
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping("brand_excel")
 	@ResponseBody
 	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
@@ -69,9 +73,15 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","number","orderMoney","average"};
+		String[]columns={"name","number","orderMoney","average","marketPrize"};
 		//定义数据
-		List<OrderPayDto> result = this.getResult(beginDate, endDate);
+		//List<OrderPayDto> result = this.getResult(beginDate, endDate);
+		List<OrderPayDto>  result = new LinkedList<>();
+		
+		Map<String,Object>  resultMap = this.getResult(beginDate, endDate);
+		result.addAll((Collection<? extends OrderPayDto>) resultMap.get("shopId"));
+		result.add((OrderPayDto) resultMap.get("brandId"));
+		
 		Brand brand = brandService.selectById(getCurrentBrandId());
 		//获取店铺名称
 		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
@@ -85,11 +95,11 @@ public class OrderController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "3");//显示的位置
+		map.put("num", "4");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		String[][] headers = {{"店铺","25"},{"已消费订单数(份)","25"},{"已消费订单金额(元)","25"},{"订单平均金额(元)","25"}};
+		String[][] headers = {{"名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
 		try{
@@ -150,15 +160,21 @@ public class OrderController extends GenericController{
 							ot.setOrderState("未支付");
 							break;
 						case 2:
-							ot.setOrderState("已支付");
+							if(o.getProductionStatus()==0){
+								ot.setOrderState("已付款");
+							}else if(o.getProductionStatus()==2){
+								ot.setOrderState("等待叫号");
+							}else if(o.getProductionStatus()==5){
+								ot.setOrderState("异常订单");
+							}
 							break;
 						case 9:
 							ot.setOrderState("已取消");
 							break;
 						case 10:
-							if(o.getProductionStatus()==2){
-								ot.setOrderState("已确认");
-							}else if(o.getProductionStatus()==3){
+							if(o.getProductionStatus()==5){
+								ot.setOrderState("异常订单");
+							}else {
 								ot.setOrderState("已消费");
 							}
 							break;

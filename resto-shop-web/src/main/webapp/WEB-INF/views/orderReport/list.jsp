@@ -46,19 +46,43 @@
 		  	<table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
 		  			<thead>
 					<tr>
-						<th>店铺名称</th>
-						<th>已消费订单(份)</th>
-						<th>已消费订单金额(元)</th>
+						<th>品牌</th>
+						<th>订单总数(份)</th>
+						<th>订单总额(元)</th>
 						<th>订单平均金额(元)</th>
+						<th>营销撬动率</th>
+					</tr>
+				</thead>
+				<tbody>
+						<td><strong>{{brandOrder.name}}</strong></td>
+						<td>{{brandOrder.number}}</td>	
+						<td>{{brandOrder.orderMoney}}</td>
+						<td>{{brandOrder.average}}</td>
+						<td>{{brandOrder.marketPrize}}</td>
+					</tr>
+				</tbody>
+		  	</table>
+		  </div>
+		  
+		  <div class="panel-body">
+		  	<table id="shopOrderTable" class="table table-striped table-bordered table-hover" width="100%">
+		  			<thead>
+					<tr>
+						<th>店铺名称</th>
+						<th>订单总数(份)</th>
+						<th>订单总额(元)</th>
+						<th>订单平均金额(元)</th>
+						<th>营销撬动率</th>
 						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="shop in shopOrderList">
-						<td><strong>{{shop.shopName}}</strong></td>
+						<td><strong>{{shop.name}}</strong></td>
 						<td>{{shop.number}}</td>	
 						<td>{{shop.orderMoney}}</td>
 						<td>{{shop.average}}</td>
+						<td>{{shop.marketPrize}}</td>
 						<td><button class="btn btn-sm btn-success"
 								@click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>
 					</tr>
@@ -113,6 +137,7 @@ var vueObj =  new Vue({
 		countlist :[],
 		appraiseCount:{},
 		shopOrderList : [],
+		brandOrder:{},
 		searchDate : {
 			beginDate : "",
 			endDate : "",
@@ -131,7 +156,8 @@ var vueObj =  new Vue({
 			return ;
 		}
 			$.post("orderReport/brand_data", this.getDate(null), function(result) {
-					that.shopOrderList = result;
+					that.shopOrderList = result.shopId;
+					that.brandOrder = result.brandId;
 					toastr.success("查询成功");
 				});
 		},

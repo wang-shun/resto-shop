@@ -494,6 +494,7 @@
             2: "套餐"
         }
         var tb = $table.DataTable({
+        	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
             ajax: {
                 url: "article/list_all",
                 dataSrc: ""

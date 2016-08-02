@@ -115,6 +115,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     ArticlePriceMapper articlePriceMapper;
+    
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -1257,7 +1258,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             temp = add(temp, articleSellDto.getSalles());
         }
         for (ArticleSellDto articleSellDto : list) {
-            double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
+            double c = articleSellDto.getSalles().divide(temp,2, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
             DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
@@ -1307,8 +1308,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                 articleSellDto.setNumRatio(f1 + "%");
             }
-
-
         }
 
         return list;
@@ -1336,41 +1335,150 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId) {
-        // TODO Auto-generated method stub
+    public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         //查询出所有店铺并设置默认值
         List<ShopDetail> shopLists = shopDetailService.selectByBrandId(brandId);
         List<OrderPayDto> orderList = new ArrayList<>();
-        DecimalFormat df = new DecimalFormat("0.00"); // 保留几位小数
         for (ShopDetail shopDetail : shopLists) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), new BigDecimal(df.format(0)), 0, new BigDecimal(df.format(0)));
+            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO,"");
             orderList.add(ot);
         }
         //查询后台数据
-        List<OrderPayDto> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
-
-        //如果查询出来有店铺数据则更新这个店铺的数据
-        for (OrderPayDto orderPayDto : list) {
-            for (OrderPayDto orderPayDto2 : orderList) {
-                if (orderPayDto.getShopDetailId().equals(orderPayDto2.getShopDetailId())) {
-                    orderPayDto2.setNumber(orderPayDto.getNumber());
-                    orderPayDto2.setOrderMoney(orderPayDto.getOrderMoney());
-                    BigDecimal v = new BigDecimal(orderPayDto2.getNumber());
-                    //orderPayDto2.setAverage(orderPayDto2.getOrderMoney().divide(v).setScale(2, BigDecimal.ROUND_HALF_UP));
-                    //theNum.divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP);
-                    orderPayDto2.setAverage(orderPayDto2.getOrderMoney().divide(v, 2, BigDecimal.ROUND_HALF_UP));
-                }
-            }
+        List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
+        Brand b = brandService.selectById(brandId);
+        OrderPayDto brandPayDto = new OrderPayDto(b.getBrandName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+        //品牌订单总额初始值
+        BigDecimal d = BigDecimal.ZERO;
+        
+        //品牌实际支付初始值
+        BigDecimal d1 = BigDecimal.ZERO;
+        
+        //品牌虚拟支付初始值
+        BigDecimal d2 = BigDecimal.ZERO;
+        
+        //品牌平均订单金额
+        BigDecimal average = BigDecimal.ZERO;
+        
+        //品牌订单数目初始值
+        int number=0;
+        String marketPrize="";//营销撬动率
+        Set<String> ids = new HashSet<>();
+        for (Order o : list) {
+			//封装品牌的数据
+        	//1.订单金额
+        	d=d.add(o.getPayValue());
+        	//品牌订单数目
+        	ids.add(o.getId());
+        	
+        	//品牌实际支付
+        	if(o.getPaymentModeId()==1||o.getPaymentModeId()==6){
+        		d1 = d1.add(o.getPayValue());
+        	}
+        	//品牌虚拟支付
+        	if(o.getPaymentModeId()==2||o.getPaymentModeId()==3||o.getPaymentModeId()==7){
+        		d2 = d2.add(o.getPayValue());
+        	}
+        	
+		}
+        
+        if(d2.compareTo(BigDecimal.ZERO)>0){
+        	//marketPrize = d1.divide(d2.setScale(2, BigDecimal.ROUND_HALF_UP))+"";
+        	marketPrize = d1.divide(d2,2,BigDecimal.ROUND_HALF_UP)+"";
         }
+        
+        brandPayDto.setOrderMoney(d);
+        if(ids!=null&&ids.size()>0){
+        	number = ids.size();
+        }
+        
+        //品牌订单数目
+        brandPayDto.setNumber(number);
+        //品牌订单平均值
+        if(number>0){
+        	//average = d.divide(new BigDecimal(String.valueOf(number)).setScale(2, BigDecimal.ROUND_HALF_UP));
+        	average = d.divide(new BigDecimal(String.valueOf(number)),2,BigDecimal.ROUND_HALF_UP);
+        }
+        brandPayDto.setAverage(average);
+        
+        //品牌营销撬动率
+        brandPayDto.setMarketPrize(marketPrize);
+        
+        Map<String,Object> map = new HashMap<>();
+        
+      //遍历订单中的是否含有这个店铺的id 有的话说明这个店铺有订单那么修改初始值
+        for (OrderPayDto sd : orderList) {
+    		//店铺订单的总额初始值
+			BigDecimal ds1 = BigDecimal.ZERO;
+	        
+	        //店铺实际支付初始值
+	        BigDecimal ds2 = BigDecimal.ZERO;
+	        
+	        //店铺虚拟支付初始值
+	        BigDecimal ds3 = BigDecimal.ZERO;
+	        
+	        //店铺平均订单金额
+	       // BigDecimal saverage = BigDecimal.ZERO;
+	        
+	        //店铺订单数目初始值
+	        int snumber=0;
+	        
+	        Set<String> sids = new HashSet<>();
+	        for (Order os : list) {
+	        	if(sd.getShopDetailId().equals(os.getShopDetailId())){
+			        //计算店铺订单总额
+					ds1=ds1.add(os.getPayValue());
+					//计算店铺的订单数目
+					 sids.add(os.getId());
+					 if(sids.size()>0){
+						 snumber = sids.size();
+					 }
+					 
+					//店铺实际支付
+		        	if(os.getPaymentModeId()==1||os.getPaymentModeId()==6){
+		        		ds2 = ds2.add(os.getPayValue());
+		        	}
+		        	//店铺虚拟支付
+		        	if(os.getPaymentModeId()==2||os.getPaymentModeId()==3||os.getPaymentModeId()==7){
+		        		ds3 = ds3.add(os.getPayValue());
+		        	}
+				}
+			}
+	        
+	       // String smarketPrize="";//营销撬动率
+			
+			//赋值店铺订单总额
+    		sd.setOrderMoney(ds1);
+    		
+    		//赋值店铺订单数目
+    	    sd.setNumber(snumber);
+    	    
+    	    //赋值店铺的订单平均金额
+    	    if(snumber>0){
+    	    	 //sd.setAverage(ds1.divide(new BigDecimal(String.valueOf(snumber))).setScale(2, BigDecimal.ROUND_HALF_UP));
+    	    	 sd.setAverage(ds1.divide(new BigDecimal(String.valueOf(snumber)), 2,BigDecimal.ROUND_HALF_UP));
+    	    }
+    	    
+    	    //赋值店铺营销撬动率
+    	    if(ds3.compareTo(BigDecimal.ZERO)>0){
+    	    	//sd.setMarketPrize(ds2.divide(ds3).setScale(2, BigDecimal.ROUND_HALF_UP)+"");
+    	    	sd.setMarketPrize(ds2.divide(ds3,2,BigDecimal.ROUND_HALF_UP)+"");
+    	    }
+    	   
+		}
+        
+    	
+    	//--------------------------------------
+        
+        map.put("shopId",orderList );
+        map.put("brandId", brandPayDto);
 
-        return orderList;
+        return map;
     }
 
     @Override
-    public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId,
-                                                                       String sort) {
+    public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId,  String sort) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         if ("0".equals(sort)) {
@@ -1387,7 +1495,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             temp = add(temp, articleSellDto.getSalles());
         }
         for (ArticleSellDto articleSellDto : list) {
-            double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
+            //double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
+        	double c = articleSellDto.getSalles().divide(temp,2,BigDecimal.ROUND_HALF_UP).doubleValue()*100;
             DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
@@ -1420,7 +1529,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             temp = add(temp, articleSellDto.getSalles());
         }
         for (ArticleSellDto articleSellDto : list) {
-            double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
+            //double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
+        	double c = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).doubleValue()*100;
             DecimalFormat myformat = new DecimalFormat("0.00");
             String str = myformat.format(c);
             str = str + "%";
@@ -1480,6 +1590,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.debug("开始退款");
     }
 
+    
+    
 
     @Override
     public List<Map<String, Object>> printTotal(String shopId) {

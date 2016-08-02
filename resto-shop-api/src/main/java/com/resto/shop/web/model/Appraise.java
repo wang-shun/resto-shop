@@ -55,8 +55,10 @@ public class Appraise {
      * 是否能打赏
      */
     private Boolean canReward;
+    
 
-    final public String getBrandId() {
+
+	final public String getBrandId() {
         return brandId;
     }
 
