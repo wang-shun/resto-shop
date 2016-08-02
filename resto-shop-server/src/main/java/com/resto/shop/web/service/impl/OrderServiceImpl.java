@@ -1581,47 +1581,62 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         Boolean result = true;
+        String msg = "";
 
-        String articleName = "";
 
         //订单菜品不可为空
         for (OrderItem orderItem : order.getOrderItems()) {
             //有任何一个菜品售罄则不能出单
-            if (!checkStock(orderItem)) {
+            Result check = checkStock(orderItem);
+            if (!check.isSuccess()) {
                 result = false;
-                articleName = orderItem.getArticleName() + "已售罄,请取消订单后重新下单";
+                msg = check.getMessage();
                 break;
             }
         }
 
-        return new Result(articleName, result);
+        return new Result(msg, result);
 
     }
 
-    private Boolean checkStock(OrderItem orderItem) {
+    private Result checkStock(OrderItem orderItem) {
         Boolean result = false;
+        int current = 0;
+        String msg =  "";
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
-                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
+                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                result = current >= orderItem.getCount();
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
+                     current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
-                result = orderMapper.selectArticlePriceCount(orderItem.getArticleId()) > orderItem.getCount();
+                current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
+                result = current >= orderItem.getCount();
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
+                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
-                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
+                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                result = current>= orderItem.getCount();
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
+                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
-                result = orderMapper.selectArticleCount(orderItem.getArticleId()) > orderItem.getCount();
+                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                result = current >= orderItem.getCount();
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
+                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             default:
                 log.debug("未知菜品分类");
                 break;
         }
-        return result;
+        return new Result(msg,result);
     }
 
 
