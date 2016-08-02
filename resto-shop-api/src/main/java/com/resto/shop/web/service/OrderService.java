@@ -259,7 +259,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 
-	public List<OrderPayDto> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
+	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
 
 
 	/**

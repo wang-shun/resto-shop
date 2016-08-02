@@ -23,8 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.AppraiseDto;
+import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -263,11 +265,11 @@ public class appraiseReportController extends GenericController{
 	public void report_brandExcel (String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
 		
 		//导出文件名
-				String fileName = "评论报表"+beginDate+"至"+endDate+".xls";
+				String fileName = "品牌评论报表"+beginDate+"至"+endDate+".xls";
 				//定义读取文件的路径
 				String path = request.getSession().getServletContext().getRealPath(fileName);
 				//定义列
-				String[]columns={"name","appraiseNum","appraiseRatio","redMoney","orderMoney","fivestar","fourstar","threestar","twostar","onestar"};
+				String[]columns={"name","appraiseNum","appraiseRatio","redMoney","totalMoney","fivestar","fourstar","threestar","twostar","onestar"};
 				//定义数据
 				 
 				//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -325,4 +327,125 @@ public class appraiseReportController extends GenericController{
 				}
 	
 	  }
+	
+	
+	@RequestMapping("shop_excel")
+	@ResponseBody
+	public void report_shopExcel (String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
+		//获取店铺名称
+				ShopDetail s = shopDetailService.selectById(shopId);
+		//导出文件名
+		String fileName = "店铺评论报表"+beginDate+"至"+endDate+".xls";
+		//定义读取文件的路径
+		String path = request.getSession().getServletContext().getRealPath(fileName);
+		//定义列
+		String[]columns={"levelName","feedBack","createTime","telephone","orderMoney","redMoney","content"};
+		//定义数据
+		
+		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+		Map<String,String> map = new HashMap<>();
+		Brand brand = brandService.selectById(getCurrentBrandId());
+		
+		//去掉最后一个逗号
+		map.put("brandName", brand.getBrandName());
+		map.put("shops", s.getName());
+		map.put("beginDate", beginDate);
+		map.put("reportType", "店铺评论报表");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "6");//显示的位置
+		map.put("reportTitle", "店铺评论");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+		List<AppraiseShopDto> result = new LinkedList<>();
+		
+		List<Order>  orderList = orderService.selectAppraiseByShopId(beginDate,endDate,shopId);
+		
+		for (Order order : orderList) {
+			
+			AppraiseShopDto a = new AppraiseShopDto();
+			
+			if(order.getAppraise().getLevel()!=null){
+				switch (order.getAppraise().getLevel()) {
+				case 1:
+					a.setLevelName("一星");
+					break;
+				case 2:
+					a.setLevelName("二星");
+					break;
+				case 3:
+					a.setLevelName("三星");
+					break;
+				case 4:
+					a.setLevelName("四星");
+					break;
+				case 5:
+					a.setLevelName("五星");
+					break;
+
+				default:
+					break;
+				}
+			}
+			
+			
+			if(order.getCustomer().getTelephone()!=null){
+				a.setTelephone(order.getCustomer().getTelephone());
+			}
+			
+			
+			if(order.getOrderMoney()!=null){
+				a.setOrderMoney(order.getOrderMoney());
+			}
+			
+			if(order.getAppraise().getFeedback()!=null){
+				a.setFeedBack(order.getAppraise().getFeedback());
+			}
+			
+			if(order.getAppraise().getContent()!=null){
+				a.setContent(order.getAppraise().getContent());
+			}
+			
+			if(order.getAppraise().getRedMoney()!=null){
+				a.setRedMoney(order.getAppraise().getRedMoney());
+			}
+			
+			if(order.getAppraise().getCreateTime()!=null){
+				a.setCreateTime(DateUtil.formatDate(order.getAppraise().getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+			}
+			
+			result.add(a);
+			
+		}
+		
+		
+		String[][] headers = {{"评分","25"},{"评论对象","25"},{"评论时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"评论金额","25"},{"评论内容","25"}};
+		//定义excel工具类对象
+		ExcelUtil<AppraiseShopDto> excelUtil=new ExcelUtil<AppraiseShopDto>();
+		OutputStream out  = null;
+		try{
+			out = new FileOutputStream(path);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
+			out.close();
+			excelUtil.download(path, response);
+			JOptionPane.showMessageDialog(null, "导出成功！");
+			log.info("excel导出成功");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {  
+			if (out != null) {  
+				try {  
+					out.close();  
+				} catch (IOException io) {  
+					//log  
+				}  
+			}  
+			
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
 }

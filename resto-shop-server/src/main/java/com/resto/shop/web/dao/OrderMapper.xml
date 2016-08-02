@@ -154,6 +154,7 @@
             <result column="red_money" property="redMoney"/>
             <result column="content" property="content"/>
             <result column="feedback" property="feedback"/>
+            <result column="create_time" property="createTime"/>
         </association>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
@@ -1266,14 +1267,18 @@ ORDER BY ${sort}
 </select>
 
 
-    <select id="selectMoneyAndNumByDate" resultType="com.resto.brand.web.dto.OrderPayDto">
-SELECT IFNULL(SUM(ap.order_money),0)orderMoney,IFNULL(COUNT(ap.id),0) number,ap.shop_detail_id   FROM
-(
-SELECT id ,shop_detail_id,order_money  from tb_order WHERE order_state in (2,10,11,12) and
-<![CDATA[ confirm_time >= #{beginDate} and confirm_time <= #{endDate}]]> and brand_id=#{brandId}
- ) as ap
-GROUP BY ap.shop_detail_id
-
+    <select id="selectMoneyAndNumByDate" resultType="com.resto.shop.web.model.Order">
+SELECT
+	o.shop_detail_id,
+	o.id,
+	oi.payment_mode_id,
+	oi.pay_value
+FROM
+	tb_order o
+INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+WHERE
+o.order_state IN (10, 11, 12) and 
+	<![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
 </select>
 
     <select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -1415,7 +1420,7 @@ WHERE
 
     <select id="selectAppraiseByShopId" resultMap="selectListByshopIdmap">
 	SELECT
-	o.id , o.order_money ,a.level,a.red_money,a.content,a.feedback ,c.telephone  from tb_order o
+	o.id , o.order_money ,a.level,a.red_money,a.content,a.feedback ,a.create_time,c.telephone  from tb_order o
 	INNER JOIN tb_order_payment_item oi
 	on o.id = oi.order_id
 	LEFT JOIN  tb_appraise a
