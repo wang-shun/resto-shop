@@ -145,7 +145,9 @@ th {
 					},
 					{
 						title : "手机号", 
-						data : "telephone" 
+						data : "telephone",
+						defaultContent:"",
+						
 					},
 					{ 
 						title : "订单金额", 
