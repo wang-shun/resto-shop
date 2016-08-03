@@ -113,7 +113,8 @@ th {
 					
 					{
 						title : "手机号", 
-						data : "customer.telephone" 
+						data : "customer.telephone", 
+						defaultContent:""
 					},
 					
 					
@@ -128,7 +129,8 @@ th {
 					
 					{ 
 						title : "评论内容", 
-						data : "appraise.content" 
+						data : "appraise.content" ,
+						defaultContent:"",
 					},
 				]
 			});
