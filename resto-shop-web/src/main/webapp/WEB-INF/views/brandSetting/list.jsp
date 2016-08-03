@@ -112,7 +112,17 @@
 				    <label>差评最少字数</label>
 				    <input type="number" class="form-control" name="badAppraiseLength" v-model="m.badAppraiseLength">
 				</div>
-				
+				<div class="form-group">
+					<div class="control-label">是否打印总单</div>
+					<label >
+						<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="0">
+						是
+					</label>
+					<label>
+						<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="1">
+						否
+					</label>
+				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
