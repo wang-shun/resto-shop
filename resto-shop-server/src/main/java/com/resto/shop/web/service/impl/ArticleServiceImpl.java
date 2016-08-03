@@ -182,8 +182,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<ArticleStock> getStock(String shopId) {
-        return articleMapper.getStock(shopId);
+    public List<ArticleStock> getStock(String shopId,String familyId,Integer empty) {
+        return articleMapper.getStock(shopId,familyId,empty);
     }
 
     @Override

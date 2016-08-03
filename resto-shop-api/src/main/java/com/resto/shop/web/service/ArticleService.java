@@ -45,7 +45,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 */
 	void initStock();
 
-	List<ArticleStock> getStock(String shopId);
+	List<ArticleStock> getStock(String shopId,String familyId,Integer empty);
 
 	Boolean clearStock(String articleId);
 
