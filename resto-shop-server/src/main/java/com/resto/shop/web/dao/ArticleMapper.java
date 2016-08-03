@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.util.List;
 
 import com.resto.shop.web.model.ArticleStock;
+import com.resto.shop.web.model.FreeDay;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -48,8 +49,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	void initSize();
 
-	List<ArticleStock> getStock(@Param("shopId") String shopId,@Param("familyId") String familyId,
-								@Param("empty") Integer empty);
+	List<ArticleStock> getStock(@Param("shopId") String shopId, @Param("familyId") String familyId,
+								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay);
 
 	Integer clearStock(String articleId);
 

@@ -13,6 +13,36 @@ public class ArticleStock {
 
     private String id;
 
+    private Integer defaultStock;
+
+    private Integer stockWeekend;
+
+    private Integer stockWorkingDay;
+
+    final public Integer getStockWorkingDay() {
+        return stockWorkingDay;
+    }
+
+    final public void setStockWorkingDay(Integer stockWorkingDay) {
+        this.stockWorkingDay = stockWorkingDay;
+    }
+
+    final public Integer getStockWeekend() {
+        return stockWeekend;
+    }
+
+    final public void setStockWeekend(Integer stockWeekend) {
+        this.stockWeekend = stockWeekend;
+    }
+
+    final public Integer getDefaultStock() {
+        return defaultStock;
+    }
+
+    final public void setDefaultStock(Integer defaultStock) {
+        this.defaultStock = defaultStock;
+    }
+
     public String getId() {
         return id;
     }

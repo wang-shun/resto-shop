@@ -1,10 +1,8 @@
 package com.resto.shop.web.service.impl;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -16,6 +14,7 @@ import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.dao.ArticleMapper;
+import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.ArticlePriceService;
@@ -26,6 +25,7 @@ import com.resto.shop.web.service.SupportTimeService;
 
 import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  *
@@ -54,6 +54,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Resource
     private BrandSettingService brandSettingService;
+
+    @Resource
+    private FreeDayMapper freedayMapper;
 
 
     @Override
@@ -183,7 +186,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<ArticleStock> getStock(String shopId,String familyId,Integer empty) {
-        return articleMapper.getStock(shopId,familyId,empty);
+
+        FreeDay day = freedayMapper.selectByDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"),shopId);
+        int freeDay = 0 ;
+        if(day == null){
+            freeDay = 1;
+        }
+        List<ArticleStock> result = articleMapper.getStock(shopId,familyId,empty,freeDay);
+
+        return result;
     }
 
     @Override
