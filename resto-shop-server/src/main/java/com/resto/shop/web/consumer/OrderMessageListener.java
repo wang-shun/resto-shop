@@ -126,10 +126,13 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
-
+       String customerId = obj.getString("customerId");
         if (orderService.checkRefundLimit(order)) {
             orderService.autoRefundOrder(obj.getString("orderId"));
             log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
+            Customer customer = customerService.selectById(customerId);
+            WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+            WeChatUtils.sendCustomerMsgASync("亲,昨日未消费订单已退款,欢迎下次再来本店消费", customer.getWechatId(), config.getAppid(), config.getAppsecret());
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }

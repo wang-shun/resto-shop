@@ -69,7 +69,7 @@ public class OrderAspect {
 		shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
 		//订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
 		log.info("当天24小时开启自动退款:"+order.getId());
-		MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getId());
+		MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getId(),order.getCustomerId());
 		if(order.getOrderState().equals(OrderState.SUBMIT)){
 //			long delay = 1000*60*15;//15分钟后自动取消订单
 //			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);

@@ -39,10 +39,11 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
-	public static void sendAutoRefundMsg(final String brandId,final String orderId){
+	public static void sendAutoRefundMsg(final String brandId,final String orderId,final String customerId){
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", brandId);
 		obj.put("orderId", orderId);
+		obj.put("customerId",customerId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_REFUND_ORDER, obj.toJSONString().getBytes());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());

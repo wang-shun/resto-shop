@@ -1454,10 +1454,10 @@ GROUP BY o.id
         update tb_article
         <set>
             <if test="type=='minus'">
-                current_working_stock = current_working_stock - 1
+                current_working_stock = current_working_stock - #{count}
             </if>
             <if test="type == 'add'">
-                current_working_stock = current_working_stock + 1
+                current_working_stock = current_working_stock +  #{count}
             </if>
         </set>
 
@@ -1468,10 +1468,10 @@ GROUP BY o.id
         update tb_article_price
         <set>
             <if test="type =='minus'">
-                current_working_stock = current_working_stock - 1
+                current_working_stock = current_working_stock -  #{count}
             </if>
             <if test="type =='add'">
-                current_working_stock = current_working_stock + 1
+                current_working_stock = current_working_stock +  #{count}
             </if>
         </set>
         where id = #{articleId}
