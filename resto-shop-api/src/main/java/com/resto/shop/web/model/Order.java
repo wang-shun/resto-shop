@@ -514,7 +514,7 @@ public class Order {
     }
 
     final public BigDecimal getOrderTotal() {
-        return orderTotal;
+        return orderTotal == null ? new BigDecimal(0) : orderTotal;
     }
 
     final public void setOrderTotal(BigDecimal orderTotal) {

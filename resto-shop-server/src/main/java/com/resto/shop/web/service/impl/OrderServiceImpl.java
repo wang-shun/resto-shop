@@ -1706,7 +1706,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("INCOME_ITEMS", incomeItems);
         data.put("PAYMENT_ITEMS", items);
         data.put("ORDER_AMOUNT", order.getOrderCount());
-        double average =  order.getOrderTotal().doubleValue() / order.getOrderCount();
+        double average =  order.getOrderCount() == 0 ? 0 :
+                order.getOrderTotal().doubleValue() / order.getOrderCount();
         DecimalFormat    df   = new DecimalFormat("######0.00");
         data.put("ORDER_AVERAGE",df.format(average));
         data.put("PRODUCT_AMOUNT", sum);
