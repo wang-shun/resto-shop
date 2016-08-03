@@ -492,16 +492,25 @@
   </update>
 
   <update id="initSuitStock">
-update tb_article t,tb_meal_attr t2,tb_meal_item t3,(select id, min(stock_working_day) as stock_working_day_count
-,min(stock_weekend) as stock_weekend_count from tb_article
-) as  t4
-set t.stock_working_day  =
-t4.stock_working_day_count, t.stock_weekend  =
-t4.stock_weekend_count
+
+update tb_article t ,
+(
+select min(stock_working_day_count) as stock_working_day_count,
+min(stock_weekend_count) as stock_weekend_count,
+article_name,id from (select max(t4.stock_weekend) as stock_weekend_count ,max(t4.stock_working_day) as stock_working_day_count,
+t2.name,t.name as article_name,t.id from tb_article t
+INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+INNER JOIN tb_article t4 on t4.id = t3.article_id
 where t.article_type = 2
-and t2.article_id = t.id
-and t3.meal_attr_id = t2.id
-and t4.id = t3.article_id
+
+GROUP BY t2.name
+) as r
+GROUP BY article_name
+) as b
+set t.stock_weekend = b.stock_weekend_count,
+t.stock_working_day = b.stock_working_day_count
+where t.id = b.id
   </update>
 
 
