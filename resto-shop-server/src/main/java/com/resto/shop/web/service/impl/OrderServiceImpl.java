@@ -891,13 +891,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
-        for (Printer printer : ticketPrinter) {
-            Map<String, Object> ticket = printTicket(order, items, shop, printer);
-            if (ticket != null) {
-                printTask.add(ticket);
-            }
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        if(setting.getAutoPrintTotal().intValue() == 0){
+            for (Printer printer : ticketPrinter) {
+                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
 
+            }
         }
+
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
         //如果是外带，添加一张外带小票
