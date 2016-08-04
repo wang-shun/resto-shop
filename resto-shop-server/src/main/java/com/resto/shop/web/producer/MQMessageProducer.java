@@ -58,6 +58,7 @@ public class MQMessageProducer {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
+		obj.put("orderMode",order.getOrderMode());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_CONFIRM_ORDER,obj.toJSONString().getBytes());
 		long delay = System.currentTimeMillis()+delayTime;
 		message.setStartDeliverTime(delay);
