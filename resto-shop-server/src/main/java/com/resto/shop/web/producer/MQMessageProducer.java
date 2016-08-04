@@ -121,6 +121,7 @@ public class MQMessageProducer {
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
 		obj.put("timeOut",delayTime.equals(limitTime));
+		obj.put("orderMode",order.getOrderMode());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CHECK_ORDER, obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
