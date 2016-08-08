@@ -1395,7 +1395,7 @@ WHERE
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status =2
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
         GROUP BY t.id
         ) as r
     </select>
@@ -1494,7 +1494,7 @@ select min(count) as count,article_name,id from (select max(t4.current_working_s
 INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
 INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
 INNER JOIN tb_article t4 on t4.id = t3.article_id
-where t.article_type = 2
+where t.article_type in(2,3)
 
 GROUP BY t2.name
 ) as r
@@ -1535,7 +1535,7 @@ select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id
         INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
-        t2.production_status =2
+        t2.production_status in (2.3)
         and
          DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
 
