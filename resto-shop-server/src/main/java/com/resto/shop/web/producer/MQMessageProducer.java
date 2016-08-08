@@ -53,6 +53,16 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendCallMessage(final String brandId,final String orderId,final String customerId){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("orderId", orderId);
+		obj.put("customerId",customerId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.SEND_CALL_MESSAGE, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(new Date().getTime());
+		sendMessageASync(message);
+	}
+
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
