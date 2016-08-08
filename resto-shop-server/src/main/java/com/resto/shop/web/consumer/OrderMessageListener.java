@@ -152,7 +152,7 @@ public class OrderMessageListener implements MessageListener {
         String customerId = obj.getString("customerId");
         Customer customer = customerService.selectById(customerId);
         WechatConfig config = wechatConfigService.selectByBrandId(brandId);
-        WeChatUtils.sendCustomerMsgASync("您的订单已被叫号，请前往取餐处取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 
         return Action.CommitMessage;
     }
