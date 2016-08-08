@@ -1395,7 +1395,7 @@ WHERE
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.order_state in (2,12,11,10)
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status =2
         GROUP BY t.id
         ) as r
     </select>
@@ -1535,7 +1535,7 @@ select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id
         INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
-        t2.order_state in (2,10,11,12)
+        t2.production_status =2
         and
          DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
 
