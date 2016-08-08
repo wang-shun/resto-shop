@@ -880,29 +880,22 @@
 		and o.order_state = 2
 		and closed=0 ORDER BY print_order_time
 	</select>
-    <select id="selectArticleSumCountByData" resultType="Integer">
-		SELECT IFNULL(SUM(brand_article_report.brandSellNum),0) totalNum FROM
-(SELECT
-		brand_report.articleId,brand_report.brandSellNum,IFNULL(brand_report.article_name,a.name)
-		articleName,a.article_family_id articleFamilyId,f.name
-		articleFamilyName
-		from
-		(
-		SELECT left(article_id,32) articleId ,SUM(count)
-		brandSellNum
-		,article_name from tb_order_item where order_id in
-		(SELECT
-		id from tb_order where order_state in (2,10,11,12) and
-		<![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> and brand_id=#{brandId}
-		)
-		GROUP BY
-		left(article_id,32)
-		) as brand_report
-		LEFT JOIN tb_article a on
-		a.id = brand_report.articleId INNER  JOIN
-		tb_article_family f on
-		a.article_family_id = f.id AND a.article_type=1
-)as brand_article_report
+
+    <select id="selectArticleSumCountByData" resultType="com.resto.brand.web.dto.brandArticleReportDto">
+        select sum(r.count) as totalNum,sum(r.final_price) as sellIncome from (SELECT
+        DISTINCT(t.order_id),t.article_name,t.count,t.final_price
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        WHERE
+        t2.brand_id = #{brandId}
+        AND t2.order_state IN (2, 10, 11, 12)
+        AND t2.production_status IN(2,3)
+        AND t.type != 3
+        AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
+        ) as r
 	</select>
 
 
@@ -977,6 +970,7 @@ select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleF
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state in (2,10,11,12)
+        and t2.production_status in (2,3)
         and
         <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
         ) as r
@@ -1122,6 +1116,7 @@ WHERE
         WHERE
         t2.brand_id = #{brandId}
         AND t2.order_state IN (2, 10, 11, 12)
+        AND t2.production_status in (2,3)
         AND t.type != 3
         AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
         ) as r
@@ -1227,6 +1222,7 @@ t.type,
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state in (2,10,11,12)
+        and t2.production_status in (2,3)
         and
       <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
         ) as r

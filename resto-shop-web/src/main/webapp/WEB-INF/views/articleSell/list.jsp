@@ -58,14 +58,14 @@
 					<tr>
 						<th>品牌名称</th>
 						<th>菜品总销量(份)</th>
-						<th>菜品销售总额</th>
+						<th>菜品销售总额(元)</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td><strong>{{brandReport.brandName}}</strong></td>
 						<td>{{brandReport.totalNum}}</td>
-						<td>{{brandReport.totalNum}}</td>
+						<td>{{brandReport.sellIncome}}</td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -161,7 +161,8 @@ var vueObj = new Vue({
 		data : {
 			brandReport : {
 				brandName : "",
-				totalNum : 0
+				totalNum : 0,
+				sellIncome:0,
 			},
 			shopReportList : [],
 			searchDate : {
@@ -195,6 +196,7 @@ var vueObj = new Vue({
 					$.post("articleSell/list_brand", this.getDate(null), function(result) {
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
+	 					that.brandReport.sellIncome=result.sellIncome;
 	 					tb2.ajax.reload();
 	 					toastr.success("查询成功");
 	 				});

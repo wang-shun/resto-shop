@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.resto.brand.web.dto.brandArticleReportDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -145,7 +146,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param shopId
 	 * @return
 	 */
-	int selectArticleSumCountByData(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("brandId")String brandId);
+    brandArticleReportDto selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
 	
 	
 	/**
