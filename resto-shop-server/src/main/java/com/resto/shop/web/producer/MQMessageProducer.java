@@ -53,11 +53,22 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendCallMessage(final String brandId,final String orderId,final String customerId){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("orderId", orderId);
+		obj.put("customerId",customerId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.SEND_CALL_MESSAGE, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(new Date().getTime());
+		sendMessageASync(message);
+	}
+
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
+		obj.put("orderMode",order.getOrderMode());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_CONFIRM_ORDER,obj.toJSONString().getBytes());
 		long delay = System.currentTimeMillis()+delayTime;
 		message.setStartDeliverTime(delay);
@@ -108,6 +119,7 @@ public class MQMessageProducer {
 		obj.put("tableNumber", order.getTableNumber());
 		obj.put("shopDetailId", order.getShopDetailId());
 		obj.put("articleCount", order.getArticleCount());
+		obj.put("orderMode",order.getOrderMode());
 		obj.put("productionStatus", order.getProductionStatus());
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
@@ -120,6 +132,7 @@ public class MQMessageProducer {
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
 		obj.put("timeOut",delayTime.equals(limitTime));
+		obj.put("orderMode",order.getOrderMode());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CHECK_ORDER, obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);

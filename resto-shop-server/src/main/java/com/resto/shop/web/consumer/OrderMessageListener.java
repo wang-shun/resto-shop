@@ -84,6 +84,8 @@ public class OrderMessageListener implements MessageListener {
             return executeAutoRefundOrder(message);
         } else if (tag.equals(MQSetting.TAG_NOTICE_SHARE_CUSTOMER)) {
             return executeNoticeShareCustomer(message);
+        } else if (tag.equals(MQSetting.SEND_CALL_MESSAGE)){
+            return executeSendCallMessage(message);
         }
         return Action.CommitMessage;
     }
@@ -141,6 +143,20 @@ public class OrderMessageListener implements MessageListener {
 
 
     }
+
+    private Action executeSendCallMessage(Message message) throws UnsupportedEncodingException {
+        String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+        JSONObject obj = JSONObject.parseObject(msg);
+        String brandId = obj.getString("brandId");
+        DataSourceContextHolder.setDataSourceName(brandId);
+        String customerId = obj.getString("customerId");
+        Customer customer = customerService.selectById(customerId);
+        WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+        WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
+        return Action.CommitMessage;
+    }
+
 
     private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);

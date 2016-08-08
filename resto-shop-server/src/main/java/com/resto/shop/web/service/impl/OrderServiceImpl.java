@@ -1679,7 +1679,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
         data.put("TOTAL_AMOUNT", order.getOrderTotal());
 
-        data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY,shopDetail.getId()));
+        data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY,shopDetail.getId())
+        .add(orderMapper.getPayment(PayMode.CHARGE_PAY,shopDetail.getId())));
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
         wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY,shopDetail.getId()));
