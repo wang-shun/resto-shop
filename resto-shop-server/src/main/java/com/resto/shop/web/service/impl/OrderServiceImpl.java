@@ -241,11 +241,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
 
             Result check = new Result();
-            if(item.getType() == 1){
+            if(item.getType() == OrderItemType.ARTICLE){
                 check = checkArticleList(item,item.getCount());
-            }else if(item.getType() == 2){
+            }else if(item.getType() == OrderItemType.UNITPRICE){
                 check = checkArticleList(item,item.getCount());
-            }else if(item.getType() == 3){
+            }else if(item.getType() == OrderItemType.SETMEALS){
                 check = checkArticleList(item,articleCount);
             }
 
