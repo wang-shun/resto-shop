@@ -536,7 +536,7 @@ where t.id = t2.article_id
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
-        where t.activated = 1 and t.state = 1
+        where  t.state = 1
         and t.shop_detail_id = #{shopId}
         <if test="familyId != null and familyId != ''">
             and t.article_family_id = #{familyId}
@@ -564,6 +564,12 @@ where t.id = t2.article_id
         set current_working_stock = 0
         where id = #{articleId}
   </update>
+
+    <update id="clearPriceTotal">
+        update tb_article_price
+        set current_working_stock = 0
+        where article_id = #{articleId}
+    </update>
 
     <update id="editStock">
     update tb_article

@@ -200,6 +200,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public Boolean clearStock(String articleId) {
         articleMapper.clearStock(articleId);
+        articleMapper.clearPriceTotal(articleId);
         articleMapper.clearPriceStock(articleId);
         articleMapper.cleanPriceAll(articleId);
         //如果有规格的
