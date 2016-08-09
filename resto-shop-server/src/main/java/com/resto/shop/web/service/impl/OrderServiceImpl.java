@@ -256,6 +256,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
 
+        if(!jsonResult.isSuccess()){
+            return jsonResult;
+        }
 
         orderItemService.insertItems(order.getOrderItems());
         BigDecimal payMoney = totalMoney;
