@@ -241,7 +241,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
 
 
-            Result check = checkArticleList(item);
+            Result check = checkArticleList(item,articleCount);
 
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
@@ -323,14 +323,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return jsonResult;
     }
 
-    public Result checkArticleList(OrderItem orderItem) {
+    public Result checkArticleList(OrderItem orderItem,int count) {
 
         Boolean result = true;
         String msg = "";
 
         //订单菜品不可为空
         //有任何一个菜品售罄则不能出单
-        Result check = checkStock(orderItem);
+        Result check = checkStock(orderItem,count);
         if (!check.isSuccess()) {
             result = false;
             msg = check.getMessage();
@@ -1797,7 +1797,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //订单菜品不可为空
         for (OrderItem orderItem : order.getOrderItems()) {
             //有任何一个菜品售罄则不能出单
-            Result check = checkStock(orderItem);
+            Result check = checkStock(orderItem,order.getOrderItems().size());
             if (!check.isSuccess()) {
                 result = false;
                 msg = check.getMessage();
@@ -1809,31 +1809,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    private Result checkStock(OrderItem orderItem) {
+    private Result checkStock(OrderItem orderItem,int count) {
         Boolean result = false;
         int current = 0;
         String msg =  "";
+        int min = 0;
+        int endMin = 10000;
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-                result = current >= orderItem.getCount();
+                result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                     current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                     current >= count ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
                 current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
-                result = current >= orderItem.getCount();
+                result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                        current >= count ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-                result = current>= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+
+                for( OrderItem oi : orderItem.getChildren()){
+                    min = orderMapper.selectArticleCount(oi.getArticleId());
+                    if(min<endMin){
+                        endMin = min;
+                    }
+                }
+                result = endMin>= count;
+                msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单":
+                        endMin >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单";
+
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
