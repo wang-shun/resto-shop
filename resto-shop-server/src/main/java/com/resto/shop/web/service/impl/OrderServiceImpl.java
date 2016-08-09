@@ -1852,7 +1852,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单":
                         endMin >= count && current>= count? "库存足够"   : orderItem.getArticleName() + "库存不足,请重新选购餐品";
                // 中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单
-
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
