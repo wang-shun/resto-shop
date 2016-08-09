@@ -54,6 +54,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Integer clearStock(String articleId);
 
+	Integer clearPriceTotal(String articleId);
+
 	Integer clearPriceStock(String articleId);
 
 	Integer cleanPriceAll(String articleId);
