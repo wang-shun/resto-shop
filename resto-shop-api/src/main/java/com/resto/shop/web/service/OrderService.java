@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
@@ -34,7 +35,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public Order selectOrderStatesById(String orderId);
 
-	public Order createOrder(Order order)throws AppException;
+	public JSONResult createOrder(Order order)throws AppException;
 
 	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
 

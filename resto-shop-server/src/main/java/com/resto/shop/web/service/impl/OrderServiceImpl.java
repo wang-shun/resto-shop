@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -116,6 +117,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
+
+
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -136,7 +139,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order createOrder(Order order) throws AppException {
+    public JSONResult createOrder(Order order) throws AppException {
+        JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -147,6 +151,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
+
+//        List<OrderItem> orderItems = new ArrayList<OrderItem>();
+
+
+
+
+
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
         Map<String, Article> articleMap = ApplicationUtils.convertCollectionToMap(String.class, articles);
@@ -228,7 +239,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+
+            Result check = checkArticleList(item);
+
+            jsonResult.setMessage(check.getMessage());
+            jsonResult.setSuccess(check.isSuccess());
         }
+
+
+
+
         orderItemService.insertItems(order.getOrderItems());
         BigDecimal payMoney = totalMoney;
 
@@ -297,7 +318,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPaymentAmount().doubleValue() == 0) {
             payOrderSuccess(order);
         }
-        return order;
+
+        jsonResult.setData(order);
+        return jsonResult;
+    }
+
+    public Result checkArticleList(OrderItem orderItem) {
+
+        Boolean result = true;
+        String msg = "";
+
+        //订单菜品不可为空
+        //有任何一个菜品售罄则不能出单
+        Result check = checkStock(orderItem);
+        if (!check.isSuccess()) {
+            result = false;
+            msg = check.getMessage();
+        }
+        return new Result(msg, result);
     }
 
     public Order payOrderSuccess(Order order) {
