@@ -411,6 +411,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             refundOrder(order);
             log.info("取消订单成功:" + order.getId());
+
+            //拒绝订单后还原库存
+			Boolean addStockSuccess  = false;
+			addStockSuccess	= addStock(getOrderInfo(orderId));
+			if(!addStockSuccess){
+				log.info("库存还原失败:"+order.getId());
+			}
+
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
@@ -1886,10 +1894,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Boolean addStock(Order order) throws AppException {
+    public Boolean addStock(Order order) {
         //首先验证订单信息
         if (order == null || CollectionUtils.isEmpty(order.getOrderItems())) {
-            throw new AppException(AppException.ORDER_IS_NULL);
+            //throw new AppException(AppException.ORDER_IS_NULL);
+            return false;
         }
         //遍历订单商品
         for (OrderItem orderItem : order.getOrderItems()) {
@@ -1917,7 +1926,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 default:
-                    throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
+                  //  throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
+                    return false;
             }
 
         }

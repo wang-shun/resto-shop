@@ -1,5 +1,6 @@
 package com.resto.shop.web.aspect;
 
+import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
@@ -64,17 +65,28 @@ public class OrderAspect {
 	public void createOrder(){};
 
 
-	@AfterReturning(value="createOrder()",returning="order")
-	public void createOrderAround(Order order) throws Throwable{
-		shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
-		//订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
-		log.info("当天24小时开启自动退款:"+order.getId());
-		MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getId(),order.getCustomerId());
-		if(order.getOrderState().equals(OrderState.SUBMIT)){
-//			long delay = 1000*60*15;//15分钟后自动取消订单
-//			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-		}else if(order.getOrderState().equals((OrderState.PAYMENT))&&order.getOrderMode()!=ShopMode.TABLE_MODE){ //坐下点餐模式不发送
-			sendPaySuccessMsg(order);
+	@AfterReturning(value="createOrder()",returning="jsonResult")
+	public void createOrderAround(JSONResult jsonResult) throws Throwable{
+		if (jsonResult.isSuccess() == true){
+			Order order  = (Order) jsonResult.getData();
+			shopCartService.clearShopCart(order.getCustomerId(),order.getShopDetailId());
+			//订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
+			log.info("当天24小时开启自动退款:"+order.getId());
+			MQMessageProducer.sendAutoRefundMsg(order.getBrandId(),order.getId(),order.getCustomerId());
+			if(order.getOrderState().equals(OrderState.SUBMIT)){
+	//			long delay = 1000*60*15;//15分钟后自动取消订单
+	//			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+			}else if(order.getOrderState().equals((OrderState.PAYMENT))&&order.getOrderMode()!=ShopMode.TABLE_MODE){ //坐下点餐模式不发送
+				sendPaySuccessMsg(order);
+			}
+
+			//出单时减少库存
+			Boolean updateStockSuccess  = false;
+			updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+			if(!updateStockSuccess){
+				log.info("库存变更失败:"+order.getId());
+			}
+
 		}
 	}
 
@@ -176,12 +188,12 @@ public class OrderAspect {
 				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
-//				//出单时减少库存
-				Boolean updateStockSuccess  = false;
-				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
-				if(!updateStockSuccess){
-					log.info("库存变更失败:"+order.getId());
-				}
+////				//出单时减少库存
+//				Boolean updateStockSuccess  = false;
+//				updateStockSuccess	= orderService.updateStock(orderService.getOrderInfo(order.getId()));
+//				if(!updateStockSuccess){
+//					log.info("库存变更失败:"+order.getId());
+//				}
 
 			}else if(ProductionStatus.HAS_CALL==order.getProductionStatus()){
 				log.info("发送叫号信息");
@@ -256,12 +268,12 @@ public class OrderAspect {
 			log.info("发送订单取消通知成功:"+msg+result);
 			MQMessageProducer.sendNoticeOrderMessage(order);
 
-			//拒绝订单后还原库存
-			Boolean addStockSuccess  = false;
-			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));
-			if(!addStockSuccess){
-				log.info("库存还原失败:"+order.getId());
-			}
+//			//拒绝订单后还原库存
+//			Boolean addStockSuccess  = false;
+//			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));
+//			if(!addStockSuccess){
+//				log.info("库存还原失败:"+order.getId());
+//			}
 
 		}
 	}
