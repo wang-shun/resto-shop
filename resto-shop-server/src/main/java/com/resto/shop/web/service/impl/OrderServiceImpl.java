@@ -872,6 +872,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
+        log.info("开始确认订单:"+order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
@@ -887,6 +888,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
+            log.info("订单已确认:"+order.getId()+"评论:"+order.getAllowAppraise());
             return order;
         }
         return null;
