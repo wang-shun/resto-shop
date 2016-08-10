@@ -185,7 +185,7 @@ public class OrderAspect {
 
 
 
-				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
+				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送"+",orderId:"+order.getId());
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
 ////				//出单时减少库存
