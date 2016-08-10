@@ -71,14 +71,14 @@ public class SmsChargeOrderController extends GenericController {
 					String show_url = "";///商品展示页面
 					String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 					String return_url = getBaseUrl()+"paynotify/alipay_return";
-					String subject = "短信充值";
+					String subject = "【餐加】短信充值";
 					Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
 					returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
 				}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 					String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 					String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
 					log.info("微信的通知路径为："+notify_url);
-					String body = "短信充值";
+					String body = "【餐加】短信充值";
 					Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, chargeMoney, spbill_create_ip, notify_url,body);
 					if("true".equals(apiReqeust.get("success"))){
 						request.getSession().setAttribute("wxPayCode", apiReqeust.get("url"));
@@ -123,13 +123,13 @@ public class SmsChargeOrderController extends GenericController {
 					String show_url = "";//商品展示页面
 					String notify_url = getBaseUrl()+"paynotify/alipay_notify";
 					String return_url = getBaseUrl()+"paynotify/alipay_return";
-					String subject = "短信充值";
+					String subject = "【餐加】短信充值";
 					Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
 					returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
 				}else if(paytype.equals(PayType.WECHAT_PAY+"")){//微信支付
 					String spbill_create_ip = InetAddress.getLocalHost().getHostAddress();
 					String notify_url =  getBaseUrl()+"paynotify/wxpay_notify";
-					String body = "短信充值";
+					String body = "【餐加】短信充值";
 					Map<String,String> apiReqeust = WeChatPayUtils.createWxPay(out_trade_no, chargeMoney, spbill_create_ip, notify_url,body);
 					if("true".equals(apiReqeust.get("success"))){
 						request.getSession().setAttribute("wxPayCode", apiReqeust.get("url"));
@@ -233,7 +233,7 @@ public class SmsChargeOrderController extends GenericController {
 		str.append("<body style='height:100%;overflow:hidden;'>");
 		str.append("<div style='position:absolute; left:0; top:0px; width:100%; height:100%; background:#BBB;text-align: center;'>");
 		str.append("<img src = 'createWxPayCode' style='margin-top:150px;'>");
-		str.append("<p><strong>扫码即可使用微信支付</strong></p>");
+		str.append("<p><span style='color:#FFF;'><strong>扫码即可使用微信支付</strong></span></p>");
 		str.append("<button class=\"closeBtn\" onclick=\"javascript:window.opener=null;window.open('','_self');window.close();\">关闭页面</button>");
 		str.append("</div></body>");
 		return str.toString();

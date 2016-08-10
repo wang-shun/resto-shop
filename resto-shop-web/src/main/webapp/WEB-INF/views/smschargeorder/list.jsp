@@ -263,6 +263,7 @@ dt, dd {
 <!-- 		  <dt>创建时间:</dt> -->
 <!-- 		  <dd>{{ orderInfo.createTime }}</dd> -->
 		</dl>
+		<p class="text-center"><strong>充值完成后，半小时内到账，请勿急躁！</strong></p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn green btn-block" data-dismiss="modal" @click="refresh">充值完成</button>
