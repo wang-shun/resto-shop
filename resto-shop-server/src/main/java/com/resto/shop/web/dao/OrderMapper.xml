@@ -1499,8 +1499,10 @@ GROUP BY t2.id
 ) as r
 GROUP BY article_name
 ) as b
-set t.current_working_stock = b.count
+set t.current_working_stock = b.count,
+t.is_empty = if(b.count = 0,1,0)
 where t.id = b.id
+
     </update>
 
 

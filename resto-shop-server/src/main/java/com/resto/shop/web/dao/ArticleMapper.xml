@@ -452,7 +452,7 @@
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
   	a.show_big,	a.description,a.photo_small,a.is_empty,
   	a.sort,a.remain_number,a.article_family_id,a.price,
-  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes
+  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
 	AND a.shop_detail_id=#{0}
@@ -536,7 +536,7 @@ where t.id = t2.article_id
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
-        where  t.state = 1
+        where  t.state = 1 and t.article_type = 1
         and t.shop_detail_id = #{shopId}
         <if test="familyId != null and familyId != ''">
             and t.article_family_id = #{familyId}
@@ -573,7 +573,13 @@ where t.id = t2.article_id
 
     <update id="editStock">
     update tb_article
-    set current_working_stock = #{count}
+    <set>
+        current_working_stock = #{count}
+        <if test="count == 0 ">
+            ,is_empty = 1
+        </if>
+    </set>
+
       where id = #{articleId}
   </update>
 
