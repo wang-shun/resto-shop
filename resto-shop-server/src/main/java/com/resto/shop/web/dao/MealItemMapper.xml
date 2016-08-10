@@ -154,7 +154,7 @@
 	  	<foreach collection="mealAttrIds" open="(" separator="," close=")" item="attrId">
 	  		#{attrId}
 	  	</foreach>
-        and a.current_working_stock > 0
+        and a.current_working_stock > 0 and a.is_empty = 0
   </select>
   <insert id="insertBatch">
   	insert into tb_meal_item 
