@@ -283,7 +283,8 @@ public class SpringContextConfig {
 	public RewardSettingService rewardSettingService(){
 		return getProxy(RewardSettingService.class);
 	}
-
+	
+	@Bean
 	public SmsChargeOrderService smsChargeOrderService(){
 		return proxy.create(SmsChargeOrderService.class);
 	}
