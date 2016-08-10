@@ -93,7 +93,7 @@
 		  </div>
 		</div>
 		
-	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" data-backdrop="static">
            <div class="modal-dialog modal-full">
                <div class="modal-content">
                    <div class="modal-header">
@@ -101,7 +101,8 @@
                    </div>
                    <div class="modal-body"> </div>
                    <div class="modal-footer">
-                        <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
+<!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
+						<button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
                    </div>
                </div>
                <!-- /.modal-content -->
@@ -111,7 +112,6 @@
        
     </div>
   </div>
-  
  <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
