@@ -131,6 +131,7 @@ public class TotalIncomeController extends GenericController {
 				}
 			}
 		}
+        in.setBrandId(brand.getId());
 		in.setBrandName(brand.getBrandName());
 		in.setWechatIncome(wechatIncome);
 		in.setRedIncome(redIncome);
@@ -139,6 +140,7 @@ public class TotalIncomeController extends GenericController {
 		in.setChargeGifAccountIncome(chargeGifAccountIncome);
 		in.setTotalIncome(in.getWechatIncome(), in.getRedIncome(), in.getCouponIncome(), in.getChargeAccountIncome(),
 				in.getChargeGifAccountIncome());
+
 		brandIncomeList.add(in);
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopIncome", shopIncomeList);
