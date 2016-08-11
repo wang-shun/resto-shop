@@ -7,10 +7,7 @@ import java.util.Map;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
-import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.dto.*;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -115,7 +112,7 @@ public interface OrderService extends GenericService<Order, String> {
 	/**
 	 * 修改就餐模式
 	 * @param modeId
-	 * @param currentShopId
+	 * @param
 	 */
 	public void updateDistributionMode(Integer modeId, String orderId);
 
@@ -305,7 +302,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	/**
 	 * 检查此订单的菜品是否有库存
-	 * @param oderId 订单号
+
 	 * @return
      */
 	Result checkArticleCount(String orderId);
@@ -327,4 +324,6 @@ public interface OrderService extends GenericService<Order, String> {
 	Boolean addStock(Order order) throws AppException;
 
 	List<Map<String, Object>> printTotal(String shopId);
+
+    List<OrderArticleDto> selectOrderArticle(String currentBrandId,String beginDate,String endDate);
 }

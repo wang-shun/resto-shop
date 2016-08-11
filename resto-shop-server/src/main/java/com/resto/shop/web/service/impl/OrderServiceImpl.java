@@ -8,10 +8,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
-import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
@@ -1653,6 +1650,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+    /**
+     *订单菜品的数据(用于中间数据库)
+     * @param brandId
+     * @return
+     */
+    @Override
+    public List <OrderArticleDto> selectOrderArticle(String brandId,String beginDate,String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return orderMapper.selectOrderArticle(brandId,begin,end);
+    }
+
 
     public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
         if (printer == null) {
@@ -1924,4 +1933,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         return true;
     }
+
+
 }

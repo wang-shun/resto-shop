@@ -1538,14 +1538,35 @@ select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id
         t2.production_status in (2.3)
         and
          DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
-
-
         ) as r
         GROUP BY r.article_name
 ) as g
 where g.id = #{familyId}
 GROUP BY g.articleFamilyName
 
+    </select>
+
+
+
+    <select id="selectOrderArticle" resultType="com.resto.brand.web.dto.OrderArticleDto">
+        SELECT
+        o.id orderId,
+        o.create_time as orderTime,
+        o.shop_detail_id as shopId,
+        oi.article_id,
+        oi.article_name,
+        oi.count as articleNum,
+        c.telephone
+        FROM
+        tb_order o
+        INNER JOIN tb_order_item oi ON o.id = oi.order_id
+        INNER JOIN tb_customer c ON o.customer_id = c.id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[ o.create_time >= #{beginTime} and o.create_time <= #{endTime}]]>
+        AND o.brand_id = #{brandId}
     </select>
 
 </mapper>

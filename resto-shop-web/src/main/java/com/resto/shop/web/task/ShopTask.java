@@ -5,9 +5,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 
 import com.resto.brand.web.model.BrandUser;
-import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 
 import org.apache.http.*;
