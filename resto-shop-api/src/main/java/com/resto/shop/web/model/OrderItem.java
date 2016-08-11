@@ -48,6 +48,11 @@ public class OrderItem {
     //关联菜品类别
     private ArticleFamily articleFamily;
     
+    //关联店铺ID 用于中间数据库 报表问题
+    private String shopId;
+    //关联   用户电话 用于中间数据库 报表问题
+    private String telephone;
+    
     public ArticleFamily getArticleFamily() {
 		return articleFamily;
 	}
@@ -198,6 +203,22 @@ public class OrderItem {
 
 	public void setArticleSum(Integer articleSum) {
 		this.articleSum = articleSum;
+	}
+
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
+	}
+
+	public String getTelephone() {
+		return telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
 	}
 	
 }

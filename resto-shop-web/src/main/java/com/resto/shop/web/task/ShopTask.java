@@ -1,14 +1,26 @@
 package com.resto.shop.web.task;
 
 
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import com.resto.brand.web.model.BrandUser;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.shop.web.controller.GenericController;
-
-import org.apache.http.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -31,17 +43,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import java.math.BigDecimal;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.*;
+import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.BrandUser;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandUserService;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.controller.GenericController;
 
 /**
  * Created by JuanSheng on 2016/7/14.
@@ -51,6 +59,8 @@ public class ShopTask extends GenericController {
 
     @Autowired
     BrandUserService brandUserService;
+    @Autowired
+    ShopDetailService shopDetailService;
 
     //9407a95341b0440c90d920fb2cedefaf
 
@@ -72,6 +82,9 @@ public class ShopTask extends GenericController {
     //订单的url
     String shopOrderUrl = urlBase + "/shop/orderReport/AllOrder";
 
+    //订单 菜品信息 url
+    String orderItemsUrl = urlBase + "/shop/syncData/getOrderItems";
+    
 
     //获取前一天的时间 (开始时间 和 结束时间)
     String beginTime = DateUtil.getYesterDayBegin();
@@ -89,22 +102,30 @@ public class ShopTask extends GenericController {
     PreparedStatement sta = null;
 
 
-     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+//     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 21 20 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 37 16 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
+    	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
+    	//书香茶香 1386c0c0f35f466097fc770bec7d6400
+    	String brandId = "974b0b1e31dc4b3fb0c3d9a0970d22e4";
         //获取品牌用户
-        BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole("1386c0c0f35f466097fc770bec7d6400", 8);
-
+        BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brandId, 8);
+        
+        List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+        
+        
         // 直接创建client
         CloseableHttpClient client = HttpClients.createDefault();
         //登入的http请求
         HttpPost httpPostLogin = new HttpPost(loginUrl);
         //登入请求的参数
         Map loginMap = new HashMap();
-        loginMap.put("username", "kc_admin");
-        loginMap.put("password", "c888c24ab6f0d64439f3002823f211f2fb4015cb");// 527527527
+//        loginMap.put("username", "kc_admin");
+//        loginMap.put("password", "c888c24ab6f0d64439f3002823f211f2fb4015cb");// 527527527
+        loginMap.put("username", brandUser.getUsername());
+        loginMap.put("password", brandUser.getPassword());// 527527527
         loginMap.put("isMD5", "true");
         
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(
@@ -117,6 +138,7 @@ public class ShopTask extends GenericController {
         list.add(brandArticleUrl);
         list.add(shopArticleUrl);
         list.add(shopOrderUrl);
+//        list.add(orderItemsUrl);
 
         try {
             // 执行post请求（登入操作）
@@ -134,12 +156,26 @@ public class ShopTask extends GenericController {
             for (int i = 0; i <list.size() ; i++) {
                 if(i==1){
                     map.put("sort","desc");
+                    netAndInsert(list.get(i),map,client,i);
                 }else if (i==2){
-                    map.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+//                  map.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+                    for(int n = 0; n < list_shopDetail.size() ; n++ ){
+                		ShopDetail shopDetail = list_shopDetail.get(n);
+                		map.put("shopId",shopDetail.getId());
+                        netAndInsert(list.get(i),map,client,i);
+                        System.out.println(" shopArticleUrl ----  【"+shopDetail.getBrandName()+"】    "+shopDetail.getName());
+                	}
                 }else if(i==3){
-                    map.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+//                  map.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+	              	for(int n = 0; n < list_shopDetail.size() ; n++ ){
+	              		ShopDetail shopDetail = list_shopDetail.get(n);
+	              		map.put("shopId",shopDetail.getId());
+	                      netAndInsert(list.get(i),map,client,i);
+	                      System.out.println(" shopArticleUrl ----  【"+shopDetail.getBrandName()+"】    "+shopDetail.getName());
+	              	}
+                }else{
+                	netAndInsert(list.get(i),map,client,i);
                 }
-                netAndInsert(list.get(i),map,client,i);
             }
 
             // cookie store
@@ -155,6 +191,7 @@ public class ShopTask extends GenericController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.out.println("-----所有导入完毕-------");
         }
     }
 
@@ -248,7 +285,7 @@ public class ShopTask extends GenericController {
                 map.put("id",id);
                 map.put("shop_id",shop_id);
                 map.put("shop_name",shop_name);
-                map.put("total_income",total_income);
+                map.put("total_income",total_income==null?total_income:0);
                 map.put("wechat_pay",wechat_pay);
                 map.put("charge_pay",charge_pay);
                 map.put("red_packet_pay",red_packet_pay);

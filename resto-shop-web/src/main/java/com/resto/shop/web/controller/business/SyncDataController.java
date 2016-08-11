@@ -1,23 +1,30 @@
  package com.resto.shop.web.controller.business;
 
 
- import com.resto.brand.core.entity.Result;
- import com.resto.brand.web.dto.*;
- import com.resto.brand.web.model.Brand;
- import com.resto.brand.web.model.ShopDetail;
- import com.resto.brand.web.service.BrandService;
- import com.resto.brand.web.service.ShopDetailService;
- import com.resto.shop.web.constant.PayMode;
- import com.resto.shop.web.controller.GenericController;
- import com.resto.shop.web.service.OrderPaymentItemService;
- import com.resto.shop.web.service.OrderService;
- import org.springframework.stereotype.Controller;
- import org.springframework.web.bind.annotation.RequestMapping;
- import org.springframework.web.bind.annotation.ResponseBody;
-
- import javax.annotation.Resource;
  import java.math.BigDecimal;
- import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.dto.BrandIncomeDto;
+import com.resto.brand.web.dto.IncomeReportDto;
+import com.resto.brand.web.dto.OrderArticleDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.service.OrderItemService;
+import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.service.OrderService;
 
  @Controller
  @RequestMapping("syncData")
@@ -35,9 +42,11 @@
 
      @Resource
      private ShopDetailService shopDetailService;
+     
+     @Resource
+     private OrderItemService orderItemService;
 
-     public SyncDataController() {
-     }
+    
 
      //订单菜品的数据封装
      @RequestMapping("syncOrderArticle")
@@ -107,6 +116,11 @@
      }
 
 
-
+     @RequestMapping("getOrderItems")
+     @ResponseBody
+     public Result getOrderItems(String beginDate,String endDate){
+    	 List<OrderItem> list_orderItem = orderItemService.selectOrderItems(beginDate, endDate);
+    	 return getSuccessResult(list_orderItem);
+     }
 
  }

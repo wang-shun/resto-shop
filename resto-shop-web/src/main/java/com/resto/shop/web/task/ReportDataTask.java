@@ -9,19 +9,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.service.BrandUserService;
 
@@ -41,6 +45,20 @@ public class ReportDataTask {
     String urlBase = "http://localhost:8081";//http://op.restoplus.cn
 	//登入的url
     String loginUrl = urlBase + "/shop/branduser/login";
+    //获取营业收入报表的数据的url(包括品牌数据和店铺的数据)
+    String incomeUrl = urlBase + "/shop/totalIncome/reportIncome";
+    //品牌菜品销售报表的数据的url
+    String brandArticleUrl = urlBase + "/shop/articleSell/brand_id_data";
+    //店铺菜品的销售报表的url
+    String shopArticleUrl = urlBase + "/shop/articleSell/shop_data";
+    //订单的url
+    String shopOrderUrl = urlBase + "/shop/orderReport/AllOrder";
+    
+    
+    //获取前一天的时间 (开始时间 和 结束时间)
+    String beginTime = DateUtil.getYesterDayBegin();
+    String endTime = DateUtil.getYesterDayEnd();
+    
 	
 //    				   ss mm HH
     @Scheduled(cron = "00 21 20 * * ?")   //每天  02:30:00 （凌晨两点半）执行
@@ -60,7 +78,50 @@ public class ReportDataTask {
     	//登录
         HttpResponse loginResponse = doPost(client, loginUrl, loginMap);
         
-        
+        //得到 loginResponse 的状态响应码
+        int statusCode=loginResponse.getStatusLine().getStatusCode();
+        if (statusCode== HttpStatus.SC_OK) {
+        	System.out.println("--------登录成功！");
+        	
+        	//设置 访问链接
+        	List<String> list = new LinkedList<>();
+            list.add(incomeUrl);
+            list.add(brandArticleUrl);
+            list.add(shopArticleUrl);
+            list.add(shopOrderUrl);
+            
+            //设置访问参数
+            Map<String, String> reportMap = new HashMap<>();
+            reportMap.put("beginDate",beginTime);
+            reportMap.put("endDate",endTime);
+            
+            //轮询访问获取数据
+            for (int i = 0; i <list.size() ; i++) {
+                if(i==1){
+                	reportMap.put("sort","desc");
+                }else if (i==2){
+                	reportMap.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+                }else if(i==3){
+                	reportMap.put("shopId","f3910fceb055442ab6b3abc6642eb70a");
+                }
+                
+                HttpResponse reportResponse = doPost(client, list.get(i), reportMap);
+                
+                //得到httpResponse的状态响应码
+                statusCode = reportResponse.getStatusLine().getStatusCode();
+            	try {
+            		if (statusCode== HttpStatus.SC_OK) {
+            			String result = getResult(reportResponse);
+            			
+            		}
+				} catch (ParseException | IOException e) {
+					e.printStackTrace();
+				}
+            }
+        	
+        }else{
+        	System.out.println("--------登录失败！");
+        }
     	
 //    	List<String> list = new LinkedList<>();
 //        list.add(incomeUrl);
@@ -103,5 +164,18 @@ public class ReportDataTask {
 			e.printStackTrace();
 		}
 		return httpResponse;
+    }
+    
+    //获取response里的数据
+    public static  String getResult(HttpResponse httpResponse)throws ParseException, IOException{
+        // 获取响应消息实体
+        HttpEntity entity = httpResponse.getEntity();
+        // 判断响应实体是否为空
+        String responseString = "";
+        if (entity != null) {
+            responseString = EntityUtils.toString(entity).replace("\r\n", "");
+        }
+
+        return responseString;
     }
 }

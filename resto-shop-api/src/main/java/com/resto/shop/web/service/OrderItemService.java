@@ -26,4 +26,13 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	public List<OrderItem> selectSaleArticleByDate( String shopId,String beginDate, String endDate,String sort);
 
 	public List<OrderItem> listByOrderIds(List<String> childIds);
+	
+	
+	/**
+	 * 用于统计 订单菜品 等信息，用于中间数据库同步时使用
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	public List<OrderItem> selectOrderItems(String beginDate,String endDate);
 }

@@ -950,31 +950,31 @@
 	</select>
 
     <select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
-	
-select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
-        DISTINCT(t.order_id),
-        LEFT (t.article_id, 32) AS articleId,
-        t.count,
-        t.article_name,
-        t5.id AS articleFamilyId,
-        t5. NAME AS articleFamilyName,
-        t5.peference,
-        t4.sort,
-		t.type,
-        t.final_price
-        FROM
-        tb_order_item t
-        INNER JOIN tb_order t2 ON t2.id = t.order_id
-        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
-        WHERE
-        t2.order_state in (2,10,11,12)
-        and t2.production_status in (2,3)
-        and
-        <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
-        ) as r
-        GROUP BY r.article_name
+		select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.shopId as shopId from (	SELECT
+	        DISTINCT(t.order_id),
+	        LEFT (t.article_id, 32) AS articleId,
+	        t.count,
+	        t.article_name,
+	        t5.id AS articleFamilyId,
+	        t5. NAME AS articleFamilyName,
+	        t5.peference,
+	        t4.sort,
+			t.type,
+	        t.final_price,
+	        t2.shop_detail_id as shopId
+	        FROM
+	        tb_order_item t
+	        INNER JOIN tb_order t2 ON t2.id = t.order_id
+	        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+	        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+	        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+	        WHERE
+	        t2.order_state in (2,10,11,12)
+	        and t2.production_status in (2,3)
+	        and
+	        <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
+	        ) as r
+	        GROUP BY r.article_name
 	</select>
 
     <!-- 品牌菜品销售中 店铺菜品按菜品分类的数据   品牌端显示 -->
@@ -1568,7 +1568,36 @@ GROUP BY g.articleFamilyName
         <![CDATA[ o.create_time >= #{beginTime} and o.create_time <= #{endTime}]]>
         AND o.brand_id = #{brandId}
     </select>
-
+    
+    
+    
+    <select id="selectOrderItems" resultType="com.resto.brand.web.dto.ArticleSellDto">
+		select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.shopId from (	SELECT
+		        DISTINCT(t.order_id),
+		        LEFT (t.article_id, 32) AS articleId,
+		        t.count,
+		        t.article_name,
+		        t5.id AS articleFamilyId,
+		        t5. NAME AS articleFamilyName,
+		        t5.peference,
+		        t4.sort,
+				t.type,
+		        t.final_price,
+		        t2.shop_detail_id as shopId
+		        FROM
+		        tb_order_item t
+		        INNER JOIN tb_order t2 ON t2.id = t.order_id
+		        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+		        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+		        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+		        WHERE
+		        t2.order_state in (2,10,11,12)
+		        and t2.production_status in (2,3)
+		        and
+		        <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
+		        ) as r
+		        GROUP BY r.article_name
+	</select>
 </mapper>
 
 
