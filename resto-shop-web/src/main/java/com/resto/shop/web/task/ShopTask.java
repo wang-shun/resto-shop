@@ -90,12 +90,12 @@ public class ShopTask extends GenericController {
 
 
      //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
-
-   @Scheduled(cron = "00 24 18 * * ?")   //每天12点执行
+    //				   ss mm HH
+    @Scheduled(cron = "00 21 20 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
         //获取品牌用户
-        BrandUser brandUser = brandUserService.selectOneByShopIdAndRole("9407a95341b0440c90d920fb2cedefaf",8);
+        BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole("1386c0c0f35f466097fc770bec7d6400", 8);
 
         // 直接创建client
         CloseableHttpClient client = HttpClients.createDefault();
@@ -104,7 +104,9 @@ public class ShopTask extends GenericController {
         //登入请求的参数
         Map loginMap = new HashMap();
         loginMap.put("username", "kc_admin");
-        loginMap.put("password", "527527527");
+        loginMap.put("password", "c888c24ab6f0d64439f3002823f211f2fb4015cb");// 527527527
+        loginMap.put("isMD5", "true");
+        
         UrlEncodedFormEntity postEntity = new UrlEncodedFormEntity(
                 getParam(loginMap), "UTF-8");
 
@@ -141,9 +143,9 @@ public class ShopTask extends GenericController {
             }
 
             // cookie store
-            setCookieStore(httpResponse);
+            //setCookieStore(httpResponse);
             // context
-            setContext();
+            //setContext();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
