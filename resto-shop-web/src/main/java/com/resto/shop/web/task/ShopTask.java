@@ -480,6 +480,7 @@ public class ShopTask extends GenericController {
 
     }
 
+
     //
     public static List<NameValuePair> getParam(Map parameterMap) {
         List<NameValuePair> param = new ArrayList<NameValuePair>();
