@@ -104,7 +104,7 @@ public class ShopTask extends GenericController {
 
 //     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 37 16 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 22 18 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
@@ -138,7 +138,7 @@ public class ShopTask extends GenericController {
         list.add(brandArticleUrl);
         list.add(shopArticleUrl);
         list.add(shopOrderUrl);
-//        list.add(orderItemsUrl);
+        list.add(orderItemsUrl);
 
         try {
             // 执行post请求（登入操作）
@@ -173,6 +173,8 @@ public class ShopTask extends GenericController {
 	                      netAndInsert(list.get(i),map,client,i);
 	                      System.out.println(" shopArticleUrl ----  【"+shopDetail.getBrandName()+"】    "+shopDetail.getName());
 	              	}
+                }else if(i==4){
+                	netAndInsert(list.get(i),map,client,i);
                 }else{
                 	netAndInsert(list.get(i),map,client,i);
                 }
@@ -262,6 +264,8 @@ public class ShopTask extends GenericController {
             sign = "allOrder";
             JSONArray jsonArray = new JSONArray(result);
             doSomethigReday(jsonArray,sign);
+        }else if(i==4){
+        	System.out.println(result);
         }
 
     }
