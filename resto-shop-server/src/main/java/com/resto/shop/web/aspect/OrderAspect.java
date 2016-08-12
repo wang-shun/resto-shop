@@ -141,10 +141,10 @@ public class OrderAspect {
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
 	public void printSuccess(){};
 
-	@AfterReturning(value="callNumber()",returning="order")
-	public void createCallMessage (Order order) throws Throwable{
-		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
-	}
+//	@AfterReturning(value="callNumber()",returning="order")
+//	public void createCallMessage (Order order) throws Throwable{
+//		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
+//	}
 
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter (Order order) throws Throwable{
