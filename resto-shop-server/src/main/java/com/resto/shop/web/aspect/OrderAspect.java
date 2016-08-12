@@ -141,10 +141,13 @@ public class OrderAspect {
 	@Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
 	public void printSuccess(){};
 
-//	@AfterReturning(value="callNumber()",returning="order")
-//	public void createCallMessage (Order order) throws Throwable{
+	@AfterReturning(value="callNumber()",returning="order")
+	public void createCallMessage (Order order) throws Throwable{
+		Customer customer = customerService.selectById(order.getCustomerId());
+		WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+		WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
-//	}
+	}
 
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
 	public void pushOrderAfter (Order order) throws Throwable{
