@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,10 +71,10 @@ public class ShopTask extends GenericController {
     //登入的url
     String loginUrl = urlBase + "/shop/branduser/login";
 
-    //获取营业收入报表的数据的url(包括品牌数据和店铺的数据)
+    //获取营业收入报表的数据的url(包括品牌数据和店铺的数据)					******
     String incomeUrl = urlBase + "/shop/totalIncome/reportIncome";
 
-    //品牌菜品销售报表的数据的url
+    //品牌菜品销售报表的数据的url									******
     String brandArticleUrl = urlBase + "/shop/articleSell/brand_id_data";
 
     //店铺菜品的销售报表的url
@@ -83,7 +84,9 @@ public class ShopTask extends GenericController {
     String shopOrderUrl = urlBase + "/shop/orderReport/AllOrder";
 
     //订单 菜品信息 url
-    String orderItemsUrl = urlBase + "/shop/syncData/getOrderItems";
+    String orderItemsUrl = urlBase + "/shop/syncData/syncOrderItems";
+    
+    
     
 
     //获取前一天的时间 (开始时间 和 结束时间)
@@ -94,17 +97,17 @@ public class ShopTask extends GenericController {
     static CookieStore cookieStore = null;
     static HttpClientContext context = null;
 
-    String url = null;
+    String url = "jdbc:mysql://192.168.1.109:3306/middle?useUnicode=true&characterEncoding=utf8";
     String driver = null;
     String username = "root";
-    String password = "root";
+    String password = "123456";
     Connection con = null;
     PreparedStatement sta = null;
 
 
 //     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 22 18 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 26 00 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
@@ -153,8 +156,12 @@ public class ShopTask extends GenericController {
 
             //调用方法执行http连接并插入数据
 
+            
             for (int i = 0; i <list.size() ; i++) {
-                if(i==1){
+            	if(i==0){
+            		netAndInsert(list.get(i),map,client,i);
+            		System.out.println(" incomeUrl ---- ");
+            	}else if(i==1){
                     map.put("sort","desc");
                     netAndInsert(list.get(i),map,client,i);
                 }else if (i==2){
@@ -175,8 +182,7 @@ public class ShopTask extends GenericController {
 	              	}
                 }else if(i==4){
                 	netAndInsert(list.get(i),map,client,i);
-                }else{
-                	netAndInsert(list.get(i),map,client,i);
+                	System.out.println("----订单详情");
                 }
             }
 
@@ -228,7 +234,6 @@ public class ShopTask extends GenericController {
 
         //与驱动做连接
 
-        url = "jdbc:mysql://127.0.0.1:3306/middle?useUnicode=true&characterEncoding=utf8";
         driver = "com.mysql.jdbc.Driver";
         Class.forName(driver);
 
@@ -265,7 +270,10 @@ public class ShopTask extends GenericController {
             JSONArray jsonArray = new JSONArray(result);
             doSomethigReday(jsonArray,sign);
         }else if(i==4){
-        	System.out.println(result);
+        	sign = "orderItems";
+        	JSONObject resultJsonObject = new JSONObject(result);
+            JSONArray jsonArray=resultJsonObject.getJSONArray("data");
+            doSomethigReday(jsonArray,sign);
         }
 
     }
@@ -431,9 +439,32 @@ public class ShopTask extends GenericController {
                 doInsert(sql,con,map);
             }
             System.out.println("订单数据导入成功");
+        }else if("orderItems".equals(sign)){
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject everyJsonObject=jsonArray.getJSONObject(i);
+                String id= ApplicationUtils.randomUUID();//生成随机的id
+                String shop_id = everyJsonObject.getString("shopId");//店铺ID
+                String order_id = everyJsonObject.getString("orderId") ;//订单编号
+//                System.out.println("--------"+DateUtil.formatDate((Date)everyJsonObject.get("createTime"), "yyyy-MM-dd HH:mm:ss") );
+//                Object order_time = everyJsonObject.get("createTime");//下单时间
+                Object order_time = beginTime;//下单时间
+                String telephone = everyJsonObject.getString("telephone") ;//电话
+                String article_name = everyJsonObject.getString("articleName") ;//菜品名称
+                int count = everyJsonObject.getInt("count") ;//数量
+                String sql = "insert into order_article(id,shop_id,order_id,order_time,telephone,article_name,article_num) values(?,?,?,?,?,?,?)";
+                Map<String,Object> map = new HashMap<>();
+                map.put("id",id);
+                map.put("shop_id",shop_id);
+                map.put("order_id",order_id);
+                map.put("order_time",order_time);
+                map.put("telephone",telephone);
+                map.put("article_name",article_name);
+                map.put("article_num",count);
+                map.put("key","orderItems");
+                doInsert(sql,con,map);
+            }
+            System.out.println("订单详情导入成功");
         }
-
-
     }
 
 
@@ -511,6 +542,15 @@ public class ShopTask extends GenericController {
                 sta.setString(13,map.get("order_state").toString());
                 sta.setString(14,map.get("create_time").toString());
                 sta.setString(15,map.get("end_time").toString());
+                sta.executeUpdate();
+            }else if("orderItems".equals(map.get("key").toString())){
+            	sta.setString(1,map.get("id").toString());
+                sta.setString(2,map.get("shop_id").toString());
+                sta.setString(3,map.get("order_id").toString());
+                sta.setString(4,map.get("order_time").toString());
+                sta.setString(5,map.get("telephone").toString());
+                sta.setString(6,map.get("article_name").toString());
+                sta.setString(7,map.get("article_num").toString());
                 sta.executeUpdate();
             }
 
