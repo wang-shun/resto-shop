@@ -38,7 +38,7 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">发票抬头：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="header" v-model="invoice.header">
+											<input type="text" class="form-control" required name="header" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.header">
 										</div>
 									</div>
 									<div class="form-group">
@@ -80,14 +80,14 @@ dt, dd {
 											人：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
-												name="name" v-model="currentAddress.name">
+												name="name" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.name">
 										</div>
 									</div>
 									<div class="form-group" :class="{'has-error':validated.invoice_create}">
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
 											<input type="text" class="form-control" required
-												name="phone" v-model="currentAddress.phone">
+												name="phone" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.phone">
 											<span class="help-block text-danger" v-if="validated.invoice_create">请输入有效联系电话！</span>
 										</div>
 									</div>
@@ -114,7 +114,7 @@ dt, dd {
 											<label for="header" class="col-sm-3 control-label">单位名称：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="header" v-model="invoice.header">
+													name="header" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.header">
 											</div>
 											<a class="col-sm-1 btn btn-sm btn-danger" @click="cleanLastInvoice" v-if="invoice.id">清空</a>
 										</div>
@@ -122,35 +122,35 @@ dt, dd {
 											<label for="header" class="col-sm-3 control-label">纳税人识别码：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="taxpayerCode" v-model="invoice.taxpayerCode">
+													name="taxpayerCode" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.taxpayerCode">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">注册地址：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="registeredAddress" v-model="invoice.registeredAddress">
+													name="registeredAddress" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.registeredAddress">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">注册电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="registeredPhone" v-model="invoice.registeredPhone">
+													name="registeredPhone" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.registeredPhone">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">开户银行：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="bankName" v-model="invoice.bankName">
+													name="bankName" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.bankName">
 											</div>
 										</div>
 										<div class="form-group">
 											<label for="header" class="col-sm-3 control-label">银行账户：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="bankAccount" v-model="invoice.bankAccount">
+													name="bankAccount" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="invoice.bankAccount">
 											</div>
 										</div>
 										<div class="form-group">
@@ -192,14 +192,14 @@ dt, dd {
 												件 人：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="name" v-model="currentAddress.name">
+													name="name" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.name">
 											</div>
 										</div>
 										<div class="form-group" :class="{'has-error':validated.invoice_create}">
 											<label for="header" class="col-sm-3 control-label">联系电话：</label>
 											<div class="col-sm-8">
 												<input type="text" class="form-control" required
-													name="phone" v-model="currentAddress.phone">
+													name="phone" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.phone">
 												<span class="help-block text-danger" v-if="validated.invoice_create">请输入有效联系电话！</span>
 											</div>
 										</div>
@@ -254,19 +254,19 @@ dt, dd {
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收件地址：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="address" v-model="currentAddress.address">
+											<input type="text" class="form-control" required name="address" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.address">
 										</div>
 									</div>
 									<div class="form-group">
 										<label for="header" class="col-sm-3 control-label">收 件 人：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="name" v-model="currentAddress.name">
+											<input type="text" class="form-control" required name="name" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.name">
 										</div>
 									</div>
 									<div class="form-group" :class="{'has-error':validated.addressinfo_modify}">
 										<label for="header" class="col-sm-3 control-label">联系电话：</label>
 										<div class="col-sm-8">
-											<input type="text" class="form-control" required name="phone" v-model="currentAddress.phone">
+											<input type="text" class="form-control" required name="phone" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" v-model="currentAddress.phone">
 											<span class="help-block text-danger" v-if="validated.addressinfo_modify">请输入有效联系电话！</span>
 										</div>
 									</div>
@@ -286,19 +286,19 @@ dt, dd {
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">收件地址：</label>
 									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="address">
+										<input type="text" class="form-control" required name="address" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
 									</div>
 								</div>
 								<div class="form-group">
 									<label for="header" class="col-sm-3 control-label">收 件 人：</label>
 									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="name">
+										<input type="text" class="form-control" required name="name" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
 									</div>
 								</div>
 								<div class="form-group" :class="{'has-error':validated.addressinfo_create}"> 
 									<label for="header" class="col-sm-3 control-label">联系电话：</label>
 									<div class="col-sm-8">
-										<input type="text" class="form-control" required name="phone">
+										<input type="text" class="form-control" required name="phone" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')">
 										<span class="help-block text-danger" v-if="validated.addressinfo_create">请输入有效联系电话！</span>
 									</div>
 								</div>
@@ -486,6 +486,7 @@ dt, dd {
 				invoiceSave : function(e){//申请发票
 					var that = this;
 					var formDom = e.target;
+					
 					if(this.checkPhone(formDom)){
 						C.ajaxFormEx(formDom,function(){
 							$("#applyInvoice").modal("hide");
@@ -540,10 +541,11 @@ dt, dd {
 					 this.validated = {};
 				},
 				checkPhone : function(dom){
+					var flag = true;
 					var phone = dom.phone.value;
 					var teleReg = /^((0\d{2,3})-)(\d{7,8})$/;  
-				    var mobileReg =/^1[358]\d{9}$/;   
-				    if (!teleReg.test(phone) && !mobileReg.test(phone)){
+				    var mobileReg =/^1[3578]\d{9}$/;   
+				    if (!teleReg.test(phone) && !mobileReg.test(phone)){//验证手机号码
 				    	var src = $(dom).attr('action');
 				    	var m = {};    
 				    	if(src == "addressinfo/create"){
@@ -554,9 +556,9 @@ dt, dd {
 				    		m.addressinfo_modify = true;
 				    	}
 				    	this.validated = m;
-				    	return false;
+				    	flag = false;
 				    }
-				    return true;
+				    return flag;
 				},
 			},
 			created : function(){//创建时初始化信息
