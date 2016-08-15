@@ -3,8 +3,4 @@
 *.classpath
 *.project
 /.git/
-/target/
-/target/
-/target/
-/target/
-/target/
+*.iml
