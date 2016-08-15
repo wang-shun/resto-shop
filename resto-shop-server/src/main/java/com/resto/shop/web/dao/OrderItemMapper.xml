@@ -266,8 +266,8 @@ order by t.print_sort asc
   </select>
   
   
-  <select id="selectOrderItems" resultType="OrderItem">
-  	SELECT o.id orderId,o.shop_detail_id shopId,i.article_name,i.count,o.create_time,c.telephone from tb_order_item i LEFT JOIN
+  <select id="selectOrderItems" resultType="java.util.HashMap">
+  	SELECT o.id order_id,o.shop_detail_id shop_id,i.article_name,i.count article_num,date_format(o.create_time,'%Y-%m-%d %H:%i:%s') order_time,c.telephone from tb_order_item i LEFT JOIN
   	 tb_order o on i.order_id = o.id LEFT JOIN tb_customer c on o.customer_id = c.id
 		where <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.order_state IN (2, 10, 11, 12)
         AND o.production_status IN (2, 3) 

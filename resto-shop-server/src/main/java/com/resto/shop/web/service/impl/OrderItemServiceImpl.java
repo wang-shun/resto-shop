@@ -111,7 +111,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         return getOrderItemsWithChild(orderItems);
     }
 
-	public List<OrderItem> selectOrderItems(String beginDate, String endDate) {
+	public List<Map<String, Object>> selectOrderItems(String beginDate, String endDate) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
 		return orderitemMapper.selectOrderItems(begin, end);

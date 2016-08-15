@@ -107,61 +107,6 @@ public class SyncDataController extends GenericController {
 	@RequestMapping("syncShopIncome")
 	@ResponseBody
 	public Result syncShopIncome(String beginDate, String endDate) {
-//		// 查询品牌和店铺的收入情况
-//		List<IncomeReportDto> incomeReportList = orderpaymentitemService.selectIncomeList(getCurrentBrandId(),
-//				beginDate, endDate);
-//		// 封装店铺所需要的数据结构
-//		List<ShopDetail> listShop = shopDetailService.selectByBrandId(getCurrentBrandId());
-//		List<ShopIncomeDto> shopIncomeList = new ArrayList<>();
-//		Map<String, ShopIncomeDto> hm = new HashMap<>();
-//		for (int i = 0; i < listShop.size(); i++) {// 实际有多少个店铺显示多少个数据
-//			ShopIncomeDto sin = new ShopIncomeDto();
-//			sin.setShopDetailId(listShop.get(i).getId());
-//			sin.setShopName(listShop.get(i).getName());
-//			// 设置每个店铺初始营业额为零
-//			BigDecimal temp = BigDecimal.ZERO;
-//			sin.setWechatIncome(temp);
-//			sin.setRedIncome(temp);
-//			sin.setCouponIncome(temp);
-//			sin.setChargeAccountIncome(temp);
-//			sin.setChargeGifAccountIncome(temp);
-//			sin.setTotalIncome(temp, temp, temp, temp, temp);
-//			String s = "" + i;
-//			hm.put(s, sin);
-//			if (!incomeReportList.isEmpty()) {
-//				for (IncomeReportDto in : incomeReportList) {
-//					if (hm.get(s).getShopDetailId().equals(in.getShopDetailId())) {
-//						switch (in.getPayMentModeId()) {
-//						case PayMode.WEIXIN_PAY:
-//							hm.get(s).setWechatIncome(in.getPayValue());
-//							break;
-//						case PayMode.ACCOUNT_PAY:
-//							hm.get(s).setRedIncome(in.getPayValue());
-//							break;
-//						case PayMode.COUPON_PAY:
-//							hm.get(s).setCouponIncome(in.getPayValue());
-//							break;
-//						case PayMode.CHARGE_PAY:
-//							hm.get(s).setChargeAccountIncome(in.getPayValue());
-//							break;
-//						case PayMode.REWARD_PAY:
-//							hm.get(s).setChargeGifAccountIncome(in.getPayValue());
-//							break;
-//
-//						default:
-//							break;
-//						}
-//						hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(), hm.get(s).getRedIncome(),
-//								hm.get(s).getCouponIncome(), hm.get(s).getChargeAccountIncome(),
-//								hm.get(s).getChargeGifAccountIncome());
-//					}
-//				}
-//			}
-//			shopIncomeList.add(hm.get(s));
-//		}
-//		return getSuccessResult(shopIncomeList);
-		
-		
 		// 查询品牌和店铺的收入情况
 		List<IncomeReportDto> incomeReportList = orderpaymentitemService.selectIncomeList(getCurrentBrandId(),
 				beginDate, endDate);
@@ -365,7 +310,7 @@ public class SyncDataController extends GenericController {
 	@RequestMapping("syncOrderItems")
 	@ResponseBody
 	public Result syncOrderItems(String beginDate, String endDate) {
-		List<OrderItem> list_orderItem = orderItemService.selectOrderItems(beginDate, endDate);
+		List<Map<String, Object>> list_orderItem = orderItemService.selectOrderItems(beginDate, endDate);
 		return getSuccessResult(list_orderItem);
 	}
 

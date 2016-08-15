@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.OrderItem;
@@ -34,5 +35,5 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<OrderItem> selectOrderItems(String beginDate,String endDate);
+	public List<Map<String, Object>> selectOrderItems(String beginDate,String endDate);
 }
