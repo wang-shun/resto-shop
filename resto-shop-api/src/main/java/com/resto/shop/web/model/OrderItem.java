@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.resto.brand.core.util.DateUtil;
 
 @JsonInclude(Include.NON_EMPTY)
 public class OrderItem {
@@ -177,8 +180,8 @@ public class OrderItem {
 		return parentId;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
+	public String getCreateTime() {
+		return DateUtil.formatDate(this.createTime, "yyyy-MM-dd HH:mm:ss");
 	}
 
 	public void setParentId(String parentId) {
