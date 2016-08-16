@@ -1574,14 +1574,13 @@ GROUP BY g.articleFamilyName
 
 
 <select id="selectBrandArticleSellList"  resultType="java.util.HashMap">
-    select r.type, r.shop_id, r.article_id, r.article_name,sum(r.count) as salles,r.article_family_name,r.peference,r.sort,r.order_id,sum(r.final_price) as sell from (	SELECT
+    select r.type, r.shop_id, r.article_id, r.article_name,sum(r.count) as salles,r.article_family_name,r.sort,r.order_id,sum(r.final_price) as sell from (	SELECT
     DISTINCT(t.order_id),
     LEFT (t.article_id, 32) AS article_id,
     t2.shop_detail_id AS shop_id,
     t.count,
     t.article_name,
     t5. NAME AS article_family_name,
-    t5.peference,
     t4.sort,
     t.type,
     t.final_price

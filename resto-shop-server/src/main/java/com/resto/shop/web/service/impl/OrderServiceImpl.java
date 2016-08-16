@@ -1681,7 +1681,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal temp = BigDecimal.ZERO;
         for (Map<String,Object> map : list) {
             //计算总销量 不能加上套餐的数量
-            if (map.get("type")!= 3) {
+            if ((Integer)map.get("type")!= 3) {
                // num += articleSellDto.getBrandSellNum().doubleValue();
                 num+=Integer.parseInt(map.get("salles").toString());
             }
@@ -1730,7 +1730,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     BigDecimal temp = BigDecimal.ZERO;
                     for (Map<String,Object> map2 : list) {
                         //计算总销量 不能加上套餐的数量
-                        if (map2.get("type")!= 3) {
+                        if ((Integer)map2.get("type")!= 3) {
                             // num += articleSellDto.getBrandSellNum().doubleValue();
                             num+=Integer.parseInt(map2.get("salles").toString());
                         }

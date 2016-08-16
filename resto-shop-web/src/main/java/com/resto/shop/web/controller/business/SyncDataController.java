@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.BrandIncomeDto;
 import com.resto.brand.web.dto.IncomeReportDto;
@@ -197,7 +198,7 @@ public class SyncDataController extends GenericController {
             otmap.put("order_id",o.getId());//订单id
             otmap.put("shop_id",o.getShopDetailId());
             otmap.put("shop_name",o.getShopName());
-            otmap.put("order_time",o.getCreateTime());
+            otmap.put("order_time",DateUtil.formatDate(o.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             otmap.put("telephone","");
             otmap.put("order_money",BigDecimal.ZERO);
             otmap.put("wechat_pay",BigDecimal.ZERO);

@@ -90,9 +90,9 @@ public class ReportDataTask{
     } 
     
     
-//    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 45 16 * * ?")   //每天12点执行
+//    @Scheduled(cron = "00 45 16 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
     	
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
@@ -138,7 +138,7 @@ public class ReportDataTask{
     	        		executeBatchSQL(state, sqlList);
     	        		conn.commit(); 
     				} catch (SQLException e) {
-    					log.error("【order_article】表  -------------- 数据  插入失败！   ");
+    					log.error("【"+key+"】表  -------------- 数据  插入失败！   ");
     					e.printStackTrace();
     					try {
     						conn.rollback();
@@ -146,7 +146,7 @@ public class ReportDataTask{
     						e1.printStackTrace();
     					} 
     				}
-                    log.info("【order_article】表 --------------导入完成");
+                    log.info("【"+key+"】表 --------------导入完成");
             	}else{
                 	log.info("查询--------------操作失败！");
             	}
