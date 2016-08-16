@@ -18,6 +18,10 @@ public class ArticleStock {
     private Integer stockWeekend;
 
     private Integer stockWorkingDay;
+    
+    private Integer articleType;
+    
+    private String emptyRemark;
 
     final public Integer getStockWorkingDay() {
         return stockWorkingDay;
@@ -74,4 +78,20 @@ public class ArticleStock {
     public void setCurrentStock(Integer currentStock) {
         this.currentStock = currentStock;
     }
+
+	public Integer getArticleType() {
+		return articleType;
+	}
+
+	public void setArticleType(Integer articleType) {
+		this.articleType = articleType;
+	}
+
+	public String getEmptyRemark() {
+		return emptyRemark;
+	}
+
+	public void setEmptyRemark(String emptyRemark) {
+		this.emptyRemark = emptyRemark;
+	}
 }

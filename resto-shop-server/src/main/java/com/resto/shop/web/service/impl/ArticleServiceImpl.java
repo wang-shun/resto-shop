@@ -199,7 +199,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean clearStock(String articleId) {
-        articleMapper.clearStock(articleId);
+        articleMapper.clearStock(articleId,"【手动沽清】");
         articleMapper.clearPriceTotal(articleId);
         articleMapper.clearPriceStock(articleId);
         articleMapper.cleanPriceAll(articleId);
@@ -212,7 +212,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean editStock(String articleId, Integer count) {
-        articleMapper.editStock(articleId, count);
+    	String emptyRemark = count <=0 ? "【手动沽清】" : null;
+        articleMapper.editStock(articleId, count ,emptyRemark);
         articleMapper.editPriceStock(articleId,count);
         orderMapper.setStockBySuit();
         articleMapper.initSizeCurrent();
