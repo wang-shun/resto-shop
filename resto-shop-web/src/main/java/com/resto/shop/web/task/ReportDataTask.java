@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,6 +34,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandUserService;
@@ -54,27 +57,21 @@ public class ReportDataTask{
     static Logger log = Logger.getLogger(ReportDataTask.class);
     
     //链接前缀
-    String urlBase = "http://localhost:8081";//http://op.restoplus.cn
+    static String urlBase = "http://localhost:8081";//http://op.restoplus.cn
     //登入的url
     String loginUrl = urlBase + "/shop/branduser/login";
-    //品牌总收入
-    String brandIncomeUrl = urlBase + "/shop/syncData/syncBrandIncome";
-    //店铺总收入
-    String shopIncomeUrl = urlBase + "/shop/syncData/syncShopIncome";    
-    //品牌菜品销售报表					
-    String brandArticleUrl = urlBase + "/shop/syncData/syncBrandOrderArticle";
-    //店铺菜品的销售报表的url
-    String shopArticleUrl = urlBase + "/shop/articleSell/shop_data";
-    //订单的url
-    String shopOrderUrl = urlBase + "/shop/orderReport/AllOrder";
-    //订单 菜品信息 url
-    String orderItemsUrl = urlBase + "/shop/syncData/syncOrderItems";
+    
+    //获取数据的URL
+    static Map<String, String> urlMap = new HashMap<>();
 
     //数据库 参数
     String url = "jdbc:mysql://127.0.0.1:3306/middle?useUnicode=true&characterEncoding=utf8";
     String driver = "com.mysql.jdbc.Driver";
     String username = "root";
     String password = "root";
+    
+    Connection conn = null;
+	Statement state = null;
     
     static {
 		//注册驱动类 
@@ -83,10 +80,17 @@ public class ReportDataTask{
 		} catch (ClassNotFoundException e) { 
 		     log.error("#ERROR# :加载数据库驱动异常，请检查！", e); 
 		} 
+		
+		urlMap.put("brand_income", urlBase + "/shop/syncData/syncBrandIncome");//品牌 总收入
+		urlMap.put("shop_income", urlBase + "/shop/syncData/syncShopIncome");//店铺 总收入
+//		urlMap.put("brand_article", urlBase + "/shop/syncData/syncBrandOrderArticle");//品牌 菜品 销售
+//		urlMap.put("shop_article", urlBase + "/shop/syncData/shop_data");//店铺 菜品 销售
+//		urlMap.put("order_detail", urlBase + "/shop/syncData/syncBrandIncome");//订单 详情 信息
+		urlMap.put("order_article", urlBase + "/shop/syncData/syncOrderItems");//订单 菜品 信息
     } 
     
     
-    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+//    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
 //    @Scheduled(cron = "00 19 17 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
@@ -113,32 +117,43 @@ public class ReportDataTask{
         
         if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {//登录成功后会 进行 重定向  页面跳转，返回的  statusCode 为 302，正常访问 密码错误时，返回的是 200.【HttpStatus.SC_OK=200】
         	log.info("--------------HttpClient 登录成功！");
+    		conn = getConnection();
+        	try {
+				conn.setAutoCommit(false);//关闭自动提交事物 
+				state = conn.createStatement();
+			} catch (SQLException e2) {
+				e2.printStackTrace();
+			}
         	
         	Map<String,String> requestMap = new HashMap<>();
         	requestMap.put("beginDate","2016-08-14");
         	requestMap.put("endDate","2016-08-14");
             
-        	HttpResponse httpResponse = doPost(client, orderItemsUrl, requestMap);
-        	if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-//        		createSQL(httpResponse, "order_article");
-        		executeSQL(httpResponse, "order_article");
-//        		String resultData = getResult(httpResponse);
-//        		JSONObject resultJsonObject = new JSONObject(resultData);
-//                JSONArray jsonArray = resultJsonObject.getJSONArray("data");
-//                Iterator<Object> it_data = jsonArray.iterator();
-//                while (it_data.hasNext()) {
-//					JSONObject ob = (JSONObject) it_data.next();
-//					Iterator it_map = ob.keys();
-//					while (it_map.hasNext()) {
-//						String key = (String) it_map.next();  
-//						System.out.println(key+"  --  "+ob.get(key));
-//					}
-//                }
-//              
-                log.info("--------------导入完成");
-        	}else{
-            	log.info("--------------操作失败！");
+        	//循环执行 URLMap 中的链接
+        	for (String key : urlMap.keySet()) {
+        		HttpResponse httpResponse = doPost(client, urlMap.get(key), requestMap);
+            	if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
+                    try {
+    	        		List<String> sqlList = createSQL(httpResponse, key);
+    	        		executeBatchSQL(state, sqlList);
+    	        		conn.commit(); 
+    				} catch (SQLException e) {
+    					log.error("【order_article】表  -------------- 数据  插入失败！   ");
+    					e.printStackTrace();
+    					try {
+    						conn.rollback();
+    					} catch (SQLException e1) {
+    						e1.printStackTrace();
+    					} 
+    				}
+                    log.info("【order_article】表 --------------导入完成");
+            	}else{
+                	log.info("查询--------------操作失败！");
+            	}
         	}
+        	//关闭链接
+        	close(conn, state, null);
+        	log.info("---------------------------------------【操作完成，关闭链接】-----------------------------------------");
         }else{
         	log.info("--------------HttpClient 登录失败！");
         }
@@ -204,27 +219,30 @@ public class ReportDataTask{
      * @param httpResponse
      * @param tableName
      */
-    public void createSQL(HttpResponse httpResponse,String tableName){
+    public List<String> createSQL(HttpResponse httpResponse,String tableName){
     	String resultData = getResult(httpResponse);
 		JSONObject resultJsonObject = new JSONObject(resultData);
         JSONArray jsonArray = resultJsonObject.getJSONArray("data");
         Iterator<Object> it_data = jsonArray.iterator();
+        List<String> sqlList = new ArrayList<>();
         while (it_data.hasNext()) {
-        	StringBuffer sql_parameters = new StringBuffer("id,");
+        	StringBuffer sql_parameters = new StringBuffer("id,data_time,");
         	StringBuffer sql_values = new StringBuffer("'"+ApplicationUtils.randomUUID()+"',");
+        	sql_values.append("'"+DateUtil.getYesterDay()+"',");
 			JSONObject ob = (JSONObject) it_data.next();
 			Iterator it_map = ob.keys();
 			while (it_map.hasNext()) {
 				String key = (String) it_map.next();  
-//				System.out.println(key+"  --  "+ob.get(key));
 				sql_parameters.append(key+",");
 				sql_values.append("'"+ob.get(key)+"',");
 			}
 			String parameters = sql_parameters.substring(0, sql_parameters.lastIndexOf(",")) ;
 	        String values = sql_values.substring(0, sql_values.lastIndexOf(",")) ;
 	        String sql = "insert into "+tableName+"("+parameters+") values("+values+")";
-	        System.out.println(sql);
+//	        System.out.println(sql);
+	        sqlList.add(sql);
         }
+        return sqlList;
     }
     
     
@@ -286,5 +304,47 @@ public class ReportDataTask{
         	log.error("#ERROR# :创建数据库连接发生异常，请检查！", e); 
         } 
         return conn; 
+    }
+    
+    /**
+     * 关闭 数据库链接 
+     * @param conn
+     * @param state
+     * @param rs
+     */
+    public void close(Connection conn, Statement state, ResultSet rs) {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (state != null) {
+            	state.close();
+            }
+            if (conn != null) {
+            	conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /** 
+     * 在一个数据库连接上执行一批【静态】SQL语句 
+     * 
+     * @param conn        数据库连接 
+     * @param sqlList 静态SQL语句字符串集合 
+     * @throws SQLException 
+     */ 
+    public void executeBatchSQL(Statement state, List<String> sqlList) throws SQLException { 
+		final int batchSize = 500;//单次最大执行条数
+	    for (int i = 0 ; i < sqlList.size() ; i++) {
+	    	String sql = sqlList.get(i);
+	    	state.addBatch(sql); 
+	    	if(i % batchSize == 0) {//每加入 500 条 SQL 时，执行插入操作。批量操作。
+	    		state.executeBatch();
+		    }
+	    } 
+	    //执行SQL，并获取返回结果 
+	    state.executeBatch(); 
     }
 }

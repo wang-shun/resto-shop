@@ -105,9 +105,9 @@ public class ShopTask extends GenericController {
     PreparedStatement sta = null;
 
 
-//     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 53 12 * * ?")   //每天12点执行
+//    @Scheduled(cron = "00 53 12 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
@@ -292,7 +292,8 @@ public class ShopTask extends GenericController {
                 BigDecimal red_packet_pay = everyJsonObject.getBigDecimal("redIncome") ;
                 BigDecimal coupon_pay = everyJsonObject.getBigDecimal("couponIncome") ;
                 BigDecimal charge_reward_pay = everyJsonObject.getBigDecimal("chargeGifAccountIncome");
-                String sql =  "insert into shop_income(id,shop_id,shop_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,create_time,end_time) values(?,?,?,?,?,?,?,?,?,?,?)";
+//                String sql =  "insert into shop_income(id,shop_id,shop_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,create_time,end_time) values(?,?,?,?,?,?,?,?,?,?,?)";
+                String sql =  "insert into shop_income(id,shop_id,shop_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,data_time) values(?,?,?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("shop_id",shop_id);
@@ -303,8 +304,8 @@ public class ShopTask extends GenericController {
                 map.put("red_packet_pay",red_packet_pay);
                 map.put("coupon_pay",coupon_pay);
                 map.put("charge_reward_pay",charge_reward_pay);
-                map.put("create_time",beginTime);
-                map.put("end_time",endTime);
+//                map.put("create_time",beginTime);
+//                map.put("end_time",endTime);
                 map.put("key","shopIncome");//标识插入到哪个表
                 doInsert(sql,con,map);
             }
@@ -322,7 +323,8 @@ public class ShopTask extends GenericController {
                 BigDecimal red_packet_pay = everyJsonObject.getBigDecimal("redIncome") ;
                 BigDecimal coupon_pay = everyJsonObject.getBigDecimal("couponIncome") ;
                 BigDecimal charge_reward_pay = everyJsonObject.getBigDecimal("chargeGifAccountIncome");
-                String sql =  "insert into brand_income(id,brand_id,brand_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,create_time,end_time) values(?,?,?,?,?,?,?,?,?,?,?)";
+//                String sql =  "insert into brand_income(id,brand_id,brand_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,create_time,end_time) values(?,?,?,?,?,?,?,?,?,?,?)";
+                String sql =  "insert into brand_income(id,brand_id,brand_name,total_income,wechat_pay,charge_pay,red_packet_pay,coupon_pay,charge_reward_pay,data_time) values(?,?,?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("brand_id",brand_id);
@@ -333,8 +335,8 @@ public class ShopTask extends GenericController {
                 map.put("red_packet_pay",red_packet_pay);
                 map.put("coupon_pay",coupon_pay);
                 map.put("charge_reward_pay",charge_reward_pay);
-                map.put("create_time",beginTime);
-                map.put("end_time",endTime);
+//                map.put("create_time",beginTime);
+//                map.put("end_time",endTime);
                 map.put("key","brandIncome");
                 //执行插入营业额的报表
                 doInsert(sql,con,map);
@@ -352,7 +354,8 @@ public class ShopTask extends GenericController {
                 String sales_occupies = everyJsonObject.getString("numRatio") ;//销量占比
                 BigDecimal sell = everyJsonObject.getBigDecimal("salles") ;//销售
                 String sell_occupies = everyJsonObject.getString("salesRatio") ;//销售占比
-                String sql =  "insert into brand_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?)";
+//                String sql =  "insert into brand_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?)";
+                String sql =  "insert into brand_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,data_time,shop_id) values(?,?,?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("article_id",article_id);
@@ -362,8 +365,8 @@ public class ShopTask extends GenericController {
                 map.put("sales_occupies",sales_occupies);
                 map.put("sell",sell);
                 map.put("sell_occupies",sell_occupies);
-                map.put("create_time",beginTime);
-                map.put("end_time",endTime);
+//                map.put("create_time",beginTime);
+//                map.put("end_time",endTime);
                 map.put("shop_id",shop_id);
                 map.put("key","brandArticleSell");
                 //执行插入营业额的报表
@@ -384,7 +387,8 @@ public class ShopTask extends GenericController {
                 BigDecimal sell = everyJsonObject.getBigDecimal("salles") ;//销售
                 String sell_occupies = everyJsonObject.getString("salesRatio") ;//销售占比
                 String shop_id = everyJsonObject.getString("shopId") ;//店铺ID
-                String sql =  "insert into shop_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?)";
+//                String sql =  "insert into shop_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?)";
+                String sql =  "insert into shop_article(id,article_id,article_family_name,article_name,salles,salles_occupies,sell,sell_occupies,data_time,shop_id) values(?,?,?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("article_id",article_id);
@@ -394,8 +398,8 @@ public class ShopTask extends GenericController {
                 map.put("sales_occupies",sales_occupies);
                 map.put("sell",sell);
                 map.put("sell_occupies",sell_occupies);
-                map.put("create_time",beginTime);
-                map.put("end_time",endTime);
+//                map.put("create_time",beginTime);
+//                map.put("end_time",endTime);
                 map.put("shop_id", shop_id);
                 map.put("key","shopArticleSell");
                 doInsert(sql,con,map);
@@ -421,9 +425,12 @@ public class ShopTask extends GenericController {
                 String order_state2 = everyJsonObject.getString("orderState");
                 int level = getLevel(level2);
                 int order_state = getOrderState(order_state2);
+//                String sql = "insert into order_detail(id,shop_name,order_id,order_time,telephone,order_money," +
+//                        "wechat_pay," +"charge_pay,charge_reward_pay,red_packet_pay,coupon_pay,level,order_state," +
+//                        "create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 String sql = "insert into order_detail(id,shop_name,order_id,order_time,telephone,order_money," +
                         "wechat_pay," +"charge_pay,charge_reward_pay,red_packet_pay,coupon_pay,level,order_state," +
-                        "create_time,end_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "data_time,shop_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("shop_name",shop_name);
@@ -438,8 +445,8 @@ public class ShopTask extends GenericController {
                 map.put("coupon_pay",coupon_pay);
                 map.put("level",level);
                 map.put("order_state",order_state);
-                map.put("create_time",beginTime);
-                map.put("end_time",endTime);
+//                map.put("create_time",beginTime);
+//                map.put("end_time",endTime);
                 map.put("shop_id",shop_id);
                 map.put("key","allOrder");
                 doInsert(sql,con,map);
@@ -449,13 +456,14 @@ public class ShopTask extends GenericController {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject everyJsonObject=jsonArray.getJSONObject(i);
                 String id= ApplicationUtils.randomUUID();//生成随机的id
-                String shop_id = everyJsonObject.getString("shopId");//店铺ID
-                String order_id = everyJsonObject.getString("orderId") ;//订单编号
-                String order_time = everyJsonObject.getString("createTime");//下单时间
+                String shop_id = everyJsonObject.getString("shop_id");//店铺ID
+                String order_id = everyJsonObject.getString("order_id") ;//订单编号
+                String order_time = everyJsonObject.getString("order_time");//下单时间
                 String telephone = everyJsonObject.getString("telephone") ;//电话
-                String article_name = everyJsonObject.getString("articleName") ;//菜品名称
-                int count = everyJsonObject.getInt("count") ;//数量
-                String sql = "insert into order_article(id,shop_id,order_id,order_time,telephone,article_name,article_num) values(?,?,?,?,?,?,?)";
+                String article_name = everyJsonObject.getString("article_name") ;//菜品名称
+                int count = everyJsonObject.getInt("article_num") ;//数量
+//                String sql = "insert into order_article(id,shop_id,order_id,order_time,telephone,article_name,article_num) values(?,?,?,?,?,?,?)";
+                String sql = "insert into order_article(id,shop_id,order_id,order_time,telephone,article_name,article_num,data_time) values(?,?,?,?,?,?,?,?)";
                 Map<String,Object> map = new HashMap<>();
                 map.put("id",id);
                 map.put("shop_id",shop_id);
@@ -488,8 +496,9 @@ public class ShopTask extends GenericController {
                 sta.setBigDecimal(7,new BigDecimal(map.get("red_packet_pay").toString()));
                 sta.setBigDecimal(8,new BigDecimal(map.get("coupon_pay").toString()));
                 sta.setBigDecimal(9,new BigDecimal(map.get("charge_reward_pay").toString()));
-                sta.setString(10,map.get("create_time").toString());
-                sta.setString(11,map.get("end_time").toString());
+//                sta.setString(10,map.get("create_time").toString());
+//                sta.setString(11,map.get("end_time").toString());
+                sta.setString(10,DateUtil.getYesterDay());
                 sta.executeUpdate();
             }else if("brandIncome".equals(map.get("key").toString())){
                 //插入数据
@@ -502,8 +511,9 @@ public class ShopTask extends GenericController {
                 sta.setBigDecimal(7,new BigDecimal(map.get("red_packet_pay").toString()));
                 sta.setBigDecimal(8,new BigDecimal(map.get("coupon_pay").toString()));
                 sta.setBigDecimal(9,new BigDecimal(map.get("charge_reward_pay").toString()));
-                sta.setString(10,map.get("create_time").toString());
-                sta.setString(11,map.get("end_time").toString());
+//                sta.setString(10,map.get("create_time").toString());
+//                sta.setString(11,map.get("end_time").toString());
+                sta.setString(10,DateUtil.getYesterDay());
                 sta.executeUpdate();
             }else if("brandArticleSell".equals(map.get("key").toString())){
                 //插入数据
@@ -515,9 +525,11 @@ public class ShopTask extends GenericController {
                 sta.setString(6,map.get("sales_occupies").toString());
                 sta.setString(7,map.get("sell").toString());
                 sta.setString(8,map.get("sell_occupies").toString());
-                sta.setString(9,map.get("create_time").toString());
-                sta.setString(10,map.get("end_time").toString());
-                sta.setString(11,map.get("shop_id").toString());
+//                sta.setString(9,map.get("create_time").toString());
+//                sta.setString(10,map.get("end_time").toString());
+                sta.setString(9,DateUtil.getYesterDay());
+//                sta.setString(11,map.get("shop_id").toString());
+                sta.setString(10,map.get("shop_id").toString());
                 sta.executeUpdate();
             }else if ("shopArticleSell".equals(map.get("key").toString())){
                 sta.setString(1,map.get("id").toString());
@@ -528,9 +540,11 @@ public class ShopTask extends GenericController {
                 sta.setString(6,map.get("sales_occupies").toString());
                 sta.setString(7,map.get("sell").toString());
                 sta.setString(8,map.get("sell_occupies").toString());
-                sta.setString(9,map.get("create_time").toString());
-                sta.setString(10,map.get("end_time").toString());
-                sta.setString(11,map.get("shop_id").toString());
+//                sta.setString(9,map.get("create_time").toString());
+//                sta.setString(10,map.get("end_time").toString());
+                sta.setString(9,DateUtil.getYesterDay());
+//                sta.setString(11,map.get("shop_id").toString());
+                sta.setString(10,map.get("shop_id").toString());
                 sta.executeUpdate();
             }else if("allOrder".equals(map.get("key").toString())){
                 sta.setString(1,map.get("id").toString());
@@ -546,9 +560,11 @@ public class ShopTask extends GenericController {
                 sta.setString(11,map.get("coupon_pay").toString());
                 sta.setString(12,map.get("level").toString());
                 sta.setString(13,map.get("order_state").toString());
-                sta.setString(14,map.get("create_time").toString());
-                sta.setString(15,map.get("end_time").toString());
-                sta.setString(16,map.get("shop_id").toString());
+//                sta.setString(14,map.get("create_time").toString());
+//                sta.setString(15,map.get("end_time").toString());
+                sta.setString(14,DateUtil.getYesterDay());
+//                sta.setString(16,map.get("shop_id").toString());
+                sta.setString(15,map.get("shop_id").toString());
                 sta.executeUpdate();
             }else if("orderItems".equals(map.get("key").toString())){
             	sta.setString(1,map.get("id").toString());
@@ -558,6 +574,7 @@ public class ShopTask extends GenericController {
                 sta.setString(5,map.get("telephone").toString());
                 sta.setString(6,map.get("article_name").toString());
                 sta.setString(7,map.get("article_num").toString());
+                sta.setString(8,DateUtil.getYesterDay());
                 sta.executeUpdate();
             }
 
