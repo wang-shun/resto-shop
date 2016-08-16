@@ -83,16 +83,16 @@ public class ReportDataTask{
 		
 		urlMap.put("brand_income", urlBase + "/shop/syncData/syncBrandIncome");//品牌 总收入
 		urlMap.put("shop_income", urlBase + "/shop/syncData/syncShopIncome");//店铺 总收入
-//		urlMap.put("brand_article", urlBase + "/shop/syncData/syncBrandOrderArticle");//品牌 菜品 销售
-//		urlMap.put("shop_article", urlBase + "/shop/syncData/shop_data");//店铺 菜品 销售
-//		urlMap.put("order_detail", urlBase + "/shop/syncData/syncBrandIncome");//订单 详情 信息
-		urlMap.put("order_article", urlBase + "/shop/syncData/syncOrderItems");//订单 菜品 信息
+		urlMap.put("brand_article", urlBase + "/shop/syncData/syncBrandOrderArticle");//品牌 菜品 销售
+		urlMap.put("shop_article", urlBase + "/shop/syncData/syncShopOrderArticle");//店铺 菜品 销售
+		urlMap.put("order_detail", urlBase + "/shop/syncData/syncOrderDetail");//订单 详情 信息
+		urlMap.put("order_article", urlBase + "/shop/syncData/syncOrderArticle");//订单 菜品 信息
     } 
     
     
 //    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-//    @Scheduled(cron = "00 19 17 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 45 16 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
     	
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
@@ -331,7 +331,7 @@ public class ReportDataTask{
     /** 
      * 在一个数据库连接上执行一批【静态】SQL语句 
      * 
-     * @param conn        数据库连接 
+     * @param state        数据库连接
      * @param sqlList 静态SQL语句字符串集合 
      * @throws SQLException 
      */ 

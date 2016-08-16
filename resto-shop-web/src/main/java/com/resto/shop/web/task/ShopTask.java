@@ -105,7 +105,7 @@ public class ShopTask extends GenericController {
     PreparedStatement sta = null;
 
 
-     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+    // @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
 //    @Scheduled(cron = "00 53 12 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {

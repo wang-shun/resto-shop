@@ -1662,6 +1662,124 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectOrderArticle(brandId,begin,end);
     }
 
+    /**
+     * 封装品牌菜品数据 用于中间数据库
+     * @param brandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectBrandArticleSellList(String brandId, String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+
+        List<Map<String, Object>> list = orderMapper.selectBrandArticleSellList(brandId, begin, end);
+        //计算总菜品销售额,//菜品总销售额
+        int num = 0;
+
+        BigDecimal temp = BigDecimal.ZERO;
+        for (Map<String,Object> map : list) {
+            //计算总销量 不能加上套餐的数量
+            if (map.get("type")!= 3) {
+               // num += articleSellDto.getBrandSellNum().doubleValue();
+                num+=Integer.parseInt(map.get("salles").toString());
+            }
+            //计算总销售额
+            temp = add(temp, new BigDecimal(map.get("sell").toString()));
+        }
+
+        for (Map<String,Object> map2 : list) {
+            //销售额占比
+           // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+            BigDecimal sell = new BigDecimal(map2.get("sell").toString());
+            BigDecimal d = sell.divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+            //map2.setSalesRatio(d + "%");
+            map2.put("sell_occupies",d+"%");
+
+            if (num != 0) {
+                //double d1 = articleSellDto.getBrandSellNum().doubleValue();
+                double d1 = Double.parseDouble(map2.get("salles").toString());
+                double d2 = d1 / num * 100;
+
+                //保留两位小数
+                BigDecimal b = new BigDecimal(d2);
+                double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+               // articleSellDto.setNumRatio(f1 + "%");
+                map2.put("salles_occupies",f1+"%");
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> selectShopArticleSellList(String brandId, String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+
+        List<Map<String, Object>> list = orderMapper.selectBrandArticleSellList(brandId, begin, end);
+        List<ShopDetail> shops = shopDetailService.selectByBrandId(brandId);
+        for (ShopDetail s : shops) {
+            for(Map<String,Object> map :list){
+                if(map.get("shop_id").toString().equals(s.getId())){
+
+                    //计算总菜品销售额,//菜品总销售额
+                    int num = 0;
+
+                    BigDecimal temp = BigDecimal.ZERO;
+                    for (Map<String,Object> map2 : list) {
+                        //计算总销量 不能加上套餐的数量
+                        if (map2.get("type")!= 3) {
+                            // num += articleSellDto.getBrandSellNum().doubleValue();
+                            num+=Integer.parseInt(map2.get("salles").toString());
+                        }
+                        //计算总销售额
+                        temp = add(temp, new BigDecimal(map2.get("sell").toString()));
+                    }
+
+                    for (Map<String,Object> map3 : list) {
+                        //销售额占比
+                        // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                        BigDecimal sell = new BigDecimal(map3.get("sell").toString());
+                        BigDecimal d = sell.divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                        //map2.setSalesRatio(d + "%");
+                        map3.put("sell_occupies",d+"%");
+
+                        if (num != 0) {
+                            //double d1 = articleSellDto.getBrandSellNum().doubleValue();
+                            double d1 = Double.parseDouble(map3.get("salles").toString());
+                            double d2 = d1 / num * 100;
+
+                            //保留两位小数
+                            BigDecimal b = new BigDecimal(d2);
+                            double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                            // articleSellDto.setNumRatio(f1 + "%");
+                            map3.put("salles_occupies",f1+"%");
+                        }
+                    }
+                    //------------------------------
+                }
+            }
+        }
+
+        return  list;
+    }
+
+    /**
+     * 查询订单详情的数据 用于中间数据库
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
+    @Override
+    public List<Order> selectListByTimeAndBrandId(String brandId ,String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return orderMapper.selectListByTimeAndBrandId(brandId,begin, end);
+    }
+
 
     public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
         if (printer == null) {

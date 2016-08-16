@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.web.dto.*;
 import org.apache.ibatis.annotations.Param;
@@ -308,4 +309,21 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<OrderArticleDto>  selectOrderArticle(@Param("brandId") String brandId,@Param("beginTime") Date beginTime,@Param("endTime") Date endTime);
 
+    /**
+     * 查询品牌菜品的数据 用于中间数据库
+     * @param brandId
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<Map<String,Object>> selectBrandArticleSellList(@Param("brandId") String brandId,@Param("beginDate") Date begin,@Param("endDate") Date end);
+
+    /**
+     * 查询订单详情数据 用于中间数据库
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<Order> selectListByTimeAndBrandId(@Param("brandId") String brandId,@Param("beginDate") Date begin, @Param("endDate") Date end);
 }
