@@ -90,7 +90,7 @@ public class ReportDataTask{
     } 
     
     
-    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+//    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
 //    @Scheduled(cron = "00 45 16 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
@@ -126,8 +126,8 @@ public class ReportDataTask{
 			}
         	
         	Map<String,String> requestMap = new HashMap<>();
-        	requestMap.put("beginDate","2016-08-14");
-        	requestMap.put("endDate","2016-08-14");
+        	requestMap.put("beginDate",DateUtil.getYesterDay());
+        	requestMap.put("endDate",DateUtil.getYesterDay());
             
         	//循环执行 URLMap 中的链接
         	for (String key : urlMap.keySet()) {
