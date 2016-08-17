@@ -84,7 +84,7 @@ public class ShopTask extends GenericController {
     String shopOrderUrl = urlBase + "/shop/orderReport/AllOrder";
 
     //订单 菜品信息 url
-    String orderItemsUrl = urlBase + "/shop/syncData/syncOrderItems";
+    String orderItemsUrl = urlBase + "/shop/syncData/syncOrderArticle";
     
     
     
@@ -105,9 +105,9 @@ public class ShopTask extends GenericController {
     PreparedStatement sta = null;
 
 
-    // @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
+//     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 36 18 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 20 19 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
