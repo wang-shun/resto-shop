@@ -1839,14 +1839,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                     current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+"个,请重新选购餐品";
+                     current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
                 current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+"个,请重新选购餐品";
+                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
