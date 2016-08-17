@@ -60,6 +60,12 @@
   	select * from tb_printer
 		where shop_detail_id = #{shopDetailId} and print_type=#{printType}
   </select>
-  
+
+
+  <select id="checkError" resultType="java.lang.Integer">
+    select count(1) from tb_order where production_status = 5
+    and shop_detail_id = #{shopId} and DATE_FORMAT(NOW(),'%m-%d-%Y') = DATE_FORMAT(push_order_time,'%m-%d-%Y')
+    and print_times = 0 and order_state != 9
+  </select>
   
 </mapper>
