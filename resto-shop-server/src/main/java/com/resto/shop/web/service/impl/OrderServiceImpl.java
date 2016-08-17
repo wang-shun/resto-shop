@@ -115,7 +115,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private ArticleFamilyMapper articleFamilyMapper;
 
 
-
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -150,9 +149,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
-
-
-
 
 
         List<Article> articles = articleService.selectList(order.getShopDetailId());
@@ -243,8 +239,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
         }
-
-
 
 
         orderItemService.insertItems(order.getOrderItems());
@@ -927,7 +921,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if(setting.getAutoPrintTotal().intValue() == 0){
+        if (setting.getAutoPrintTotal().intValue() == 0) {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
                 if (ticket != null) {
@@ -1220,7 +1214,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date end = DateUtil.getformatEndDate(endDate);
         Brand brand = brandService.selectById(brandId);
         int totalNum = 0;
-        brandArticleReportDto bo  = orderMapper.selectArticleSumCountByData(begin,end,brandId);
+        brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
         bo.setBrandName(brand.getBrandName());
@@ -1651,19 +1645,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     /**
-     *订单菜品的数据(用于中间数据库)
+     * 订单菜品的数据(用于中间数据库)
+     *
      * @param brandId
      * @return
      */
     @Override
-    public List <OrderArticleDto> selectOrderArticle(String brandId,String beginDate,String endDate) {
+    public List<OrderArticleDto> selectOrderArticle(String brandId, String beginDate, String endDate) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectOrderArticle(brandId,begin,end);
+        return orderMapper.selectOrderArticle(brandId, begin, end);
     }
 
     /**
      * 封装品牌菜品数据 用于中间数据库
+     *
      * @param brandId
      * @param beginDate
      * @param endDate
@@ -1679,23 +1675,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int num = 0;
 
         BigDecimal temp = BigDecimal.ZERO;
-        for (Map<String,Object> map : list) {
+        for (Map<String, Object> map : list) {
             //计算总销量 不能加上套餐的数量
-            if ((Integer)map.get("type")!= 3) {
-               // num += articleSellDto.getBrandSellNum().doubleValue();
-                num+=Integer.parseInt(map.get("salles").toString());
+            if ((Integer) map.get("type") != 3) {
+                // num += articleSellDto.getBrandSellNum().doubleValue();
+                num += Integer.parseInt(map.get("salles").toString());
             }
             //计算总销售额
             temp = add(temp, new BigDecimal(map.get("sell").toString()));
         }
 
-        for (Map<String,Object> map2 : list) {
+        for (Map<String, Object> map2 : list) {
             //销售额占比
-           // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+            // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             BigDecimal sell = new BigDecimal(map2.get("sell").toString());
-            BigDecimal d = sell.divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+            BigDecimal d = sell.divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             //map2.setSalesRatio(d + "%");
-            map2.put("sell_occupies",d+"%");
+            map2.put("sell_occupies", d + "%");
 
             if (num != 0) {
                 //double d1 = articleSellDto.getBrandSellNum().doubleValue();
@@ -1705,10 +1701,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //保留两位小数
                 BigDecimal b = new BigDecimal(d2);
                 double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-               // articleSellDto.setNumRatio(f1 + "%");
-                map2.put("salles_occupies",f1+"%");
+                // articleSellDto.setNumRatio(f1 + "%");
+                map2.put("salles_occupies", f1 + "%");
             }
         }
+
+        for (Map<String, Object> map3 : list) {
+
+            map3.remove("type");
+            map3.remove("sort");
+            map3.remove("order_id");
+        }
+
 
         return list;
     }
@@ -1717,67 +1721,72 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> selectShopArticleSellList(String brandId, String beginDate, String endDate) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-
-        List<Map<String, Object>> list = orderMapper.selectBrandArticleSellList(brandId, begin, end);
         List<ShopDetail> shops = shopDetailService.selectByBrandId(brandId);
+        List<Map<String, Object>> list = new ArrayList<>();
+
         for (ShopDetail s : shops) {
-            for(Map<String,Object> map :list){
-                if(map.get("shop_id").toString().equals(s.getId())){
+            List<Map<String, Object>> list2 = orderMapper.selectShopArticleSellList(s.getId(), begin, end);
+            if(list2!=null&&list2.size()>0){
+                //计算总菜品销售额,//菜品总销售额
+                int num = 0;
 
-                    //计算总菜品销售额,//菜品总销售额
-                    int num = 0;
-
-                    BigDecimal temp = BigDecimal.ZERO;
-                    for (Map<String,Object> map2 : list) {
-                        //计算总销量 不能加上套餐的数量
-                        if ((Integer)map2.get("type")!= 3) {
-                            // num += articleSellDto.getBrandSellNum().doubleValue();
-                            num+=Integer.parseInt(map2.get("salles").toString());
-                        }
-                        //计算总销售额
-                        temp = add(temp, new BigDecimal(map2.get("sell").toString()));
+                BigDecimal temp = BigDecimal.ZERO;
+                for (Map<String, Object> map2 : list2) {
+                    //计算总销量 不能加上套餐的数量
+                    if ((Integer) map2.get("type") != 3) {
+                        // num += articleSellDto.getBrandSellNum().doubleValue();
+                        num += Integer.parseInt(map2.get("salles").toString());
                     }
-
-                    for (Map<String,Object> map3 : list) {
-                        //销售额占比
-                        // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-                        BigDecimal sell = new BigDecimal(map3.get("sell").toString());
-                        BigDecimal d = sell.divide(temp,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-                        //map2.setSalesRatio(d + "%");
-                        map3.put("sell_occupies",d+"%");
-
-                        if (num != 0) {
-                            //double d1 = articleSellDto.getBrandSellNum().doubleValue();
-                            double d1 = Double.parseDouble(map3.get("salles").toString());
-                            double d2 = d1 / num * 100;
-
-                            //保留两位小数
-                            BigDecimal b = new BigDecimal(d2);
-                            double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                            // articleSellDto.setNumRatio(f1 + "%");
-                            map3.put("salles_occupies",f1+"%");
-                        }
-                    }
-                    //------------------------------
+                    //计算总销售额
+                    temp = add(temp, new BigDecimal(map2.get("sell").toString()));
                 }
+
+                for (Map<String, Object> map3 : list2) {
+                    //销售额占比
+                    // BigDecimal d = new BigDecimal(map2.get("selles").toString()).divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                    BigDecimal sell = new BigDecimal(map3.get("sell").toString());
+                    BigDecimal d = sell.divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                    //map2.setSalesRatio(d + "%");
+                    map3.put("sell_occupies", d + "%");
+
+                    if (num != 0) {
+                        //double d1 = articleSellDto.getBrandSellNum().doubleValue();
+                        double d1 = Double.parseDouble(map3.get("salles").toString());
+                        double d2 = d1 / num * 100;
+
+                        //保留两位小数
+                        BigDecimal b = new BigDecimal(d2);
+                        double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                        // articleSellDto.setNumRatio(f1 + "%");
+                        map3.put("salles_occupies", f1 + "%");
+                    }
+                }
+                for (Map<String, Object> map4 : list2) {
+                    map4.remove("sort");
+                    map4.remove("type");
+                    map4.remove("order_id");
+                }
+                list.addAll(list2);
+
             }
         }
 
-        return  list;
+        return list;
     }
 
     /**
      * 查询订单详情的数据 用于中间数据库
+     *
      * @param beginDate
      * @param endDate
      * @param brandId
      * @return
      */
     @Override
-    public List<Order> selectListByTimeAndBrandId(String brandId ,String beginDate, String endDate) {
+    public List<Order> selectListByTimeAndBrandId(String brandId, String beginDate, String endDate) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTimeAndBrandId(brandId,begin, end);
+        return orderMapper.selectListByTimeAndBrandId(brandId, begin, end);
     }
 
 
@@ -1847,42 +1856,42 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
         data.put("TOTAL_AMOUNT", order.getOrderTotal());
 
-        data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY,shopDetail.getId())
-        .add(orderMapper.getPayment(PayMode.CHARGE_PAY,shopDetail.getId())));
+        data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId())
+                .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())));
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
-        wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY,shopDetail.getId()));
+        wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId()));
         wxItem.put("PAYMENT_MODE", "微信支付");
         Map<String, Object> chargeItem = new HashMap<>();
-        chargeItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.CHARGE_PAY,shopDetail.getId()));
+        chargeItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId()));
         chargeItem.put("PAYMENT_MODE", "充值支付");
         incomeItems.add(wxItem);
         incomeItems.add(chargeItem);
-        BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY,shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY,shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.REWARD_PAY,shopDetail.getId()));
+        BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
+                .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
         data.put("DISCOUNT_AMOUNT", discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         data.put("DISCOUNT_ITEMS", discountItems);
         Map<String, Object> accountPay = new HashMap<>();
-        accountPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ACCOUNT_PAY,shopDetail.getId()));
+        accountPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()));
         accountPay.put("PAYMENT_MODE", "红包支付");
         discountItems.add(accountPay);
         Map<String, Object> couponPay = new HashMap<>();
-        couponPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.COUPON_PAY,shopDetail.getId()));
+        couponPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()));
         couponPay.put("PAYMENT_MODE", "优惠券支付");
         discountItems.add(couponPay);
         Map<String, Object> rewardPay = new HashMap<>();
-        rewardPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.REWARD_PAY,shopDetail.getId()));
+        rewardPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
         rewardPay.put("PAYMENT_MODE", "充值赠送支付");
         discountItems.add(rewardPay);
 
         data.put("INCOME_ITEMS", incomeItems);
         data.put("PAYMENT_ITEMS", items);
         data.put("ORDER_AMOUNT", order.getOrderCount());
-        double average =  order.getOrderCount() == 0 ? 0 :
+        double average = order.getOrderCount() == 0 ? 0 :
                 order.getOrderTotal().doubleValue() / order.getOrderCount();
-        DecimalFormat    df   = new DecimalFormat("######0.00");
-        data.put("ORDER_AVERAGE",df.format(average));
+        DecimalFormat df = new DecimalFormat("######0.00");
+        data.put("ORDER_AVERAGE", df.format(average));
         data.put("PRODUCT_AMOUNT", sum);
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -1893,8 +1902,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<ArticleFamily> articleFamilies = articleFamilyMapper.selectListByDistributionModeId(shopDetail.getId(), 1);
         for (ArticleFamily articleFamily : articleFamilies) {
             Map<String, Object> productItem = new HashMap<>();
-            Integer subtotal = orderMapper.getArticleCount(shopDetail.getId(),articleFamily.getId());
-            productItem.put("SUBTOTAL", subtotal  == null ? 0 : subtotal);
+            Integer subtotal = orderMapper.getArticleCount(shopDetail.getId(), articleFamily.getId());
+            productItem.put("SUBTOTAL", subtotal == null ? 0 : subtotal);
             productItem.put("FAMILY_NAME", articleFamily.getName());
             productItems.add(productItem);
         }
@@ -1931,41 +1940,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private Result checkStock(OrderItem orderItem) {
         Boolean result = false;
         int current = 0;
-        String msg =  "";
+        String msg = "";
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                     current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,最大购买" + current + ",个,请取消订单后重新下单";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
                 current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
                 result = current >= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,最大购买" + current + ",个,请取消订单后重新下单";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-                result = current>= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                result = current >= orderItem.getCount();
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,最大购买" + current + ",个,请取消订单后重新下单";
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,最大购买"+current+",个,请取消订单后重新下单";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,最大购买" + current + ",个,请取消订单后重新下单";
                 break;
             default:
                 log.debug("未知菜品分类");
                 break;
         }
-        return new Result(msg,result);
+        return new Result(msg, result);
     }
 
 
@@ -1980,7 +1989,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (orderItem.getType()) {
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     //同时更新套餐库存(套餐库存为 最小库存的单品)
                     orderMapper.setStockBySuit();
@@ -1988,18 +1997,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     break;
                 default:
@@ -2023,24 +2032,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (orderItem.getType()) {
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
-                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
+                    orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
+                    orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
-                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     break;
                 default:
