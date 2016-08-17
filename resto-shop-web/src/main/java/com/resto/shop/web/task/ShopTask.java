@@ -97,7 +97,7 @@ public class ShopTask extends GenericController {
     static CookieStore cookieStore = null;
     static HttpClientContext context = null;
 
-    String url = "jdbc:mysql://127.0.0.1:3306/middle?useUnicode=true&characterEncoding=utf8";
+    String url = "jdbc:mysql://192.168.8.118:3306/middle?useUnicode=true&characterEncoding=utf8";
     String driver = null;
     String username = "root";
     String password = "root";
@@ -107,7 +107,7 @@ public class ShopTask extends GenericController {
 
 //     @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 20 19 * * ?")   //每天12点执行
+    @Scheduled(cron = "00 09 14 * * ?")   //每天12点执行
     public void job1() throws ClassNotFoundException, UnsupportedEncodingException {
 
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
