@@ -531,8 +531,9 @@ where t.id = t2.article_id
         familyName,
         ifnull(t2.current_working_stock,t.current_working_stock) as currentStock ,
         ifnull(t2.stock_weekend,t.stock_weekend) as stockWeekend ,
-        ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay
-
+        ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay,
+		t.article_type articleType,
+		t.empty_remark emptyRemark
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
@@ -554,7 +555,7 @@ where t.id = t2.article_id
 
     <update id="clearStock">
     update tb_article
-        set is_empty = 1  , current_working_stock = 0
+        set is_empty = 1  , current_working_stock = 0 , empty_remark = #{emptyRemark}
         where id = #{articleId}
 
   </update>
@@ -574,7 +575,7 @@ where t.id = t2.article_id
     <update id="editStock">
     update tb_article
     <set>
-        current_working_stock = #{count}
+        current_working_stock = #{count} , empty_remark = #{emptyRemark}
         <if test="count == 0 ">
             ,is_empty = 1
         </if>

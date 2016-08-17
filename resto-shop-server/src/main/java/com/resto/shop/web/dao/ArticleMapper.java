@@ -52,7 +52,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	List<ArticleStock> getStock(@Param("shopId") String shopId, @Param("familyId") String familyId,
 								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay);
 
-	Integer clearStock(String articleId);
+	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	Integer clearPriceTotal(String articleId);
 
@@ -60,7 +60,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Integer cleanPriceAll(String articleId);
 
-	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count);
+	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
 	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count);
 
