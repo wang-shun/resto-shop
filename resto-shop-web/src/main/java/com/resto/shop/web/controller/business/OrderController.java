@@ -163,7 +163,7 @@ public class OrderController extends GenericController{
 							if(o.getProductionStatus()==0){
 								ot.setOrderState("已付款");
 							}else if(o.getProductionStatus()==2){
-								ot.setOrderState("等待叫号");
+								ot.setOrderState("已打印");
 							}else if(o.getProductionStatus()==5){
 								ot.setOrderState("异常订单");
 							}
