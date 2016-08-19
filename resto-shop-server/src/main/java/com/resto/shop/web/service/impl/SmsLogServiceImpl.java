@@ -62,7 +62,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
 		//查询
-		BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
+		//BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
+        BrandUser brandUser = brandUserService.selectOneByBrandId(b.getId());
 		
 		//发送短信返回
 		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
