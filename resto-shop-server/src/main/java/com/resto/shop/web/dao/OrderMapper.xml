@@ -952,7 +952,7 @@
     <select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
 	
 select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
-        DISTINCT(t.order_id),
+        t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         t.count,
         t.article_name,
@@ -973,6 +973,7 @@ select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleF
         and t2.production_status in (2,3)
         and
         <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
+         GROUP BY t.id
         ) as r
         GROUP BY r.article_name
 	</select>
