@@ -10,20 +10,21 @@ import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShareSetting;
+import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
-import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.Coupon;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -53,6 +54,11 @@ public class OrderMessageListener implements MessageListener {
 
     @Resource
     ShareSettingService shareSettingService;
+
+    @Resource
+    OrderItemService orderItemService;
+    @Resource
+    ShopDetailService shopDetailService;
 
     @Override
     public Action consume(Message message, ConsumeContext context) {
@@ -128,18 +134,42 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
-       String customerId = obj.getString("customerId");
+        String customerId = obj.getString("customerId");
         if (orderService.checkRefundLimit(order)) {
             orderService.autoRefundOrder(obj.getString("orderId"));
             log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
             Customer customer = customerService.selectById(customerId);
             WechatConfig config = wechatConfigService.selectByBrandId(brandId);
-            WeChatUtils.sendCustomerMsgASync("亲,昨日未消费订单已退款,欢迎下次再来本店消费", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            StringBuilder sb = new StringBuilder("亲,昨日未消费订单已退款,欢迎下次再来本店消费\n");
+            sb.append("订单编号:"+order.getSerialNumber()+"\n");
+            if(order.getOrderMode()!=null){
+                switch (order.getOrderMode()) {
+                    case ShopMode.TABLE_MODE:
+                        sb.append("桌号:"+order.getTableNumber()+"\n");
+                        break;
+                    default:
+                        sb.append("取餐码："+order.getVerCode()+"\n");
+                        break;
+                }
+            }
+            if( order.getShopName()==null||"".equals(order.getShopName())){
+                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+            }
+            sb.append("就餐店铺："+order.getShopName()+"\n");
+            sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+            sb.append("订单明细：\n");
+            List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+            for(OrderItem item : orderItem){
+                sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+            }
+            sb.append("订单金额："+order.getOrderMoney()+"\n");
+            WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
 
         return Action.CommitMessage;
+
 
 
     }

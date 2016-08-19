@@ -94,7 +94,7 @@ public class OrderAspect {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
 		StringBuffer msg = new StringBuffer();
-		msg.append("订单编号:"+order.getSerialNumber()+"\n");
+		msg.append("订单编号:\n"+order.getSerialNumber()+"\n");
 		if(order.getOrderMode()!=null){
 			switch (order.getOrderMode()) {
 			case ShopMode.TABLE_MODE:
@@ -266,9 +266,33 @@ public class OrderAspect {
 			Customer customer = customerService.selectById(order.getCustomerId());
 			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
-			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消");
+			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消\n");
+			msg.append("订单编号:\n"+order.getSerialNumber()+"\n");
+			if(order.getOrderMode()!=null){
+				switch (order.getOrderMode()) {
+					case ShopMode.TABLE_MODE:
+						msg.append("桌号:"+order.getTableNumber()+"\n");
+						break;
+					default:
+						msg.append("取餐码："+order.getVerCode()+"\n");
+						break;
+				}
+			}
+			if( order.getShopName()==null||"".equals(order.getShopName())){
+				order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+			}
+			msg.append("就餐店铺："+order.getShopName()+"\n");
+			msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+			msg.append("订单明细：\n");
+			List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+			for(OrderItem item : orderItem){
+				msg.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+			}
+			msg.append("订单金额："+order.getOrderMoney()+"\n");
+
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送订单取消通知成功:"+msg+result);
+
 			MQMessageProducer.sendNoticeOrderMessage(order);
 
 //			//拒绝订单后还原库存
