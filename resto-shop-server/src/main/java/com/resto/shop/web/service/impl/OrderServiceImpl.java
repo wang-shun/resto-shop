@@ -8,6 +8,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.dto.ShopArticleReportDto;
@@ -568,6 +569,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCallNumberTime(new Date());
             update(order);
         }
+
         return order;
     }
 
@@ -872,6 +874,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
+        log.info("开始确认订单:"+order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
@@ -887,6 +890,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
+            log.info("订单已确认:"+order.getId()+"评论:"+order.getAllowAppraise());
             return order;
         }
         return null;
@@ -1835,14 +1839,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                     current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+"个,请重新选购餐品";
+                     current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
                 current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+"个,请重新选购餐品";
+                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存

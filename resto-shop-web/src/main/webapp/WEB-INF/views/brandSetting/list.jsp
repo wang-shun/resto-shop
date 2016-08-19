@@ -65,10 +65,10 @@
 				    <label>微信外卖名称</label>
 				    <input type="text" class="form-control" name="wechatWaimaiName" v-model="m.wechatWaimaiName">
 				</div>
-				<div class="form-group">
-				    <label>微信自定义样式</label>
-				    <textarea class="form-control" name="wechatCustomoStyle" v-model="m.wechatCustomoStyle"></textarea>
-				</div>
+				<%--<div class="form-group">--%>
+				    <%--<label>微信自定义样式</label>--%>
+				    <%--<textarea class="form-control" name="wechatCustomoStyle" v-model="m.wechatCustomoStyle"></textarea>--%>
+				<%--</div>--%>
 				
 				<div class="form-group">
 				    <label>红包提醒倒计时(秒)</label>

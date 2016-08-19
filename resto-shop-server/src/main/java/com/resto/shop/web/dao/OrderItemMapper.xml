@@ -260,7 +260,7 @@ left join tb_order_item t3 on t3.article_id = t2.article_id
 
 where  t.article_id =  #{articleid}
 and t3.parent_id = #{parentid}
-GROUP BY t3.article_name
+GROUP BY t3.id
 order by t.print_sort asc
 
   </select>

@@ -87,8 +87,6 @@
 						var str = "";
 						if("1" == tdData){
 							str = "堂吃" ;
-						}else if("2" == tdData){
-							str = "外卖" ;
 						}else{
 							str = "情况不明" ;
 						}

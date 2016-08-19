@@ -168,6 +168,7 @@ dt,dd{
 				return d;
 			}
 		},
+		order: [[ 1, 'desc' ]],
 		columns : [ {
 			title : "店铺",
 			data : "shopName",

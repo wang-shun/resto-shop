@@ -94,7 +94,7 @@ public class OrderAspect {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config= wechatConfigService.selectByBrandId(customer.getBrandId());
 		StringBuffer msg = new StringBuffer();
-		msg.append("订单编号:"+order.getSerialNumber()+"\n");
+		msg.append("订单编号:\n"+order.getSerialNumber()+"\n");
 		if(order.getOrderMode()!=null){
 			switch (order.getOrderMode()) {
 			case ShopMode.TABLE_MODE:
@@ -143,7 +143,10 @@ public class OrderAspect {
 
 	@AfterReturning(value="callNumber()",returning="order")
 	public void createCallMessage (Order order) throws Throwable{
-		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
+		Customer customer = customerService.selectById(order.getCustomerId());
+		WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+		WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 	}
 
 	@AfterReturning(value="pushOrder()||callNumber()||printSuccess()",returning="order")
@@ -185,7 +188,7 @@ public class OrderAspect {
 
 
 
-				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送");
+				log.info("打印成功后，发送自动确认订单通知！"+setting.getAutoConfirmTime()+"s 后发送"+",orderId:"+order.getId());
 				MQMessageProducer.sendAutoConfirmOrder(order,setting.getAutoConfirmTime()*1000);
 
 ////				//出单时减少库存
@@ -263,9 +266,33 @@ public class OrderAspect {
 			Customer customer = customerService.selectById(order.getCustomerId());
 			WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 			StringBuffer msg = new StringBuffer();
-			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消");
+			msg.append("您好，您 "+DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss")+" 的订单"+"已被商家取消\n");
+			msg.append("订单编号:\n"+order.getSerialNumber()+"\n");
+			if(order.getOrderMode()!=null){
+				switch (order.getOrderMode()) {
+					case ShopMode.TABLE_MODE:
+						msg.append("桌号:"+order.getTableNumber()+"\n");
+						break;
+					default:
+						msg.append("取餐码："+order.getVerCode()+"\n");
+						break;
+				}
+			}
+			if( order.getShopName()==null||"".equals(order.getShopName())){
+				order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+			}
+			msg.append("就餐店铺："+order.getShopName()+"\n");
+			msg.append("订单时间："+DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+			msg.append("订单明细：\n");
+			List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+			for(OrderItem item : orderItem){
+				msg.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+			}
+			msg.append("订单金额："+order.getOrderMoney()+"\n");
+
 			String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 			log.info("发送订单取消通知成功:"+msg+result);
+
 			MQMessageProducer.sendNoticeOrderMessage(order);
 
 //			//拒绝订单后还原库存
