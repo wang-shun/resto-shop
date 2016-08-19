@@ -533,15 +533,19 @@ where t.id = t2.article_id
         ifnull(t2.stock_weekend,t.stock_weekend) as stockWeekend ,
         ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay,
 		t.article_type articleType,
-		ifnull(t2.empty_remark,t.empty_remark) as empty_remark
+		ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
+		t.activated
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
-        where  t.state = 1 and t.activated = 1 and t.article_type = 1
-        and t.shop_detail_id = #{shopId}
+        where  t.state = 1
+        <if test="activated != null">
+         and t.activated = #{activated}
+        </if>
         <if test="familyId != null and familyId != ''">
             and t.article_family_id = #{familyId}
         </if>
+        and t.shop_detail_id = #{shopId}
         ) as r
         <where>
             <if test="empty == 1">
@@ -623,4 +627,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
     set is_empty = 0 , empty_remark = NULL where current_working_stock > 0
   </update>
 
+	<update id="setActivate">
+		UPDATE tb_article set activated = #{activated} where id  = #{articleId}
+	</update>
 </mapper>

@@ -22,6 +22,8 @@ public class ArticleStock {
     private Integer articleType;
     
     private String emptyRemark;
+    
+    private Integer activated;
 
     final public Integer getStockWorkingDay() {
         return stockWorkingDay;
@@ -94,4 +96,14 @@ public class ArticleStock {
 	public void setEmptyRemark(String emptyRemark) {
 		this.emptyRemark = emptyRemark;
 	}
+
+	public Integer getActivated() {
+		return activated;
+	}
+
+	public void setActivated(Integer activated) {
+		this.activated = activated;
+	}
+	
+	
 }

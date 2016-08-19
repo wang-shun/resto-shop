@@ -50,7 +50,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void initSize();
 
 	List<ArticleStock> getStock(@Param("shopId") String shopId, @Param("familyId") String familyId,
-								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay);
+								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay,@Param("activated")Integer activated);
 
 	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
@@ -69,4 +69,12 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void clearMain(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	void initEmpty();
+	
+	/**
+	 * 设置 菜品 下架（0）/上架（1） 
+	 * @param articleId
+	 * @param activated
+	 * @return
+	 */
+	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated); 
 }

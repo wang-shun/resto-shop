@@ -185,15 +185,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<ArticleStock> getStock(String shopId,String familyId,Integer empty) {
+    public List<ArticleStock> getStock(String shopId,String familyId,Integer empty,Integer activated) {
 
         FreeDay day = freedayMapper.selectByDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"),shopId);
         int freeDay = 0 ;
         if(day == null){
             freeDay = 1;
         }
-        List<ArticleStock> result = articleMapper.getStock(shopId,familyId,empty,freeDay);
-
+        List<ArticleStock> result = articleMapper.getStock(shopId,familyId,empty,freeDay,activated);
+        log.error("-------  "+activated);
         return result;
     }
 
@@ -221,4 +221,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.initEmpty();
         return true;
     }
+
+	@Override
+	public Boolean setActivated(String articleId, Integer activated) {
+		int row = articleMapper.setActivate(articleId, activated);
+		return row > 0 ? true : false;
+	}
 }
