@@ -533,7 +533,7 @@ where t.id = t2.article_id
         ifnull(t2.stock_weekend,t.stock_weekend) as stockWeekend ,
         ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay,
 		t.article_type articleType,
-		t.empty_remark emptyRemark
+		ifnull(t2.empty_remark,t.empty_remark) as empty_remark
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
@@ -562,13 +562,13 @@ where t.id = t2.article_id
 
     <update id="clearPriceStock">
     update tb_article_price
-        set current_working_stock = 0
+        set current_working_stock = 0 , empty_remark = #{emptyRemark}
         where id = #{articleId}
   </update>
 
     <update id="clearPriceTotal">
         update tb_article_price
-        set current_working_stock = 0
+        set current_working_stock = 0 , empty_remark = #{emptyRemark}
         where article_id = #{articleId}
     </update>
 
@@ -586,7 +586,7 @@ where t.id = t2.article_id
 
     <update id="editPriceStock">
     update tb_article_price
-    set current_working_stock = #{count}
+    set current_working_stock = #{count}  , empty_remark = #{emptyRemark}
     where id = #{articleId}
   </update>
 
@@ -597,13 +597,14 @@ where t.id = t2.article_id
     GROUP BY article_id
     ) as t2
     set t.current_working_stock = t2.current_working_stock_count
-    ,t.is_empty = if(t2.current_working_stock_count = 0,1,0)
+    ,t.is_empty = if(t2.current_working_stock_count = 0,1,0),
+    t.empty_remark = if(t2.current_working_stock_count = 0,'【自动谷清】菜品所有规格都已售罄',NULL)
     where t.id = t2.article_id
   </update>
 
     <update id="cleanPriceAll">
     update tb_article_price
-    set current_working_stock = 0
+    set current_working_stock = 0 , empty_remark = #{emptyRemark}
     where article_id = #{articleId}
   </update>
 
@@ -611,7 +612,7 @@ where t.id = t2.article_id
     update tb_article ,
  (select article_id from tb_article_price where id = #{articleId} ) as b
 set current_working_stock = 0
-, is_empty = 1
+, is_empty = 1 , empty_remark = #{emptyRemark}
 where id = b.article_id
 and (select count(1) from tb_article_price where article_id = b.article_id ) = (select count(1) from
 tb_article_price where article_id = b.article_id  and current_working_stock = 0)
@@ -619,7 +620,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
     <update id="initEmpty">
     update tb_article
-    set is_empty = 0 where current_working_stock > 0
+    set is_empty = 0 , empty_remark = NULL where current_working_stock > 0
   </update>
 
 </mapper>

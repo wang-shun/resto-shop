@@ -935,6 +935,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             refundOrder(order);
             log.info("取消订单成功:" + order.getId());
+            
+            //拒绝订单后还原库存
+			Boolean addStockSuccess  = false;
+			addStockSuccess	= addStock(getOrderInfo(orderId));
+			if(!addStockSuccess){
+				log.info("库存还原失败:"+order.getId());
+			}
         }
         return order;
     }
@@ -1901,6 +1908,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(articlePrice.getArticleId());
+                    orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
@@ -1943,6 +1951,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(articlePrice.getArticleId());
+                    orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());

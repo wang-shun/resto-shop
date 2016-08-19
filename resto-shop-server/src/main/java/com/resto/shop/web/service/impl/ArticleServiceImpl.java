@@ -199,14 +199,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean clearStock(String articleId) {
-        articleMapper.clearStock(articleId,"【手动沽清】");
-        articleMapper.clearPriceTotal(articleId);
-        articleMapper.clearPriceStock(articleId);
-        articleMapper.cleanPriceAll(articleId);
+    	String emptyRemark = "【手动沽清】";
+        articleMapper.clearStock(articleId,emptyRemark);
+        articleMapper.clearPriceTotal(articleId,emptyRemark);
+        articleMapper.clearPriceStock(articleId,emptyRemark);
+//        articleMapper.cleanPriceAll(articleId,emptyRemark);//方法重复
         //如果有规格的
         orderMapper.setStockBySuit();
         articleMapper.initSizeCurrent();
-        articleMapper.clearMain(articleId);
+        articleMapper.clearMain(articleId,emptyRemark);
         return true;
     }
 
@@ -214,7 +215,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean editStock(String articleId, Integer count) {
     	String emptyRemark = count <=0 ? "【手动沽清】" : null;
         articleMapper.editStock(articleId, count ,emptyRemark);
-        articleMapper.editPriceStock(articleId,count);
+        articleMapper.editPriceStock(articleId,count,emptyRemark);
         orderMapper.setStockBySuit();
         articleMapper.initSizeCurrent();
         articleMapper.initEmpty();

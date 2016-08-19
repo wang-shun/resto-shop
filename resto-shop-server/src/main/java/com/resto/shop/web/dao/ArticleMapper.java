@@ -54,19 +54,19 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceTotal(String articleId);
+	Integer clearPriceTotal(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceStock(String articleId);
+	Integer clearPriceStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer cleanPriceAll(String articleId);
+	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
-	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count);
+	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
 	void initSizeCurrent();
 
-	void clearMain(String articleId);
+	void clearMain(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	void initEmpty();
 }
