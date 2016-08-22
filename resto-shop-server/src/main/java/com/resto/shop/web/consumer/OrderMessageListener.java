@@ -117,9 +117,9 @@ public class OrderMessageListener implements MessageListener {
             for (Coupon coupon : couponList) {
                 sum = sum.add(coupon.getValue());
             }
-            StringBuffer msg = new StringBuffer("亲，感谢你的分享，你的好友");
+            StringBuffer msg = new StringBuffer("亲，感谢您的分享，您的好友");
             msg.append(customer.getNickname()).append("已领取").append(sum).append("元红包，")
-                    .append(customer.getNickname()).append("如到店消费你将获得").append(shareSetting.getMinMoney())
+                    .append(customer.getNickname()).append("如到店消费您将获得").append(shareSetting.getMinMoney())
                     .append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             log.info("异步发送分享注册微信通知ID:" + customer.getShareCustomer() + " 内容:" + msg);
@@ -182,7 +182,7 @@ public class OrderMessageListener implements MessageListener {
         String customerId = obj.getString("customerId");
         Customer customer = customerService.selectById(customerId);
         WechatConfig config = wechatConfigService.selectByBrandId(brandId);
-        WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 
         return Action.CommitMessage;
     }
@@ -208,7 +208,7 @@ public class OrderMessageListener implements MessageListener {
 
     private void sendShareMsg(Appraise appraise) {
 
-        StringBuffer msg = new StringBuffer("感谢你的评价 ，分享好友\n");
+        StringBuffer msg = new StringBuffer("感谢您的评价 ，分享好友\n");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());

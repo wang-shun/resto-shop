@@ -145,7 +145,7 @@ public class OrderAspect {
 	public void createCallMessage (Order order) throws Throwable{
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-		WeChatUtils.sendCustomerMsgASync("你的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+		WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 	}
 
@@ -251,7 +251,7 @@ public class OrderAspect {
 		StringBuffer msg = new StringBuffer();
 		rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
 		msg.append("<a href='"+setting.getWechatWelcomeUrl()+"?subpage=my&dialog=account'>")
-		.append("你邀请的好友").append(customer.getNickname()).append("已到店消费，你已获得")
+		.append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
 				.append(rewardMoney).append("元红包返利").append("</a>");
 		String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
 		log.info("发送返利通知成功:"+shareCustomer.getId()+" MSG: "+msg+result);
