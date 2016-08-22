@@ -433,7 +433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-
+			orderMapper.setStockBySuit();//自动更新套餐数量
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
