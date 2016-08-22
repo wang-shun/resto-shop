@@ -54,6 +54,7 @@
   			shop_detail_id=#{shopId}
   		</if>
   	</where>
+  	ORDER BY peference
   </select>
   
   <select id="selectListByDistributionModeId" resultType="ArticleFamily">
