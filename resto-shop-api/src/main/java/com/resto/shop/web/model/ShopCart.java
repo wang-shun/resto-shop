@@ -13,6 +13,18 @@ public class ShopCart {
 
     private Integer distributionModeId;
 
+    private String shopType;
+
+    private Integer pid;
+
+    public String getShopType() { return shopType; }
+
+    public void setShopType(String shopType) { this.shopType = shopType; }
+
+    public Integer getPid() { return pid; }
+
+    public void setPid(Integer pid) { this.pid = pid; }
+
     public Integer getId() {
         return id;
     }
