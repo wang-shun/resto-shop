@@ -27,6 +27,7 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
 	 * @return
 	 */
 	List<SmsLog> selectListWhere(String begin, String end,String shopIds);
+
 	/**
 	 * 根据品牌
 	 * 查询全部短信记录
