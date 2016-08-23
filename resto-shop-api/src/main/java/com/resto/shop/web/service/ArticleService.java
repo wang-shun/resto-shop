@@ -13,7 +13,7 @@ public interface ArticleService extends GenericService<Article, String> {
 
 	Article save(Article article);
 
-	Article selectFullById(String id);
+	Article selectFullById(String id, String show);
 
 	/**
 	 * 通过店铺Id以及配送模式查询
@@ -21,7 +21,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @param distributionModeId
 	 * @return
 	 */
-	List<Article> selectListFull(String currentShopId, Integer distributionModeId);
+	List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show);
 	
 	/**
 	 * 根据 是否 谷清 查询菜品信息

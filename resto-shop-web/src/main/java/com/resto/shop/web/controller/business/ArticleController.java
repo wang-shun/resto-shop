@@ -59,7 +59,7 @@ public class ArticleController extends GenericController{
 	@RequestMapping("list_one_full")
 	@ResponseBody
 	public Result list_one_full(String id){
-		Article article = articleService.selectFullById(id);
+		Article article = articleService.selectFullById(id, "");
 		return getSuccessResult(article);
 	}
 
