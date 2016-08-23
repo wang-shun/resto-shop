@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import java.util.List;
+
 public class ShopCart {
     private Integer id;
 
@@ -16,6 +18,12 @@ public class ShopCart {
     private String shopType;
 
     private Integer pid;
+
+    private List<ShopCart> currentItem;
+
+    public List<ShopCart> getCurrentItem() { return currentItem; }
+
+    public void setCurrentItem(List<ShopCart> currentItem) { this.currentItem = currentItem; }
 
     public String getShopType() { return shopType; }
 
