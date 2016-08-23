@@ -70,12 +70,12 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 	}
 
 	@Override
-	public List<MealAttr> selectFullByArticleId(String articleId) {
+	public List<MealAttr> selectFullByArticleId(String articleId,String show) {
 		List<MealAttr> list = selectList(articleId);
 		if(list.size()>0){
 			Map<Integer,MealAttr> attrMap = ApplicationUtils.convertCollectionToMap(Integer.class, list);
 			List<Integer> ids = new ArrayList<>(attrMap.keySet());
-			List<MealItem> items = mealItemService.selectByAttrIds(ids);
+			List<MealItem> items = mealItemService.selectByAttrIds(ids,show);
 			for (MealItem mealItem : items) {
 				MealAttr attr = attrMap.get(mealItem.getMealAttrId());
 				if(attr.getMealItems()==null){
