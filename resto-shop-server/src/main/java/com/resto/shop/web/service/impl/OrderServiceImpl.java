@@ -1900,8 +1900,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
-                    //同时更新套餐库存(套餐库存为 最小库存的单品)
-                    orderMapper.setStockBySuit();
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
@@ -1926,7 +1924,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-
+        //同时更新套餐库存(套餐库存为 最小库存的单品)
+        orderMapper.setStockBySuit();
         return true;
     }
 
