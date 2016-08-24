@@ -318,7 +318,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * 将单品最低库存设置为 套餐库存
 	 * @return
 	 */
-	Boolean setStockBySuit();
+	Boolean setStockBySuit(@Param("shopId")String shopId);
 
 	BigDecimal getPayment(@Param("type") Integer type,@Param("shopId") String shopId);
 
