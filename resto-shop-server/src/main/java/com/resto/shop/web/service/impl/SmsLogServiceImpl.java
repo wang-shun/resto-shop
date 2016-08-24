@@ -153,6 +153,12 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
 	@Override
 	public List<SmsLog> selectListWhere(String begin,String end,String shopIds) {
+        if(("".equals(begin)||begin==null)&&(end==null||"".equals(""))){
+            begin = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+            end = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+        }
+
+
 		Date beginDate = DateUtil.getformatBeginDate(begin);
 		Date endDate = DateUtil.getformatEndDate(end);
 		String[] temp = shopIds.split(",");

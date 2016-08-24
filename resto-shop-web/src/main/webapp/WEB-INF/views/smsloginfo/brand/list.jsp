@@ -110,7 +110,7 @@
 		var tb = $table.DataTable({
 			"order": [[ 3, 'desc' ]],
 			ajax : {
-				url : "smsloginfo/listByShopAndDate",
+				url : "smsloginfo/listByShopsAndDate",
 				dataSrc : "",
 				type : "POST",
 				data : function(d) {
@@ -216,7 +216,6 @@
 				//默认选中所有的店铺
 				this.checked();
 			},
-			
 		});
 		C.vue=vueObj;
 	})

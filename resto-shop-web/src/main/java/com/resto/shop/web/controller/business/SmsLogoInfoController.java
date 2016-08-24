@@ -86,6 +86,16 @@ public class SmsLogoInfoController extends GenericController{
 	@ResponseBody
 	@RequestMapping("/listByShopsAndDate")
 	public List<SmsLog> listByWhere(@RequestParam("begin")String begin,@RequestParam("end")String end,@RequestParam("shopIds")String shopIds){
+        if(shopIds==null||"".equals(shopIds)){
+            //默认选择全部
+            shopIds = "";
+            List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+            for (ShopDetail sid:shops) {
+                shopIds+=sid.getId()+",";
+            }
+            shopIds.substring(0,shopIds.length()-1);
+
+        }
 		return smsLogService.selectListWhere(begin,end,shopIds) ;
 	}
 	
@@ -93,7 +103,6 @@ public class SmsLogoInfoController extends GenericController{
 	 * 根据时间和当前店铺id查询短信
 	 * @param begin
 	 * @param end
-	 * @param shopIds
 	 * @return
 	 */
 	@ResponseBody
