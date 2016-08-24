@@ -17,10 +17,12 @@ import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.RedConfig;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.RedConfigService;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -56,6 +58,8 @@ public class OrderAspect {
 	ShopDetailService shopDetailService;
 	@Resource
 	ShareSettingService shareSettingService;
+	@Resource
+	RedConfigService redConfigService;
 
 	@Resource
 	OrderService orderService;
@@ -215,6 +219,7 @@ public class OrderAspect {
 		Customer customer = customerService.selectById(order.getCustomerId());
 		WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 		BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+//		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
 		if(order.getAllowAppraise()){
 			StringBuffer msg = new StringBuffer();
 			msg.append("您有一个红包未领取\n");

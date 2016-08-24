@@ -45,10 +45,11 @@ public interface ArticleService extends GenericService<Article, String> {
 	 */
 	void initStock();
 
-	List<ArticleStock> getStock(String shopId,String familyId,Integer empty);
+	List<ArticleStock> getStock(String shopId,String familyId,Integer empty,Integer activated);
 
 	Boolean clearStock(String articleId);
 
 	Boolean editStock(String articleId,Integer count);
 
+	Boolean setActivated(String articleId,Integer activated);
 }

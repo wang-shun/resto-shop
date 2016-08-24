@@ -80,10 +80,12 @@
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
                                                v-model="m.activated">上架
                                     </label>
-                                    <label class="radio-inline">
-                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
-                                               v-model="m.isEmpty">沽清
-                                    </label>
+                                    <span v-if="m.articleType != 2" >
+                                        <label class="radio-inline">
+                                            <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
+                                                   v-model="m.isEmpty">沽清
+                                        </label>
+                                    </span>
                                 </div>
                             </div>
 

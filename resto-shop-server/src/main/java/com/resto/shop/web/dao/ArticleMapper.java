@@ -50,23 +50,31 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void initSize();
 
 	List<ArticleStock> getStock(@Param("shopId") String shopId, @Param("familyId") String familyId,
-								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay);
+								@Param("empty") Integer empty,@Param("freeDay") Integer freeDay,@Param("activated")Integer activated);
 
 	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceTotal(String articleId);
+	Integer clearPriceTotal(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceStock(String articleId);
+	Integer clearPriceStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer cleanPriceAll(String articleId);
+	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
-	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count);
+	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
 	void initSizeCurrent();
 
-	void clearMain(String articleId);
+	void clearMain(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	void initEmpty();
+	
+	/**
+	 * 设置 菜品 下架（0）/上架（1） 
+	 * @param articleId
+	 * @param activated
+	 * @return
+	 */
+	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated); 
 }

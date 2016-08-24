@@ -285,18 +285,34 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
 	/**
-	 * 库存为0时设置沽清
+	 * 库存为0时设置沽清	---	tb_article
 	 * @param articleId
 	 * @return
 	 */
 	Boolean setEmpty(String articleId);
 
+	
 	/**
-	 * 还原库存时重置售罄状态
+	 * 库存为0时设置沽清	---	tb_article_price
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setArticlePriceEmpty(String articleId);
+	
+	
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article	
 	 * @param articleId
 	 * @return
      */
 	Boolean setEmptyFail(String articleId);
+	
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article_price	
+	 * @param articleId
+	 * @return
+     */
+	Boolean setArticlePriceEmptyFail(String articleId);
 
 	/**
 	 * 将单品最低库存设置为 套餐库存

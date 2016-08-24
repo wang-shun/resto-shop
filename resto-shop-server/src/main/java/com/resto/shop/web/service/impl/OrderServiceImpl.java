@@ -433,7 +433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-
+			orderMapper.setStockBySuit();//自动更新套餐数量
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
@@ -935,6 +935,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             refundOrder(order);
             log.info("取消订单成功:" + order.getId());
+            
+            //拒绝订单后还原库存
+			Boolean addStockSuccess  = false;
+			addStockSuccess	= addStock(getOrderInfo(orderId));
+			if(!addStockSuccess){
+				log.info("库存还原失败:"+order.getId());
+			}
+			orderMapper.setStockBySuit();//自动更新套餐数量
         }
         return order;
     }
@@ -1901,6 +1909,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(articlePrice.getArticleId());
+                    orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
@@ -1936,6 +1945,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
+                   
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
@@ -1943,16 +1953,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(articlePrice.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.updateArticlePriceStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(articlePrice.getArticleId());
+                    orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                     break;
                 case OrderItemType.SETMEALS:
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
+                  
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD,orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
+                    
                     break;
                 default:
                   //  throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
