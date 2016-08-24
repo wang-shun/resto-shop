@@ -553,8 +553,7 @@ where t.id = t2.article_id
             </if>
 
         </where>
-
-
+		order by articleType DESC
     </select>
 
     <update id="clearStock">
