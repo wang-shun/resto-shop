@@ -1857,11 +1857,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
-                //如果是套餐,不做判断，只判断套餐下的子品是否有库存
+            	//如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-
+                Map<String,Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
                 for( OrderItem oi : orderItem.getChildren()){
+                	//查询当前菜品，剩余多少份
                     min = orderMapper.selectArticleCount(oi.getArticleId());
+                    if(order_items_map.containsKey(oi.getArticleId())){
+                    	order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId())+oi.getCount());
+                    	min -= oi.getCount();
+                	}else{
+                		order_items_map.put(oi.getArticleId(), oi.getCount());
+                	}
                     if(min<endMin){
                         endMin = min;
                     }
