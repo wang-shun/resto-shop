@@ -154,9 +154,9 @@
 	  	<foreach collection="mealAttrIds" open="(" separator="," close=")" item="attrId">
 	  		#{attrId}
 	  	</foreach>
-        <if test="show != ''">
-          and a.current_working_stock > 0 and a.is_empty = 0
-        </if>
+<!--         <if test="show != ''"> -->
+<!--           and a.current_working_stock > 0 and a.is_empty = 0 -->
+<!--         </if> -->
   </select>
   <insert id="insertBatch">
   	insert into tb_meal_item 

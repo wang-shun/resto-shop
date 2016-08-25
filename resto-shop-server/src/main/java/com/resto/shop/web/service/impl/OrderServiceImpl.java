@@ -433,7 +433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-			orderMapper.setStockBySuit();//自动更新套餐数量
+			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
@@ -942,7 +942,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-			orderMapper.setStockBySuit();//自动更新套餐数量
+			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
         return order;
     }
@@ -1857,11 +1857,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
-                //如果是套餐,不做判断，只判断套餐下的子品是否有库存
+            	//如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-
+                Map<String,Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
                 for( OrderItem oi : orderItem.getChildren()){
+                	//查询当前菜品，剩余多少份
                     min = orderMapper.selectArticleCount(oi.getArticleId());
+                    if(order_items_map.containsKey(oi.getArticleId())){
+                    	order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId())+oi.getCount());
+                    	min -= oi.getCount();
+                	}else{
+                		order_items_map.put(oi.getArticleId(), oi.getCount());
+                	}
                     if(min<endMin){
                         endMin = min;
                     }
@@ -1900,8 +1907,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS,orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
-                    //同时更新套餐库存(套餐库存为 最小库存的单品)
-                    orderMapper.setStockBySuit();
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
@@ -1926,7 +1931,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-
+        //同时更新套餐库存(套餐库存为 最小库存的单品)
+        orderMapper.setStockBySuit(order.getShopDetailId());
         return true;
     }
 

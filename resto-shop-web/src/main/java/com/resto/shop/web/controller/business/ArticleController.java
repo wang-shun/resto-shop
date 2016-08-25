@@ -67,18 +67,19 @@ public class ArticleController extends GenericController{
 	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid @RequestBody Article article){
-		article.setShopDetailId(getCurrentShopId());
-		article.setUpdateUserId(getCurrentUserId());
-		article.setUpdateTime(new Date());
-		if(StringUtils.isEmpty(article.getId())){
-			article.setCreateUserId(getCurrentUserId());
-			articleService.save(article);
-		}else{
-			articleService.update(article);
-		}
-		articleService.initStock();
-		return Result.getSuccess();
-	}
+        article.setShopDetailId(getCurrentShopId());
+        article.setUpdateUserId(getCurrentUserId());
+        article.setUpdateTime(new Date());
+        if(StringUtils.isEmpty(article.getId())){
+            article.setCreateUserId(getCurrentUserId());
+            articleService.save(article);
+        }else{
+            articleService.update(article);
+        }
+        articleService.initStock();
+        return Result.getSuccess();
+
+    }
 	
 	@RequestMapping("delete")
 	@ResponseBody
