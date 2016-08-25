@@ -76,36 +76,22 @@ public class ArticleController extends GenericController{
 		}else{
 			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
 			if(article.getIsEmpty() == true){
-				if(article.getArticleType() == 1 && list.size() ==0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-				} else if(article.getArticleType() == 1 && list.size() !=0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-					for(ArticlePrice ap :list){
-						ap.setCurrentWorkingStock(0);
-						articlePriceService.update(ap);
-					}
-				}
+				articleService.clearStock(article.getId());
 			}else {
 				if(article.getArticleType() == 1 && list.size() ==0) {
 					if (IsFreeday(new Date())) {
-						article.setCurrentWorkingStock(article.getStockWorkingDay());
-						articleService.update(article);
+						articleService.editStock(article.getId(), article.getStockWorkingDay());
 					} else {
-						article.setCurrentWorkingStock(article.getStockWeekend());
-						articleService.update(article);
+						articleService.editStock(article.getId(), article.getStockWeekend());
 					}
 				} else if (article.getArticleType() == 1 && list.size() !=0){
 					if (IsFreeday(new Date())) {
 						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWorkingDay());
-							articlePriceService.update(ap);
+							articleService.editStock(ap.getId(), ap.getStockWorkingDay());
 						}
 					} else {
 						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWeekend());
-							articlePriceService.update(ap);
+							articleService.editStock(ap.getId(), ap.getStockWeekend());
 						}
 					}
 				}
