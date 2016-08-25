@@ -109,7 +109,7 @@ public class ArticleController extends GenericController{
 		}
         articleService.initStock();
 		return Result.getSuccess();
-	}
+    }
 	
 	@RequestMapping("delete")
 	@ResponseBody
