@@ -96,7 +96,14 @@ public class ArticleController extends GenericController{
 					}
 				}
 			}
+			if(article.getActivated() == true){
+				articleService.setActivated(article.getId(), 1);
+			}else{
+				articleService.setActivated(article.getId(), 0);
+			}
+			articleService.update(article);
 		}
+
         articleService.initStock();
 		return Result.getSuccess();
 	}
