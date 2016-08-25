@@ -7,7 +7,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
+ import com.resto.shop.web.service.FreedayService;
+ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,9 @@ import com.resto.shop.web.service.ArticleService;
 @Controller
 @RequestMapping("article")
 public class ArticleController extends GenericController{
+
+	@Resource
+	FreedayService freedayService;
 
 	@Resource
 	ArticleService articleService;
@@ -59,7 +63,7 @@ public class ArticleController extends GenericController{
 	@RequestMapping("list_one_full")
 	@ResponseBody
 	public Result list_one_full(String id){
-		Article article = articleService.selectFullById(id, "");
+		Article article = articleService.selectFullById(id,"");
 		return getSuccessResult(article);
 	}
 
@@ -74,41 +78,33 @@ public class ArticleController extends GenericController{
 			article.setCreateUserId(getCurrentUserId());
 			articleService.save(article);
 		}else{
+			articleService.update(article);
 			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
 			if(article.getIsEmpty() == true){
-				if(article.getArticleType() == 1 && list.size() ==0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-				} else if(article.getArticleType() == 1 && list.size() !=0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-					for(ArticlePrice ap :list){
-						ap.setCurrentWorkingStock(0);
-						articlePriceService.update(ap);
-					}
-				}
+				articleService.clearStock(article.getId());
 			}else {
 				if(article.getArticleType() == 1 && list.size() ==0) {
-					if (IsFreeday(new Date())) {
-						article.setCurrentWorkingStock(article.getStockWorkingDay());
-						articleService.update(article);
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+						articleService.editStock(article.getId(), article.getStockWeekend());
 					} else {
-						article.setCurrentWorkingStock(article.getStockWeekend());
-						articleService.update(article);
+						articleService.editStock(article.getId(), article.getStockWorkingDay());
 					}
 				} else if (article.getArticleType() == 1 && list.size() !=0){
-					if (IsFreeday(new Date())) {
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
 						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWorkingDay());
-							articlePriceService.update(ap);
+							articleService.editStock(ap.getId(), ap.getStockWeekend());
 						}
 					} else {
 						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWeekend());
-							articlePriceService.update(ap);
+							articleService.editStock(ap.getId(), ap.getStockWorkingDay());
 						}
 					}
 				}
+			}
+			if(article.getActivated() == true){
+				articleService.setActivated(article.getId(), 1);
+			}else{
+				articleService.setActivated(article.getId(), 0);
 			}
 		}
         articleService.initStock();
