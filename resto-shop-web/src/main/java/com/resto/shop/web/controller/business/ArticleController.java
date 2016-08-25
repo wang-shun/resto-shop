@@ -67,53 +67,19 @@ public class ArticleController extends GenericController{
 	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid @RequestBody Article article){
-		article.setShopDetailId(getCurrentShopId());
-		article.setUpdateUserId(getCurrentUserId());
-		article.setUpdateTime(new Date());	
-		if(StringUtils.isEmpty(article.getId())){
-			article.setCreateUserId(getCurrentUserId());
-			articleService.save(article);
-		}else{
-			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
-			if(article.getIsEmpty() == true){
-				if(article.getArticleType() == 1 && list.size() ==0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-				} else if(article.getArticleType() == 1 && list.size() !=0){
-					article.setCurrentWorkingStock(0);
-					articleService.update(article);
-					for(ArticlePrice ap :list){
-						ap.setCurrentWorkingStock(0);
-						articlePriceService.update(ap);
-					}
-				}
-			}else {
-				if(article.getArticleType() == 1 && list.size() ==0) {
-					if (IsFreeday(new Date())) {
-						article.setCurrentWorkingStock(article.getStockWorkingDay());
-						articleService.update(article);
-					} else {
-						article.setCurrentWorkingStock(article.getStockWeekend());
-						articleService.update(article);
-					}
-				} else if (article.getArticleType() == 1 && list.size() !=0){
-					if (IsFreeday(new Date())) {
-						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWorkingDay());
-							articlePriceService.update(ap);
-						}
-					} else {
-						for(ArticlePrice ap : list){
-							ap.setCurrentWorkingStock(ap.getStockWeekend());
-							articlePriceService.update(ap);
-						}
-					}
-				}
-			}
-		}
+        article.setShopDetailId(getCurrentShopId());
+        article.setUpdateUserId(getCurrentUserId());
+        article.setUpdateTime(new Date());
+        if(StringUtils.isEmpty(article.getId())){
+            article.setCreateUserId(getCurrentUserId());
+            articleService.save(article);
+        }else{
+            articleService.update(article);
+        }
         articleService.initStock();
-		return Result.getSuccess();
-	}
+        return Result.getSuccess();
+
+    }
 	
 	@RequestMapping("delete")
 	@ResponseBody
