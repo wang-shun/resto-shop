@@ -1687,6 +1687,46 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+    @Override
+    public List<Map<String, Object>> printKitchenReceipt(String orderId) {
+        log.info("打印订单全部:" + orderId);
+        Order order = selectById(orderId);
+        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+        List<OrderItem> items = orderItemService.listByOrderId(orderId);
+        List<Map<String, Object>> printTask = new ArrayList<>();
+//        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+//        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+//        if(setting.getAutoPrintTotal().intValue() == 0){
+//            for (Printer printer : ticketPrinter) {
+//                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+//                if (ticket != null) {
+//                    printTask.add(ticket);
+//                }
+//
+//            }
+//        }
+        System.out.println("----------------------------1234");
+
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+
+        //如果是外带，添加一张外带小票
+        if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
+            List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
+            for (Printer printer : packagePrinter) {
+                Map<String, Object> packageTicket = printTicket(order, items, shop, printer);
+                if (packageTicket != null) {
+                    printTask.add(packageTicket);
+                }
+            }
+        }
+
+//        }
+        if (!kitchenTicket.isEmpty()) {
+            printTask.addAll(kitchenTicket);
+        }
+        return printTask;
+    }
+
 
     public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
         if (printer == null) {

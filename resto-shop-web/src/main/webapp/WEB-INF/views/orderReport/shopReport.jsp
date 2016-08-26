@@ -274,16 +274,16 @@ dt,dd{
 					$("#orderId").html(data.id);
 					$("#createTime").html(
 							new Date(data.createTime)
-									.format("yyyy-MM-dd mm:hh:ss"));
+									.format("yyyy-MM-dd hh:mm:ss"));
 					$("#distributionMode").html(
 							getDistriubtioMode(data.distributionModeId));
 					$("#verCode").html(data.verCode);
 					$("#telephone").html(data.customer.telephone);
 					$("#orderMoney").html(data.orderMoney + "元");
-					if (data.appraise) {
-						$("#appriase").html(getLevel(data.appraise.level));
-						$("#content").html(data.appraise.content);
-					}
+// 					if (data.appraise) {
+						$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
+						$("#content").html(data.appraise!=null ? data.appraise.content:null);
+// 					}
 					$("#orderState").html(getState(data.orderState));
 					$('#articleList').text("");
 

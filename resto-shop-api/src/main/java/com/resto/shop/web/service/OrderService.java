@@ -115,7 +115,7 @@ public interface OrderService extends GenericService<Order, String> {
 	/**
 	 * 修改就餐模式
 	 * @param modeId
-	 * @param currentShopId
+	 * @param orderId
 	 */
 	public void updateDistributionMode(Integer modeId, String orderId);
 
@@ -305,7 +305,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	/**
 	 * 检查此订单的菜品是否有库存
-	 * @param oderId 订单号
+	 * @param orderId 订单号
 	 * @return
      */
 	Result checkArticleCount(String orderId);
@@ -327,4 +327,13 @@ public interface OrderService extends GenericService<Order, String> {
 	Boolean addStock(Order order) throws AppException;
 
 	List<Map<String, Object>> printTotal(String shopId);
+
+    /**
+     * 打印厨房小票
+     * @param oid
+     * @return
+     */
+    List<Map<String, Object>>  printKitchenReceipt(String oid);
+
+
 }
