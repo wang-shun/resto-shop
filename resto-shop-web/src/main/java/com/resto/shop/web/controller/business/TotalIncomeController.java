@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.resto.shop.web.model.ChargeOrder;
+import com.resto.shop.web.service.ChargeOrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +48,9 @@ public class TotalIncomeController extends GenericController {
 	@Resource
 	OrderPaymentItemService orderpaymentitemService;
 
+    @Resource
+    ChargeOrderService chargeOrderService;
+
 	@RequestMapping("/list")
 	public void list() {
 	}
@@ -71,6 +76,15 @@ public class TotalIncomeController extends GenericController {
 			sin.setChargeAccountIncome(temp);
 			sin.setChargeGifAccountIncome(temp);
 			sin.setTotalIncome(temp, temp, temp, temp, temp);
+
+            //查询此店铺的充值金额
+            List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId( beginDate,endDate,sin.getShopDetailId());
+            BigDecimal factShopTemp = temp;
+
+            for (ChargeOrder co : chargeOrderList) {
+                factShopTemp = factShopTemp.add(co.getChargeMoney());
+            }
+
 			String s = "" + i;
 			hm.put(s, sin);
 			if (!incomeReportList.isEmpty()) {
@@ -99,6 +113,7 @@ public class TotalIncomeController extends GenericController {
 						hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(), hm.get(s).getRedIncome(),
 								hm.get(s).getCouponIncome(), hm.get(s).getChargeAccountIncome(),
 								hm.get(s).getChargeGifAccountIncome());
+                        hm.get(s).setFactIncome(factShopTemp.add(hm.get(s).getWechatIncome()));
 					}
 				}
 			}
@@ -115,6 +130,7 @@ public class TotalIncomeController extends GenericController {
 		BigDecimal couponIncome = BigDecimal.ZERO;
 		BigDecimal chargeAccountIncome = BigDecimal.ZERO;
 		BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
+        BigDecimal factBrandIncome = BigDecimal.ZERO;
 
 		if (!incomeReportList.isEmpty()) {
 			for (IncomeReportDto income : incomeReportList) {
@@ -139,6 +155,15 @@ public class TotalIncomeController extends GenericController {
 		in.setChargeGifAccountIncome(chargeGifAccountIncome);
 		in.setTotalIncome(in.getWechatIncome(), in.getRedIncome(), in.getCouponIncome(), in.getChargeAccountIncome(),
 				in.getChargeGifAccountIncome());
+
+        //查询品牌的充值记录
+        List<ChargeOrder> brandChargeList = chargeOrderService.selectByDateAndBrandId(beginDate,endDate,brand.getId());
+        for(ChargeOrder co : brandChargeList){
+           factBrandIncome = factBrandIncome.add(co.getChargeMoney());
+        }
+        factBrandIncome = factBrandIncome.add(in.getWechatIncome());
+        in.setFactIncome(factBrandIncome);
+
 		brandIncomeList.add(in);
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopIncome", shopIncomeList);
@@ -188,13 +213,13 @@ public class TotalIncomeController extends GenericController {
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌营业额报表");// 表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "6");// 显示的位置
+		map.put("num", "7");// 显示的位置
 		map.put("reportTitle", "品牌收入条目");// 表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = { { "品牌", "20" }, { "营收总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
+		String[][] headers = { { "品牌", "20" }, {"营收总额(元)","16"},{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
 				 { "充值赠送支付(元)", "23" } };
-		String[] columns = { "name", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome", 
+		String[] columns = { "name","factIncome", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
 				 "chargeGifAccountIncome" };
 		
 		List<ReportIncomeDto> result = new LinkedList<>();
@@ -209,6 +234,7 @@ public class TotalIncomeController extends GenericController {
 			rt.setCouponIncome(shopIncomeDto.getCouponIncome());
 			rt.setName(shopIncomeDto.getShopName());
 			rt.setRedIncome(shopIncomeDto.getRedIncome());
+            rt.setFactIncome(shopIncomeDto.getFactIncome());
 			result.add(rt);
 		}
 		for (BrandIncomeDto brandIncomeDto : brandresult) {
@@ -220,6 +246,7 @@ public class TotalIncomeController extends GenericController {
 			rt.setCouponIncome(brandIncomeDto.getCouponIncome());
 			rt.setName(brandIncomeDto.getBrandName());
 			rt.setRedIncome(brandIncomeDto.getRedIncome());
+            rt.setFactIncome(brandIncomeDto.getFactIncome());
 			result.add(rt);
 		}
 		ExcelUtil<ReportIncomeDto> excelUtil = new ExcelUtil<ReportIncomeDto>();

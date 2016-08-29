@@ -2,12 +2,14 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
@@ -177,5 +179,23 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			accountService.addAccount(payValue, customer.getAccountId(), "退还充值赠送金额", AccountLog.REWARD_PAY_REFUND);
 		}
 	}
+
+    @Override
+    public List<ChargeOrder> selectByDateAndShopId(String beginDate, String endDate, String shopId) {
+        
+       Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+        Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+        
+        return chargeorderMapper.selectByDateAndShopId(begin,end,shopId);
+    }
+
+    @Override
+    public List<ChargeOrder> selectByDateAndBrandId(String beginDate, String endDate, String brandId) {
+
+        Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+        Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+
+        return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
+    }
 
 }
