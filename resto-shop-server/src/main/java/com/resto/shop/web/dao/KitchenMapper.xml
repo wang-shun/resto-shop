@@ -73,10 +73,9 @@
   	SELECT * from tb_kitchen where id in (SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId})
   </select>
   <select id="selectKitchenByMealsItemId" resultType="Kitchen">
- 	 SELECT * FROM tb_kitchen WHERE id = 
-		(SELECT kitchen_id FROM tb_meal_item 
-			 WHERE NAME IN 	(SELECT article_name FROM tb_order_item WHERE parent_id=#{0})
-			 AND kitchen_id IS NOT NULL AND kitchen_id !=-1
-		LIMIT 0,1)
+		SELECT * FROM tb_kitchen WHERE id = 
+		(SELECT kitchen_id FROM tb_article_kitchen 
+			 WHERE article_id IN 	(SELECT article_id FROM tb_order_item WHERE parent_id=#{0})
+			 limit 0,1)
   </select>
 </mapper>
