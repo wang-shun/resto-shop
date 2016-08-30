@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -39,4 +40,13 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 	List<OrderItem> listByOrderIds(List<String> childIds);
 
     List<OrderItem> getListBySort(@Param("parentid") String parentid,@Param("articleid") String articleid);
+    
+    
+    /**
+     * 查询订单详情   【用于同步 中间数据库 操作】
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Map<String, Object>> selectOrderItems(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 }
