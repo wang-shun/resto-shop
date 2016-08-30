@@ -81,22 +81,22 @@ public class ArticleController extends GenericController{
 			articleService.update(article);
 			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
 			if(article.getIsEmpty() == true){
-				articleService.clearStock(article.getId());
+				articleService.clearStock(article.getId(),getCurrentShopId());
 			}else {
 				if(article.getArticleType() == 1 && list.size() ==0) {
 					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
-						articleService.editStock(article.getId(), article.getStockWeekend());
+						articleService.editStock(article.getId(), article.getStockWeekend(),getCurrentShopId());
 					} else {
-						articleService.editStock(article.getId(), article.getStockWorkingDay());
+						articleService.editStock(article.getId(), article.getStockWorkingDay(),getCurrentShopId());
 					}
 				} else if (article.getArticleType() == 1 && list.size() !=0){
 					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
 						for(ArticlePrice ap : list){
-							articleService.editStock(ap.getId(), ap.getStockWeekend());
+							articleService.editStock(ap.getId(), ap.getStockWeekend(),getCurrentShopId());
 						}
 					} else {
 						for(ArticlePrice ap : list){
-							articleService.editStock(ap.getId(), ap.getStockWorkingDay());
+							articleService.editStock(ap.getId(), ap.getStockWorkingDay(),getCurrentShopId());
 						}
 					}
 				}
