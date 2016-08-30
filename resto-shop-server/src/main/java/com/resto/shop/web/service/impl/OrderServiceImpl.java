@@ -433,7 +433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-			orderMapper.setStockBySuit();//自动更新套餐数量
+			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
@@ -942,7 +942,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!addStockSuccess){
 				log.info("库存还原失败:"+order.getId());
 			}
-			orderMapper.setStockBySuit();//自动更新套餐数量
+			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
         return order;
     }
@@ -1687,6 +1687,46 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+    @Override
+    public List<Map<String, Object>> printKitchenReceipt(String orderId) {
+        log.info("打印订单全部:" + orderId);
+        Order order = selectById(orderId);
+        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+        List<OrderItem> items = orderItemService.listByOrderId(orderId);
+        List<Map<String, Object>> printTask = new ArrayList<>();
+//        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+//        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+//        if(setting.getAutoPrintTotal().intValue() == 0){
+//            for (Printer printer : ticketPrinter) {
+//                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+//                if (ticket != null) {
+//                    printTask.add(ticket);
+//                }
+//
+//            }
+//        }
+        System.out.println("----------------------------1234");
+
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+
+        //如果是外带，添加一张外带小票
+        if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
+            List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
+            for (Printer printer : packagePrinter) {
+                Map<String, Object> packageTicket = printTicket(order, items, shop, printer);
+                if (packageTicket != null) {
+                    printTask.add(packageTicket);
+                }
+            }
+        }
+
+//        }
+        if (!kitchenTicket.isEmpty()) {
+            printTask.addAll(kitchenTicket);
+        }
+        return printTask;
+    }
+
 
     public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
         if (printer == null) {
@@ -1857,11 +1897,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
-                //如果是套餐,不做判断，只判断套餐下的子品是否有库存
+            	//如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-
+                Map<String,Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
                 for( OrderItem oi : orderItem.getChildren()){
+                	//查询当前菜品，剩余多少份
                     min = orderMapper.selectArticleCount(oi.getArticleId());
+                    if(order_items_map.containsKey(oi.getArticleId())){
+                    	order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId())+oi.getCount());
+                    	min -= oi.getCount();
+                	}else{
+                		order_items_map.put(oi.getArticleId(), oi.getCount());
+                	}
                     if(min<endMin){
                         endMin = min;
                     }
@@ -1925,7 +1972,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
         //同时更新套餐库存(套餐库存为 最小库存的单品)
-        orderMapper.setStockBySuit();
+        orderMapper.setStockBySuit(order.getShopDetailId());
         return true;
     }
 
