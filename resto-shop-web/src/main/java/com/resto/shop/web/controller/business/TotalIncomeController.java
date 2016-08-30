@@ -293,7 +293,7 @@ public class TotalIncomeController extends GenericController {
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺营业额报表");// 表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "6");// 显示的位置
+		map.put("num", "5");// 显示的位置
 		map.put("reportTitle", "店铺收入条目");// 表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		

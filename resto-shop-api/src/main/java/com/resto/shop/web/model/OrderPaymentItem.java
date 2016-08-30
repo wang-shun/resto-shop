@@ -23,6 +23,17 @@ public class OrderPaymentItem {
 
     private String resultData;
 
+    //新增字段用来存营收总额
+    private  BigDecimal factIncome;
+
+    public BigDecimal getFactIncome() {
+        return factIncome;
+    }
+
+    public void setFactIncome(BigDecimal factIncome) {
+        this.factIncome = factIncome;
+    }
+
     public String getId() {
         return id;
     }
@@ -98,5 +109,10 @@ public class OrderPaymentItem {
 		
 	}
     
-    
+    public  OrderPaymentItem(BigDecimal factIncome){
+        super();
+        this.factIncome = factIncome;
+    }
+
+
 }

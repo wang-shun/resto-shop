@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.IncomeReportDto;
+import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderPaymentItemService extends GenericService<OrderPaymentItem, String> {
@@ -15,5 +16,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
 	List<IncomeReportDto> selectIncomeList(String brandId,String beginDate,String endDate);
 
 	List<OrderPaymentItem> selectListByShopId(String shopId);
+    List<IncomeReportDto> selectIncomeListByShopId(String shopId,String beginDate,String endDate);
 
 }
