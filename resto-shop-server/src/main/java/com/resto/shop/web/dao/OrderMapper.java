@@ -57,9 +57,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * 查询某个店铺某天，某个状态的订单
      * @param shopId
      * @param date
-     * @param productionState
+     * @param proStatus
      * @return
      */
+
 	List<Order> selectShopOrderByDateAndProductionStates(@Param("shopId")String shopId,@Param("date") Date date,@Param("proStatus") int[] proStatus);
 
 
@@ -136,16 +137,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	String selectNewCustomerPackageId(String currentCustomerId, String currentShopId);
 
 	List<Order> selectReadyList(String currentShopId);
-	
-	
-	/**
-	 * 根据时间 和指定 店铺ID 查询已完成的订单(orderSatus = 2,10,11,12)
-	 * 的菜品销售总和。
-	 * @param beginDate
-	 * @param endDate
-	 * @param shopId
-	 * @return
-	 */
+
+    /**
+     * 根据时间 和指定 店铺ID 查询已完成的订单(orderSatus = 2,10,11,12)
+     * 的菜品销售总和。
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
     brandArticleReportDto selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
 	
 	
@@ -212,13 +212,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ShopArticleReportDto> selectShopArticleCom(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("brandId")String brandId);
 
-	/**
-	 * 查询店铺的菜品销售总量
-	 * @param begin
-	 * @param end
-	 * @param id
-	 * @return
-	 */
+    /**
+     * 查询店铺的菜品销售总量
+     * @param brandId
+     * @param begin
+     * @param end
+     * @param sort
+     * @return
+     */
 //	int selectShopArticleNum(@Param("beginDate")Date beginDate,@Param("endDate") Date endDate, @Param("shopId")String shopId);
 
 	List<ArticleSellDto> selectBrandArticleSellByDateAndFamilyId(@Param("brandId")String brandId,@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("sort") String sort);
@@ -322,6 +323,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	BigDecimal getPayment(@Param("type") Integer type,@Param("shopId") String shopId);
 
+    /**
+     *
+     * @param shopId
+     * @param familyId
+     * @return
+     */
 	Integer getArticleCount(@Param("shopId") String shopId,@Param("familyId") String familyId);
+
+
 
 }

@@ -150,10 +150,13 @@
     <select id="selectByAttrIds" resultType="MealItem">
         select it.*,a.photo_small from tb_meal_item it
         left join tb_article a on it.article_id=a.id
-        where   a.state = 1  and  meal_attr_id in
+		where meal_attr_id in
         <foreach collection="mealAttrIds" open="(" separator="," close=")" item="attrId">
             #{attrId}
         </foreach>
+        <if test="show != ''">
+            and a.state = 1
+        </if>
         <!--         <if test="show != ''"> -->
         <!--           and a.current_working_stock > 0 and a.is_empty = 0 -->
         <!--         </if> -->

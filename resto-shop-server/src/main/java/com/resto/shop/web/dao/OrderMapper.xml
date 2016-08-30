@@ -1199,12 +1199,13 @@ SELECT IFNULL(SUM(shop_article_report.shopSellNum),0) totalNum FROM
         GROUP BY e.articleFamilyName
 order by ${sort}
 
+
 </select>
 
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
         select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
-        DISTINCT(t.order_id),
+        t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         t.count,
         t.article_name,
