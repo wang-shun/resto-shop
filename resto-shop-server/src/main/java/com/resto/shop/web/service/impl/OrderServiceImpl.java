@@ -53,6 +53,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private static final Map<String, Map<String, Integer>> NUMBER_SHOP_MAP = new ConcurrentHashMap<>();
 
+    private static final String NUMBER= "0123456789";
+
     @Resource
     private OrderMapper orderMapper;
 
@@ -138,6 +140,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order selectOrderStatesById(String orderId) {
         return orderMapper.selectOrderStatesById(orderId);
+    }
+
+    public static String generateString(int length) {
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(NUMBER.charAt(random.nextInt(NUMBER.length())));
+        }
+        return sb.toString();
     }
 
     @Override
