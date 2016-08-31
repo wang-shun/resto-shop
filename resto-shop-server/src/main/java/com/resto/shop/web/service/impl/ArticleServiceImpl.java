@@ -96,7 +96,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public Article selectFullById(String id, String show) {
+    public Article selectFullById(String id,String show) {
         Article article = selectById(id);
         List<Integer> kitchenList = kitchenService.selectIdsByArticleId(id);
         article.setKitchenList(kitchenList.toArray(new Integer[0]));
@@ -125,7 +125,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     a.setArticlePrices(prices);
                 }
             } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {
-                List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
+                List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(),show);
                 a.setMealAttrs(mealAttrs);
             }
             if (!articleMap.containsKey(a.getId())) {

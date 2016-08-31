@@ -41,7 +41,7 @@ public class CodeGenerateFromJavaTemp {
 		
 		
 		/**
-		 * arr [classSimpleName,idType,tableName]
+		 * arr [classSimpleName,idType,tableName] 
 		 */
 		String [][]  classPrimay = new String[][]{
 //			new String[]{"ShowPhoto","Integer","tb_show_photo"},
