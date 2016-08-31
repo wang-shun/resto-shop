@@ -32,29 +32,38 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public void updateShopCart(ShopCart shopCart) {
+    public int updateShopCart(ShopCart shopCart) {
         //先查询当前客户是否有该商品的 购物车的条目
-        Integer number = shopCart.getNumber();
-        ShopCart shopCartItem  = shopcartMapper.selectShopCartItem(shopCart);
-        if(shopCartItem==null&&number>0){
+        if(shopCart.getShopType().equals("1")){
+            Integer number = shopCart.getNumber();
+            ShopCart shopCartItem  = shopcartMapper.selectShopCartItem(shopCart);
+            if(shopCartItem==null&&number>0){
+                insertShopCart(shopCart);
+                return shopCart.getId();
+            }else if(shopCartItem!=null&&number>0){
+                shopCartItem.setNumber(number);
+                shopcartMapper.updateShopCartItem(shopCartItem);
+                return  shopCartItem.getId();
+            }else if(shopCartItem!=null&&number<=0){
+                deleteShopCartItem(shopCartItem.getId());
+                return shopCartItem.getId();
+            }
+        } else {
             insertShopCart(shopCart);
-        }else if(shopCartItem!=null&&number>0){
-            shopCartItem.setNumber(number);
-            shopcartMapper.updateShopCartItem(shopCartItem);
-        }else if(shopCartItem!=null&&number<=0){
-            deleteShopCartItem(shopCartItem.getId());
+            return shopCart.getId();
         }
-        
-        
+
+        return 0;
     }
 
     private void deleteShopCartItem(Integer id) {
         shopcartMapper.deleteByPrimaryKey(id);
     }
 
-    private void insertShopCart(ShopCart shopCart) {
-        
+    private int insertShopCart(ShopCart shopCart) {
         shopcartMapper.insertSelective(shopCart);
+        int farId = shopCart.getId();
+        return farId;
     }
 
 	@Override

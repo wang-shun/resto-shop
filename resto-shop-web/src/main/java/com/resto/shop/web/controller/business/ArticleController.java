@@ -1,5 +1,6 @@
  package com.resto.shop.web.controller.business;
 
+
  import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -8,11 +9,22 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
  import com.resto.shop.web.service.FreedayService;
+
+ import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.service.BrandService;
+ import com.resto.brand.web.service.BrandSettingService;
+ import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.model.Article;
+ import com.resto.shop.web.model.ArticlePrice;
+ import com.resto.shop.web.service.ArticlePriceService;
+ import com.resto.shop.web.service.ArticleService;
+>>>>>>> shopcart_wyj
  import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.service.BrandService;
@@ -22,6 +34,13 @@ import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
+
+ import javax.annotation.Resource;
+ import javax.validation.Valid;
+ import java.util.Calendar;
+ import java.util.Date;
+ import java.util.List;
+
 
 @Controller
 @RequestMapping("article")
@@ -117,7 +136,7 @@ public class ArticleController extends GenericController{
 		articleService.delete(id);
 		return Result.getSuccess();
 	}
-	
+
 	public boolean IsFreeday(Date time){
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(time);
