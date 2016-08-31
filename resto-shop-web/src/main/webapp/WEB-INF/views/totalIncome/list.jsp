@@ -91,8 +91,13 @@ var tb1 = $("#brandReportTable").DataTable({
 		},       
 		{                 
 			title : "营收总额(元)",
-			data : "totalIncome",
-		},  
+			data : "factIncome",
+			defaultContent:'0'
+		},
+		 {
+            title : "订单总额(元)",
+            data : "totalIncome",
+        },
 		{                 
 			title : "微信支付收入(元)",
 			data : "wechatIncome",
@@ -128,8 +133,13 @@ var tb2 = $("#shopReportTable").DataTable({
 		},       
 		{                 
 			title : "营收总额(元)",
-			data : "totalIncome",
-		},  
+			data : "factIncome",
+			defaultContent:'0'
+		},
+		{
+            title : "订单总额(元)",
+            data : "totalIncome",
+        },
 		{                 
 			title : "微信支付收入(元)",
 			data : "wechatIncome",

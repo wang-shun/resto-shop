@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.ChargeOrder;
@@ -40,6 +41,21 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 	void refundReward(BigDecimal payValue, String id);
 
-	
+    /**
+     * 查询店铺某个时间段的充值记录
+     * @param beginDate
+     * @param endDate
+     * @param shopDetailId
+     * @return
+     */
+    List<ChargeOrder> selectByDateAndShopId(String beginDate, String endDate, String shopDetailId);
 
+    /**
+     * 查询品牌某个时间的充值记录
+     * @param beginDate
+     * @param endDate
+     * @param id
+     * @return
+     */
+    List<ChargeOrder> selectByDateAndBrandId(String beginDate, String endDate, String id);
 }

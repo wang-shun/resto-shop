@@ -1,6 +1,8 @@
 package com.resto.shop.web.dao;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -29,5 +31,8 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
 	void refundCharge(BigDecimal payValue, String id);
 
 	void refundReward(BigDecimal payValue, String id);
-    
+
+    List<ChargeOrder> selectByDateAndShopId(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("shopId") String shopId);
+
+    List<ChargeOrder> selectByDateAndBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
 }
