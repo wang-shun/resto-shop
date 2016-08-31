@@ -40,4 +40,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	void updateNewNoticeTime(String customerId);
 
 	void updateFirstOrderTime(String id);
+
+	Integer checkRegistered(String id);
 }
