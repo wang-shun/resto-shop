@@ -149,4 +149,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		return rewardMoney;
 	}
 
+	@Override
+	public Boolean checkRegistered(String id) {
+		return customerMapper.checkRegistered(id) > 0;
+	}
 }
