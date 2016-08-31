@@ -148,9 +148,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         if (customer == null) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
-        } else if (customer.getTelephone() == null) {
-            throw new AppException(AppException.NOT_BIND_PHONE);
-        } else if (order.getOrderItems().isEmpty()) {
+        }else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
