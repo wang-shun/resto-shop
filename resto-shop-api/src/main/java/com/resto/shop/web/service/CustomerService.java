@@ -39,4 +39,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	void updateFirstOrderTime(String id);
 
 	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
+
+	Boolean checkRegistered(String id);
 }
