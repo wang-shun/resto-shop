@@ -161,7 +161,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, ArticlePrice> articlePriceMap = ApplicationUtils.convertCollectionToMap(String.class,
                 articlePrices);
 
-        order.setVerCode(customer.getTelephone().substring(7));
+        if (customer != null && customer.getTelephone() != null) {
+            order.setVerCode(customer.getTelephone().substring(7));
+        } else {
+            order.setVerCode(generateString(5));
+        }
         order.setId(orderId);
         order.setCreateTime(new Date());
         BigDecimal totalMoney = BigDecimal.ZERO;
