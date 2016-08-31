@@ -7,7 +7,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
+ import com.resto.shop.web.service.FreedayService;
+ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,9 @@ import com.resto.shop.web.service.ArticleService;
 @Controller
 @RequestMapping("article")
 public class ArticleController extends GenericController{
+
+	@Resource
+	FreedayService freedayService;
 
 	@Resource
 	ArticleService articleService;
@@ -59,7 +63,7 @@ public class ArticleController extends GenericController{
 	@RequestMapping("list_one_full")
 	@ResponseBody
 	public Result list_one_full(String id){
-		Article article = articleService.selectFullById(id, "");
+		Article article = articleService.selectFullById(id,"");
 		return getSuccessResult(article);
 	}
 
@@ -67,18 +71,44 @@ public class ArticleController extends GenericController{
 	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid @RequestBody Article article){
-        article.setShopDetailId(getCurrentShopId());
-        article.setUpdateUserId(getCurrentUserId());
-        article.setUpdateTime(new Date());
-        if(StringUtils.isEmpty(article.getId())){
-            article.setCreateUserId(getCurrentUserId());
-            articleService.save(article);
-        }else{
-            articleService.update(article);
-        }
+		article.setShopDetailId(getCurrentShopId());
+		article.setUpdateUserId(getCurrentUserId());
+		article.setUpdateTime(new Date());	
+		if(StringUtils.isEmpty(article.getId())){
+			article.setCreateUserId(getCurrentUserId());
+			articleService.save(article);
+		}else{
+			articleService.update(article);
+			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
+			if(article.getIsEmpty() == true){
+				articleService.clearStock(article.getId(),getCurrentShopId());
+			}else {
+				if(article.getArticleType() == 1 && list.size() ==0) {
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+						articleService.editStock(article.getId(), article.getStockWeekend(),getCurrentShopId());
+					} else {
+						articleService.editStock(article.getId(), article.getStockWorkingDay(),getCurrentShopId());
+					}
+				} else if (article.getArticleType() == 1 && list.size() !=0){
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+						for(ArticlePrice ap : list){
+							articleService.editStock(ap.getId(), ap.getStockWeekend(),getCurrentShopId());
+						}
+					} else {
+						for(ArticlePrice ap : list){
+							articleService.editStock(ap.getId(), ap.getStockWorkingDay(),getCurrentShopId());
+						}
+					}
+				}
+			}
+			if(article.getActivated() == true){
+				articleService.setActivated(article.getId(), 1);
+			}else{
+				articleService.setActivated(article.getId(), 0);
+			}
+		}
         articleService.initStock();
-        return Result.getSuccess();
-
+		return Result.getSuccess();
     }
 	
 	@RequestMapping("delete")

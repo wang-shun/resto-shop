@@ -553,8 +553,7 @@ where t.id = t2.article_id
             </if>
 
         </where>
-
-
+		order by articleType DESC
     </select>
 
     <update id="clearStock">
@@ -602,7 +601,7 @@ where t.id = t2.article_id
     ) as t2
     set t.current_working_stock = t2.current_working_stock_count
     ,t.is_empty = if(t2.current_working_stock_count = 0,1,0),
-    t.empty_remark = if(t2.current_working_stock_count = 0,'【自动谷清】菜品所有规格都已售罄',NULL)
+    t.empty_remark = if(t2.current_working_stock_count = 0,'【自动沽清】菜品所有规格都已售罄',NULL)
     where t.id = t2.article_id
   </update>
 
