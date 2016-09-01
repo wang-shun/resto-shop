@@ -34,7 +34,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public int updateShopCart(ShopCart shopCart) {
         //先查询当前客户是否有该商品的 购物车的条目
-        if(shopCart.getShopType().equals("1")){
+        if("1".equals(shopCart.getShopType())){
             Integer number = shopCart.getNumber();
             ShopCart shopCartItem  = shopcartMapper.selectShopCartItem(shopCart);
             if(shopCartItem==null&&number>0){
