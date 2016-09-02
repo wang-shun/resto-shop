@@ -182,21 +182,37 @@ $(document).ready(function(){
 					} 
 				}
 			}, 
-			{                 
-				title : "优惠券开始时间",
-				data : "beginDateTime",
-				createdCell:function(td,tdData){
-					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
-				}
-			},  
-			{                 
-				title : "优惠券结束时间",
-				data : "endDateTime",
-				createdCell:function(td,tdData){
-					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
-				}
-			},     
-			{                 
+			//{
+			//	title : "优惠券开始时间",
+			//	data : "beginDateTime",
+			//	createdCell:function(td,tdData){
+			//		$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+			//	}
+			//},
+			//{
+			//	title : "优惠券结束时间",
+			//	data : "endDateTime",
+			//	createdCell:function(td,tdData){
+			//		$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+			//	}
+			//},
+			{
+			    title : "优惠券的有效时间",
+			    data : "timeConsType",
+			    createdCell : function(td,tdData,row,rowData){
+			        if(tdData==1){
+			            $(td).html(row.couponValiday+"天");
+			        }else if(tdData==2){
+			            $(td).html(new Date(row.beginDateTime).format("yyyy-MM-dd")+"到"+new Date(row.endDateTime).format("yyyy-MM-dd"));
+
+			        }
+
+
+			    }
+
+			},
+
+			{
 				title : "优惠券数量",
 				data : "couponNumber",
 			},                 
