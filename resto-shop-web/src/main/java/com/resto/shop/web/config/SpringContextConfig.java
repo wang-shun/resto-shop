@@ -227,7 +227,13 @@ public class SpringContextConfig {
 	public ShareSettingService shareSettingService(){
 		return getProxy(ShareSettingService.class);
 	}
-	
+
+    @Bean
+    public EmployeeService employeeService(){
+        return getProxy(EmployeeService.class);
+    }
+
+
 	@Bean
 	public RewardSettingService rewardSettingService(){
 		return getProxy(RewardSettingService.class);

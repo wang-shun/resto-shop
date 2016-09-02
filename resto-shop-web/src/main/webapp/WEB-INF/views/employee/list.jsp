@@ -35,20 +35,6 @@
                             <input type="text" class="form-control" name="telephone" v-model="m.telephone">
                         </div>
 
-
-                         <div class="form-group">
-                            <label>职位</label>
-                            <div class="radio-list">
-                                <label class="radio-inline">
-                                  <input type="radio" name="role.id" v-model="m.role.id" value="1"> 服务员
-                                </label>
-                                <label class="radio-inline">
-                                  <input type="radio" name="role.id" v-model="m.role.id" value="2"> 店长
-                                </label>
-                            </div>
-                        </div>
-
-
                         <div class="form-group">
                             <label>额度</label>
                             <input type="text" class="form-control" name="money" v-model="m.money">
