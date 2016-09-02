@@ -2,9 +2,8 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
-import com.alibaba.druid.util.StringUtils;
-import com.resto.shop.web.producer.MQMessageProducer;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -12,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.druid.util.StringUtils;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 import com.resto.shop.web.service.SmsLogService;
@@ -36,11 +37,12 @@ public class BindPhoneAspect {
 	@Around("bindPhone()")
 	public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
 		String customerId = (String) pj.getArgs()[1];
+		Integer couponType = (Integer) pj.getArgs()[2];
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
 		if(isFirstBind){
-			newCustomerCouponService.giftCoupon(cus);
+			newCustomerCouponService.giftCoupon(cus,couponType);
 			//如果有分享者，那么给分享者发消息
 			if(!StringUtils.isEmpty(cus.getShareCustomer())){
 				MQMessageProducer.sendNoticeShareMessage(cus);
