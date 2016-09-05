@@ -4,6 +4,8 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.web.service.RoleService;
+import com.resto.shop.web.model.ERole;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -23,12 +25,14 @@ public class SpringContextConfig {
 	public PermissionService permissionService(){
 		return getProxy(PermissionService.class);
 	}
+
 	
 	@Bean 
 	public RoleService roleService(){
 		return getProxy(RoleService.class);
 	}
-	
+
+
 	@Bean
 	public UserService userService(){
 		return getProxy(UserService.class);
@@ -233,6 +237,9 @@ public class SpringContextConfig {
         return getProxy(EmployeeService.class);
     }
 
+	@Bean
+
+	public ERoleService eRoleService(){return  getProxy(ERoleService.class); }
 
 	@Bean
 	public RewardSettingService rewardSettingService(){

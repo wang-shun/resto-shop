@@ -121,11 +121,14 @@
 					createdCell:function(td,tdData,rowData,row){
 						var operator=[
 							<s:hasPermission name="employee/delete">
-							C.createDelBtn(tdData,"employee/delete"),
+							         C.createDelBtn(tdData,"employee/delete"),
 							</s:hasPermission>
 							<s:hasPermission name="employee/modify">
-							C.createEditBtn(rowData),
+							        C.createEditBtn(rowData),
 							</s:hasPermission>
+							<s:hasPermission name="employee/assign">
+                            		C.createAssignBtn(rowData),
+                            </s:hasPermission>
 						];
 						$(td).html(operator);
 					}
@@ -135,7 +138,32 @@
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
 			el:"#control",
-			mixins:[C.formVueMix]
+			mixins:[C.formVueMix],
+			methods : {
+                    createAssignBtn : function (employeeId){
+                           // url:"role/assign",
+                         //   formaction:"role/assign_form",
+                          // data:{employeeId:employeeId},
+                          //  name:"分配权限"
+
+                          		var button = $("<button class='btn btn-xs green'>").html(name||"分配角色");
+                          		button.click(function(){
+                          			_C.delConfirmDialog(function(){
+                          				_C.ajax(delUrl,{id:value},function(result){
+                          					if(result.success){
+                          						tb.ajax.reload();
+                          						_C.simpleMsg("分配角色成功");
+                          					}else{
+                          						errorMsg(result.message);
+                          					}
+                          				});
+                          			});
+                          		});
+                          		return button;
+                    }
+			}
+
+
 		});
 		C.vue=vueObj;
 	}());

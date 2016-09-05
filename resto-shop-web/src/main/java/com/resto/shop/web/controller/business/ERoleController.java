@@ -11,52 +11,51 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.shop.web.model.Employee;
-import com.resto.shop.web.service.EmployeeService;
+import com.resto.shop.web.model.ERole;
+import com.resto.shop.web.service.ERoleService;
 
 @Controller
-@RequestMapping("employee")
-public class EmployeeController extends GenericController{
+@RequestMapping("erole")
+public class ERoleController extends GenericController{
 
 	@Resource
-	EmployeeService employeeService;
+	ERoleService eroleService;
 	
 	@RequestMapping("/list")
     public void list(){
     }
 
-
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<Employee> listData(){
-		return employeeService.selectList();
+	public List<ERole> listData(){
+		return eroleService.selectList();
 	}
 	
 	@RequestMapping("list_one")
 	@ResponseBody
 	public Result list_one(Long id){
-		Employee employee = employeeService.selectById(id);
-		return getSuccessResult(employee);
+		ERole erole = eroleService.selectById(id);
+		return getSuccessResult(erole);
 	}
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid Employee employee){
-		employeeService.insertOne(employee,getCurrentBrandUser());
+	public Result create(@Valid ERole erole){
+		eroleService.insert(erole);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid Employee employee){
-		employeeService.update(employee);
+	public Result modify(@Valid ERole erole){
+		eroleService.update(erole);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){
-		employeeService.delete(id);
+		eroleService.delete(id);
 		return Result.getSuccess();
 	}
 }
