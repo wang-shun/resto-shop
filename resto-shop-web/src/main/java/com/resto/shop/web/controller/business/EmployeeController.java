@@ -5,7 +5,9 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.brand.web.model.Role;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -39,7 +41,7 @@ public class EmployeeController extends GenericController{
 		return getSuccessResult(employee);
 	}
 	
-	@RequestMapping("create")
+	@RequestMapping("addData")
 	@ResponseBody
 	public Result create(@Valid Employee employee){
 		employeeService.insertOne(employee,getCurrentBrandUser());
@@ -59,4 +61,12 @@ public class EmployeeController extends GenericController{
 		employeeService.delete(id);
 		return Result.getSuccess();
 	}
+
+
+	@RequestMapping("add")
+	public String add(){
+		return "employee/save";
+	}
+
+
 }
