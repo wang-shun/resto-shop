@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Employee {
-    private String id;
+    private Long id;
+
+    private String name;
 
     private String telephone;
 
@@ -14,11 +16,11 @@ public class Employee {
 
     private String createUser;
 
-    private Date lastLoginTime;
+    private Date updateTime;
 
     private String updateUser;
 
-    private String shopDetailId;
+    private Date lastLoginTime;
 
     private Byte state;
 
@@ -26,12 +28,20 @@ public class Employee {
 
     private String qrCode;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id == null ? null : id.trim();
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
     public String getTelephone() {
@@ -66,12 +76,12 @@ public class Employee {
         this.createUser = createUser == null ? null : createUser.trim();
     }
 
-    public Date getLastLoginTime() {
-        return lastLoginTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setLastLoginTime(Date lastLoginTime) {
-        this.lastLoginTime = lastLoginTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getUpdateUser() {
@@ -82,12 +92,12 @@ public class Employee {
         this.updateUser = updateUser == null ? null : updateUser.trim();
     }
 
-    public String getShopDetailId() {
-        return shopDetailId;
+    public Date getLastLoginTime() {
+        return lastLoginTime;
     }
 
-    public void setShopDetailId(String shopDetailId) {
-        this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
     }
 
     public Byte getState() {
