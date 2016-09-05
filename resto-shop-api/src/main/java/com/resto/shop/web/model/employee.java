@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class Employee {
     private Long id;
@@ -27,6 +28,16 @@ public class Employee {
     private BigDecimal money;
 
     private String qrCode;
+
+    private List<String> shopIds;
+
+    public List<String> getShopIds() {
+        return shopIds;
+    }
+
+    public void setShopIds(List<String> shopIds) {
+        this.shopIds = shopIds;
+    }
 
     public Long getId() {
         return id;
