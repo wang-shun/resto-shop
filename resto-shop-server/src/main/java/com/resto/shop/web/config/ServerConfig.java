@@ -31,7 +31,8 @@ public class ServerConfig {
 	public BrandService brandService(){
 		return proxy.create(BrandService.class);
 	}
-	
+
+
 	@Bean
 	public WechatConfigService wechatConfigService(){
 		return proxy.create(WechatConfigService.class);

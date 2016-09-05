@@ -1,6 +1,6 @@
 package com.resto.shop.web.model;
 
-public class Role {
+public class ERole {
     private Long id;
 
     private String roleName;
