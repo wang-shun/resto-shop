@@ -280,4 +280,8 @@
   <update id="updateFirstOrderTime">
   	update tb_customer set first_order_time=now() where id=#{0}
   </update>
+
+  <select id="checkRegistered" resultType="java.lang.Integer">
+    select count(1) from tb_customer where id = #{0} and telephone is null
+  </select>
 </mapper>

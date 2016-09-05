@@ -44,6 +44,8 @@ public class NewCustomCoupon {
 
     private String brandId;
     
+    private Integer couponType;//优惠券类型(-1:通用,0:新用户注册,1:邀请注册)
+    
     @NotNull(message="配送模式不能为空")
     private Integer distributionModeId;
     
@@ -197,4 +199,14 @@ public class NewCustomCoupon {
     public void setDistributionModeId(Integer distributionModeId) {
         this.distributionModeId = distributionModeId;
     }
+
+	public Integer getCouponType() {
+		return couponType;
+	}
+
+	public void setCouponType(Integer couponType) {
+		this.couponType = couponType;
+	}
+    
+    
 }
