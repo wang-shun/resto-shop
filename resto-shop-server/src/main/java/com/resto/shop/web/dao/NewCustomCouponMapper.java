@@ -2,6 +2,8 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.NewCustomCoupon;
 
@@ -18,7 +20,9 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
 
     int updateByPrimaryKey(NewCustomCoupon record);
 
-    List<NewCustomCoupon> selectListByBrandId(String brandId);
+    List<NewCustomCoupon> selectListByBrandId(@Param("brandId")String brandId);
+    
+    List<NewCustomCoupon> selectListByCouponType(@Param("brandId")String brandId,@Param("couponType")Integer couponType);
 
-	List<NewCustomCoupon> selectListByBrandIdAndIsActive(String brandId);
+	List<NewCustomCoupon> selectListByBrandIdAndIsActive(@Param("brandId")String brandId,@Param("couponType")Integer couponType);
 }

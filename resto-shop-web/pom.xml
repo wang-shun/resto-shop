@@ -231,9 +231,16 @@
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
 		</dependency>
-		
-		
-		
+
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+
+
+
 		<!-- UEditor -->
 		<dependency>
 	      <groupId>com.baidu.ueditor</groupId>

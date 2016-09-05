@@ -95,11 +95,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 				//短信发送失败不更新短信账户
 				insert(smsLog);
 			}
-			
 		}
 		log.info("短信发送结果:"+string);
-		
-	
 		return string;
 	}
 
@@ -156,17 +153,23 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
 	@Override
 	public List<SmsLog> selectListWhere(String begin,String end,String shopIds) {
+        if(("".equals(begin)||begin==null)&&(end==null||"".equals(""))){
+            begin = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+            end = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+        }
+
+
 		Date beginDate = DateUtil.getformatBeginDate(begin);
 		Date endDate = DateUtil.getformatEndDate(end);
-		String[] temp = shopIds.split(","); 
+		String[] temp = shopIds.split(",");
 		//查询短信记录
 		List<SmsLog> list =  smslogMapper.selectListByWhere(beginDate, endDate, temp);
 		for (SmsLog smsLog : list) {
 			smsLog.setSmsLogTyPeName(SmsLogType.getSmsLogTypeName(smsLog.getSmsType()));
 		}
-		
+
 		return list;
-		
+
 	}
 
 	@Override

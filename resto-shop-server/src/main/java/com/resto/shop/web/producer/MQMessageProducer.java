@@ -151,7 +151,7 @@ public class MQMessageProducer {
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_ORDER,obj.toJSONString().getBytes());
-		sendMessageASync(message);
+        sendMessageASync(message);
 		
 	}
 
