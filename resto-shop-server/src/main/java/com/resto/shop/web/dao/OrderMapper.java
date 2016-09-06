@@ -326,9 +326,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	/**
 	 * 获取所有桌号加菜列表
-	 * @param shopid
+	 * @param shopId
 	 * @return
      */
-	List<Order> getTableNumberAll(@Param("shopid") String shopid);
+	List<Order> getTableNumberAll(@Param("shopId") String shopId);
 
 }

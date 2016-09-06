@@ -337,8 +337,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	/**
 	 * 获取所有桌号加菜列表
-	 * @param shopid
+	 * @param shopId
 	 * @return
 	 */
-	List<Order> getTableNumberAll( String shopid);
+	List<Order> getTableNumberAll( String shopId);
 }

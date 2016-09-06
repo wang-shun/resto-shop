@@ -1728,8 +1728,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> getTableNumberAll(String shopid) {
-        return orderMapper.getTableNumberAll(shopid);
+    public List<Order> getTableNumberAll(String shopId) {
+        List<Order>  result = orderMapper.getTableNumberAll(shopId);
+        return result;
     }
 
 

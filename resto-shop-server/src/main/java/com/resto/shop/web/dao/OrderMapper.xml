@@ -173,7 +173,7 @@
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
 
-        <collection property="orderItems" javaType="List" ofType="orderItem">
+        <collection property="orderItems" javaType="List" ofType="orderItem" select="selectOrderItems" column="{order_id = id}">
             <id column="orderItem_id" property="id"/>
             <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
             <result column="count" property="count" jdbcType="INTEGER"/>
@@ -181,7 +181,7 @@
             <result column="unit_price" property="unitPrice" jdbcType="DECIMAL"/>
         </collection>
 
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem" select="selectOrderPaymentItems" column="{order_id = id}">
             <id column="orderPaymentItem_id" property="id"/>
             <result column="pay_value" property="payValue"/>
             <result column="payment_mode_id" property="paymentModeId"/>
@@ -1588,11 +1588,15 @@ GROUP BY g.articleFamilyName
 
     </select>
 
-    <select id="getTableNumberAll" resultMap="selectOrderTableNumberMap">
-        select *,max(create_time) from tb_order o
-        LEFT JOIN tb_order_payment_item op ON op.order_id = o.id
-        LEFT JOIN tb_order_item oi ON o.id = oi.order_id
-        where shop_detail_id= #{shopid} group by table_number ORDER BY create_time desc
+    <select id="getTableNumberAll" parameterType="java.lang.String" resultMap="selectOrderTableNumberMap">
+        select * from (select * from tb_order o  where o.shop_detail_id = #{shopId} ORDER BY o.create_time desc ) as r
+        group by r.table_number order by r.create_time desc
+    </select>
+    <select id="selectOrderPaymentItems" resultType="orderPaymentItem">
+        select * from tb_order_payment_item where id = #{order_id} and payment_mode_id in (1,4)
+    </select>
+    <select id="selectOrderItems" resultType="orderItem">
+        select * from tb_order_item where id = #{order_id}
     </select>
 
 </mapper>
