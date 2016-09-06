@@ -335,5 +335,10 @@ public interface OrderService extends GenericService<Order, String> {
      */
     List<Map<String, Object>>  printKitchenReceipt(String oid);
 
-
+	/**
+	 * 获取所有桌号加菜列表
+	 * @param shopid
+	 * @return
+	 */
+	List<Order> getTableNumberAll( String shopid);
 }

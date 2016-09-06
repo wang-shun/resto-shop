@@ -1727,6 +1727,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+    @Override
+    public List<Order> getTableNumberAll(String shopid) {
+        return orderMapper.getTableNumberAll(shopid);
+    }
+
 
     public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
         if (printer == null) {

@@ -163,6 +163,32 @@
         </association>
     </resultMap>
 
+    <resultMap id="selectOrderTableNumberMap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+        <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
+        <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+
+        <collection property="orderItems" javaType="List" ofType="orderItem">
+            <id column="orderItem_id" property="id"/>
+            <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
+            <result column="count" property="count" jdbcType="INTEGER"/>
+            <result column="final_price" property="finalPrice" jdbcType="DECIMAL"/>
+            <result column="unit_price" property="unitPrice" jdbcType="DECIMAL"/>
+        </collection>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+
+
 
     <sql id="Base_Column_List">
 		id, table_number, customer_count, accounting_time,
@@ -1560,6 +1586,13 @@ select IFNULL(SUM(shopSellNum),0) from ( SELECT sum(r.count) as shopSellNum,r.id
 where g.id = #{familyId}
 GROUP BY g.articleFamilyName
 
+    </select>
+
+    <select id="getTableNumberAll" resultMap="selectOrderTableNumberMap">
+        select *,max(create_time) from tb_order o
+        LEFT JOIN tb_order_payment_item op ON op.order_id = o.id
+        LEFT JOIN tb_order_item oi ON o.id = oi.order_id
+        where shop_detail_id= #{shopid} group by table_number ORDER BY create_time desc
     </select>
 
 </mapper>

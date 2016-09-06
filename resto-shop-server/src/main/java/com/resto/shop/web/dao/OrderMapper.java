@@ -324,4 +324,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Integer getArticleCount(@Param("shopId") String shopId,@Param("familyId") String familyId);
 
+	/**
+	 * 获取所有桌号加菜列表
+	 * @param shopid
+	 * @return
+     */
+	List<Order> getTableNumberAll(@Param("shopid") String shopid);
+
 }
