@@ -172,6 +172,11 @@
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
+        <result column="article_count" property="articleCount" jdbcType="INTEGER"/>
+        <result column="customer_count" property="customerCount" jdbcType="INTEGER"/>
+        <result column="payment_amount" property="paymentAmount" jdbcType="DECIMAL"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
 
         <collection property="orderItems" javaType="List" ofType="orderItem" select="selectOrderItems" column="{order_id = id}">
             <id column="orderItem_id" property="id"/>
@@ -1589,16 +1594,34 @@ GROUP BY g.articleFamilyName
     </select>
 
     <select id="getTableNumberAll" parameterType="java.lang.String" resultMap="selectOrderTableNumberMap">
-        select * from (select * from tb_order o  where o.shop_detail_id = #{shopId} ORDER BY o.create_time desc ) as r
+        select
+         r.id id,
+         r.table_number table_number,
+         r.article_count article_count,
+         r.create_time create_time,
+         r.payment_amount payment_amount,
+         r.order_money order_money,
+         r.customer_count customer_count
+         from (select * from tb_order o  where o.shop_detail_id = #{shopId} ORDER BY o.create_time desc ) as r
         group by r.table_number order by r.create_time desc
     </select>
-    <select id="selectOrderPaymentItems" resultType="orderPaymentItem">
-        select * from tb_order_payment_item where id = #{order_id} and payment_mode_id in (1,4)
+    <select id="selectOrderPaymentItems" resultType="orderPaymentItem" resultMap="orderPaymentItemMap">
+        select id as orderPaymentItem_id from tb_order_payment_item op
+        LEFT JOIN tb_order o on o.id = op.order_id
+        where op.id = ${order_id} and op.payment_mode_id in (1,4)
     </select>
-    <select id="selectOrderItems" resultType="orderItem">
-        select * from tb_order_item where id = #{order_id}
+    <select id="selectOrderItems" resultType="orderItem" resultMap="orderItemMap">
+        select id as orderItem_id from tb_order_item oi
+        LEFT JOIN tb_order o on o.id = oi.order_id
+        where oi.id = ${order_id}
     </select>
 
+    <resultMap type="orderPaymentItem" id="orderPaymentItemMap" >
+        <id property="id" column="id" javaType="java.lang.String" />
+    </resultMap>
+    <resultMap type="orderItem" id="orderItemMap" >
+        <id property="id" column="id" javaType="java.lang.String" />
+    </resultMap>
 </mapper>
 
 
