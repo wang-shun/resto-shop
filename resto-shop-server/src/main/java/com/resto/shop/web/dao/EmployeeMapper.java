@@ -15,4 +15,6 @@ public interface EmployeeMapper  extends GenericDao<Employee,Long> {
     int updateByPrimaryKeySelective(Employee record);
 
     int updateByPrimaryKey(Employee record);
+
+
 }

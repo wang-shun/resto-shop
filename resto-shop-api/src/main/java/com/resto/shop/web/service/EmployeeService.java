@@ -12,4 +12,11 @@ public interface EmployeeService extends GenericService<Employee, Long> {
      * @param currentBrandUser
      */
     void insertOne(Employee employee, BrandUser currentBrandUser);
+
+    /**
+     * 获取员工信息
+     * @param id
+     * @return
+     */
+    Employee selectEmployeeInfo(Long id);
 }
