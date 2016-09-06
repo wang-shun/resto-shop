@@ -2,8 +2,10 @@ package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
+/**
+ * Created by KONATA on 2016/9/6.
+ */
 public class Employee {
     private Long id;
 
@@ -132,7 +134,10 @@ public class Employee {
         return qrCode;
     }
 
+
+
     public void setQrCode(String qrCode) {
         this.qrCode = qrCode == null ? null : qrCode.trim();
     }
+
 }

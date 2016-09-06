@@ -163,31 +163,19 @@
         </association>
     </resultMap>
 
-    <resultMap id="selectOrderTableNumberMap" type="com.resto.shop.web.model.Order">
+    <resultMap id="selectOrderTableNumberMap" type="Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+
         <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
-        <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
-        <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
+
+        <result column="payment_amount" property="paymentAmount" jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
 
-        <collection property="orderItems" javaType="List" ofType="orderItem">
-            <id column="orderItem_id" property="id"/>
-            <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
-            <result column="count" property="count" jdbcType="INTEGER"/>
-            <result column="final_price" property="finalPrice" jdbcType="DECIMAL"/>
-            <result column="unit_price" property="unitPrice" jdbcType="DECIMAL"/>
-        </collection>
 
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <id column="orderPaymentItem_id" property="id"/>
-            <result column="pay_value" property="payValue"/>
-            <result column="payment_mode_id" property="paymentModeId"/>
-        </collection>
     </resultMap>
 
+
+    
 
 
     <sql id="Base_Column_List">
@@ -1588,12 +1576,39 @@ GROUP BY g.articleFamilyName
 
     </select>
 
-    <select id="getTableNumberAll" resultMap="selectOrderTableNumberMap">
-        select *,max(create_time) from tb_order o
-        LEFT JOIN tb_order_payment_item op ON op.order_id = o.id
-        LEFT JOIN tb_order_item oi ON o.id = oi.order_id
-        where shop_detail_id= #{shopid} group by table_number ORDER BY create_time desc
+    <select id="getTableNumberAll"  resultType="Order">
+         select r.* from (select tb_order.id,table_number,article_count,create_time,person_count
+ from tb_order
+left join tb_order_payment_item on tb_order_payment_item.order_id = tb_order.id
+where table_number is not null and table_number != '' and payment_mode_id is not null and tb_order.production_status in (2,3)
+and (tb_order.order_mode = 1 or tb_order.table_no != null ) and tb_order.shop_detail_id =  #{shopId}
+GROUP BY tb_order.id
+order by create_time desc ) as r
+GROUP BY r.table_number
+
+
     </select>
+    <select id="selectOrderPaymentItems" resultType="OrderPaymentItem"  >
+        select op.id as orderPaymentItem_id,payment_mode_id from tb_order_payment_item op
+        LEFT JOIN tb_order o on o.id = op.order_id
+        where op.order_id = #{orderId}
+    </select>
+
+    <select id="selectOrderItems" resultType="OrderItem" >
+        select oi.id as orderItem_id,article_name,article_id from tb_order_item oi
+        LEFT JOIN tb_order o on o.id = oi.order_id
+        where oi.order_id = #{orderId}
+    </select>
+
+
+
+    <select id="getOrderDetail" resultMap="selectOrderTableNumberMap">
+        select id,distribution_mode_id,order_money,payment_amount from tb_order where id = #{orderId}
+    </select>
+
+
+
+
 
 </mapper>
 

@@ -1728,8 +1728,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> getTableNumberAll(String shopid) {
-        return orderMapper.getTableNumberAll(shopid);
+    public List<Order> getTableNumberAll(String shopId) {
+        return orderMapper.getTableNumberAll(shopId);
     }
 
 
@@ -2026,5 +2026,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         return true;
+    }
+
+    @Override
+    public Order getOrderDetail(String orderId) {
+        Order order =  orderMapper.getOrderDetail(orderId);
+        order.setOrderItems(orderMapper.selectOrderItems(orderId));
+        order.setOrderPaymentItems(orderMapper.selectOrderPaymentItems(orderId));
+        return order;
     }
 }
