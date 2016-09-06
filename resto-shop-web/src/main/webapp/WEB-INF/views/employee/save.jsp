@@ -10,7 +10,7 @@
 		</div>
 		<div class="form-group">
 			<label>员工性别</label>
-			<input type="text" class="form-control" name="sex" value="${m.sex}">
+			<input type="text" class="form-control" name="sex" value="${m.sex }">
 		</div>
 		<div class="form-group">
 			<label>手机号</label>
@@ -20,6 +20,5 @@
 			<label>额度</label>
 			<input type="text" class="form-control" name="money" value="${m.money }">
 		</div>
-
 	</div>
 </form>
