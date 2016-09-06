@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -330,5 +332,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
      */
 	List<Order> getTableNumberAll(@Param("shopId") String shopId);
+
+	Order getOrderDetail(String orderId);
+
+	List<OrderPaymentItem> selectOrderPaymentItems(String orderId);
+
+	List<OrderItem> selectOrderItems(String orderId);
 
 }

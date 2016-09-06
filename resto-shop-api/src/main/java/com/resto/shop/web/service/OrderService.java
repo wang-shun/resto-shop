@@ -341,4 +341,11 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	List<Order> getTableNumberAll( String shopId);
+
+
+	/**
+	 * 根据订单获取订单信息
+	 * @return
+     */
+    Order getOrderDetail(String orderId);
 }

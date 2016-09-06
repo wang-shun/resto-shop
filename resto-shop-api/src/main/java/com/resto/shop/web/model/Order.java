@@ -98,6 +98,10 @@ public class Order {
     //评价
     private Appraise appraise;
 
+    private int personCount;
+
+
+
 
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
@@ -126,6 +130,14 @@ public class Order {
 
     private List<OrderPaymentItem> orderPaymentItems;
 
+
+    final public int getPersonCount() {
+        return personCount;
+    }
+
+    final public void setPersonCount(int personCount) {
+        this.personCount = personCount;
+    }
 
     final public String getId() {
         return id;
