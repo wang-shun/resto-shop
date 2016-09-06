@@ -13,6 +13,8 @@
     </div>
 </div>
 
+
+
 <script>
     (function(){
         $("[data-formurl]").click(function(){
@@ -93,7 +95,7 @@
 
         function createAssignBtn(employeeId){
             return C.createFormBtn({
-                url:"employee/assign",
+                url:"employee/employee_role",
                 formaction:"employee/assign_form",
                 data:{employeeId:employeeId},
                 name:"分配角色"
