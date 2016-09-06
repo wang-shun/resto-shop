@@ -18,7 +18,6 @@
   </resultMap>
 
 
-
   <sql id="Base_Column_List">id, name, telephone, sex, create_time, create_user, update_time, update_user, last_login_time, state, money, qr_code</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select 
     <include refid="Base_Column_List"/> from tb_employee where id = #{id,jdbcType=BIGINT}
@@ -71,11 +70,12 @@
     </set> where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Employee">update tb_employee set name = #{name,jdbcType=VARCHAR}, telephone = #{telephone,jdbcType=VARCHAR}, sex = #{sex,jdbcType=CHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, create_user = #{createUser,jdbcType=VARCHAR}, update_time = #{updateTime,jdbcType=TIMESTAMP}, update_user = #{updateUser,jdbcType=VARCHAR}, last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}, state = #{state,jdbcType=TINYINT}, money = #{money,jdbcType=DECIMAL}, qr_code = #{qrCode,jdbcType=VARCHAR} where id = #{id,jdbcType=BIGINT}</update>
-  <select id="selectList" resultMap="lsitEmployee">
+  <select id="selectList" resultType="employee">
 
   SELECT
 	e.id,
 	e. name,
+	e.sex,
 	e.telephone,
 	e.create_time,
 	e.create_user,

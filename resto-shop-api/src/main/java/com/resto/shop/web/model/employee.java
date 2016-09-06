@@ -29,14 +29,15 @@ public class Employee {
 
     private String qrCode;
 
-    private List<String> shopIds;
+    private  String shop_id;
 
-    public List<String> getShopIds() {
-        return shopIds;
+
+    public String getShop_id() {
+        return shop_id;
     }
 
-    public void setShopIds(List<String> shopIds) {
-        this.shopIds = shopIds;
+    public void setShop_id(String shop_id) {
+        this.shop_id = shop_id;
     }
 
     public Long getId() {

@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import com.resto.brand.web.service.RoleService;
 import com.resto.shop.web.model.ERole;
+import com.resto.shop.web.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
