@@ -73,7 +73,7 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Employee">update tb_employee set name = #{name,jdbcType=VARCHAR}, telephone = #{telephone,jdbcType=VARCHAR}, sex = #{sex,jdbcType=CHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, create_user = #{createUser,jdbcType=VARCHAR}, update_time = #{updateTime,jdbcType=TIMESTAMP}, update_user = #{updateUser,jdbcType=VARCHAR}, last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}, state = #{state,jdbcType=TINYINT}, money = #{money,jdbcType=DECIMAL}, qr_code = #{qrCode,jdbcType=VARCHAR} where id = #{id,jdbcType=BIGINT}</update>
   <select id="selectList" resultMap="lsitEmployee">
 
-      SELECT
+  SELECT
 	e.id,
 	e. name,
 	e.telephone,
@@ -83,6 +83,7 @@
 	e.update_user,
 	e.last_login_time,
 	e.money,
+	e.shop_id,
 	er.role_id,
 	l.role_name
 FROM
