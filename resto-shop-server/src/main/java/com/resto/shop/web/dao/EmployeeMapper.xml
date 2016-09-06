@@ -75,7 +75,7 @@
 
       SELECT
 	e.id,
-	e. NAME,
+	e. name,
 	e.telephone,
 	e.create_time,
 	e.create_user,

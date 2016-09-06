@@ -79,7 +79,7 @@
                         var delBtn = C.createDelBtn(tdData,"employee/delete");
                         operator.push(delBtn);
                         </s:hasPermission>
-                        <s:hasPermission name="employee/edit">
+                        <s:hasPermission name="employee/modify">
                         var editBtn = C.createEditBtn(tdData,"employee/modify","employee/modify");
                         operator.push(editBtn);
                         </s:hasPermission>
