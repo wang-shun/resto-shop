@@ -94,7 +94,7 @@
         function createAssignBtn(employeeId){
             return C.createFormBtn({
                 url:"employee/assign",
-                formaction:"emp;oyee/assign_form",
+                formaction:"employee/assign_form",
                 data:{employeeId:employeeId},
                 name:"分配角色"
             });
