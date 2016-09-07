@@ -1527,7 +1527,7 @@ where t.id = b.id
        select ifnull(sum(t2.pay_value),0) from tb_order t
 INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
 where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId} and t.production_status in (2,3)
+and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}
     </select>
 
 
