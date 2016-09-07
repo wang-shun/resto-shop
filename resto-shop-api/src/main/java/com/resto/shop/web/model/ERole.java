@@ -7,6 +7,16 @@ public class ERole {
 
     private String status;
 
+    private  String shopName;
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
     public Long getId() {
         return id;
     }

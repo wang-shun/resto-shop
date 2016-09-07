@@ -13,6 +13,22 @@
     </div>
 </div>
 
+<div class="modal fade" id="employeeRoModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-full">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+            </div>
+            <div class="modal-body"> </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
 
 
 <script>
@@ -86,22 +102,54 @@
                         operator.push(editBtn);
                         </s:hasPermission>
                         <s:hasPermission name="employee/assign">
-                        operator.push(createAssignBtn(tdData));
+                            var btn = vueObj.createBtn(null, "分配角色",
+                                    "btn-sm btn-info",
+                                    function() {
+                                       // $("#employeeRoModal").modal();
+                                       vueObj. showEmployeeRoleMoal("给用户分配店铺角色",tdData)
+                                        console.log(tdData);
+                                    })
+                        operator.push(btn);
                         </s:hasPermission>
                         $(td).html(operator);
                     }
                 } ],
         });
 
-        function createAssignBtn(employeeId){
-            return C.createFormBtn({
-                url:"employee/employee_role",
-                formaction:"employee/assign_form",
-                data:{employeeId:employeeId},
-                name:"分配角色"
-            });
-        }
         var C = new Controller(null,tb);
+
+        var vueObj = new Vue({
+            el:"#control",
+            mixins:[C.formVueMix],
+            methods:{
+                    openModal : function(url, modalTitle,employeeId) {
+                    $.post(url, {"employeeId":employeeId},function(result) {
+                        var modal = $("#employeeRoModal");
+                        modal.find(".modal-body").html(result);
+                        modal.find(".modal-title > strong").html(modalTitle);
+                        modal.modal()
+                    })
+
+                },
+                showEmployeeRoleMoal : function(title,employeeId) {
+                    $("#employeeRoModal").modal('show');
+                    this.openModal("employee/employee_role", title,employeeId);
+                },
+                createBtn :function (btnName,btnValue,btnClass,btnfunction) {
+                    return $('<input />', {
+                    name : btnName,
+                    value : btnValue,
+                    type : "button",
+                    class : "btn " + btnClass,
+                    click : btnfunction
+                    })
+                }
+
+
+    }
+        });
+        C.vue=vueObj;
     }());
+
 
 </script>
