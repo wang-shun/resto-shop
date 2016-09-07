@@ -67,6 +67,15 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 		shopcartMapper.clearAllShopCart(customerId, shopDetailId);
 	}
 
-    
+    @Override
+    public void clearShopCartGeekPos(String userId, String shopId) {
+        shopcartMapper.clearShopCartGeekPos(userId, shopId);
+    }
+
+    @Override
+    public List<ShopCart> listUserShopCart(String userId, String shopId, Integer distributionModeId) {
+        return  shopcartMapper.listUserShopCart(userId, shopId, distributionModeId);
+    }
+
 
 }

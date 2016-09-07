@@ -9,13 +9,14 @@
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
   </resultMap>
-  <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id</sql>
+  <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, user_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_shop_cart where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from tb_shop_cart where id = #{id,jdbcType=INTEGER}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.ShopCart">insert into tb_shop_cart (id, number, customer_id, article_id, shop_detail_id, distribution_mode_id ) values (#{id,jdbcType=INTEGER}, #{number,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER} )</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.ShopCart">insert into tb_shop_cart (id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, user_id) values (#{id,jdbcType=INTEGER}, #{number,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{userId,jdbcType=BIGINT})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.ShopCart">insert into tb_shop_cart 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -23,7 +24,8 @@
       <if test="customerId != null">customer_id,</if>  
       <if test="articleId != null">article_id,</if>  
       <if test="shopDetailId != null">shop_detail_id,</if>  
-      <if test="distributionModeId != null">distribution_mode_id,</if> 
+      <if test="distributionModeId != null">distribution_mode_id,</if>
+      <if test="userId != null">user_id,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
@@ -31,7 +33,8 @@
       <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>  
-      <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if>
+      <if test="userId != null">#{userId,jdbcType=BIGINT},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart 
@@ -40,18 +43,24 @@
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>  
-      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>
+      <if test="userId != null">user_id = #{userId,jdbcType=BIGINT}</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, user_id = #{userId,jdbcType=BIGINT} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="ShopCart">select * from tb_shop_cart</select>
   
   <!-- 查询购物车明细 -->
   <select id="listUserAndShop" resultType="com.resto.shop.web.model.ShopCart">
-  select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id from tb_shop_cart
+  select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,user_id from tb_shop_cart
   where distribution_mode_id=#{distributionModeId} and customer_id=#{customerId} and shop_detail_id=#{shopDetailId}
   </select>
-  
+
+  <!-- 查询购物车明细 -->
+  <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
+    select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,user_id from tb_shop_cart
+    where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2}
+  </select>
   
   <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
 		select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id from tb_shop_cart
@@ -68,7 +77,8 @@
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>  
-      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if> 
+      <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>
+      <if test="userId != null">user_id = #{userId,jdbcType=BIGINT},</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   
@@ -80,5 +90,9 @@
  <delete id="clearAllShopCart">
 	 delete from tb_shop_cart where customer_id = #{0}  and  shop_detail_id = #{1}
  </delete>
+
+  <delete id="clearShopCartGeekPos">
+    delete from tb_shop_cart where user_id = #{0}  and  shop_detail_id = #{1}
+  </delete>
 	
 </mapper>
