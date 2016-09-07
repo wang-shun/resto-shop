@@ -83,7 +83,7 @@
 	e.update_user,
 	e.last_login_time,
 	e.money,
-	e.shop_id,
+	er.shop_id,
 	er.role_id,
 	l.role_name
 FROM

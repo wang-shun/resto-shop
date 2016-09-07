@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by KONATA on 2016/9/6.
@@ -33,6 +34,15 @@ public class Employee {
 
     private  String shop_id;
 
+    List<EmployeeRole> employeeRoleList;
+
+    public List<EmployeeRole> getEmployeeRoleList() {
+        return employeeRoleList;
+    }
+
+    public void setEmployeeRoleList(List<EmployeeRole> employeeRoleList) {
+        this.employeeRoleList = employeeRoleList;
+    }
 
     public String getShop_id() {
         return shop_id;
