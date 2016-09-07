@@ -1712,6 +1712,46 @@ GROUP BY r.table_number
 
 
 
+    <resultMap id="EmployeeResultMap" type="Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="tableNumber" property="tableNumber"/>
+        <result column="article_count" property="articleCount"/>
+        <result column="order_state" property="orderState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="person_count" property="personCount"/>
+
+        <collection property="orderItems" javaType="List" ofType="orderItem">
+            <id column="orderItem_id" property="id"/>
+            <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
+            <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+        </collection>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
+
+
+
+    </resultMap>
+
+
+
+    <select id="getOrderByEmployee" resultMap="EmployeeResultMap">
+        select t.id,ifnull(t.table_no,t.table_number) as tableNumber,t.article_count,t.order_state,
+        t.create_time,t.payment_amount,t.order_money,t3.id as orderPaymentItem_id,
+        t3.payment_mode_id,t2.article_id,t2.article_name,t2.id as orderItem_id
+        ,t.person_count from tb_order t
+        left join tb_order_item t2 on t2.order_id = t.id
+        left join tb_order_payment_item t3 on t3.order_id = t.id
+        where DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+        and t.employee_id = #{employeeId} and t.shop_detail_id = #{shopId}
+
+    </select>
 
 
 </mapper>
