@@ -19,4 +19,14 @@ public interface EmployeeService extends GenericService<Employee, Long> {
      * @return
      */
     Employee selectEmployeeInfo(Long id);
+
+    /**
+     * 获取员工的店铺角色信息
+     * @param employeeId
+     * @return
+     */
+    Employee selectOneById(Long employeeId);
+
+    //更新员工的信息(包含其角色信息)
+    void updateSelected(Long employeeId, String id, BrandUser currentBrandUser);
 }

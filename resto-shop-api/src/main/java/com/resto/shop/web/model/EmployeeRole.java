@@ -39,7 +39,7 @@ public class EmployeeRole {
         return roleId;
     }
 
-    public void setRoleId(Long roleId) {
+    public void setRoleId(long roleId) {
         this.roleId = roleId;
     }
 

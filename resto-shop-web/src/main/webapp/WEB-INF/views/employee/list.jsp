@@ -87,6 +87,10 @@
                 {
                     title : "二维码",
                     data : "qrCode",
+                    createdCell:function (td,tdData,row,rowData) {
+                        console.log(row.id);
+                    }
+
                 },
                 {
                     title : "操作",

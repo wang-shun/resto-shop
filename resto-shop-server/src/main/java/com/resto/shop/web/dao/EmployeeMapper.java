@@ -16,5 +16,5 @@ public interface EmployeeMapper  extends GenericDao<Employee,Long> {
 
     int updateByPrimaryKey(Employee record);
 
-
+    Employee selectOneById(Long id);
 }

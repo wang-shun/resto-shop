@@ -84,9 +84,14 @@ public class EmployeeController extends GenericController{
 
 	 @RequestMapping("employee_role")
 	 public ModelAndView assignPermissions(Long employeeId){
+
+	     //查询出该员工所有店铺的所有角色
+        Employee employee =  employeeService.selectOneById(employeeId);
+
 		 ModelAndView mv = new ModelAndView("employee/employee_role");
-		 mv.addObject("employeeId", employeeId);
-		 return mv;
+		 mv.addObject("employee", employee);
+         System.out.println(employee);
+         return mv;
 	 }
 
 
@@ -113,7 +118,12 @@ public class EmployeeController extends GenericController{
 
 	 @RequestMapping("assign_form")
 	 @ResponseBody
-	 public Result assignForm(Long employeeId) throws ReflectiveOperationException{
+	 public Result assignForm(Long employeeId,String id) {
+         //31164cebcc4b422685e8d9a32db12ab8_1002,31164cebcc4b422685e8d9a32db12ab8_1003
+         //更新员工信息和中间表格信息(先不考虑更新，只是插入中间表数据)
+        employeeService.updateSelected(employeeId,id,getCurrentBrandUser());
+
+
 		// roleService.assignRolePermissions(roleId,pids);
 		 return new Result(true);
 	 }

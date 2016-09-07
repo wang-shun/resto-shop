@@ -17,6 +17,20 @@
     <result column="qr_code" property="qrCode" jdbcType="VARCHAR"/>
   </resultMap>
 
+    <resultMap id="selectList" type="employee" autoMapping="true">
+              <id column="id" property="id"></id>
+        <collection property="employeeRoleList" javaType="list" ofType="EmployeeRole" >
+                <id column="em_ro_id" property="id"></id>
+               <result column="shop_id" property="shopId"/>
+                <association property="eRole" javaType="ERole" >
+                    <id column="role_id" property="id"></id>
+                    <result column="role_name" property="roleName" />
+                </association>
+        </collection>
+
+
+    </resultMap>
+
 
   <sql id="Base_Column_List">id, name, telephone, sex, create_time, create_user, update_time, update_user, last_login_time, state, money, qr_code</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select 
@@ -70,8 +84,7 @@
     </set> where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Employee">update tb_employee set name = #{name,jdbcType=VARCHAR}, telephone = #{telephone,jdbcType=VARCHAR}, sex = #{sex,jdbcType=CHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, create_user = #{createUser,jdbcType=VARCHAR}, update_time = #{updateTime,jdbcType=TIMESTAMP}, update_user = #{updateUser,jdbcType=VARCHAR}, last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP}, state = #{state,jdbcType=TINYINT}, money = #{money,jdbcType=DECIMAL}, qr_code = #{qrCode,jdbcType=VARCHAR} where id = #{id,jdbcType=BIGINT}</update>
-  <select id="selectList" resultType="employee">
-
+  <select id="selectList" resultMap="selectList">
   SELECT
 	e.id,
 	e. name,
@@ -83,8 +96,9 @@
 	e.update_user,
 	e.last_login_time,
 	e.money,
+	er.id as em_ro_id,
 	er.shop_id,
-	er.role_id,
+	l.id as role_id,
 	l.role_name
 FROM
 	tb_employee e
@@ -92,6 +106,32 @@ LEFT JOIN tb_employee_role er ON e.id = er.employee_id
 LEFT JOIN tb_role l ON l.id = er.role_id
 WHERE
 	e.state = 1
+</select>
+<select id="selectOneById" resultMap="selectList">
+      SELECT
+    e.id,
+    e. name,
+    e.sex,
+    e.telephone,
+    e.create_time,
+    e.create_user,
+    e.update_time,
+    e.update_user,
+    e.last_login_time,
+    e.money,
+    er.id as em_ro_id,
+    er.shop_id,
+    l.id as role_id,
+    l.role_name
+    FROM
+    tb_employee e
+    INNER  JOIN tb_employee_role er ON e.id = er.employee_id
+    INNER JOIN  tb_role l ON l.id = er.role_id
+    WHERE
+    e.state = 1 and l.status=1 and e.id=#{id}
 
 </select>
+
+
+
 </mapper>
