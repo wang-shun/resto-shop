@@ -1405,6 +1405,7 @@ order by ${sort}
         shop_detail_id = #{shopId} and
          DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y') and
         production_status in (2,3))  as t
+
     </select>
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
@@ -1486,7 +1487,7 @@ order by ${sort}
         where id = #{articleId}
         and current_working_stock = 0
     </update>
-    
+
     <update id="setArticlePriceEmpty">
         update tb_article_price
         set empty_remark = '【系统自动沽清】菜品此规格已售馨'
@@ -1499,7 +1500,7 @@ order by ${sort}
         set is_empty = 0 , empty_remark = NULL
         where id = #{articleId}
     </update>
-    
+
     <update id="setArticlePriceEmptyFail">
         update tb_article_price
         set empty_remark = NULL
