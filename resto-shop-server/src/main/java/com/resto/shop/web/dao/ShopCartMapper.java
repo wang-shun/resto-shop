@@ -28,4 +28,8 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
 	void clearShopCart(String customerId, Integer distributionModeId, String shopDetailId);
 
 	void clearAllShopCart(String customerId,String shopDetailId);
+
+    void clearShopCartGeekPos(String userId, String shopId);
+
+    List<ShopCart> listUserShopCart(String userId, String shopId, Integer distributionModeId);
 }

@@ -33,6 +33,8 @@ public class Coupon {
     private Integer distributionModeId;
 
     private String customerId;
+    
+    private Integer couponType;//优惠券类型(-1:通用,0:新用户注册,1:邀请注册)
 
     public String getId() {
         return id;
@@ -153,4 +155,13 @@ public class Coupon {
     public void setCustomerId(String customerId) {
         this.customerId = customerId == null ? null : customerId.trim();
     }
+
+	public Integer getCouponType() {
+		return couponType;
+	}
+
+	public void setCouponType(Integer couponType) {
+		this.couponType = couponType;
+	}
+    
 }

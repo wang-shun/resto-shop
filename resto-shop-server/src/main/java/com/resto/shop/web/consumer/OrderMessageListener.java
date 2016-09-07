@@ -97,9 +97,6 @@ public class OrderMessageListener implements MessageListener {
     }
 
 
-
-
-
     private Action executeNoticeShareCustomer(Message message) throws UnsupportedEncodingException {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
         Customer customer = JSONObject.parseObject(msg, Customer.class);

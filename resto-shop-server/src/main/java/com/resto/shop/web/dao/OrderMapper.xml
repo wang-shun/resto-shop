@@ -104,6 +104,7 @@
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
@@ -175,7 +176,7 @@
     </resultMap>
 
 
-    
+
 
 
     <sql id="Base_Column_List">
@@ -1576,6 +1577,109 @@ GROUP BY g.articleFamilyName
 
     </select>
 
+
+
+    <select id="selectOrderArticle" resultType="com.resto.brand.web.dto.OrderArticleDto">
+        SELECT
+        o.id orderId,
+        o.create_time as orderTime,
+        o.shop_detail_id as shopId,
+        oi.article_id,
+        oi.article_name,
+        oi.count as articleNum,
+        c.telephone
+        FROM
+        tb_order o
+        INNER JOIN tb_order_item oi ON o.id = oi.order_id
+        INNER JOIN tb_customer c ON o.customer_id = c.id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[ o.create_time >= #{beginTime} and o.create_time <= #{endTime}]]>
+        AND o.brand_id = #{brandId}
+    </select>
+
+
+    <select id="selectBrandArticleSellList"  resultType="java.util.HashMap">
+        select r.type, r.shop_id, r.article_id, r.article_name,sum(r.count) as salles,r.article_family_name,r.sort,r.order_id,sum(r.final_price) as sell from (	SELECT
+        DISTINCT(t.order_id),
+        LEFT (t.article_id, 32) AS article_id,
+        t2.shop_detail_id AS shop_id,
+        t.count,
+        t.article_name,
+        t5. NAME AS article_family_name,
+        t4.sort,
+        t.type,
+        t.final_price
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+        WHERE
+        t2.order_state in (2,10,11,12)
+        and t2.production_status in (2,3)
+        and
+        <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
+        ) as r
+        GROUP BY r.article_name
+    </select>
+
+    <select id="selectListByTimeAndBrandId" resultMap="selectOrdersMap">
+        SELECT
+        o.id,
+        o.shop_detail_id,
+        o.create_time,
+        o.distribution_mode_id,
+        o.ver_code,
+        o.order_money,
+        o.order_state,
+        o.production_status,
+        c.telephone,
+        a.level,
+        oi.pay_value,
+        oi.payment_mode_id
+        FROM
+        tb_order o
+        LEFT JOIN tb_customer c ON o.customer_id = c.id
+        LEFT JOIN tb_appraise a ON o.id = a.order_id
+        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
+        where
+        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.brand_id=#{brandId}
+    </select>
+
+
+
+    <select id="selectShopArticleSellList" resultType="java.util.HashMap">
+        select r.articleId as article_id,r.type, r.article_name,sum(r.count) as salles,r.articleFamilyName as article_family_name,r.order_id,sum(r.final_price) as sell,r.shopId as shop_id from (	SELECT
+        DISTINCT(t.order_id),
+        LEFT (t.article_id, 32) AS articleId,
+        t.count,
+        t.article_name,
+        t5.id AS articleFamilyId,
+        t5. NAME AS articleFamilyName,
+        t4.sort,
+        t.type,
+        t.final_price,
+        t2.shop_detail_id as shopId
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
+        WHERE
+        t2.order_state in (2,10,11,12)
+        and t2.production_status in (2,3)
+        and
+        <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
+        ) as r
+        GROUP BY r.article_name
+    </select>
+
+
     <select id="getTableNumberAll"  resultType="Order">
          select r.* from (select tb_order.id,table_number,article_count,create_time,person_count
  from tb_order
@@ -1608,6 +1712,46 @@ GROUP BY r.table_number
 
 
 
+    <resultMap id="EmployeeResultMap" type="Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="tableNumber" property="tableNumber"/>
+        <result column="article_count" property="articleCount"/>
+        <result column="order_state" property="orderState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="person_count" property="personCount"/>
+
+        <collection property="orderItems" javaType="List" ofType="orderItem">
+            <id column="orderItem_id" property="id"/>
+            <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
+            <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+        </collection>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
+
+
+
+    </resultMap>
+
+
+
+    <select id="getOrderByEmployee" resultMap="EmployeeResultMap">
+        select t.id,ifnull(t.table_no,t.table_number) as tableNumber,t.article_count,t.order_state,
+        t.create_time,t.payment_amount,t.order_money,t3.id as orderPaymentItem_id,
+        t3.payment_mode_id,t2.article_id,t2.article_name,t2.id as orderItem_id
+        ,t.person_count from tb_order t
+        left join tb_order_item t2 on t2.order_id = t.id
+        left join tb_order_payment_item t3 on t3.order_id = t.id
+        where DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+        and t.employee_id = #{employeeId} and t.shop_detail_id = #{shopId}
+
+    </select>
 
 
 </mapper>

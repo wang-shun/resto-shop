@@ -13,6 +13,7 @@ public interface MealAttrService extends GenericService<MealAttr, Integer> {
 
 	void deleteByIds(List<Integer> ids);
 
-	List<MealAttr> selectFullByArticleId(String articleId, String show);
+
+	List<MealAttr> selectFullByArticleId(String articleId,String show);
     
 }

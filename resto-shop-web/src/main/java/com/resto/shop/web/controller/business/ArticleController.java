@@ -1,5 +1,6 @@
  package com.resto.shop.web.controller.business;
 
+
  import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,10 +22,15 @@ import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.ArticlePriceService;
 import com.resto.shop.web.service.ArticleService;
+import com.resto.shop.web.service.FreedayService;
+
 
 @Controller
 @RequestMapping("article")
 public class ArticleController extends GenericController{
+
+	@Resource
+	FreedayService freedayService;
 
 	@Resource
 	ArticleService articleService;
@@ -59,7 +65,7 @@ public class ArticleController extends GenericController{
 	@RequestMapping("list_one_full")
 	@ResponseBody
 	public Result list_one_full(String id){
-		Article article = articleService.selectFullById(id, "");
+		Article article = articleService.selectFullById(id,"");
 		return getSuccessResult(article);
 	}
 
@@ -67,18 +73,44 @@ public class ArticleController extends GenericController{
 	@RequestMapping("save")
 	@ResponseBody
 	public Result create(@Valid @RequestBody Article article){
-        article.setShopDetailId(getCurrentShopId());
-        article.setUpdateUserId(getCurrentUserId());
-        article.setUpdateTime(new Date());
-        if(StringUtils.isEmpty(article.getId())){
-            article.setCreateUserId(getCurrentUserId());
-            articleService.save(article);
-        }else{
-            articleService.update(article);
-        }
+		article.setShopDetailId(getCurrentShopId());
+		article.setUpdateUserId(getCurrentUserId());
+		article.setUpdateTime(new Date());	
+		if(StringUtils.isEmpty(article.getId())){
+			article.setCreateUserId(getCurrentUserId());
+			articleService.save(article);
+		}else{
+			articleService.update(article);
+			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
+			if(article.getIsEmpty() == true){
+				articleService.clearStock(article.getId(),getCurrentShopId());
+			}else {
+				if(article.getArticleType() == 1 && list.size() ==0) {
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+						articleService.editStock(article.getId(), article.getStockWeekend(),getCurrentShopId());
+					} else {
+						articleService.editStock(article.getId(), article.getStockWorkingDay(),getCurrentShopId());
+					}
+				} else if (article.getArticleType() == 1 && list.size() !=0){
+					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+						for(ArticlePrice ap : list){
+							articleService.editStock(ap.getId(), ap.getStockWeekend(),getCurrentShopId());
+						}
+					} else {
+						for(ArticlePrice ap : list){
+							articleService.editStock(ap.getId(), ap.getStockWorkingDay(),getCurrentShopId());
+						}
+					}
+				}
+			}
+			if(article.getActivated() == true){
+				articleService.setActivated(article.getId(), 1);
+			}else{
+				articleService.setActivated(article.getId(), 0);
+			}
+		}
         articleService.initStock();
-        return Result.getSuccess();
-
+		return Result.getSuccess();
     }
 	
 	@RequestMapping("delete")
@@ -87,7 +119,7 @@ public class ArticleController extends GenericController{
 		articleService.delete(id);
 		return Result.getSuccess();
 	}
-	
+
 	public boolean IsFreeday(Date time){
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(time);
