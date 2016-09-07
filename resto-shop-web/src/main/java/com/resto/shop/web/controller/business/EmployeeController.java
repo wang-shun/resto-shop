@@ -90,6 +90,7 @@ public class EmployeeController extends GenericController{
 
 		 ModelAndView mv = new ModelAndView("employee/employee_role");
 		 mv.addObject("employee", employee);
+         mv.addObject("employeeId",employeeId);
          System.out.println(employee);
          return mv;
 	 }

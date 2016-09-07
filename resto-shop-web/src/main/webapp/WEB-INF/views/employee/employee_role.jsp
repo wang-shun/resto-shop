@@ -16,7 +16,7 @@ dt,dd{
 <div class="row" id="empRole">
 	<div class="col-md-12">
 		<form class="form-inline" role="form"  action="/employee/assign_form"  @submit.prevent="save">
-			<input type="text" name="employeeId" value="${employee.id}"/>
+			<input type="text" name="employeeId" value="${employeeId}"/>
 			<table class="table table-bordered">
 				<tr v-for="shop in shopERoles">
 					<td style="width: 30%"><input type="checkbox"  id="{{shop.shopId}}" value={{shop.shopId} />{{shop.shopName}}</td>

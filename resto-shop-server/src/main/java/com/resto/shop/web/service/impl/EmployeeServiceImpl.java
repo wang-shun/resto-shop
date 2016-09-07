@@ -68,7 +68,7 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
     public void updateSelected(Long employeeId, String id, BrandUser brandUser) {
 
         //查询员工信息
-        Employee employee = employeeMapper.selectOneById(employeeId);
+        Employee employee = employeeMapper.selectByPrimaryKey(employeeId);
         employee.setUpdateTime(new Date());
         employee.setUpdateUser(brandUser.getUsername());
         //更新员工基本信息
