@@ -147,6 +147,7 @@ public class TotalIncomeController extends GenericController {
 				}
 			}
 		}
+        in.setBrandId(brand.getId());
 		in.setBrandName(brand.getBrandName());
 		in.setWechatIncome(wechatIncome);
 		in.setRedIncome(redIncome);

@@ -23,7 +23,20 @@ public class SmsLog {
 
     private Boolean isSuccess;
     
-    public Long getId() {
+    /**
+     * 短信验证码类型名字
+     */
+    private String smsLogTyPeName;
+    
+    public String getSmsLogTyPeName() {
+		return smsLogTyPeName;
+	}
+
+	public void setSmsLogTyPeName(String smsLogTyPeName) {
+		this.smsLogTyPeName = smsLogTyPeName;
+	}
+
+	public Long getId() {
         return id;
     }
 

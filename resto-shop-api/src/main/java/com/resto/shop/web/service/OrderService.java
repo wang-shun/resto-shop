@@ -7,10 +7,7 @@ import java.util.Map;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
-import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.dto.*;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -328,6 +325,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	List<Map<String, Object>> printTotal(String shopId);
 
+
     /**
      * 打印厨房小票
      * @param oid
@@ -342,6 +340,34 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	List<Order> getTableNumberAll( String shopId);
 
+    List<OrderArticleDto> selectOrderArticle(String currentBrandId,String beginDate,String endDate);
+
+    /**
+     * 查询品牌菜品销售  用于中间数据库
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Map<String,Object>> selectBrandArticleSellList(String currentBrandId, String beginDate, String endDate);
+
+    /**
+     * 查询店铺菜品销售 用于中间数据库
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Map<String,Object>> selectShopArticleSellList(String currentBrandId, String beginDate, String endDate);
+
+    /**
+     * 查询订单详情 用于中间数据库
+     * @param beginDate
+     * @param endDate
+     * @param currentBrandId
+     * @return
+     */
+    List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
 
 	/**
 	 * 根据订单获取订单信息

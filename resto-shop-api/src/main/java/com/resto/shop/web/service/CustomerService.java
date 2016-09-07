@@ -15,7 +15,7 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 	Customer register(Customer customer);
 
-	void bindPhone(String phone, String currentCustomerId) throws AppException;
+	void bindPhone(String phone, String currentCustomerId,Integer couponType) throws AppException;
     
 	/**
 	 * 根据ID才查询用户昵称和手机号码
@@ -39,4 +39,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	void updateFirstOrderTime(String id);
 
 	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
+
+	Boolean checkRegistered(String id);
 }

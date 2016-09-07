@@ -13,10 +13,10 @@
 				<div class="portlet-body">
 					<form role="form" action="{{m.id?'brandsetting/modify':'brandsetting/create'}}" @submit.prevent="save">
 			<div class="form-body">
-				<div class="form-group">
+				<!--<div class="form-group">
 				    <label>短信签名</label>
 				    <input type="text" class="form-control" name="smsSign" v-model="m.smsSign">
-				</div>
+				</div>-->
 				<div class="form-group">
 				    <label>评论最小金额</label>
 				    <input type="text" class="form-control" name="appraiseMinMoney" v-model="m.appraiseMinMoney">
