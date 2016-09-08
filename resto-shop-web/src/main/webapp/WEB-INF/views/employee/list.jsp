@@ -89,6 +89,12 @@
                     data : "qrCode",
                     createdCell:function (td,tdData,row,rowData) {
                         console.log(row.id);
+                        //console.log(row.id);
+//                        $.post("employee/QR",{"employeeId":row.id}, function (data) {
+//                           console.log(data);
+//                        });
+                       $(td).html( "<a href=\"#\" class=\"thumbnail\"><img src=\"employee/QR?employeeId=\"+row.id alt=\" 二为嘛 \"></a>");
+                          //  $(td).html("<a href=\"employee/QR?employeeId=\"+row.id > 点击</a>");
                     }
 
                 },

@@ -26,14 +26,15 @@ dt,dd{
 					<td style="width: 70%">
 						<div class="checkbox" v-for = "eRole in shop.eRolelist">
 							<label>
-                                <input type="text" value="{{shop.shopId}}_{{eRole.id}}" name="em">
-								<input type="checkbox" id="{{shop.shopId}}_{{eRole.id}}" value={{eRole.id}} /> {{eRole.roleName}}
+                                <input type="hidden" value="{{shop.shopId}}_{{eRole.id}}" name="em">
+								<input type="checkbox" id="{{shop.shopId}}_{{eRole.id}}" value={{eRole.id}}  v-model=true/> {{eRole.roleName}}
 							</label>
 						</div>
 					</td>
 				</tr>
 			</table>
 			<button type="submit" class="btn btn-primary">提交</button>
+            <button type="button" class="btn btn-primary" @click="showChecked">显示</button>
 		</form>
 	</div>
 </div>
@@ -41,91 +42,55 @@ dt,dd{
 
 <script>
 	$(function(){
-
 		var employeeId =  $("[name='employeeId']").val();
-
-
-		var vm = new Vue({
-				el:"#empRole",
-				data:{
-					shopERoles:[],
-                    employee:{},
-                    formData:"",
-				},
-			methods:{
-				showAllShopAndRoles : function() {
-					$.ajax({
-						url:'employee/listAllShopsAndRoles',
-						success:function (result) {
-							vm.shopERoles=result.data;
-						}
-					})
-
-				},
-				showSelected : function(employeeId) {
-					var that = this;
-					$.ajax({
-						url:"employee/listIds",
-						data:{
-							"employeeId":employeeId,
-						},
-						success:function (result) {
-							Vue.nextTick(function () {
-								///$("#31164cebcc4b422685e8d9a32db12ab8_1002").prop("checked","checked");
-								// DOM 更新了
-								var data = result.data;
-								if(data!=null){
-									that.checkedlist = data;
-									for (var i in data){
-//										console.log("#"+data[i]);
-//										$("#"+data[i]).attr("checked",true);
-
-									}
-
-								}
-
-							})
-
-						}
-					})
-
-				},
-				save : function () {
-//					$("input:checked").each(function(i,d){
-//						console.log(d);
-//					})
+		var vm;
+        vm = new Vue({
+            el: "#empRole",
+            data: {
+                shopERoles: [],
+                employee: {},
+                formData: "",
+                checked:[]
+            },
+            methods: {
+                save: function () {
                     $.ajax({
-                        url:"employee/assign_form",
-                        dataType:"post",
-                        data:{
-                            "employeeId":employeeId,
-                            "id":vm.formData,
+                        url: "employee/assign_form",
+                        dataType: "post",
+                        data: {
+                            "employeeId": employeeId,
+                            "id": vm.formData,
                         },
-                        success:function (result) {
+                        success: function (result) {
                             alert("保存成功");
                         }
                     })
 
-				}
-				},
-				created : function(){
+                }
 
-					var that = this;
-					//加载所有的多选框数据(店铺数据和角色数据)
-					that.showAllShopAndRoles();
-					//已经有的店铺的角色设为选中状态
-                   // that.formData="31164cebcc4b422685e8d9a32db12ab8_1002,31164cebcc4b422685e8d9a32db12ab8_1003"
-					that.showSelected(employeeId);
+                showChecked : function () {
+                        $("#31164cebcc4b422685e8d9a32db12ab8_1002").prop("checked", "checked");
+                },
 
-				},
-			    ready: function () {
-				//	Document.getElementById("31164cebcc4b422685e8d9a32db12ab8_1002").prop("checked","checked")
+            },
+            created : function () {
+                //加载所有的复选框
+                $.ajax({
+                    url: 'employee/listAllShopsAndRoles',
+                    success: function (result) {
+                        Vue.nextTick(function () {
+                            vm.shopERoles = result.data;
+                            vm.checked.push(1002);
+                        })
+                    }
+                })
 
-					$("#12232e1_1001").prop("checked","checked");
-				}
+            },
 
 
-		})
+
+
+        });
 
 
 	});

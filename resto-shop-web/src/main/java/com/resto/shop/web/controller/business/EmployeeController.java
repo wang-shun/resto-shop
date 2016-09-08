@@ -1,6 +1,9 @@
  package com.resto.shop.web.controller.business;
 
+ import com.google.zxing.WriterException;
+ import com.resto.brand.core.alipay.util.httpClient.HttpResponse;
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.core.util.QRCodeUtil;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.constant.ERoleDto;
@@ -17,7 +20,10 @@
  import org.springframework.web.servlet.ModelAndView;
 
  import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletResponse;
  import javax.validation.Valid;
+ import java.io.IOException;
+ import java.io.OutputStream;
  import java.util.ArrayList;
  import java.util.HashMap;
  import java.util.List;
@@ -114,11 +120,10 @@ public class EmployeeController extends GenericController{
 
 	     //查询出该员工所有店铺的所有角色
         Employee employee =  employeeService.selectOneById(employeeId);
-
 		 ModelAndView mv = new ModelAndView("employee/employee_role");
 		 mv.addObject("employee", employee);
          mv.addObject("employeeId",employeeId);
-         System.out.println(employee);
+
          return mv;
 	 }
 
@@ -172,5 +177,30 @@ public class EmployeeController extends GenericController{
 		 }
 		 return getSuccessResult(elist);
 	 }
+
+
+	 @RequestMapping("QR")
+     @ResponseBody
+     public  Result createQR(Long employeeId, HttpServletResponse httpResponse) throws WriterException {
+         OutputStream out = null;
+         try {
+             out = httpResponse.getOutputStream();
+             QRCodeUtil.createQRCode(String.valueOf(employeeId),"png",out);
+
+         } catch (IOException e) {
+             e.printStackTrace();
+         }finally {
+             if(out==null){
+                 try {
+                     out.close();
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                 }
+             }
+
+         }
+         return  getSuccessResult();
+
+     }
 
 }
