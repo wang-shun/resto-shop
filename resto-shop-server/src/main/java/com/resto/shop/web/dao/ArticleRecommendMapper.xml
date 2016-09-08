@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.resto.shop.web.dao.ArticleRecommendMapper">
+
+
+    <resultMap id="RecommendResultMap" type="com.resto.shop.web.model.ArticleRecommend">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="is_used" property="isUsed"/>
+        <result column="sort" property="sort"/>
+        <collection property="articles" javaType="List" ofType="com.resto.shop.web.model.ArticleRecommendPrice">
+            <id column="article_recommend_price_id" property="id"/>
+            <result column="article_id" property="articleId"/>
+            <result column="article_name" property="articleName"/>
+            <result column="article_price" property="articlePrice"/>
+            <result column="max_count" property="maxCount"/>
+            <result column="sort" property="sort"/>
+        </collection>
+    </resultMap>
+
+    <select id="getRecommendList" resultMap="RecommendResultMap">
+        select t.id,t.name,t.count,t.is_used,t.sort,t2.id as article_recommend_price_id,t2.article_id,t2.article_name
+        ,t2.article_price,t2.max_count,t2.sort as count from tb_recommend t
+        left join tb_recommend_article t2 on t2.recommend_id = t.id
+         where t.shop_detail_id = #{shopId}
+        and t.is_used = 0
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_recommend where id = #{id,jdbcType=VARCHAR}</delete>
+</mapper>
