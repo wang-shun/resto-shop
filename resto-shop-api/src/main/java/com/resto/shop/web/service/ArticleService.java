@@ -52,4 +52,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	Boolean editStock(String articleId,Integer count,String shopId);
 
 	Boolean setActivated(String articleId,Integer activated);
+
+	List<Article> getSingoArticle(String shopId);
 }

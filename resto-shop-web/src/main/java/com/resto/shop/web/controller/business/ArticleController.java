@@ -134,4 +134,11 @@ public class ArticleController extends GenericController{
 		}
 		return true;
 	}
+
+	@RequestMapping("singo_article")
+	@ResponseBody
+	public List<Article> getSingoList(){
+		List<Article> result =  articleService.getSingoArticle(getCurrentShopId());
+		return result;
+	}
 }

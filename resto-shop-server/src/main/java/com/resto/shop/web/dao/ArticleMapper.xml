@@ -629,4 +629,15 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 	<update id="setActivate">
 		UPDATE tb_article set activated = #{activated} where id  = #{articleId}
 	</update>
+
+
+    <select id="getSingoArticle" resultType="Article">
+       select
+        <include refid="Base_Column_List"/>
+        from tb_article
+where state =1 and activated =1
+and article_type =1
+and id not in (select article_id from tb_article_price GROUP BY article_id)
+and shop_detail_id = #{shopId}
+    </select>
 </mapper>

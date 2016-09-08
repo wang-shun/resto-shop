@@ -165,7 +165,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleCanChoice">
+                                <tr v-for="art in articleList">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -424,6 +424,7 @@
                         create: function (article_type) {
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
+                                articleList:[],
                                 supportTimes: [],
                                 kitchenList: [],
                                 articles: [],
@@ -658,6 +659,11 @@
                             }
                         });
 
+
+
+                        $.post("article/singo_article", null, function (data) {
+                            that.articleList = data;
+                        });
                         $.post("articlefamily/list_all", null, function (data) {
                             that.articlefamilys = data;
                         });

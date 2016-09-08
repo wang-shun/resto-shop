@@ -76,5 +76,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	 * @param activated
 	 * @return
 	 */
-	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated); 
+	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated);
+
+	List<Article> getSingoArticle(String shopId);
 }
