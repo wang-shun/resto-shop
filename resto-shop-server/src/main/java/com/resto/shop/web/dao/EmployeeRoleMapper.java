@@ -2,6 +2,8 @@ package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.EmployeeRole;
 
+import java.util.List;
+
 public interface EmployeeRoleMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -14,4 +16,6 @@ public interface EmployeeRoleMapper {
     int updateByPrimaryKeySelective(EmployeeRole record);
 
     int updateByPrimaryKey(EmployeeRole record);
+
+    int deleteByIds(List<Long> ids);
 }

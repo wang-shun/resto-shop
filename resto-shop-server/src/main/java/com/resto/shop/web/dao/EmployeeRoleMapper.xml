@@ -79,4 +79,14 @@
       shop_id = #{shopId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <delete id="deleteByIds" parameterType="java.util.List">
+    delete from tb_employee_role where id in
+
+    <foreach collection="list" index="index" item = "item" open="(" separator="," close=")">#{ item}
+
+    </foreach>
+
+  </delete>
+
 </mapper>

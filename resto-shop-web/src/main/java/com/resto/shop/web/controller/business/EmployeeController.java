@@ -7,6 +7,7 @@
  import com.resto.shop.web.controller.GenericController;
  import com.resto.shop.web.model.ERole;
  import com.resto.shop.web.model.Employee;
+ import com.resto.shop.web.model.EmployeeRole;
  import com.resto.shop.web.service.ERoleService;
  import com.resto.shop.web.service.EmployeeService;
  import org.apache.commons.collections.map.HashedMap;
@@ -52,6 +53,32 @@ public class EmployeeController extends GenericController{
 		Employee employee = employeeService.selectById(id);
 		return getSuccessResult(employee);
 	}
+
+	@RequestMapping("listOne")
+	@ResponseBody
+	public  Result listOne(Long employeeId){
+			Employee employee = employeeService.selectOneById(employeeId);
+			return getSuccessResult(employee);
+	}
+
+	 @RequestMapping("listIds")
+	 @ResponseBody
+	 public  Result listIds(Long employeeId){
+		 Employee employee = employeeService.selectOneById(employeeId);
+		 List<String> ids = new ArrayList<>();
+		 if(employee!=null){
+				if(!employee.getEmployeeRoleList().isEmpty()){
+						for(EmployeeRole er : employee.getEmployeeRoleList()){
+								String id = er.getShopId()+"_"+er.geteRole().getId();
+								ids.add(id);
+						}
+				}
+		 }
+
+		 return getSuccessResult(ids);
+	 }
+
+
 	
 	@RequestMapping("addData")
 	@ResponseBody
@@ -121,11 +148,8 @@ public class EmployeeController extends GenericController{
 	 @ResponseBody
 	 public Result assignForm(Long employeeId,String id) {
          //31164cebcc4b422685e8d9a32db12ab8_1002,31164cebcc4b422685e8d9a32db12ab8_1003
-         //更新员工信息和中间表格信息(先不考虑更新，只是插入中间表数据)
+
         employeeService.updateSelected(employeeId,id,getCurrentBrandUser());
-
-
-		// roleService.assignRolePermissions(roleId,pids);
 		 return new Result(true);
 	 }
 

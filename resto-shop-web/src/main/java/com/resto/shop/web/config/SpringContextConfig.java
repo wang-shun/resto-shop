@@ -4,30 +4,12 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.web.service.RoleService;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
-
-import com.resto.brand.web.service.AddressInfoService;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.DatabaseConfigService;
-import com.resto.brand.web.service.DistributionModeService;
-import com.resto.brand.web.service.ModuleListService;
-import com.resto.brand.web.service.PermissionService;
-import com.resto.brand.web.service.RewardSettingService;
-import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.ShopModeService;
-import com.resto.brand.web.service.SmsAcountService;
-import com.resto.brand.web.service.SmsChargeOrderService;
-import com.resto.brand.web.service.SmsTicketService;
-import com.resto.brand.web.service.UserGroupService;
-import com.resto.brand.web.service.UserService;
-import com.resto.brand.web.service.WechatConfigService;
 
 import cn.restoplus.rpc.client.RpcProxy;
 
@@ -249,11 +231,6 @@ public class SpringContextConfig {
 		return getProxy(ShareSettingService.class);
 	}
 
-    @Bean
-    public EmployeeService employeeService(){
-        return getProxy(EmployeeService.class);
-    }
-
 	@Bean
 	public ERoleService eRoleService(){
 		return  getProxy(ERoleService.class); }
@@ -283,7 +260,18 @@ public class SpringContextConfig {
 		return proxy.create(SmsTicketService.class);
 	}
 
-	
+	@Bean
+	public EmployeeService employeeService(){
+		return getProxy(EmployeeService.class);
+	}
+
+
+	@Bean
+	public com.resto.brand.web.service.EmployeeService employeeBrandService(){return  proxy.create(com.resto.brand.web.service.EmployeeService.class);}
+
+
+
+
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}

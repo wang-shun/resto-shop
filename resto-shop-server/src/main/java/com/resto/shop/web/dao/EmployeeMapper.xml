@@ -121,6 +121,7 @@ WHERE
     e.money,
     er.id as em_ro_id,
     er.shop_id,
+    er.role_id,
     l.id as role_id,
     l.role_name
     FROM
