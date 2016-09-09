@@ -165,7 +165,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
 
-
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
         Map<String, Article> articleMap = ApplicationUtils.convertCollectionToMap(String.class, articles);
@@ -264,7 +263,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item,articleCount);
             }
 
-
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
 
@@ -272,8 +270,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 break;
             }
         }
-
-
 
         if(!jsonResult.isSuccess()){
             return jsonResult;
