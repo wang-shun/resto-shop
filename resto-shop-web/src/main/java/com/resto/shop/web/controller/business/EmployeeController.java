@@ -1,7 +1,6 @@
  package com.resto.shop.web.controller.business;
 
  import com.google.zxing.WriterException;
- import com.resto.brand.core.alipay.util.httpClient.HttpResponse;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.QRCodeUtil;
  import com.resto.brand.web.model.ShopDetail;
@@ -13,7 +12,6 @@
  import com.resto.shop.web.model.EmployeeRole;
  import com.resto.shop.web.service.ERoleService;
  import com.resto.shop.web.service.EmployeeService;
- import org.apache.commons.collections.map.HashedMap;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,9 +23,9 @@
  import java.io.IOException;
  import java.io.OutputStream;
  import java.util.ArrayList;
- import java.util.HashMap;
+ import java.util.HashSet;
  import java.util.List;
- import java.util.Map;
+ import java.util.Set;
 
  @Controller
 @RequestMapping("employee")
@@ -71,16 +69,17 @@ public class EmployeeController extends GenericController{
 	 @ResponseBody
 	 public  Result listIds(Long employeeId){
 		 Employee employee = employeeService.selectOneById(employeeId);
-		 List<String> ids = new ArrayList<>();
+		 Set<String> ids = new HashSet<>();
 		 if(employee!=null){
 				if(!employee.getEmployeeRoleList().isEmpty()){
 						for(EmployeeRole er : employee.getEmployeeRoleList()){
 								String id = er.getShopId()+"_"+er.geteRole().getId();
+								String shopId = er.getShopId();
 								ids.add(id);
+								ids.add(shopId);
 						}
 				}
 		 }
-
 		 return getSuccessResult(ids);
 	 }
 
@@ -120,9 +119,25 @@ public class EmployeeController extends GenericController{
 
 	     //查询出该员工所有店铺的所有角色
         Employee employee =  employeeService.selectOneById(employeeId);
+
+		 //查询出所有的店铺角色
+		 List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+		 //查询出所有的定义的角色
+		 List<ERole> eRoles = eRoleService.selectList();
+		 //定义一个map封装店铺和 角色的数据
+		 List<ERoleDto> elist = new ArrayList<>();
+		 for (ShopDetail shop : shops) {
+			 ERoleDto eDto = new ERoleDto();
+			 eDto.setShopId(shop.getId());
+			 eDto.setShopName(shop.getName());
+			 eDto.seteRolelist(eRoles);
+			 elist.add(eDto);
+		 }
+
 		 ModelAndView mv = new ModelAndView("employee/employee_role");
 		 mv.addObject("employee", employee);
          mv.addObject("employeeId",employeeId);
+		 mv.addObject("elist",elist);
 
          return mv;
 	 }
@@ -151,10 +166,10 @@ public class EmployeeController extends GenericController{
 
 	 @RequestMapping("assign_form")
 	 @ResponseBody
-	 public Result assignForm(Long employeeId,String id) {
+	 public Result assignForm(String employeeId,String id) {
          //31164cebcc4b422685e8d9a32db12ab8_1002,31164cebcc4b422685e8d9a32db12ab8_1003
 
-        employeeService.updateSelected(employeeId,id,getCurrentBrandUser());
+        employeeService.updateSelected(Long.parseLong(employeeId),id,getCurrentBrandUser());
 		 return new Result(true);
 	 }
 

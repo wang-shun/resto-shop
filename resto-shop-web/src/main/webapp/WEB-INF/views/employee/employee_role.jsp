@@ -10,6 +10,7 @@ dt,dd{
 	height: 25px;
 }
 </style>
+
 <h2 class="text-center">
 	<strong>给员工分配角色</strong>
 </h2>
@@ -17,83 +18,130 @@ dt,dd{
 <div class="row" id="empRole">
 	<div class="col-md-12">
 		<form class="form-inline" role="form"  action="/employee/assign_form"  @submit.prevent="save">
-			<input type="text" name="employeeId" value="${employeeId}"/>
-			<input type="checkbox" id="12232e1_1001" />
+			<input type="hidden" name="employeeId" value="${employeeId}"/>
 			<table class="table table-bordered">
-				<tr v-for="shop in shopERoles">
-					<td style="width: 30%"><input type="checkbox"  id="{{shop.shopId}}" value={{shop.shopId} />{{shop.shopName}}</td>
-                    <%--<td> <input type=""text" value={{shop.shopId}}/></td>--%>
-					<td style="width: 70%">
-						<div class="checkbox" v-for = "eRole in shop.eRolelist">
-							<label>
-                                <input type="hidden" value="{{shop.shopId}}_{{eRole.id}}" name="em">
-								<input type="checkbox" id="{{shop.shopId}}_{{eRole.id}}" value={{eRole.id}}  v-model=true/> {{eRole.roleName}}
-							</label>
-						</div>
-					</td>
-				</tr>
+					<c:forEach var="item" items="${elist}" >
+						<tr>
+							<td style="width: 25%"><input type="checkbox"  id="${item.shopId}" value=${item.shopId} class="item-edit" name="shops"  />${item.shopName}  </td>
+							<c:forEach  var="i" items="${item.eRolelist}" >
+								<td style="width: 25%">
+									<div class="checkbox" >
+										<label>
+											<input type="checkbox" id="${item.shopId}_${i.id}" value=${item.shopId}_${i.id} name="spCodeId"  class="item-edit" /> ${i.roleName}
+										</label>
+									</div>
+								</td>
+							</c:forEach>
+						</tr>
+					</c:forEach>
 			</table>
 			<button type="submit" class="btn btn-primary">提交</button>
-            <button type="button" class="btn btn-primary" @click="showChecked">显示</button>
 		</form>
 	</div>
 </div>
 
 
 <script>
+
 	$(function(){
 		var employeeId =  $("[name='employeeId']").val();
 		var vm;
-        vm = new Vue({
-            el: "#empRole",
-            data: {
-                shopERoles: [],
-                employee: {},
-                formData: "",
-                checked:[]
-            },
-            methods: {
+		vm = new Vue({
+			//parent: vueObj,
+
+			el: "#empRole",
+			data: {
+				shopERoles: [],
+				employee: {},
+				formData: "",
+			},
+			methods: {
                 save: function () {
+                	var that = this;
+                	//获取所有的选中的checkbox的id值
+					$('input:checkbox[name=spCodeId]:checked').each(function(i){
+						if(0==i){
+							vm.formData = $(this).val();
+						}else{
+							vm.formData += (","+$(this).val());
+						}
+					});
+
                     $.ajax({
                         url: "employee/assign_form",
-                        dataType: "post",
+                        type: "post",
                         data: {
                             "employeeId": employeeId,
                             "id": vm.formData,
                         },
                         success: function (result) {
-                            alert("保存成功");
+							toastr.success("保存成功");
+							$("#employeeRoModal").modal('hide');
                         }
                     })
-
-                }
-
-                showChecked : function () {
-                        $("#31164cebcc4b422685e8d9a32db12ab8_1002").prop("checked", "checked");
                 },
 
-            },
-            created : function () {
-                //加载所有的复选框
-                $.ajax({
-                    url: 'employee/listAllShopsAndRoles',
-                    success: function (result) {
-                        Vue.nextTick(function () {
-                            vm.shopERoles = result.data;
-                            vm.checked.push(1002);
-                        })
-                    }
-                })
+			},
+			ready : function () {
+				//选中已经有的角色
+				$.ajax({
+							url :  "employee/listIds",
+							data : {
+								"employeeId":employeeId,
+							},
+							success: function (result) {
+								var data = result.data;
+								if(result.data!=null){
+									for(var i=0 ; i<data.length ;i++){
+										$("#"+data[i]).prop("checked", "checked");
+									}
+								}
+						}
+					}
+				)
+				//
+			$('.item-edit').on('click', function() {
+				var item = $(this).attr("id");//获取这个id
+				var temp = $(this).is(':checked');
+				//console.log(temp);
 
-            },
+				//选择店铺的时候做全选和全部选操作
+				if(item.indexOf("_")==-1){
+					$("input:checkbox[name=spCodeId]").each(function(i){
+							if($(this).attr("id").indexOf(item)>=0){
+								$(this).prop("checked",temp)
+							}
+					});
+				}else {
+					//如果选择的是角色如果 是选中则对应的店铺
+						if(temp){
+							$("input:checkbox[name=shops]").each(function(i){
+								var tem2 = item.substring(0,item.indexOf("_"))
+								console.log(tem2);
+								$("#"+temp2).prop("checked","checked");
+							});
+						}else {
+							//如果是未选择则判断这一行的角色是否都是没选中则让店铺为未选择状态
+							var temp2 = item.substring(0,item.indexOf("_"))
+							var temp3 = false//默认店铺未选中
+							$("input:checkbox[name=spCodeId]:checked").each(function(i){
+								console.log($(this).attr("id"));
+							});
+							//$("#"+temp2).prop("checked",temp3);
+
+						}
 
 
 
+				}
 
-        });
+			});
+
+			},
+		});
+
 
 
 	});
-
 
 </script>

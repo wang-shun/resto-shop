@@ -12,6 +12,17 @@
 			<label>员工性别</label>
 			<input type="text" class="form-control" name="sex" value="${m.sex }">
 		</div>
+
+		<div class="form-group">
+			<label class="control-label">员工性别</label>
+			<div class="radio-list" style="margin-left: 20px;">
+				<label class="radio-inline">
+					<input type="radio" class="md-radiobtn" name="timeConsType" value="男" v-model="m.sex" >男</label>
+				<label class="radio-inline">
+					<input type="radio" class="md-radiobtn" name="timeConsType" value="女" v-model="m.sex" >女</label>
+			</div>
+		</div>
+
 		<div class="form-group">
 			<label>手机号</label>
 			<input type="text" class="form-control" name="telephone" value="${m.telephone }">

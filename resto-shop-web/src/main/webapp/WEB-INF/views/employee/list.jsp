@@ -2,47 +2,85 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
-<div class="table-div" id="control">
-    <div class="clearfix"></div>
-    <div class="table-filter">&nbsp;
-        <!-- data-formurl返回的是新增的页面   data-formaction是添加 -->
-        <button class="btn green pull-right margin-bottom-20" data-formurl="employee/add" data-formaction="employee/addData">新增用户</button>
-    </div>
-    <div class="table-body">
-        <table class="table table-striped table-hover table-bordered "></table>
-    </div>
-</div>
-
-<div class="modal fade" id="employeeRoModal" tabindex="-1" role="dialog" data-backdrop="static">
-    <div class="modal-dialog modal-full">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
-            </div>
-            <div class="modal-body"> </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
+<div id="control">
+    <div class="row form-div" v-if="showform">
+        <div class="col-md-offset-3 col-md-6" >
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject bold font-blue-hoki"> 表单</span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <form role="form" action="{{m.id?'employee/modify':'employee/addData'}}" @submit.prevent="save">
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label>员工姓名</label>
+                                <input type="text" class="form-control" name="name" v-model="m.name">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">员工性别</label>
+                                <div class="radio-list" style="margin-left: 20px;">
+                                    <label class="radio-inline">
+                                        <input type="radio" class="md-radiobtn" name="sex" value="男" v-model="m.sex" >男</label>
+                                    <label class="radio-inline">
+                                        <input type="radio" class="md-radiobtn" name="sex" value="女" v-model="m.sex" >女</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>手机号</label>
+                                <input type="text" class="form-control" name="telephone" v-model="m.telephone">
+                            </div>
+                            <div class="form-group">
+                                <label>额度</label>
+                                <input type="text" class="form-control" name="money" v-model="m.money">
+                            </div>
+                        </div>
+                        <input type="hidden" name="id" v-model="m.id" />
+                        <input class="btn green"  type="submit"  value="保存"/>
+                        <a class="btn default" @click="cancel" >取消</a>
+                    </form>
+                </div>
             </div>
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
-</div>
 
+    <div class="modal fade" id="employeeRoModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+    <div class="table-div">
+        <div class="table-operator">
+            <s:hasPermission name="employee/add">
+                <button class="btn green pull-right" @click="create">新建</button>
+            </s:hasPermission>
+        </div>
+        <div class="clearfix"></div>
+        <div class="table-filter"></div>
+        <div class="table-body">
+            <table class="table table-striped table-hover table-bordered "></table>
+        </div>
+    </div>
+</div>
 
 
 <script>
     (function(){
-        $("[data-formurl]").click(function(){
-            var url = $(this).data("formurl");
-            var action = $(this).data("formaction");
-            C.loadForm({
-                url:url,
-                formaction:action,
-
-            });
-        });
-
+        var cid="#control";
         var $table = $(".table-body>table");
         var tb = $table.DataTable({
             ajax : {
@@ -63,23 +101,6 @@
                     data:"telephone"
                 }
                 ,
-                // {
-                // title : "createUser",
-                // data : "createUser",
-                //},
-                // {
-                //   title : "lastLoginTime",
-                // data : "lastLoginTime",
-                //},
-                // {
-                //   title : "updateUser",
-                // data : "updateUser",
-                //},
-
-                //{
-                //  title : "state",
-                // data : "state",
-                //},
                 {
                     title : "额度",
                     data : "money",
@@ -88,40 +109,28 @@
                     title : "二维码",
                     data : "qrCode",
                     createdCell:function (td,tdData,row,rowData) {
-                        console.log(row.id);
-                        //console.log(row.id);
-//                        $.post("employee/QR",{"employeeId":row.id}, function (data) {
-//                           console.log(data);
-//                        });
-                       $(td).html( "<a href=\"#\" class=\"thumbnail\"><img src=\"employee/QR?employeeId=\"+row.id alt=\" 二为嘛 \"></a>");
-                          //  $(td).html("<a href=\"employee/QR?employeeId=\"+row.id > 点击</a>");
+                      // $(td).html( "<a href=\"#\" class=\"thumbnail\"><img src=\"employee/QR?employeeId=\"+row.id alt=\" 二为嘛 \"></a>");
+                          $(td).html("<a href=\"employee/QR?employeeId=\"+row.id > 点击</a>");
                     }
 
                 },
                 {
                     title : "操作",
                     data : "id",
-                    createdCell:function(td,tdData){
-                        var operator = [];
-                        <s:hasPermission name="employee/delete">
-                        var delBtn = C.createDelBtn(tdData,"employee/delete");
-                        operator.push(delBtn);
-                        </s:hasPermission>
-                        <s:hasPermission name="employee/modify">
-                        var editBtn = C.createEditBtn(tdData,"employee/modify","employee/modify");
-                        operator.push(editBtn);
-                        </s:hasPermission>
-                        <s:hasPermission name="employee/assign">
-                            var btn = vueObj.createBtn(null, "分配角色",
-                                    "btn-sm btn-info",
-                                    function() {
-                                       // $("#employeeRoModal").modal();
-                                       vueObj. showEmployeeRoleMoal("给用户分配店铺角色",tdData)
-                                        console.log(tdData);
-                                    })
-                        operator.push(btn);
-                        </s:hasPermission>
+                    createdCell:function(td,tdData,rowData,row){
+                        var operator=[
+                            <s:hasPermission name="employee/delete">
+                            C.createDelBtn(tdData,"employee/delete"),
+                            </s:hasPermission>
+                            <s:hasPermission name="employee/modify">
+                            C.createEditBtn(rowData),
+                            </s:hasPermission>
+                            <s:hasPermission name="employee/assign">
+                            vueObj.createAssignBtn(tdData,operator),
+                            </s:hasPermission>
+                        ];
                         $(td).html(operator);
+
                     }
                 } ],
         });
@@ -145,6 +154,10 @@
                     $("#employeeRoModal").modal('show');
                     this.openModal("employee/employee_role", title,employeeId);
                 },
+                closeModal : function () {
+                    $("#employeeRoModal").html();
+                    $("#employeeRoModal").modal();
+                },
                 createBtn :function (btnName,btnValue,btnClass,btnfunction) {
                     return $('<input />', {
                     name : btnName,
@@ -153,13 +166,34 @@
                     class : "btn " + btnClass,
                     click : btnfunction
                     })
-                }
+                },
+                createAssignBtn : function (tdData,operator) {
+                    var btn = vueObj.createBtn(null, "分配角色",
+                    "btn-sm btn-info",
+                    function() {
+                    vueObj. showEmployeeRoleMoal("给用户分配店铺角色",tdData)
+                    })
+                   return btn;
+                },
 
 
-    }
+             },
+            events:{
+                "closeModal2":function(){
+                    var that = this;
+                    that.closeModal();
+                },
+            },
+            created : function () {
+                var that = this;
+                this.$on("closeModal2",function(){
+                });
+            }
+
         });
         C.vue=vueObj;
-    }());
 
+
+    }());
 
 </script>
