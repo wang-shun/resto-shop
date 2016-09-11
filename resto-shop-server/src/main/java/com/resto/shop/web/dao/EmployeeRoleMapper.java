@@ -18,4 +18,5 @@ public interface EmployeeRoleMapper {
     int updateByPrimaryKey(EmployeeRole record);
 
     int deleteByIds(List<Long> ids);
+
 }

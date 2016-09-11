@@ -28,11 +28,11 @@
  import java.util.Set;
 
  @Controller
-@RequestMapping("employee")
-public class EmployeeController extends GenericController{
+ @RequestMapping("employee")
+ class EmployeeController extends GenericController{
 
-	@Resource
-	EmployeeService employeeService;
+     @Resource
+     private EmployeeService employeeService;
 
 	 @Resource
 	 ShopDetailService shopDetailService;

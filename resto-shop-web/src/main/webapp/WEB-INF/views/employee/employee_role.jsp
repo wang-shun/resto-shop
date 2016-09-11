@@ -51,8 +51,8 @@ dt,dd{
 
 			el: "#empRole",
 			data: {
-				shopERoles: [],
-				employee: {},
+
+				employeeRoles:[],
 				formData: "",
 			},
 			methods: {
@@ -95,41 +95,49 @@ dt,dd{
 									for(var i=0 ; i<data.length ;i++){
 										$("#"+data[i]).prop("checked", "checked");
 									}
+                                    vm.employeeRoles = data;
 								}
 						}
 					}
 				)
 				//
 			$('.item-edit').on('click', function() {
-				var item = $(this).attr("id");//获取这个id
+				var item = $(this).val();//获取这个id
 				var temp = $(this).is(':checked');
-				//console.log(temp);
-
 				//选择店铺的时候做全选和全部选操作
 				if(item.indexOf("_")==-1){
 					$("input:checkbox[name=spCodeId]").each(function(i){
-							if($(this).attr("id").indexOf(item)>=0){
+							if($(this).val().indexOf(item)>=0){
 								$(this).prop("checked",temp)
 							}
 					});
 				}else {
-					//如果选择的是角色如果 是选中则对应的店铺
+                    //获取店铺的
+                    var item2 = item.substring(0,item.indexOf("_"));
+                    //当前选中店铺必选中
 						if(temp){
-							$("input:checkbox[name=shops]").each(function(i){
-								var tem2 = item.substring(0,item.indexOf("_"))
-								console.log(tem2);
-								$("#"+temp2).prop("checked","checked");
-							});
-						}else {
-							//如果是未选择则判断这一行的角色是否都是没选中则让店铺为未选择状态
-							var temp2 = item.substring(0,item.indexOf("_"))
-							var temp3 = false//默认店铺未选中
-							$("input:checkbox[name=spCodeId]:checked").each(function(i){
-								console.log($(this).attr("id"));
-							});
-							//$("#"+temp2).prop("checked",temp3);
+                            $("#"+item2).prop("checked",true);
+						}else{
+						    //如果当前是未选中，则判断这一行是否都是未选中，只有都是未选则更改店铺为未选中
+                            //获取当时的shop状态
+                            var temp3 = $("#"+item2).prop("checked");
+                            //当前未选中，店铺是选中
+                            if(temp3){
+                                var temp4 = false;
+                                var m;
+                                $("input:checkbox[name=spCodeId]:checked").each(function(i){
+                                     m = $(this).val().substring(0,32);
+                                    if(m==item2){
+                                       temp4 = true;
+                                    }
 
-						}
+                                });
+                                //console.log(temp4);
+                                $("#"+item2).prop("checked",temp4);
+                            }
+
+
+                        }
 
 
 

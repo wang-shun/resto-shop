@@ -21,6 +21,7 @@ import java.util.*;
 /**
  *
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 @RpcService
 public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> implements EmployeeService {
 
@@ -48,6 +49,8 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
 
         //设置状态为正常
         employee.setState((byte)1);
+
+
 
         //保存员工信息
         employeeMapper.insertSelective(employee);
