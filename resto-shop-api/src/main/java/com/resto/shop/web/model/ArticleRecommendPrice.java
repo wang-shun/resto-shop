@@ -14,23 +14,16 @@ public class ArticleRecommendPrice {
 
     private String articleId;
 
-    private int maxCount;
+    private Integer maxCount;
 
     private String articleName;
 
-    private int sort;
+    private Integer sort;
 
     private Date createTime;
 
-    private BigDecimal articlePrice;
+    private BigDecimal price;
 
-    final public BigDecimal getArticlePrice() {
-        return articlePrice;
-    }
-
-    final public void setArticlePrice(BigDecimal articlePrice) {
-        this.articlePrice = articlePrice;
-    }
 
     final public String getId() {
         return id;
@@ -56,11 +49,11 @@ public class ArticleRecommendPrice {
         this.articleId = articleId;
     }
 
-    final public int getMaxCount() {
+    final public Integer getMaxCount() {
         return maxCount;
     }
 
-    final public void setMaxCount(int maxCount) {
+    final public void setMaxCount(Integer maxCount) {
         this.maxCount = maxCount;
     }
 
@@ -72,11 +65,11 @@ public class ArticleRecommendPrice {
         this.articleName = articleName;
     }
 
-    final public int getSort() {
+    final public Integer getSort() {
         return sort;
     }
 
-    final public void setSort(int sort) {
+    final public void setSort(Integer sort) {
         this.sort = sort;
     }
 
@@ -86,5 +79,13 @@ public class ArticleRecommendPrice {
 
     final public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    final public BigDecimal getPrice() {
+        return price;
+    }
+
+    final public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

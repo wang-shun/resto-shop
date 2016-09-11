@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.resto.shop.web.dao.UnitMapper">
+
+    <resultMap id="UnitResultMap" type="com.resto.shop.web.model.Unit">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <collection property="families" javaType="List" ofType="com.resto.shop.web.model.UnitFamily">
+            <id column="family_id" property="id"/>
+            <result column="family_name" property="name"/>
+            <result column="family_sort" property="sort"/>
+            <result column="family_type" property="type"/>
+            <collection property="detailList" javaType="List" ofType="com.resto.shop.web.model.UnitDetail">
+                <id column="detail_id" property="id"/>
+                <id column="detail_name" property="name"/>
+                <id column="detail_sort" property="sort"/>
+                <id column="detail_spread" property="spread"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+
+    <select id="getUnits" resultType="Unit">
+        select t.id ,t.name,t2.id as family_id,t2.name as family_name,t2.sort as family_sort,
+          t2.type as family_type,t3.id as detail_id,t3.name as detail_name,
+           t3.sort as detail_sort,t3.spread as  detail_spread from tb_unit t
+        left join tb_unit_family t2 on t2.unit_id = t.id
+        left join tb_unit_detail t3 on t3.family_id = t2.id
+        where t.shop_detail_id = #{shopId}
+    </select>
+
+</mapper>

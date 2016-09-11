@@ -272,6 +272,10 @@ public class SpringContextConfig {
 		return proxy.create(SmsTicketService.class);
 	}
 
+	@Bean
+	public UnitService unitService(){
+		return proxy.create(UnitService.class);
+	}
 
 	@Bean
 	public ArticleRecommendService articleRecommendService(){

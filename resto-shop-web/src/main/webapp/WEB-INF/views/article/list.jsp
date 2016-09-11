@@ -201,7 +201,17 @@
                                 </div>
                             </div>
                             <div class="clearfix"></div>
-
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
+                                <label class="col-md-2 text-right">推荐餐品包</label>
+                                <div class="col-md-10">
+                                    <select  name="recommendId"  v-model="m.recommendId" >
+                                        <option value="selected">未选择餐品包</option>
+                                        <option :value="f.id" v-for="f in recommendList">
+                                            {{f.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
@@ -627,6 +637,7 @@
                     mixins: [C.formVueMix],
                     data: {
                         articlefamilys: [],
+                        recommendList:[],
                         supportTimes: [],
                         kitchenList: [],
                         checkedUnit: [],
@@ -741,6 +752,7 @@
                         create: function (article_type) {
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
+//                                recommendId:this.recommendList[0].id,
                                 supportTimes: [],
                                 kitchenList: [],
                                 mealAttrs: [],
@@ -976,8 +988,13 @@
                             }
                         });
 
+
                         $.post("articlefamily/list_all", null, function (data) {
                             that.articlefamilys = data;
+                        });
+
+                        $.post("recommend/list_all", null, function (data) {
+                            that.recommendList = data;
                         });
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;

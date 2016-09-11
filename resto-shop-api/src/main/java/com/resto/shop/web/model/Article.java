@@ -107,6 +107,17 @@ public class Article {
 
     private Integer currentWorkingStock;
 
+    //推荐餐品包id
+    private String recommendId;
+
+    final public String getRecommendId() {
+        return recommendId;
+    }
+
+    final public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
     final public Integer getCurrentWorkingStock() {
         return currentWorkingStock;
     }

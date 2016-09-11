@@ -2,6 +2,9 @@ package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleRecommend;
@@ -26,9 +29,18 @@ public class RecommendController extends GenericController {
     @Autowired
     private ArticleRecommendService articleRecommendService;
 
+    @Autowired
+    private BrandSettingService brandSettingService;
+
     @RequestMapping("/articleList")
     public ModelAndView index(){
-        return new ModelAndView("recommend/list");
+        BrandSetting setting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        if(setting != null && setting.getRecommendArticle().equals(new Integer(1))){ //开启推荐餐包功能
+            return new ModelAndView("recommend/list");
+        }else{
+            return new ModelAndView("recommend/none");
+        }
+
     }
 
 
@@ -46,9 +58,31 @@ public class RecommendController extends GenericController {
         return Result.getSuccess();
     }
 
-    @RequestMapping("save")
+    @RequestMapping("/create")
     @ResponseBody
     public Result create(@Valid @RequestBody ArticleRecommend articleRecommend){
-        return new JSONResult<>();
+        //创建主表
+        String id = ApplicationUtils.randomUUID();
+        articleRecommend.setId(id);
+        articleRecommend.setShopId(getCurrentShopId());
+        articleRecommendService.insert(articleRecommend);
+        articleRecommendService.insertRecommendArticle(id,articleRecommend.getArticles());
+        return new Result(true);
     }
+
+
+    @RequestMapping("/getRecommendById")
+    @ResponseBody
+    public ArticleRecommend getRecommendById(String id){
+        return articleRecommendService.getRecommendById(id);
+    }
+
+    @RequestMapping("/modify")
+    @ResponseBody
+    public Result modify(@Valid @RequestBody ArticleRecommend articleRecommend){
+        articleRecommendService.update(articleRecommend);
+        articleRecommendService.updateRecommendArticle(articleRecommend.getId(),articleRecommend.getArticles());
+        return Result.getSuccess();
+    }
+
 }

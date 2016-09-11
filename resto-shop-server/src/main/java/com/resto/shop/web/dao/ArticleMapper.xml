@@ -37,13 +37,14 @@
         <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
         <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
         <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
+        <result column="recommend_id" property="recommendId"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock
+      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -66,7 +67,7 @@
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend)
+      is_remind,article_type,stock_working_day,stock_weekend,recommend_id)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -77,7 +78,8 @@
       #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT}, 
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
-      #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER})
+      #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
+      #{recommendId,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -184,6 +186,9 @@
             <if test="stockWeekend != null">
                 stock_weekend,
             </if>
+            <if test="recommendId != null">
+                recommend_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -288,6 +293,9 @@
             <if test="stockWeekend != null">
                 #{stockWeekend},
             </if>
+            <if test="recommendId != null">
+                #{recommendId},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -391,6 +399,9 @@
             <if test="currentWorkingStock != null">
                 current_working_stock = #{currentWorkingStock},
             </if>
+            <if test="recommendId != null">
+                recommend_id = #{recommendId},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -429,7 +440,8 @@
       article_type = #{articleType},
       stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
       stock_weekend = #{stockWeekend,jdbcType=INTEGER},
-      current_working_stock = #{currentWorkingStock,jdbcType=INTEGER}
+      current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
+      recommend_id = #{recommendId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
@@ -632,12 +644,13 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
 
     <select id="getSingoArticle" resultType="Article">
-       select
-        <include refid="Base_Column_List"/>
+       select tb_article_family.name as articleFamilyName,
+       tb_article.id,tb_article.name,tb_article.sort,price
         from tb_article
+        left join tb_article_family on tb_article.article_family_id = tb_article_family.id
 where state =1 and activated =1
 and article_type =1
-and id not in (select article_id from tb_article_price GROUP BY article_id)
-and shop_detail_id = #{shopId}
+and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
+and tb_article.shop_detail_id = #{shopId}
     </select>
 </mapper>

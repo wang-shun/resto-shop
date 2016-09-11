@@ -24,7 +24,7 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">表单</h4>
+                    <h4 class="modal-title">规格包管理</h4>
                 </div>
                 <form class="form-horizontal" role="form"
                       @submit.prevent="save">
@@ -37,61 +37,78 @@
                                     <div class="portlet-title">
                                         <div class="caption font-green-sharp">
                                             <i class="icon-speech font-green-sharp"></i>
-                                            <span class="caption-subject bold uppercase"> 编辑餐品</span>
+                                            <span class="caption-subject bold uppercase"> 编辑规格包</span>
                                         </div>
 
                                     </div>
                                     <div class="portlet-body">
                                         <div class="portlet box blue-hoki"
                                         >
-                                            <div class="portlet-title">
+                                            <div class="portlet-title" ><!--v-for="attr in familyList "-->
 
                                                 <div class="caption">
                                                     <label class="control-label col-md-4"
-                                                           style="width:120px">模板名称&nbsp;</label>
+                                                           style="width:120px">属性名称&nbsp;</label>
                                                     <div class="col-md-4">
                                                         <input class="form-control" type="text" v-model="m.name"
-                                                               id="recommendName" required="required" lazy>
+                                                               id="unitName" required="required" lazy>
                                                     </div>
 
                                                 </div>
 
 
                                                 <div class="caption">
-                                                    <label class="control-label col-md-4" style="width:200px">最大购买数量&nbsp;</label>
+                                                    <label class="control-label col-md-4" style="width:200px">排序&nbsp;</label>
                                                     <div class="col-md-4">
-                                                        <input class="form-control" type="text" v-model="m.count"
-                                                               id="maxCount" required="required" name="printSort" lazy
+                                                        <input class="form-control" type="text" v-model="m.sort"
+                                                               id="sort" required="required" name="sort" lazy
                                                         >
                                                     </div>
 
                                                 </div>
 
+                                                <div class="flex-1 caption radio-list">
+                                                    <label class="control-label col-md-4" style="width:200px">
+                                                        <input type="radio" name="type"
+                                                               v-model="attr.type"
+                                                        />
+                                                        单选&nbsp;
+                                                    </label>
+                                                    <label class="control-label col-md-4" style="width:200px">
+                                                        <input type="radio" name="type"
+                                                               v-model="attr.type"
+                                                        />
+                                                        多选或不选&nbsp;
+                                                    </label>
+                                                </div>
 
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
                                                        @click="delMealAttr(attr)"></a>
                                                 </div>
                                             </div>
-                                            <div class="portlet-body" v-for="attr in articles ">
+                                            <div class="portlet-body" > <!--v-for="attr in articles "-->
                                                 <%--<div class="portlet-body" v-if="m.id != null" v-for="attr in m.articles "  >--%>
                                                 <div class="form-group col-md-12">
-                                                    <div class="flex-row">
-                                                        <div class="flex-2">餐品名称</div>
-                                                        <div class="flex-2">餐品价格</div>
+                                                    <div class="flex-row" style="text-align: center">
+                                                        <div class="flex-1" style="text-align: center" ></div>
+                                                        <div class="flex-2">名称</div>
+                                                        <div class="flex-2">差价</div>
                                                         <div class="flex-1">排序</div>
-                                                        <div class="flex-1">最大购买数量</div>
                                                         <div class="flex-1">移除</div>
                                                     </div>
-                                                    <div class="flex-row">
-                                                        <div class="flex-2">
+                                                    <div class="flex-row" style="text-align: center">
+                                                        <div class="flex-1" style="text-align: center" >
+                                                            <label style="text-align: center">规格一:</label>
+                                                        </div>
+                                                        <div class="flex-2" >
                                                             <input type="text" class="form-control"
                                                                    v-model="attr.articleName" name="articleName"
                                                                    required="required"/>
                                                         </div>
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
-                                                                   v-model="attr.price" name="price"
+                                                                   v-model="attr.spread" name="spread"
                                                                    required="required"/>
                                                         </div>
                                                         <div class="flex-1">
@@ -99,11 +116,7 @@
                                                                    v-model="attr.sort"
                                                                    required="required" lazy/>
                                                         </div>
-                                                        <div class="flex-1">
-                                                            <input type="text" class="form-control"
-                                                                   v-model="attr.maxCount" name="maxCount"
-                                                                   required="required" lazy/>
-                                                        </div>
+
                                                         <div class="flex-1">
                                                             <button class="btn red" type="button"
                                                                     @click="removeMealItem(attr)">移除
@@ -111,19 +124,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <%--<div class="col-md-4 col-md-offset-8">--%>
-                                                <%--<button class="btn btn-block blue" type="button"--%>
-                                                <%--@click="addMealItem(attr)"><i class="fa fa-cutlery"></i>--%>
-                                                <%--添加配菜--%>
-                                                <%--</button>--%>
-                                                <%--</div>--%>
+                                                <div class="col-md-4 col-md-offset-8">
+                                                <button class="btn btn-block blue" type="button"
+                                                @click="addMealItem(attr)"><i class="fa fa-cutlery"></i>
+                                                添加规格
+                                                </button>
+                                                </div>
                                                 <div class="clearfix"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-md-offset-4">
                                             <button class="btn btn-block blue" type="button" @click="addMealItem()">
                                                 <i class="fa fa-plus"></i>
-                                                添加餐品属性
+                                                添加规格包属性
                                             </button>
                                         </div>
                                         <div class="clearfix"></div>
@@ -205,7 +218,7 @@
     </div>
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="recommend/add">
+            <s:hasPermission name="unit/add">
                 <button class="btn green pull-right" @click="create(2)">新建</button>
             </s:hasPermission>
         </div>
@@ -223,7 +236,7 @@
     (function () {
         var cid = "#control";
         var action;
-        var recommendId = null;
+        var unitId = null;
 
         var $table = $(".table-body>table");
         var allArticles = [];
@@ -237,30 +250,27 @@
 
         var tb = $table.DataTable({
             ajax: {
-                url: "recommend/list_all",
+                url: "unit/list_all",
                 dataSrc: ""
             },
             columns: [
                 {
-                    title: "模板名称",
+                    title: "规格包名称",
                     data: "name",
                 },
-                {
-                    title: "最大购买餐品数量",
-                    data: "count",
-                },
+
 
                 {
-                    title: "模板项",
-                    data: "articles",
+                    title: "属性",
+                    data: "families",
                     defaultContent: "",
                     createdCell: function (td, tdData) {
                         $(td).html('');
 
                         for (var i in tdData) {
-                            if (tdData[i].articleName) {
+                            if (tdData[i].name) {
                                 var span = $("<span class='btn blue btn-xs'></span>");
-                                $(td).append(span.html(tdData[i].articleName));
+                                $(td).append(span.html(tdData[i].name));
                             }
 
                         }
@@ -272,10 +282,10 @@
                     data: "id",
                     createdCell: function (td, tdData, rowData, row) {
                         var operator = [
-                            <s:hasPermission name="recommend/delete">
-                            C.createDelBtn(tdData, "recommend/delete"),
+                            <s:hasPermission name="unit/delete">
+                            C.createDelBtn(tdData, "unit/delete"),
                             </s:hasPermission>
-                            <s:hasPermission name="recommend/edit">
+                            <s:hasPermission name="unit/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                         ];
@@ -322,6 +332,7 @@
                         checkedUnit: [],
                         articleattrs: [],
                         articles: [],
+                        familyList:[],
                         articleunits: {},
                         unitPrices: [],
                         mealtempList: [],
@@ -455,7 +466,7 @@
                         ,
                         create: function (article_type) {
                             action = "create";
-                            recommendId = null;
+                            unitId = null;
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
                                 articleList: [],
@@ -493,11 +504,11 @@
                         edit: function (model) {
                             var that = this;
                             action = "edit";
-                            recommendId = model.id;
+                            unitId = model.id;
                             that.showform = true;
                             that.checkedUnit = [];
-                            $.post("recommend/getRecommendById", {id: model.id}, function (result) {
-                                $('#recommendName').val(result.name);
+                            $.post("unit/getRecommendById", {id: model.id}, function (result) {
+                                $('#unitName').val(result.name);
                                 $('#maxCount').val(result.count);
                                 that.articles = [];
                                 for (var i = 0; i < result.articles.length; i++) {
@@ -544,18 +555,18 @@
                             var m = this.m;
 
                             var data = {
-                                name: $('#recommendName').val(),
+                                name: $('#unitName').val(),
                                 count: $('#maxCount').val(),
-                                id : recommendId
+                                id : unitId
                             };
                             data.articles = this.articles;
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);
                             var url;
                             if(action == "edit"){
-                                url = "recommend/modify";
+                                url = "unit/modify";
                             }else{
-                                url = "recommend/create";
+                                url = "unit/create";
                             }
                             $.ajax({
                                 contentType: "application/json",

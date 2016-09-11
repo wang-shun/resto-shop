@@ -17,7 +17,18 @@ public class ArticleRecommend {
 
     private int sort;
 
+    private String shopId;
+
+
     private List<ArticleRecommendPrice> articles;
+
+    final public String getShopId() {
+        return shopId;
+    }
+
+    final public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
 
     final public List<ArticleRecommendPrice> getArticles() {
         return articles;
