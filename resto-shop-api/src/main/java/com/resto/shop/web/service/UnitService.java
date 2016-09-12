@@ -11,4 +11,14 @@ import java.util.List;
 public interface UnitService extends GenericService<Unit, String> {
 
    List<Unit> getUnits(String shopId);
+
+   void insertFamily(Unit unit);
+
+   Unit getUnitById(String id);
+
+   void initUnit(Unit unit);
+
+   Unit getUnitByArticleid(String articleId);
+
+
 }

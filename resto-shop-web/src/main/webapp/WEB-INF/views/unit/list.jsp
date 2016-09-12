@@ -28,6 +28,7 @@
                 </div>
                 <form class="form-horizontal" role="form"
                       @submit.prevent="save">
+
                     <div class="modal-body auto-height">
                         <div class="form-body">
 
@@ -37,20 +38,21 @@
                                     <div class="portlet-title">
                                         <div class="caption font-green-sharp">
                                             <i class="icon-speech font-green-sharp"></i>
-                                            <span class="caption-subject bold uppercase"> 编辑规格包</span>
+                                            <span class="caption-subject bold uppercase"> 规格包名称： </span>
+                                            <input  type="text" v-model="m.name"
+                                                   id="uName" required="required" lazy>
                                         </div>
 
                                     </div>
                                     <div class="portlet-body">
-                                        <div class="portlet box blue-hoki"
-                                        >
-                                            <div class="portlet-title" ><!--v-for="attr in familyList "-->
+                                        <div class="portlet box blue-hoki" v-for="attr in unit.familyList">
+                                            <div class="portlet-title"><!--v-for="attr in familyList "-->
 
                                                 <div class="caption">
                                                     <label class="control-label col-md-4"
                                                            style="width:120px">属性名称&nbsp;</label>
                                                     <div class="col-md-4">
-                                                        <input class="form-control" type="text" v-model="m.name"
+                                                        <input class="form-control" type="text" v-model="attr.name"
                                                                id="unitName" required="required" lazy>
                                                     </div>
 
@@ -58,9 +60,10 @@
 
 
                                                 <div class="caption">
-                                                    <label class="control-label col-md-4" style="width:200px">排序&nbsp;</label>
+                                                    <label class="control-label col-md-4"
+                                                           style="width:200px">排序&nbsp;</label>
                                                     <div class="col-md-4">
-                                                        <input class="form-control" type="text" v-model="m.sort"
+                                                        <input class="form-control" type="text" v-model="attr.sort"
                                                                id="sort" required="required" name="sort" lazy
                                                         >
                                                     </div>
@@ -69,13 +72,13 @@
 
                                                 <div class="flex-1 caption radio-list">
                                                     <label class="control-label col-md-4" style="width:200px">
-                                                        <input type="radio" name="type"
-                                                               v-model="attr.type"
+                                                        <input type="radio" name="{{attr.name}}"
+                                                               v-model="attr.type" required value="0"
                                                         />
                                                         单选&nbsp;
                                                     </label>
                                                     <label class="control-label col-md-4" style="width:200px">
-                                                        <input type="radio" name="type"
+                                                        <input type="radio" name="{{attr.name}}" required value="1"
                                                                v-model="attr.type"
                                                         />
                                                         多选或不选&nbsp;
@@ -87,54 +90,54 @@
                                                        @click="delMealAttr(attr)"></a>
                                                 </div>
                                             </div>
-                                            <div class="portlet-body" > <!--v-for="attr in articles "-->
+                                            <div class="portlet-body"> <!--v-for="attr in articles "-->
                                                 <%--<div class="portlet-body" v-if="m.id != null" v-for="attr in m.articles "  >--%>
-                                                <div class="form-group col-md-12">
+                                                <div class="form-group col-md-12" v-for="item in attr.detailList">
                                                     <div class="flex-row" style="text-align: center">
-                                                        <div class="flex-1" style="text-align: center" ></div>
+
                                                         <div class="flex-2">名称</div>
                                                         <div class="flex-2">差价</div>
                                                         <div class="flex-1">排序</div>
                                                         <div class="flex-1">移除</div>
                                                     </div>
                                                     <div class="flex-row" style="text-align: center">
-                                                        <div class="flex-1" style="text-align: center" >
-                                                            <label style="text-align: center">规格一:</label>
-                                                        </div>
-                                                        <div class="flex-2" >
+
+
+                                                        <div class="flex-2">
                                                             <input type="text" class="form-control"
-                                                                   v-model="attr.articleName" name="articleName"
+                                                                   v-model="item.name" name="name"
                                                                    required="required"/>
                                                         </div>
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
-                                                                   v-model="attr.spread" name="spread"
+                                                                   v-model="item.spread" name="spread"
                                                                    required="required"/>
                                                         </div>
                                                         <div class="flex-1">
                                                             <input type="text" class="form-control" name="sort"
-                                                                   v-model="attr.sort"
+                                                                   v-model="item.sort"
                                                                    required="required" lazy/>
                                                         </div>
 
                                                         <div class="flex-1">
                                                             <button class="btn red" type="button"
-                                                                    @click="removeMealItem(attr)">移除
+                                                                    @click="removeMealItem(attr,item)">移除
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 col-md-offset-8">
-                                                <button class="btn btn-block blue" type="button"
-                                                @click="addMealItem(attr)"><i class="fa fa-cutlery"></i>
-                                                添加规格
-                                                </button>
+                                                    <button class="btn btn-block blue" type="button"
+                                                            @click="addItem(attr)"><i class="fa fa-cutlery"></i>
+                                                        添加规格
+                                                    </button>
                                                 </div>
                                                 <div class="clearfix"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-md-offset-4">
-                                            <button class="btn btn-block blue" type="button" @click="addMealItem()">
+                                            <button class="btn btn-block blue" type="button"
+                                                    @click="addMealItem(unit.familyList)">
                                                 <i class="fa fa-plus"></i>
                                                 添加规格包属性
                                             </button>
@@ -332,8 +335,11 @@
                         checkedUnit: [],
                         articleattrs: [],
                         articles: [],
-                        familyList:[],
+                        unit: new HashMap(),
+
                         articleunits: {},
+                        familyLis: [],
+
                         unitPrices: [],
                         mealtempList: [],
                         articleList: [],
@@ -362,12 +368,13 @@
 
                             $("#article-choice-dialog").modal('hide');
                         },
-                        removeMealItem: function (attr) {
-                            this.articles.$remove(attr);
+                        removeMealItem: function (attr, item) {
+                            attr.detailList.$remove(item);
+//                            this.unit.detailList.$remove(attr);
 
-                            articleList.push(attr);
+//                            articleList.push(attr);
 
-                            this.choiceArticleShow.items = this.articles;
+//                            this.choiceArticleShow.items = this.articles;
 
                         },
                         removeArticleItem: function (mealItem) {
@@ -399,22 +406,47 @@
                             }
                             this.choiceArticleShow.items.push(item);
                         },
-                        addMealItem: function () {
-                            this.choiceArticleShow.show = true;
-                            this.choiceArticleShow.items = this.articles;
-                            this.choiceArticleShow.itemsLess = articleList;
-
-                            this.$nextTick(function () {
-                                $("#article-choice-dialog").modal('show');
-                                var that = this;
-                                $("#article-choice-dialog").on('hidden.bs.modal', function () {
-                                    that.choiceArticleShow.show = false;
+                        addItem: function (attr) {
+                            if(attr.detailList){
+                                attr.detailList.push({
+                                    name: null,
+                                    spread: null,
+                                    sort: null
                                 });
-                            })
+                            }else{
+                                attr.detailList = [{ name: null,
+                                    spread: null,
+                                    sort: null}];
+                            }
+
+
+
+                        },
+                        addMealItem: function (arr) {
+//                            this.choiceArticleShow.show = true;
+//                            this.choiceArticleShow.items = this.articles;
+//                            this.choiceArticleShow.itemsLess = articleList;
+                            var len = this.unit.familyList.length;
+                            var family = {
+                                no: len,
+                                name: null,
+                                sort: null,
+                                type: null,
+                                detailList: []
+                            }
+
+                            this.unit.familyList.push(family);
+//                            this.$nextTick(function () {
+//                                $("#article-choice-dialog").modal('show');
+//                                var that = this;
+//                                $("#article-choice-dialog").on('hidden.bs.modal', function () {
+//                                    that.choiceArticleShow.show = false;
+//                                });
+//                            })
                         },
 
                         delMealAttr: function (meal) {
-                            this.m.articles.$remove(meal);
+                            this.unit.familyList.$remove(meal);
                         }
                         ,
                         addMealAttr: function () {
@@ -465,6 +497,21 @@
                         }
                         ,
                         create: function (article_type) {
+
+
+//                            this.unit = null;
+                            var family = {
+                                no: null,
+                                name: null,
+                                sort: null,
+                                type: null,
+                                detailList: []
+                            }
+                            var unit = {
+                                familyList : [family]
+                            }
+
+                            this.unit = unit;
                             action = "create";
                             unitId = null;
                             this.m = {
@@ -504,31 +551,29 @@
                         edit: function (model) {
                             var that = this;
                             action = "edit";
+
                             unitId = model.id;
                             that.showform = true;
-                            that.checkedUnit = [];
-                            $.post("unit/getRecommendById", {id: model.id}, function (result) {
-                                $('#unitName').val(result.name);
-                                $('#maxCount').val(result.count);
-                                that.articles = [];
-                                for (var i = 0; i < result.articles.length; i++) {
-                                    that.articles.push(result.articles[i]);
+                            $.post("unit/getUnitById", {id: model.id}, function (result) {
+                                $('#uName').val(result.name);
+                                var arr = [];
+                                for (var i = 0; i < result.families.length; i++) {
+
+                                    var family = {
+                                        id:result.families[i].id,
+                                        no: i,
+                                        name: result.families[i].name,
+                                        sort: result.families[i].sort,
+                                        type: result.families[i].type,
+                                        detailList: result.families[i].detailList
+                                    }
+                                    arr.push(family);
                                 }
-//
-//                                var article = result.data;
-//                                article.articles || (article.articles = []);
-//                                that.m = article;
-//                                if (article.hasUnit && article.hasUnit != " " && article.hasUnit.length) {
-//                                    var unit = article.hasUnit.split(",");
-//                                    unit = $.unique(unit);
-//                                    for (var i in  unit) {
-//                                        that.checkedUnit.push(parseInt(unit[i]));
-//                                    }
-//                                }
-//                                that.unitPrices = article.prices;
-//                                if (!article.kitchenList) {
-//                                    article.kitchenList = [];
-//                                }
+                                that.unit = null;
+                                var unit = {
+                                    familyList : arr
+                                }
+                                that.unit = unit;
                             });
 
                         }
@@ -555,19 +600,21 @@
                             var m = this.m;
 
                             var data = {
-                                name: $('#unitName').val(),
-                                count: $('#maxCount').val(),
-                                id : unitId
+                                id: unitId,
+                                name : $('#uName').val()
                             };
-                            data.articles = this.articles;
+
+                            data.families = this.unit.familyList;
+                            
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);
                             var url;
-                            if(action == "edit"){
+                            if (action == "edit") {
                                 url = "unit/modify";
-                            }else{
+                            } else {
                                 url = "unit/create";
                             }
+
                             $.ajax({
                                 contentType: "application/json",
                                 type: "post",

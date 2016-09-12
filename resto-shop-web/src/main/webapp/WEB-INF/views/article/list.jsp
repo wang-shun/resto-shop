@@ -213,6 +213,17 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-10" v-if="m.articleType==1">
+                            <label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>
+                            <div class="col-md-10">
+                                <select  name="unitId"  v-model="m.unitId" >
+                                    <option value="selected">未选择规格包</option>
+                                    <option :value="f.id" v-for="f in unitList">
+                                        {{f.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
                                     <div class="article-attr" v-for="attr in articleattrs" v-if="attr.articleUnits">
@@ -489,7 +500,7 @@
         }
 
         if(count > 1){
-           alert("打印排序添加重复");
+            alert("打印排序添加重复");
             $(t).val('');
         }
 
@@ -506,7 +517,7 @@
             2: "套餐"
         }
         var tb = $table.DataTable({
-        	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+            "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
             ajax: {
                 url: "article/list_all",
                 dataSrc: ""
@@ -642,6 +653,7 @@
                         kitchenList: [],
                         checkedUnit: [],
                         articleattrs: [],
+                        unitList:[],
                         articleunits: {},
                         unitPrices: [],
                         mealtempList: [],
@@ -995,6 +1007,9 @@
 
                         $.post("recommend/list_all", null, function (data) {
                             that.recommendList = data;
+                        });
+                        $.post("unit/list_all", null, function (data) {
+                            that.unitList = data;
                         });
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;

@@ -37,6 +37,7 @@
         <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
         <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
         <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
+        <result column="unit_id" property="unitId"/>
         <result column="recommend_id" property="recommendId"/>
     </resultMap>
     <sql id="Base_Column_List">
@@ -44,7 +45,7 @@
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id
+      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id,unit_id
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -67,7 +68,7 @@
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,recommend_id)
+      is_remind,article_type,stock_working_day,stock_weekend,recommend_id,unit_id)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -79,7 +80,7 @@
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
-      #{recommendId,jdbcType=VARCHAR})
+      #{recommendId,jdbcType=VARCHAR},#{unitId,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -189,6 +190,9 @@
             <if test="recommendId != null">
                 recommend_id,
             </if>
+            <if test="unitId != null">
+                unit_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -296,6 +300,9 @@
             <if test="recommendId != null">
                 #{recommendId},
             </if>
+            <if test="unitId != null">
+                #{unitId},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -402,6 +409,9 @@
             <if test="recommendId != null">
                 recommend_id = #{recommendId},
             </if>
+            <if test="unitId != null">
+                unit_id =  #{unitId},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -441,7 +451,8 @@
       stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
       stock_weekend = #{stockWeekend,jdbcType=INTEGER},
       current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
-      recommend_id = #{recommendId,jdbcType=VARCHAR}
+      recommend_id = #{recommendId,jdbcType=VARCHAR},
+      unit_id = #{unitId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 

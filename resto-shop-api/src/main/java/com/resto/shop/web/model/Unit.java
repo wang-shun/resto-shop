@@ -11,8 +11,18 @@ public class Unit {
 
     private String name;
 
+    private String shopId;
+
     private List<UnitFamily> families;
 
+
+    final public String getShopId() {
+        return shopId;
+    }
+
+    final public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
 
     final public String getId() {
         return id;
