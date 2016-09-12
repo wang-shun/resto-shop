@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import javax.annotation.Resource;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ERoleMapper;
@@ -12,7 +13,7 @@ import cn.restoplus.rpc.server.RpcService;
  *
  */
 @RpcService
-public class ERoleServiceImpl extends GenericServiceImpl<ERole, Long> implements ERoleService {
+class ERoleServiceImpl extends GenericServiceImpl<ERole, Long> implements ERoleService {
 
     @Resource
     private ERoleMapper eroleMapper;
