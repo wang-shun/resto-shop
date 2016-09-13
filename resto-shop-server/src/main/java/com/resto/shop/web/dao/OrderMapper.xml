@@ -1721,6 +1721,10 @@ GROUP BY r.table_number
         <result column="payment_amount" property="paymentAmount"/>
         <result column="order_money" property="orderMoney"/>
         <result column="person_count" property="personCount"/>
+        <result column="pay_mode" property="paymentModeId" />
+        <result column="customer_count" property="customerCount" />
+        <result column="order_money" property="orderMoney" />
+        <result column="original_amount" property="originalAmount" />
 
         <collection property="orderItems" javaType="List" ofType="orderItem">
             <id column="orderItem_id" property="id"/>
@@ -1745,7 +1749,7 @@ GROUP BY r.table_number
         select t.id,ifnull(t.table_no,t.table_number) as tableNumber,t.article_count,t.order_state,
         t.create_time,t.payment_amount,t.order_money,t3.id as orderPaymentItem_id,
         t3.payment_mode_id,t2.article_id,t2.article_name,t2.id as orderItem_id
-        ,t.person_count from tb_order t
+        ,t.person_count,t.pay_mode,t.customer_count,t.order_money,t.original_amount from tb_order t
         left join tb_order_item t2 on t2.order_id = t.id
         left join tb_order_payment_item t3 on t3.order_id = t.id
         where DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
