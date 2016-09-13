@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
+import com.resto.shop.web.service.PermissionService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -269,7 +270,10 @@ public class SpringContextConfig {
 	@Bean
 	public com.resto.brand.web.service.EmployeeService employeeBrandService(){return  proxy.create(com.resto.brand.web.service.EmployeeService.class);}
 
-
+    @Bean
+    public  com.resto.brand.web.service.PermissionService brandPermissionService(){
+        return proxy.create(com.resto.brand.web.service.PermissionService.class);
+    }
 
 
 	public <T> T getProxy(Class<T> clazz){

@@ -73,5 +73,8 @@ public class ServerConfig {
 		return  proxy.create(EmployeeService.class);
 	}
 
+	@Bean
+    public  com.resto.brand.web.service.PermissionService    brandPermissionService(){return  proxy.create( com.resto.brand.web.service.PermissionService.class);}
+
 
 }

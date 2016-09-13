@@ -48,7 +48,7 @@ public class CodeGenerateFromJavaTemp {
 		 * 实体类型 主键  和  表名
 		 */
 		String [][]  classPrimay = new String[][]{
-			new String[]{"ERole","Long","tb_role"},
+			new String[]{"Permission","Long","tb_permission"},
 		};
 		
 		for (String[] cp: classPrimay) {
