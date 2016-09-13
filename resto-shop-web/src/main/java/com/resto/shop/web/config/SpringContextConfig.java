@@ -5,6 +5,7 @@ import java.io.File;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.model.RolePermission;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.PermissionService;
@@ -273,6 +274,11 @@ public class SpringContextConfig {
     @Bean
     public  com.resto.brand.web.service.PermissionService brandPermissionService(){
         return proxy.create(com.resto.brand.web.service.PermissionService.class);
+    }
+
+    @Bean
+    public  RolePermissionService rolePermissionService(){
+        return  proxy.create(RolePermissionService.class);
     }
 
 
