@@ -75,8 +75,13 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
 
 
     @Override
-    public Employee selectEmployeeInfo(String id) {
+    public Employee selectEmployeeInfo(Long id) {
         return employeeMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public Employee selectEmployeeByTel(String tel) {
+        return employeeMapper.selectEmployeeByTel(tel);
     }
 
     @Override

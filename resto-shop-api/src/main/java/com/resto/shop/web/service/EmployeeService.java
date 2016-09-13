@@ -20,7 +20,9 @@ public interface EmployeeService extends GenericService<Employee, Long> {
      * @param id
      * @return
      */
-    Employee selectEmployeeInfo(String id);
+    Employee selectEmployeeInfo(Long id);
+
+    Employee selectEmployeeByTel(String tel);
 
     /**
      * 获取员工的店铺角色信息
