@@ -13,18 +13,18 @@
 	            <div class="portlet-body">
 	            	<form role="form" action="{{m.id?'permission/modify':'permission/create'}}" @submit.prevent="save">
 						<div class="form-body">
-							<div class="form-group">
-    <label>permissionName</label>
-    <input type="text" class="form-control" name="permissionName" v-model="m.permissionName">
-</div>
-<div class="form-group">
-    <label>permissionSign</label>
-    <input type="text" class="form-control" name="permissionSign" v-model="m.permissionSign">
-</div>
-<div class="form-group">
-    <label>sort</label>
-    <input type="text" class="form-control" name="sort" v-model="m.sort">
-</div>
+                            <div class="form-group">
+                            <label>权限名称</label>
+                            <input type="text" class="form-control" name="permissionName" v-model="m.permissionName">
+                        </div>
+                        <div class="form-group">
+                            <label>权限标识</label>
+                            <input type="text" class="form-control" name="permissionSign" v-model="m.permissionSign">
+                        </div>
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="text" class="form-control" name="sort" v-model="m.sort">
+                        </div>
 
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -61,18 +61,18 @@
 				dataSrc : ""
 			},
 			columns : [
-				{                 
-	title : "permissionName",
-	data : "permissionName",
-},                 
-{                 
-	title : "permissionSign",
-	data : "permissionSign",
-},                 
-{                 
-	title : "sort",
-	data : "sort",
-},                 
+                            {
+                title : "权限名称",
+                data : "permissionName",
+            },
+            {
+                title : "权限标识",
+                data : "permissionSign",
+            },
+            {
+                title : "排序",
+                data : "sort",
+            },
 
 				{
 					title : "操作",
