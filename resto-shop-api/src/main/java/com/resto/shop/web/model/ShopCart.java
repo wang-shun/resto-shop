@@ -15,7 +15,7 @@ public class ShopCart {
 
     private Integer distributionModeId;
 
-    private Long userId;
+    private String userId;
 
     private String shopType;
 
@@ -23,9 +23,9 @@ public class ShopCart {
 
     private List<ShopCart> currentItem;
 
-    public Long getUserId() { return userId; }
+    public String getUserId() { return userId; }
 
-    public void setUserId(Long userId) { this.userId = userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
     public List<ShopCart> getCurrentItem() { return currentItem; }
 

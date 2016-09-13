@@ -88,5 +88,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         return  shopcartMapper.listUserShopCart(userId, shopId, distributionModeId);
     }
 
+    @Override
+    public void delMealArticle(String id) {
+        shopcartMapper.delMealArticle(id);
+    }
+
 
 }
