@@ -162,10 +162,10 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
             //更新brand端
             com.resto.brand.web.model.Employee employee2 = employeeBrandService.selectOneBytelephone(employee.getTelephone());
             employee2.setState(0);
-            r.setSuccess(false);
+            r.setSuccess(true);
         }
 
-        return null;
+        return r;
     }
 
 }
