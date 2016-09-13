@@ -92,7 +92,7 @@
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
                                                                    v-model="attr.price" name="price"
-                                                                   required="required"/>
+                                                                   required="required" readonly/>
                                                         </div>
                                                         <div class="flex-1">
                                                             <input type="text" class="form-control" name="sort"

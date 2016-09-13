@@ -205,24 +205,24 @@
                                 <label class="col-md-2 text-right">推荐餐品包</label>
                                 <div class="col-md-10">
                                     <select  name="recommendId"  v-model="m.recommendId" >
-                                        <option value="selected">未选择餐品包</option>
+                                        <option value="">未选择餐品包</option>
                                         <option :value="f.id" v-for="f in recommendList">
                                             {{f.name}}
                                         </option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group col-md-10" v-if="m.articleType==1">
-                            <label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>
-                            <div class="col-md-10">
-                                <select  name="unitId"  v-model="m.unitId" >
-                                    <option value="selected">未选择规格包</option>
-                                    <option :value="f.id" v-for="f in unitList">
-                                        {{f.name}}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                            <%--<div class="form-group col-md-10" v-if="m.articleType==1">--%>
+                            <%--<label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>--%>
+                            <%--<div class="col-md-10">--%>
+                                <%--<select  name="unitId"  v-model="m.unitId" >--%>
+                                    <%--<option value="selected">未选择规格包</option>--%>
+                                    <%--<option :value="f.id" v-for="f in unitList">--%>
+                                        <%--{{f.name}}--%>
+                                    <%--</option>--%>
+                                <%--</select>--%>
+                            <%--</div>--%>
+                        <%--</div>--%>
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
