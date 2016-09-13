@@ -88,8 +88,7 @@
 	@RequestMapping("addData")
 	@ResponseBody
 	public Result create(@Valid Employee employee){
-		employeeService.insertOne(employee,getCurrentBrandUser());
-		return Result.getSuccess();
+		return employeeService.insertOne(employee,getCurrentBrandUser(),getCurrentBrandId());
 	}
 	
 	@RequestMapping("modify")
@@ -102,8 +101,9 @@
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){
-		employeeService.delete(id);
-		return Result.getSuccess();
+	    //做假删除
+
+		return employeeService.updateEmployee(id);
 	}
 
 

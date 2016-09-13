@@ -28,7 +28,6 @@
                 </association>
         </collection>
 
-
     </resultMap>
 
 
@@ -132,7 +131,5 @@ WHERE
     e.state = 1 and l.status=1 and e.id=#{id}
 
 </select>
-
-
 
 </mapper>

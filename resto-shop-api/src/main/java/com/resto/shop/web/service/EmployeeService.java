@@ -13,7 +13,7 @@ public interface EmployeeService extends GenericService<Employee, Long> {
      * @param employee
      * @param currentBrandUser
      */
-    void insertOne(Employee employee, BrandUser currentBrandUser);
+    Result insertOne(Employee employee, BrandUser currentBrandUser,String brandId);
 
     /**
      * 获取员工信息
@@ -34,4 +34,6 @@ public interface EmployeeService extends GenericService<Employee, Long> {
 
     //判断手机号是否被注册
     Result checkeTelephone(String telephone);
+
+     Result updateEmployee(Long id);
 }

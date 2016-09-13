@@ -178,15 +178,15 @@
                 checkTelephone : function (tdData) {
                     //页面做判断
 
-                    if(!(/^1[3|4|5|7|8]\d{9}$/.test(phone))){
-                        toast.error("请填写正确的手机号码!");
-                        return false;
+                    if(!(/^1[3|4|5|7|8]\d{9}$/.test(tdData))){
+                        toastr.error("请填写正确的手机号码!");
+                        return ;
                     }
 
                     $.post("employee/checkeTelephone",{"telephone":tdData},function (result) {
                         if(result.success){
                             toastr.error(result.message);
-                            return false;
+                            return ;
                         }
                     })
 

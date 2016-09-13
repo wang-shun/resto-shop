@@ -7,6 +7,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandUser;
 
 import com.resto.shop.web.dao.EmployeeMapper;
@@ -41,23 +42,37 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
     }
 
     @Override
-    public void insertOne(Employee employee, BrandUser brandUser) {
-        //设置创建时间
-        employee.setCreateTime(new Date());
+    public Result insertOne(Employee employee, BrandUser brandUser,String brandId) {
+        Result r = new Result();
+       //判断是否是手机号码是否被注册过
+        com.resto.brand.web.model.Employee employee2 = employeeBrandService.selectOneBytelephone(employee.getTelephone());
+        if(null!=employee2){
+            r.setSuccess(false);
+            r.setMessage("该手机号码已经注册过请重新填写");
+        }else {
+            com.resto.brand.web.model.Employee employee3 = new com.resto.brand.web.model.Employee();
+            employee3.setId(ApplicationUtils.randomUUID());
+            employee3.setState(1);
+            employee3.setBrandId(brandId);
+            employee3.setTelephone(employee.getTelephone());
+            //1在brand端插入数据
+            employeeBrandService.insert(employee3);
 
-        //设置创建人
-        employee.setCreateUser(brandUser.getUsername());
-
-        //设置状态为正常
-        employee.setState((byte)1);
-
-
-
-        //保存员工信息
-        employeeMapper.insertSelective(employee);
-
+            //在shop端插入数据
+            //设置创建时间
+            employee.setCreateTime(new Date());
+            //设置创建人
+            employee.setCreateUser(brandUser.getUsername());
+            //设置状态为正常
+            employee.setState((byte)1);
+            //保存员工信息
+            employeeMapper.insertSelective(employee);
+            r.setSuccess(true);
+        }
+        return  r;
 
     }
+
 
     @Override
     public Employee selectEmployeeInfo(Long id) {
@@ -130,6 +145,27 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
             r.setSuccess(true);
         }
         return r;
+    }
+
+    @Override
+    public Result updateEmployee(Long id) {
+        Result r = new Result();
+        //查询
+        Employee employee = employeeMapper.selectOneById(id);
+        if(null==employee){
+            r.setSuccess(false);
+            r.setMessage("该用户不存在删除失败");
+        }else {
+            //更新shop端
+            employee.setState((byte)0);
+            employeeMapper.updateByPrimaryKey(employee);
+            //更新brand端
+            com.resto.brand.web.model.Employee employee2 = employeeBrandService.selectOneBytelephone(employee.getTelephone());
+            employee2.setState(0);
+            r.setSuccess(false);
+        }
+
+        return null;
     }
 
 }
