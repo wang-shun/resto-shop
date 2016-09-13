@@ -10,7 +10,7 @@ public interface EmployeeMapper  extends GenericDao<Employee,Long> {
 
     int insertSelective(Employee record);
 
-    Employee selectByPrimaryKey(Long id);
+    Employee selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(Employee record);
 
