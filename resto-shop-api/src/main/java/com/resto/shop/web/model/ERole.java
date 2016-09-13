@@ -5,7 +5,7 @@ public class ERole {
 
     private String roleName;
 
-    private String status;
+    private Byte status;
 
     private  String shopName;
 
@@ -33,11 +33,11 @@ public class ERole {
         this.roleName = roleName == null ? null : roleName.trim();
     }
 
-    public String getStatus() {
+    public Byte getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status == null ? null : status.trim();
+    public void setStatus(Byte status) {
+        this.status = status;
     }
 }

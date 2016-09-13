@@ -5,13 +5,13 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.model.ERole;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.shop.web.model.ERole;
 import com.resto.shop.web.service.ERoleService;
 
 @Controller

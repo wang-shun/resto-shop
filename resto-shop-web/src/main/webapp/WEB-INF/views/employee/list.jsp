@@ -33,7 +33,7 @@
                             </div>
                             <div class="form-group">
                                 <label>额度</label>
-                                <input type="text" class="form-control" name="money" v-model="m.money">
+                                <input type="number" class="form-control" name="money" v-model="m.money">
                             </div>
                         </div>
                         <input type="hidden" name="id" v-model="m.id" />

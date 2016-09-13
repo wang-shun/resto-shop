@@ -14,13 +14,13 @@
 	            	<form role="form" action="{{m.id?'erole/modify':'erole/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>roleName</label>
-    <input type="text" class="form-control" name="roleName" v-model="m.roleName">
-</div>
-<div class="form-group">
-    <label>status</label>
-    <input type="text" class="form-control" name="status" v-model="m.status">
-</div>
+                            <label>角色名</label>
+                            <input type="text" class="form-control" name="roleName" v-model="m.roleName">
+                        </div>
+                        <%--<div class="form-group">--%>
+                            <%--<label>status</label>--%>
+                            <%--<input type="text" class="form-control" name="status" v-model="m.status">--%>
+                        <%--</div>--%>
 
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
