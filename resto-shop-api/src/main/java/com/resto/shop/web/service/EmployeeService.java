@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.shop.web.model.Employee;
@@ -31,4 +32,6 @@ public interface EmployeeService extends GenericService<Employee, Long> {
     //更新员工的信息(包含其角色信息)
     void updateSelected(Long employeeId, String id, BrandUser currentBrandUser);
 
+    //判断手机号是否被注册
+    Result checkeTelephone(String telephone);
 }

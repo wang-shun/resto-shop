@@ -29,7 +29,7 @@
                             </div>
                             <div class="form-group">
                                 <label>手机号</label>
-                                <input type="text" class="form-control" name="telephone" v-model="m.telephone">
+                                <input type="text" class="form-control" name="telephone" v-model="m.telephone" @blur="checkTelephone(m.telephone)">
                             </div>
                             <div class="form-group">
                                 <label>额度</label>
@@ -175,21 +175,26 @@
                     })
                    return btn;
                 },
+                checkTelephone : function (tdData) {
+                    //页面做判断
 
+                    if(!(/^1[3|4|5|7|8]\d{9}$/.test(phone))){
+                        toast.error("请填写正确的手机号码!");
+                        return false;
+                    }
 
+                    $.post("employee/checkeTelephone",{"telephone":tdData},function (result) {
+                        if(result.success){
+                            toastr.error(result.message);
+                            return false;
+                        }
+                    })
+
+                }
+                
+                
+                
              },
-            events:{
-                "closeModal2":function(){
-                    var that = this;
-                    that.closeModal();
-                },
-            },
-            created : function () {
-                var that = this;
-                this.$on("closeModal2",function(){
-                });
-            }
-
         });
         C.vue=vueObj;
 

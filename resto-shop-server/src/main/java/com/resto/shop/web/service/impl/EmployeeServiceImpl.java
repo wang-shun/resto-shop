@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import javax.annotation.Resource;
 
 import cn.restoplus.rpc.common.util.StringUtil;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 
@@ -92,7 +93,6 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
                 //删除掉所有该用户有的店铺角色
                 employeeRoleMapper.deleteByIds(ids);
             }
-
         }
 
             //更新员工的角色信息
@@ -117,6 +117,19 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
                     employeeBrandService.updateSelect(employee4);
                 }
             }
+    }
+
+    @Override
+    public Result checkeTelephone(String telephone) {
+         Result r = new Result();
+         com.resto.brand.web.model.Employee employee= employeeBrandService.selectOneBytelephone(telephone);
+        if(null!=employee){
+            r.setSuccess(false);
+            r.setMessage("该手机号已经注册");
+        }else {
+            r.setSuccess(true);
+        }
+        return r;
     }
 
 }

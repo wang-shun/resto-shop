@@ -218,4 +218,14 @@
 
      }
 
+
+     @RequestMapping("checkeTelephone")
+     @ResponseBody
+     public  Result checkeTelephone(String telephone){
+
+        return employeeService.checkeTelephone(telephone);
+
+     }
+
+
 }
