@@ -67,7 +67,7 @@
     <!-- 查询购物车明细 -->
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
         select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id from tb_shop_cart
-        where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2}
+        where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
