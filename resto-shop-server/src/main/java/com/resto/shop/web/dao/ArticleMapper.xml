@@ -656,7 +656,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
     <select id="getSingoArticle" resultType="Article">
        select tb_article_family.name as articleFamilyName,
-       tb_article.id,tb_article.name,tb_article.sort,price
+       tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
         from tb_article
         left join tb_article_family on tb_article.article_family_id = tb_article_family.id
 where state =1 and activated =1
