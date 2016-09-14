@@ -196,7 +196,7 @@
 
 	 @RequestMapping("QR")
      @ResponseBody
-     public  Result createQR(Long employeeId, HttpServletResponse httpResponse) throws WriterException {
+     public  Result createQR(String employeeId, HttpServletResponse httpResponse) throws WriterException {
          OutputStream out = null;
          try {
              out = httpResponse.getOutputStream();

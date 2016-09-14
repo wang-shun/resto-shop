@@ -9,10 +9,7 @@
         <tr>
             <%--<th style="width: 50px;">序号</th>--%>
             <th>角色</th>
-            <th>导出邮件</th>
-            <th>导入excel</th>
-            <th>发短信</th>
-            <th>站内信</th>
+            <th v-for="erole in eroleList.permissions">{{erole.roleName}}</th>
         </tr>
         </thead>
         <tbody>

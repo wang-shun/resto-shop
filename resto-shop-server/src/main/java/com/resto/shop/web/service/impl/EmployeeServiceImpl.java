@@ -65,6 +65,9 @@ public class EmployeeServiceImpl extends GenericServiceImpl<Employee, Long> impl
             employee.setCreateUser(brandUser.getUsername());
             //设置状态为正常
             employee.setState((byte)1);
+            //设置qr
+            employee.setQrCode(employee3.getId());
+
             //保存员工信息
             employeeMapper.insertSelective(employee);
             r.setSuccess(true);

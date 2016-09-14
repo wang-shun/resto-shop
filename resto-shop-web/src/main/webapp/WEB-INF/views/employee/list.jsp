@@ -108,9 +108,15 @@
                 {
                     title : "二维码",
                     data : "qrCode",
-                    createdCell:function (td,tdData,row,rowData) {
+                    createdCell:function (td,tdData) {
                       // $(td).html( "<a href=\"#\" class=\"thumbnail\"><img src=\"employee/QR?employeeId=\"+row.id alt=\" 二为嘛 \"></a>");
-                          $(td).html("<a href=\"employee/QR?employeeId=\"+row.id > 点击</a>");
+                       // <img src="/i/eg_tulip.jpg"  alt="上海鲜花港 - 郁金香" />
+
+                         var str  = "employee/QR?employeeId="+tdData;
+
+                        //  $(td).html("<a href="+str+"> 点击</a>");
+                        $(td).html( "<a href='#' class='thumbnail'><img src='employee/QR?employeeId"+tdData+"' width='50px' height='50px'></a>");
+
                     }
 
                 },

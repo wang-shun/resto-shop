@@ -91,6 +91,7 @@
 	e.id,
 	e. name,
 	e.sex,
+	e.qr_code,
 	e.telephone,
 	e.create_time,
 	e.create_user,
