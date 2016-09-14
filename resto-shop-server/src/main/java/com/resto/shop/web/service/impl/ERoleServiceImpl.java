@@ -9,6 +9,8 @@ import com.resto.shop.web.model.ERole;
 import com.resto.shop.web.service.ERoleService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+
 /**
  *
  */
@@ -21,6 +23,10 @@ class ERoleServiceImpl extends GenericServiceImpl<ERole, Long> implements ERoleS
     @Override
     public GenericDao<ERole, Long> getDao() {
         return eroleMapper;
-    } 
+    }
 
+    @Override
+    public List<ERole> selectRolePermissionList() {
+        return null;
+    }
 }

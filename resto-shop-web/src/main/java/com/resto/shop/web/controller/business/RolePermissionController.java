@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.model.ERole;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,8 +28,8 @@ public class RolePermissionController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<RolePermission> listData(){
-		return rolepermissionService.selectList();
+	public Result listData(){
+		return rolepermissionService.selectRolePermissionList();
 	}
 	
 	@RequestMapping("list_one")

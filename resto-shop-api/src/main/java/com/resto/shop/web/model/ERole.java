@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import java.util.List;
+
 public class ERole {
     private Long id;
 
@@ -8,6 +10,16 @@ public class ERole {
     private Byte status;
 
     private  String shopName;
+
+    private List<Permission> permissions;
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
 
     public String getShopName() {
         return shopName;

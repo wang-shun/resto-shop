@@ -53,6 +53,24 @@
 
 <script>
 	(function(){
+	    var vm = new Vue({
+	        el:'#control',
+            data:{
+
+            },
+            ready: function () {
+                //查询列和行
+                $.ajax({
+                    url:"rolepermission/list_all",
+                    success:function (result) {
+                        console.log(result.data);
+                    }
+                    
+                })
+            }
+
+        })
+
 
 	}());
 	
