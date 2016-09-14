@@ -1394,13 +1394,14 @@ order by ${sort}
     </update>
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
-        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  t.original_amount as orderTotal from tb_order t
+        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  t.order_money as orderTotal from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
         GROUP BY t.id
         ) as r
+
     </select>
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
@@ -1482,7 +1483,7 @@ order by ${sort}
         where id = #{articleId}
         and current_working_stock = 0
     </update>
-    
+
     <update id="setArticlePriceEmpty">
         update tb_article_price
         set empty_remark = '【系统自动沽清】菜品此规格已售馨'
@@ -1495,7 +1496,7 @@ order by ${sort}
         set is_empty = 0 , empty_remark = NULL
         where id = #{articleId}
     </update>
-    
+
     <update id="setArticlePriceEmptyFail">
         update tb_article_price
         set empty_remark = NULL
@@ -1527,7 +1528,7 @@ where t.id = b.id
        select ifnull(sum(t2.pay_value),0) from tb_order t
 INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
 where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId} and t.production_status in (2,3)
+and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.production_status in (2,3)
     </select>
 
 

@@ -201,7 +201,28 @@
                                 </div>
                             </div>
                             <div class="clearfix"></div>
-
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
+                                <label class="col-md-2 text-right">推荐餐品包</label>
+                                <div class="col-md-10">
+                                    <select  name="recommendId"  v-model="m.recommendId" >
+                                        <option value="">未选择餐品包</option>
+                                        <option :value="f.id" v-for="f in recommendList">
+                                            {{f.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <%--<div class="form-group col-md-10" v-if="m.articleType==1">--%>
+                            <%--<label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>--%>
+                            <%--<div class="col-md-10">--%>
+                                <%--<select  name="unitId"  v-model="m.unitId" >--%>
+                                    <%--<option value="selected">未选择规格包</option>--%>
+                                    <%--<option :value="f.id" v-for="f in unitList">--%>
+                                        <%--{{f.name}}--%>
+                                    <%--</option>--%>
+                                <%--</select>--%>
+                            <%--</div>--%>
+                        <%--</div>--%>
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
@@ -479,7 +500,7 @@
         }
 
         if(count > 1){
-           alert("打印排序添加重复");
+            alert("打印排序添加重复");
             $(t).val('');
         }
 
@@ -496,7 +517,7 @@
             2: "套餐"
         }
         var tb = $table.DataTable({
-        	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+            "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
             ajax: {
                 url: "article/list_all",
                 dataSrc: ""
@@ -627,10 +648,12 @@
                     mixins: [C.formVueMix],
                     data: {
                         articlefamilys: [],
+                        recommendList:[],
                         supportTimes: [],
                         kitchenList: [],
                         checkedUnit: [],
                         articleattrs: [],
+                        unitList:[],
                         articleunits: {},
                         unitPrices: [],
                         mealtempList: [],
@@ -741,6 +764,7 @@
                         create: function (article_type) {
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
+//                                recommendId:this.recommendList[0].id,
                                 supportTimes: [],
                                 kitchenList: [],
                                 mealAttrs: [],
@@ -976,8 +1000,16 @@
                             }
                         });
 
+
                         $.post("articlefamily/list_all", null, function (data) {
                             that.articlefamilys = data;
+                        });
+
+                        $.post("recommend/list_all", null, function (data) {
+                            that.recommendList = data;
+                        });
+                        $.post("unit/list_all", null, function (data) {
+                            that.unitList = data;
                         });
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;

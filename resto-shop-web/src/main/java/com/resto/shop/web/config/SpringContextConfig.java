@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.service.*;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -27,39 +28,6 @@ import com.resto.brand.web.service.SmsTicketService;
 import com.resto.brand.web.service.UserGroupService;
 import com.resto.brand.web.service.UserService;
 import com.resto.brand.web.service.WechatConfigService;
-import com.resto.shop.web.service.AccountLogService;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.AdvertService;
-import com.resto.shop.web.service.AppraiseService;
-import com.resto.shop.web.service.ArticleAttrService;
-import com.resto.shop.web.service.ArticleFamilyService;
-import com.resto.shop.web.service.ArticlePriceService;
-import com.resto.shop.web.service.ArticleService;
-import com.resto.shop.web.service.ArticleUnitService;
-import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargePaymentService;
-import com.resto.shop.web.service.ChargeSettingService;
-import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.DeliveryPointService;
-import com.resto.shop.web.service.DistributionTimeService;
-import com.resto.shop.web.service.FreedayService;
-import com.resto.shop.web.service.KitchenService;
-import com.resto.shop.web.service.MealAttrService;
-import com.resto.shop.web.service.MealTempAttrService;
-import com.resto.shop.web.service.MealTempService;
-import com.resto.shop.web.service.NewCustomCouponService;
-import com.resto.shop.web.service.NoticeService;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderPaymentItemService;
-import com.resto.shop.web.service.OrderService;
-import com.resto.shop.web.service.PictureSliderService;
-import com.resto.shop.web.service.PrinterService;
-import com.resto.shop.web.service.RedConfigService;
-import com.resto.shop.web.service.ShopCartService;
-import com.resto.shop.web.service.ShowPhotoService;
-import com.resto.shop.web.service.SmsLogService;
-import com.resto.shop.web.service.SupportTimeService;
 
 import cn.restoplus.rpc.client.RpcProxy;
 
@@ -304,7 +272,16 @@ public class SpringContextConfig {
 		return proxy.create(SmsTicketService.class);
 	}
 
-	
+	@Bean
+	public UnitService unitService(){
+		return proxy.create(UnitService.class);
+	}
+
+	@Bean
+	public ArticleRecommendService articleRecommendService(){
+		return proxy.create(ArticleRecommendService.class);
+	}
+
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}

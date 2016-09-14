@@ -123,6 +123,17 @@
 						否
 					</label>
 				</div>
+				<div class="form-group">
+					<div class="control-label">是否启用推荐餐包</div>
+					<label >
+						<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="1">
+						是
+					</label>
+					<label>
+						<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="0">
+						否
+					</label>
+				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>

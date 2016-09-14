@@ -123,6 +123,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label>赠送方式：</label>
+                                <br/>
+<!--                                 <label class="radio-inline"> -->
+<!-- 								  <input type="radio" name="couponType" id="inlineRadio1" value="-1" v-model="m.couponType">通&nbsp;用 -->
+<!-- 								</label> -->
+								<input type="radio" name="couponType" id="inlineRadio1" value="-1" hidden v-model="m.couponType">
+								<label class="radio-inline">
+								  <input type="radio" name="couponType" id="inlineRadio2" value="0" v-model="m.couponType">新用户
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="couponType" id="inlineRadio3" value="1" v-model="m.couponType">邀&nbsp;请
+								</label>
+                            </div>
                         </div>
                         <input type="hidden" name="id" v-model="m.id" />
                         <input class="btn green" type="submit" value="保存" /> <a class="btn default" @click="cancel">取消</a>
@@ -158,6 +172,19 @@ $(document).ready(function(){
 		},
 		columns : [
 			{                 
+				title : "赠送方式",
+				data : "couponType",
+				createdCell:function(td,tdData){
+					if(tdData == -1){
+						$(td).html("<span class='label label-success'>通&nbsp;用</span>");
+					}else if(tdData == 0){
+						$(td).html("<span class='label label-primary'>新用户</span>");
+					}else if(tdData == 1){
+						$(td).html("<span class='label label-info'>邀&nbsp;请</span>");
+					}
+				}
+			}, 
+			{                 
 				title : "活动名称",
 				data : "name",
 			}, 
@@ -182,21 +209,37 @@ $(document).ready(function(){
 					} 
 				}
 			}, 
-			{                 
-				title : "优惠券开始时间",
-				data : "beginDateTime",
-				createdCell:function(td,tdData){
-					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
-				}
-			},  
-			{                 
-				title : "优惠券结束时间",
-				data : "endDateTime",
-				createdCell:function(td,tdData){
-					$(td).html(new Date(tdData).format("yyyy-MM-dd"));
-				}
-			},     
-			{                 
+			//{
+			//	title : "优惠券开始时间",
+			//	data : "beginDateTime",
+			//	createdCell:function(td,tdData){
+			//		$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+			//	}
+			//},
+			//{
+			//	title : "优惠券结束时间",
+			//	data : "endDateTime",
+			//	createdCell:function(td,tdData){
+			//		$(td).html(new Date(tdData).format("yyyy-MM-dd"));
+			//	}
+			//},
+			{
+			    title : "优惠券的有效时间",
+			    data : "timeConsType",
+			    createdCell : function(td,tdData,row,rowData){
+			        if(tdData==1){
+			            $(td).html(row.couponValiday+"天");
+			        }else if(tdData==2){
+			            $(td).html(new Date(row.beginDateTime).format("yyyy-MM-dd")+"到"+new Date(row.endDateTime).format("yyyy-MM-dd"));
+
+			        }
+
+
+			    }
+
+			},
+
+			{
 				title : "优惠券数量",
 				data : "couponNumber",
 			},                 
@@ -213,11 +256,11 @@ $(document).ready(function(){
 				data : "isActivty",
 				"render":function(data){
 					if(data==1){
-						data='是';
+						data="<span class='label label-info'>启&nbsp;用</span>";
 					}else if(data==0){
-						data='否';
+						data="<span class='label label-danger'>未启用</span>";
 					}else{
-						data='未知';
+						data="<span class='label label-warning'>未&nbsp;知</span>";
 					}
 					return data;
 				}
@@ -252,16 +295,19 @@ $(document).ready(function(){
 				},
 				closeForm:function(){
 					this.m={};
+					this.m.couponType = -1;
 					this.showform = false;
 				},
 				cancel:function(){
 					this.m={};
+					this.m.couponType = -1;
 					this.closeForm();
 				},
 				create:function(){
 					this.m={
 							timeConsType:1,
 							useWithAccount:1,
+							couponType:-1,
 					};
 // 					this.showDateNum=false;
 // 					this.showDateTime=false;

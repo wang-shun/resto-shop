@@ -41,7 +41,8 @@
       <if test="useWithAccount != null">use_with_account,</if>  
       <if test="remark != null">remark,</if>  
       <if test="distributionModeId != null">distribution_mode_id,</if>  
-      <if test="customerId != null">customer_id,</if> 
+      <if test="customerId != null">customer_id,</if>   
+      <if test="couponType != null">coupon_type,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -59,6 +60,7 @@
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if> 
+      <if test="couponType != null">#{couponType,jdbcType=VARCHAR},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon 
@@ -77,6 +79,7 @@
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if> 
+      <if test="couponType != null">coupon_type = #{couponType,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon set name = #{name,jdbcType=VARCHAR}, value = #{value,jdbcType=DECIMAL}, min_amount = #{minAmount,jdbcType=DECIMAL}, begin_date = #{beginDate,jdbcType=DATE}, end_date = #{endDate,jdbcType=DATE}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_used = #{isUsed,jdbcType=BIT}, using_time = #{usingTime,jdbcType=TIMESTAMP}, coupon_source = #{couponSource,jdbcType=VARCHAR}, use_with_account = #{useWithAccount,jdbcType=BIT}, remark = #{remark,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>

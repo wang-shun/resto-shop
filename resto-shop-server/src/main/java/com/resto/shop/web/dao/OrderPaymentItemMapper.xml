@@ -84,7 +84,8 @@
 		WHERE 
 			o.brand_id = #{brandId} and 
 			oi.pay_time>#{begin} and 
-			oi.pay_time <#{end}
+			oi.pay_time <#{end} and
+			o.production_status in(2,3)
 			 ORDER BY o.shop_detail_id , oi.payment_mode_id
 		) as ap
 		WHERE ap.payment_mode_id IS NOT NULL
@@ -105,7 +106,8 @@
         o.shop_detail_id = #{shopId} and
         <![CDATA[
             oi.pay_time>#{begin} and
-            oi.pay_time <#{end}
+            oi.pay_time <#{end} and
+            o.production_status in(2,3)
         ]]>
         ORDER BY oi.payment_mode_id
         ) as ap

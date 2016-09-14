@@ -107,6 +107,30 @@ public class Article {
 
     private Integer currentWorkingStock;
 
+    //推荐餐品包id
+    private String recommendId;
+
+    //规格id
+    private String unitId;
+
+    final public String getUnitId() {
+        return unitId;
+    }
+
+
+
+    final public void setUnitId(String unitId) {
+        this.unitId = unitId;
+    }
+
+    final public String getRecommendId() {
+        return recommendId;
+    }
+
+    final public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
     final public Integer getCurrentWorkingStock() {
         return currentWorkingStock;
     }

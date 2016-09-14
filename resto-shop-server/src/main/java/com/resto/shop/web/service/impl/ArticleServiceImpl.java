@@ -227,4 +227,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 		int row = articleMapper.setActivate(articleId, activated);
 		return row > 0 ? true : false;
 	}
+
+    @Override
+    public List<Article> getSingoArticle(String shopId) {
+        return articleMapper.getSingoArticle(shopId);
+    }
 }

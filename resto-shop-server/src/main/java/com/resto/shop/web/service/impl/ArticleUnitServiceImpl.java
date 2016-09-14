@@ -29,6 +29,8 @@ public class ArticleUnitServiceImpl extends GenericServiceImpl<ArticleUnit, Inte
 	@Override
 	public List<ArticleUnit> selectListByAttrId(Integer attrId) {
 		return articleunitMapper.selectListByAttrId(attrId);
-	} 
+	}
+
+
     
 }
