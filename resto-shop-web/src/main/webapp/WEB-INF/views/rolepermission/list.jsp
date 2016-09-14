@@ -16,7 +16,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr v>
             <%--<td class="center"  style="width: 30px;">1</td>--%>
             <td class="center" id="ROLE_NAMETd3264c8e83d0248bb9e3ea6195b4c021">一级管理员</td>
             <td class="center" style="height: 20px;">
@@ -25,24 +25,7 @@
                     <span class="lbl"></span>
                 </label>
             </td>
-            <td class="center" style="height: 20px;">
-                <label>
-                    <input name="switch-field-1" onclick="upRb('3264c8e83d0248bb9e3ea6195b4c0216','3542adfbda73410c976e185ffe50ad06')" class="make-switch" type="checkbox">
-                    <span class="lbl"></span>
-                </label>
-            </td>
-            <td class="center" style="height: 20px;">
-                <label>
-                    <input name="switch-field-1" onclick="upRb('3264c8e83d0248bb9e3ea6195b4c0216','4efa162fce8340f0bd2dcd3b11d327ec')" class="make-switch" type="checkbox" checked="checked">
-                    <span class="lbl"></span>
-                </label>
-            </td>
-            <td class="center" style="height: 20px;">
-                <label>
-                    <input name="switch-field-1" onclick="upRb('3264c8e83d0248bb9e3ea6195b4c0216','cc51b694d5344d28a9aa13c84b7166cd')" class="make-switch" type="checkbox" checked="checked">
-                    <span class="lbl"></span>
-                </label>
-            </td>
+
         </tr>
         </tbody>
     </table>
@@ -56,14 +39,14 @@
 	    var vm = new Vue({
 	        el:'#control',
             data:{
-
+                eroleList:[],
             },
             ready: function () {
                 //查询列和行
                 $.ajax({
                     url:"rolepermission/list_all",
                     success:function (result) {
-                        console.log(result.data);
+                        vm.eroleList=result.data;
                     }
                     
                 })

@@ -7,6 +7,19 @@
     <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
     <result column="status" property="status" jdbcType="VARCHAR"/>
   </resultMap>
+
+    <resultMap id="rolePermissionList" type="com.resto.shop.web.model.ERole" autoMapping="true">
+        <id column="id" property="id"/>
+        <result  column="role_name" property="roleName" ></result>
+        <collection property="permissions" javaType="list" ofType="Permission" >
+            <id column="id" property="id"/>
+            <result column="pemission_name" property="permissionName"/>
+            <result column="permission_sign" property="permissionSign" />
+        </collection>
+    </resultMap>
+
+
+
   <sql id="Base_Column_List">id, role_name, status</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select 
     <include refid="Base_Column_List"/> from tb_role where id = #{id,jdbcType=BIGINT}
@@ -35,9 +48,9 @@
   <select id="selectList" resultType="ERole">select  id, role_name,status  from tb_role where status = 1</select>
 
 
-    <select id="selectRolePermissionList" resultMap="rolePermissionList">
-
-
+    <select id="selectRolePermissionList" resultMap="rolePermissionList" >
+      SELECT r.id,r.role_name,rp.permission_id,p.permission_name,p.permission_sign  from tb_role r INNER JOIN tb_role_permission rp on r.id=rp.role_id
+      INNER JOIN tb_permission p on rp.permission_id = p.id WHERE r.status=1
     </select>
 
 

@@ -14,6 +14,7 @@ import com.resto.shop.web.service.PermissionService;
 import com.resto.shop.web.service.RolePermissionService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,24 +38,48 @@ public class RolePermissionServiceImpl extends GenericServiceImpl<RolePermission
     }
 
     @Override
-    public Result selectRolePermissionList() {
+    public List<ERole> selectRolePermissionList() {
+        //查询所有的角色权限
+        List<ERole> eRoleList =eRoleService.selectRolePermissionList();
+        List<String> ids = new LinkedList<>();
+
+        if(null!=eRoleList&&eRoleList.size()>0){
+            for(ERole eRole:eRoleList){
+                if(eRole.getPermissions().size()>0&&eRole.getPermissions()!=null){
+                    for(Permission p :eRole.getPermissions()){
+                        String id = eRole.getId()+","+p.getId();
+                        ids.add(id);
+                    }
+                }
+            }
+
+        }
+
+
         //查询所有的角色
         List<ERole> elist = eRoleService.selectList();
         //查询所有的权限
         List<Permission> plist = permissionService.selectList();
-        for (Permission ep: plist) {
-            ep.setStatus(0);
+        if(null!=elist){
+            for (Permission ep: plist) {
+                ep.setStatus(0);
+            }
+            if(null!=plist){
+                //把所权限加入所有的角色
+                for(ERole e : elist){
+                    e.setPermissions(plist);
+                }
+            }
         }
 
-        //把所权限加入所有的角色
-        for(ERole e : elist){
-            e.setPermissions(plist);
+        //
+        for(ERole e :elist){
+            for(Permission p :e.getPermissions()){
+                if(ids.contains(e.getId()+","+p.getId())){
+                    p.setStatus(1);
+                }
+            }
         }
-
-        //查询所有的角色权限
-        List<ERole> eRoleList =eRoleService.selectRolePermissionList();
-
-
-        return null;
+        return  elist;
     }
 }

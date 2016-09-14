@@ -29,7 +29,7 @@ public class RolePermissionController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData(){
-		return rolepermissionService.selectRolePermissionList();
+	    return getSuccessResult(rolepermissionService.selectRolePermissionList()) ;
 	}
 	
 	@RequestMapping("list_one")

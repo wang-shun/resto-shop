@@ -2,9 +2,12 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
+import com.resto.shop.web.model.ERole;
 import com.resto.shop.web.model.RolePermission;
+
+import java.util.List;
 
 public interface RolePermissionService extends GenericService<RolePermission, Long> {
 
-    Result selectRolePermissionList();
+    List<ERole> selectRolePermissionList();
 }
