@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
 import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
