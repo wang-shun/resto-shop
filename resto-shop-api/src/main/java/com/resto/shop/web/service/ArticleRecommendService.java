@@ -11,6 +11,7 @@ import java.util.List;
  */
 public interface ArticleRecommendService extends GenericService<ArticleRecommend, String> {
 
+
     List<ArticleRecommend> getRecommendList(String shopId);
 
     ArticleRecommend getRecommendById(String id);
