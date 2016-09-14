@@ -11,6 +11,7 @@ public class Unit {
 
     private String name;
 
+
     private String shopId;
 
     private List<UnitFamily> families;
