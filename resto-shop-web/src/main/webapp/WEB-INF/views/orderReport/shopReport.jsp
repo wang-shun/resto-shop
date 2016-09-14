@@ -226,10 +226,10 @@ dt,dd{
 			createdCell : function(td, tdData,rowData) {
 				var button = $("<button class='btn green'>详情</button>");
 				button.click(function() {
-					if(rowData.telephone=="" || rowData.telephone==null){
-						toastr.error("此订单没有填写手机号！");
-						return;	
-					}
+//					if(rowData.telephone=="" || rowData.telephone==null){
+//						toastr.error("此订单没有填写手机号！");
+//						return;
+//					}
 					showDetails(tdData);
 				})
 				$(td).html(button);
@@ -278,7 +278,11 @@ dt,dd{
 					$("#distributionMode").html(
 							getDistriubtioMode(data.distributionModeId));
 					$("#verCode").html(data.verCode);
-					$("#telephone").html(data.customer.telephone);
+                    var telephone = ""
+                    if (typeof(data.customer) !="undefined") {
+                        telephone = data.customer.telephone;
+                    }
+                    $("#telephone").html(telephone);
 					$("#orderMoney").html(data.orderMoney + "元");
 // 					if (data.appraise) {
 						$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
@@ -313,7 +317,9 @@ dt,dd{
 					// 					});
 					//----------------------------------------------------------------					 					
 					$("#orderDetail").modal();
-				}
+				}else{
+                    $("#orderState").html("<h1>没有数据</h1>");
+                }
 
 			}
 		});
