@@ -7,7 +7,7 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th style="width: 50px;">序号</th>
+            <%--<th style="width: 50px;">序号</th>--%>
             <th>角色</th>
             <th>导出邮件</th>
             <th>导入excel</th>
@@ -17,7 +17,7 @@
         </thead>
         <tbody>
         <tr>
-            <td class="center"  style="width: 30px;">1</td>
+            <%--<td class="center"  style="width: 30px;">1</td>--%>
             <td class="center" id="ROLE_NAMETd3264c8e83d0248bb9e3ea6195b4c021">一级管理员</td>
             <td class="center" style="height: 20px;">
                 <label>

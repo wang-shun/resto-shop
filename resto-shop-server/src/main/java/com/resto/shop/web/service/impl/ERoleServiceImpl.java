@@ -27,6 +27,6 @@ class ERoleServiceImpl extends GenericServiceImpl<ERole, Long> implements ERoleS
 
     @Override
     public List<ERole> selectRolePermissionList() {
-        return null;
+        return eroleMapper.selectRolePermissionList();
     }
 }

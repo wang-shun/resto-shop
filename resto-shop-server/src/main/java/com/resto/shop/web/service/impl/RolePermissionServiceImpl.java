@@ -42,6 +42,14 @@ public class RolePermissionServiceImpl extends GenericServiceImpl<RolePermission
         List<ERole> elist = eRoleService.selectList();
         //查询所有的权限
         List<Permission> plist = permissionService.selectList();
+        for (Permission ep: plist) {
+            ep.setStatus(0);
+        }
+
+        //把所权限加入所有的角色
+        for(ERole e : elist){
+            e.setPermissions(plist);
+        }
 
         //查询所有的角色权限
         List<ERole> eRoleList =eRoleService.selectRolePermissionList();
