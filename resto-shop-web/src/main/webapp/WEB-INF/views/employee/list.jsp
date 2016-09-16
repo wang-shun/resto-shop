@@ -108,15 +108,13 @@
                 {
                     title : "二维码",
                     data : "qrCode",
-                    createdCell:function (td,tdData) {
-                      // $(td).html( "<a href=\"#\" class=\"thumbnail\"><img src=\"employee/QR?employeeId=\"+row.id alt=\" 二为嘛 \"></a>");
-                       // <img src="/i/eg_tulip.jpg"  alt="上海鲜花港 - 郁金香" />
-
-                         var str  = "employee/QR?employeeId="+tdData;
-
-                        //  $(td).html("<a href="+str+"> 点击</a>");
-                        $(td).html( "<a href='#' class='thumbnail'><img src='employee/QR?employeeId"+tdData+"' width='50px' height='50px'></a>");
-
+                    createdCell:function (td,tdData,row,rowData) {
+//                        "<a class='btn blue' href='shopqrcode/downloadFile?fileName="+data.message+"'>点击下载</a>";
+                        console.log(row);
+                         var str  = "employee/downloadFile?id="+tdData+"&&name="+row.name;
+                        $(td).html( "<a href='#' class='thumbnail'><img src='employee/QR?employeeId"+tdData+"' width='40px' height='40px'></a>");
+                        var download= "<a href="+str+"> 点击下载</a>";
+                        $(td).html(download);
                     }
 
                 },

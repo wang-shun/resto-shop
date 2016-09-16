@@ -2,8 +2,10 @@
 
  import com.google.zxing.WriterException;
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.core.util.FileToZip;
  import com.resto.brand.core.util.QRCodeUtil;
  import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.service.RoleService;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.constant.ERoleDto;
  import com.resto.shop.web.controller.GenericController;
@@ -18,14 +20,13 @@
  import org.springframework.web.servlet.ModelAndView;
 
  import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
  import javax.servlet.http.HttpServletResponse;
  import javax.validation.Valid;
- import java.io.IOException;
- import java.io.OutputStream;
- import java.util.ArrayList;
- import java.util.HashSet;
- import java.util.List;
- import java.util.Set;
+ import java.io.*;
+ import java.util.*;
+
+ import static com.resto.shop.web.controller.business.QrCodeController.deleteFile;
 
  @Controller
  @RequestMapping("employee")
@@ -35,10 +36,13 @@
      private EmployeeService employeeService;
 
 	 @Resource
-	 ShopDetailService shopDetailService;
+	 private  ShopDetailService shopDetailService;
 
 	 @Resource
-	 ERoleService eRoleService;
+	 private ERoleService eRoleService;
+
+     @Resource
+   private com.resto.brand.web.service.EmployeeService employeeBrandService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -142,28 +146,6 @@
          return mv;
 	 }
 
-
-//	 @RequestMapping("assignData")
-//	 @ResponseBody
-//	 public Result assignData(Long employeeId) throws ReflectiveOperationException{
-//
-//		  String s = "\n" +
-//				  "{\"eRoles\":[\n" +
-//				  "\t{\"id\":1,\"text\":\"测试店铺电视叫号\",\"children\":[{\"id\":10051,\"text\":\"店长\",\"children\":null},{\"id\":10052,\"text\":\"服务员\",\"children\":null},{\"id\":10053,\"text\":\"经理\",\"children\":null}]},\n" +
-//				  "\t{\"id\":2,\"text\":\"测试店铺坐下点餐\",\"children\":[{\"id\":10054,\"text\":\"店长\",\"children\":null},{\"id\":10055,\"text\":\"服务员\",\"children\":null},{\"id\":10056,\"text\":\"经理\",\"children\":null}]},\n" +
-//				  "\t{\"id\":3,\"text\":\"测试店铺扫码\",\"children\":[{\"id\":10057,\"text\":\"店长\",\"children\":null},{\"id\":10058,\"text\":\"服务员\",\"children\":null},{\"id\":10059,\"text\":\"经理\",\"children\":null}]}\t\n" +
-//				  "],\n" +
-//				  "\n" +
-//				  "\"hasERoles\":[10051,10052]\n" +
-//				  "}";
-//
-//		 JSONObject js  = JSON.parseObject(s);
-//
-//		 return  getSuccessResult(js);
-//
-//	 }
-
-
 	 @RequestMapping("assign_form")
 	 @ResponseBody
 	 public Result assignForm(String employeeId,String id) {
@@ -226,6 +208,100 @@
         return employeeService.checkeTelephone(telephone);
 
      }
+
+
+     public Result run(String zipname,List<String>names ,String id,HttpServletRequest request)
+             throws IOException, InterruptedException, WriterException {
+         String fileSavePath = getFilePath(request,null);
+         deleteFile(new File(fileSavePath));//删除历史生成的文件
+         String filepath;//生成二位吗的文件路径
+         String fileName;//二维码名字
+
+         if(names.isEmpty()){  //如果是生成个人的二维码
+             //生成的zip路径
+              filepath = getFilePath(request,zipname);
+             //生成二位码的名字也是
+              fileName =zipname+".jpg";
+              QRCodeUtil.createQRCode(id,filepath,fileName);
+         }else {//如果是生成的全部二位码
+             //生成的zip的路径
+             filepath = getFilePath(request,zipname);
+            for(String s:names){
+                fileName = s+".jpg";
+                QRCodeUtil.createQRCode(id,filepath,fileName);
+            }
+         }
+             //打包
+             FileToZip.fileToZip(filepath, fileSavePath, zipname);
+             Result result = new Result(true);
+             result.setMessage(zipname+".zip");
+             System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
+             return result;
+
+     }
+
+
+     @RequestMapping("/downloadFile")
+     public String donloadFile(String id ,String name,HttpServletRequest request,
+                               HttpServletResponse response) throws IOException, WriterException, InterruptedException {
+         List<String> names = new ArrayList<>();//定义所有二维码的名字
+         String zipname;//定义zip的名字
+         String shopName = shopDetailService.selectByPrimaryKey(getCurrentShopId()).getName();
+         List<Employee> employeeList = employeeService.selectList();
+         //如果当前值为空说明是生成全部的文件
+         if("".equals(id)||null==id){
+                for(Employee e: employeeList){
+                    names.add(e.getName());
+                }
+             zipname  = shopName;
+         }else{
+             zipname = name;
+         }
+
+         //第一步生成zip文件
+         Result r = run(zipname,names,id,request);
+         String fileName = r.getMessage();
+         response.setContentType("text/html;charset=utf-8");
+         request.setCharacterEncoding("UTF-8");
+         java.io.BufferedInputStream bis = null;
+         java.io.BufferedOutputStream bos = null;
+         String downLoadPath = getFilePath(request,fileName);
+         try {
+             long fileLength = new File(downLoadPath).length();
+             response.setContentType("application/x-msdownload;");
+             response.setHeader("Content-disposition", "attachment; filename="
+                     + new String(fileName.getBytes("utf-8"), "ISO8859-1"));
+             response.setHeader("Content-Length", String.valueOf(fileLength));
+             bis = new BufferedInputStream(new FileInputStream(downLoadPath));
+             bos = new BufferedOutputStream(response.getOutputStream());
+             byte[] buff = new byte[2048];
+             int bytesRead;
+             while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+                 bos.write(buff, 0, bytesRead);
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
+         } finally {
+             if (bis != null)
+                 bis.close();
+             if (bos != null)
+                 bos.close();
+         }
+         return null;
+     }
+
+     public String getFilePath(HttpServletRequest request,String fileName){
+         String systemPath = request.getServletContext().getRealPath("");
+         systemPath = systemPath.replaceAll("\\\\", "/");
+         int lastR = systemPath.lastIndexOf("/");
+         systemPath = systemPath.substring(0,lastR)+"/";
+         String filePath = "qrCodeFiles/";
+         if(fileName!=null){
+             filePath += fileName;
+         }
+         return systemPath+filePath;
+     }
+
 
 
 }
