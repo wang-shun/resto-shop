@@ -210,14 +210,17 @@
      }
 
 
-     public Result run(String zipname,List<String>names ,String id,HttpServletRequest request)
+     public Result run(String zipname,List<Employee>elist ,String id,HttpServletRequest request)
              throws IOException, InterruptedException, WriterException {
          String fileSavePath = getFilePath(request,null);
          deleteFile(new File(fileSavePath));//删除历史生成的文件
          String filepath;//生成二位吗的文件路径
          String fileName;//二维码名字
 
-         if(names.isEmpty()){  //如果是生成个人的二维码
+         //查询所有id
+         List<com.resto.brand.web.model.Employee> list = employeeBrandService.selectList();
+
+         if(elist.isEmpty()){  //如果是生成个人的二维码
              //生成的zip路径
               filepath = getFilePath(request,zipname);
              //生成二位码的名字也是
@@ -226,10 +229,17 @@
          }else {//如果是生成的全部二位码
              //生成的zip的路径
              filepath = getFilePath(request,zipname);
-            for(String s:names){
-                fileName = s+".jpg";
-                QRCodeUtil.createQRCode(id,filepath,fileName);
-            }
+             for(com.resto.brand.web.model.Employee employee:list){
+                 for(Employee e : elist){
+                     if(e.getTelephone().equals(employee.getTelephone())){
+                         employee.setName(e.getName());
+                     }
+                 }
+             }
+             for (com.resto.brand.web.model.Employee employee2 : list){
+                 fileName = employee2.getName()+".jpg";
+                 QRCodeUtil.createQRCode(employee2.getId(),filepath,fileName);
+             }
          }
              //打包
              FileToZip.fileToZip(filepath, fileSavePath, zipname);
@@ -244,22 +254,19 @@
      @RequestMapping("/downloadFile")
      public String donloadFile(String id ,String name,HttpServletRequest request,
                                HttpServletResponse response) throws IOException, WriterException, InterruptedException {
-         List<String> names = new ArrayList<>();//定义所有二维码的名字
          String zipname;//定义zip的名字
-         String shopName = shopDetailService.selectByPrimaryKey(getCurrentShopId()).getName();
+
+         String shopName = shopDetailService.selectById(getCurrentShopId()).getName();
          List<Employee> employeeList = employeeService.selectList();
          //如果当前值为空说明是生成全部的文件
          if("".equals(id)||null==id){
-                for(Employee e: employeeList){
-                    names.add(e.getName());
-                }
              zipname  = shopName;
          }else{
              zipname = name;
          }
 
          //第一步生成zip文件
-         Result r = run(zipname,names,id,request);
+         Result r = run(zipname,employeeList,id,request);
          String fileName = r.getMessage();
          response.setContentType("text/html;charset=utf-8");
          request.setCharacterEncoding("UTF-8");
