@@ -63,6 +63,9 @@
         <!-- /.modal-dialog -->
     </div>
 
+    <button class="btn green pull-right" @click="uploadFile">下载全部</button>
+
+
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="employee/add">
@@ -179,6 +182,21 @@
                     })
                    return btn;
                 },
+                uploadFile : function () {
+                  $.ajax({
+                      url:'employee/downloadFile',
+                      data:{
+                          "id":'',
+                          "name":''
+                      },
+                      success:function (result) {
+                          toastr.success("下载成功")
+                      }
+
+                          }
+                  )
+                },
+
                 checkTelephone : function (tdData) {
                     //页面做判断
 

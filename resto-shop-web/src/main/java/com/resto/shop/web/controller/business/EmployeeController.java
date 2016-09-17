@@ -236,6 +236,7 @@
                      }
                  }
              }
+
              for (com.resto.brand.web.model.Employee employee2 : list){
                  fileName = employee2.getName()+".jpg";
                  QRCodeUtil.createQRCode(employee2.getId(),filepath,fileName);
