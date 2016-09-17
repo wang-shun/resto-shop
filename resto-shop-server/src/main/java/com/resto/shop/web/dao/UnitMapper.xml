@@ -5,35 +5,28 @@
     <resultMap id="UnitResultMap" type="com.resto.shop.web.model.Unit">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
-        <collection property="families" javaType="List" ofType="com.resto.shop.web.model.UnitFamily">
-            <id column="family_id" property="id"/>
-            <result column="family_name" property="name"/>
-            <result column="family_sort" property="sort"/>
-            <result column="family_type" property="type"/>
-            <collection property="detailList" javaType="List" ofType="com.resto.shop.web.model.UnitDetail">
-                <id column="detail_id" property="id"/>
-                <id column="detail_name" property="name"/>
-                <id column="detail_sort" property="sort"/>
-                <id column="detail_spread" property="spread"/>
-                <id column="click" property="click"/>
-            </collection>
+        <result column="sort" property="sort"/>
+        <result column="choice_type" property="choiceType"/>
+        <result column="is_used" property="isUsed"/>
+        <collection property="details" javaType="List" ofType="com.resto.shop.web.model.UnitDetail">
+            <id column="detail_id" property="id"/>
+            <result column="detail_name" property="name"/>
+            <result column="detail_sort" property="sort"/>
         </collection>
     </resultMap>
 
 
     <select id="getUnits" resultMap="UnitResultMap">
-        select t.id ,t.name,t2.id as family_id,t2.name as family_name,t2.sort as family_sort,
-          t2.type as family_type,t3.id as detail_id,t3.name as detail_name,
-           t3.sort as detail_sort,t3.spread as  detail_spread from tb_unit t
-        left join tb_unit_family t2 on t2.unit_id = t.id
-        left join tb_unit_detail t3 on t3.family_id = t2.id
+        select t.id ,t.name,t.sort,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort
+           from tb_unit t
+        left join tb_unit_detail t2 on t2.unit_id = t.id
         where t.shop_detail_id = #{shopId}
     </select>
 
     <insert id="insertSelective">
         insert into tb_unit
-        (id,name,shop_detail_id)
-        values(#{id},#{name},#{shopId})
+        (id,name,shop_detail_id,sort)
+        values(#{id},#{name},#{shopId},#{sort})
     </insert>
 
 
@@ -45,8 +38,8 @@
 
     <insert id="insertDetail">
         insert into tb_unit_detail
-        (id,family_id,name,sort,spread)
-        values(#{detail.id},#{familyId},#{detail.name},#{detail.sort},#{detail.spread})
+        (id,unit_id,name,sort)
+        values(#{detail.id},#{unitId},#{detail.name},#{detail.sort})
     </insert>
 
     <delete id="deleteByPrimaryKey">
@@ -54,24 +47,22 @@
     </delete>
 
     <select id="getUnitById" resultMap="UnitResultMap">
-         select t.name,t.id,t2.id  as family_id,t2.name as family_name,
-            t2.sort as family_sort,t2.type as  family_type,
-             t3.id as detail_id,t3.name as detail_name,t3.sort as detail_sort,
-              t3.spread as detail_spread from tb_unit t
-         left join tb_unit_family t2 on t2.unit_id = t.id
-         left join tb_unit_detail t3 on t3.family_id = t2.id
+         select t.id ,t.name,t.sort,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort
+           from tb_unit t
+         left join tb_unit_detail t2 on t2.unit_id = t.id
          where t.id = #{id}
     </select>
 
     <update id="updateByPrimaryKeySelective">
         update tb_unit
-        set name = #{name}
+        set name = #{name},
+        sort = #{sort}
         where id = #{id}
     </update>
 
     <delete id="deleteDetail">
         delete from tb_unit_detail
-        where family_id = #{familyId}
+        where unit_id = #{unitId}
     </delete>
 
     <delete id="deleteFamily">
@@ -80,13 +71,8 @@
     </delete>
 
     <select id="getUnitByArticleid" resultMap="UnitResultMap">
-         select t2.id,t2.name,t3.id as family_id,t3.name as family_name,
-            t3.sort as family_sort, t3.type as  family_type ,
-            t4.id as detail_id,t4.name as detail_name,t4.sort as detail_sort,
-             t4.spread as detail_spread from tb_article t
-         left join tb_unit t2 on t2.id =  t.unit_id
-         left join tb_unit_family t3 on t3.unit_id = t2.id
-         left join tb_unit_detail t4 on t4.family_id = t3.id
-         where t.id = #{articleId}
+       select t2.unit_id as id ,t2.choice_type,t2.is_used from tb_article t
+left join tb_article_unit_new t2 on t2.article_id = t.id
+where t.id = #{articleId}
     </select>
 </mapper>

@@ -5,10 +5,8 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.UnitMapper;
-import com.resto.shop.web.model.SupportTime;
 import com.resto.shop.web.model.Unit;
 import com.resto.shop.web.model.UnitDetail;
-import com.resto.shop.web.model.UnitFamily;
 import com.resto.shop.web.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +16,7 @@ import java.util.List;
  * Created by KONATA on 2016/9/11.
  */
 @RpcService
-public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements UnitService{
+public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements UnitService {
 
     @Autowired
     private UnitMapper unitMapper;
@@ -34,20 +32,11 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     }
 
     @Override
-    public void insertFamily(Unit unit) {
-        for(UnitFamily unitFamily: unit.getFamilies()){
-            String familyId =  ApplicationUtils.randomUUID();
-            unitFamily.setId(familyId);
-            unitMapper.insertFamily(unit.getId(),unitFamily);
-            if(unitFamily.getDetailList() != null ){
-                for(UnitDetail detail : unitFamily.getDetailList()){
-                    String detailId =  ApplicationUtils.randomUUID();
-                    detail.setId(detailId);
-                    unitMapper.insertDetail(familyId,detail);
-
-                }
-            }
-
+    public void insertDetail(Unit unit) {
+        for (UnitDetail unitDetail : unit.getDetails()) {
+            String detailId = ApplicationUtils.randomUUID();
+            unitDetail.setId(detailId);
+            unitMapper.insertDetail(unit.getId(), unitDetail);
         }
     }
 
@@ -58,14 +47,11 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
 
     @Override
     public void initUnit(Unit unit) {
-        unitMapper.deleteFamily(unit.getId());
-        for(UnitFamily unitFamily : unit.getFamilies()){
-            unitMapper.deleteDetail(unitFamily.getId());
-        }
+        unitMapper.deleteDetail(unit.getId());
     }
 
     @Override
-    public Unit getUnitByArticleid(String articleId) {
+    public List<Unit> getUnitByArticleid(String articleId) {
         return unitMapper.getUnitByArticleid(articleId);
     }
 }
