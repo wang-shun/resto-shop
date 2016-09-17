@@ -54,4 +54,16 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     public List<Unit> getUnitByArticleid(String articleId) {
         return unitMapper.getUnitByArticleid(articleId);
     }
+
+    @Override
+    public void insertArticleRelation(String articleId, List<Unit> units) {
+        for(Unit unit : units){
+            String id = ApplicationUtils.randomUUID();
+            unitMapper.insertArticleRelation(articleId,id,unit);
+            for(UnitDetail unitDetail : unit.getDetails()){
+                String detailID = ApplicationUtils.randomUUID();
+                unitMapper.insertUnitDetailRelation(detailID,id,unitDetail);
+            }
+        }
+    }
 }

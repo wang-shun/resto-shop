@@ -75,4 +75,20 @@
 left join tb_article_unit_new t2 on t2.article_id = t.id
 where t.id = #{articleId}
     </select>
+
+    <insert id="insertArticleRelation">
+        insert into
+       tb_article_unit_new
+       (id,article_id,unit_id,choice_type,is_used)
+       values
+       (#{id},#{articleId},#{unit.id},#{unit.choiceType},1)
+    </insert>
+
+    <insert id="insertUnitDetailRelation">
+        insert into
+        tb_article_unit_detail
+        (id,unit_detail_id,article_unit_id,price,sort,is_used)
+        values
+        (#{id},#{detail.id},#{relationId},#{detail.price},#{detail.sort},ifnull(#{detail.isUsed},1))
+    </insert>
 </mapper>

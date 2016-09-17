@@ -81,11 +81,13 @@ public class ArticleController extends GenericController{
 	public Result create(@Valid @RequestBody Article article){
 		article.setShopDetailId(getCurrentShopId());
 		article.setUpdateUserId(getCurrentUserId());
-		article.setUpdateTime(new Date());	
+		article.setUpdateTime(new Date());
+		String id = article.getId();
 		if(StringUtils.isEmpty(article.getId())){
 			article.setCreateUserId(getCurrentUserId());
-			articleService.save(article);
+			id = articleService.save(article).getId();
 		}else{
+
 			articleService.update(article);
 			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
 			if(article.getIsEmpty() == true){
@@ -115,6 +117,7 @@ public class ArticleController extends GenericController{
 				articleService.setActivated(article.getId(), 0);
 			}
 		}
+		unitService.insertArticleRelation(id,article.getUnits());
         articleService.initStock();
 		return Result.getSuccess();
     }

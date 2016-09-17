@@ -15,7 +15,8 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-    .print-sort{
+
+    .print-sort {
 
     }
 </style>
@@ -80,7 +81,7 @@
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
                                                v-model="m.activated">上架
                                     </label>
-                                    <span v-if="m.articleType != 2" >
+                                    <span v-if="m.articleType != 2">
                                         <label class="radio-inline">
                                             <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
                                                    v-model="m.isEmpty">沽清
@@ -204,7 +205,7 @@
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">推荐餐品包</label>
                                 <div class="col-md-10">
-                                    <select  name="recommendId"  v-model="m.recommendId" >
+                                    <select name="recommendId" v-model="m.recommendId">
                                         <option value="">未选择餐品包</option>
                                         <option :value="f.id" v-for="f in recommendList">
                                             {{f.name}}
@@ -215,14 +216,74 @@
                             <%--<div class="form-group col-md-10" v-if="m.articleType==1">--%>
                             <%--<label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>--%>
                             <%--<div class="col-md-10">--%>
-                                <%--<select  name="unitId"  v-model="m.unitId" >--%>
-                                    <%--<option value="selected">未选择规格包</option>--%>
-                                    <%--<option :value="f.id" v-for="f in unitList">--%>
-                                        <%--{{f.name}}--%>
-                                    <%--</option>--%>
-                                <%--</select>--%>
+                            <%--<select  name="unitId"  v-model="m.unitId" >--%>
+                            <%--<option value="selected">未选择规格包</option>--%>
+                            <%--<option :value="f.id" v-for="f in unitList">--%>
+                            <%--{{f.name}}--%>
+                            <%--</option>--%>
+                            <%--</select>--%>
                             <%--</div>--%>
-                        <%--</div>--%>
+                            <%--</div>--%>
+
+
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
+                                <label class="col-md-2 text-right">规格属性（新）<label style="color:red">注：与旧版规格只能使用一个</label></label>
+                                <div class="col-md-10">
+                                    <%--<div class="article-attr" v-for="attr in unitList">--%>
+                                    <%--<label class="article-attr-label">{{attr.name}}:</label>--%>
+									<span class="article-units">
+										<label v-for="attr in unitList">
+                                            <input type="checkbox" id="{{attr.id}}" @click="clickUnit(attr)">
+                                            {{attr.name}}
+                                        </label>
+									</span>
+                                    <%--</div>--%>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group col-md-10" v-for="select in selectedUnit.unitList">
+                                <div class="col-md-10">
+                                    <label class="col-md-2 control-label">规格属性: {{select.name}}</label>
+                                    <span class="article-units">
+                                          <label class="col-md-2 control-label">选择类型: </label>
+
+                                        <input type="radio" required name="{{select.name}}" @click="changeType(select,0)"> 单选
+                                        <input type="radio" required name="{{select.name}}" @click="changeType(select,1)"> 多选或不选
+
+                                    </span>
+                                </div>
+
+                                <div class="col-md-10">
+                                    <div class="flex-row">
+                                        <div class="flex-1 text-right">规格</div>
+                                        <div class="flex-1">差价</div>
+                                        <div class="flex-1">排序</div>
+                                        <div class="flex-1">是否启用</div>
+
+                                    </div>
+                                    <div class="flex-row " v-for="detail in select.details">
+                                        <label class="flex-1 control-label">{{detail.name}}</label>
+                                        <div class="flex-1">
+                                            <input type="text" class="form-control"
+                                                v-model="detail.price"  id="price{{detail.id}}"   required="required"/>
+                                        </div>
+                                        <div class="flex-1">
+                                            <input type="text" class="form-control" name="sort"
+                                                   v-model="detail.sort" id="sort{{detail.id}}" required="required"
+                                            />
+                                        </div>
+                                        <div class="flex-1">
+                                            <input type="checkbox" id="{{detail.id}}" checked="detail.isUsed == 1"
+                                                   @click="changeUsed(select,detail)" style="width:70px;height:30px">
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
@@ -236,6 +297,8 @@
                                     </div>
                                 </div>
                             </div>
+
+
                             <div class="form-group col-md-10" v-if="allUnitPrice.length">
                                 <label class="col-md-2 control-label">规格价格</label>
                                 <div class="col-md-10">
@@ -266,7 +329,7 @@
                                         <div class="flex-2">
                                             <input type="text" class="form-control" name="stockWorkingDay"
                                                    id="workingDay" v-model="u.stockWorkingDay"
-                                                   onchange="changeStockWeekend()"  />
+                                                   onchange="changeStockWeekend()"/>
                                         </div>
                                         <div class="flex-2">
                                             <input type="text" class="form-control" name="stockWeekend"
@@ -293,7 +356,7 @@
                                     <div class="portlet-body">
                                         <div class="portlet box blue-hoki"
                                              v-for="attr in m.mealAttrs | orderBy  'sort'">
-                                            <div class="portlet-title" >
+                                            <div class="portlet-title">
                                                 <div class="caption">
                                                     <label class="control-label">&nbsp;</label>
                                                     <div class="pull-right">
@@ -311,10 +374,12 @@
                                                 </div>
 
                                                 <div class="caption">
-                                                    <label class="control-label col-md-4" style="width:120px">打印排序&nbsp;</label>
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">打印排序&nbsp;</label>
                                                     <div class="col-md-4">
                                                         <input class="form-control" type="text" v-model="attr.printSort"
-                                                               required="required"  name="printSort" lazy onblur="checkSort(this)">
+                                                               required="required" name="printSort" lazy
+                                                               onblur="checkSort(this)">
                                                     </div>
 
                                                 </div>
@@ -400,7 +465,7 @@
                     <div class="modal-footer">
                         <input type="hidden" name="id" v-model="m.id"/>
                         <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary" >保存</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -486,20 +551,20 @@
 
 <script>
 
-    function checkSort(t){
-        if($(t).val() == ''){
+    function checkSort(t) {
+        if ($(t).val() == '') {
             return;
         }
         var v = $(t).val();
         var count = 0;
         var attr = document.getElementsByName("printSort");
-        for(var i = 0;i< attr.length;i++){
-            if(v == attr[i].value){
-                count ++;
+        for (var i = 0; i < attr.length; i++) {
+            if (v == attr[i].value) {
+                count++;
             }
         }
 
-        if(count > 1){
+        if (count > 1) {
             alert("打印排序添加重复");
             $(t).val('');
         }
@@ -517,7 +582,7 @@
             2: "套餐"
         }
         var tb = $table.DataTable({
-            "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+            "lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
             ajax: {
                 url: "article/list_all",
                 dataSrc: ""
@@ -648,12 +713,13 @@
                     mixins: [C.formVueMix],
                     data: {
                         articlefamilys: [],
-                        recommendList:[],
+                        recommendList: [],
                         supportTimes: [],
                         kitchenList: [],
                         checkedUnit: [],
                         articleattrs: [],
-                        unitList:[],
+                        unitList: [],
+                        selectedUnit: new HashMap(),
                         articleunits: {},
                         unitPrices: [],
                         mealtempList: [],
@@ -681,6 +747,37 @@
                         removeArticleItem: function (mealItem) {
                             this.choiceArticleShow.items.$remove(mealItem);
                         },
+                        changeType:function(attr,type){
+                            attr.choiceType = type;
+                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
+                                if (this.selectedUnit.unitList[i].id == attr.id) {
+                                    this.selectedUnit.unitList[i].choiceType=type;
+
+                                }
+                            }
+                        },
+                        changeUsed:function(select,item){
+                            var use ;
+                            if(item.isUsed == 0 || !item.isUsed){
+                                use = 1;
+                                item.isUsed = 1;
+
+                            }else{
+                                use = 0;
+                                item.isUsed = 0;
+                            }
+                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
+                                if (this.selectedUnit.unitList[i].id == select.id) {
+                                    for(var k = 0;i< this.selectedUnit.unitList[i].details.length;k++){
+                                        if(this.selectedUnit.unitList[i].details[k].id  == item.id){
+                                            this.selectedUnit.unitList[i].details[k].isUsed = use;
+                                            break;
+                                        }
+
+                                    }
+                                }
+                            }
+                        },
                         addArticleItem: function (art) {
                             var item = {
                                 name: art.name,
@@ -696,6 +793,35 @@
                                 item.isDefault = true;
                             }
                             this.choiceArticleShow.items.push(item);
+                        },
+                        clickUnit: function (attr) {
+                            if (!this.selectedUnit.unitList) {
+                                this.selectedUnit.unitList = [];
+                            }
+
+                            var contains = false;
+                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
+
+                                if (this.selectedUnit.unitList[i].id == attr.id) {
+                                    contains = true;
+                                    for(var k = 0;k < this.selectedUnit.unitList[i].details.length;k++){
+                                        var price = 'price'+this.selectedUnit.unitList[i].details[k].id;
+
+                                        document.getElementById(price).value = 2222;
+                                        $('#sort'+this.selectedUnit.unitList[i].details[k].id).val("");
+                                    }
+                                    this.selectedUnit.unitList.$remove(attr);
+
+                                    break;
+                                }
+                            }
+
+                            if (!contains) {
+                                this.selectedUnit.unitList.push(attr);
+
+                            }
+
+
                         },
                         addMealItem: function (meal) {
                             this.choiceArticleShow.show = true;
@@ -762,6 +888,7 @@
                         }
                         ,
                         create: function (article_type) {
+
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
 //                                recommendId:this.recommendList[0].id,
@@ -774,10 +901,33 @@
                                 showBig: true,
                                 isEmpty: false,
                                 sort: 0,
+                                units : [],
                                 articleType: article_type,
                             };
-                            this.checkedUnit = [];
+                            this.selectedUnit = [];
                             this.showform = true;
+
+                            var detail = {
+                                name: null,
+                                price: null,
+                                sort: null,
+                                isUsed: null
+                            };
+                            var u = {
+                                name: null,
+                                id: null,
+                                sort: null,
+                                type: null,
+                                details: [detail]
+                            }
+
+
+                            var list = {
+                                unitList: []
+                            }
+                            this.selectedUnit = list;
+
+
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -833,6 +983,17 @@
                             var action = $(e.target).attr("action");
                             this.m.articlePrices = this.unitPrices;
                             this.m.hasUnit = this.checkedUnit.join() || " ";
+                            this.m.units = [];
+                            for(var i =0;i< that.selectedUnit.unitList.length;i++){
+                                this.m.units.push({
+                                    id:that.selectedUnit.unitList[i].id,
+                                    choiceType:that.selectedUnit.unitList[i].choiceType,
+                                    details: that.selectedUnit.unitList[i].details,
+                                });
+                            }
+
+
+
                             var m = this.m;
 
                             var jsonData = JSON.stringify(this.m);
@@ -912,7 +1073,6 @@
                                 }
                                 checked.length && result.push(checked);
                             }
-
 
 
                             function getAll(allData) {

@@ -20,5 +20,7 @@ public interface UnitService extends GenericService<Unit, String> {
 
    List<Unit> getUnitByArticleid(String articleId);
 
+   void insertArticleRelation(String articleId,List<Unit> units);
+
 
 }
