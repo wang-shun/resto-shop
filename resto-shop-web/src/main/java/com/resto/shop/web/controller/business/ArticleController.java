@@ -8,8 +8,10 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
+ import com.resto.shop.web.service.UnitService;
+ import org.apache.commons.lang3.StringUtils;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,6 +45,9 @@ public class ArticleController extends GenericController{
 
 	@Resource
 	BrandService brandService;
+
+	@Autowired
+	private UnitService unitService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -66,6 +71,7 @@ public class ArticleController extends GenericController{
 	@ResponseBody
 	public Result list_one_full(String id){
 		Article article = articleService.selectFullById(id,"");
+		article.setUnits(unitService.getUnitByArticleid(id));
 		return getSuccessResult(article);
 	}
 
@@ -75,11 +81,14 @@ public class ArticleController extends GenericController{
 	public Result create(@Valid @RequestBody Article article){
 		article.setShopDetailId(getCurrentShopId());
 		article.setUpdateUserId(getCurrentUserId());
-		article.setUpdateTime(new Date());	
+		article.setUpdateTime(new Date());
+		String id = article.getId();
 		if(StringUtils.isEmpty(article.getId())){
 			article.setCreateUserId(getCurrentUserId());
-			articleService.save(article);
+			id = articleService.save(article).getId();
+			unitService.insertArticleRelation(id,article.getUnits());
 		}else{
+
 			articleService.update(article);
 			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
 			if(article.getIsEmpty() == true){
@@ -108,7 +117,10 @@ public class ArticleController extends GenericController{
 			}else{
 				articleService.setActivated(article.getId(), 0);
 			}
+
+			unitService.updateArticleRelation(id,article.getUnits());
 		}
+
         articleService.initStock();
 		return Result.getSuccess();
     }

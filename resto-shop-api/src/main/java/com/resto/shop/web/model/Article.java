@@ -110,17 +110,16 @@ public class Article {
     //推荐餐品包id
     private String recommendId;
 
-    //规格id
-    private String unitId;
 
-    final public String getUnitId() {
-        return unitId;
+    //规格属性
+    private List<Unit> units;
+
+    final public List<Unit> getUnits() {
+        return units;
     }
 
-
-
-    final public void setUnitId(String unitId) {
-        this.unitId = unitId;
+    final public void setUnits(List<Unit> units) {
+        this.units = units;
     }
 
     final public String getRecommendId() {

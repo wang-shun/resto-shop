@@ -10,18 +10,28 @@ public class UnitDetail {
 
     private String name;
 
-    private BigDecimal spread;
+
 
     private Integer sort;
 
-    private Boolean click;
+    private Integer isUsed;
 
-    final public Boolean getClick() {
-        return click;
+    private BigDecimal price ;
+
+    final public BigDecimal getPrice() {
+        return price;
     }
 
-    final public void setClick(Boolean click) {
-        this.click = click;
+    final public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    final public Integer getIsUsed() {
+        return isUsed;
+    }
+
+    final public void setIsUsed(Integer isUsed) {
+        this.isUsed = isUsed;
     }
 
     final public Integer getSort() {
@@ -32,13 +42,7 @@ public class UnitDetail {
         this.sort = sort;
     }
 
-    final public BigDecimal getSpread() {
-        return spread;
-    }
 
-    final public void setSpread(BigDecimal spread) {
-        this.spread = spread;
-    }
 
     final public String getId() {
         return id;

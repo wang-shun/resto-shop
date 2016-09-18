@@ -40,6 +40,17 @@ public class UnitController extends GenericController {
         return result;
     }
 
+
+    @RequestMapping("/list_all_id")
+    @ResponseBody
+    public List<Unit> getListById(String articleId){
+        List<Unit> result =  unitService.getUnitsByArticleId(getCurrentShopId(),articleId);
+        return result;
+    }
+
+
+
+
     @RequestMapping("/create")
     @ResponseBody
     public Result create(@Valid @RequestBody Unit unit){
@@ -49,7 +60,7 @@ public class UnitController extends GenericController {
         unit.setShopId(getCurrentShopId());
         unitService.insert(unit);
         //创建属性
-        unitService.insertFamily(unit);
+        unitService.insertDetail(unit);
         return new Result(true);
     }
 
@@ -59,7 +70,7 @@ public class UnitController extends GenericController {
         unitService.update(unit);
         unitService.initUnit(unit);
         //创建属性
-        unitService.insertFamily(unit);
+        unitService.insertDetail(unit);
         return new Result(true);
     }
 
