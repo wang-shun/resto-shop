@@ -873,7 +873,7 @@
     </select>
     <select id="selectReadyList" resultType="Order">
         SELECT o.id,nickname as
-        remark,o.print_order_time FROM tb_order o LEFT JOIN
+        remark,o.print_order_time,o.ver_code as verCode FROM tb_order o LEFT JOIN
         tb_customer c
         ON
         o.customer_id=c.id
