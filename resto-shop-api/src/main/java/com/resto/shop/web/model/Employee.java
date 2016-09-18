@@ -34,6 +34,16 @@ public class Employee {
 
     private  String shop_id;
 
+    private  String brandEmployeeId;
+
+    public String getBrandEmployeeId() {
+        return brandEmployeeId;
+    }
+
+    public void setBrandEmployeeId(String brandEmployeeId) {
+        this.brandEmployeeId = brandEmployeeId;
+    }
+
     List<EmployeeRole> employeeRoleList;
 
     public List<EmployeeRole> getEmployeeRoleList() {
