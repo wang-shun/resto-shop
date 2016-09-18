@@ -55,7 +55,28 @@ public class OrderItem {
     private String shopId;
     //关联   用户电话 用于中间数据库 报表问题
     private String telephone;
-    
+
+
+    private String name;
+
+    private BigDecimal price;
+
+    final public BigDecimal getPrice() {
+        return price;
+    }
+
+    final public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    final public String getName() {
+        return name;
+    }
+
+    final public void setName(String name) {
+        this.name = name;
+    }
+
     public ArticleFamily getArticleFamily() {
 		return articleFamily;
 	}
