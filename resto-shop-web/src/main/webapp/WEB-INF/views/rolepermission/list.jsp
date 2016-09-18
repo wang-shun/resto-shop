@@ -55,14 +55,11 @@
         <tbody>
         <tr v-for="(index,r) in eroleList">
             <td>{{index+1}}</td>
-            <td>{{r}}</td>
-            <td v-for="rp in r.permissions/"><input type="checkbox" class="make-switch"  data-on-color="primary" data-off-color="info" data-size="small" >
-
-
-
-
-
-            </td>
+            <td>{{r.roleName}}</td>
+            <td><input type="checkbox" :class="vm.class" data-on-color="primary" data-off-color="info" data-size="small" ></td>
+            <td><input type="checkbox" class="make-switch"  data-on-color="primary" data-off-color="info" data-size="small"></td>
+            <td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>
+            <td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>
         </tr>
         </tbody>
     </table>
@@ -75,7 +72,8 @@
 	    var vm = new Vue({
 	        el:'#control',
             data:{
-                permission:[],
+                   class:"make-switch",
+                    permission:[],
                 eroleList :[]
             },
             ready: function () {
@@ -86,13 +84,16 @@
                     success:function (result) {
                         that.permission=result;
                     }
-                });
+                })
                 $.ajax({
                     url:"rolepermission/list_all",
                     success:function (result) {
+                        that.eroleList=result.data;
                         console.log(result.data);
                     }
+
                 })
+
             },
         })
 	}());
