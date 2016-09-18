@@ -8,8 +8,10 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
+ import com.resto.shop.web.service.UnitService;
+ import org.apache.commons.lang3.StringUtils;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,6 +45,9 @@ public class ArticleController extends GenericController{
 
 	@Resource
 	BrandService brandService;
+
+	@Autowired
+	private UnitService unitService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -66,6 +71,7 @@ public class ArticleController extends GenericController{
 	@ResponseBody
 	public Result list_one_full(String id){
 		Article article = articleService.selectFullById(id,"");
+		article.setUnits(unitService.getUnitByArticleid(id));
 		return getSuccessResult(article);
 	}
 

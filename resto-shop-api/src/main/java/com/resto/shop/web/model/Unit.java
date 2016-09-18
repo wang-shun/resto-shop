@@ -11,11 +11,40 @@ public class Unit {
 
     private String name;
 
+    private Integer sort;
 
     private String shopId;
 
-    private List<UnitFamily> families;
+    private Integer choiceType;
 
+    private Integer isUsed;
+
+    private List<UnitDetail> details;
+
+
+    final public Integer getIsUsed() {
+        return isUsed;
+    }
+
+    final public void setIsUsed(Integer isUsed) {
+        this.isUsed = isUsed;
+    }
+
+    final public Integer getChoiceType() {
+        return choiceType;
+    }
+
+    final public void setChoiceType(Integer choiceType) {
+        this.choiceType = choiceType;
+    }
+
+    final public Integer getSort() {
+        return sort;
+    }
+
+    final public void setSort(Integer sort) {
+        this.sort = sort;
+    }
 
     final public String getShopId() {
         return shopId;
@@ -41,11 +70,11 @@ public class Unit {
         this.name = name;
     }
 
-    final public List<UnitFamily> getFamilies() {
-        return families;
+    final public List<UnitDetail> getDetails() {
+        return details;
     }
 
-    final public void setFamilies(List<UnitFamily> families) {
-        this.families = families;
+    final public void setDetails(List<UnitDetail> details) {
+        this.details = details;
     }
 }

@@ -24,7 +24,7 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">规格包管理</h4>
+                    <h4 class="modal-title">规格属性</h4>
                 </div>
                 <form class="form-horizontal" role="form"
                       @submit.prevent="save">
@@ -35,25 +35,16 @@
 
                             <div class="col-md-12">
                                 <div class="portlet light bordered">
-                                    <div class="portlet-title">
-                                        <div class="caption font-green-sharp">
-                                            <i class="icon-speech font-green-sharp"></i>
-                                            <span class="caption-subject bold uppercase"> 规格包名称： </span>
-                                            <input  type="text" v-model="m.name"
-                                                   id="uName" required="required" lazy>
-                                        </div>
 
-                                    </div>
                                     <div class="portlet-body">
-                                        <div class="portlet box blue-hoki" v-for="attr in unit.familyList">
-                                            <div class="portlet-title"><!--v-for="attr in familyList "-->
-
+                                        <div class="portlet box blue-hoki" >
+                                            <div class="portlet-title">
                                                 <div class="caption">
                                                     <label class="control-label col-md-4"
                                                            style="width:120px">属性名称&nbsp;</label>
-                                                    <div class="col-md-4">
-                                                        <input class="form-control" type="text" v-model="attr.name"
-                                                               id="unitName" required="required" lazy>
+                                                    <div class="col-md-6">
+                                                        <input class="form-control" type="text" v-model="m.name"
+                                                               id="uName" required="required" lazy>
                                                     </div>
 
                                                 </div>
@@ -62,43 +53,29 @@
                                                 <div class="caption">
                                                     <label class="control-label col-md-4"
                                                            style="width:200px">排序&nbsp;</label>
-                                                    <div class="col-md-4">
-                                                        <input class="form-control" type="text" v-model="attr.sort"
-                                                               id="sort" required="required" name="sort" lazy
+                                                    <div class="col-md-6">
+                                                        <input class="form-control" type="text" v-model="m.sort"
+                                                               id="uSort" required="required" name="sort" lazy
                                                         >
                                                     </div>
 
                                                 </div>
 
-                                                <div class="flex-1 caption radio-list">
-                                                    <label class="control-label col-md-4" style="width:200px">
-                                                        <input type="radio" name="{{attr.name}}"
-                                                               v-model="attr.type" required value="0"
-                                                        />
-                                                        单选&nbsp;
-                                                    </label>
-                                                    <label class="control-label col-md-4" style="width:200px">
-                                                        <input type="radio" name="{{attr.name}}" required value="1"
-                                                               v-model="attr.type"
-                                                        />
-                                                        多选或不选&nbsp;
-                                                    </label>
-                                                </div>
 
-                                                <div class="tools">
-                                                    <a href="javascript:;" class="remove"
-                                                       @click="delMealAttr(attr)"></a>
-                                                </div>
+                                                <%--<div class="tools">--%>
+                                                    <%--<a href="javascript:;" class="remove"--%>
+                                                       <%--@click="delMealAttr(attr)"></a>--%>
+                                                <%--</div>--%>
                                             </div>
                                             <div class="portlet-body"> <!--v-for="attr in articles "-->
                                                 <%--<div class="portlet-body" v-if="m.id != null" v-for="attr in m.articles "  >--%>
-                                                <div class="form-group col-md-12" v-for="item in attr.detailList">
+                                                <div class="form-group col-md-12" v-for="item in unit.detailList">
                                                     <div class="flex-row" style="text-align: center">
 
                                                         <div class="flex-2">名称</div>
-                                                        <div class="flex-2">差价</div>
-                                                        <div class="flex-1">排序</div>
-                                                        <div class="flex-1">移除</div>
+                                                        <%--<div class="flex-2">差价</div>--%>
+                                                        <div class="flex-2">排序</div>
+                                                        <div class="flex-2">移除</div>
                                                     </div>
                                                     <div class="flex-row" style="text-align: center">
 
@@ -108,40 +85,40 @@
                                                                    v-model="item.name" name="name"
                                                                    required="required"/>
                                                         </div>
+                                                        <%--<div class="flex-2">--%>
+                                                            <%--<input type="text" class="form-control"--%>
+                                                                   <%--v-model="item.spread" name="spread"--%>
+                                                                   <%--required="required"/>--%>
+                                                        <%--</div>--%>
                                                         <div class="flex-2">
-                                                            <input type="text" class="form-control"
-                                                                   v-model="item.spread" name="spread"
-                                                                   required="required"/>
-                                                        </div>
-                                                        <div class="flex-1">
                                                             <input type="text" class="form-control" name="sort"
                                                                    v-model="item.sort"
                                                                    required="required" lazy/>
                                                         </div>
 
-                                                        <div class="flex-1">
+                                                        <div class="flex-2">
                                                             <button class="btn red" type="button"
-                                                                    @click="removeMealItem(attr,item)">移除
+                                                                    @click="removeMealItem(item)">移除
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 col-md-offset-8">
                                                     <button class="btn btn-block blue" type="button"
-                                                            @click="addItem(attr)"><i class="fa fa-cutlery"></i>
+                                                            @click="addItem"><i class="fa fa-cutlery"></i>
                                                         添加规格
                                                     </button>
                                                 </div>
                                                 <div class="clearfix"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 col-md-offset-4">
-                                            <button class="btn btn-block blue" type="button"
-                                                    @click="addMealItem(unit.familyList)">
-                                                <i class="fa fa-plus"></i>
-                                                添加规格包属性
-                                            </button>
-                                        </div>
+                                        <%--<div class="col-md-4 col-md-offset-4">--%>
+                                            <%--<button class="btn btn-block blue" type="button"--%>
+                                                    <%--@click="addMealItem(unit.familyList)">--%>
+                                                <%--<i class="fa fa-plus"></i>--%>
+                                                <%--添加规格包属性--%>
+                                            <%--</button>--%>
+                                        <%--</div>--%>
                                         <div class="clearfix"></div>
                                     </div>
                                 </div>
@@ -258,14 +235,14 @@
             },
             columns: [
                 {
-                    title: "规格包名称",
+                    title: "属性名称",
                     data: "name",
                 },
 
 
                 {
-                    title: "属性",
-                    data: "families",
+                    title: "属性明细",
+                    data: "details",
                     defaultContent: "",
                     createdCell: function (td, tdData) {
                         $(td).html('');
@@ -368,8 +345,8 @@
 
                             $("#article-choice-dialog").modal('hide');
                         },
-                        removeMealItem: function (attr, item) {
-                            attr.detailList.$remove(item);
+                        removeMealItem: function (item) {
+                            this.unit.detailList.$remove(item);
 //                            this.unit.detailList.$remove(attr);
 
 //                            articleList.push(attr);
@@ -406,18 +383,32 @@
                             }
                             this.choiceArticleShow.items.push(item);
                         },
-                        addItem: function (attr) {
-                            if(attr.detailList){
-                                attr.detailList.push({
-                                    name: null,
-                                    spread: null,
-                                    sort: null
-                                });
+                        addItem: function () {
+                            if(!this.unit.detailList){
+                                this.unit.detailList = [{
+                                    name : null,
+                                    sort : null
+                                }];
                             }else{
-                                attr.detailList = [{ name: null,
-                                    spread: null,
-                                    sort: null}];
+                                this.unit.detailList.push({
+                                    name : null,
+                                    sort : null
+                                });
                             }
+
+
+//
+//                            if(attr.detailList){
+//                                attr.detailList.push({
+//                                    name: null,
+//                                    spread: null,
+//                                    sort: null
+//                                });
+//                            }else{
+//                                attr.detailList = [{ name: null,
+//                                    spread: null,
+//                                    sort: null}];
+//                            }
 
 
 
@@ -500,18 +491,16 @@
 
 
 //                            this.unit = null;
-                            var family = {
-                                no: null,
-                                name: null,
-                                sort: null,
-                                type: null,
-                                detailList: []
-                            }
+
                             var unit = {
-                                familyList : [family]
+                                detailList : []
                             }
 
+
+
+
                             this.unit = unit;
+
                             action = "create";
                             unitId = null;
                             this.m = {
@@ -556,22 +545,22 @@
                             that.showform = true;
                             $.post("unit/getUnitById", {id: model.id}, function (result) {
                                 $('#uName').val(result.name);
+                                $('#uSort').val(result.sort);
                                 var arr = [];
-                                for (var i = 0; i < result.families.length; i++) {
+                                for (var i = 0; i < result.details.length; i++) {
 
-                                    var family = {
-                                        id:result.families[i].id,
+                                    var detail = {
+                                        id:result.details[i].id,
                                         no: i,
-                                        name: result.families[i].name,
-                                        sort: result.families[i].sort,
-                                        type: result.families[i].type,
-                                        detailList: result.families[i].detailList
+                                        name: result.details[i].name,
+                                        sort: result.details[i].sort
+
                                     }
-                                    arr.push(family);
+                                    arr.push(detail);
                                 }
                                 that.unit = null;
                                 var unit = {
-                                    familyList : arr
+                                    detailList : arr
                                 }
                                 that.unit = unit;
                             });
@@ -601,10 +590,11 @@
 
                             var data = {
                                 id: unitId,
-                                name : $('#uName').val()
+                                name : $('#uName').val(),
+                                sort : $('#uSort').val()
                             };
 
-                            data.families = this.unit.familyList;
+                            data.details = this.unit.detailList;
                             
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);
