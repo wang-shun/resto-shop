@@ -202,6 +202,9 @@
                                 </div>
                             </div>
                             <div class="clearfix"></div>
+
+
+
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">推荐餐品包</label>
                                 <div class="col-md-10">
