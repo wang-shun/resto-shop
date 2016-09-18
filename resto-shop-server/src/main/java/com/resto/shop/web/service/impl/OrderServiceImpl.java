@@ -151,7 +151,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return sb.toString();
     }
 
-    @Override
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -165,6 +164,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
 
+
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
         Map<String, Article> articleMap = ApplicationUtils.convertCollectionToMap(String.class, articles);
@@ -174,11 +174,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (customer != null && customer.getTelephone() != null) {
             order.setVerCode(customer.getTelephone().substring(7));
         } else {
-            if(!order.getAllowContinueOrder()){
-                order.setVerCode(generateString(5));
-            }
+            order.setVerCode(generateString(5));
         }
-        log.info("当前交易码为："+order.getVerCode());
         order.setId(orderId);
         order.setCreateTime(new Date());
         BigDecimal totalMoney = BigDecimal.ZERO;
@@ -263,6 +260,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item,articleCount);
             }
 
+
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
 
@@ -270,6 +268,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 break;
             }
         }
+
+
 
         if(!jsonResult.isSuccess()){
             return jsonResult;
@@ -338,7 +338,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
         }
-        log.info("当前交易码为："+order.getVerCode());
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
