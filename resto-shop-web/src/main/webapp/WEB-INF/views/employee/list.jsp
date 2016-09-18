@@ -3,6 +3,8 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
 <div id="control">
+    <img src="employee/QR?employeeId=3hfa78f74efa46c1b8e96ca99b419818" width=50 height=40 onMouseover="this.width=80; this.height=60" onMouseout="this.width=50;this.height=40">
+
     <div class="row form-div" v-if="showform">
         <div class="col-md-offset-3 col-md-6" >
             <div class="portlet light bordered">
@@ -63,8 +65,9 @@
         <!-- /.modal-dialog -->
     </div>
 
-    <button class="btn green pull-right" @click="uploadFile">下载全部</button>
-
+    <%--<button class="btn green pull-right" @click="uploadFile">下载全部</button>--%>
+    <%--<a href="employee/downloadFile">下载全部</a>--%>
+    <a href="employee/downloadFile" class="btn btn-primary btn-lg active" role="button">下载全部二维码</a>
 
     <div class="table-div">
         <div class="table-operator">
@@ -112,12 +115,12 @@
                     title : "二维码",
                     data : "qrCode",
                     createdCell:function (td,tdData,row,rowData) {
-//                        "<a class='btn blue' href='shopqrcode/downloadFile?fileName="+data.message+"'>点击下载</a>";
-                        console.log(row);
-                         var str  = "employee/downloadFile?id="+tdData+"&&name="+row.name;
-                        $(td).html( "<a href='#' class='thumbnail'><img src='employee/QR?employeeId"+tdData+"' width='40px' height='40px'></a>");
+                       var img = "<img src=\"employee/QR?employeeId="+tdData+"\" width=40 height=30 onMouseover=\"this.width=130; this.height=110\" onMouseout=\"this.width=50;this.height=40\">";
+                        var str  = "employee/downloadFile?id="+tdData+"&&name="+row.name;
                         var download= "<a href="+str+"> 点击下载</a>";
-                        $(td).html(download);
+                        $(td).html(img+"<br/>"+download);
+
+
                     }
 
                 },

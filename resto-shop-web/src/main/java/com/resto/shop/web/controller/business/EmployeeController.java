@@ -14,8 +14,10 @@
  import com.resto.shop.web.model.EmployeeRole;
  import com.resto.shop.web.service.ERoleService;
  import com.resto.shop.web.service.EmployeeService;
+ import org.apache.poi.util.StringUtil;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.RequestParam;
  import org.springframework.web.bind.annotation.ResponseBody;
  import org.springframework.web.servlet.ModelAndView;
 
@@ -210,7 +212,7 @@
      }
 
 
-     public Result run(String zipname,List<Employee>elist ,String id,HttpServletRequest request)
+     public Result run(String zipname,List<Employee>shopElist ,String id,HttpServletRequest request)
              throws IOException, InterruptedException, WriterException {
          String fileSavePath = getFilePath(request,null);
          deleteFile(new File(fileSavePath));//删除历史生成的文件
@@ -220,27 +222,24 @@
          //查询所有id
          List<com.resto.brand.web.model.Employee> list = employeeBrandService.selectList();
 
-         if(elist.isEmpty()){  //如果是生成个人的二维码
-             //生成的zip路径
-              filepath = getFilePath(request,zipname);
-             //生成二位码的名字也是
-              fileName =zipname+".jpg";
-              QRCodeUtil.createQRCode(id,filepath,fileName);
-         }else {//如果是生成的全部二位码
+         if(null==id||"".equals(id)){  //id没好值说明是点全部下载
              //生成的zip的路径
              filepath = getFilePath(request,zipname);
-             for(com.resto.brand.web.model.Employee employee:list){
-                 for(Employee e : elist){
-                     if(e.getTelephone().equals(employee.getTelephone())){
-                         employee.setName(e.getName());
+             for(Employee e:shopElist){
+                 for(com.resto.brand.web.model.Employee employee2:list){
+                     if(e.getTelephone().equals(employee2.getTelephone())){
+                         e.setBrandEmployeeId(employee2.getId());
                      }
                  }
+                 fileName = e.getName()+".jpg";
+                 QRCodeUtil.createQRCode(e.getBrandEmployeeId(),filepath,fileName);
              }
-
-             for (com.resto.brand.web.model.Employee employee2 : list){
-                 fileName = employee2.getName()+".jpg";
-                 QRCodeUtil.createQRCode(employee2.getId(),filepath,fileName);
-             }
+         }else {//如果是生成个人的下载
+             //生成的zip路径
+             filepath = getFilePath(request,zipname);
+             //生成二位码的名字也是
+             fileName =zipname+".jpg";
+             QRCodeUtil.createQRCode(id,filepath,fileName);
          }
              //打包
              FileToZip.fileToZip(filepath, fileSavePath, zipname);
@@ -253,7 +252,7 @@
 
 
      @RequestMapping("/downloadFile")
-     public String donloadFile(String id ,String name,HttpServletRequest request,
+     public String donloadFile(@RequestParam(value = "id" ,required = false,defaultValue = "") String id ,@RequestParam(value = "name",required = false,defaultValue = "") String name, HttpServletRequest request,
                                HttpServletResponse response) throws IOException, WriterException, InterruptedException {
          String zipname;//定义zip的名字
 

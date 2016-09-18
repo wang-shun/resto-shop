@@ -4,29 +4,68 @@
 
 
 <div id="control">
+    <%--<table class="table table-bordered">--%>
+        <%--<thead>--%>
+        <%--<tr>--%>
+            <%--<th>序号</th>--%>
+            <%--<th>角色</th>--%>
+            <%--<th>买单</th>--%>
+            <%--<th>申请额度</th>--%>
+            <%--<th>同意申请</th>--%>
+            <%--<th>发短信</th>--%>
+        <%--</tr>--%>
+        <%--</thead>--%>
+        <%--<tbody>--%>
+        <%--<tr>--%>
+            <%--<td>1</td>--%>
+            <%--<td>经理</td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>2</td>--%>
+            <%--<td>服务员</td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>3</td>--%>
+            <%--<td>店长</td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
+        <%--</tr>--%>
+        <%--</tbody>--%>
+    <%--</table>--%>
+
+
     <table class="table table-bordered">
         <thead>
         <tr>
-            <%--<th style="width: 50px;">序号</th>--%>
+            <th>序号</th>
             <th>角色</th>
-            <th v-for="erole in eroleList.permissions">{{erole.roleName}}</th>
+            <th v-for="p in permission">{{p.permissionName}}</th>
         </tr>
         </thead>
         <tbody>
-        <tr v>
-            <%--<td class="center"  style="width: 30px;">1</td>--%>
-            <td class="center" id="ROLE_NAMETd3264c8e83d0248bb9e3ea6195b4c021">一级管理员</td>
-            <td class="center" style="height: 20px;">
-                <label>
-                    <input name="switch-field-1" onclick="upRb('3264c8e83d0248bb9e3ea6195b4c0216','3542adfbda73410c976e185ffe50ad06')" class="make-switch" type="checkbox">
-                    <span class="lbl"></span>
-                </label>
-            </td>
+        <tr v-for="(index,r) in eroleList">
+            <td>{{index+1}}</td>
+            <td>{{r}}</td>
+            <td v-for="rp in r.permissions/"><input type="checkbox" class="make-switch"  data-on-color="primary" data-off-color="info" data-size="small" >
 
+
+
+
+
+            </td>
         </tr>
         </tbody>
     </table>
-
 
 	</div>
 	
@@ -36,22 +75,26 @@
 	    var vm = new Vue({
 	        el:'#control',
             data:{
-                eroleList:[],
+                permission:[],
+                eroleList :[]
             },
             ready: function () {
-                //查询列和行
+                var that = this;
+                //查询所有的角色用于显示行
+                $.ajax({
+                    url:"permission/list_all",
+                    success:function (result) {
+                        that.permission=result;
+                    }
+                });
                 $.ajax({
                     url:"rolepermission/list_all",
                     success:function (result) {
-                        vm.eroleList=result.data;
+                        console.log(result.data);
                     }
-                    
                 })
-            }
-
+            },
         })
-
-
 	}());
 	
 
