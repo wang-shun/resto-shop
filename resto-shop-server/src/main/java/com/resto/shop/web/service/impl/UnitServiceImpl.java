@@ -32,6 +32,11 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     }
 
     @Override
+    public List<Unit> getUnitsByArticleId(String shopId, String articleId) {
+        return unitMapper.getUnitsByArticleId(shopId, articleId);
+    }
+
+    @Override
     public void insertDetail(Unit unit) {
         for (UnitDetail unitDetail : unit.getDetails()) {
             String detailId = ApplicationUtils.randomUUID();
@@ -59,11 +64,18 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     public void insertArticleRelation(String articleId, List<Unit> units) {
         for(Unit unit : units){
             String id = ApplicationUtils.randomUUID();
+            unit.setChoiceType(unit.getChoiceType() == null ? 1 : unit.getChoiceType());
             unitMapper.insertArticleRelation(articleId,id,unit);
             for(UnitDetail unitDetail : unit.getDetails()){
                 String detailID = ApplicationUtils.randomUUID();
                 unitMapper.insertUnitDetailRelation(detailID,id,unitDetail);
             }
         }
+    }
+
+    @Override
+    public void updateArticleRelation(String articleId, List<Unit> units) {
+        unitMapper.deleteArticleUnit(articleId);
+        insertArticleRelation(articleId, units);
     }
 }

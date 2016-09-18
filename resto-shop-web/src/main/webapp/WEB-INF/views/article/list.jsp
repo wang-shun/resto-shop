@@ -233,7 +233,9 @@
                                     <%--<label class="article-attr-label">{{attr.name}}:</label>--%>
 									<span class="article-units">
 										<label v-for="attr in unitList">
-                                            <input type="checkbox" id="{{attr.id}}" @click="clickUnit(attr)">
+                                            <input type="checkbox"
+                                                   v-model="attr.isUsed" v-bind:true-value="1" v-bind:false-value="0"
+                                                   id="{{attr.id}}" @click="clickUnit(attr)">
                                             {{attr.name}}
                                         </label>
 									</span>
@@ -244,15 +246,24 @@
 
                             <div class="form-group col-md-10" v-for="select in selectedUnit.unitList">
                                 <div class="col-md-10">
-                                    <label class="col-md-2 control-label">规格属性: {{select.name}}</label>
-                                    <span class="article-units">
-                                          <label class="col-md-2 control-label">选择类型: </label>
+                                    <label class="col-md-2 ">规格属性: {{select.name}}</label>
+                                    <label class="col-md-2 ">是否单选: <input type="checkbox" v-bind:true-value="0"
+                                                                          v-bind:false-value="1"
+                                                                          v-model="select.choiceType"></label>
+                                    <%--<div class="col-md-7 radio-list">--%>
 
-                                        <input type="radio" required name="{{select.name}}" @click="changeType(select,0)"> 单选
-                                        <input type="radio" required name="{{select.name}}" @click="changeType(select,1)"> 多选或不选
 
-                                    </span>
+                                    <%--</div>--%>
+
                                 </div>
+                                <%--<div class="col-md-10">--%>
+
+
+                                <%--&lt;%&ndash;<label for="choice{{select.id}}">是否单选: </label>&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;<input type="checkbox" id="choice{{select.id}}"&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;v-model="select.choiceType" v-bind:true-value="0" v-bind:false-value="1"/>&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;</span>&ndash;%&gt;--%>
+                                <%--</div>--%>
 
                                 <div class="col-md-10">
                                     <div class="flex-row">
@@ -266,7 +277,7 @@
                                         <label class="flex-1 control-label">{{detail.name}}</label>
                                         <div class="flex-1">
                                             <input type="text" class="form-control"
-                                                v-model="detail.price"  id="price{{detail.id}}"   required="required"/>
+                                                   v-model="detail.price" id="price{{detail.id}}" required="required"/>
                                         </div>
                                         <div class="flex-1">
                                             <input type="text" class="form-control" name="sort"
@@ -274,8 +285,16 @@
                                             />
                                         </div>
                                         <div class="flex-1">
-                                            <input type="checkbox" id="{{detail.id}}" checked="detail.isUsed == 1"
-                                                   @click="changeUsed(select,detail)" style="width:70px;height:30px">
+                                            <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                                   @click="changeUsed(select,detail)" v-model="detail.isUsed"
+                                                   style="width:70px;height:30px">
+                                            <%--<input type="radio" required name="type{{detail.id}}"--%>
+                                            <%--checked v-model="detail.isUsed"     @click="changeUsed(select,detail,1)"> 是--%>
+                                            <%--<input type="radio" required name="type{{detail.id}}"--%>
+                                            <%--v-model="detail.isUsed"   @click="changeUsed(select,detail,0)"> 否--%>
+
+                                            <%--<input type="checkbox" id="{{detail.id}}" checked="detail.isUsed == 1" v-model="detail.isUsed"--%>
+                                            <%--@click="changeUsed(select,detail)" style="width:70px;height:30px">--%>
                                         </div>
 
 
@@ -551,6 +570,7 @@
 
 <script>
 
+    var action;
     function checkSort(t) {
         if ($(t).val() == '') {
             return;
@@ -747,29 +767,21 @@
                         removeArticleItem: function (mealItem) {
                             this.choiceArticleShow.items.$remove(mealItem);
                         },
-                        changeType:function(attr,type){
-                            attr.choiceType = type;
-                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
-                                if (this.selectedUnit.unitList[i].id == attr.id) {
-                                    this.selectedUnit.unitList[i].choiceType=type;
 
-                                }
-                            }
-                        },
-                        changeUsed:function(select,item){
-                            var use ;
-                            if(item.isUsed == 0 || !item.isUsed){
+                        changeUsed: function (select, item, type) {
+                            var use;
+                            if (item.isUsed == 0 || !item.isUsed) {
                                 use = 1;
                                 item.isUsed = 1;
 
-                            }else{
+                            } else {
                                 use = 0;
                                 item.isUsed = 0;
                             }
                             for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
                                 if (this.selectedUnit.unitList[i].id == select.id) {
-                                    for(var k = 0;i< this.selectedUnit.unitList[i].details.length;k++){
-                                        if(this.selectedUnit.unitList[i].details[k].id  == item.id){
+                                    for (var k = 0; i < this.selectedUnit.unitList[i].details.length; k++) {
+                                        if (this.selectedUnit.unitList[i].details[k].id == item.id) {
                                             this.selectedUnit.unitList[i].details[k].isUsed = use;
                                             break;
                                         }
@@ -804,21 +816,18 @@
 
                                 if (this.selectedUnit.unitList[i].id == attr.id) {
                                     contains = true;
-                                    for(var k = 0;k < this.selectedUnit.unitList[i].details.length;k++){
-                                        var price = 'price'+this.selectedUnit.unitList[i].details[k].id;
-
-                                        document.getElementById(price).value = 2222;
-                                        $('#sort'+this.selectedUnit.unitList[i].details[k].id).val("");
-                                    }
                                     this.selectedUnit.unitList.$remove(attr);
-
+                                    this.selectedUnit.unitList.$remove(this.selectedUnit.unitList[i]);
                                     break;
                                 }
                             }
 
                             if (!contains) {
+                                for (var i = 0; i < attr.details.length; i++) {
+                                    attr.details[i].isUsed = 1;
+                                    attr.details[i].price = null;
+                                }
                                 this.selectedUnit.unitList.push(attr);
-
                             }
 
 
@@ -888,7 +897,8 @@
                         }
                         ,
                         create: function (article_type) {
-
+                            var that = this;
+                            action = "create";
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
 //                                recommendId:this.recommendList[0].id,
@@ -901,32 +911,22 @@
                                 showBig: true,
                                 isEmpty: false,
                                 sort: 0,
-                                units : [],
+                                units: [],
                                 articleType: article_type,
                             };
-                            this.selectedUnit = [];
-                            this.showform = true;
 
-                            var detail = {
-                                name: null,
-                                price: null,
-                                sort: null,
-                                isUsed: null
-                            };
-                            var u = {
-                                name: null,
-                                id: null,
-                                sort: null,
-                                type: null,
-                                details: [detail]
-                            }
+                            this.showform = true;
+                            this.selectedUnit = [];
+
 
 
                             var list = {
                                 unitList: []
                             }
                             this.selectedUnit = list;
-
+                            $.post("unit/list_all", null, function (data) {
+                                that.unitList = data;
+                            });
 
                         }
                         ,
@@ -942,11 +942,31 @@
                         }
                         ,
                         edit: function (model) {
+                            this.selectedUnit = [];
+
+
+
+                            var list = {
+                                unitList: []
+                            }
+                            this.selectedUnit = list;
+
                             var that = this;
-                            that.showform = true;
-                            that.checkedUnit = [];
+
+
+                            action = "edit";
+
                             $.post("article/list_one_full", {id: model.id}, function (result) {
                                 var article = result.data;
+
+                                that.checkedUnit = [];
+                                that.showform = true;
+
+                                that.selectedUnit.unitList = [];
+                                for (var i = 0; i < article.units.length; i++) {
+                                    that.selectedUnit.unitList.push(article.units[i]);
+                                }
+
                                 article.mealAttrs || (article.mealAttrs = []);
                                 that.m = article;
                                 if (article.hasUnit && article.hasUnit != " " && article.hasUnit.length) {
@@ -960,6 +980,11 @@
                                 if (!article.kitchenList) {
                                     article.kitchenList = [];
                                 }
+
+
+                            });
+                            $.post("unit/list_all_id", {articleId: model.id}, function (data) {
+                                that.unitList = data;
                             });
 
                         }
@@ -984,14 +1009,13 @@
                             this.m.articlePrices = this.unitPrices;
                             this.m.hasUnit = this.checkedUnit.join() || " ";
                             this.m.units = [];
-                            for(var i =0;i< that.selectedUnit.unitList.length;i++){
+                            for (var i = 0; i < that.selectedUnit.unitList.length; i++) {
                                 this.m.units.push({
-                                    id:that.selectedUnit.unitList[i].id,
-                                    choiceType:that.selectedUnit.unitList[i].choiceType,
+                                    id: that.selectedUnit.unitList[i].id,
+                                    choiceType: that.selectedUnit.unitList[i].choiceType,
                                     details: that.selectedUnit.unitList[i].details,
                                 });
                             }
-
 
 
                             var m = this.m;
@@ -1168,9 +1192,7 @@
                         $.post("recommend/list_all", null, function (data) {
                             that.recommendList = data;
                         });
-                        $.post("unit/list_all", null, function (data) {
-                            that.unitList = data;
-                        });
+
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;
                         });

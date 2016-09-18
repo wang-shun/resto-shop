@@ -86,6 +86,7 @@ public class ArticleController extends GenericController{
 		if(StringUtils.isEmpty(article.getId())){
 			article.setCreateUserId(getCurrentUserId());
 			id = articleService.save(article).getId();
+			unitService.insertArticleRelation(id,article.getUnits());
 		}else{
 
 			articleService.update(article);
@@ -116,8 +117,10 @@ public class ArticleController extends GenericController{
 			}else{
 				articleService.setActivated(article.getId(), 0);
 			}
+
+			unitService.updateArticleRelation(id,article.getUnits());
 		}
-		unitService.insertArticleRelation(id,article.getUnits());
+
         articleService.initStock();
 		return Result.getSuccess();
     }

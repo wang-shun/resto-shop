@@ -12,6 +12,8 @@ public interface UnitService extends GenericService<Unit, String> {
 
    List<Unit> getUnits(String shopId);
 
+   List<Unit> getUnitsByArticleId(String shopId,String articleId);
+
    void insertDetail(Unit unit);
 
    Unit getUnitById(String id);
@@ -21,6 +23,8 @@ public interface UnitService extends GenericService<Unit, String> {
    List<Unit> getUnitByArticleid(String articleId);
 
    void insertArticleRelation(String articleId,List<Unit> units);
+
+   void updateArticleRelation(String articleId,List<Unit> units);
 
 
 }

@@ -40,6 +40,17 @@ public class UnitController extends GenericController {
         return result;
     }
 
+
+    @RequestMapping("/list_all_id")
+    @ResponseBody
+    public List<Unit> getListById(String articleId){
+        List<Unit> result =  unitService.getUnitsByArticleId(getCurrentShopId(),articleId);
+        return result;
+    }
+
+
+
+
     @RequestMapping("/create")
     @ResponseBody
     public Result create(@Valid @RequestBody Unit unit){
