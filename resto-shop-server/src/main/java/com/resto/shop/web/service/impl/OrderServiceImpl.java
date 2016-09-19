@@ -205,6 +205,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     price = p.getPrice();
                     fans_price = p.getFansPrice();
                     break;
+                case OrderItemType.UNIT_NEW:
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(item.getName());
+                    org_price = item.getPrice();
+                    price = item.getPrice();
+                    fans_price = item.getPrice();
+                    break;
                 case OrderItemType.SETMEALS:
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
@@ -260,6 +267,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item,item.getCount());
             }else if(item.getType() == OrderItemType.SETMEALS){
                 check = checkArticleList(item,articleCount);
+            }else if (item.getType() == OrderItemType.UNIT_NEW){
+                check = checkArticleList(item,item.getCount());
             }
 
 
@@ -2083,6 +2092,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
                         current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,请重新选购餐品";
                 break;
+            case OrderItemType.UNIT_NEW:
+                //如果是单品无规格，直接判断菜品是否有库存
+                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                result = current >= count;
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
+                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
+                break;
             default:
                 log.debug("未知菜品分类");
                 break;
@@ -2120,6 +2136,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
+                    orderMapper.setEmpty(orderItem.getArticleId());
+                    break;
+                case OrderItemType.UNIT_NEW:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
                     break;
@@ -2169,6 +2190,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     
+                    break;
+                case OrderItemType.UNIT_NEW:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
+                    orderMapper.setEmptyFail(orderItem.getArticleId());
+
                     break;
                 default:
                   //  throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
