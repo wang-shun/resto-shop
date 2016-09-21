@@ -79,7 +79,13 @@
   </select>
 
     <select id="selectKitchenByOrderItem" resultType="Kitchen">
-        select * from tb_kitchen where id =  (select kitchen_id from tb_meal_item where meal_attr_id = #{mealAttrId} and article_id  = #{item.articleId})
+        select * from tb_kitchen where id
+         =  (select kitchen_id from tb_meal_item where meal_attr_id in
+        <foreach collection="mealAttrIds" index="index" item="mealAttrId" open="("
+                 separator="," close=")">
+            #{mealAttrId}
+        </foreach>
+         and article_id  = #{item.articleId})
     </select>
 
     <select id="getMealAttrId" resultType="java.lang.Long">

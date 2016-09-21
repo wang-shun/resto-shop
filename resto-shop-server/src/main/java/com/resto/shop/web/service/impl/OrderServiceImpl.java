@@ -8,12 +8,6 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
-
-import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
-import com.resto.brand.web.dto.brandArticleReportDto;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
@@ -53,7 +47,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private static final Map<String, Map<String, Integer>> NUMBER_SHOP_MAP = new ConcurrentHashMap<>();
 
-    private static final String NUMBER= "0123456789";
+    private static final String NUMBER = "0123456789";
 
     @Resource
     private OrderMapper orderMapper;
@@ -158,7 +152,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         if (customer == null) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
-        }else if (order.getOrderItems().isEmpty()) {
+        } else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
@@ -174,7 +168,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (customer != null && customer.getTelephone() != null) {
             order.setVerCode(customer.getTelephone().substring(7));
         } else {
-            if(!order.getAllowContinueOrder()){
+            if (!order.getAllowContinueOrder()) {
                 order.setVerCode(generateString(5));
             }
         }
@@ -261,28 +255,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
 
             Result check = new Result();
-            if(item.getType() == OrderItemType.ARTICLE){
-                check = checkArticleList(item,item.getCount());
-            }else if(item.getType() == OrderItemType.UNITPRICE){
-                check = checkArticleList(item,item.getCount());
-            }else if(item.getType() == OrderItemType.SETMEALS){
-                check = checkArticleList(item,articleCount);
-            }else if (item.getType() == OrderItemType.UNIT_NEW){
-                check = checkArticleList(item,item.getCount());
+            if (item.getType() == OrderItemType.ARTICLE) {
+                check = checkArticleList(item, item.getCount());
+            } else if (item.getType() == OrderItemType.UNITPRICE) {
+                check = checkArticleList(item, item.getCount());
+            } else if (item.getType() == OrderItemType.SETMEALS) {
+                check = checkArticleList(item, articleCount);
+            } else if (item.getType() == OrderItemType.UNIT_NEW) {
+                check = checkArticleList(item, item.getCount());
             }
 
 
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
 
-            if(!check.isSuccess()){
+            if (!check.isSuccess()) {
                 break;
             }
         }
 
 
-
-        if(!jsonResult.isSuccess()){
+        if (!jsonResult.isSuccess()) {
             return jsonResult;
         }
 
@@ -359,14 +352,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return jsonResult;
     }
 
-    public Result checkArticleList(OrderItem orderItem,int count) {
+    public Result checkArticleList(OrderItem orderItem, int count) {
 
         Boolean result = true;
         String msg = "";
 
         //订单菜品不可为空
         //有任何一个菜品售罄则不能出单
-        Result check = checkStock(orderItem,count);
+        Result check = checkStock(orderItem, count);
         if (!check.isSuccess()) {
             result = false;
             msg = check.getMessage();
@@ -449,12 +442,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("取消订单成功:" + order.getId());
 
             //拒绝订单后还原库存
-			Boolean addStockSuccess  = false;
-			addStockSuccess	= addStock(getOrderInfo(orderId));
-			if(!addStockSuccess){
-				log.info("库存还原失败:"+order.getId());
-			}
-			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
+            Boolean addStockSuccess = false;
+            addStockSuccess = addStock(getOrderInfo(orderId));
+            if (!addStockSuccess) {
+                log.info("库存还原失败:" + order.getId());
+            }
+            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
             return true;
         } else {
             log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
@@ -651,6 +644,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
             //得到当前菜品 所关联的厨房信息
@@ -666,31 +660,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             } else if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
 //                continue;
-                Long mealAttrId = kitchenService.getMealAttrId(item);
-                Kitchen kitchen = kitchenService.selectKitchenByOrderItem(item,mealAttrId);
-                if (kitchen != null) {
-                    String kitchenId = kitchen.getId().toString();
-                    kitchenMap.put(kitchenId, kitchen);
-                    if (!kitchenArticleMap.containsKey(kitchenId)) {
-                        //如果没有 则新建
-                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                    continue;
+                } else {
+                    List<Long> mealAttrIds = kitchenService.getMealAttrId(item);
+                    Kitchen kitchen = kitchenService.selectKitchenByOrderItem(item, mealAttrIds);
+                    if (kitchen != null) {
+                        String kitchenId = kitchen.getId().toString();
+                        kitchenMap.put(kitchenId, kitchen);
+                        if (!kitchenArticleMap.containsKey(kitchenId)) {
+                            //如果没有 则新建
+                            kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                        }
+                        kitchenArticleMap.get(kitchenId).add(item);
                     }
-                    kitchenArticleMap.get(kitchenId).add(item);
                 }
-            }
 
-            if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
-                continue;
-//                Kitchen kitchen = kitchenService.selectMealKitchen(item);
-//                if (kitchen != null) {
-//                    String kitchenId = kitchen.getId().toString();
-//                    kitchenMap.put(kitchenId, kitchen);
-//                    if (!kitchenArticleMap.containsKey(kitchenId)) {
-//                        //如果没有 则新建
-//                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
-//                    }
-//                    kitchenArticleMap.get(kitchenId).add(item);
-//                }
+            }else if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
+                if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                    Kitchen kitchen = kitchenService.selectMealKitchen(item);
+                    if (kitchen != null) {
+                        String kitchenId = kitchen.getId().toString();
+                        kitchenMap.put(kitchenId, kitchen);
+                        if (!kitchenArticleMap.containsKey(kitchenId)) {
+                            //如果没有 则新建
+                            kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                        }
+                        kitchenArticleMap.get(kitchenId).add(item);
+                    }
+                } else {
+                    continue;
+                }
+//
             } else {
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
                 for (Kitchen kitchen : kitchenList) {
@@ -907,7 +908,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
-        log.info("开始确认订单:"+order.getId());
+        log.info("开始确认订单:" + order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
@@ -923,7 +924,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-            log.info("订单已确认:"+order.getId()+"评论:"+order.getAllowAppraise());
+            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
             return order;
         }
         return null;
@@ -968,14 +969,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             refundOrder(order);
             log.info("取消订单成功:" + order.getId());
-            
+
             //拒绝订单后还原库存
-			Boolean addStockSuccess  = false;
-			addStockSuccess	= addStock(getOrderInfo(orderId));
-			if(!addStockSuccess){
-				log.info("库存还原失败:"+order.getId());
-			}
-			orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
+            Boolean addStockSuccess = false;
+            addStockSuccess = addStock(getOrderInfo(orderId));
+            if (!addStockSuccess) {
+                log.info("库存还原失败:" + order.getId());
+            }
+            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
         return order;
     }
@@ -1006,6 +1007,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
+
 
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
@@ -1759,7 +1761,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printTask.addAll(kitchenTicket);
         }
         return printTask;
-		}
+    }
+
     /**
      * 订单菜品的数据(用于中间数据库)
      *
@@ -1842,7 +1845,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         for (ShopDetail s : shops) {
             List<Map<String, Object>> list2 = orderMapper.selectShopArticleSellList(s.getId(), begin, end);
-            if(list2!=null&&list2.size()>0){
+            if (list2 != null && list2.size() > 0) {
                 //计算总菜品销售额,//菜品总销售额
                 int num = 0;
 
@@ -2041,7 +2044,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //订单菜品不可为空
         for (OrderItem orderItem : order.getOrderItems()) {
             //有任何一个菜品售罄则不能出单
-            Result check = checkStock(orderItem,order.getOrderItems().size());
+            Result check = checkStock(orderItem, order.getOrderItems().size());
             if (!check.isSuccess()) {
                 result = false;
                 msg = check.getMessage();
@@ -2053,10 +2056,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    private Result checkStock(OrderItem orderItem,int count) {
+    private Result checkStock(OrderItem orderItem, int count) {
         Boolean result = false;
         int current = 0;
-        String msg =  "";
+        String msg = "";
         int min = 0;
         int endMin = 10000;
         switch (orderItem.getType()) {
@@ -2064,58 +2067,58 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //如果是单品无规格，直接判断菜品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                     current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
                 current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
                 result = current >= count;
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
-            	//如果是套餐,不做判断，只判断套餐下的子品是否有库存
+                //如果是套餐,不做判断，只判断套餐下的子品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
-                Map<String,Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
-                for( OrderItem oi : orderItem.getChildren()){
-                	//查询当前菜品，剩余多少份
+                Map<String, Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
+                for (OrderItem oi : orderItem.getChildren()) {
+                    //查询当前菜品，剩余多少份
                     min = orderMapper.selectArticleCount(oi.getArticleId());
-                    if(order_items_map.containsKey(oi.getArticleId())){
-                    	order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId())+oi.getCount());
-                    	min -= oi.getCount();
-                	}else{
-                		order_items_map.put(oi.getArticleId(), oi.getCount());
-                	}
-                    if(min<endMin){
+                    if (order_items_map.containsKey(oi.getArticleId())) {
+                        order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId()) + oi.getCount());
+                        min -= oi.getCount();
+                    } else {
+                        order_items_map.put(oi.getArticleId(), oi.getCount());
+                    }
+                    if (min < endMin) {
                         endMin = min;
                     }
                 }
                 //result = endMin>= count;
-                result = endMin>= count && current>= count;
-                msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单":
-                        endMin >= count && current>= count? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+endMin+"个,请重新选购餐品";
-               // 中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单
+                result = endMin >= count && current >= count;
+                msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单" :
+                        endMin >= count && current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + endMin + "个,请重新选购餐品";
+                // 中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= orderItem.getCount();
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= orderItem.getCount() ? "库存足够"   : orderItem.getArticleName() + "库存不足,请重新选购餐品";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,请重新选购餐品";
                 break;
             case OrderItemType.UNIT_NEW:
                 //如果是单品无规格，直接判断菜品是否有库存
                 current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
-                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单":
-                        current >= count ? "库存足够"   : orderItem.getArticleName() + "中单品库存不足,最大购买"+current+"个,请重新选购餐品";
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             default:
                 log.debug("未知菜品分类");
                 break;
         }
-        return new Result(msg,result);
+        return new Result(msg, result);
     }
 
 
@@ -2181,7 +2184,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
-                   
+
                     break;
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
@@ -2195,13 +2198,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
                     //如果是套餐，那么更新套餐库存
-                  
+
                     break;
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_ADD, orderItem.getCount());
                     orderMapper.setEmptyFail(orderItem.getArticleId());
-                    
+
                     break;
                 case OrderItemType.UNIT_NEW:
                     //如果是没有规格的单品信息,那么更新该单品的库存
@@ -2210,7 +2213,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                     break;
                 default:
-                  //  throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
+                    //  throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + orderItem.getType());
                     return false;
             }
 
