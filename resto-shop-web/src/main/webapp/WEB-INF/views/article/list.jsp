@@ -87,6 +87,12 @@
                                                    v-model="m.isEmpty">沽清
                                         </label>
                                     </span>
+                                    <span>
+                                        <label class="radio-inline">
+                                            <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                                   v-model="m.isHidden">隐藏
+                                        </label>
+                                    </span>
                                 </div>
                             </div>
 

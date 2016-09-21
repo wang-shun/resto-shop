@@ -89,6 +89,8 @@ public class Article {
     private Long likes;
     
     private List<MealAttr> mealAttrs;
+
+    private Integer isHidden;
     
 	/**
      * 用于保存 类型名称
@@ -115,6 +117,14 @@ public class Article {
     private List<Unit> units;
 
     private Integer newUnit;
+
+    final public Integer getIsHidden() {
+        return isHidden;
+    }
+
+    final public void setIsHidden(Integer isHidden) {
+        this.isHidden = isHidden;
+    }
 
     final public Integer getNewUnit() {
         return newUnit;
