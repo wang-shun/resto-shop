@@ -1267,7 +1267,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         Brand brand = brandService.selectById(brandId);
-        int totalNum = 0;
         brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
