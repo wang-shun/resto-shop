@@ -114,6 +114,16 @@ public class Article {
     //规格属性
     private List<Unit> units;
 
+    private Integer newUnit;
+
+    final public Integer getNewUnit() {
+        return newUnit;
+    }
+
+    final public void setNewUnit(Integer newUnit) {
+        this.newUnit = newUnit;
+    }
+
     final public List<Unit> getUnits() {
         return units;
     }
