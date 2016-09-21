@@ -649,22 +649,12 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 	</update>
 
 
-    <!--<select id="getSingoArticle" resultType="Article">-->
-       <!--select tb_article_family.name as articleFamilyName,-->
-       <!--tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price-->
-        <!--from tb_article-->
-        <!--left join tb_article_family on tb_article.article_family_id = tb_article_family.id-->
-<!--where state =1 and activated =1-->
-<!--and article_type =1-->
-<!--and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)-->
-<!--and tb_article.shop_detail_id = #{shopId}-->
-    <!--</select>-->
     <select id="getSingoArticle" resultType="Article">
         select tb_article_family.name as articleFamilyName,
         tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
         from tb_article
         left join tb_article_family on tb_article.article_family_id = tb_article_family.id
-        where state =1
+        where state =1 and activated =1
         and article_type =1
         and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
         and tb_article.shop_detail_id = #{shopId}
