@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
+import com.resto.shop.web.model.OrderItem;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -54,4 +55,8 @@ public interface KitchenMapper  extends GenericDao<Kitchen,Integer> {
     List<Kitchen> selectInfoByArticleId(@Param("articleId") String articleId);
 
 	Kitchen selectKitchenByMealsItemId(String id);
+
+    Kitchen selectKitchenByOrderItem(@Param("item") OrderItem orderItem,@Param("mealAttrId") Long mealAttrId);
+
+    Long getMealAttrId(OrderItem item);
 }

@@ -664,12 +664,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         articleId = price.getArticleId();
                     }
                 }
-            } else if (item.getType() == OrderItemType.MEALS_CHILDREN) {
-                continue;
-            }
-
-            if (OrderItemType.SETMEALS == item.getType()) {
-                Kitchen kitchen = kitchenService.selectMealKitchen(item);
+            } else if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
+//                continue;
+                Long mealAttrId = kitchenService.getMealAttrId(item);
+                Kitchen kitchen = kitchenService.selectKitchenByOrderItem(item,mealAttrId);
                 if (kitchen != null) {
                     String kitchenId = kitchen.getId().toString();
                     kitchenMap.put(kitchenId, kitchen);
@@ -679,6 +677,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     kitchenArticleMap.get(kitchenId).add(item);
                 }
+            }
+
+            if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
+                continue;
+//                Kitchen kitchen = kitchenService.selectMealKitchen(item);
+//                if (kitchen != null) {
+//                    String kitchenId = kitchen.getId().toString();
+//                    kitchenMap.put(kitchenId, kitchen);
+//                    if (!kitchenArticleMap.containsKey(kitchenId)) {
+//                        //如果没有 则新建
+//                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+//                    }
+//                    kitchenArticleMap.get(kitchenId).add(item);
+//                }
             } else {
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
                 for (Kitchen kitchen : kitchenList) {

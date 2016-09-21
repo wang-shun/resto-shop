@@ -59,6 +59,15 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	public Kitchen selectMealKitchen(OrderItem mealItems) {
 		Kitchen kitchen = kitchenMapper.selectKitchenByMealsItemId(mealItems.getId());
 		return kitchen;
-	} 
+	}
 
+	@Override
+	public Kitchen selectKitchenByOrderItem(OrderItem item,Long mealAttrId) {
+		return kitchenMapper.selectKitchenByOrderItem(item,mealAttrId);
+	}
+
+	@Override
+	public Long getMealAttrId(OrderItem orderItem) {
+		return kitchenMapper.getMealAttrId(orderItem);
+	}
 }

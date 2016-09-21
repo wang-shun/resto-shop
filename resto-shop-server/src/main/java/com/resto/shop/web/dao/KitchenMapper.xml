@@ -77,4 +77,13 @@
 		LEFT JOIN tb_article_kitchen ak on ak.article_id = tempa.article_id  ) as tempb , tb_kitchen
 		 where tb_kitchen.id = tempb.kitchen_id LIMIT 0,1
   </select>
+
+    <select id="selectKitchenByOrderItem" resultType="Kitchen">
+        select * from tb_kitchen where id =  (select kitchen_id from tb_meal_item where meal_attr_id = #{mealAttrId} and article_id  = #{item.articleId})
+    </select>
+
+    <select id="getMealAttrId" resultType="java.lang.Long">
+        select t.id from tb_meal_attr t
+         where article_id = (select article_id from tb_order_item where id = #{parentId})
+    </select>
 </mapper>

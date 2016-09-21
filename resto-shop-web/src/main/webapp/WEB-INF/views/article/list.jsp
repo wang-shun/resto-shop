@@ -145,7 +145,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5" v-if="m.articleType==1">
+                            <div class="form-group col-md-5" >
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">
                                     <textarea rows="3" class="form-control" name="description"

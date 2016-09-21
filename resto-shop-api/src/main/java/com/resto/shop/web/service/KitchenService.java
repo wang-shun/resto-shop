@@ -36,4 +36,9 @@ public interface KitchenService extends GenericService<Kitchen, Integer> {
 
 
 	Kitchen selectMealKitchen(OrderItem mealItems);
+
+	Kitchen selectKitchenByOrderItem(OrderItem item,Long mealAttrId);
+
+	Long getMealAttrId(OrderItem orderItem);
+
 }
