@@ -75,6 +75,7 @@
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus" />
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -1433,6 +1434,7 @@
         SELECT
         o.shop_detail_id,
         o.id,
+        o.production_status,
         o.create_time,
         o.distribution_mode_id,
         o.ver_code,

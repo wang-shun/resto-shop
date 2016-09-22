@@ -158,7 +158,7 @@ public class OrderController extends GenericController{
 							if(o.getProductionStatus()==0){
 								ot.setOrderState("已付款");
 							}else if(o.getProductionStatus()==2){
-								ot.setOrderState("已打印");
+								ot.setOrderState("已消费");
 							}else if(o.getProductionStatus()==5){
 								ot.setOrderState("异常订单");
 							}
@@ -179,7 +179,6 @@ public class OrderController extends GenericController{
 						case 12:
 							ot.setOrderState("已分享");
 							break;
-
 						default:
 							break;
 						}
@@ -204,13 +203,11 @@ public class OrderController extends GenericController{
 						case 5:
 							ot.setLevel("五星");
 							break;
-
 						default:
 							break;
 						}
 					}
 					//订单支付
-					
 					if(o.getOrderPaymentItems()!=null){
 						if(!o.getOrderPaymentItems().isEmpty()){
 							for(OrderPaymentItem oi : o.getOrderPaymentItems()){
@@ -238,11 +235,11 @@ public class OrderController extends GenericController{
 							}
 						}
 					}
-					//设置营销撬动率  (订单金额-实际支付金额)/实际支付的金额
+					//设置营销撬动率  实际/虚拟
 					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
 					BigDecimal temp = o.getOrderMoney().subtract(real);
 					String incomPrize = "";
-					if(temp.compareTo(BigDecimal.ZERO)!=0){
+					if(temp.compareTo(BigDecimal.ZERO)>0){
 						incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
 					}
 					ot.setIncomePrize(incomPrize);
