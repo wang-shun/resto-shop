@@ -295,6 +295,10 @@ public interface OrderService extends GenericService<Order, String> {
 	//查询品牌所有已消费的订单
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
 
+    //查询店铺所有的已消费的订单
+    public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
+
+
 	//查询订单关联评论的内容
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 

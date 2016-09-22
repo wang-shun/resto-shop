@@ -101,6 +101,15 @@
         </collection>
     </resultMap>
 
+    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
+        <id column="id"  property="id"/>
+        <result column="order_money" property="orderMoney"/>
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+           <result column="payment_mode_id" property="paymentModeId"/>
+          <result column="pay_value" property="payValue"/>
+        </collection>
+    </resultMap>
+
 
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -127,6 +136,7 @@
             <id column="orderPaymentItem_id" property="id"/>
             <result column="pay_value" property="payValue"/>
             <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="pay_value" property="payValue"/>
         </collection>
     </resultMap>
 
@@ -1742,6 +1752,20 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         ) as r
         GROUP BY r.article_name
     </select>
+
+    <select id="selectListByShopId" resultMap="consumedOrderByshopId">
+        SELECT
+        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        and o.production_status in (2,3) AND
+         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+    </select>
+
+
 
 
 </mapper>

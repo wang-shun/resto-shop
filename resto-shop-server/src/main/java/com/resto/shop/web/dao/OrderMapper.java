@@ -395,4 +395,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询店铺下所有的已消费的订单
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+
+    List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 }
