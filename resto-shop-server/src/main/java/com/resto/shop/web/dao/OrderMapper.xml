@@ -1666,6 +1666,18 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         GROUP BY r.article_name
     </select>
 
+    <select id="selectListByShopId" resultMap="consumedOrderByshopId">
+        SELECT
+        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        and o.production_status in (2,3) AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+    </select>
+
 
 </mapper>
 
