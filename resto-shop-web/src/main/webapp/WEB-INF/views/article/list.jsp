@@ -151,7 +151,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5" >
+                            <div class="form-group col-md-5">
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">
                                     <textarea rows="3" class="form-control" name="description"
@@ -208,7 +208,6 @@
                                 </div>
                             </div>
                             <div class="clearfix"></div>
-
 
 
                             <div class="form-group col-md-10" v-if="m.articleType==1">
@@ -411,6 +410,19 @@
                                                     </div>
 
                                                 </div>
+
+
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">选择类型&nbsp;</label>
+                                                    <div class="col-md-4">
+                                                        <select class="form-control" style="width:150px" name="choiceType" v-model="attr.choiceType">
+                                                            <option value="0">单选</option>
+                                                            <option value="1">多选</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
                                                        @click="delMealAttr(attr)"></a>
@@ -928,7 +940,6 @@
                             this.selectedUnit = [];
 
 
-
                             var list = {
                                 unitList: []
                             }
@@ -952,7 +963,6 @@
                         ,
                         edit: function (model) {
                             this.selectedUnit = [];
-
 
 
                             var list = {
