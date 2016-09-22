@@ -145,7 +145,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param brandId
 	 * @return
 	 */
-    brandArticleReportDto selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
+    Integer selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
 	
 	
 	/**
@@ -358,4 +358,41 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Map<String,Object>> selectShopArticleSellList(@Param("shopId") String shopId, @Param("beginDate") Date begin, @Param("endDate") Date end);
+
+    /**
+     * 查询品牌菜品的总销量
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    int selectBrandArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌菜品的总价值
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+
+    BigDecimal selectBrandArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌下每个店铺的菜品销量和
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<ShopArticleReportDto> selectShopArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌下每个店铺的菜品销售和
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 }

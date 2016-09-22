@@ -362,4 +362,14 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
+
+    /**
+     * 查询所有的已经消费的订单
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Order> selectAllAlreadyConsumed(String currentBrandId, String beginDate, String endDate);
+
 }

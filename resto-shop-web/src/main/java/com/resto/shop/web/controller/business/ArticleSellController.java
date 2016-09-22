@@ -78,7 +78,8 @@ public class ArticleSellController extends GenericController{
 //		list.add(saleReportDto);
 //		return list;
 //	}
-	
+
+
 	@RequestMapping("/list_brand")
 	@ResponseBody
 	public brandArticleReportDto list_brand(String beginDate,String endDate){
