@@ -134,6 +134,18 @@
 						否
 					</label>
 				</div>
+
+				<div class="form-group">
+					<div class="control-label">套餐出单方式</div>
+					<label >
+						<input type="radio" name="printType" v-model="m.printType" value="0">
+						整单出单
+					</label>
+					<label>
+						<input type="radio" name="printType" v-model="m.printType" value="1">
+						分单出单
+					</label>
+				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
