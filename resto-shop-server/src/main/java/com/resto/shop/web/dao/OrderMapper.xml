@@ -888,7 +888,7 @@
         ON
         o.customer_id=c.id
         WHERE production_status=2 and shop_detail_id=#{0}
-        and o.order_state = 2
+        and o.order_state in (2,10)
         and closed=0 ORDER BY print_order_time
     </select>
 
