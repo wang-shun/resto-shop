@@ -82,4 +82,11 @@ public class RolePermissionServiceImpl extends GenericServiceImpl<RolePermission
         }
         return  elist;
     }
+
+    @Override
+    public RolePermission selectByRoleIdAndPermissionId(Long roleId, Long permissionId) {
+        return rolepermissionMapper.selectByRoleIdAndPermissionId(roleId,permissionId);
+    }
+
+
 }

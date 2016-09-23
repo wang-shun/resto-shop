@@ -5,7 +5,7 @@ public class RolePermission {
 
     private Long roleId;
 
-    private Long employeeId;
+    private Long permissionId;
 
     public Long getId() {
         return id;
@@ -23,11 +23,11 @@ public class RolePermission {
         this.roleId = roleId;
     }
 
-    public Long getEmployeeId() {
-        return employeeId;
+    public Long getPermissionId() {
+        return permissionId;
     }
 
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
+    public void setPermissionId(Long permissionId) {
+        this.permissionId = permissionId;
     }
 }

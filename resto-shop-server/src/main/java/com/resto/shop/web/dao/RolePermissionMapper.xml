@@ -4,10 +4,10 @@
   <resultMap id="BaseResultMap" type="com.resto.shop.web.model.RolePermission" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="role_id" property="roleId" jdbcType="BIGINT" />
-    <result column="employee_id" property="employeeId" jdbcType="BIGINT" />
+    <result column="permission_id" property="permissionId" jdbcType="BIGINT" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, role_id, employee_id
+    id, role_id, permission_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -20,33 +20,27 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.RolePermission" >
-    insert into tb_role_permission (id, role_id, employee_id
+    insert into tb_role_permission (id, role_id, permission_id
       )
-    values (#{id,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{employeeId,jdbcType=BIGINT}
+    values (#{id,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{permissionId,jdbcType=BIGINT}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.RolePermission" >
     insert into tb_role_permission
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
       <if test="roleId != null" >
         role_id,
       </if>
-      <if test="employeeId != null" >
-        employee_id,
+      <if test="permissionId != null" >
+        permission_id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
       <if test="roleId != null" >
         #{roleId,jdbcType=BIGINT},
       </if>
-      <if test="employeeId != null" >
-        #{employeeId,jdbcType=BIGINT},
+      <if test="permissionId != null" >
+        #{permissionId,jdbcType=BIGINT},
       </if>
     </trim>
   </insert>
@@ -56,8 +50,8 @@
       <if test="roleId != null" >
         role_id = #{roleId,jdbcType=BIGINT},
       </if>
-      <if test="employeeId != null" >
-        employee_id = #{employeeId,jdbcType=BIGINT},
+      <if test="permissionId != null" >
+        permission_id = #{permissionId,jdbcType=BIGINT},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -65,14 +59,31 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.RolePermission" >
     update tb_role_permission
     set role_id = #{roleId,jdbcType=BIGINT},
-      employee_id = #{employeeId,jdbcType=BIGINT}
+      permission_id = #{permissionId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
     <select id="selectList" resultType="com.resto.shop.web.model.RolePermission">
-        SELECT * from tb_role_permission
-
+       SELECT
+            rp.id,
+            rp.role_id,
+            rp.permission_id
+        FROM
+            tb_role r
+        INNER JOIN tb_role_permission rp ON r.id = rp.role_id
+        INNER JOIN tb_permission p ON rp.permission_id = p.id
     </select>
 
+    <select id="selectByRoleIdAndPermissionId" resultType="com.resto.shop.web.model.RolePermission">
+         SELECT
+            id,
+            role_id,
+            permission_id
+        FROM
+            tb_role_permission
+        WHERE
+            role_id = #{roleId}
+        AND permission_id = #{permissionId}
+    </select>
 
 </mapper>

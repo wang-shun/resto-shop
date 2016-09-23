@@ -4,99 +4,87 @@
 
 
 <div id="control">
-    <%--<table class="table table-bordered">--%>
-        <%--<thead>--%>
-        <%--<tr>--%>
-            <%--<th>序号</th>--%>
-            <%--<th>角色</th>--%>
-            <%--<th>买单</th>--%>
-            <%--<th>申请额度</th>--%>
-            <%--<th>同意申请</th>--%>
-            <%--<th>发短信</th>--%>
-        <%--</tr>--%>
-        <%--</thead>--%>
-        <%--<tbody>--%>
-        <%--<tr>--%>
-            <%--<td>1</td>--%>
-            <%--<td>经理</td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-            <%--<td>2</td>--%>
-            <%--<td>服务员</td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-            <%--<td>3</td>--%>
-            <%--<td>店长</td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-            <%--<td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>--%>
-        <%--</tr>--%>
-        <%--</tbody>--%>
-    <%--</table>--%>
-
-
-    <table class="table table-bordered">
+    <table id="dynamic-table" class="table table-bordered">
         <thead>
         <tr>
-            <th>序号</th>
-            <th>角色</th>
-            <th v-for="p in permission">{{p.permissionName}}</th>
+            <th class="center">序号</th>
+            <th class='center'>角色</th>
+                <!-- 按钮循环 -->
+                <c:forEach items="${permissionList}" var="permission" varStatus="pb">
+                    <th>${permission.permissionName }</th>
+                </c:forEach>
         </tr>
         </thead>
-        <tbody>
-        <tr v-for="(index,r) in eroleList">
-            <td>{{index+1}}</td>
-            <td>{{r.roleName}}</td>
-            <td><input type="checkbox" :class="vm.class" data-on-color="primary" data-off-color="info" data-size="small" ></td>
-            <td><input type="checkbox" class="make-switch"  data-on-color="primary" data-off-color="info" data-size="small"></td>
-            <td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>
-            <td><input type="checkbox" class="make-switch" checked data-on-color="primary" data-off-color="info" data-size="small"></td>
-        </tr>
-        </tbody>
+                    <!-- 角色循环 -->
+                    <c:forEach items="${roleList}" var="role" varStatus="rs">
+                        <tr>
+                            <td>${rs.index+1}</td>
+                            <td>${role.roleName }</td>
+                                <!-- 按钮循环 -->
+                                <c:forEach items="${permissionList}" var="permission" varStatus="pb">
+                                    <!-- 关联表循环 -->
+                                    <c:forEach items="${rolePermissionList}" var="rp" varStatus="vsRb">
+                                        <c:if test="${role.id == rp.roleId && rp.permissionId ==permission.id }">
+                                            <c:set value="1" var="rbvalue"></c:set>
+                                        </c:if>
+                                    </c:forEach>
+                                    <td>
+                                        <input type="checkbox" class="make-switch"  name="${permission.id}" value="${role.id}"  data-on-color="primary" data-off-color="info" data-size="small"  <c:if test="${rbvalue == 1 }">checked="checked"</c:if> />
+                                        <%--<input type="checkbox" class="make-switch" name="checkebox"  data-on-color="primary" data-off-color="info" data-size="small"  <c:if test="${rbvalue == 1 }">checked="checked"</c:if> />--%>
+                                    </td>
+                                    <c:set value="0" var="rbvalue"></c:set>
+                                </c:forEach>
+                        </tr>
+                    </c:forEach>
     </table>
-
 	</div>
-	
 
-<script>
-	(function(){
-	    var vm = new Vue({
-	        el:'#control',
-            data:{
-                   class:"make-switch",
-                    permission:[],
-                eroleList :[]
-            },
-            ready: function () {
-                var that = this;
-                //查询所有的角色用于显示行
-                $.ajax({
-                    url:"permission/list_all",
-                    success:function (result) {
-                        that.permission=result;
-                    }
-                })
-                $.ajax({
-                    url:"rolepermission/list_all",
-                    success:function (result) {
-                        that.eroleList=result.data;
-                        console.log(result.data);
-                    }
+    <script type="text/javascript">
+        $(document).ready(function(){
 
-                })
+        });
+        //处理按钮点击
+//        function upRb(roleId,permissionId){
+//            console.log("1111");
+//            $.ajax({
+//                type: "POST",
+//                url: "rolepermission/upRolePermision",
+//                data:{
+//                    "roleId":roleId,
+//                    "permissionId":permissionId,
+//                },
+//                dataType:'json',
+//                //beforeSend: validateData,
+//                cache: false,
+//                success: function(data){
+//                },
+//            });
+//        }
 
-            },
-        })
-	}());
-	
 
-</script>
+        $("input[type=checkbox]").on('switchChange.bootstrapSwitch', function(event, state) {
+//            console.log($(this).val()); // DOM element
+//            console.log(event); // jQuery event
+//            console.log(state); // true | false//var str = $(this).val();
+            console.log($(this).val());
+            console.log($(this).prop("name"))
+            var roleId = $(this).val();
+            var permissionId = $(this).prop("name");
+            $.ajax({
+                type: "POST",
+                url: "rolepermission/upRolePermision",
+                data:{
+                    "roleId":roleId,
+                    "permissionId":permissionId,
+                    "state":state
+                },
+                dataType:'json',
+                //beforeSend: validateData,
+                cache: false,
+                success: function(data){
+                },
+            });
+        });
+
+
+    </script>
