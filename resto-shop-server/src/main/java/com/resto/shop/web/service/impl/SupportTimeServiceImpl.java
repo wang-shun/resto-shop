@@ -63,9 +63,9 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 		//int weekDay = c.get(Calendar.DAY_OF_WEEK)-1;  //这里周末等于1 所以全部减一
         //设置 weekDay
         int weekDay = c.get(Calendar.DAY_OF_WEEK);
-        if(weekDay != 1){//如果 weekDay 不等于1 则默认-2
+        if(weekDay != 1){//如果为周一到周六，则默认减2。
             weekDay-=2;
-        }else{//
+        }else{//如果是周日，则不减2，设为默认值6，代表周日 。
             weekDay=6;
         }
 
