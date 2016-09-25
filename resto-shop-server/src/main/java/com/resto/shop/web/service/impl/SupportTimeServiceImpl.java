@@ -60,12 +60,22 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 		Calendar c = Calendar.getInstance();
 		c.setTime(now);
 		int freeDaybin = isFreeDay?1<<8:1<<7;
-		int weekDay = c.get(Calendar.DAY_OF_WEEK)-1;  //这里周末等于1 所以全部减一
+		//int weekDay = c.get(Calendar.DAY_OF_WEEK)-1;  //这里周末等于1 所以全部减一
+        //设置 weekDay
+        int weekDay = c.get(Calendar.DAY_OF_WEEK);
+        if(weekDay != 1){//如果 weekDay 不等于1 则默认-2
+            weekDay-=2;
+        }else{//
+            weekDay=6;
+        }
+
 		List<SupportTime> support = new ArrayList<>();
 		for (SupportTime st : supportTime) {
 			int bin = st.getSupportWeekBin();
 			int todaybin = 1<<weekDay;
-			if((bin&todaybin)>0||(bin&freeDaybin)>0){
+            System.out.println(bin&todaybin);
+            System.out.println(bin&freeDaybin);
+            if((bin&todaybin)>0||(bin&freeDaybin)>0){
 				try {
 					Date begin = DateUtil.parseDate(st.getBeginTime(),"HH:mm");
 					Date end = DateUtil.parseDate(st.getEndTime(),"HH:mm");

@@ -1274,7 +1274,7 @@ order by ${sort}
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (10, 11, 12) and
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
     </select>
 
