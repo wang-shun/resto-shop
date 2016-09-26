@@ -687,7 +687,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
 
-            }else if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
+            }
+
+
+            if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
                 if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     Kitchen kitchen = kitchenService.selectMealKitchen(item);
                     if (kitchen != null) {
