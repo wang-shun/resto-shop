@@ -331,8 +331,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setOrderMoney(totalMoney); // 订单实际金额
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
         order.setPrintTimes(0);
-        order.setOrderState(OrderState.SUBMIT);
-        order.setProductionStatus(ProductionStatus.NOT_ORDER);
+
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         order.setOrderMode(detail.getShopMode());
         if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
@@ -342,10 +341,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
         }
+        //判断是否是后付款模式
+        if(order.getOrderMode() == 5){
+            order.setOrderState(OrderState.SUBMIT);
+            order.setProductionStatus(ProductionStatus.NOT_PAY_NOT_ORDER);
+        } else {
+            order.setOrderState(OrderState.SUBMIT);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
+        }
+
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
-            payOrderSuccess(order);
+            payOrderSuccess(order,order.getOrderMode());
         }
 
         jsonResult.setData(order);
@@ -367,9 +375,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public Order payOrderSuccess(Order order) {
-        order.setOrderState(OrderState.PAYMENT);
-        update(order);
+    public Order payOrderSuccess(Order order,Integer shopMode) {
+        if(shopMode != 5){
+            order.setOrderState(OrderState.PAYMENT);
+            update(order);
+        }
+
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
             int articleCountWithChildren = selectArticleCountById(parent.getId());
@@ -541,7 +552,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.debug("开始插入支付记录: " + order.getId());
             orderPaymentItemService.insert(item);
             log.debug("付款成功: " + order.getId());
-            payOrderSuccess(order);
+            payOrderSuccess(order,order.getOrderMode());
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }

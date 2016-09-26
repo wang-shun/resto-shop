@@ -31,5 +31,9 @@ public class ProductionStatus {
 	 */
 	public final static int NOT_PRINT = 5;
 
+	/**
+	 * 未付款未下单
+	 */
+	public static final int NOT_PAY_NOT_ORDER = 6;
 	
 }
