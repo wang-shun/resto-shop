@@ -566,7 +566,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order pushOrder(String orderId) throws AppException {
         Order order = selectById(orderId);
         if (validOrderCanPush(order)) {
-            order.setProductionStatus(ProductionStatus.HAS_ORDER);
+            if(order.getOrderMode() == 5){
+                order.setProductionStatus(ProductionStatus.IN_ORDER_NOT_ORDER);
+            } else {
+                order.setProductionStatus(ProductionStatus.HAS_ORDER);
+            }
             order.setPushOrderTime(new Date());
             update(order);
             return order;

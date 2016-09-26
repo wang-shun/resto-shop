@@ -35,5 +35,15 @@ public class ProductionStatus {
 	 * 未付款未下单
 	 */
 	public static final int NOT_PAY_NOT_ORDER = 6;
+
+	/**
+	 * 未付款下单中
+	 */
+	public static final int IN_ORDER_NOT_ORDER = 7;
+
+	/**
+	 * 未付款已下单
+	 */
+	public static final int HAS_ORDER_NOT_ORDER = 8;
 	
 }
