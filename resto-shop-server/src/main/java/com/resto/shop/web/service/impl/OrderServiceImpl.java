@@ -297,9 +297,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
+        ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         // 使用余额
         if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
-            BigDecimal payValue = accountService.payOrder(order, payMoney, customer);
+            BigDecimal payValue = accountService.payOrder(order, payMoney, customer, detail.getShopMode());
 //			BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
             if (payValue.doubleValue() > 0) {
                 payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -332,7 +333,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
         order.setPrintTimes(0);
 
-        ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
+
         order.setOrderMode(detail.getShopMode());
         if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
             order.setTableNumber(order.getVerCode());
