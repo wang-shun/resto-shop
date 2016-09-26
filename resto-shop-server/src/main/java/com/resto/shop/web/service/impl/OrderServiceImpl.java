@@ -298,12 +298,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
-        // 使用余额
-        if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
-            BigDecimal payValue = accountService.payOrder(order, payMoney, customer, detail.getShopMode());
-//			BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
-            if (payValue.doubleValue() > 0) {
-                payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
+        if(detail.getShopMode() != 5){
+            // 使用余额
+            if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
+                BigDecimal payValue = accountService.payOrder(order, payMoney, customer);
+//			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
+                if (payValue.doubleValue() > 0) {
+                    payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
 
 //				OrderPaymentItem item = new OrderPaymentItem();
 //				item.setId(ApplicationUtils.randomUUID());
@@ -315,6 +316,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //				item.setResultData(account.getId());
 //				orderPaymentItemService.insert(item);
 //				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                }
             }
         }
 

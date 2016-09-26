@@ -113,7 +113,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	}
 
 	@Override
-	public BigDecimal payOrder(Order order,BigDecimal payMoney, Customer customer, Integer orderMode) {
+	public BigDecimal payOrder(Order order,BigDecimal payMoney, Customer customer) {
 		Account account = selectById(customer.getAccountId());  //找到用户帐户
 		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
 		if(balance==null){
@@ -130,9 +130,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
 				redPay = redPackageMoney;
 				BigDecimal remainPay = realPay.subtract(redPay).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
-				if(orderMode != 5){
-					chargeOrderService.useChargePay(remainPay,customer.getId(),order);
-				}
+				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
