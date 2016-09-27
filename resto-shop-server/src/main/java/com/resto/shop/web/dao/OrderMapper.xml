@@ -1689,6 +1689,26 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
 
+    <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
+    <select id="selectByOrderSatesAndProductionStates" resultType="Order">
+        SELECT * from tb_order where shop_detail_id = #{shopId}
+        <if test="orderStates != null and orderStates != '' ">
+            and ORDER_STATE in
+            <foreach collection="orderStates" item="state" open="("
+                     separator="," close=")">
+                #{state}
+            </foreach>
+        </if>
+        <if test="productionStates != null and productionStates != '' ">
+            and production_status in
+            <foreach collection="productionStates" item="state" open="("
+                     separator="," close=")">
+                #{state}
+            </foreach>
+        </if>
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        ORDER BY create_time DESC
+    </select>
 
 </mapper>
 

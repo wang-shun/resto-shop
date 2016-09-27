@@ -2253,5 +2253,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return true;
     }
 
+    @Override
+    public List<Order> selectByOrderSatesAndProductionStates(String shopId, String[] orderStates,
+                                                             String[] productionStates) {
+        return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+    }
 
 }
