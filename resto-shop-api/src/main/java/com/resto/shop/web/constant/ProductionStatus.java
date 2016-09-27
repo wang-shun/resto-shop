@@ -42,7 +42,7 @@ public class ProductionStatus {
 	public static final int IN_ORDER_NOT_ORDER = 7;
 
 	/**
-	 * 未付款已下单
+	 * 未付款待支付
 	 */
 	public static final int HAS_ORDER_NOT_ORDER = 8;
 	
