@@ -347,7 +347,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //判断是否是后付款模式
         if(order.getOrderMode() == 5){
             order.setOrderState(OrderState.SUBMIT);
-            order.setProductionStatus(ProductionStatus.NOT_PAY_NOT_ORDER);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
+            order.setAllowContinueOrder(true);
         } else {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
@@ -567,7 +568,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         //如果是后付款模式 不验证直接进行修改模式
         if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
-            order.setProductionStatus(ProductionStatus.IN_ORDER_NOT_ORDER);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
         } else if(validOrderCanPush(order)) {
