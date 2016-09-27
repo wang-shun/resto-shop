@@ -565,17 +565,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order pushOrder(String orderId) throws AppException {
         Order order = selectById(orderId);
-        if (validOrderCanPush(order)) {
-            if(order.getOrderMode() == 5){
-                order.setProductionStatus(ProductionStatus.IN_ORDER_NOT_ORDER);
-            } else {
-                order.setProductionStatus(ProductionStatus.HAS_ORDER);
-            }
+        //如果是后付款模式 不验证直接进行修改模式
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            order.setProductionStatus(ProductionStatus.IN_ORDER_NOT_ORDER);
+            order.setPushOrderTime(new Date());
+            update(order);
+        } else if(validOrderCanPush(order)) {
+            order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
             return order;
         }
-        return null;
+        return order;
     }
 
     private boolean validOrderCanPush(Order order) throws AppException {
