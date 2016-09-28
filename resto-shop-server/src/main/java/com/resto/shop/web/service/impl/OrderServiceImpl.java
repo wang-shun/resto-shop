@@ -2259,4 +2259,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
     }
 
+
+    @Override
+    public void payOrderModeFive(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        order.setOrderState(OrderState.PAYMENT);
+        order.setAllowCancel(false);
+        order.setAllowContinueOrder(false);
+        update(order);
+    }
 }

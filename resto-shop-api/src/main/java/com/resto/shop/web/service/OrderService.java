@@ -375,4 +375,6 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
+
+	void payOrderModeFive(String orderId);
 }

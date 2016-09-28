@@ -139,6 +139,9 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            orderService.payOrderModeFive(order.getId());
+        }
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
