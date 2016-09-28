@@ -123,6 +123,8 @@ public class MQMessageProducer {
 		obj.put("productionStatus", order.getProductionStatus());
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
+		obj.put("originalAmount", order.getOriginalAmount());
+		obj.put("orderMoney", order.getOrderMoney());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
