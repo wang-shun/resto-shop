@@ -168,7 +168,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (customer != null && customer.getTelephone() != null) {
             order.setVerCode(customer.getTelephone().substring(7));
         } else {
-            if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())){
+            if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
             }
         }
@@ -286,7 +286,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
-        if(detail.getShopMode() != 5){
+        if (detail.getShopMode() != 5) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -346,7 +346,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setTableNumber(parentOrder.getTableNumber());
         }
         //判断是否是后付款模式
-        if(order.getOrderMode() == 5){
+        if (order.getOrderMode() == 5) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setAllowContinueOrder(true);
@@ -358,7 +358,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
-            payOrderSuccess(order,order.getOrderMode());
+            payOrderSuccess(order, order.getOrderMode());
         }
 
         jsonResult.setData(order);
@@ -380,8 +380,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public Order payOrderSuccess(Order order,Integer shopMode) {
-        if(shopMode != 5){
+    public Order payOrderSuccess(Order order, Integer shopMode) {
+        if (shopMode != 5) {
             order.setOrderState(OrderState.PAYMENT);
             update(order);
         }
@@ -557,7 +557,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.debug("开始插入支付记录: " + order.getId());
             orderPaymentItemService.insert(item);
             log.debug("付款成功: " + order.getId());
-            payOrderSuccess(order,order.getOrderMode());
+            payOrderSuccess(order, order.getOrderMode());
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }
@@ -568,11 +568,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order pushOrder(String orderId) throws AppException {
         Order order = selectById(orderId);
         //如果是后付款模式 不验证直接进行修改模式
-        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-        } else if(validOrderCanPush(order)) {
+        } else if (validOrderCanPush(order)) {
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
@@ -2264,32 +2264,52 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void payOrderModeFive(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        if(order.getOrderState() < OrderState.SUBMIT){
+
+        if (order.getOrderState() < OrderState.SUBMIT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
             update(order);
         }
 
+        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        for (Order child : orders) {
+            if (child.getOrderState() < OrderState.SUBMIT) {
+                child.setOrderState(OrderState.PAYMENT);
+                child.setAllowCancel(false);
+                child.setAllowContinueOrder(false);
+                update(child);
+            }
+        }
+
+
     }
 
 
     @Override
     public Result payPrice(BigDecimal factMoney, String orderId) {
+        //拿到订单
         Order order = orderMapper.selectByPrimaryKey(orderId);
 
         Customer customer = customerService.selectById(order.getCustomerId());
-        if(order.getOrderState() < OrderState.SUBMIT){
-            accountService.payOrder(order,factMoney,customer);
 
-
+        if (order.getOrderState() < OrderState.SUBMIT) {
+            accountService.payOrder(order, factMoney, customer);
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
             update(order);
-
+            List<Order> orders = orderMapper.selectByParentId(order.getId());
+            for (Order child : orders) {
+                if (child.getOrderState() < OrderState.SUBMIT) {
+                    child.setOrderState(OrderState.PAYMENT);
+                    child.setAllowCancel(false);
+                    child.setAllowContinueOrder(false);
+                    update(child);
+                }
+            }
             return new Result(true);
-        }else{
+        } else {
             return new Result(false);
         }
 
