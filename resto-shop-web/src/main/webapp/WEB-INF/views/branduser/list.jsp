@@ -11,21 +11,21 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form" action="{{'branduser/create'}}" @submit.prevent="save">
+	            	<form role="form"  action="{{m.id?'branduser/modify':'branduser/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
 						    <label>用户名</label>
 						    <input type="text" class="form-control" name="username" v-model="m.username" @blur="checkname(m.username)" required="required">
 						</div>
-						<div class="form-group">
+						<div class="form-group" v-if="!m.id">
 						    <label>密码</label>
-						    <input type="password" class="form-control" name="password" v-model="m.password" required="required">
+						    <input type="password" class="form-control" name="password" v-model="m.password" required="required" >
 						</div>
 						
 						<div class="form-group">
 							<div label for="shopDetailId" class="control-label">选择店铺</div>
 							<div>
-								<select class="form-control" name="shopDetailId" :value="shop.id">
+								<select class="form-control" name="shopDetailId" v-model="currendShopId">
 									<option v-for="shop in  shops" :value="shop.id">
 										{{shop.name}}
 									</option>
@@ -36,9 +36,9 @@
 						<div class="form-group">
 							<div label for="roleId" class="control-label">选择角色</div>
 							<div>
-								<select class="form-control" name="roleId" :value="role.id">
+								<select class="form-control" name="roleId" v-model="currendRoleId">
 									<option v-for="role in  roles" :value="role.id">
-										{{role.name}}
+                                        {{role.name}}--{{role.id}}
 									</option>
 								</select>
 							</div>
@@ -78,19 +78,33 @@
 				dataSrc : ""
 			},
 			columns : [
-							{                 
-				title : "用户名",
-				data : "username",
-			},                 
-			{                 
-				title : "店铺名称",
-				data : "shopName",
-			}, 
-			{                 
-				title : "角色名字",
-				data : "roleName",
-			}, 
-			
+                {
+                    title : "用户名",
+                    data : "username",
+		    	},
+                {
+                    title : "店铺名称",
+                    data : "shopName",
+                },
+                {
+                    title : "角色名字",
+                    data : "roleName",
+                },
+                <%--{--%>
+                    <%--title:"操作",--%>
+                    <%--data:"id",--%>
+                    <%--createdCell:function (td,tdData,rowData,row) {--%>
+                        <%--var operator=[--%>
+                            <%--<s:hasPermission name="branduser/delete">--%>
+                            <%--C.createDelBtn(tdData,"branduser/delete"),--%>
+                            <%--</s:hasPermission>--%>
+                            <%--<s:hasPermission name="branduser/edit">--%>
+                            <%--C.createEditBtn(rowData),--%>
+                            <%--</s:hasPermission>--%>
+                        <%--];--%>
+                        <%--$(td).html(operator);--%>
+                    <%--}--%>
+                <%--}--%>
 			],
 		});
 		
@@ -100,6 +114,8 @@
 			data:{
 				shops:{},
 				roles:{},
+                currendShopId:"",
+                currendRoleId:"",
 			},
 			mixins:[C.formVueMix],
 			methods:{
@@ -109,9 +125,22 @@
 					Vue.nextTick(function(){
 						vueObj.initShopName();
 						vueObj.initRoleName();
-					}) 
-				}, 
-				initShopName:function(){
+					})
+				},
+                edit:function (model) {
+				    var that = this;
+                    this.m = model;
+                    this.openForm();
+                    Vue.nextTick(function(){
+                        vueObj.initShopName(true);
+                        vueObj.initRoleName(true);
+                        that.currendRoleId = model.roleId;
+                        that.currendShopId =  model.shopDetailId;
+                    })
+                },
+
+				initShopName:function(isUpdate){
+                    var that = this;
 					$.ajax({
 						url:"shopDetail/list_all",
 						success:function(result){
@@ -122,11 +151,15 @@
 									temps[i]={"id":data[i].id,"name":data[i].name};
 								}
  								vueObj.$set("shops",temps);
+                                if(!isUpdate){
+                                    that.currendShopId = data[0].id;
+                                }
 							}
 						}
 					});
 				},
-				initRoleName:function(){
+				initRoleName:function(isUpdate){
+				    var that = this;
 					$.ajax({
 						url:"usergroup/list_all",
 						success:function(result){
@@ -137,6 +170,9 @@
 									temps[i]={"id":data[i].id,"name":data[i].roleName}
 								}
 								vueObj.$set("roles",temps);
+                                if(!isUpdate){
+                                    that.currendRoleId = data[0].id;
+                                }
 							}
 						}
 						
