@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -377,4 +378,6 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
 
 	void payOrderModeFive(String orderId);
+
+	Result payPrice(BigDecimal factMoney,String orderId);
 }

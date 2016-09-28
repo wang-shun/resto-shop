@@ -283,22 +283,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal payMoney = totalMoney;
 
         // 使用优惠卷
-        if (order.getUseCoupon() != null) {
-            Coupon coupon = couponService.useCoupon(totalMoney, order);
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.COUPON_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(coupon.getValue());
-            item.setRemark("优惠卷支付:" + item.getPayValue());
-            item.setResultData(coupon.getId());
-            orderPaymentItemService.insert(item);
-            payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-        }
+
 
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         if(detail.getShopMode() != 5){
+            if (order.getUseCoupon() != null) {
+                Coupon coupon = couponService.useCoupon(totalMoney, order);
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.COUPON_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(coupon.getValue());
+                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setResultData(coupon.getId());
+                orderPaymentItemService.insert(item);
+                payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
             // 使用余额
             if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
                 BigDecimal payValue = accountService.payOrder(order, payMoney, customer);
@@ -2267,5 +2268,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setAllowCancel(false);
         order.setAllowContinueOrder(false);
         update(order);
+    }
+
+
+    @Override
+    public Result payPrice(BigDecimal factMoney, String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        Customer customer = customerService.selectById(order.getCustomerId());
+        accountService.payOrder(order,factMoney,customer);
+
+
+        order.setOrderState(OrderState.PAYMENT);
+        order.setAllowCancel(false);
+        order.setAllowContinueOrder(false);
+        update(order);
+
+        return new Result(true);
     }
 }
