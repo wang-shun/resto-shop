@@ -2265,7 +2265,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void payOrderModeFive(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
 
-        if (order.getOrderState() < OrderState.SUBMIT) {
+        if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
@@ -2274,7 +2274,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         List<Order> orders = orderMapper.selectByParentId(order.getId());
         for (Order child : orders) {
-            if (child.getOrderState() < OrderState.SUBMIT) {
+            if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
                 child.setAllowCancel(false);
                 child.setAllowContinueOrder(false);
@@ -2293,7 +2293,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Customer customer = customerService.selectById(order.getCustomerId());
 
-        if (order.getOrderState() < OrderState.SUBMIT) {
+        if (order.getOrderState() < OrderState.PAYMENT) {
             accountService.payOrder(order, factMoney, customer);
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
