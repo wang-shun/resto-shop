@@ -2264,25 +2264,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void payOrderModeFive(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        order.setOrderState(OrderState.PAYMENT);
-        order.setAllowCancel(false);
-        order.setAllowContinueOrder(false);
-        update(order);
+        if(order.getOrderState() < OrderState.SUBMIT){
+            order.setOrderState(OrderState.PAYMENT);
+            order.setAllowCancel(false);
+            order.setAllowContinueOrder(false);
+            update(order);
+        }
+
     }
 
 
     @Override
     public Result payPrice(BigDecimal factMoney, String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
+
         Customer customer = customerService.selectById(order.getCustomerId());
-        accountService.payOrder(order,factMoney,customer);
+        if(order.getOrderState() < OrderState.SUBMIT){
+            accountService.payOrder(order,factMoney,customer);
 
 
-        order.setOrderState(OrderState.PAYMENT);
-        order.setAllowCancel(false);
-        order.setAllowContinueOrder(false);
-        update(order);
+            order.setOrderState(OrderState.PAYMENT);
+            order.setAllowCancel(false);
+            order.setAllowContinueOrder(false);
+            update(order);
 
-        return new Result(true);
+            return new Result(true);
+        }else{
+            return new Result(false);
+        }
+
     }
 }
