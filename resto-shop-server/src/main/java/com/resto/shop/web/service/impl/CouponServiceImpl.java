@@ -10,13 +10,16 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.CouponService;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.shop.web.service.OrderPaymentItemService;
 
 /**
  *
@@ -36,6 +39,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public List<Coupon> listCoupon(Coupon coupon) {
         return couponMapper.listCoupon(coupon);
     }
+
+	@Resource
+	OrderPaymentItemService orderPaymentItemService;
 
     @Override
     public void insertCoupon(Coupon coupon) {
@@ -110,4 +116,21 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		return couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId);
 	}
 
+	@Override
+	public void useCouponById(String orderId, String id) {
+		Coupon coupon = selectById(id);
+		coupon.setIsUsed(true);
+		coupon.setRemark("后付款消费优惠券");
+		update(coupon);
+
+		OrderPaymentItem item = new OrderPaymentItem();
+		item.setId(ApplicationUtils.randomUUID());
+		item.setOrderId(orderId);
+		item.setPaymentModeId(PayMode.COUPON_PAY);
+		item.setPayTime(new Date());
+		item.setPayValue(coupon.getValue());
+		item.setRemark("优惠卷支付:" + item.getPayValue());
+		item.setResultData(coupon.getId());
+		orderPaymentItemService.insert(item);
+	}
 }
