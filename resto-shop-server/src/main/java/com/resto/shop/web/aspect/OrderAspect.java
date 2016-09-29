@@ -12,6 +12,7 @@ import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.OrderState;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
@@ -292,7 +293,8 @@ public class OrderAspect {
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
             String money = "(";
             for(OrderPaymentItem orderPaymentItem : paymentItems){
-                money += orderPaymentItem.getRemark() + " ";
+                money +=  PayMode.getPayModeName(orderPaymentItem.getPaymentModeId())+ "： "+orderPaymentItem.getPayValue()+" ";
+
             }
             StringBuffer msg = new StringBuffer();
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
