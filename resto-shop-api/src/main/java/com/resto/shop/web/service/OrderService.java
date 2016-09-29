@@ -377,7 +377,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
 
-	void payOrderModeFive(String orderId);
+	Order payOrderModeFive(String orderId);
 
-	Result payPrice(BigDecimal factMoney,String orderId);
+	Order payPrice(BigDecimal factMoney,String orderId);
 }

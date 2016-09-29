@@ -2262,7 +2262,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public void payOrderModeFive(String orderId) {
+    public Order payOrderModeFive(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
 
         if (order.getOrderState() < OrderState.PAYMENT) {
@@ -2282,12 +2282,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
+        return order;
     }
 
 
     @Override
-    public Result payPrice(BigDecimal factMoney, String orderId) {
+    public Order payPrice(BigDecimal factMoney, String orderId) {
         //拿到订单
         Order order = orderMapper.selectByPrimaryKey(orderId);
 
@@ -2308,10 +2308,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     update(child);
                 }
             }
-            return new Result(true);
-        } else {
-            return new Result(false);
+
         }
+
+        return order;
 
     }
 }
