@@ -132,7 +132,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			//剩余短信在设置的范围内
 			if(this.isHave(arrs, remindNum+"")){
 				//发短信提醒商家
-				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, phone);
+				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone());
 			}
 		}
 		//商家给客户发短信
