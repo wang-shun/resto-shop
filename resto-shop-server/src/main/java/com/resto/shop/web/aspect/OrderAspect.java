@@ -256,6 +256,29 @@ public class OrderAspect {
 
     ;
 
+
+    @AfterReturning(value = "printSuccess()", returning = "order")
+    public void pushContent(Order order) {
+        if(order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.SUBMIT
+                && order.getProductionStatus() == ProductionStatus.PRINTED){
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            StringBuffer msg = new StringBuffer();
+            msg.append("订单编号:" + order.getSerialNumber() + "\n");
+            msg.append("桌号：" + order.getTableNumber() + "\n");
+            msg.append("就餐店铺：" + order.getShopName() + "\n");
+            msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+            msg.append("订单明细：\n");
+            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+            for (OrderItem item : orderItem) {
+                msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+            }
+
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        }
+
+    }
+
     @AfterReturning(value = "confirmOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
         log.info("确认订单成功后回调:" + order.getId());
