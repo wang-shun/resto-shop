@@ -266,7 +266,7 @@ public class OrderAspect {
             StringBuffer msg = new StringBuffer();
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
-            msg.append("就餐店铺：" + order.getShopName() + "\n");
+            msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
