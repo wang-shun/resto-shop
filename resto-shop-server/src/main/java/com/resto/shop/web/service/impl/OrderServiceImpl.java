@@ -2263,8 +2263,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order payOrderModeFive(String orderId) {
+    	BigDecimal totalMoney = BigDecimal.ZERO;//计算订单原价，不使用任何优惠方式
         Order order = orderMapper.selectByPrimaryKey(orderId);
-
+        totalMoney = totalMoney.add(order.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
+        
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
@@ -2279,12 +2281,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 child.setAllowCancel(false);
                 child.setAllowContinueOrder(false);
                 update(child);
+                //插入 支付项
+                insertOrderPaymentItem(child, child.getOriginalAmount());
+                //计算 订单总额
+                totalMoney = totalMoney.add(child.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
         }
-
+        
+        //设置  【主订单 】 支付方式     子订单为计算
+        insertOrderPaymentItem(order, totalMoney);
+        
         return order;
     }
-
+    
+    public void insertOrderPaymentItem(Order order,BigDecimal totalMoney){
+    	OrderPaymentItem item = new OrderPaymentItem();
+        item.setId(ApplicationUtils.randomUUID());
+        item.setOrderId(order.getId());
+        item.setPaymentModeId(PayMode.MONEY_PAY);
+        item.setPayTime(order.getCreateTime());
+        item.setPayValue(totalMoney);
+        item.setRemark("商家在POS端使用其他支付方式确认订单:" + item.getPayValue());
+        item.setResultData("其他支付方式");
+        orderPaymentItemService.insert(item);
+    }
 
     @Override
     public Order payPrice(BigDecimal factMoney, String orderId) {
