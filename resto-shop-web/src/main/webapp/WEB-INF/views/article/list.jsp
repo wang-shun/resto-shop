@@ -22,7 +22,7 @@
 </style>
 <div id="control">
 
-    <div class="modal fade" id="article-dialog" v-if="showform">
+    <div class="modal fade" id="article-dialog" v-if="showform" @click="cleanRemark">
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -34,7 +34,7 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品类别</label>
                                 <div class="col-md-7">
-                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId" required="required">
                                         <option :value="f.id" v-for="f in articlefamilys">
                                             {{f.name}}
                                         </option>
@@ -51,14 +51,14 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品单位</label>
                                 <div class="col-md-7">
-                                    <input type="text" class="form-control" name="unit" v-model="m.unit">
+                                    <input type="text" class="form-control" name="unit" v-model="m.unit" required="required">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">价格</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="price" v-model="m.price"
-                                           required="required">
+                                           required="required" pattern="\d{1,10}(\.\d{1,2})?$" title="价格只能输入数字,且只能保存两位小数！">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
@@ -167,6 +167,7 @@
                                                 <input type="checkbox" name="kitchenList" :value="kitchen.id"
                                                        v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
                                             </label>
+                                            <div id="kitchenRemark"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -178,9 +179,10 @@
                                                 <input type="checkbox" name="supportTimes" :value="time.id"
                                                        v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
                                             </label>
-                                            <label>
+                                            <label v-if="supportTimes.length>0">
                                                 <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
                                             </label>
+                                            <div id="supportTimeRemark"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -931,6 +933,8 @@
                                 showDesc: true,
                                 showBig: true,
                                 isEmpty: false,
+                                stockWorkingDay:100,
+                                stockWeekend:50,
                                 sort: 0,
                                 units: [],
                                 articleType: article_type,
@@ -1020,9 +1024,34 @@
                         ,
                         changeColor: function (val) {
                             $(".color-mini").minicolors("value", val);
-                        }
-                        ,
+                        },
+                        cleanRemark : function(){
+                        	$("#kitchenRemark").html("");
+                        	$("#supportTimeRemark").html("");
+                        },
+                        checkNull : function(){
+                        	if(this.kitchenList.length<=0){//判断当前店铺是否创建了出餐厨房
+                        		$("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
+                        		return true;
+                        	}
+                        	if(this.m.kitchenList.length<=0){//出餐厨房 非空验证
+                        		$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
+                        		return true;
+                        	}
+                        	if(this.supportTimes.length<=0){//判断当前店铺是否创建了供应时间
+                        		$("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
+                        		return true;
+                        	}
+                        	if(this.m.supportTimes.length<=0){//供应时间 非空验证
+                        		$("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
+                        		return true;
+                        	}
+                        	return false;
+                        },
                         save: function (e) {
+                        	if(this.checkNull()){//验证必选项(出参厨房和供应时间)
+                        		return;
+                        	}
                             var that = this;
                             var action = $(e.target).attr("action");
                             this.m.articlePrices = this.unitPrices;
