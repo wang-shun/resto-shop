@@ -169,6 +169,19 @@ public class OrderAspect {
 
     ;
 
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderModeFive(..))")
+    public void payOrderModeFive() {
+    }
+
+    ;
+
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payPrice(..))")
+    public void payPrice() {
+    }
+    ;
+
     @AfterReturning(value = "callNumber()", returning = "order")
     public void createCallMessage(Order order) throws Throwable {
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -177,7 +190,7 @@ public class OrderAspect {
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||houFuPayOrder()", returning = "order")
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()", returning = "order")
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
