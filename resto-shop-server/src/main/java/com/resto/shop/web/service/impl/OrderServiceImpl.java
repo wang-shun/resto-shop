@@ -2314,4 +2314,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return order;
 
     }
+
+    @Override
+    public void useRedPrice(BigDecimal factMoney, String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+
+        Customer customer = customerService.selectById(order.getCustomerId());
+        accountService.payOrder(order, factMoney, customer);
+    }
 }
