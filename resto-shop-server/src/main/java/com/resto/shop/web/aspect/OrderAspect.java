@@ -17,6 +17,7 @@ import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -58,6 +59,9 @@ public class OrderAspect {
 
     @Resource
     OrderService orderService;
+
+    @Resource
+    OrderPaymentItemService orderPaymentItemService;
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
@@ -274,6 +278,25 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
 
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        }
+
+    }
+
+    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
+    public void payContent(Order order) {
+        if(order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
+                && order.getProductionStatus() == ProductionStatus.PRINTED){
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+            String money = "(";
+            for(OrderPaymentItem orderPaymentItem : paymentItems){
+                money += orderPaymentItem.getRemark() + " ";
+            }
+            StringBuffer msg = new StringBuffer();
+            msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
+            msg.append("支付成功。订单金额：").append(order.getOrderMoney()).append(money).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
