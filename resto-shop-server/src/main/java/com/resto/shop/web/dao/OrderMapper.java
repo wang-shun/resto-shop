@@ -75,9 +75,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param currentShopId
 	 * @param dateBegin
 	 * @param dateEnd
-	 * @return
+	 * @param shopMode
+     * @return
 	 */
-	List<Order> selectHistoryOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+	List<Order> selectHistoryOrderList(@Param("shopId") String currentShopId, @Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd, @Param("shopMode") Integer shopMode);
 
 	/**
 	 * 查询某天的异常订单

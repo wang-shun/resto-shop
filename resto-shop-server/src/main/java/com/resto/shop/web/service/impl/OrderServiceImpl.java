@@ -964,12 +964,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return order;
     }
 
+
+
     @Override
-    public List<Order> selectHistoryOrderList(String currentShopId, Date date) {
+    public List<Order> selectHistoryOrderList(String currentShopId, Date date,Integer shopMode) {
         Date begin = DateUtil.getDateBegin(date);
         Date end = DateUtil.getDateEnd(date);
-        return orderMapper.selectHistoryOrderList(currentShopId, begin, end);
-
+        return orderMapper.selectHistoryOrderList(currentShopId, begin, end,shopMode);
     }
 
     @Override

@@ -742,9 +742,12 @@
         WHERE
         shop_detail_id=#{shopId}
         AND
-        <![CDATA[ push_order_time>#{dateBegin} AND push_order_time<#{dateEnd}]]>
+        <![CDATA[ create_time>#{dateBegin} AND create_time<#{dateEnd}]]>
         and closed=0
-        order by push_order_time DESC;
+        <if test="shopMode != null and shopMode == 5">
+            and order_state not in (1,9)
+        </if>
+        order by create_time DESC;
     </select>
 
     <select id="selectErrorOrderList" resultType="Order">

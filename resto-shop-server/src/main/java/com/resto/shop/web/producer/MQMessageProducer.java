@@ -125,6 +125,7 @@ public class MQMessageProducer {
 		obj.put("parentOrderId", order.getParentOrderId());
 		obj.put("originalAmount", order.getOriginalAmount());
 		obj.put("orderMoney", order.getOrderMoney());
+        obj.put("serialNumber",order.getSerialNumber());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
@@ -178,4 +179,22 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+    public static void sendModelFivePaySuccess(Order order) {
+        JSONObject obj=  new JSONObject();
+        obj.put("brandId", order.getBrandId());
+        obj.put("id", order.getId());
+        obj.put("tableNumber", order.getTableNumber());
+        obj.put("shopDetailId", order.getShopDetailId());
+        obj.put("articleCount", order.getArticleCount());
+        obj.put("orderMode",order.getOrderMode());
+        obj.put("productionStatus", order.getProductionStatus());
+        obj.put("verCode", order.getVerCode());
+        obj.put("parentOrderId", order.getParentOrderId());
+        obj.put("originalAmount", order.getOriginalAmount());
+        obj.put("orderMoney", order.getOrderMoney());
+        obj.put("serialNumber",order.getSerialNumber());
+        Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_DELETE_ORDER,obj.toJSONString().getBytes());
+        sendMessageASync(message);
+
+    }
 }

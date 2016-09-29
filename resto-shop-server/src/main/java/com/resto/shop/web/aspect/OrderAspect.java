@@ -227,10 +227,9 @@ public class OrderAspect {
                 }else{
                     if(order.getOrderState() == OrderState.PAYMENT){
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
+                        MQMessageProducer.sendModelFivePaySuccess(order);
                     }
                 }
-
-
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
@@ -242,11 +241,7 @@ public class OrderAspect {
                     }
                 }
                 log.info("发送打印信息");
-
-
-
                 log.info("打印成功后，发送自动确认订单通知！" + setting.getAutoConfirmTime() + "s 后发送" + ",orderId:" + order.getId());
-
             } else if (ProductionStatus.HAS_CALL == order.getProductionStatus()) {
                 log.info("发送叫号信息");
                 MQMessageProducer.sendPlaceOrderMessage(order);
