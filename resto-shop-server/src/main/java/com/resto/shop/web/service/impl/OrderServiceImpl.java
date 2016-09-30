@@ -319,19 +319,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
             }
-        }else{
-            if (order.getParentOrderId() != null) {  //子订单
-                Order parent = selectById(order.getParentOrderId());
-                int articleCountWithChildren = selectArticleCountById(parent.getId());
-                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
-                    parent.setLastOrderTime(order.getCreateTime());
-                }
-                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
-                parent.setCountWithChild(articleCountWithChildren);
-                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-                update(parent);
-
-            }
         }
 
         if (payMoney.doubleValue() < 0) {
@@ -359,7 +346,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setTableNumber(parentOrder.getTableNumber());
         }
         //判断是否是后付款模式
-        if (order.getOrderMode() == 5) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setAllowContinueOrder(true);
@@ -375,6 +362,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         jsonResult.setData(order);
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            if (order.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(order.getParentOrderId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(order.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
+
+            }
+        }
         return jsonResult;
     }
 
