@@ -265,9 +265,9 @@ public class OrderAspect {
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
             if(order.getParentOrderId() == null){
-                msg.append("下单成功:"   + "\n");
+                msg.append("下单成功!"   + "\n");
             }else{
-                msg.append("加菜成功:"   + "\n");
+                msg.append("加菜成功!"   + "\n");
             }
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
