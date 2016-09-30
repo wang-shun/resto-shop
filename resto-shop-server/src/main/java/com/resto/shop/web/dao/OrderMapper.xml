@@ -1729,6 +1729,7 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         and order_state = 1 and production_status != 5
         and table_number is not null
         order by create_time DESC;
+
     </select>
 </mapper>
 
