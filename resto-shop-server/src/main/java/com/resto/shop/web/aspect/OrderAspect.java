@@ -264,6 +264,11 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
+            if(order.getParentOrderId() == null){
+                msg.append("下单成功:"   + "\n");
+            }else{
+                msg.append("加菜成功:"   + "\n");
+            }
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
             msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
@@ -292,8 +297,15 @@ public class OrderAspect {
 
             }
             StringBuffer msg = new StringBuffer();
+            BigDecimal sum = order.getOrderMoney();
+            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+            for (Order child : orders) { //遍历子订单
+                sum = sum.add(child.getOrderMoney());
+            }
+
+
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
-            msg.append("支付成功。订单金额：").append(order.getOrderMoney()).append(money).append(") ");
+            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
