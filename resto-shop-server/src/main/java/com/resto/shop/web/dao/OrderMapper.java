@@ -89,6 +89,17 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
+
+	/**
+	 * 查询未付款的订单（后付模式）
+	 * @param currentShopId
+	 * @param dateBegin
+	 * @param dateEnd
+     * @return
+     */
+	List<Order> getOrderNoPayList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
 	void clearPushOrder(String id, int notOrder);
 
 	void setOrderNumber(String orderId, String tableNumber);

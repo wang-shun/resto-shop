@@ -1000,6 +1000,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectErrorOrderList(currentShopId, begin, end);
     }
 
+
+    @Override
+    public List<Order> getOrderNoPayList(String currentShopId, Date date) {
+        Date begin = DateUtil.getDateBegin(date);
+        Date end = DateUtil.getDateEnd(date);
+        return orderMapper.getOrderNoPayList(currentShopId, begin, end);
+    }
+
     @Override
     public Order cancelOrderPos(String orderId) throws AppException {
         Order order = selectById(orderId);

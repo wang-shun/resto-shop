@@ -1719,6 +1719,16 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         ORDER BY create_time DESC
     </select>
 
+
+    <select id="getOrderNoPayList" resultType="Order">
+        select * from tb_order
+        WHERE
+        shop_detail_id=#{shopId}
+        AND
+        <![CDATA[ create_time >#{dateBegin} AND create_time  <#{dateEnd}]]>
+        and order_state = 1 and production_status != 5
+        order by create_time DESC;
+    </select>
 </mapper>
 
 
