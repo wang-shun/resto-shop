@@ -2350,7 +2350,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             List<Order> orders = orderMapper.selectByParentId(order.getId());
             for (Order child : orders) {
-                if (child.getOrderState() < OrderState.SUBMIT) {
+                if (child.getOrderState() < OrderState.PAYMENT) {
                     child.setOrderState(OrderState.PAYMENT);
                     child.setAllowCancel(false);
                     child.setAllowContinueOrder(false);
