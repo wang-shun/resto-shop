@@ -436,7 +436,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private List<String> selectChildIdsByParentId(String id) {
-        return orderMapper.selectChildIdsByParentId(id);
+        Order order = orderMapper.selectByPrimaryKey(id);
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            return   orderMapper.selectChildIdsByParentIdByFive(id);
+        }else{
+            return   orderMapper.selectChildIdsByParentId(id);
+        }
+
     }
 
     @Override

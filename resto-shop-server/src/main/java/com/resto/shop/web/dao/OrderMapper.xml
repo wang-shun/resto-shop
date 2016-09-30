@@ -871,6 +871,12 @@
         select * from tb_order
         where parent_order_id=#{0}
     </select>
+
+    <select id="selectChildIdsByParentIdByFive" resultType="String">
+         select id from
+        tb_order where parent_order_id=#{0}
+        and order_state in (1,2,10,11,12)
+    </select>
     <select id="selectChildIdsByParentId" resultType="String">
         select id from
         tb_order where parent_order_id=#{0}

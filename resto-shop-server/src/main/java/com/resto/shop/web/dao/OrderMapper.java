@@ -133,6 +133,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<String> selectChildIdsByParentId(String id);
 
+	List<String> selectChildIdsByParentIdByFive(String id);
+
 	String selectNewCustomerPackageId(String currentCustomerId, String currentShopId);
 
 	List<Order> selectReadyList(String currentShopId);
