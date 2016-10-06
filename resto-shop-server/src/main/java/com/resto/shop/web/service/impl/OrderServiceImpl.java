@@ -358,7 +358,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
-            payOrderSuccess(order, order.getOrderMode());
+            payOrderSuccess(order);
         }
 
         jsonResult.setData(order);
@@ -394,8 +394,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public Order payOrderSuccess(Order order, Integer shopMode) {
-        if (shopMode != 5) {
+    public Order payOrderSuccess(Order order) {
+        if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             update(order);
         }
@@ -572,11 +572,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Order order = selectById(item.getOrderId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
-        if (historyItem == null) {
+        if(historyItem==null){
             orderPaymentItemService.insert(item);
-            payOrderSuccess(order, order.getOrderMode());
-        } else {
-            log.warn("该笔支付记录已经处理过:" + item.getId());
+           payOrderSuccess(order);
+        }else{
+            log.warn("该笔支付记录已经处理过:"+item.getId());
         }
         return order;
     }
