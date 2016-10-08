@@ -61,6 +61,16 @@ public class OrderItem {
 
     private BigDecimal price;
 
+    private Integer mealItemId;
+
+    final public Integer getMealItemId() {
+        return mealItemId;
+    }
+
+    final public void setMealItemId(Integer mealItemId) {
+        this.mealItemId = mealItemId;
+    }
+
     final public BigDecimal getPrice() {
         return price;
     }

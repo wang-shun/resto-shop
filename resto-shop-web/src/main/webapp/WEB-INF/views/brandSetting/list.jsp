@@ -146,6 +146,22 @@
 						分单出单
 					</label>
 				</div>
+
+				<div class="form-group">
+					<div class="control-label">是否启用服务费</div>
+					<label >
+						<input type="radio" name="isUseServicePrice"  v-model="m.isUseServicePrice" value="0" onchange="hideServicePrice()">
+						否
+					</label>
+					<label>
+						<input type="radio" name="isUseServicePrice" onchange="showServicePrice()" v-model="m.isUseServicePrice" value="1">
+						是
+					</label>
+				</div>
+				<div class="form-group" id="serviceDiv" style="display: none">
+					<label>服务费/每人</label>
+					<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required">
+				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
@@ -157,8 +173,17 @@
 </div>
 
 <script>
-	
+
+	function showServicePrice(){
+		$('#serviceDiv').show();
+	}
+
+	function hideServicePrice(){
+		$('#serviceDiv').hide();
+	}
 	$(document).ready(function(){
+
+
 		
 		initcontent();
 		
@@ -227,6 +252,11 @@
 				success:function(result){
 					console.log(result.data);
 	 				vueObj.m=result.data;
+					if(result.data.isUseServicePrice == 1){
+						$('#serviceDiv').show();
+					}else{
+						$('#serviceDiv').hide();
+					}
 				}
 			})
 		}

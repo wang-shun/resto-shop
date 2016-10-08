@@ -59,4 +59,6 @@ public interface KitchenMapper  extends GenericDao<Kitchen,Integer> {
     Kitchen selectKitchenByOrderItem(@Param("item") OrderItem orderItem,@Param("mealAttrIds") List<Long> mealAttrId);
 
     List<Long> getMealAttrId(OrderItem item);
+
+    Kitchen getItemKitchenId(OrderItem item);
 }

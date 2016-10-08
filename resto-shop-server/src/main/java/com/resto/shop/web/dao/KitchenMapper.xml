@@ -92,4 +92,8 @@
         select t.id from tb_meal_attr t
          where article_id = (select article_id from tb_order_item where id = #{parentId})
     </select>
+
+    <select id="getItemKitchenId" resultType="Kitchen">
+      select * from tb_kitchen where id = (select kitchen_id from tb_meal_item where id = #{mealItemId})
+    </select>
 </mapper>

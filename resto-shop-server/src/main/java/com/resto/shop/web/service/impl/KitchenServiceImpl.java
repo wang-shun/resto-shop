@@ -70,4 +70,9 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	public List<Long> getMealAttrId(OrderItem orderItem) {
 		return kitchenMapper.getMealAttrId(orderItem);
 	}
+
+	@Override
+	public Kitchen getItemKitchenId(OrderItem orderItem) {
+		return kitchenMapper.getItemKitchenId(orderItem);
+	}
 }
