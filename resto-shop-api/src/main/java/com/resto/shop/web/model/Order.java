@@ -126,6 +126,15 @@ public class Order {
 
     private List<OrderPaymentItem> orderPaymentItems;
 
+    private BigDecimal servicePrice;
+
+    final public BigDecimal getServicePrice() {
+        return servicePrice;
+    }
+
+    final public void setServicePrice(BigDecimal servicePrice) {
+        this.servicePrice = servicePrice;
+    }
 
     final public String getId() {
         return id;
