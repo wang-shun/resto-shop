@@ -273,6 +273,7 @@ public class OrderAspect {
             msg.append("桌号：" + order.getTableNumber() + "\n");
             msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+            msg.append("服务费：" + order.getServicePrice() + "\n");
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {
@@ -303,6 +304,7 @@ public class OrderAspect {
                 sum = sum.add(child.getOrderMoney());
             }
 
+            sum = sum.add(order.getServicePrice());
 
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");

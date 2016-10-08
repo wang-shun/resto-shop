@@ -64,6 +64,7 @@
                 jdbcType="TIMESTAMP"/>
         <result column="orderCount" property="orderCount"/>
         <result column="orderTotal" property="orderTotal"/>
+        <result column="service_price" property="servicePrice"/>
     </resultMap>
 
 
@@ -193,7 +194,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count
+        last_order_time,customer_count,service_price
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -372,6 +373,9 @@
             <if test="lastOrderTime != null">
                 last_order_time,
             </if>
+            <if test="servicePrice != null">
+                service_price,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -484,6 +488,9 @@
             </if>
             <if test="lastOrderTime != null">
                 #{lastOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="servicePrice != null">
+                #{servicePrice,jdbcType=DECIMAL}
             </if>
         </trim>
     </insert>
