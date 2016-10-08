@@ -144,7 +144,7 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
-        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderModeFive(order.getId());
         }
     }
@@ -185,6 +185,7 @@ public class OrderAspect {
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payPrice(..))")
     public void payPrice() {
     }
+
     ;
 
     @AfterReturning(value = "callNumber()", returning = "order")
@@ -220,12 +221,12 @@ public class OrderAspect {
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
-                if(order.getOrderMode() != ShopMode.HOUFU_ORDER){
+                if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
-                }else{
-                    if(order.getOrderState() == OrderState.PAYMENT){
+                } else {
+                    if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
                     }
@@ -259,15 +260,15 @@ public class OrderAspect {
 
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
-        if(order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.SUBMIT
-                && order.getProductionStatus() == ProductionStatus.PRINTED){
+        if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.SUBMIT
+                && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
-            if(order.getParentOrderId() == null){
-                msg.append("下单成功!"   + "\n");
-            }else{
-                msg.append("加菜成功!"   + "\n");
+            if (order.getParentOrderId() == null) {
+                msg.append("下单成功!" + "\n");
+            } else {
+                msg.append("加菜成功!" + "\n");
             }
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
@@ -287,14 +288,14 @@ public class OrderAspect {
 
     @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
     public void payContent(Order order) {
-        if(order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
-                && order.getProductionStatus() == ProductionStatus.PRINTED){
+        if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
+                && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
             String money = "(";
-            for(OrderPaymentItem orderPaymentItem : paymentItems){
-                money +=  PayMode.getPayModeName(orderPaymentItem.getPaymentModeId())+ "： "+orderPaymentItem.getPayValue()+" ";
+            for (OrderPaymentItem orderPaymentItem : paymentItems) {
+                money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
 
             }
             StringBuffer msg = new StringBuffer();
@@ -303,7 +304,6 @@ public class OrderAspect {
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
-
             sum = sum.add(order.getServicePrice());
 
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
@@ -391,6 +391,8 @@ public class OrderAspect {
             }
             msg.append("就餐店铺：" + order.getShopName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+            msg.append("服务费：" + order.getServicePrice() + "\n");
+
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {
