@@ -877,6 +877,7 @@
     <select id="selectByParentId" resultType="Order">
         select * from tb_order
         where parent_order_id=#{0}
+        and order_state != 9
     </select>
 
     <select id="selectChildIdsByParentIdByFive" resultType="String">
