@@ -326,6 +326,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payMoney = BigDecimal.ZERO;
         }
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
+
         order.setAllowCancel(true); // 订单是否允许取消
         order.setAllowAppraise(false);
         order.setArticleCount(articleCount); // 订单餐品总数
