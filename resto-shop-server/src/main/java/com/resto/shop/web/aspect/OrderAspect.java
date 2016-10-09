@@ -419,6 +419,10 @@ public class OrderAspect {
 
             MQMessageProducer.sendNoticeOrderMessage(order);
 
+            if (order.getParentOrderId() != null) {  //子订单
+                orderService.updateOrderChild(order.getId());
+            }
+
 //			//拒绝订单后还原库存
 //			Boolean addStockSuccess  = false;
 //			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));

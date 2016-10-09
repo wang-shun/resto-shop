@@ -858,7 +858,7 @@
 
     <select id="selectParentAmount" resultType="java.lang.Double">
         SELECT
-        SUM(order_money) FROM tb_order WHERE id=#{0} OR parent_order_id=#{0}
+        SUM(order_money) FROM tb_order WHERE id=#{0} OR parent_order_id=#{0} and order_state != 9
     </select>
 
     <update id="updateParentAmount">
@@ -872,7 +872,7 @@
     <select id="selectArticleCountById" resultType="Integer">
         select
         sum(article_count) from tb_order WHERE id=#{0} OR
-        parent_order_id=#{0}
+        parent_order_id=#{0} and order_state != 9
     </select>
     <select id="selectByParentId" resultType="Order">
         select * from tb_order

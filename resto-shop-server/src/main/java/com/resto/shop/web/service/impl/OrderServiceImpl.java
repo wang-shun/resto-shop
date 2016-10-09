@@ -381,6 +381,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return jsonResult;
     }
 
+
+    @Override
+    public void updateOrderChild(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        Order parent = selectById(order.getParentOrderId());
+        int articleCountWithChildren = selectArticleCountById(parent.getId());
+        if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+            parent.setLastOrderTime(order.getCreateTime());
+        }
+        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+        parent.setCountWithChild(articleCountWithChildren);
+        parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+        update(parent);
+    }
+
     public Result checkArticleList(OrderItem orderItem, int count) {
 
         Boolean result = true;
