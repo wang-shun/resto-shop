@@ -419,10 +419,16 @@
                                                            style="width:120px">选择类型&nbsp;</label>
                                                     <div class="col-md-4">
                                                         <select class="form-control" style="width:150px" name="choiceType" v-model="attr.choiceType">
-                                                            <option value="0">单选</option>
-                                                            <option value="1">多选</option>
+                                                            <option value="0">必选</option>
+                                                            <option value="1">任选</option>
                                                         </select>
+
+
                                                     </div>
+                                                    <div class="col-md-4" v-if="attr.choiceType == 0">
+                                                    <input class="form-control" type="text" v-model="attr.choiceCount"
+                                                           required="required" lazy>
+                                                        </div>
                                                 </div>
 
                                                 <div class="tools">
