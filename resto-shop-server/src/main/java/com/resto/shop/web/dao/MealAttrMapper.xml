@@ -10,6 +10,7 @@
     <result column="print_sort" property="printSort" jdbcType="INTEGER"/>
     <result column="choice_count" property="choiceCount"/>
     <result column="choice_type" property="choiceType"/>
+
   </resultMap>
   <sql id="Base_Column_List">id, name, sort, article_id,print_sort,choice_type,choice_count</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 

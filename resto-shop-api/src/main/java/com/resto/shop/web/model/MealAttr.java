@@ -19,6 +19,7 @@ public class MealAttr {
 
     private Integer choiceCount;
 
+
     final public Integer getChoiceCount() {
         return choiceCount;
     }
