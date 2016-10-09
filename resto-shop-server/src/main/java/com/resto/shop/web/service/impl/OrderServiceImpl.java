@@ -325,7 +325,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
-        order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
         order.setAllowCancel(true); // 订单是否允许取消
         order.setAllowAppraise(false);
