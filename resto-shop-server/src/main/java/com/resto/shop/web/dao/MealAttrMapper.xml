@@ -8,6 +8,7 @@
     <result column="sort" property="sort" jdbcType="INTEGER"/>
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
     <result column="print_sort" property="printSort" jdbcType="INTEGER"/>
+
     <result column="choice_count" property="choiceCount"/>
     <result column="choice_type" property="choiceType"/>
 
