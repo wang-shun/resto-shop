@@ -34,7 +34,8 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品类别</label>
                                 <div class="col-md-7">
-                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId" required="required">
+                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId"
+                                            required="required">
                                         <option :value="f.id" v-for="f in articlefamilys">
                                             {{f.name}}
                                         </option>
@@ -51,14 +52,16 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品单位</label>
                                 <div class="col-md-7">
-                                    <input type="text" class="form-control" name="unit" v-model="m.unit" required="required">
+                                    <input type="text" class="form-control" name="unit" v-model="m.unit"
+                                           required="required">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">价格</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="price" v-model="m.price"
-                                           required="required" pattern="\d{1,10}(\.\d{1,2})?$" title="价格只能输入数字,且只能保存两位小数！">
+                                           required="required" pattern="\d{1,10}(\.\d{1,2})?$"
+                                           title="价格只能输入数字,且只能保存两位小数！">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
@@ -418,7 +421,9 @@
                                                     <label class="control-label col-md-4"
                                                            style="width:120px">选择类型&nbsp;</label>
                                                     <div class="col-md-4">
-                                                        <select class="form-control" style="width:150px" name="choiceType" v-model="attr.choiceType">
+                                                        <select class="form-control" style="width:150px"
+                                                                name="choiceType" v-model="attr.choiceType"
+                                                                v-on:change="choiceTypeChange(attr)">
                                                             <option value="0">必选</option>
                                                             <option value="1">任选</option>
                                                         </select>
@@ -426,9 +431,10 @@
 
                                                     </div>
                                                     <div class="col-md-4" v-if="attr.choiceType == 0">
-                                                    <input class="form-control" type="text" v-model="attr.choiceCount"
-                                                           required="required" lazy>
-                                                        </div>
+                                                        <input class="form-control" type="text"
+                                                               v-model="attr.choiceCount"
+                                                               required="required">
+                                                    </div>
                                                 </div>
 
                                                 <div class="tools">
@@ -466,8 +472,8 @@
                                                         </div>
                                                         <div class="flex-1 radio-list">
                                                             <label class="radio-inline">
-                                                                <input type="radio" :name="attr.name" :value="true"
-                                                                       v-model="item.isDefault"
+                                                                <input type="checkbox" :name="attr.name" :value="true"  v-bind:disabled="attr.choiceType == 1"
+                                                                       v-model="item.isDefault && attr.choiceType == 0"
                                                                        @change="itemDefaultChange(attr,item)"/>
                                                                 设为默认
                                                             </label>
@@ -779,12 +785,18 @@
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
-                            for (var i in attr.mealItems) {
-                                var m = attr.mealItems[i];
-                                if (m != item) {
-                                    m.isDefault = false;
-                                }
+                            if(item.isDefault){
+                                item.isDefault = false;
+                            }else{
+                                item.isDefault = true;
                             }
+
+//                            for (var i in attr.mealItems) {
+//                                var m = attr.mealItems[i];
+//                                if (m != item) {
+//                                    m.isDefault = false;
+//                                }
+//                            }
                         },
                         updateAttrItems: function () {
                             this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
@@ -878,6 +890,13 @@
                             this.m.mealAttrs.$remove(meal);
                         }
                         ,
+                        choiceTypeChange: function (attr) {
+                            if (attr.choiceType == 1) {
+
+                            }else{
+
+                            }
+                        },
                         addMealAttr: function () {
                             var sort = this.maxMealAttrSort + 1;
                             this.m.mealAttrs.push({
@@ -939,8 +958,8 @@
                                 showDesc: true,
                                 showBig: true,
                                 isEmpty: false,
-                                stockWorkingDay:100,
-                                stockWeekend:50,
+                                stockWorkingDay: 100,
+                                stockWeekend: 50,
                                 sort: 0,
                                 units: [],
                                 articleType: article_type,
@@ -1031,33 +1050,52 @@
                         changeColor: function (val) {
                             $(".color-mini").minicolors("value", val);
                         },
-                        cleanRemark : function(){
-                        	$("#kitchenRemark").html("");
-                        	$("#supportTimeRemark").html("");
+                        cleanRemark: function () {
+                            $("#kitchenRemark").html("");
+                            $("#supportTimeRemark").html("");
                         },
-                        checkNull : function(){
-                        	if(this.kitchenList.length<=0){//判断当前店铺是否创建了出餐厨房
-                        		$("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
-                        		return true;
-                        	}
-                        	if(this.m.kitchenList.length<=0){//出餐厨房 非空验证
-                        		$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
-                        		return true;
-                        	}
-                        	if(this.supportTimes.length<=0){//判断当前店铺是否创建了供应时间
-                        		$("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
-                        		return true;
-                        	}
-                        	if(this.m.supportTimes.length<=0){//供应时间 非空验证
-                        		$("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
-                        		return true;
-                        	}
-                        	return false;
+                        checkNull: function () {
+                            if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
+                                $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
+                                return true;
+                            }
+                            if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+                                $("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
+                                return true;
+                            }
+                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
+                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
+                                return true;
+                            }
+                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
+                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
+                                return true;
+                            }
+                            return false;
                         },
                         save: function (e) {
-                        	if(this.checkNull()){//验证必选项(出参厨房和供应时间)
-                        		return;
-                        	}
+
+                            var attrs = this.m.mealAttrs;
+                            for (var i = 0; i < attrs.length; i++) {
+                                var attr = attrs[i];
+                                var count = 0;
+                                for (var k = 0; k < attr.mealItems.length; k++) {
+                                    if (attr.mealItems[k].isDefault) {
+                                        count++;
+                                    }
+                                }
+                                if (attr.choiceType == 0) {
+                                    if (attr.choiceCount != count) {
+                                        C.errorMsg("默认选中项与必选数量不等");
+                                        return;
+                                    }
+                                }
+                            }
+
+
+                            if (this.checkNull()) {//验证必选项(出参厨房和供应时间)
+                                return;
+                            }
                             var that = this;
                             var action = $(e.target).attr("action");
                             this.m.articlePrices = this.unitPrices;
@@ -1232,6 +1270,7 @@
                                 $(".modal-backdrop.fade.in").remove();
                             }
                         });
+
                         this.$watch("m", function () {
                             if (this.m.id) {
                                 $('.color-mini').minicolors("value", this.m.controlColor);
