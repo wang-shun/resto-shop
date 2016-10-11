@@ -750,10 +750,7 @@
         shop_detail_id=#{shopId}
         AND
         <![CDATA[ create_time>#{dateBegin} AND create_time<#{dateEnd}]]>
-        and closed=0
-        <if test="shopMode != null and shopMode == 5">
-            and order_state not in (1,9)
-        </if>
+        and closed=0 and order_state not in (1,9)
         order by create_time DESC;
     </select>
 
