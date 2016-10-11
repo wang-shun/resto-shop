@@ -118,4 +118,34 @@ where t.id = #{articleId}
         delete from tb_article_unit_new
         where article_id = #{articleId}
     </delete>
+
+    <select id="getUnitNew" resultType="java.lang.String">
+        select id from tb_article_unit_new where unit_id = #{id}
+    </select>
+
+    <delete id="deleteUnit">
+        delete from tb_article_unit_detail where article_unit_id in
+        <foreach collection="ids" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteUnitNew">
+        delete from tb_article_unit_new where unit_id = #{id}
+    </delete>
+
+    <delete id="deleteUnitMore">
+        delete from tb_article_unit_detail where article_unit_id = #{id}
+        and unit_detail_id not in
+        <foreach collection="details" separator="," item="detail" open="(" close=")">
+            #{detail.id}
+        </foreach>
+    </delete>
+
+    <select id="getUnitByRelation" resultType="java.lang.Integer">
+        select count(1) from tb_article_unit_detail where unit_detail_id = #{detailId}
+        and article_unit_id = #{relationId}
+    </select>
+    
+
 </mapper>

@@ -36,4 +36,14 @@ public interface UnitMapper extends GenericDao<Unit, String> {
                                  @Param("detail") UnitDetail unitDetail);
 
     int deleteArticleUnit(String articleId);
+
+    List<String> getUnitNew(String id);
+
+    void deleteUnitMore(@Param("id") String id,@Param("details") List<UnitDetail> details);
+
+    void deleteUnit(@Param("ids") List<String> ids);
+
+    void deleteUnitNew(@Param("id") String id);
+
+    Integer getUnitByRelation(@Param("detailId") String detailId,@Param("relationId") String relationId);
 }

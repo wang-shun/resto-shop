@@ -290,7 +290,7 @@
                                         <label class="flex-1 control-label">{{detail.name}}</label>
                                         <div class="flex-1">
                                             <input type="text" class="form-control"
-                                                   v-model="detail.price" id="price{{detail.id}}" required="required"/>
+                                                   v-model="detail.price" :value="detail.price==null?0:detail.price" id="price{{detail.id}}" required="required"/>
                                         </div>
                                         <div class="flex-1">
                                             <input type="text" class="form-control" name="sort"

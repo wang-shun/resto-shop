@@ -3,7 +3,6 @@ package com.resto.shop.web.controller.business;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.Unit;
 import com.resto.shop.web.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,28 +31,25 @@ public class UnitController extends GenericController {
     }
 
 
-
     @RequestMapping("/list_all")
     @ResponseBody
-    public List<Unit> getList(){
-        List<Unit> result =  unitService.getUnits(getCurrentShopId());
+    public List<Unit> getList() {
+        List<Unit> result = unitService.getUnits(getCurrentShopId());
         return result;
     }
 
 
     @RequestMapping("/list_all_id")
     @ResponseBody
-    public List<Unit> getListById(String articleId){
-        List<Unit> result =  unitService.getUnitsByArticleId(getCurrentShopId(),articleId);
+    public List<Unit> getListById(String articleId) {
+        List<Unit> result = unitService.getUnitsByArticleId(getCurrentShopId(), articleId);
         return result;
     }
 
 
-
-
     @RequestMapping("/create")
     @ResponseBody
-    public Result create(@Valid @RequestBody Unit unit){
+    public Result create(@Valid @RequestBody Unit unit) {
         //创建主表
         String id = ApplicationUtils.randomUUID();
         unit.setId(id);
@@ -66,24 +62,29 @@ public class UnitController extends GenericController {
 
     @RequestMapping("/modify")
     @ResponseBody
-    public Result modify(@Valid @RequestBody Unit unit){
+    public Result modify(@Valid @RequestBody Unit unit) {
         unitService.update(unit);
         unitService.initUnit(unit);
         //创建属性
-        unitService.insertDetail(unit);
+        Unit u = unitService.insertDetail(unit);
+
+        //同步更新 使用该规格包的菜品信息
+        unitService.modifyUnit(u);
+
         return new Result(true);
     }
 
     @RequestMapping("/delete")
     @ResponseBody
-    public Result delete(String id){
+    public Result delete(String id) {
         unitService.delete(id);
+        unitService.deleteUnit(id);
         return Result.getSuccess();
     }
 
     @RequestMapping("/getUnitById")
     @ResponseBody
-    public Unit getUnitById(String id){
+    public Unit getUnitById(String id) {
         return unitService.getUnitById(id);
     }
 
