@@ -674,7 +674,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
     <update id="deleteRecommendId">
         update tb_article
-        set recommend_id is null
+        set recommend_id = null
         where recommend_id = #{recommendId}
     </update>
 </mapper>
