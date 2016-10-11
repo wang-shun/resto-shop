@@ -670,4 +670,11 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
         and tb_article.shop_detail_id = #{shopId}
     </select>
+
+
+    <update id="deleteRecommendId">
+        update tb_article
+        set recommend_id is null
+        where recommend_id = #{recommendId}
+    </update>
 </mapper>

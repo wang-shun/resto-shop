@@ -232,4 +232,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<Article> getSingoArticle(String shopId) {
         return articleMapper.getSingoArticle(shopId);
     }
+
+    @Override
+    public void deleteRecommendId(String recommendId) {
+         articleMapper.deleteRecommendId(recommendId);
+    }
 }
