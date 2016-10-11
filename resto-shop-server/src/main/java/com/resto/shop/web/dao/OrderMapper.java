@@ -72,6 +72,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	/**
 	 * 查询某天的历史订单
+	 * 根据店铺模式查询不同状态的历史订单。（2016-10-11，已取消此功能，改为所有模式的店铺的历史订单都不为取消状态和未支付状态）
 	 * @param currentShopId
 	 * @param dateBegin
 	 * @param dateEnd
