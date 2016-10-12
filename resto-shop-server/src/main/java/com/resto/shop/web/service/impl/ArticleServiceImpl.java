@@ -237,4 +237,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void deleteRecommendId(String recommendId) {
          articleMapper.deleteRecommendId(recommendId);
     }
+
+    @Override
+    public void saveLog(Integer result, String taskId) {
+        articleMapper.saveLog(result, taskId);
+    }
 }

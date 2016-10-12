@@ -56,4 +56,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	List<Article> getSingoArticle(String shopId);
 
 	void deleteRecommendId(String recommendId);
+
+	void saveLog(Integer result,String taskId);
 }

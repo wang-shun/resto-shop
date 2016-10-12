@@ -677,4 +677,10 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         set recommend_id = null
         where recommend_id = #{recommendId}
     </update>
+
+    <insert id="saveLog">
+        insert into tb_print_log
+        (taskId,result)
+        values (#{taskId},#{result})
+    </insert>
 </mapper>

@@ -81,4 +81,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	List<Article> getSingoArticle(String shopId);
 
 	int deleteRecommendId(String recommendId);
+
+	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
 }
