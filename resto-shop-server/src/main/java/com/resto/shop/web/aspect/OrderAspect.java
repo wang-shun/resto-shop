@@ -230,9 +230,6 @@ public class OrderAspect {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
                     }
-
-
-
                 }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
