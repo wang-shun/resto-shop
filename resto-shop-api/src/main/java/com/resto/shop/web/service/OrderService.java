@@ -388,4 +388,6 @@ public interface OrderService extends GenericService<Order, String> {
 	void useRedPrice(BigDecimal factMoney,String orderId);
 
 	void updateOrderChild(String orderId);
+	
+	void cleanShopOrder(String shopId);
 }

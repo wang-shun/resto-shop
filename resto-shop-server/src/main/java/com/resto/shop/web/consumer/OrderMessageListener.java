@@ -142,10 +142,10 @@ public class OrderMessageListener implements MessageListener {
             if(order.getOrderMode()!=null){
                 switch (order.getOrderMode()) {
                     case ShopMode.TABLE_MODE:
-                        sb.append("桌号:"+order.getTableNumber()+"\n");
+                        sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
                         break;
                     default:
-                        sb.append("取餐码："+order.getVerCode()+"\n");
+                        sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
                         break;
                 }
             }

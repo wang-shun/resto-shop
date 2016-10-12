@@ -8,6 +8,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
@@ -2388,4 +2389,51 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         accountService.payOrder(order, factMoney, customer);
     }
+
+	@Override
+	public void cleanShopOrder(String shopId) {
+		String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
+		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
+		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+		for(Order order : orderList){
+			if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+				sendWxRefundMsg(order);
+			}
+		}
+	}
+	
+	public void sendWxRefundMsg(Order order){
+		if (checkRefundLimit(order)) {
+            autoRefundOrder(order.getId());
+            log.info("款项自动退还到相应账户:" + order.getId());
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+            StringBuilder sb = new StringBuilder("亲,今日未消费订单已退款,欢迎下次再来本店消费\n");
+            sb.append("订单编号:"+order.getSerialNumber()+"\n");
+            if(order.getOrderMode()!=null){
+                switch (order.getOrderMode()) {
+                    case ShopMode.TABLE_MODE:
+                        sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                        break;
+                    default:
+                        sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                        break;
+                }
+            }
+            if( order.getShopName()==null||"".equals(order.getShopName())){
+                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+            }
+            sb.append("就餐店铺："+order.getShopName()+"\n");
+            sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+            sb.append("订单明细：\n");
+            List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+            for(OrderItem item : orderItem){
+                sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+            }
+            sb.append("订单金额："+order.getOrderMoney()+"\n");
+            WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        } else {
+            log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
+        }
+	}
 }
