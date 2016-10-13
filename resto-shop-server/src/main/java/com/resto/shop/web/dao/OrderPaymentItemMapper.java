@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.resto.shop.web.model.Order;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -24,26 +25,26 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
     int updateByPrimaryKey(OrderPaymentItem record);
 
-	List<OrderPaymentItem> selectByOrderId(String orderId);
+    List<OrderPaymentItem> selectByOrderId(String orderId);
 
-	List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("shopId")String shopId,@Param("beginDate")Date beginDate, @Param("endDate")Date endDate);
-	
-	/**
-	 * 根据时间查询  【充值订单 】状态为 1 的信息，用于报表统计时使用
-	 * @param shopId
-	 * @param beginDate
-	 * @param endDate
-	 * @author lmx
-	 * @return
-	 */
-	OrderPaymentItem selectChargeOrderByDate(@Param("shopId")String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
-	
-	/**
-	 * 查询品牌下不同店铺的数据
-	 * @param brandId
-	 * @return
-	 */
-	List<IncomeReportDto> selectIncomeList(@Param("brandId")String brandId,@Param("begin")Date begin,@Param("end")Date end);
+    List<OrderPaymentItem> selectpaymentByPaymentMode(@Param("shopId")String shopId,@Param("beginDate")Date beginDate, @Param("endDate")Date endDate);
+
+    /**
+     * 根据时间查询  【充值订单 】状态为 1 的信息，用于报表统计时使用
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @author lmx
+     * @return
+     */
+    OrderPaymentItem selectChargeOrderByDate(@Param("shopId")String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
+
+    /**
+     * 查询品牌下不同店铺的数据
+     * @param brandId
+     * @return
+     */
+    List<IncomeReportDto> selectIncomeList(@Param("brandId")String brandId,@Param("begin")Date begin,@Param("end")Date end);
 
     /**
      * 查询店铺的营收数据
@@ -53,4 +54,17 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      * @return
      */
     List<IncomeReportDto> selectIncomeListByShopId(@Param("shopId") String shopId, @Param("begin") Date begin,@Param("end") Date end);
+
+    List<OrderPaymentItem> selectListByResultData(@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+    List<Order> selectOrderMoneyByBrandIdGroupByOrderId(@Param("beginDate")Date begin,@Param("endDate")  Date end);
+
+    /**
+     * 新报表查询订单收入
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<OrderPaymentItem> selectShopIncomeList(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 }

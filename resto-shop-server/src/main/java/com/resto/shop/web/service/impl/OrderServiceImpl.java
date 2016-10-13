@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 @RpcService
-public class OrderServiceImpl extends GenericServiceImpl<Order, String> implements OrderService {
+public  class OrderServiceImpl extends GenericServiceImpl<Order, String> implements OrderService {
 
     //用来添加打印小票的序号
     //添加两个Map 一个是订单纬度,一个是店铺纬度
@@ -592,7 +592,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if(historyItem==null){
             orderPaymentItemService.insert(item);
-           payOrderSuccess(order);
+            payOrderSuccess(order);
         }else{
             log.warn("该笔支付记录已经处理过:"+item.getId());
         }
@@ -914,11 +914,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             items.add(item);
         }
-
-        Map<String, Object> item = new HashMap<>();
-        item.put("SUBTOTAL", order.getServicePrice());
-        item.put("ARTICLE_NAME", "酱料费");
-        item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
 
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
@@ -1368,9 +1363,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date end = DateUtil.getformatEndDate(endDate);
         Brand brand = brandService.selectById(brandId);
         int totalNum = 0;
-        brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
+        //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        //brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
+        brandArticleReportDto bo = new brandArticleReportDto();
+
+        totalNum = orderMapper.selectArticleSum(begin, end, brandId);
+
+        BigDecimal totalMoney = BigDecimal.ZERO;
+        totalMoney = orderMapper.selectConfirmMoney(begin,end,brandId);
+        bo.setSellIncome(totalMoney);
+        bo.setTotalNum(totalNum);
         bo.setBrandName(brand.getBrandName());
         return bo;
     }
@@ -2315,10 +2317,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order payOrderModeFive(String orderId) {
-    	BigDecimal totalMoney = BigDecimal.ZERO;//计算订单原价，不使用任何优惠方式
+        BigDecimal totalMoney = BigDecimal.ZERO;//计算订单原价，不使用任何优惠方式
         Order order = orderMapper.selectByPrimaryKey(orderId);
         totalMoney = totalMoney.add(order.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
-        
+
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
@@ -2339,15 +2341,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 totalMoney = totalMoney.add(child.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
         }
-        
+
         //设置  【主订单 】 支付方式     子订单为计算
         insertOrderPaymentItem(order, totalMoney);
-        
+
         return order;
     }
-    
+
     public void insertOrderPaymentItem(Order order,BigDecimal totalMoney){
-    	OrderPaymentItem item = new OrderPaymentItem();
+        OrderPaymentItem item = new OrderPaymentItem();
         item.setId(ApplicationUtils.randomUUID());
         item.setOrderId(order.getId());
         item.setPaymentModeId(PayMode.MONEY_PAY);
@@ -2395,20 +2397,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         accountService.payOrder(order, factMoney, customer);
     }
 
-	@Override
-	public void cleanShopOrder(String shopId) {
-		String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
-		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
-		for(Order order : orderList){
-			if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-				sendWxRefundMsg(order);
-			}
-		}
-	}
-	
-	public void sendWxRefundMsg(Order order){
-		if (checkRefundLimit(order)) {
+    @Override
+    public void cleanShopOrder(String shopId) {
+        String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
+        String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
+        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+        for(Order order : orderList){
+            if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+                sendWxRefundMsg(order);
+            }
+        }
+    }
+
+    public void sendWxRefundMsg(Order order){
+        if (checkRefundLimit(order)) {
             autoRefundOrder(order.getId());
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
@@ -2440,5 +2442,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
-	}
+    }
+    @Override
+    public List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+
+        List<Order> list = orderMapper.selectExceptionOrderListBybrandId(begin,end,brandId);
+
+        return list;
+    }
+
+    @Override
+    public List<Order> selectHasPayListOrderByBrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayListOrderByBrandId(begin,end,brandId);
+    }
+
+    @Override
+    public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate,String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayOrderPayMentItemListBybrandId(begin,end,brandId);
+    }
 }

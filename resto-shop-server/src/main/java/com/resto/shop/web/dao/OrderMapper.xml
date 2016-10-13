@@ -77,6 +77,7 @@
         </collection>
     </resultMap>
 
+
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
@@ -743,7 +744,8 @@
         id,
         ver_code,
         article_count,
-        table_number
+        table_number,
+        parent_order_id
         FROM
         tb_order
         WHERE
@@ -752,7 +754,7 @@
         <![CDATA[ create_time>#{dateBegin} AND create_time<#{dateEnd}]]>
         and closed=0 and order_state not in (1,9)
         <if test="shopMode != null and shopMode == 1">
-             and production_status not in (0,5)
+            and production_status not in (0,5)
         </if>
         order by create_time DESC;
     </select>
@@ -881,7 +883,7 @@
     </select>
 
     <select id="selectChildIdsByParentIdByFive" resultType="String">
-         select id from
+        select id from
         tb_order where parent_order_id=#{0}
         and order_state in (1,2,10,11,12)
     </select>
@@ -910,22 +912,42 @@
         and closed=0 ORDER BY print_order_time
     </select>
 
-    <select id="selectArticleSumCountByData" resultType="com.resto.brand.web.dto.brandArticleReportDto">
-        select sum(r.count) as totalNum,sum(r.final_price) as sellIncome from (SELECT
-        DISTINCT(t.order_id),t.article_name,t.count,t.final_price
-        FROM
-        tb_order_item t
-        INNER JOIN tb_order t2 ON t2.id = t.order_id
-        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-        WHERE
-        t2.brand_id = #{brandId}
-        AND t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status IN(2,3)
-        AND t.type != 3
-        AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
-        ) as r
+    <!--<select id="selectArticleSumCountByData" resultType="com.resto.brand.web.dto.brandArticleReportDto">-->
+    <!--select sum(r.count) as totalNum,sum(r.final_price) as sellIncome from (SELECT-->
+    <!--DISTINCT(t.order_id),t.article_name,t.count,t.final_price-->
+    <!--FROM-->
+    <!--tb_order_item t-->
+    <!--INNER JOIN tb_order t2 ON t2.id = t.order_id-->
+    <!--INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id-->
+    <!--INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)-->
+    <!--WHERE-->
+    <!--t2.brand_id = #{brandId}-->
+    <!--AND t2.order_state IN (2, 10, 11, 12)-->
+    <!--AND t2.production_status IN(2,3)-->
+    <!--AND t.type != 3-->
+    <!--AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>-->
+    <!--) as r-->
+    <!--</select>-->
+
+    <!--菜品销售总数-->
+    <select id="selectArticleSum" resultType="Integer">
+        SELECT sum(t.count) from tb_order_item t WHERE order_id in (
+        SELECT id from tb_order o WHERE
+        o.order_state in(2,10,11,12) and o.production_status in (2,3)
+        and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        and o.brand_id=#{brandId}
+        ) and  t.type!=3
     </select>
+
+
+
+    <select id="selectConfirmMoney" resultType="BigDecimal">
+        SELECT sum(o.order_money) from tb_order o WHERE
+        o.order_state in(2,10,11,12) and o.production_status in (2,3)
+        and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        and o.brand_id=#{brandId}
+    </select>
+
 
 
     <!-- 品牌菜品销售 -->
@@ -1228,7 +1250,7 @@
         GROUP BY e.articleFamilyName
         order by ${sort}
 
-</select>
+    </select>
 
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
@@ -1241,7 +1263,7 @@
         t5. NAME AS articleFamilyName,
         t5.peference,
         t4.sort,
-t.type,
+        t.type,
         t.final_price
         FROM
         tb_order_item t
@@ -1253,10 +1275,10 @@ t.type,
         t2.order_state in (2,10,11,12)
         and t2.production_status in (2,3)
         and
-      <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
+        <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
         ) as r
         GROUP BY r.article_name
-order by ${sort}
+        order by ${sort}
 
     </select>
 
@@ -1302,7 +1324,6 @@ order by ${sort}
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (10, 11, 12) and
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
     </select>
 
@@ -1384,6 +1405,7 @@ order by ${sort}
 
     <select id="selectOrderDetails" resultMap="selectOrderDetailsMap">
         SELECT
+        o.production_status,
         o.shop_detail_id,
         o.id,
         o.create_time,
@@ -1435,11 +1457,9 @@ order by ${sort}
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
         o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money from tb_order o
-        INNER JOIN tb_order_payment_item oi
-        on o.id = oi.order_id
         LEFT JOIN  tb_appraise a
         on o.id = a.order_id
-        WHERE o.order_state in (10,11,12) and o.production_status in (2,3)
+        WHERE o.order_state in (2,10,11,12) and o.production_status in (2,3)
         and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and o.brand_id = #{brandId}
         GROUP BY o.id
@@ -1533,30 +1553,30 @@ order by ${sort}
 
     <update id="setStockBySuit">
 
-update tb_article t ,
-(
-select min(count) as count,article_name,id from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id from tb_article t
-INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
-INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
-INNER JOIN tb_article t4 on t4.id = t3.article_id
-where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
-GROUP BY t2.id
-) as r
-GROUP BY article_name
-) as b
-set t.current_working_stock = b.count,
-t.is_empty = if(b.count = 0,1,0),t.empty_remark = if(b.count = 0,'【系统自动沽清】套餐某子菜品售罄',NULL)
-where t.id = b.id
+        update tb_article t ,
+        (
+        select min(count) as count,article_name,id from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id from tb_article t
+        INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+        INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+        INNER JOIN tb_article t4 on t4.id = t3.article_id
+        where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+        GROUP BY t2.id
+        ) as r
+        GROUP BY article_name
+        ) as b
+        set t.current_working_stock = b.count,
+        t.is_empty = if(b.count = 0,1,0),t.empty_remark = if(b.count = 0,'【系统自动沽清】套餐某子菜品售罄',NULL)
+        where t.id = b.id
 
     </update>
 
 
 
     <select id="getPayment" resultType="java.math.BigDecimal">
-       select ifnull(sum(t2.pay_value),0) from tb_order t
-INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
-where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.production_status in (2,3)
+        select ifnull(sum(t2.pay_value),0) from tb_order t
+        INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+        where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+        and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.production_status in (2,3)
     </select>
 
 
@@ -1739,6 +1759,38 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         order by create_time DESC;
 
     </select>
+
+
+    <select id="selectExceptionOrderListBybrandId" resultType="Order">
+        select id from tb_order
+        WHERE
+        brand_id=#{brandId}
+        AND
+        <![CDATA[ create_time >#{beginDate} AND create_time  <#{endDate}]]>
+        and order_state in(2,10,11,12) and production_status in (0,1,5)
+    </select>
+
+    <select id="selectHasPayListOrderByBrandId" resultType="Order">
+        SELECT id,order_money from tb_order
+        WHERE
+        brand_id=#{brandId}
+        AND
+        <![CDATA[ create_time >#{beginDate} AND create_time  <#{endDate}]]>
+        and order_state in(2,10,11,12) and production_status in (2,3)
+    </select>
+
+
+    <!-- -->
+    <select id="selectHasPayOrderPayMentItemListBybrandId" resultMap="consumedOrderByshopId">
+        SELECT
+        o.id , o.order_money ,oi.pay_value,oi.payment_mode_id  from tb_order o
+        INNER JOIN tb_order_payment_item oi
+        on o.id = oi.order_id
+        WHERE  o.brand_id = #{brandId} and o.order_state !=9
+        and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+    </select>
+
+
 </mapper>
 
 
