@@ -915,12 +915,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             items.add(item);
         }
 
-        Map<String, Object> item = new HashMap<>();
-        item.put("SUBTOTAL", order.getServicePrice());
-        item.put("ARTICLE_NAME", "酱料费");
-        item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
+        BrandSetting brandSetting =  brandSettingService.selectByBrandId(order.getBrandId());
 
-        items.add(item);
+        if(brandSetting.getIsUseServicePrice() == 1){
+            Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", order.getServicePrice());
+            item.put("ARTICLE_NAME", "酱料费");
+            item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
+
+            items.add(item);
+
+        }
+
 
 
         Map<String, Object> print = new HashMap<>();
