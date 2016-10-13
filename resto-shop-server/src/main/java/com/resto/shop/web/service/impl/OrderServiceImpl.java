@@ -915,6 +915,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             items.add(item);
         }
 
+        Map<String, Object> item = new HashMap<>();
+        item.put("SUBTOTAL", order.getServicePrice());
+        item.put("ARTICLE_NAME", "酱料费");
+        item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
+
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
