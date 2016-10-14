@@ -24,27 +24,25 @@ import org.dom4j.io.XMLWriter;
 
 @SuppressWarnings({"resource","unused"})
 public class CodeGenerateFromJavaTemp {
-	final static String DaoPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-server/src/main/java/com/resto/shop/web/dao/";
-	final static String ServicePath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/service/";
-	final static String ServiceImpl = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
-	final static String JspPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-web/src/main/webapp/WEB-INF/views/";
-	final static String ControllerPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
+    final  static  String bathPath = "C:/yz/resto/resto-shop/";//项目存放的基础位置";
+	final static String DaoPath = bathPath+"resto-shop-server/src/main/java/com/resto/shop/web/dao/";
+	final static String ServicePath = bathPath+"resto-shop-api/src/main/java/com/resto/shop/web/service/";
+	final static String ServiceImpl = bathPath+"resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
+	final static String JspPath = bathPath+"resto-shop-web/src/main/webapp/WEB-INF/views/";
+	final static String ControllerPath = bathPath+"resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
 	final static String DaoMapperPath = DaoPath;
-	final static String TempPath = "D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/source-temps/";
-	final static String ModelClassName ="D:/work/RestoPlus/gitRepository/resto-shop/resto-shop-api/src/main/java/com/resto/shop/web/model/";
+	final static String TempPath = bathPath+"/resto-shop-api/source-temps/";
+	final static String ModelClassName =bathPath+"/resto-shop-api/src/main/java/com/resto/shop/web/model/";
 	final static String ModelClassPackage="com.resto.shop.web.model";
 	static String classpath = CodeGenerateFromJavaTemp.class.getResource("/").getFile();
-	
-	
+
 	public static void main(String[] args) throws Exception {
-		
-		
-		
+
 		/**
 		 * arr [classSimpleName,idType,tableName] 
 		 */
 		String [][]  classPrimay = new String[][]{
-//			new String[]{"ShowPhoto","Integer","tb_show_photo"},
+	//	new String[]{"TableCode","String","tb_table_code"},
 		};
 		
 		for (String[] cp: classPrimay) {

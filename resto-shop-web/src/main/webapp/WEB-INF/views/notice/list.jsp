@@ -59,6 +59,7 @@
 									</label>
 							    </div>
 							</div>
+
 						</div>
 						<div class="text-center">
 							<input type="hidden" name="id" v-model="m.id" />

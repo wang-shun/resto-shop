@@ -979,7 +979,7 @@
     </select>
 
     <select id="selectShopArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.shopId as shopId from (	SELECT
+        select r.articleId,r.type, r.article_name,sum(r.count) as shopSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.shopId as shopId ,r.numberCode from (	SELECT
         DISTINCT(t.order_id),
         LEFT (t.article_id, 32) AS articleId,
         t.count,
@@ -987,6 +987,7 @@
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
         t5.peference,
+        t4.peference as numberCode,
         t4.sort,
         t.type,
         t.final_price,
@@ -1232,7 +1233,7 @@
 
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
-        select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
+        select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.peference as  numberCode from (	SELECT
         t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         t.count,
@@ -1241,7 +1242,8 @@
         t5. NAME AS articleFamilyName,
         t5.peference,
         t4.sort,
-t.type,
+        t.type,
+        t4.peference as numberCode,
         t.final_price
         FROM
         tb_order_item t

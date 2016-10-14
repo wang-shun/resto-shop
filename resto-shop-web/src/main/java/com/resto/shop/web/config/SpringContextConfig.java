@@ -282,6 +282,12 @@ public class SpringContextConfig {
 		return proxy.create(ArticleRecommendService.class);
 	}
 
+
+    @Bean
+    public TableCodeService tableCodeService(){
+        return proxy.create(TableCodeService.class);
+    }
+
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);
 	}
