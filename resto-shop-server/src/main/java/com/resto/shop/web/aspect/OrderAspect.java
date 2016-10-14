@@ -82,9 +82,11 @@ public class OrderAspect {
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                 MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
             }
-            if (order.getOrderState().equals(OrderState.SUBMIT)) {
-                //			long delay = 1000*60*15;//15分钟后自动取消订单
-                //			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+            //自动取消订单，不包含后付款模式
+            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() != ShopMode.HOUFU_ORDER) {//给了钱，但未完全支付（只扣了余额和优惠券单位扣除微信支付）
+            	//long delay = 1000*60*60*2;//两个小时后自动取消订单
+            	long delay = 1000*60;//1分钟后自动取消订单  (测试情况)
+                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
             } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode() != ShopMode.TABLE_MODE) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
