@@ -4,6 +4,7 @@ import cn.restoplus.rpc.client.RpcProxy;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
+import com.resto.shop.web.service.PermissionService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -19,8 +20,8 @@ public class SpringContextConfig {
     RpcProxy proxy;
 
     @Bean
-    public com.resto.brand.web.service.PermissionService permissionService() {
-        return getProxy(com.resto.brand.web.service.PermissionService.class);
+    public PermissionService permissionService() {
+        return getProxy(PermissionService.class);
     }
 
 
