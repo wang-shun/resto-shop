@@ -59,5 +59,10 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
         return tablecodeMapper.selectByCodeNumber(codeNumber);
     }
 
+    @Override
+    public TableCode selectByPersonNumber(Integer personNumber) {
+        return tablecodeMapper.selectByPersonNumber(personNumber);
+    }
+
 
 }

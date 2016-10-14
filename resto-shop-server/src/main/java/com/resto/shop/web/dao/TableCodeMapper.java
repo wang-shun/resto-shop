@@ -19,4 +19,6 @@ public interface TableCodeMapper  extends GenericDao<TableCode,String> {
     TableCode selectByName(String name);
 
     TableCode selectByCodeNumber(String codeNumber);
+
+    TableCode selectByPersonNumber(Integer personNumber);
 }

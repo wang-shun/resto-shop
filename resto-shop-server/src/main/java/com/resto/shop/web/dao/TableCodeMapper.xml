@@ -96,4 +96,17 @@ WHERE
         code_number = #{codeNumber}
     </select>
 
+    <select id="selectByPersonNumber" resultType="TableCode">
+        select id,
+        name,
+        code_number,
+        max_number,
+        min_number,
+        is_used,
+        shop_detail_id,
+        brand_id from tb_table_code
+        where min_number &lt; #{codeNumber} and max_number &gt; #{codeNumber} and is_used = 1
+        order by (max_number - min_number) asc
+        limit 1
+    </select>
 </mapper>

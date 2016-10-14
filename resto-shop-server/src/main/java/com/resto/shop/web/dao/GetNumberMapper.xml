@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.GetNumberMapper">
+    <resultMap id="BaseResultMap" type="com.resto.shop.web.model.GetNumber">
+        <id column="id" property="id" />
+        <result column="shop_detail_id" property="shopDetailId" />
+        <result column="brand_id" property="brandId" />
+        <result column="state" property="state" />
+        <result column="create_time" property="createTime" />
+        <result column="eat_time" property="eatTime" />
+        <result column="pass_number_time" property="passNumberTime" />
+        <result column="person_number" property="personNumber" />
+        <result column="phone" property="phone" />
+        <result column="wait_number" property="waitNumber" />
+        <result column="table_type" property="tableType" />
+        <result column="call_number" property="callNumber" />
+        <result column="flow_money" property="flowMoney" />
+
+    </resultMap>
+    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money</sql>
+
+    <insert id="insert" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number (id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money)
+      values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney})
+    </insert>
+
+    <select id="selectByTableTypeShopId" resultType="TableCode">
+        SELECT <include refid="Base_Column_List" /> FROM tb_get_number
+        WHERE table_type = #{tableType} and shop_detail_id = #{shopId}
+    </select>
+</mapper>
