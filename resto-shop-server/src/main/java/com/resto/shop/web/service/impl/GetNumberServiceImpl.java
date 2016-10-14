@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.GetNumberMapper;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Created by carl on 2016/10/14.
  */
+@RpcService
 public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> implements GetNumberService {
 
     @Resource
