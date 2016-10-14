@@ -25,11 +25,6 @@ import org.dom4j.io.XMLWriter;
 @SuppressWarnings({"resource","unused"})
 public class CodeGenerateFromJavaTemp {
     final  static  String bathPath = "C:/yz/resto/resto-shop/";//项目存放的基础位置";
-	final static String DaoPath = bathPath+"resto-shop-server/src/main/java/com/resto/shop/web/dao/";
-	final static String ServicePath = bathPath+"resto-shop-api/src/main/java/com/resto/shop/web/service/";
-	final static String ServiceImpl = bathPath+"resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
-	final static String JspPath = bathPath+"resto-shop-web/src/main/webapp/WEB-INF/views/";
-	final static String ControllerPath = bathPath+"resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
 
 	final  static  String BasePath = "C:/yz/resto/resto-shop/";
 
@@ -39,8 +34,6 @@ public class CodeGenerateFromJavaTemp {
 	final static String JspPath = BasePath+"resto-shop-web/src/main/webapp/WEB-INF/views/";
 	final static String ControllerPath = "resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
 	final static String DaoMapperPath = DaoPath;
-	final static String TempPath = bathPath+"/resto-shop-api/source-temps/";
-	final static String ModelClassName =bathPath+"/resto-shop-api/src/main/java/com/resto/shop/web/model/";
 	final static String TempPath = BasePath+"resto-shop-api/source-temps/";
 	final static String ModelClassName =BasePath+"resto-shop-api/src/main/java/com/resto/shop/web/model/";
 	final static String ModelClassPackage="com.resto.shop.web.model";
