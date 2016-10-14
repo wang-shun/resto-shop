@@ -145,13 +145,6 @@ public class BrandUserController extends GenericController{
 		return Result.getSuccess();
 	}
 
-    @RequestMapping("/delete")
-    @ResponseBody
-    public Result delete(String id){
-        brandUserService.deleteBrandUser(id);
-        return Result.getSuccess();
-    }
-
 
     @RequestMapping("/modify")
     @ResponseBody

@@ -1620,17 +1620,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<ArticleSellDto> list = orderMapper.selectShopArticleSellByDateAndId(shopId, begin, end, sort);
         //计算总菜品销售额
+        //计算总菜品数
+        double num = 0;
+
         BigDecimal temp = BigDecimal.ZERO;
         for (ArticleSellDto articleSellDto : list) {
+            //计算总销量 不能加上套餐的数量
+            if (articleSellDto.getType() != 3) {
+                num += articleSellDto.getShopSellNum().doubleValue();
+            }
             temp = add(temp, articleSellDto.getSalles());
         }
         for (ArticleSellDto articleSellDto : list) {
-            //double c = articleSellDto.getSalles().divide(temp, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            double c = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).doubleValue() * 100;
-            DecimalFormat myformat = new DecimalFormat("0.00");
-            String str = myformat.format(c);
-            str = str + "%";
-            articleSellDto.setSalesRatio(str);
+            //销售额占比
+            BigDecimal d = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+            articleSellDto.setSalesRatio(d + "%");
+            if (num != 0) {
+                double d1 = articleSellDto.getShopSellNum().doubleValue();
+                double d2 = d1 / num * 100;
+                //保留三位小数
+                BigDecimal b = new BigDecimal(d2);
+                double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                articleSellDto.setNumRatio(f1 + "%");
+            }
         }
 
         return list;
