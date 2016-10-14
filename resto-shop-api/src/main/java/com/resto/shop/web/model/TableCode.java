@@ -26,6 +26,26 @@ public class TableCode {
     //是否启用
     private Byte isUsed;
 
+    private  String shopDetailId;
+
+    private  String brandId;
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
+    public String getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
     public String getId() {
         return id;
     }

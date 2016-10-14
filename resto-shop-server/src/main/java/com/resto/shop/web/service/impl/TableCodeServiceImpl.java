@@ -26,7 +26,7 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
     }
 
     @Override
-    public void insertTableCode(TableCode tablecode) {
+    public void insertTableCode(TableCode tablecode,String brandId,String shopDetailId) {
 
         //做后台验证
         if(tablecode.getMinNumber()>tablecode.getMaxNumber()){
@@ -35,13 +35,18 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
 
         //插入时间
         tablecode.setCreateTime(new Date());
+        tablecode.setBrandId(brandId);
+        tablecode.setShopDetailId(shopDetailId);
         tablecode.setEndTime(tablecode.getCreateTime());
+
+        tablecodeMapper.insertSelective(tablecode);
     }
 
     @Override
     public void updateTableCode(TableCode tablecode) {
         //更新时间
         tablecode.setEndTime(new Date());
+        tablecodeMapper.updateByPrimaryKeySelective(tablecode);
     }
 
     @Override

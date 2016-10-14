@@ -5,7 +5,7 @@ import com.resto.shop.web.model.TableCode;
 
 public interface TableCodeService extends GenericService<TableCode, String> {
 
-    void insertTableCode(TableCode tablecode);
+    void insertTableCode(TableCode tablecode,String brandId,String shopDetailId);
 
     void updateTableCode(TableCode tablecode);
 

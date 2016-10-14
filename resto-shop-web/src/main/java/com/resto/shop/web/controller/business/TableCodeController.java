@@ -41,7 +41,7 @@ public class TableCodeController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid TableCode tablecode){
-		tablecodeService.insertTableCode(tablecode);
+		tablecodeService.insertTableCode(tablecode,getCurrentBrandId(),getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
