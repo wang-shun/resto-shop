@@ -75,7 +75,12 @@ var shopTable = $("#shopTable").DataTable({
 		{
 			title : "菜名",
 			data : "articleName",
-		},	
+		},
+        {
+            title: "编号",
+            data : "numberCode"
+
+        },
 		{
 			title : "销量(份)",
 			data : "shopSellNum",
