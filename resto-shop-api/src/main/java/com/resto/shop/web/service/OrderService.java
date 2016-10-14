@@ -401,4 +401,22 @@ public interface OrderService extends GenericService<Order, String> {
 	void updateOrderChild(String orderId);
 
 	void cleanShopOrder(String shopId);
+
+	/**
+	 * 根据订单获取订单信息
+	 *
+	 * @return
+	 */
+	Order getOrderDetail(String orderId);
+
+	/**
+	 * 获取员工订单
+	 *
+	 * @return
+	 */
+	List<Order> getOrderByEmployee(String employeeId, String shopId);
+
+	JSONResult createOrderByEmployee(Order order) throws AppException;
+
+
 }
