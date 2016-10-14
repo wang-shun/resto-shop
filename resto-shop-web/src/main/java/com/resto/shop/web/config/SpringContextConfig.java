@@ -25,6 +25,8 @@ public class SpringContextConfig {
     }
 
 
+
+
     @Bean
     public RoleService roleService() {
         return getProxy(RoleService.class);
@@ -110,6 +112,8 @@ public class SpringContextConfig {
     public ArticleUnitService articleUnitService() {
         return getProxy(ArticleUnitService.class);
     }
+
+
 
     @Bean
     public ChargeOrderService chargeOrderService() {
