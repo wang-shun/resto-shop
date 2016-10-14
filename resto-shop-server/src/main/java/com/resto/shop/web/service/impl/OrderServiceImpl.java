@@ -2409,7 +2409,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	@Override
 	public void cleanShopOrder(String shopId) {
 		String[] orderStates = new String[]{OrderState.SUBMIT+"",OrderState.PAYMENT+""};//未付款和未全部付款和已付款
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_PRINT+""};//已付款未下单和异常订单
+		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+""};//已付款未下单
 		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
 		for(Order order : orderList){
 			if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
