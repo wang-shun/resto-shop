@@ -2422,7 +2422,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-            StringBuilder sb = new StringBuilder("亲,今日未消费订单已退款,欢迎下次再来本店消费\n");
+            StringBuilder sb = null;
+            if(order.getOrderState().equals(OrderState.SUBMIT)){//未支付和未完成支付
+            	sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
+            }else{//已支付未消费
+            	sb = new StringBuilder("亲,今日未消费订单已自动退款,欢迎下次再来本店消费\n");
+            }
             sb.append("订单编号:"+order.getSerialNumber()+"\n");
             if(order.getOrderMode()!=null){
                 switch (order.getOrderMode()) {
