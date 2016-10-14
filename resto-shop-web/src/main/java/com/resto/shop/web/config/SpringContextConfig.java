@@ -5,6 +5,11 @@ import java.io.File;
 import javax.annotation.Resource;
 
 import com.resto.shop.web.service.*;
+import com.resto.brand.web.service.*;
+import com.resto.shop.web.model.RolePermission;
+import com.resto.shop.web.service.*;
+import com.resto.shop.web.service.EmployeeService;
+import com.resto.shop.web.service.PermissionService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -42,12 +47,14 @@ public class SpringContextConfig {
 	public PermissionService permissionService(){
 		return getProxy(PermissionService.class);
 	}
-	
+
+
 	@Bean 
 	public RoleService roleService(){
 		return getProxy(RoleService.class);
 	}
-	
+
+
 	@Bean
 	public UserService userService(){
 		return getProxy(UserService.class);
@@ -246,7 +253,11 @@ public class SpringContextConfig {
 	public ShareSettingService shareSettingService(){
 		return getProxy(ShareSettingService.class);
 	}
-	
+
+	@Bean
+	public ERoleService eRoleService(){
+		return  getProxy(ERoleService.class); }
+
 	@Bean
 	public RewardSettingService rewardSettingService(){
 		return getProxy(RewardSettingService.class);
@@ -281,6 +292,26 @@ public class SpringContextConfig {
 	public ArticleRecommendService articleRecommendService(){
 		return proxy.create(ArticleRecommendService.class);
 	}
+
+	@Bean
+	public EmployeeService employeeService(){
+		return getProxy(EmployeeService.class);
+	}
+
+
+	@Bean
+	public com.resto.brand.web.service.EmployeeService employeeBrandService(){return  proxy.create(com.resto.brand.web.service.EmployeeService.class);}
+
+    @Bean
+    public  com.resto.brand.web.service.PermissionService brandPermissionService(){
+        return proxy.create(com.resto.brand.web.service.PermissionService.class);
+    }
+
+    @Bean
+    public  RolePermissionService rolePermissionService(){
+        return  proxy.create(RolePermissionService.class);
+    }
+
 
 	public <T> T getProxy(Class<T> clazz){
 		return proxy.create(clazz);

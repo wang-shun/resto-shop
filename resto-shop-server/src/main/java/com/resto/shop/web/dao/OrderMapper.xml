@@ -175,6 +175,20 @@
         </association>
     </resultMap>
 
+    <resultMap id="selectOrderTableNumberMap" type="Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+
+        <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+
+        <result column="payment_amount" property="paymentAmount" jdbcType="DECIMAL"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+
+
+    </resultMap>
+
+
+
+
 
     <sql id="Base_Column_List">
         id, table_number, customer_count, accounting_time,
@@ -1692,6 +1706,84 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
         ) as r
         GROUP BY r.article_name
+    </select>
+
+
+    <select id="getTableNumberAll"  resultType="Order">
+         select r.* from (select tb_order.id,table_number,article_count,create_time,person_count
+ from tb_order
+left join tb_order_payment_item on tb_order_payment_item.order_id = tb_order.id
+where table_number is not null and table_number != '' and payment_mode_id is not null and tb_order.production_status in (2,3)
+and (tb_order.order_mode = 1 or tb_order.table_no != null ) and tb_order.shop_detail_id =  #{shopId}
+GROUP BY tb_order.id
+order by create_time desc ) as r
+GROUP BY r.table_number
+
+
+    </select>
+    <select id="selectOrderPaymentItems" resultType="OrderPaymentItem"  >
+        select op.id as orderPaymentItem_id,payment_mode_id from tb_order_payment_item op
+        LEFT JOIN tb_order o on o.id = op.order_id
+        where op.order_id = #{orderId}
+    </select>
+
+    <select id="selectOrderItems" resultType="OrderItem" >
+        select oi.id as orderItem_id,article_name,article_id from tb_order_item oi
+        LEFT JOIN tb_order o on o.id = oi.order_id
+        where oi.order_id = #{orderId}
+    </select>
+
+
+
+    <select id="getOrderDetail" resultMap="selectOrderTableNumberMap">
+        select id,distribution_mode_id,order_money,payment_amount from tb_order where id = #{orderId}
+    </select>
+
+
+
+    <resultMap id="EmployeeResultMap" type="Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="tableNumber" property="tableNumber"/>
+        <result column="article_count" property="articleCount"/>
+        <result column="order_state" property="orderState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="person_count" property="personCount"/>
+        <result column="pay_mode" property="paymentModeId" />
+        <result column="customer_count" property="customerCount" />
+        <result column="order_money" property="orderMoney" />
+        <result column="original_amount" property="originalAmount" />
+
+        <collection property="orderItems" javaType="List" ofType="orderItem">
+            <id column="orderItem_id" property="id"/>
+            <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
+            <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+        </collection>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
+
+
+
+    </resultMap>
+
+
+
+    <select id="getOrderByEmployee" resultMap="EmployeeResultMap">
+        select t.id,ifnull(t.table_no,t.table_number) as tableNumber,t.article_count,t.order_state,
+        t.create_time,t.payment_amount,t.order_money,t3.id as orderPaymentItem_id,
+        t3.payment_mode_id,t2.article_id,t2.article_name,t2.id as orderItem_id
+        ,t.person_count,t.pay_mode,t.customer_count,t.order_money,t.original_amount from tb_order t
+        left join tb_order_item t2 on t2.order_id = t.id
+        left join tb_order_payment_item t3 on t3.order_id = t.id
+        where DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+        and t.employee_id = #{employeeId} and t.shop_detail_id = #{shopId}
+
     </select>
 
     <select id="selectListByShopId" resultMap="consumedOrderByshopId">
