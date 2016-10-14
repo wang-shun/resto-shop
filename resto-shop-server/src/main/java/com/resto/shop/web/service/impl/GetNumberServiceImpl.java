@@ -24,6 +24,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Override
     public List<GetNumber> selectByTableTypeShopId(String tableType, String shopId) {
-        return null;
+        return getNumberMapper.selectByTableTypeShopId(tableType, shopId);
     }
 }

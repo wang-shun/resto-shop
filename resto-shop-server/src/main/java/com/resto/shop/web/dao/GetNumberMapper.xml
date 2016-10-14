@@ -24,7 +24,7 @@
       values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney})
     </insert>
 
-    <select id="selectByTableTypeShopId" resultType="TableCode">
+    <select id="selectByTableTypeShopId" resultType="GetNumber">
         SELECT <include refid="Base_Column_List" /> FROM tb_get_number
         WHERE table_type = #{tableType} and shop_detail_id = #{shopId}
     </select>
