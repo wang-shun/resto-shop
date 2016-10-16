@@ -13,6 +13,8 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     int insert(GetNumber getNumber);
 
+    int insertSelective(GetNumber getNumber);
+
     List<GetNumber> selectByTableTypeShopId(@Param("tableType")String tableType,@Param("shopId")String shopId);
 
 }

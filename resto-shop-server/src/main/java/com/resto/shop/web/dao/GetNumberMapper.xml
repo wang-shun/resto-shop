@@ -24,6 +24,39 @@
       values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney})
     </insert>
 
+    <insert id="insertSelective" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="shopDetailId != null">shop_detail_id,</if>
+            <if test="brandId != null">brand_id,</if>
+            <if test="state != null">state,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="eatTime != null">eat_time,</if>
+            <if test="passNumberTime != null">pass_number_time,</if>
+            <if test="personNumber != null">person_number,</if>
+            <if test="phone != null">phone,</if>
+            <if test="waitNumber != null">wait_number,</if>
+            <if test="tableType != null">table_type,</if>
+            <if test="callNumber != null">call_number,</if>
+            <if test="flowMoney != null">flow_money,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="shopDetailId != null">#{shopDetailId},</if>
+            <if test="brandId != null">#{brandId},</if>
+            <if test="state != null">#{state},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="eatTime != null">#{eatTime},</if>
+            <if test="passNumberTime != null">#{passNumberTime},</if>
+            <if test="personNumber != null">#{personNumber},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="waitNumber != null">#{waitNumber},</if>
+            <if test="tableType != null">#{tableType},</if>
+            <if test="callNumber != null">#{callNumber},</if>
+            <if test="flowMoney != null">#{flowMoney},</if>
+        </trim>
+    </insert>
+
     <select id="selectByTableTypeShopId" resultType="GetNumber">
         SELECT <include refid="Base_Column_List" /> FROM tb_get_number
         WHERE table_type = #{tableType} and shop_detail_id = #{shopId}
