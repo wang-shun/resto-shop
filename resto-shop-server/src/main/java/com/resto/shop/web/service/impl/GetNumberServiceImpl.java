@@ -35,7 +35,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     }
 
     @Override
-    public void updateGetNumber(GetNumber getNumber) {
+    public void updateGetNumber(GetNumber getNumber,String state) {
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
     }
 }
