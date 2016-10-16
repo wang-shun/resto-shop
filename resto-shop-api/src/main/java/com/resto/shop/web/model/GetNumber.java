@@ -32,11 +32,31 @@ public class GetNumber {
 
     private Integer callNumber;
 
+    private Date callNumberTime;
+
     private BigDecimal flowMoney;
 
     private Integer countByTableTpye;
 
     private String imgUrl;
+
+    private String shopName;
+
+    public Date getCallNumberTime() {
+        return callNumberTime;
+    }
+
+    public void setCallNumberTime(Date callNumberTime) {
+        this.callNumberTime = callNumberTime;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
 
     public Integer getCountByTableTpye() {
         return countByTableTpye;
