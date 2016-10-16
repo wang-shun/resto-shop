@@ -1,6 +1,8 @@
 package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 
 import java.util.List;
@@ -14,6 +16,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     Integer selectCount(String tableType);
 
-    void updateGetNumber(GetNumber getNumber,Integer state);
+    GetNumber updateGetNumber(GetNumber getNumber, Integer state);
 
 }

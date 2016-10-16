@@ -38,7 +38,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     }
 
     @Override
-    public void updateGetNumber(GetNumber getNumber,Integer state) {
+    public GetNumber updateGetNumber(GetNumber getNumber,Integer state) {
         if (state == WaitModerState.WAIT_MODEL_NUMBER_ZERO){
             getNumber.setCallNumber(getNumber.getCallNumber()+1);
             getNumber.setCallNumberTime(new Date());
@@ -54,5 +54,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setPassNumberTime(new Date());
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
+        return getNumber;
     }
 }
