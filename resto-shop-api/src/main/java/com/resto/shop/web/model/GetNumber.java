@@ -42,6 +42,26 @@ public class GetNumber {
 
     private String shopName;
 
+    private String customerId;
+
+    private String finalMoney;
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getFinalMoney() {
+        return finalMoney;
+    }
+
+    public void setFinalMoney(String finalMoney) {
+        this.finalMoney = finalMoney;
+    }
+
     public Date getCallNumberTime() {
         return callNumberTime;
     }

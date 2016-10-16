@@ -14,6 +14,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     Integer selectCount(String tableType);
 
-    void updateGetNumber(GetNumber getNumber,String state);
+    void updateGetNumber(GetNumber getNumber,Integer state);
 
 }

@@ -17,12 +17,14 @@
         <result column="call_number" property="callNumber" />
         <result column="flow_money" property="flowMoney" />
         <result column="call_number_time" property="callNumberTime" />
+        <result column="customer_id" property="customerId" />
+        <result column="final_money" property="finalMoney" />
 
     </resultMap>
-    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time</sql>
+    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money</sql>
 
-    <insert id="insert" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number (id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time)
-      values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney},#{callNumberTime})
+    <insert id="insert" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number (id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money)
+      values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney},#{callNumberTime},#{customerId},#{finalMoney})
     </insert>
 
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number
@@ -41,6 +43,8 @@
             <if test="callNumber != null">call_number,</if>
             <if test="flowMoney != null">flow_money,</if>
             <if test="callNumberTime != null">call_number_time,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="finalMoney != null">final_money,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -57,6 +61,8 @@
             <if test="callNumber != null">#{callNumber},</if>
             <if test="flowMoney != null">#{flowMoney},</if>
             <if test="callNumberTime != null">#{callNumberTime},</if>
+            <if test="customerId != null">customerId,</if>
+            <if test="finalMoney != null">finalMoney,</if>
         </trim>
     </insert>
 
@@ -75,10 +81,12 @@
             <if test="callNumber != null">call_number = #{callNumber},</if>
             <if test="flowMoney != null">flow_money = #{flowMoney},</if>
             <if test="callNumberTime != null">call_number_time = #{callNumberTime},</if>
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="finalMoney != null">final_money = #{finalMoney},</if>
         </set> where id = #{id}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number set shop_detail_id = #{shopDetailId},brand_id = #{brandId},state = #{state},create_time = #{createTime},eat_time = #{eatTime},pass_number_time = #{passNumberTime},person_number = #{personNumber},phone = #{phone},wait_number = #{waitNumber},table_type = #{tableType},call_number = #{callNumber},flow_money = #{flowMoney},call_number_time = #{callNumberTime} where id = #{id}</update>
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number set shop_detail_id = #{shopDetailId},brand_id = #{brandId},state = #{state},create_time = #{createTime},eat_time = #{eatTime},pass_number_time = #{passNumberTime},person_number = #{personNumber},phone = #{phone},wait_number = #{waitNumber},table_type = #{tableType},call_number = #{callNumber},flow_money = #{flowMoney},call_number_time = #{callNumberTime},customer_id = #{customerId},final_money=#{finalMoney} where id = #{id}</update>
 
     <select id="selectByTableTypeShopId" resultType="GetNumber">
         SELECT <include refid="Base_Column_List" /> FROM tb_get_number
