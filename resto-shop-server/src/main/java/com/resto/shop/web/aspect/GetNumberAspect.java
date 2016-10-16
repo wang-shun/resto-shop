@@ -51,7 +51,7 @@ public class GetNumberAspect {
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("亲，您一共获取"+getNumber.getFinalMoney()+"元等位红包，红包金额在本次消费中将会直接使用哦。\n");
-                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi'>立即点餐</a>");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
                 StringBuffer msg = new StringBuffer();
