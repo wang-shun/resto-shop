@@ -46,6 +46,16 @@ public class GetNumber {
 
     private BigDecimal finalMoney;
 
+    private BigDecimal highMoney;
+
+    public BigDecimal getHighMoney() {
+        return highMoney;
+    }
+
+    public void setHighMoney(BigDecimal highMoney) {
+        this.highMoney = highMoney;
+    }
+
     public String getCustomerId() {
         return customerId;
     }

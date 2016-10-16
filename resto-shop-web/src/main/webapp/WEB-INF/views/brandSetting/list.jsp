@@ -158,11 +158,6 @@
 						是
 					</label>
 				</div>
-
-				<div  class="form-group">
-					<label>等位红包每秒增加价</label>
-					<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney" required="required">
-				</div>
 				<div class="form-group" id="serviceDiv" style="display: none">
 					<label>服务费/每人</label>
 					<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required">
