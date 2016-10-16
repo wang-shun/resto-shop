@@ -44,7 +44,7 @@ public class GetNumber {
 
     private String customerId;
 
-    private String finalMoney;
+    private BigDecimal finalMoney;
 
     public String getCustomerId() {
         return customerId;
@@ -54,11 +54,11 @@ public class GetNumber {
         this.customerId = customerId;
     }
 
-    public String getFinalMoney() {
+    public BigDecimal getFinalMoney() {
         return finalMoney;
     }
 
-    public void setFinalMoney(String finalMoney) {
+    public void setFinalMoney(BigDecimal finalMoney) {
         this.finalMoney = finalMoney;
     }
 
