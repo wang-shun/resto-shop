@@ -60,6 +60,26 @@
         </trim>
     </insert>
 
+    <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number
+        <set>
+            <if test="shopDetailId != null">shop_detail_id = #{shopDetailId},</if>
+            <if test="brandId != null">brand_id = #{brandId},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="eatTime != null">eat_time = #{eatTime},</if>
+            <if test="passNumberTime != null">pass_number_time = #{passNumberTime},</if>
+            <if test="personNumber != null">person_number = #{personNumber},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="waitNumber != null">wait_number = #{waitNumber},</if>
+            <if test="tableType != null">table_type = #{tableType},</if>
+            <if test="callNumber != null">call_number = #{callNumber},</if>
+            <if test="flowMoney != null">flow_money = #{flowMoney},</if>
+            <if test="callNumberTime != null">call_number_time = #{callNumberTime},</if>
+        </set> where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number set shop_detail_id = #{shopDetailId},brand_id = #{brandId},state = #{state},create_time = #{createTime},eat_time = #{eatTime},pass_number_time = #{passNumberTime},person_number = #{personNumber},phone = #{phone},wait_number = #{waitNumber},table_type = #{tableType},call_number = #{callNumber},flow_money = #{flowMoney},call_number_time = #{callNumberTime} where id = #{id}</update>
+
     <select id="selectByTableTypeShopId" resultType="GetNumber">
         SELECT <include refid="Base_Column_List" /> FROM tb_get_number
         WHERE table_type = #{tableType} and shop_detail_id = #{shopId} and state = 0

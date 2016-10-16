@@ -33,4 +33,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     public Integer selectCount(String tableType) {
         return getNumberMapper.selectCount(tableType).size();
     }
+
+    @Override
+    public void updateGetNumber(GetNumber getNumber) {
+        getNumberMapper.updateByPrimaryKeySelective(getNumber);
+    }
 }
