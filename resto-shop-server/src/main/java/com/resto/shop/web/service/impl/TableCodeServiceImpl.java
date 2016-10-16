@@ -10,6 +10,7 @@ import com.resto.shop.web.service.TableCodeService;
 import cn.restoplus.rpc.server.RpcService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -65,4 +66,8 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
     }
 
 
+    @Override
+    public List<TableCode> getTableList(String shopId) {
+        return tablecodeMapper.getTableList(shopId);
+    }
 }

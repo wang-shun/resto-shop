@@ -109,4 +109,12 @@ WHERE
         order by (max_number - min_number) asc
         limit 1
     </select>
+
+    <select id="getTableList" resultType="TableCode">
+        select t.* ,(select count(1) from tb_get_number where
+        state = 0 and  table_type = t.code_number and t.is_used = 1) as waitNumber
+         from tb_table_code t
+        where t.is_used = 1
+
+    </select>
 </mapper>

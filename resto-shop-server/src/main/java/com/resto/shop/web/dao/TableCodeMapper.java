@@ -3,6 +3,8 @@ package com.resto.shop.web.dao;
 import com.resto.shop.web.model.TableCode;
 import com.resto.brand.core.generic.GenericDao;
 
+import java.util.List;
+
 public interface TableCodeMapper  extends GenericDao<TableCode,String> {
     int deleteByPrimaryKey(String id);
 
@@ -21,4 +23,6 @@ public interface TableCodeMapper  extends GenericDao<TableCode,String> {
     TableCode selectByCodeNumber(String codeNumber);
 
     TableCode selectByPersonNumber(Integer personNumber);
+
+    List<TableCode> getTableList(String shopId);
 }
