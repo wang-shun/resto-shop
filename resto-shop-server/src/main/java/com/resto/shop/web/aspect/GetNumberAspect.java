@@ -55,7 +55,7 @@ public class GetNumberAspect {
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
                 StringBuffer msg = new StringBuffer();
-                msg.append(customer.getNickname() + "已过号，谢谢您的支持与谅解，XX元等位红包已失效，期待您的下次光临。\n");
+                msg.append(customer.getNickname() + "已过号，谢谢您的支持与谅解，" + getNumber.getFinalMoney() + "元等位红包已失效，期待您的下次光临。\n");
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             }
         }
