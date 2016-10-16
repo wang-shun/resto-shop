@@ -12,4 +12,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     List<GetNumber> selectByTableTypeShopId(String tableType, String shopId);
 
+    Integer selectCount(String tableType);
+
 }

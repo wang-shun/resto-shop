@@ -34,6 +34,26 @@ public class GetNumber {
 
     private BigDecimal flowMoney;
 
+    private Integer countByTableTpye;
+
+    private String imgUrl;
+
+    public Integer getCountByTableTpye() {
+        return countByTableTpye;
+    }
+
+    public void setCountByTableTpye(Integer countByTableTpye) {
+        this.countByTableTpye = countByTableTpye;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
     public String getId() {
         return id;
     }

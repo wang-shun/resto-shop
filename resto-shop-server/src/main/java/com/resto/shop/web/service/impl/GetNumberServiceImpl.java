@@ -28,4 +28,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     public List<GetNumber> selectByTableTypeShopId(String tableType, String shopId) {
         return getNumberMapper.selectByTableTypeShopId(tableType, shopId);
     }
+
+    @Override
+    public Integer selectCount(String tableType) {
+        return getNumberMapper.selectCount(tableType).size();
+    }
 }

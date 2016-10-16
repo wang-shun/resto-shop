@@ -17,4 +17,8 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     List<GetNumber> selectByTableTypeShopId(@Param("tableType")String tableType,@Param("shopId")String shopId);
 
+    GetNumber selectByPrimaryKey(String id);
+
+    List<GetNumber> selectCount(String tableType);
+
 }
