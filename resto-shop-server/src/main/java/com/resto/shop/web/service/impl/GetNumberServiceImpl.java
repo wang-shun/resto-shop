@@ -9,6 +9,7 @@ import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.service.GetNumberService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -42,10 +43,14 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setCallNumber(getNumber.getCallNumber()+1);
             getNumber.setCallNumberTime(new Date());
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
-            getNumber.setState(1);
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_ONE);
             getNumber.setEatTime(new Date());
+            //计算最终等位红包价格
+            Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
+            getNumber.setFinalMoney(getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)));
+
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
-            getNumber.setState(2);
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_TWO);
             getNumber.setPassNumberTime(new Date());
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
