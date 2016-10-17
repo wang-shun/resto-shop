@@ -49,7 +49,17 @@ public class Customer implements Serializable{
     private Date newNoticeTime;
     
     private String shareCustomer;
-    
+
+    private Integer isNowRegister;
+
+    public void setIsNowRegister(Integer isNowRegister) {
+        this.isNowRegister = isNowRegister;
+    }
+
+    public Integer getIsNowRegister() {
+        return isNowRegister;
+    }
+
     public String getId() {
         return id;
     }
