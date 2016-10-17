@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Order {
+public class Order implements Serializable{
     private String id;
 
     private String tableNumber;
@@ -98,6 +99,13 @@ public class Order {
     //评价
     private Appraise appraise;
 
+    private int personCount;
+
+    private Integer payMode;
+
+
+
+    private Long employeeId;
 
      /**
      * 用于保存 订单的 菜品名称（查询时使用）
@@ -123,6 +131,13 @@ public class Order {
 
     private BigDecimal orderTotal;
 
+    final public Integer getPayMode() {
+        return payMode;
+    }
+
+    final public void setPayMode(Integer payMode) {
+        this.payMode = payMode;
+    }
 
     private List<OrderPaymentItem> orderPaymentItems;
 
@@ -134,6 +149,21 @@ public class Order {
 
     final public void setServicePrice(BigDecimal servicePrice) {
         this.servicePrice = servicePrice;
+    }
+    final public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    final public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    final public int getPersonCount() {
+        return personCount;
+    }
+
+    final public void setPersonCount(int personCount) {
+        this.personCount = personCount;
     }
 
     final public String getId() {

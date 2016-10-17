@@ -14,16 +14,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.enums.MenuType;
 import com.resto.brand.core.enums.UserGroupSign;
 import com.resto.brand.web.model.Permission;
-import com.resto.brand.web.service.PermissionService;
+
 
 /**
  * 公共视图控制器
  **/
 @Controller
+@SuppressWarnings("SpringJavaAutowiringInspection")
 public class CommonController {
 	
 	@Resource
-	PermissionService permissionService;
+	com.resto.brand.web.service.PermissionService brandPermissionService;
 	
     /**
      * 首页
@@ -32,7 +33,7 @@ public class CommonController {
      */
     @RequestMapping("/")
     public String index(HttpServletRequest request) {
-    	List<Permission> allMenu = permissionService.selectFullStructMenu(UserGroupSign.BRAND_GROUP);
+    	List<Permission> allMenu = brandPermissionService.selectFullStructMenu(UserGroupSign.BRAND_GROUP);
     	request.setAttribute("allMenu", allMenu);
         return "index";
     }
@@ -64,7 +65,7 @@ public class CommonController {
 		r.setPermissionName("Auto Genic Manager");
 		r.setPermissionSign("auto genic"+System.currentTimeMillis());
 		r.setId(500L);
-		permissionService.insert(r);
+        brandPermissionService.insert(r);
 		Long rootId = r.getId();
 		long base = 1;
 		for (String cp: classPrimay) {
@@ -79,7 +80,7 @@ public class CommonController {
 			p.setPermissionSign(modelNameLower+"/list");
 			p.setParentId(rootId);
 			p.setUserGroupId(groupid);
-			permissionService.insert(p);
+            brandPermissionService.insert(p);
 			
 			Long pid = p.getId();
 			long childbase = 1;
@@ -92,7 +93,7 @@ public class CommonController {
 				child.setPermissionName(modelNameLower+":"+childPermission);
 				child.setPermissionSign(modelNameLower+"/"+childPermission);
 				child.setParentId(pid);
-				permissionService.insert(child);
+                brandPermissionService.insert(child);
 			}
 		}
     	

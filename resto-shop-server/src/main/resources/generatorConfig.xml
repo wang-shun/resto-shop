@@ -41,6 +41,7 @@
 
         <!--对应数据库表名 mybatis-generator:generate -->
 
+       <table tableName="tb_role_permission" domainObjectName="RolePermission" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
        <table tableName="tb_table_code" domainObjectName="TableCode" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

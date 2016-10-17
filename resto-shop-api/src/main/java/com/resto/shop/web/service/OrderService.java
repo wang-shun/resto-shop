@@ -337,16 +337,25 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 打印厨房小票
+     *
      * @param oid
      * @return
      */
     List<Map<String, Object>>  printKitchenReceipt(String oid);
 
+    /**
+     * 获取所有桌号加菜列表
+     *
+     * @param shopId
+     * @return
+     */
+    List<Order> getTableNumberAll(String shopId);
 
     List<OrderArticleDto> selectOrderArticle(String currentBrandId,String beginDate,String endDate);
 
     /**
      * 查询品牌菜品销售  用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -356,6 +365,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询店铺菜品销售 用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -365,6 +375,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询订单详情 用于中间数据库
+     *
      * @param beginDate
      * @param endDate
      * @param currentBrandId
@@ -388,6 +399,24 @@ public interface OrderService extends GenericService<Order, String> {
 	void useRedPrice(BigDecimal factMoney,String orderId);
 
 	void updateOrderChild(String orderId);
-	
+
 	void cleanShopOrder(String shopId);
+
+	/**
+	 * 根据订单获取订单信息
+	 *
+	 * @return
+	 */
+	Order getOrderDetail(String orderId);
+
+	/**
+	 * 获取员工订单
+	 *
+	 * @return
+	 */
+	List<Order> getOrderByEmployee(String employeeId, String shopId);
+
+	JSONResult createOrderByEmployee(Order order) throws AppException;
+
+
 }

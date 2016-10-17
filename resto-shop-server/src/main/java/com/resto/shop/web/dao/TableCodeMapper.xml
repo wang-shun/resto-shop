@@ -81,8 +81,6 @@ WHERE
     </select>
 
     <select id="selectByCodeNumber" resultType="TableCode">
-
-
         SELECT
         id,
         name,
@@ -116,4 +114,25 @@ WHERE
 </select>
 
 
+    <select id="selectByPersonNumber" resultType="TableCode">
+        select id,
+        name,
+        code_number,
+        max_number,
+        min_number,
+        is_used,
+        shop_detail_id,
+        brand_id from tb_table_code
+        where min_number &lt; #{personNumber} and max_number &gt; #{personNumber} and is_used = 1
+        order by (max_number - min_number) asc
+        limit 1
+    </select>
+
+    <select id="getTableList" resultType="TableCode">
+        select t.* ,(select count(1) from tb_get_number where
+        state = 0 and  table_type = t.code_number and t.is_used = 1) as waitNumber
+         from tb_table_code t
+        where t.is_used = 1
+
+    </select>
 </mapper>

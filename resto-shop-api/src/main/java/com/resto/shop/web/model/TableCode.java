@@ -30,6 +30,17 @@ public class TableCode {
 
     private  String brandId;
 
+    //等待位数
+    private Integer waitNumber;
+
+    final public Integer getWaitNumber() {
+        return waitNumber;
+    }
+
+    final public void setWaitNumber(Integer waitNumber) {
+        this.waitNumber = waitNumber;
+    }
+
     public String getShopDetailId() {
         return shopDetailId;
     }

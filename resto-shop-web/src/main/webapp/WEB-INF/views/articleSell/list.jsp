@@ -46,7 +46,7 @@
   <div class="tab-content">
   	<!-- 菜品销售报表 -->
     <div role="tabpanel" class="tab-pane active" id="dayReport">
-    	<!-- 品牌菜品销售表 -->
+    	<!-- 品牌菜品销售表   -->
     	<div class="panel panel-success">
 		  <div class="panel-heading text-center">
 		  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表
@@ -103,6 +103,8 @@
            </div>
            <!-- /.modal-dialog -->
        </div>
+
+
     <!-- 店铺菜品销售表 -->
     <div role="tabpanel" class="tab-pane" id="revenueCount">
     	<div class="panel panel-primary" style="border-color:write;">
@@ -197,7 +199,7 @@ var vueObj = new Vue({
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
 	 					that.brandReport.sellIncome=result.sellIncome;
-	 					tb2.ajax.reload();
+	 					//tb2.ajax.reload();
 	 					toastr.success("查询成功");
 	 				});
 				  break;
@@ -346,7 +348,6 @@ $('#ulTab a').click(function (e) {
 	  var num = vueObj.getNumActive()
 	  switch(num){
 	  case 1:
-		  
 		  $.post("articleSell/list_brand", vueObj.getDate(null), function(result) {
 				vueObj.brandReport.brandName = result.brandName;
 				vueObj.brandReport.totalNum = result.totalNum;

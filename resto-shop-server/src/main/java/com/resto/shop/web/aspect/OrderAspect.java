@@ -72,6 +72,31 @@ public class OrderAspect {
     ;
 
 
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrderByEmployee(..))")
+    public void createOrderByEmployee() {
+    }
+
+    ;
+
+
+    @AfterReturning(value = "createOrderByEmployee()", returning = "jsonResult")
+    public void createOrderByEmployeeAround(JSONResult jsonResult) throws Throwable {
+        if (jsonResult.isSuccess() == true) {
+            Order order = (Order) jsonResult.getData();
+            shopCartService.clearShopCartGeekPos(String.valueOf(order.getEmployeeId()), order.getShopDetailId());
+
+            //出单时减少库存
+            Boolean updateStockSuccess = false;
+            updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
+            if (!updateStockSuccess) {
+                log.info("库存变更失败:" + order.getId());
+            }
+
+        }
+    }
+
+
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
@@ -196,28 +221,47 @@ public class OrderAspect {
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()", returning = "order")
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()", returning = "order")
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
-                MQMessageProducer.sendPlaceOrderMessage(order);
+				if (order.getEmployeeId() == null) {
+					MQMessageProducer.sendPlaceOrderMessage(order);
+					log.info("检查打印异常");
+					int times = setting.getReconnectTimes();
+					int seconds = setting.getReconnectSecond();
+					for (int i = 0; i < times; i++) {
+						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+					}
+				} else {
+					if (order.getOrderState().equals(OrderState.PAYMENT)) {
+						MQMessageProducer.sendPlaceOrderMessage(order);
+						log.info("检查打印异常");
+						int times = setting.getReconnectTimes();
+						int seconds = setting.getReconnectSecond();
+						for (int i = 0; i < times; i++) {
+							MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+						}
+					}
+				}
+               // MQMessageProducer.sendPlaceOrderMessage(order);
 
 
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
-                if (order.getOrderMode() == ShopMode.TABLE_MODE) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
+                if (order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
                     log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
                     sendPaySuccessMsg(order);
                 }
-                log.info("检查打印异常");
-                int times = setting.getReconnectTimes();
-                int seconds = setting.getReconnectSecond();
-                for (int i = 0; i < times; i++) {
-                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-                }
+                //log.info("检查打印异常");
+                //int times = setting.getReconnectTimes();
+                //int seconds = setting.getReconnectSecond();
+                //for (int i = 0; i < times; i++) {
+                  //  MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+                //}
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
