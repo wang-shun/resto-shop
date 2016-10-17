@@ -62,7 +62,7 @@
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.TableCode">update tb_table_code set name = #{name,jdbcType=VARCHAR}, code_number = #{codeNumber,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, end_time = #{endTime,jdbcType=TIMESTAMP}, max_number = #{maxNumber,jdbcType=INTEGER}, min_number = #{minNumber,jdbcType=INTEGER}, is_used = #{isUsed,jdbcType=TINYINT},shop_detail_id = #{shopDetailId},brand_id=#{brandId} where id = #{id,jdbcType=VARCHAR}</update>
-  <select id="selectList" resultType="TableCode">select * from tb_table_code</select>
+  <select id="selectList" resultType="TableCode">select * from tb_table_code </select>
 
     <select id="selectByName" resultType="TableCode">
         SELECT
@@ -95,5 +95,23 @@ WHERE
         WHERE
         code_number = #{codeNumber}
     </select>
+
+
+    <select id="selectListByShopId" resultType="TableCode">
+       SELECT
+        id,
+        name,
+        code_number,
+        max_number,
+        min_number,
+        is_used,
+        shop_detail_id,
+        brand_id
+        FROM
+        tb_table_code
+        WHERE
+        shop_detail_id = #{shopId}
+</select>
+
 
 </mapper>
