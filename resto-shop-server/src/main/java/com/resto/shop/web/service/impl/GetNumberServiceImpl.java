@@ -53,7 +53,8 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_TWO);
             getNumber.setPassNumberTime(new Date());
             //计算最终等位红包价格
-            Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
+
+            Long tempTime = (new Date().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             getNumber.setFinalMoney(getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)));
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
