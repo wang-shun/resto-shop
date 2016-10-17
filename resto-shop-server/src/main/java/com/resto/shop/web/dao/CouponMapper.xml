@@ -18,6 +18,7 @@
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
     <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
+      <result column="shop_det" property="customerId" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
@@ -42,8 +43,11 @@
       <if test="remark != null">remark,</if>  
       <if test="distributionModeId != null">distribution_mode_id,</if>  
       <if test="customerId != null">customer_id,</if>   
-      <if test="couponType != null">coupon_type,</if> 
-    </trim>  
+      <if test="couponType != null">coupon_type,</if>
+       <!--如果存了店铺id 说明是店铺专有的优惠券 -->
+        <if test="shopDetailId != null">shop_detail_id,</if>
+
+    </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
       <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
@@ -60,7 +64,9 @@
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">#{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if> 
-      <if test="couponType != null">#{couponType,jdbcType=VARCHAR},</if> 
+      <if test="couponType != null">#{couponType,jdbcType=VARCHAR},</if>
+        <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
+
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon 
@@ -79,7 +85,8 @@
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
       <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>  
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if> 
-      <if test="couponType != null">coupon_type = #{couponType,jdbcType=VARCHAR},</if> 
+      <if test="couponType != null">coupon_type = #{couponType,jdbcType=VARCHAR},</if>
+        <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon set name = #{name,jdbcType=VARCHAR}, value = #{value,jdbcType=DECIMAL}, min_amount = #{minAmount,jdbcType=DECIMAL}, begin_date = #{beginDate,jdbcType=DATE}, end_date = #{endDate,jdbcType=DATE}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_used = #{isUsed,jdbcType=BIT}, using_time = #{usingTime,jdbcType=TIMESTAMP}, coupon_source = #{couponSource,jdbcType=VARCHAR}, use_with_account = #{useWithAccount,jdbcType=BIT}, remark = #{remark,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
@@ -88,7 +95,7 @@
   <!-- 查询当前用户的优惠券列表 -->
   <select id="listCoupon" parameterType="com.resto.shop.web.model.Coupon" resultType="com.resto.shop.web.model.Coupon">
   select id,name,value,min_amount,begin_date,end_date,begin_time,end_time,is_used,using_time,
-  coupon_source,use_with_account,remark,distribution_mode_id,customer_id
+  coupon_source,use_with_account,remark,distribution_mode_id,customer_id,shop_detail_id
    from tb_coupon where is_used=#{isUsed} and distribution_mode_id=#{distributionModeId} and customer_id=#{customerId}
    <![CDATA[AND begin_date<=current_date AND end_date >=current_date AND begin_time<=NOW() AND end_time>=NOW()]]>
    order by value DESC

@@ -27,7 +27,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
     @Resource
     private NewCustomCouponMapper newcustomcouponMapper;
-    
+
     @Resource
     private CouponService couponService;
 
@@ -37,67 +37,124 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     }
 
     @Override
-    public int insertNewCustomCoupon(NewCustomCoupon brand) {
-        
-        return newcustomcouponMapper.insertSelective(brand);
+    public int insertNewCustomCoupon(NewCustomCoupon newCustomCoupon) {
+
+        return newcustomcouponMapper.insertSelective(newCustomCoupon);
     }
-    
+
     @Override
     public List<NewCustomCoupon> selectListByBrandId(String currentBrandId) {
-        
+
         return newcustomcouponMapper.selectListByBrandId(currentBrandId);
     }
 
-	@Override
-	public void giftCoupon(Customer cus,Integer couponType) {
-		//根据 品牌id 查询该品牌的优惠卷配置 查询已经启用的优惠券
-	    List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
-	    //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
-	    if(couponConfigs == null || couponConfigs.size()== 0 ){
-	    	couponType = -1;
-	    	couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
-	    }
-		//根据优惠卷配置，添加对应数量的优惠卷
-	    Date beginDate  = new Date();
-	    for(NewCustomCoupon cfg: couponConfigs){
-	        Coupon coupon = new Coupon();
-	        coupon.setName(cfg.getCouponName());
-	        coupon.setValue(cfg.getCouponValue());
-	        coupon.setMinAmount(cfg.getCouponMinMoney());
-	        coupon.setCouponType(couponType);
-	        coupon.setBeginTime(cfg.getBeginTime());
-	        coupon.setEndTime(cfg.getEndTime());
-	        coupon.setUseWithAccount(cfg.getUseWithAccount());
-	        coupon.setDistributionModeId(cfg.getDistributionModeId());
-	        coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
-	        coupon.setCustomerId(cus.getId());
-	        //优惠券时间选择的类型分配时间
-	        if(cfg.getTimeConsType()==TimeCons.MODELA){
-	        	coupon.setBeginDate(beginDate);
-		        coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
-	        }else if(cfg.getTimeConsType()==TimeCons.MODELB){
-	        	coupon.setBeginDate(cfg.getBeginDateTime());
-	        	coupon.setEndDate(cfg.getEndDateTime());
-	        }
-	        
-	        for(int i=0;i<cfg.getCouponNumber();i++){
-	            couponService.insertCoupon(coupon);
-	        }
-	        
-	    }
-	    
-	}
 
-	@Override
-	public List<NewCustomCoupon> selectListByCouponType(String currentBrandId, Integer couponType) {
-		List<NewCustomCoupon> list = newcustomcouponMapper.selectListByCouponType(currentBrandId, couponType);
-		//如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
-		if(list==null || list.size()==0){
-			list = newcustomcouponMapper.selectListByCouponType(currentBrandId, -1);
-		}
-		return list;
-	}
+//	@Override
+//	public void giftCoupon(Customer cus,Integer couponType) {
+//		//根据 品牌id 查询该品牌的优惠卷配置 查询已经启用的优惠券
+//	    List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
+//	    //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+//	    if(couponConfigs == null || couponConfigs.size()== 0 ){
+//	    	couponType = -1;
+//	    	couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
+//	    }
+//		//根据优惠卷配置，添加对应数量的优惠卷
+//	    Date beginDate  = new Date();
+//	    for(NewCustomCoupon cfg: couponConfigs){
+//	        Coupon coupon = new Coupon();
+//	        coupon.setName(cfg.getCouponName());
+//	        coupon.setValue(cfg.getCouponValue());
+//	        coupon.setMinAmount(cfg.getCouponMinMoney());
+//	        coupon.setCouponType(couponType);
+//	        coupon.setBeginTime(cfg.getBeginTime());
+//	        coupon.setEndTime(cfg.getEndTime());
+//	        coupon.setUseWithAccount(cfg.getUseWithAccount());
+//	        coupon.setDistributionModeId(cfg.getDistributionModeId());
+//	        coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
+//	        coupon.setCustomerId(cus.getId());
+//	        //优惠券时间选择的类型分配时间
+//	        if(cfg.getTimeConsType()==TimeCons.MODELA){
+//	        	coupon.setBeginDate(beginDate);
+//		        coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
+//	        }else if(cfg.getTimeConsType()==TimeCons.MODELB){
+//	        	coupon.setBeginDate(cfg.getBeginDateTime());
+//	        	coupon.setEndDate(cfg.getEndDateTime());
+//	        }
+//
+//	        for(int i=0;i<cfg.getCouponNumber();i++){
+//	            couponService.insertCoupon(coupon);
+//	        }
+//
+//	    }
+//
+//	}
 
-   
+    public void giftCoupon(Customer cus,Integer couponType,String shopId) {
+        //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
+        List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(shopId,couponType);
+        //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+        if(couponConfigs == null || couponConfigs.size()== 0 ){
+            couponType = -1;
+            couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(shopId,couponType);
+        }
+        //根据优惠卷配置，添加对应数量的优惠卷
+        Date beginDate  = new Date();
+        for(NewCustomCoupon cfg: couponConfigs){
+            Coupon coupon = new Coupon();
+            coupon.setName(cfg.getCouponName());
+            coupon.setValue(cfg.getCouponValue());
+            coupon.setMinAmount(cfg.getCouponMinMoney());
+            coupon.setCouponType(couponType);
+            coupon.setBeginTime(cfg.getBeginTime());
+            coupon.setEndTime(cfg.getEndTime());
+            coupon.setUseWithAccount(cfg.getUseWithAccount());
+            coupon.setDistributionModeId(cfg.getDistributionModeId());
+            coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
+            coupon.setCustomerId(cus.getId());
+            //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
+            if(cfg.getShopDetailId()!=null){
+                coupon.setShopDetailId(cfg.getShopDetailId());
+            }
+            //优惠券时间选择的类型分配时间
+            if(cfg.getTimeConsType()==TimeCons.MODELA){
+                coupon.setBeginDate(beginDate);
+                coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
+            }else if(cfg.getTimeConsType()==TimeCons.MODELB){
+                coupon.setBeginDate(cfg.getBeginDateTime());
+                coupon.setEndDate(cfg.getEndDateTime());
+            }
+            for(int i=0;i<cfg.getCouponNumber();i++){
+                couponService.insertCoupon(coupon);
+            }
+
+        }
+
+    }
+
+    @Override
+    public List<NewCustomCoupon> selectListByCouponType(String currentBrandId, Integer couponType) {
+        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByCouponType(currentBrandId, couponType);
+        //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+        if(list==null || list.size()==0){
+            list = newcustomcouponMapper.selectListByCouponType(currentBrandId, -1);
+        }
+        return list;
+    }
+
+    @Override
+    public List<NewCustomCoupon> selectListByCouponTypeAndShopId(String shopId, Integer couponType) {
+        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByCouponTypeAndShopId(shopId, couponType);
+        //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+        if(list==null || list.size()==0){
+            list = newcustomcouponMapper.selectListByCouponTypeAndShopId(shopId, -1);
+        }
+        return list;
+    }
+
+    @Override
+    public List<NewCustomCoupon> selectListShopId(String shopId) {
+        return newcustomcouponMapper.selectListByShopId(shopId);
+    }
+
 
 }
