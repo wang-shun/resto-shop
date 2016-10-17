@@ -82,7 +82,6 @@ WHERE
 
     <select id="selectByCodeNumber" resultType="TableCode">
 
-
         SELECT
         id,
         name,
