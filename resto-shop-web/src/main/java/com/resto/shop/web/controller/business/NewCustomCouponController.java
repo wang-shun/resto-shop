@@ -42,6 +42,8 @@ public class NewCustomCouponController extends GenericController{
 	@ResponseBody
 	public List<NewCustomCoupon> listData(){
 		return newcustomcouponService.selectListByBrandId(getCurrentBrandId());
+
+
 		
 	}
 	
