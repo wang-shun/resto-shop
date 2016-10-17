@@ -81,6 +81,8 @@ WHERE
     </select>
 
     <select id="selectByCodeNumber" resultType="TableCode">
+
+
         SELECT
         id,
         name,
