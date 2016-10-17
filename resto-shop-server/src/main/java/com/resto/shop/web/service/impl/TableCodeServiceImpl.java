@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.dao.TableCodeMapper;
 import com.resto.shop.web.model.TableCode;

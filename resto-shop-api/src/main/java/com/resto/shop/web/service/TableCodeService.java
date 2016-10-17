@@ -15,6 +15,12 @@ public interface TableCodeService extends GenericService<TableCode, String> {
 
     TableCode selectByCodeNumber(String codeNumber);
 
+    TableCode selectByPersonNumber(Integer personNumber);
+
+    List<TableCode> getTableList(String shopId);
+
+
+
     List<TableCode> selectListByShopId(String shopId);
 
     TableCode selectByPersonNumber(Integer personNumber);
