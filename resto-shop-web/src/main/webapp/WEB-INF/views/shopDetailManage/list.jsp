@@ -30,11 +30,11 @@
 						</div>
 						<div  class="form-group">
 							<label>等位红包每秒增加价</label>
-							<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney" required="required">
+							<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney">
 						</div>
 						<div  class="form-group">
 							<label>等位红包上线价格</label>
-							<input type="text" class="form-control" name="highMoney" :value="m.highMoney" required="required">
+							<input type="text" class="form-control" name="highMoney" :value="m.highMoney">
 						</div>
 					</div>
 					<input class="btn green" type="submit" value="保存" /> 

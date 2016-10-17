@@ -20,4 +20,12 @@ public interface TableCodeService extends GenericService<TableCode, String> {
     List<TableCode> getTableList(String shopId);
 
 
+
+    List<TableCode> selectListByShopId(String shopId);
+
+    TableCode selectByPersonNumber(Integer personNumber);
+
+    List<TableCode> getTableList(String shopId);
+
+
 }
