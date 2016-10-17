@@ -123,8 +123,11 @@ WHERE
         is_used,
         shop_detail_id,
         brand_id from tb_table_code
-        where min_number &lt; #{personNumber} and max_number &gt; #{personNumber} and is_used = 1
-        order by (max_number - min_number) asc
+        where
+         <![CDATA[  min_number <= #{personNumber} and max_number >= #{personNumber}]]>
+          and is_used = 1
+        and shop_detail_id = #{shopId}
+        order by max_number asc
         limit 1
     </select>
 
