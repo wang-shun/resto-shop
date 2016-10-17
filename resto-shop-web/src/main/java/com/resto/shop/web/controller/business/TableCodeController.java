@@ -28,7 +28,7 @@ public class TableCodeController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<TableCode> listData(){
-		return tablecodeService.selectList();
+		return tablecodeService.selectListByShopId(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

@@ -34,7 +34,7 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
         if(tablecode.getMinNumber()>tablecode.getMaxNumber()){
             return;
         }
-        tablecode.setId(ApplicationUtils.randomUUID());
+
         //插入时间
         tablecode.setCreateTime(new Date());
         tablecode.setBrandId(brandId);
@@ -59,6 +59,11 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
     @Override
     public TableCode selectByCodeNumber(String codeNumber) {
         return tablecodeMapper.selectByCodeNumber(codeNumber);
+    }
+
+    @Override
+    public List<TableCode> selectListByShopId(String shopId) {
+        return tablecodeMapper.selectListByShopId(shopId);
     }
 
     @Override
