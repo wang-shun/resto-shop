@@ -10,15 +10,20 @@ import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.service.CustomerService;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
  * Created by carl on 2016/10/16.
  */
+
+@Component
+@Aspect
 public class GetNumberAspect {
 
     Logger log = LoggerFactory.getLogger(getClass());
