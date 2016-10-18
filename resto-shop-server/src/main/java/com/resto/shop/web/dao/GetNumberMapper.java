@@ -4,6 +4,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.GetNumber;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,6 +24,6 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     GetNumber selectByPrimaryKey(String id);
 
-    List<GetNumber> selectCount(String tableType);
+    List<GetNumber> selectCount(@Param("tableType") String tableType,@Param("date") Date date);
 
 }
