@@ -27,6 +27,7 @@ import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -119,6 +120,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
+
+    @Autowired
+    private GetNumberService getNumberService;
 
 
     @Override
@@ -339,6 +343,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setRemark("等位红包支付:" + order.getWaitMoney());
             item.setResultData(order.getWaitId());
             orderPaymentItemService.insert(item);
+
+            GetNumber getNumber =  getNumberService.selectById(order.getWaitId());
+            getNumber.setFinalMoney(new BigDecimal(0));
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
+            getNumberService.update(getNumber);
         }
 
         if (payMoney.doubleValue() < 0) {
@@ -381,6 +390,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPaymentAmount().doubleValue() == 0) {
             payOrderSuccess(order);
         }
+
 
         jsonResult.setData(order);
         if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
