@@ -56,7 +56,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setPassNumberTime(new Date());
             //计算最终等位红包价格
 
-            Long tempTime = (new Date().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
+            Long tempTime = (getNumber.getPassNumberTime().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
             getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
         }
