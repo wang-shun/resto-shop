@@ -51,7 +51,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 //            if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
 //                getNumber.setFinalMoney(getNumber.getHighMoney());
 //            }else{
-                getNumber.setFinalMoney(endMoney);
+            getNumber.setFinalMoney(getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)));
 //            }
 
 //            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
