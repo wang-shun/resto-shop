@@ -11,4 +11,6 @@ public class WaitModerState {
 
     public static Integer WAIT_MODEL_NUMBER_TWO = 2; //取票状态为过号
 
+    public static Integer WAIT_MODEL_NUMBER_THREE = 3; //已消费的等位红包
+
 }
