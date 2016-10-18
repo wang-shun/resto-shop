@@ -48,17 +48,15 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             //计算最终等位红包价格
             Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
-
-            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? endMoney : getNumber.getHighMoney());
+            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
 
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_TWO);
             getNumber.setPassNumberTime(new Date());
             //计算最终等位红包价格
-
             Long tempTime = (getNumber.getPassNumberTime().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
-            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? endMoney : getNumber.getHighMoney());
+            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
         return getNumber;
