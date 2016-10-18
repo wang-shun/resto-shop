@@ -38,7 +38,6 @@ public class BindPhoneAspect {
     public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
         String customerId = (String) pj.getArgs()[1];
         Integer couponType = (Integer) pj.getArgs()[2];
-        String    shopId = (String) pj.getArgs()[3];
         Customer cus = customerService.selectById(customerId);
         boolean isFirstBind = !cus.getIsBindPhone();
         Object obj = pj.proceed();
