@@ -21,7 +21,6 @@ import javax.annotation.Resource;
 /**
  * Created by carl on 2016/10/16.
  */
-
 @Component
 @Aspect
 public class GetNumberAspect {
