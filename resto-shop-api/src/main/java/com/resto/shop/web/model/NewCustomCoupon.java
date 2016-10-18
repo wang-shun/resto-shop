@@ -77,14 +77,6 @@ public class NewCustomCoupon {
 
     private  Integer isBrand;
 
-    public Integer getIsBrand() {
-        return isBrand;
-    }
-
-    public void setIsBrand(Integer isBrand) {
-        this.isBrand = isBrand;
-    }
-
     public Boolean getActivty() {
         return isActivty;
     }
@@ -92,8 +84,6 @@ public class NewCustomCoupon {
     public void setActivty(Boolean activty) {
         isActivty = activty;
     }
-
-
 
     public Integer getTimeConsType() {
         return timeConsType;
@@ -239,5 +229,11 @@ public class NewCustomCoupon {
         this.couponType = couponType;
     }
 
+    public Integer getIsBrand() {
+        return isBrand;
+    }
 
+    public void setIsBrand(Integer isBrand) {
+        this.isBrand = isBrand;
+    }
 }

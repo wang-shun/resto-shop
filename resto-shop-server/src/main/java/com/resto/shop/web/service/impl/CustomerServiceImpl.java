@@ -89,9 +89,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
         return customer;
     }
 
-
     @Override
-    public void bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId) throws AppException {
+    public void bindPhone(String phone, String currentCustomerId,Integer couponType) throws AppException {
         Customer customer = customerMapper.selectByPhone(phone);
         if(customer!=null){
             throw new AppException(AppException.PHONE_IS_BIND);

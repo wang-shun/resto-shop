@@ -286,7 +286,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         // 使用优惠卷
 
-
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         if (detail.getShopMode() != 5) {
             if (order.getUseCoupon() != null) {

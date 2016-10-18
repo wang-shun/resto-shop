@@ -49,6 +49,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     }
 
 
+
+
 //	@Override
 //	public void giftCoupon(Customer cus,Integer couponType) {
 //		//根据 品牌id 查询该品牌的优惠卷配置 查询已经启用的优惠券
@@ -89,13 +91,13 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //
 //	}
 
-    public void giftCoupon(Customer cus,Integer couponType,String shopId) {
+    public void giftCoupon(Customer cus,Integer couponType) {
         //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
-        List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(shopId,couponType);
+        List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
         if(couponConfigs == null || couponConfigs.size()== 0 ){
             couponType = -1;
-            couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(shopId,couponType);
+            couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         }
         //根据优惠卷配置，添加对应数量的优惠卷
         Date beginDate  = new Date();
@@ -115,6 +117,11 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             if(cfg.getShopDetailId()!=null){
                 coupon.setShopDetailId(cfg.getShopDetailId());
             }
+            //如果是品牌的专有优惠券
+            if(cfg.getIsBrand()==1&&cfg.getBrandId()!=null){
+                coupon.setBrandId(cfg.getBrandId());
+            }
+
             //优惠券时间选择的类型分配时间
             if(cfg.getTimeConsType()==TimeCons.MODELA){
                 coupon.setBeginDate(beginDate);

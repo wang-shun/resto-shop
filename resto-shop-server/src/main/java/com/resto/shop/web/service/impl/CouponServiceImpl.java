@@ -1,8 +1,10 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -36,8 +38,17 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     }
 
     @Override
-    public List<Coupon> listCoupon(Coupon coupon) {
-        return couponMapper.listCoupon(coupon);
+    public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
+        List<Coupon> list = new ArrayList<>();
+        //查询出品牌的
+        coupon.setBrandId(brandId);
+        coupon.setShopDetailId(shopId);
+        List<Coupon> brandList = couponMapper.listCouponByBrandId(coupon);
+        //查询出店铺的专属优惠券
+        List<Coupon> shopList = couponMapper.listCouponByShopId(coupon);
+        list.addAll(brandList);
+        list.addAll(shopList);
+        return list;
     }
 
     @Resource
@@ -53,7 +64,6 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Override
     public Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException {
-
 
         Coupon coupon = selectById(order.getUseCoupon());
         //判断优惠卷是否已使用
@@ -90,6 +100,10 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
             throw new AppException(AppException.COUPON_NOT_USEACCOUNT);
         }
 
+        //判断是否是店铺专属的优惠券  优惠券有店铺id并且店铺id和订单中的店铺id不一样就会抛异常
+        if(coupon.getShopDetailId()!=null &&!order.getShopDetailId().equals(coupon.getShopDetailId())){
+            throw new AppException(AppException.COUPON_IS_SHOP);
+        }
         coupon.setIsUsed(true);
         coupon.setUsingTime(new Date());
         this.update(coupon);
@@ -104,8 +118,10 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         update(coupon);
     }
 
+
+
     @Override
-    public List<Coupon> listCouponByStatus(String status, String customerId) {
+    public List<Coupon> listCouponByStatus(String status, String customerId,String brandId,String shopId) {
         String IS_EXPIRE = null;
         String NOT_EXPIRE = null;
         if("2".equals(status)){
@@ -115,7 +131,14 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         if("0".equals(status)){
             NOT_EXPIRE = "NOT_EXPIRE";
         }
-        return couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId);
+        List<Coupon> list = new ArrayList<>();
+        //查询品牌优惠券
+        List<Coupon> brandList = couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId,brandId);
+        //当前店铺专属的优惠券
+        List<Coupon> shopList = couponMapper.listCouponByStatusAndShopId(status, IS_EXPIRE, NOT_EXPIRE, customerId,shopId);
+        list.addAll(brandList);
+        list.addAll(shopList);
+        return list;
     }
 
     @Override
