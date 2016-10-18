@@ -131,6 +131,27 @@ public class Order implements Serializable{
 
     private BigDecimal orderTotal;
 
+    //等位红包
+    private BigDecimal waitMoney;
+
+    private String waitId;
+
+    final public String getWaitId() {
+        return waitId;
+    }
+
+    final public void setWaitId(String waitId) {
+        this.waitId = waitId;
+    }
+
+    final public BigDecimal getWaitMoney() {
+        return waitMoney;
+    }
+
+    final public void setWaitMoney(BigDecimal waitMoney) {
+        this.waitMoney = waitMoney;
+    }
+
     final public Integer getPayMode() {
         return payMode;
     }

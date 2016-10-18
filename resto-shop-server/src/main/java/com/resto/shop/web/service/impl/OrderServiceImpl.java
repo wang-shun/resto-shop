@@ -326,6 +326,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
+        if(order.getWaitMoney().doubleValue() > 0){
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.WAIT_MONEY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(order.getWaitMoney());
+            item.setRemark("等位红包支付:" + order.getWaitMoney());
+            item.setResultData(order.getWaitId());
+            orderPaymentItemService.insert(item);
+        }
+
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
