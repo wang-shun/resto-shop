@@ -326,6 +326,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
+
+        payMoney = payMoney.subtract(order.getWaitMoney());
+
         if(order.getWaitMoney().doubleValue() > 0){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
