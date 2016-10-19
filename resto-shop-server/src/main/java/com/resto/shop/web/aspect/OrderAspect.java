@@ -212,12 +212,12 @@ public class OrderAspect {
                     log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
                     sendPaySuccessMsg(order);
                 }
-//                log.info("检查打印异常");
-//                int times = setting.getReconnectTimes();
-//                int seconds = setting.getReconnectSecond();
-//                for (int i = 0; i < times; i++) {
-//                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-//                }
+                log.info("检查打印异常");
+                int times = setting.getReconnectTimes();
+                int seconds = setting.getReconnectSecond();
+                for (int i = 0; i < times; i++) {
+                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+                }
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
