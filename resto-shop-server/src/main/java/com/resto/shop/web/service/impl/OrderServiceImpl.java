@@ -886,6 +886,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
         // 根据id查询订单
         Order order = selectById(orderId);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if(ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()){
+        	order.setProductionStatus(ProductionStatus.PRINTED);
+        	order.setPrintOrderTime(new Date());
+        	orderMapper.updateByPrimaryKeySelective(order);
+        }
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
@@ -1822,6 +1828,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printKitchenReceipt(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if(ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()){
+        	order.setProductionStatus(ProductionStatus.PRINTED);
+        	order.setPrintOrderTime(new Date());
+        	orderMapper.updateByPrimaryKeySelective(order);
+        }
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
