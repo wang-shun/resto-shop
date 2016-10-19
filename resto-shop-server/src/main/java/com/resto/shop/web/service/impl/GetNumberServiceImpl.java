@@ -61,4 +61,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
         return getNumber;
     }
+
+    @Override
+    public GetNumber getWaitInfoByCustomerId(String customerId,String shopId) {
+        return getNumberMapper.getWaitInfoByCustomerId(customerId,shopId);
+    }
 }

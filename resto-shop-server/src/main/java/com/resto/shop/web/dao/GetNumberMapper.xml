@@ -112,4 +112,9 @@
             and #{date} >= create_time
         </if>
     </select>
+
+    <select id="getWaitInfoByCustomerId" resultType="GetNumber">
+        select * from tb_get_number where shop_detail_id = #{shopId}
+        and customer_id = #{customerId} order by create_time desc limit 1
+    </select>
 </mapper>

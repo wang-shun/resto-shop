@@ -19,4 +19,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     GetNumber updateGetNumber(GetNumber getNumber, Integer state);
 
+    GetNumber getWaitInfoByCustomerId(String customerId,String shopId);
+
 }
