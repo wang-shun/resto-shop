@@ -345,7 +345,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
 
             GetNumber getNumber =  getNumberService.selectById(order.getWaitId());
-            getNumber.setFinalMoney(new BigDecimal(0));
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
             getNumberService.update(getNumber);
         }
