@@ -109,9 +109,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         item.setOrderId(order.getId());
         item.setPaymentModeId(PayMode.WAIT_MONEY);
         item.setPayTime(order.getCreateTime());
-        item.setPayValue(order.getWaitMoney());
+        item.setPayValue(getNumber.getFinalMoney());
         item.setRemark("退还等位红包:" + order.getWaitMoney());
-        item.setResultData(order.getWaitId());
+        item.setResultData(getNumber.getId());
         orderPaymentItemService.insert(item);
 
 
