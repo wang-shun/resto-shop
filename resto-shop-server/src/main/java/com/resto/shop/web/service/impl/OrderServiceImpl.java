@@ -295,6 +295,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
+
+        if(order.getWaitMoney().doubleValue() > 0){
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.WAIT_MONEY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(order.getWaitMoney());
+            item.setRemark("等位红包支付:" + order.getWaitMoney());
+            item.setResultData(order.getWaitId());
+            orderPaymentItemService.insert(item);
+
+            GetNumber getNumber =  getNumberService.selectById(order.getWaitId());
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
+            getNumberService.update(getNumber);
+
+        }
+
+        payMoney = payMoney.subtract(order.getWaitMoney());
+
         if (detail.getShopMode() != 5) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
@@ -331,23 +351,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        payMoney = payMoney.subtract(order.getWaitMoney());
 
-        if(order.getWaitMoney().doubleValue() > 0){
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.WAIT_MONEY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(order.getWaitMoney());
-            item.setRemark("等位红包支付:" + order.getWaitMoney());
-            item.setResultData(order.getWaitId());
-            orderPaymentItemService.insert(item);
 
-            GetNumber getNumber =  getNumberService.selectById(order.getWaitId());
-            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
-            getNumberService.update(getNumber);
-        }
+
 
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
