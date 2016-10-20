@@ -308,6 +308,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
 
             GetNumber getNumber =  getNumberService.selectById(order.getWaitId());
+            log.error(order.getWaitId() + "-----------222222222222222");
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
             getNumberService.update(getNumber);
 
