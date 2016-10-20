@@ -50,7 +50,7 @@ public class GetNumberAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ZERO){
                 StringBuffer msg = new StringBuffer();
-                msg.append(customer.getNickname() + "，请至餐厅就餐。\n");
+                msg.append(customer.getNickname() + "，请至餐厅就餐，您一共生成了" + getNumber.getFinalMoney() + "的等位红包。\n");
                 WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
                 StringBuffer msg = new StringBuffer();
