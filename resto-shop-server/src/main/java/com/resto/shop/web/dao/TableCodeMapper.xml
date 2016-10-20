@@ -134,7 +134,7 @@ WHERE
     <select id="getTableList" resultType="TableCode">
         select t.* ,(select count(1) from tb_get_number where
         state = 0 and  table_type = t.code_number and t.is_used = 1
-         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d') and shop_detail_id = #{shopId}
         ) as waitNumber
          from tb_table_code t
         where t.is_used = 1
