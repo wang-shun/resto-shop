@@ -33,7 +33,7 @@
 							<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney">
 						</div>
 						<div  class="form-group">
-							<label>等位红包上线价格</label>
+							<label>等位红包上限价格</label>
 							<input type="text" class="form-control" name="highMoney" :value="m.highMoney">
 						</div>
 					</div>
