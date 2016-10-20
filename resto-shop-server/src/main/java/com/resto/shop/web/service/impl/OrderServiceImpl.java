@@ -612,6 +612,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             config.getMchkey(), config.getPayCertPath());
                     item.setResultData(new JSONObject(result).toString());
                     break;
+                case PayMode.WAIT_MONEY:
+                    getNumberService.refundWaitMoney(order);
+                    break;
             }
             item.setId(newPayItemId);
             item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));

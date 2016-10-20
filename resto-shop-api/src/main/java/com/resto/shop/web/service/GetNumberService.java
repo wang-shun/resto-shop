@@ -4,6 +4,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
+import com.resto.shop.web.model.Order;
 
 import java.util.Date;
 import java.util.List;
@@ -20,5 +21,7 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     GetNumber updateGetNumber(GetNumber getNumber, Integer state);
 
     GetNumber getWaitInfoByCustomerId(String customerId,String shopId);
+
+    void refundWaitMoney(Order order);
 
 }
