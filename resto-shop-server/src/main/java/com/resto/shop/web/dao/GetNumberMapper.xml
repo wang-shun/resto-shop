@@ -99,6 +99,7 @@
         <if test="tableType != null and tableType != ''">
             and table_type = #{tableType}
         </if>
+        order by create_time desc
     </select>
     
     <select id="selectByPrimaryKey" resultType="GetNumber">
