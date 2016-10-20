@@ -42,6 +42,14 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         if (state == WaitModerState.WAIT_MODEL_NUMBER_ZERO){
             getNumber.setCallNumber(getNumber.getCallNumber()+1);
             getNumber.setCallNumberTime(new Date());
+            //计算最终等位红包价格
+            Long tempTime = (getNumber.getCallNumberTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
+            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
+            if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
+                getNumber.setFinalMoney(getNumber.getHighMoney());
+            }else{
+                getNumber.setFinalMoney(endMoney);
+            }
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_ONE);
             getNumber.setEatTime(new Date());
@@ -53,7 +61,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             }else{
                 getNumber.setFinalMoney(endMoney);
             }
-
 //            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
 
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
