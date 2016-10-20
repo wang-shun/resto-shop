@@ -139,6 +139,6 @@ WHERE
          from tb_table_code t
         where t.is_used = 1
         and t.shop_detail_id = #{shopId}
-
+ order by t.max_number asc
     </select>
 </mapper>
