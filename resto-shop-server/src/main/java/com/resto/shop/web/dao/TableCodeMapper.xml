@@ -58,7 +58,7 @@
       <if test="minNumber != null">min_number = #{minNumber,jdbcType=INTEGER},</if>  
       <if test="isUsed != null">is_used = #{isUsed,jdbcType=TINYINT},</if>
         <if test="shopDetailId != null">shop_detail_id = #{shopDetailId},</if>
-        <if test="brand_id != null">brand_id = #{brandId},</if>
+        <if test="brandId != null">brand_id = #{brandId},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.TableCode">update tb_table_code set name = #{name,jdbcType=VARCHAR}, code_number = #{codeNumber,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, end_time = #{endTime,jdbcType=TIMESTAMP}, max_number = #{maxNumber,jdbcType=INTEGER}, min_number = #{minNumber,jdbcType=INTEGER}, is_used = #{isUsed,jdbcType=TINYINT},shop_detail_id = #{shopDetailId},brand_id=#{brandId} where id = #{id,jdbcType=VARCHAR}</update>
