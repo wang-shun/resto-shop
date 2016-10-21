@@ -70,9 +70,11 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
             if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                getNumber.setFinalMoney(getNumber.getHighMoney());
+                if(getNumber.getFinalMoney() == null || getNumber.getFinalMoney().equals(new BigDecimal(0)))
+                    getNumber.setFinalMoney(getNumber.getHighMoney());
             }else{
-                getNumber.setFinalMoney(endMoney);
+                if(getNumber.getFinalMoney() == null || getNumber.getFinalMoney().equals(new BigDecimal(0)))
+                    getNumber.setFinalMoney(endMoney);
             }
 //            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
 
@@ -84,9 +86,11 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
             //getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
             if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                getNumber.setFinalMoney(getNumber.getHighMoney());
+                if(getNumber.getFinalMoney() == null || getNumber.getFinalMoney().equals(new BigDecimal(0)))
+                    getNumber.setFinalMoney(getNumber.getHighMoney());
             }else{
-                getNumber.setFinalMoney(endMoney);
+                if(getNumber.getFinalMoney() == null || getNumber.getFinalMoney().equals(new BigDecimal(0)))
+                    getNumber.setFinalMoney(endMoney);
             }
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
