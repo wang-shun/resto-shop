@@ -8,10 +8,7 @@ import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.model.ShopMode;
-import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -32,6 +29,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -110,7 +108,16 @@ public class OrderMessageListener implements MessageListener {
         ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
         if (shareCustomer != null && shareSetting != null) {
             BigDecimal sum = new BigDecimal(0);
-            List<Coupon> couponList = couponService.listCouponByStatus("0", customer.getId());
+            List<Coupon> couponList = new ArrayList<>();
+            //品牌专属优惠券
+            List<Coupon> couponList1 = couponService.listCouponByStatus("0", customer.getId(),customer.getBrandId(),null);
+            couponList.addAll(couponList1);
+            List<ShopDetail> listShop = shopDetailService.selectByBrandId(customer.getBrandId());
+            for(ShopDetail s : listShop){
+                //店铺专属优惠券
+                List<Coupon> couponList2 = couponService.listCouponByStatus("0", customer.getId(),null,s.getId());
+                couponList.addAll(couponList2);
+            }
             for (Coupon coupon : couponList) {
                 sum = sum.add(coupon.getValue());
             }
