@@ -14,6 +14,7 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Customer login(String openid);
 
 	Customer register(Customer customer);
+    void updateCustomer(Customer customer);
 
 	void bindPhone(String phone, String currentCustomerId,Integer couponType) throws AppException;
     
