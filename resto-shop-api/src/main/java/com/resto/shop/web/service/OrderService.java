@@ -372,6 +372,8 @@ public interface OrderService extends GenericService<Order, String> {
      */
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
 
+
+
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单
 	 * @param shopId
