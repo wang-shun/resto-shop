@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.web.dto.*;
+import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -392,4 +394,19 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
+	/**
+	 * 获取所有桌号加菜列表
+	 * @param shopId
+	 * @return
+     */
+	List<Order> getTableNumberAll(@Param("shopId") String shopId);
+
+	Order getOrderDetail(String orderId);
+
+	List<OrderPaymentItem> selectOrderPaymentItems(String orderId);
+
+	List<OrderItem> selectOrderItems(String orderId);
+
+	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
+
 }

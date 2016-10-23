@@ -11,34 +11,34 @@ import com.resto.shop.web.model.Order;
 
 public interface CustomerService extends GenericService<Customer, String> {
 
-    Customer login(String openid);
+	Customer login(String openid);
 
-    Customer register(Customer customer);
+	Customer register(Customer customer);
 
-    void bindPhone(String phone, String currentCustomerId,Integer couponType) throws AppException;
+	void bindPhone(String phone, String currentCustomerId,Integer couponType) throws AppException;
+    
+	/**
+	 * 根据ID才查询用户昵称和手机号码
+	 * @param customerId
+	 * @return
+	 */
+	Customer selectNickNameAndTelephone(String customerId);
 
-    /**
-     * 根据ID才查询用户昵称和手机号码
-     * @param customerId
-     * @return
-     */
-    Customer selectNickNameAndTelephone(String customerId);
+	List<Customer> selectListByBrandId(String currentBrandId);
 
-    List<Customer> selectListByBrandId(String currentBrandId);
+	void changeLastOrderShop(String shopDetailId, String customerId);
+	
+	/**
+	 * 解绑手机号码
+	 * @param currentCustomerId
+	 */
+	void unbindphone(String currentCustomerId);
 
-    void changeLastOrderShop(String shopDetailId, String customerId);
+	void updateNewNoticeTime(String id);
 
-    /**
-     * 解绑手机号码
-     * @param currentCustomerId
-     */
-    void unbindphone(String currentCustomerId);
+	void updateFirstOrderTime(String id);
 
-    void updateNewNoticeTime(String id);
+	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
 
-    void updateFirstOrderTime(String id);
-
-    BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
-
-    Boolean checkRegistered(String id);
+	Boolean checkRegistered(String id);
 }
