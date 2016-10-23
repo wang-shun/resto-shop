@@ -52,7 +52,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setCallNumberTime(new Date());
             //计算最终等位红包价格
             Long tempTime = (getNumber.getCallNumberTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
-            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
+            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)).setScale(2,   BigDecimal.ROUND_HALF_UP);             //最终价钱
             if(getNumber.getCallNumber() == 0){
                 if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
                     getNumber.setFinalMoney(getNumber.getHighMoney());
@@ -68,29 +68,25 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             getNumber.setEatTime(new Date());
             //计算最终等位红包价格
             Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
-            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
+            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)).setScale(2,   BigDecimal.ROUND_HALF_UP);             //最终价钱
+
+
             if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                if(getNumber.getFinalMoney().compareTo(BigDecimal.ZERO) != 1)
-                    getNumber.setFinalMoney(getNumber.getHighMoney());
+                getNumber.setFinalMoney(getNumber.getHighMoney());
             }else{
-                if(getNumber.getFinalMoney().compareTo(BigDecimal.ZERO) != 1)
-                    getNumber.setFinalMoney(endMoney);
+                getNumber.setFinalMoney(endMoney);
             }
-//            getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
 
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_TWO);
             getNumber.setPassNumberTime(new Date());
             //计算最终等位红包价格
             Long tempTime = (getNumber.getPassNumberTime().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
-            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime));             //最终价钱
-            //getNumber.setFinalMoney(endMoney.compareTo(getNumber.getHighMoney()) > 0 ? getNumber.getHighMoney() : endMoney);
+            BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)).setScale(2,   BigDecimal.ROUND_HALF_UP);             //最终价钱
             if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                if(getNumber.getFinalMoney().compareTo(BigDecimal.ZERO) != 1)
-                    getNumber.setFinalMoney(getNumber.getHighMoney());
+                getNumber.setFinalMoney(getNumber.getHighMoney());
             }else{
-                if(getNumber.getFinalMoney().compareTo(BigDecimal.ZERO) != 1)
-                    getNumber.setFinalMoney(endMoney);
+                getNumber.setFinalMoney(endMoney);
             }
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);
