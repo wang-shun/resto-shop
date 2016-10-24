@@ -36,6 +36,26 @@ public class Coupon {
     
     private Integer couponType;//优惠券类型(-1:通用,0:新用户注册,1:邀请注册)
 
+    private String brandId;
+
+    private String shopDetailId;
+
+    final public String getBrandId() {
+        return brandId;
+    }
+
+    final public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
+    final public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    final public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
     public String getId() {
         return id;
     }

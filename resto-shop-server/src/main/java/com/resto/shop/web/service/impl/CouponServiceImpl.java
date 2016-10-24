@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,10 +36,20 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return couponMapper;
     }
 
-    @Override
-    public List<Coupon> listCoupon(Coupon coupon) {
-        return couponMapper.listCoupon(coupon);
-    }
+	@Override
+	public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
+		List<Coupon> list = new ArrayList<>();
+		//查询出品牌的
+		coupon.setBrandId(brandId);
+		coupon.setShopDetailId(shopId);
+		List<Coupon> brandList = couponMapper.listCouponByBrandId(coupon);
+		//查询出店铺的专属优惠券
+		List<Coupon> shopList = couponMapper.listCouponByShopId(coupon);
+		list.addAll(brandList);
+		list.addAll(shopList);
+		return list;
+	}
+
 
 	@Resource
 	OrderPaymentItemService orderPaymentItemService;

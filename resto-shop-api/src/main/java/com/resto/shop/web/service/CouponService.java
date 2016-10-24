@@ -10,7 +10,7 @@ import com.resto.shop.web.model.Order;
 
 public interface CouponService extends GenericService<Coupon, String> {
 
-    List<Coupon> listCoupon(Coupon coupon);
+	List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId);
 
     void insertCoupon(Coupon coupon);
 
