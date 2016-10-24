@@ -245,6 +245,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public void assignArticle(String[] shopList, String[] articleList) {
+        for(String articleId : articleList){ //遍历菜品
+            Article article = articleMapper.selectByPrimaryKey(articleId); //得到菜品
+            ArticleFamily articleFamily = article.getArticleFamily(); //得到菜品分类
 
+        }
     }
 }
