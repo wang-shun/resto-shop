@@ -71,6 +71,16 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	        coupon.setDistributionModeId(cfg.getDistributionModeId());
 	        coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
 	        coupon.setCustomerId(cus.getId());
+
+            //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
+            if(cfg.getShopDetailId()!=null){
+                coupon.setShopDetailId(cfg.getShopDetailId());
+            }
+            //如果是品牌的专有优惠券
+            if(cfg.getIsBrand()==1&&cfg.getBrandId()!=null){
+                coupon.setBrandId(cfg.getBrandId());
+            }
+
 	        //优惠券时间选择的类型分配时间
 	        if(cfg.getTimeConsType()==TimeCons.MODELA){
 	        	coupon.setBeginDate(beginDate);

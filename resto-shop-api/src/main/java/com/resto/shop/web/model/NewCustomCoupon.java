@@ -68,7 +68,28 @@ public class NewCustomCoupon {
 		return timeConsType;
 	}
 
-	public void setTimeConsType(Integer timeConsType) {
+
+	private String shopDetailId;//新增字段店铺id 如果有表示是店铺的优惠券
+
+    private  Integer isBrand;//新增字段 是否是品牌专有
+
+    public Integer getIsBrand() {
+        return isBrand;
+    }
+
+    public void setIsBrand(Integer isBrand) {
+        this.isBrand = isBrand;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
+    public void setTimeConsType(Integer timeConsType) {
 		this.timeConsType = timeConsType;
 	}
 
