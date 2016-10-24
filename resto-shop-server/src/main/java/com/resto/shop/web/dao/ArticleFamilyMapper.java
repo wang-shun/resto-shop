@@ -25,4 +25,7 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
 	List<ArticleFamily> selectListByDistributionModeId(@Param("currentShopId") String currentShopId,@Param("distributionModeId") Integer distributionModeId);
 
 	String selectByName(String name);
+
+    void copyBrandArticleFamily(ArticleFamily articleFamily);
+
 }

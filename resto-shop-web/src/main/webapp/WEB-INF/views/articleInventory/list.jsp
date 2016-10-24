@@ -70,8 +70,9 @@
 				{
 					title: "全选 <input type='checkbox' id='checkAll' />",
 					data:"id",
+					width:'10%',
 					createdCell: function (td, tdData) {
-						$(td).html("<input type='checkbox' value=\" "+tdData+"\" name= 'artcielCheck' />");
+						$(td).html("<input type='checkbox' style='width:30px;height:30px' value=\" "+tdData+"\" name= 'artcielCheck' />");
 					},
 				},
 				{
@@ -194,11 +195,11 @@
 
                                 columns: [
                                     {
-                                        title: "全选 <input type='checkbox' id='checkShop'   />",
+                                        title: "全选 <input type='checkbox' style='width:20px;height:20px' id='checkShop'   />",
                                         data:"id",
                                         width:'30%',
                                         createdCell: function (td, tdData) {
-                                            $(td).html("<input type='checkbox' name='shopType'  value=\" "+tdData+"\"  />");
+                                            $(td).html("<input type='checkbox' style='width:20px;height:20px' name='shopType'  value=\" "+tdData+"\"  />");
                                         },
                                     },
                                     {

@@ -65,5 +65,12 @@
   <select id="selectByName" resultType="java.lang.String">
   		SELECT id from tb_article_family WHERE name=#{name}
   </select>
+
+
+  <insert id="copyBrandArticleFamily">
+    INSERT INTO tb_article_family (id,NAME,peference,shop_detail_id,distribution_mode_id)
+    values
+    (#{id},#{name},#{peference},#{shopDetailId},#{distributionModeId})
+  </insert>
   
 </mapper>

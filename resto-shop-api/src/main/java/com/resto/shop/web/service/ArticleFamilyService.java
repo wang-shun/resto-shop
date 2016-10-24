@@ -12,4 +12,10 @@ public interface ArticleFamilyService extends GenericService<ArticleFamily, Stri
 	List<ArticleFamily> selectListByDistributionModeId(String currentShopId,Integer distributionModeId);
 
 	String selectByName(String Name);
+
+	/**
+	 * 将品牌菜品分类授权给店铺
+	 * @Param articleFamily 菜品分类
+     */
+	void copyBrandArticleFamily(ArticleFamily articleFamily);
 }

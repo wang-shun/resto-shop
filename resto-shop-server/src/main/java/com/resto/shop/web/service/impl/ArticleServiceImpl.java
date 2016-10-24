@@ -13,19 +13,17 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.DatabaseConfig;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.service.ArticlePriceService;
-import com.resto.shop.web.service.ArticleService;
-import com.resto.shop.web.service.KitchenService;
-import com.resto.shop.web.service.MealAttrService;
-import com.resto.shop.web.service.SupportTimeService;
+import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -49,14 +47,24 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Resource
     private KitchenService kitchenService;
 
-    @Resource
-    private MealAttrService mealAttrService;
+
 
     @Resource
     private BrandSettingService brandSettingService;
 
     @Resource
     private FreeDayMapper freedayMapper;
+
+    @Autowired
+    private ArticleFamilyService articleFamilyService;
+
+    @Autowired
+    private MealAttrService mealAttrService;
+
+    @Autowired
+    private MealItemService mealItemService;
+
+
 
 
     @Override
@@ -247,8 +255,27 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void assignArticle(String[] shopList, String[] articleList) {
         for(String articleId : articleList){ //遍历菜品
             Article article = articleMapper.selectByPrimaryKey(articleId); //得到菜品
-            ArticleFamily articleFamily = article.getArticleFamily(); //得到菜品分类
 
+            //得到菜品分类
+            ArticleFamily articleFamily = articleFamilyService.selectById(article.getArticleFamilyId());
+            //循环店铺
+            for(String shopId : shopList){
+                //每个店铺生成自己的菜品分类
+                String familyId = ApplicationUtils.randomUUID();
+                articleFamily.setId(familyId);
+                articleFamily.setShopDetailId(shopId);
+                articleFamilyService.copyBrandArticleFamily(articleFamily);
+
+                article.setId(ApplicationUtils.randomUUID());
+                article.setShopDetailId(shopId);
+                article.setArticleFamilyId(familyId);
+                articleMapper.insert(article);
+
+//                articlePriceServer.selectByArticleId()
+
+
+
+            }
         }
     }
 }

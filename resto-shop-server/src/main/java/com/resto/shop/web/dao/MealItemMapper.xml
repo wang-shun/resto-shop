@@ -174,4 +174,8 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="selectByAttrId" resultType="MealItem">
+        select * from tb_meal_item where attr_id = #{attrId}
+    </select>
 </mapper>

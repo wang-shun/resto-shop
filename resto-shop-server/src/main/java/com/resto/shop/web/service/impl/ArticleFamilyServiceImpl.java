@@ -39,6 +39,10 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 	@Override
 	public String selectByName(String name) {
 		return articlefamilyMapper.selectByName(name);
-	} 
+	}
 
+	@Override
+	public void copyBrandArticleFamily(ArticleFamily articleFamily) {
+		articlefamilyMapper.copyBrandArticleFamily(articleFamily);
+	}
 }
