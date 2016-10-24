@@ -55,6 +55,12 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      */
     List<IncomeReportDto> selectIncomeListByShopId(@Param("shopId") String shopId, @Param("begin") Date begin,@Param("end") Date end);
 
+    /**
+     * 查询异常订单 订单退款失败：  退款金额大于支付金额
+     * @param begin
+     * @param end
+     * @return
+     */
     List<OrderPaymentItem> selectListByResultData(@Param("beginDate") Date begin, @Param("endDate") Date end);
 
     List<Order> selectOrderMoneyByBrandIdGroupByOrderId(@Param("beginDate")Date begin,@Param("endDate")  Date end);
@@ -67,4 +73,12 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      * @return
      */
     List<OrderPaymentItem> selectShopIncomeList(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询异常订单 订单退款失败 没有证书
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<OrderPaymentItem> selectListByResultDataByNoFile(@Param("beginDate") Date begin, @Param("endDate") Date end);
 }

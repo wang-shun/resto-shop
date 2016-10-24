@@ -367,7 +367,7 @@ public class SyncDataController extends GenericController {
     @RequestMapping("syncOrderPaymentItemException")
     @ResponseBody
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
-        //1.查退款失败的
+        //1.查退款失败原因为： 累计退款金额大于支付金额
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
 
         if(!orderPaymentItemList.isEmpty()){
@@ -380,13 +380,20 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("退款没有成功");
+                orderException.setWhy("累计退款金额大于支付金额");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
                 orderExceptionService.insert(orderException);
             }
         }
+
+        //1.查退款失败原因为： 没有证书
+        List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
+
+
+
+
         //查询订单项丢失
         //查询所有的订单和它的订单项(不考虑 orderstate 和productionStatus)
         List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
@@ -406,10 +413,11 @@ public class SyncDataController extends GenericController {
                         //查询店铺的名字
                         ShopDetail shopDetail = shopDetailService.selectById(order2.getShopDetailId());
                         //插入数据
+
                         OrderException orderException = new OrderException();
                         orderException.setOrderId(order2.getId());
                         orderException.setOrderMoney(order2.getOrderMoney());
-                        orderException.setWhy("订单项和订单金额不一致");
+                        orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,order.getOrderMoney()));
                         orderException.setShopName(shopDetail.getName());
                         orderException.setCreateTime(order2.getCreateTime());
                         orderException.setBrandName(brandName);
@@ -427,5 +435,16 @@ public class SyncDataController extends GenericController {
     //设置 BigDecimal 默认值为 0
     public BigDecimal getBigDecimal(BigDecimal data){
         return data != null ? data : BigDecimal.ZERO;
+    }
+
+
+    /**
+     * 提供精确的减法运算。
+     * @param d1 被减数
+     * @param d2 减数
+     * @return 两个参数的差
+     */
+    public static double sub(BigDecimal d1,BigDecimal d2){
+        return d1.subtract(d2).doubleValue();
     }
 }

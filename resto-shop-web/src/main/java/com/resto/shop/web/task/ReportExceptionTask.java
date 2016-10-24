@@ -46,34 +46,35 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-     @Scheduled(cron = "00 34 11 * * ?")   //每天12点执行
+     @Scheduled(cron = "00 17 17 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
         //查询所有的品牌
         List<Brand> brandList = brandService.selectList();
         for (Brand brand : brandList) {
-            //获取品牌用户
-            BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brand.getId(), 8);
-            //创建 Client 对象
-            CloseableHttpClient client = HttpClients.createDefault();
-            //设置登录参数
-            Map<String, String> parameterMap = new HashMap<>();
-            parameterMap.put("username", brandUser.getUsername());
-            parameterMap.put("password", brandUser.getPassword());// 527527527
-            parameterMap.put("isMD5", "true");
-            //登录
-            HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
+            if(!"测试专用品牌".equals(brand.getBrandName())){
+                //获取品牌用户
+                BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brand.getId(), 8);
+                //创建 Client 对象
+                CloseableHttpClient client = HttpClients.createDefault();
+                //设置登录参数
+                Map<String, String> parameterMap = new HashMap<>();
+                parameterMap.put("username", brandUser.getUsername());
+                parameterMap.put("password", brandUser.getPassword());// 527527527
+                parameterMap.put("isMD5", "true");
+                //登录
+                HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
 
-            //得到httpResponse的状态响应码
-            int statusCode = loginResponse.getStatusLine().getStatusCode();
+                //得到httpResponse的状态响应码
+                int statusCode = loginResponse.getStatusLine().getStatusCode();
 
-            if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
-                log.info("--------------HttpClient 登录成功！");
-                Map<String, String> requestMap = new HashMap<>();
-                requestMap.put("beginDate", DateUtil.getYesterDay());
-                requestMap.put("endDate", DateUtil.getYesterDay());
-                requestMap.put("brandName",brand.getBrandName());
-                //循环执行 URLMap 中的链接
+                if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
+                    log.info("--------------HttpClient 登录成功！");
+                    Map<String, String> requestMap = new HashMap<>();
+                    requestMap.put("beginDate", "2016-10-22");
+                    requestMap.put("endDate", "2016-10-22");
+                    requestMap.put("brandName",brand.getBrandName());
+                    //循环执行 URLMap 中的链接
                     HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
                     HttpResponse httpResponse2 = doPost(client, orderPayMentItemExceptionUrl, requestMap);
                     if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -84,9 +85,11 @@ public class ReportExceptionTask {
                     if(httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
                         log.info("执行了插入异常订单项的请求");
                     }
+                }
+
+            }
             }
 
-        }
     }
 
 

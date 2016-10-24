@@ -120,7 +120,18 @@
         <![CDATA[
             pay_time>#{beginDate} and
             pay_time <#{endDate} and
-           result_data like'%ERROR%'
+           result_data like'%累计退款金额大于支付金额%'
+        ]]>
+
+    </select>
+
+
+    <select id="selectListByResultDataByNoFile" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate} and
+           result_data like'%No such file or directory%'
         ]]>
 
     </select>
