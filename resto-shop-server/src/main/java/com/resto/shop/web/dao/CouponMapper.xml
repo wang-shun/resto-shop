@@ -100,10 +100,11 @@
    order by value DESC
   </select>
 
-    <!-- 根据状态查询 客户的优惠劵 -->
+    <!-- 根据状态查询 客户所有品牌的优惠劵 -->
     <select id="listCouponByStatus" resultType="Coupon">
         select * from tb_coupon
         where CUSTOMER_ID = #{customerId}
+        AND  brand_id = #{brandId}
         <if test="status != null and status != '' ">
             and is_used= #{status}
         </if>
@@ -115,6 +116,24 @@
         </if>
         order by VALUE DESC
     </select>
+
+
+    <!-- 根据状态查询 客户所有店铺的优惠劵 -->
+    <select id="listCouponByStatusAndShopId" resultType="Coupon">
+        select * from tb_coupon
+        where CUSTOMER_ID = #{customerId}
+        AND  shop_detail_id = #{shopId}
+        <if test="status != null and status != '' ">
+            and is_used= #{status}
+        </if>
+        <if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
+            <![CDATA[AND (begin_date<=current_date()  AND end_date >=current_date() )]]>
+        </if>
+        <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
+            <![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
+        </if>
+        order by VALUE DESC
+    </select >
 
 
     <select id="listCouponByBrandId" parameterType="com.resto.shop.web.model.Coupon"

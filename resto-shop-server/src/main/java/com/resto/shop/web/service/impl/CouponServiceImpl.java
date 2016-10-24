@@ -114,7 +114,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 	}
 
 	@Override
-	public List<Coupon> listCouponByStatus(String status, String customerId) {
+	public List<Coupon> listCouponByStatus(String status, String customerId,String brandId,String shopId) {
 		String IS_EXPIRE = null;
 		String NOT_EXPIRE = null;
 		if("2".equals(status)){
@@ -124,7 +124,14 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		if("0".equals(status)){
 			NOT_EXPIRE = "NOT_EXPIRE";
 		}
-		return couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId);
+		List<Coupon> list = new ArrayList<>();
+		//查询品牌优惠券
+		List<Coupon> brandList = couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId,brandId);
+		//当前店铺专属的优惠券
+		List<Coupon> shopList = couponMapper.listCouponByStatusAndShopId(status, IS_EXPIRE, NOT_EXPIRE, customerId,shopId);
+		list.addAll(brandList);
+		list.addAll(shopList);
+		return list;
 	}
 
 	@Override
