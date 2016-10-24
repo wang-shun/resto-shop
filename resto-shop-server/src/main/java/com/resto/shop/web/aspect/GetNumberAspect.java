@@ -51,17 +51,17 @@ public class GetNumberAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ZERO){
                 StringBuffer msg = new StringBuffer();
-                msg.append(customer.getNickname() + "，请至餐厅就餐，您一共生成了" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "的等位红包。\n");
-                WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                msg.append(customer.getNickname() + "，请至餐厅就餐，您一共获得" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元的等位红包。\n");
+                WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("亲，您一共获取"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将会直接使用哦。\n");
+                msg.append("亲，您一共获得"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将直接使用哦。\n");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
-                WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
                 StringBuffer msg = new StringBuffer();
                 msg.append(customer.getNickname() + "已过号，谢谢您的支持与谅解，" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元等位红包已失效，期待您的下次光临。\n");
-                WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             }
         }
     }
