@@ -58,4 +58,10 @@ public interface ArticleService extends GenericService<Article, String> {
 	void deleteRecommendId(String recommendId);
 
 	void saveLog(Integer result,String taskId);
+
+
+	/**
+	 * 菜品库分配菜品
+	 */
+	void assignArticle(String [] shopList,String articleList[]);
 }

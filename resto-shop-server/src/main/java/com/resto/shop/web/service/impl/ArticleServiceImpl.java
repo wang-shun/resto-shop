@@ -242,4 +242,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void saveLog(Integer result, String taskId) {
         articleMapper.saveLog(result, taskId);
     }
+
+    @Override
+    public void assignArticle(String[] shopList, String[] articleList) {
+
+    }
 }
