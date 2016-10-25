@@ -39,7 +39,7 @@ public class NewCustomCouponController extends GenericController{
     }
 
     /**
-     * 查询所有的优惠券
+     * 查询所有的优惠券设置
      * @return
      */
     @RequestMapping("/list_all")

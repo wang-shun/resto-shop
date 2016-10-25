@@ -133,7 +133,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         }
         List<Coupon> list = new ArrayList<>();
         //查询品牌优惠券
-        List<Coupon> brandList = couponMapper.listCouponByStatus(status, IS_EXPIRE, NOT_EXPIRE, customerId,brandId);
+        List<Coupon> brandList = couponMapper.listCouponByStatusAndBrandId(status, IS_EXPIRE, NOT_EXPIRE, customerId,brandId);
         //当前店铺专属的优惠券
         List<Coupon> shopList = couponMapper.listCouponByStatusAndShopId(status, IS_EXPIRE, NOT_EXPIRE, customerId,shopId);
         list.addAll(brandList);
