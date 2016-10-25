@@ -15,5 +15,5 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
 	void giftCoupon(Customer cus,Integer couponType,String shopId);
 
     
-    List<NewCustomCoupon> selectListByCouponType(String currentBrandId,Integer couponType);
+    List<NewCustomCoupon> selectListByCouponType(String brandId,Integer couponType,String shopId);
 }

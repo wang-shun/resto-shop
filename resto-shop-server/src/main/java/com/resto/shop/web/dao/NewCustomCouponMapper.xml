@@ -107,5 +107,19 @@
   use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time
    from tb_new_custom_coupon where brand_id=#{brandId} and coupon_type = #{couponType} and is_activty=1
   </select>
+
+    <select id="selectListByCouponTypeAndBrandId" resultType="NewCustomCoupon">
+        select id,name,coupon_value,coupon_validay,coupon_number,create_time,coupon_type,
+        use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time
+        from tb_new_custom_coupon where brand_id=#{brandId} and coupon_type = #{couponType} and is_activty=1 and is_brand=1
+    </select>
+
+
+
+    <select id="selectListByCouponTypeAndShopId" resultType="NewCustomCoupon">
+        select id,name,coupon_value,coupon_validay,coupon_number,create_time,coupon_type,
+        use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time
+        from tb_new_custom_coupon where shop_detail_id=#{shopId} and coupon_type = #{couponType} and is_activty=1 and is_brand=0
+    </select>
   
 </mapper>

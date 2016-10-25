@@ -25,4 +25,8 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
     List<NewCustomCoupon> selectListByCouponType(@Param("brandId")String brandId,@Param("couponType")Integer couponType);
 
 	List<NewCustomCoupon> selectListByBrandIdAndIsActive(@Param("brandId")String brandId,@Param("couponType")Integer couponType);
+
+    List<NewCustomCoupon> selectListByCouponTypeAndBrandId(@Param("brandId") String brandId,@Param("couponType") Integer couponType);
+
+    List<NewCustomCoupon> selectListByCouponTypeAndShopId(@Param("shopId") String shopId,@Param("couponType") Integer couponType);
 }

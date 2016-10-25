@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -98,12 +99,19 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    
 	}
 
-	@Override
-	public List<NewCustomCoupon> selectListByCouponType(String currentBrandId, Integer couponType) {
-		List<NewCustomCoupon> list = newcustomcouponMapper.selectListByCouponType(currentBrandId, couponType);
+
+    @Override
+	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {
+        List<NewCustomCoupon> list = new ArrayList<>();
+        //查询品牌设置的优惠券
+        List<NewCustomCoupon> brandList = newcustomcouponMapper.selectListByCouponTypeAndBrandId(brandId,couponType);
+        //查询店铺设置的优惠券
+        List<NewCustomCoupon> shopList = newcustomcouponMapper.selectListByCouponTypeAndShopId(shopId,couponType);
+		list.addAll(brandList);
+        list.addAll(shopList);
 		//如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
 		if(list==null || list.size()==0){
-			list = newcustomcouponMapper.selectListByCouponType(currentBrandId, -1);
+			list = newcustomcouponMapper.selectListByCouponType(brandId, -1);
 		}
 		return list;
 	}
