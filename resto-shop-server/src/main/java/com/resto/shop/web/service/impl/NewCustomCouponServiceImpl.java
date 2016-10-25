@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
     @Resource
     private NewCustomCouponMapper newcustomcouponMapper;
-
+    
     @Resource
     private CouponService couponService;
 
@@ -41,10 +42,10 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
         return newcustomcouponMapper.insertSelective(newCustomCoupon);
     }
-
+    
     @Override
     public List<NewCustomCoupon> selectListByBrandId(String currentBrandId) {
-
+        
         return newcustomcouponMapper.selectListByBrandId(currentBrandId);
     }
 
@@ -91,7 +92,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //
 //	}
 
-    public void giftCoupon(Customer cus,Integer couponType) {
+    public void giftCoupon(Customer cus,Integer couponType,String shopId) {
         //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
         List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
@@ -114,7 +115,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
             coupon.setCustomerId(cus.getId());
             //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
-            if(cfg.getShopDetailId()!=null){
+            if(cfg.getShopDetailId()!=null&&shopId.equals(cfg.getShopDetailId())){
                 coupon.setShopDetailId(cfg.getShopDetailId());
             }
             //如果是品牌的专有优惠券
@@ -138,15 +139,22 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
     }
 
+
     @Override
-    public List<NewCustomCoupon> selectListByCouponType(String currentBrandId, Integer couponType) {
-        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByCouponType(currentBrandId, couponType);
-        //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
-        if(list==null || list.size()==0){
-            list = newcustomcouponMapper.selectListByCouponType(currentBrandId, -1);
-        }
-        return list;
-    }
+	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {
+        List<NewCustomCoupon> list = new ArrayList<>();
+        //查询品牌设置的优惠券
+        List<NewCustomCoupon> brandList = newcustomcouponMapper.selectListByCouponTypeAndBrandId(brandId,couponType);
+        //查询店铺设置的优惠券
+        List<NewCustomCoupon> shopList = newcustomcouponMapper.selectListByCouponTypeAndShopId(shopId,couponType);
+		list.addAll(brandList);
+        list.addAll(shopList);
+		//如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+		if(list==null || list.size()==0){
+			list = newcustomcouponMapper.selectListByCouponType(brandId, -1);
+		}
+		return list;
+	}
 
     @Override
     public List<NewCustomCoupon> selectListByCouponTypeAndShopId(String shopId, Integer couponType) {

@@ -51,8 +51,8 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return list;
     }
 
-    @Resource
-    OrderPaymentItemService orderPaymentItemService;
+	@Resource
+	OrderPaymentItemService orderPaymentItemService;
 
     @Override
     public void insertCoupon(Coupon coupon) {
@@ -110,13 +110,13 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return coupon;
     }
 
-    @Override
-    public void refundCoupon(String id) {
-        Coupon coupon = selectById(id);
-        coupon.setIsUsed(false);
-        coupon.setRemark("退还优惠卷");
-        update(coupon);
-    }
+	@Override
+	public void refundCoupon(String id) {
+		Coupon coupon = selectById(id);
+		coupon.setIsUsed(false);
+		coupon.setRemark("退还优惠卷");
+		update(coupon);
+	}
 
 
 
@@ -141,21 +141,21 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return list;
     }
 
-    @Override
-    public void useCouponById(String orderId, String id) {
-        Coupon coupon = selectById(id);
-        coupon.setIsUsed(true);
-        coupon.setRemark("后付款消费优惠券");
-        update(coupon);
+	@Override
+	public void useCouponById(String orderId, String id) {
+		Coupon coupon = selectById(id);
+		coupon.setIsUsed(true);
+		coupon.setRemark("后付款消费优惠券");
+		update(coupon);
 
-        OrderPaymentItem item = new OrderPaymentItem();
-        item.setId(ApplicationUtils.randomUUID());
-        item.setOrderId(orderId);
-        item.setPaymentModeId(PayMode.COUPON_PAY);
-        item.setPayTime(new Date());
-        item.setPayValue(coupon.getValue());
-        item.setRemark("优惠卷支付:" + item.getPayValue());
-        item.setResultData(coupon.getId());
-        orderPaymentItemService.insert(item);
-    }
+		OrderPaymentItem item = new OrderPaymentItem();
+		item.setId(ApplicationUtils.randomUUID());
+		item.setOrderId(orderId);
+		item.setPaymentModeId(PayMode.COUPON_PAY);
+		item.setPayTime(new Date());
+		item.setPayValue(coupon.getValue());
+		item.setRemark("优惠卷支付:" + item.getPayValue());
+		item.setResultData(coupon.getId());
+		orderPaymentItemService.insert(item);
+	}
 }
