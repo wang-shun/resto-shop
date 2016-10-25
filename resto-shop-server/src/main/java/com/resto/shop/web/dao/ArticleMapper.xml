@@ -70,7 +70,7 @@
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,recommend_id,is_hidden)
+      is_remind,article_type,stock_working_day,stock_weekend,recommend_id,is_hidden,pId)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -82,7 +82,7 @@
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
-      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT})
+      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -683,4 +683,20 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         (taskId,result)
         values (#{taskId},#{result})
     </insert>
+
+
+    <select id="selectPidAndShopId" resultType="java.lang.Integer">
+        select count(1) from tb_article where shop_detail_id = #{shopId} and pId = #{articleId}
+    </select>
+
+    <select id="getArticleByMeal" resultType="Article">
+select * from tb_article where id in (  select article_id from tb_meal_item where meal_attr_id in
+(select id from tb_meal_attr where article_id = #{articleId})
+GROUP BY article_id
+)
+    </select>
+
+    <select id="selectByPid" resultType="Article">
+        select * from tb_article where pId= #{pId} and shop_detail_id = #{shopId}
+    </select>
 </mapper>

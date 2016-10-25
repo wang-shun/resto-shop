@@ -45,4 +45,9 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 	public void copyBrandArticleFamily(ArticleFamily articleFamily) {
 		articlefamilyMapper.copyBrandArticleFamily(articleFamily);
 	}
+
+	@Override
+	public ArticleFamily checkSame(String shopId, String name) {
+		return articlefamilyMapper.checkSame(shopId, name);
+	}
 }

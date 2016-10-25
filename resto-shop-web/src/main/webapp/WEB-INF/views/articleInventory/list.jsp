@@ -62,7 +62,6 @@
 				dataSrc: ""
 			},
 
-			stateSave: true,
 			deferRender: true,
 			ordering: false,
 
@@ -185,11 +184,10 @@
                                 "lengthMenu": [[-1,5, 10, 15], ["全部",5, 10, 15]],
 								"scrollY": "300px",
                                 ajax: {
-                                    url: "shopDetail/list_all",
+                                    url: "shopDetail/list_without_self",
                                     dataSrc: "data"
                                 },
 
-                                stateSave: true,
                                 deferRender: true,
                                 ordering: false,
 

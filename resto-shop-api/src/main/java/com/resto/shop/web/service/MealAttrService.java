@@ -15,5 +15,6 @@ public interface MealAttrService extends GenericService<MealAttr, Integer> {
 
 
 	List<MealAttr> selectFullByArticleId(String articleId,String show);
-    
+
+
 }

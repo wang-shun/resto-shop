@@ -47,5 +47,18 @@ public class ShopDetailController extends GenericController{
 	    List<ShopDetail> lists = shopDetailService.selectByBrandId(getCurrentBrandId());
 	    return getSuccessResult(lists);
 	}
+
+
+	@RequestMapping("list_without_self")
+	@ResponseBody
+	public Result listWithoutSelf(){
+		List<ShopDetail> lists = shopDetailService.selectByBrandId(getCurrentBrandId());
+		for(int i = 0;i < lists.size();i++){
+			if(lists.get(i).getId().equals(getCurrentShopId())){
+				lists.remove(i);
+			}
+		}
+		return getSuccessResult(lists);
+	}
 	
 }

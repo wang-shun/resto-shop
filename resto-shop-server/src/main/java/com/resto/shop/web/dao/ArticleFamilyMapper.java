@@ -28,4 +28,6 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
 
     void copyBrandArticleFamily(ArticleFamily articleFamily);
 
+    ArticleFamily checkSame(@Param("shopId") String shopId,@Param("name") String name);
+
 }

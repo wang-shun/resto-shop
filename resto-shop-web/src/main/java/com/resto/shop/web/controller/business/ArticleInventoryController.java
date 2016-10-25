@@ -35,7 +35,7 @@ public class ArticleInventoryController {
     public Result create(String [] shopList,String [] articleList) {
 
         articleService.assignArticle(shopList, articleList);
-
+        articleService.assignTotal(shopList, articleList);
         return new Result(true);
 
     }
