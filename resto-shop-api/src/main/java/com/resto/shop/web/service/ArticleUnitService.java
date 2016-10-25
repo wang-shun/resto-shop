@@ -8,4 +8,9 @@ import com.resto.shop.web.model.ArticleUnit;
 public interface ArticleUnitService extends GenericService<ArticleUnit, Integer> {
 	
 	List<ArticleUnit> selectListByAttrId(Integer attrId);
+
+	int insertByAuto(ArticleUnit articleUnit);
+
+	ArticleUnit selectSame(String name,String attrId);
+
 }

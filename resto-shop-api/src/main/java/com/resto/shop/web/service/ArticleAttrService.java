@@ -29,4 +29,17 @@ public interface ArticleAttrService extends GenericService<ArticleAttr, Integer>
 	 * @param id
 	 */
 	void updateInfo(ArticleAttr articleAttr);
+
+	/**
+	 * 根据菜品id查询信息
+	 * @param articleId 菜品id
+	 * @return
+     */
+	List<ArticleAttr> selectListByArticleId(String articleId);
+
+	int insertByAuto(ArticleAttr articleAttr);
+
+	ArticleAttr selectSame(String name,String shopId);
+
+
 }

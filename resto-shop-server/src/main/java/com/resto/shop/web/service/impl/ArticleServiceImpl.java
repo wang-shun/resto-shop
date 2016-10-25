@@ -24,6 +24,8 @@ import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -65,6 +67,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     private MealItemService mealItemService;
 
 
+    @Autowired
+    private ArticleAttrService articleAttrService;
+
+    @Autowired
+    private ArticleUnitService articleUnitService;
 
 
     @Override
@@ -269,10 +276,56 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 article.setId(ApplicationUtils.randomUUID());
                 article.setShopDetailId(shopId);
                 article.setArticleFamilyId(familyId);
+
+
+                //判断下是不是有规格单品
+                List<ArticleAttr> articleAttrs = articleAttrService.selectListByArticleId(articleId);
+                StringBuilder hasUnit = new StringBuilder();
+                if(!CollectionUtils.isEmpty(articleAttrs)){
+                    for(ArticleAttr articleAttr : articleAttrs){
+                        //得到要复制的规格
+                        List<ArticleUnit> articleUnits = articleUnitService.selectListByAttrId(articleAttr.getId());
+                        ArticleAttr same =  articleAttrService.selectSame(articleAttr.getName(),shopId);
+                        //不存在相同规格属性
+                        if(same == null){
+                            articleAttr.setId(null);
+                            articleAttr.setShopDetailId(shopId);
+                            articleAttrService.insertByAuto(articleAttr);
+                        }else{
+                            //存在相同规格属性
+                            articleAttr.setId(same.getId());
+                        }
+
+                        for(ArticleUnit articleUnit : articleUnits){
+                            ArticlePrice articlePrice = articlePriceServer.selectByArticle(articleId,articleUnit.getId());
+                            if(articlePrice == null){
+                                continue;
+                            }
+                            ArticleUnit sameUnit = articleUnitService.selectSame(articleUnit.getName(),articleAttr.getId().toString());
+                            if(sameUnit == null){
+                                articleUnit.setTbArticleAttrId(articleAttr.getId());
+                                articleUnit.setId(null);
+                                articleUnitService.insertByAuto(articleUnit);
+                            }else{
+                                articleUnit.setId(sameUnit.getId());
+                            }
+
+
+                            hasUnit.append(sameUnit.getId()).append(",");
+                            articlePrice.setArticleId(article.getId());
+                            articlePrice.setUnitIds(articleUnit.getId().toString());
+                            articlePrice.setId(article.getId() + "@"+articlePrice.getUnitIds());
+                            articlePriceServer.insert(articlePrice);
+                        }
+                    }
+
+                }
+                if(!StringUtils.isEmpty(hasUnit.toString())){
+                    article.setHasUnit(hasUnit.toString().substring(0,hasUnit.length()-1));
+
+                }
+
                 articleMapper.insert(article);
-
-//                articlePriceServer.selectByArticleId()
-
 
 
             }

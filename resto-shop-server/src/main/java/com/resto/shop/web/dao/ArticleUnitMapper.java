@@ -27,5 +27,9 @@ public interface ArticleUnitMapper extends GenericDao<ArticleUnit,Integer>{
      * @param id
      */
     void deleteByAttrId(Integer id);
+
+    int insertByAuto(ArticleUnit articleUnit);
+
+    ArticleUnit selectSame(@Param("name") String name,@Param("attrId") String attrId);
        
 }
