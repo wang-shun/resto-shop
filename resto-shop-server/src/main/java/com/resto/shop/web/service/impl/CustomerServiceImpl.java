@@ -39,7 +39,6 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 
 	@Override
 	public Customer login(String openid) {
-		log.info("\n\n----查询\n\n");
 		Customer customer = selectByOpenId(openid);
 		if(customer!=null){
 			Customer change = new Customer();
@@ -47,7 +46,6 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			change.setLastLoginTime(new Date());
 			update(change);
 		}
-		log.info("\n\n----查询2\n\n");
 		return customer;
 	}
 	
@@ -76,7 +74,6 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	
 	@Override
 	public Customer register(Customer customer) {
-		log.info("【register   ----   01】");
 		String customerId = ApplicationUtils.randomUUID();
 		customer.setId(customerId);
 		Account account = new Account();
@@ -88,7 +85,6 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setLastLoginTime(new Date());
 		customer.setRegiestTime(new Date());
 		customer.setAccount(account.getRemain());
-		log.info("【register   ----   02】");
 		insert(customer);
 		return customer;
 	}
