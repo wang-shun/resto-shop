@@ -318,6 +318,7 @@ var tb2 = $("#articleSellTable").DataTable({
         {
           title : "编号",
            data : "numberCode",
+           defaultContent:"",
         },
 		{
 			title : "销量(份)",
