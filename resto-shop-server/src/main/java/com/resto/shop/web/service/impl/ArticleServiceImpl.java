@@ -252,34 +252,34 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public void assignArticle(String[] shopList, String[] articleList) {
-        for (String articleId : articleList) { //遍历菜品
-            Article article = articleMapper.selectByPrimaryKey(articleId); //得到菜品
+        for (String articleId : articleList) { //遍历要复制的菜品
+            Article article = articleMapper.selectByPrimaryKey(articleId); //得到要复制的菜品
 
-            //得到菜品分类
+            //得到要复制的菜品分类
             ArticleFamily articleFamily = articleFamilyService.selectById(article.getArticleFamilyId());
             //循环店铺
             for (String shopId : shopList) {
+                //将菜品的店铺设置为要复制的店铺
+                article.setId(ApplicationUtils.randomUUID());
+                article.setShopDetailId(shopId);
 
-                int check = articleMapper.selectPidAndShopId(shopId, articleId);
-                if (check > 0) {
-                    continue;
-                }
+                //判断该店铺下是否已有菜品分类
                 ArticleFamily family = articleFamilyService.checkSame(shopId, articleFamily.getName());
                 if (family == null) {
-                    //每个店铺生成自己的菜品分类
+                    //如果没有,那么生成
                     String familyId = ApplicationUtils.randomUUID();
                     articleFamily.setId(familyId);
                     articleFamily.setShopDetailId(shopId);
                     articleFamilyService.copyBrandArticleFamily(articleFamily);
                     article.setArticleFamilyId(familyId);
                 }else{
+                    //如果有,那么覆盖
+                    //todo
+                    articleFamily.setId(family.getId());
+                    articleFamily.setShopDetailId(shopId);
+                    articleFamilyService.update(articleFamily);
                     article.setArticleFamilyId(family.getId());
                 }
-
-
-                article.setId(ApplicationUtils.randomUUID());
-                article.setShopDetailId(shopId);
-
 
                 //判断下是不是有规格单品
                 List<ArticleAttr> articleAttrs = articleAttrService.selectListByArticleId(articleId);
@@ -297,8 +297,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             articleAttr.setShopDetailId(shopId);
                             articleAttrService.insertByAuto(articleAttr);
                         } else {
-                            //存在相同规格属性
+                            //存在相同规格属性,覆盖
                             articleAttr.setId(same.getId());
+                            articleAttr.setShopDetailId(shopId);
+                            articleAttrService.update(articleAttr);
                         }
 
                         for (ArticleUnit articleUnit : articleUnits) {
@@ -313,15 +315,27 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                                 articleUnitService.insertByAuto(articleUnit);
                             } else {
                                 articleUnit.setId(sameUnit.getId());
+                                articleUnit.setTbArticleAttrId(articleAttr.getId());
+                                articleUnitService.update(articleUnit);
 
                             }
 
                             hasUnit.append(articleUnit.getId()).append(",");
 
-                            articlePrice.setArticleId(article.getId());
-                            articlePrice.setUnitIds(articleUnit.getId().toString());
-                            articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
-                            articlePriceServer.insert(articlePrice);
+                            ArticlePrice copy = articlePriceServer.selectById(article.getId() + "@" + articlePrice.getUnitIds());
+                            if(copy != null){
+                                articlePrice.setArticleId(article.getId());
+                                articlePrice.setUnitIds(articleUnit.getId().toString());
+                                articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
+                                articlePriceServer.update(articlePrice);
+                            }else{
+                                articlePrice.setArticleId(article.getId());
+                                articlePrice.setUnitIds(articleUnit.getId().toString());
+                                articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
+                                articlePriceServer.insert(articlePrice);
+                            }
+
+
                         }
                     }
 
@@ -333,7 +347,19 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
                 }
                 article.setpId(articleId);
-                articleMapper.insert(article);
+                //判断要复制的菜品是否已经在该店铺下生成过
+                Article copy = articleMapper.selectByPid(articleId, shopId);
+                if (copy != null) {
+                    //如果生成过,那么覆盖
+                    //todo
+                    article.setId(copy.getId());
+                    articleMapper.updateByPrimaryKeySelective(article);
+
+                }else{
+                    articleMapper.insert(article);
+                }
+
+
 
 
             }
@@ -353,16 +379,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     //如果是套餐的话，先获取套餐下的全部单品
                     List<Article> articles = articleMapper.getArticleByMeal(articleId);
                     for (Article art : articles) {
-                        //判断每个单品是不是全部已经引入
-                        int  check = articleMapper.selectPidAndShopId(shopId, art.getId());
-                        if (check > 0) {
-                            continue;
-                        }
-                        //引入单品
+
+                        art.setShopDetailId(shopId);
+                        art.setpId(art.getId());
+
                         //得到菜品分类
                         ArticleFamily family = articleFamilyService.selectById(art.getArticleFamilyId());
-
-
                         ArticleFamily articleFamily = articleFamilyService.checkSame(shopId, family.getName());
                         if (articleFamily == null) {
                             //每个店铺生成自己的菜品分类
@@ -370,17 +392,26 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             family.setId(familyId);
                             family.setShopDetailId(shopId);
                             articleFamilyService.copyBrandArticleFamily(family);
-                            article.setArticleFamilyId(familyId);
+                            art.setArticleFamilyId(familyId);
                         }else{
-                            article.setArticleFamilyId(articleFamily.getId());
+                            articleFamily.setId(articleFamily.getId());
+                            articleFamily.setShopDetailId(shopId);
+                            articleFamilyService.update(articleFamily);
+                            art.setArticleFamilyId(articleFamily.getId());
                         }
 
-                        //每个店铺生成自己的菜品分类
+                        //判断每个单品是不是全部已经引入
+                        Article copy = articleMapper.selectByPid(art.getId(), shopId);
+                        if (copy != null) {
+                            //如果生成过,那么覆盖
+                            //todo
+                            art.setId(copy.getId());
+                            articleMapper.updateByPrimaryKeySelective(art);
 
-                        art.setShopDetailId(shopId);
-                        art.setpId(art.getId());
-                        art.setId(ApplicationUtils.randomUUID());
-                        articleMapper.insert(art);
+                        }else{
+                            art.setId(ApplicationUtils.randomUUID());
+                            articleMapper.insert(art);
+                        }
                     }
 
 //                    //得到要复制的套餐属性

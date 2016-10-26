@@ -687,16 +687,18 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
     <select id="selectPidAndShopId" resultType="java.lang.Integer">
         select count(1) from tb_article where shop_detail_id = #{shopId} and pId = #{articleId}
+        and state = 1
     </select>
 
     <select id="getArticleByMeal" resultType="Article">
 select * from tb_article where id in (  select article_id from tb_meal_item where meal_attr_id in
 (select id from tb_meal_attr where article_id = #{articleId})
 GROUP BY article_id
-)
+) and state = 1
     </select>
 
     <select id="selectByPid" resultType="Article">
         select * from tb_article where pId= #{pId} and shop_detail_id = #{shopId}
+        and state = 1
     </select>
 </mapper>
