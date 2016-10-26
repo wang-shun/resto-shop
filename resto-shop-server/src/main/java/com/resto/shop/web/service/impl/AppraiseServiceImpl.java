@@ -120,7 +120,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setShopDetailId(order.getShopDetailId());
 			BigDecimal redMoney= rewardRed(order);
 			appraise.setRedMoney(redMoney);
-			
+			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
 			order.setOrderState(OrderState.HASAPPRAISE);
 			order.setAllowAppraise(false);
