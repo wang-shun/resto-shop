@@ -53,10 +53,6 @@ public class ShareAspect {
 	@AfterReturning(value="saveAppraise()",returning="appraise")
 	public void saveAppraiseSuccess(Appraise appraise) throws InterruptedException {
 
-		WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
-		Customer customer = customerService.selectById(appraise.getCustomerId());
-        WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//		WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 
 		log.info("保存评论成功,触发分享判定:"+appraise.getId());
 		if(appraise!=null){
