@@ -2,6 +2,9 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.model.Customer;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -49,6 +52,12 @@ public class ShareAspect {
 	
 	@AfterReturning(value="saveAppraise()",returning="appraise")
 	public void saveAppraiseSuccess(Appraise appraise) throws InterruptedException {
+
+		WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
+		Customer customer = customerService.selectById(appraise.getCustomerId());
+//        WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+		WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
 		log.info("保存评论成功,触发分享判定:"+appraise.getId());
 		if(appraise!=null){
 			ShareSetting setting = shareSettingService.selectValidSettingByBrandId(DataSourceContextHolder.getDataSourceName());
