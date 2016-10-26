@@ -546,12 +546,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             case ShopMode.MANUAL_ORDER: //验证码下单
             case ShopMode.CALL_NUMBER: //电视叫号
             case ShopMode.TABLE_MODE: //坐下点餐
-                result = ((order.getOrderState().equals(OrderState.CONFIRM) ||
+                result = (((order.getOrderState().equals(OrderState.CONFIRM) ||
                         order.getOrderState().equals(OrderState.PAYMENT))
                         &&
                         order.getProductionStatus().equals(ProductionStatus.NOT_PRINT))
                         || (order.getOrderState().equals(OrderState.PAYMENT) &&
-                        order.getProductionStatus().equals(ProductionStatus.NOT_ORDER));
+                        order.getProductionStatus().equals(ProductionStatus.NOT_ORDER)))
+                   || (order.getOrderState().equals(OrderState.SUBMIT) && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER))  
+                ;
                 break;
             default:
                 log.info("未知的店铺模式:" + orderMode);
@@ -915,6 +917,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
         // 根据id查询订单
         Order order = selectById(orderId);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if(ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()){
+        	order.setProductionStatus(ProductionStatus.PRINTED);
+        	order.setPrintOrderTime(new Date());
+        	orderMapper.updateByPrimaryKeySelective(order);
+        }
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
@@ -1851,6 +1859,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printKitchenReceipt(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if(ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()){
+        	order.setProductionStatus(ProductionStatus.PRINTED);
+        	order.setPrintOrderTime(new Date());
+        	orderMapper.updateByPrimaryKeySelective(order);
+        }
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
@@ -2442,8 +2456,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
 	public void cleanShopOrder(String shopId) {
-		String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
+		String[] orderStates = new String[]{OrderState.SUBMIT+"",OrderState.PAYMENT+""};//未付款和未全部付款和已付款
+		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+""};//已付款未下单
 		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
 		for(Order order : orderList){
 			if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
@@ -2458,7 +2472,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-            StringBuilder sb = new StringBuilder("亲,今日未消费订单已退款,欢迎下次再来本店消费\n");
+            StringBuilder sb = null;
+            if(order.getOrderState().equals(OrderState.SUBMIT)){//未支付和未完成支付
+            	sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
+            }else{//已支付未消费
+            	sb = new StringBuilder("亲,今日未消费订单已自动退款,欢迎下次再来本店消费\n");
+            }
             sb.append("订单编号:"+order.getSerialNumber()+"\n");
             if(order.getOrderMode()!=null){
                 switch (order.getOrderMode()) {
