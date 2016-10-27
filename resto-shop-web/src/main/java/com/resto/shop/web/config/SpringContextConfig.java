@@ -324,6 +324,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public RedisService redisService() {
+        return proxy.create(RedisService.class);
+    }
+
+    @Bean
     public RolePermissionService rolePermissionService() {
         return proxy.create(RolePermissionService.class);
     }
