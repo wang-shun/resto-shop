@@ -1,17 +1,19 @@
-package com.resto.shop.web;
+package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.constant.Function;
 import com.resto.shop.web.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
+
 @RpcService
 public class RedisServiceImpl implements RedisService{
 
-    @Autowired(required = false)//运行的Spring环境中如果存在就注入，没有就忽略
-    private  static ShardedJedisPool shardedJedisPool;
+    @Autowired(required = false)//如果Spring容器中有对象就注入，没有就忽略
+    public ShardedJedisPool shardedJedisPool;
 
-    public static  <T> T execute(Function<T, ShardedJedis> fun) {
+    @Override
+    public    <T> T execute(Function<T, ShardedJedis> fun) {
         ShardedJedis shardedJedis = null;
         try {
             // 从连接池中获取到jedis分片对象
@@ -30,11 +32,12 @@ public class RedisServiceImpl implements RedisService{
 
     /**
      * 执行set操作
-     * 
+     *
      * @param key
      * @param value
      * @return
      */
+    @Override
     public String set(final String key, final String value) {
         return this.execute(new Function<String, ShardedJedis>() {
             @Override
@@ -46,10 +49,11 @@ public class RedisServiceImpl implements RedisService{
 
     /**
      * 执行GET操作
-     * 
+     *
      * @param key
      * @return
      */
+    @Override
     public String get(final String key) {
         return this.execute(new Function<String, ShardedJedis>() {
             @Override
@@ -61,10 +65,11 @@ public class RedisServiceImpl implements RedisService{
 
     /**
      * 执行DEL操作
-     * 
+     *
      * @param key
      * @return
      */
+    @Override
     public Long del(final String key) {
         return this.execute(new Function<Long, ShardedJedis>() {
             @Override
@@ -76,11 +81,12 @@ public class RedisServiceImpl implements RedisService{
 
     /**
      * 设置生存时间，单位为秒
-     * 
+     *
      * @param key
      * @param seconds
      * @return
      */
+    @Override
     public Long expire(final String key, final Integer seconds) {
         return this.execute(new Function<Long, ShardedJedis>() {
             @Override
@@ -92,11 +98,12 @@ public class RedisServiceImpl implements RedisService{
 
     /**
      * 执行set操作并且设置生存时间，单位为秒
-     * 
+     *
      * @param key
      * @param value
      * @return
      */
+    @Override
     public  String set(final String key, final String value, final Integer seconds) {
         return this.execute(new Function<String, ShardedJedis>() {
             @Override

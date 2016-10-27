@@ -1,14 +1,10 @@
 package com.resto.shop.web.service;
 import com.resto.shop.web.constant.Function;
-import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.ShardedJedis;
 
 public interface RedisService {
 
-
-
-    public static  <T> T execute(Function<T, Object> fun) {
-        return null;
-    }
+       <T> T execute(Function<T, ShardedJedis> fun) ;
 
     /**
      * 执行set操作
@@ -17,9 +13,7 @@ public interface RedisService {
      * @param value
      * @return
      */
-    public String set(final String key, final String value) {
-        return null;
-    }
+     String set(final String key, final String value);
 
     /**
      * 执行GET操作
@@ -27,9 +21,7 @@ public interface RedisService {
      * @param key
      * @return
      */
-    public String get(final String key) {
-       return null;
-    }
+    String get(final String key);
 
     /**
      * 执行DEL操作
@@ -37,9 +29,7 @@ public interface RedisService {
      * @param key
      * @return
      */
-    public Long del(final String key) {
-        return null;
-    }
+     Long del(final String key);
 
     /**
      * 设置生存时间，单位为秒
@@ -48,9 +38,7 @@ public interface RedisService {
      * @param seconds
      * @return
      */
-    public Long expire(final String key, final Integer seconds) {
-        return null;
-    }
+     Long expire(final String key, final Integer seconds);
 
     /**
      * 执行set操作并且设置生存时间，单位为秒
@@ -59,9 +47,7 @@ public interface RedisService {
      * @param value
      * @return
      */
-    public  String set(final String key, final String value, final Integer seconds) {
-        return null;
-    }
+    String set(final String key, final String value, final Integer seconds);
 
 
 
