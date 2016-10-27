@@ -219,8 +219,7 @@ public class OrderMessageListener implements MessageListener {
         log.info("分享人:" + customer.getNickname());
         msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
-        WeChatUtils.sendCustomerMsgASync("322323232323", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("分享完毕:" );
     }
 
@@ -250,6 +249,33 @@ public class OrderMessageListener implements MessageListener {
         if (order.getOrderState() == OrderState.SUBMIT) {
             log.info("自动取消订单:" + obj.getString("orderId"));
             orderService.cancelOrder(obj.getString("orderId"));
+            log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+            StringBuilder sb = new StringBuilder("亲,今日未完成支付的订单已被系统自动取消,欢迎下次再来本店消费\n");
+            sb.append("订单编号:"+order.getSerialNumber()+"\n");
+            if(order.getOrderMode()!=null){
+                switch (order.getOrderMode()) {
+                    case ShopMode.TABLE_MODE:
+                        sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                        break;
+                    default:
+                        sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                        break;
+                }
+            }
+            if( order.getShopName()==null||"".equals(order.getShopName())){
+                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+            }
+            sb.append("就餐店铺："+order.getShopName()+"\n");
+            sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+            sb.append("订单明细：\n");
+            List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+            for(OrderItem item : orderItem){
+                sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+            }
+            sb.append("订单金额："+order.getOrderMoney()+"\n");
+            WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }
