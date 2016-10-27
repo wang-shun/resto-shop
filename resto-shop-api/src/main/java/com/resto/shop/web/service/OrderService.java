@@ -337,7 +337,6 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 打印厨房小票
-     *
      * @param oid
      * @return
      */
@@ -355,7 +354,6 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询品牌菜品销售  用于中间数据库
-     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -365,7 +363,6 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询店铺菜品销售 用于中间数据库
-     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -375,15 +372,12 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询订单详情 用于中间数据库
-     *
      * @param beginDate
      * @param endDate
      * @param currentBrandId
      * @return
      */
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
-
-
 
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单
@@ -400,6 +394,32 @@ public interface OrderService extends GenericService<Order, String> {
 
 	void useRedPrice(BigDecimal factMoney,String orderId);
 
+    List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String currentBrandId);
+
+    List<Order> selectHasPayListOrderByBrandId(String beginDate, String endDate, String currentBrandId);
+
+    /**
+     * 查询所有订单和该订单下的订单项  (用于报表的异常订单项中查询订单项是否和订单的金额一致 也就是看有没有订单项丢失)
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate,String brandId);
+
+    void updateOrderChild(String orderId);
+
+    void cleanShopOrder(String shopId);
+
+    public boolean cancelExceptionOrder(String orderId);
+
+    /**
+     * 查询所有已提交单位支付的订单
+     * @param currentBrandId
+     * @param s
+     * @param s1
+     * @return
+     */
+    List<Order> selectNeedCacelOrderList(String currentBrandId, String s, String s1);
 	void updateOrderChild(String orderId);
 
 	void cleanShopOrder(String shopId);

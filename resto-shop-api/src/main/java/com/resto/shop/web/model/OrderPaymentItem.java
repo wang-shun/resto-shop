@@ -13,7 +13,7 @@ public class OrderPaymentItem {
     private String remark;
 
     private Integer paymentModeId;
-    
+
     /**
      * 用于保存支付方式
      */
@@ -25,6 +25,17 @@ public class OrderPaymentItem {
 
     //新增字段用来存营收总额
     private  BigDecimal factIncome;
+
+    //新增用来关联店铺id
+    private  String shopDetailId;
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
 
     public BigDecimal getFactIncome() {
         return factIncome;
@@ -90,25 +101,25 @@ public class OrderPaymentItem {
         this.resultData = resultData == null ? null : resultData.trim();
     }
 
-	public String getPaymentModeVal() {
-		return paymentModeVal;
-	}
+    public String getPaymentModeVal() {
+        return paymentModeVal;
+    }
 
-	public void setPaymentModeVal(String paymentModeVal) {
-		this.paymentModeVal = paymentModeVal;
-	}
+    public void setPaymentModeVal(String paymentModeVal) {
+        this.paymentModeVal = paymentModeVal;
+    }
 
-	public OrderPaymentItem(BigDecimal payValue, Integer paymentModeId, String paymentModeVal) {
-		super();
-		this.payValue = payValue;
-		this.paymentModeId = paymentModeId;
-		this.paymentModeVal = paymentModeVal;
-	}
-	
-	public OrderPaymentItem(){
-		
-	}
-    
+    public OrderPaymentItem(BigDecimal payValue, Integer paymentModeId, String paymentModeVal) {
+        super();
+        this.payValue = payValue;
+        this.paymentModeId = paymentModeId;
+        this.paymentModeVal = paymentModeVal;
+    }
+
+    public OrderPaymentItem(){
+
+    }
+
     public  OrderPaymentItem(BigDecimal factIncome){
         super();
         this.factIncome = factIncome;

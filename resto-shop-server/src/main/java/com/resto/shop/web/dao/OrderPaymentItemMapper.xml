@@ -2,63 +2,63 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderPaymentItemMapper">
-  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.OrderPaymentItem">
-    <id column="id" property="id" jdbcType="VARCHAR"/>
-    <result column="pay_time" property="payTime" jdbcType="TIMESTAMP"/>
-    <result column="pay_value" property="payValue" jdbcType="DECIMAL"/>
-    <result column="remark" property="remark" jdbcType="VARCHAR"/>
-    <result column="payment_mode_id" property="paymentModeId" jdbcType="INTEGER"/>
-    <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.resto.shop.web.model.OrderPaymentItem" extends="BaseResultMap">
-    <result column="result_data" property="resultData" jdbcType="LONGVARCHAR"/>
-  </resultMap>
-  <sql id="Base_Column_List">id, pay_time, pay_value, remark, payment_mode_id, order_id</sql>
-  <sql id="Blob_Column_List">result_data</sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">select 
-    <include refid="Base_Column_List"/> , 
-    <include refid="Blob_Column_List"/> from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item (id, pay_time, pay_value, remark, payment_mode_id, order_id, result_data) values (#{id,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{payValue,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{paymentModeId}, #{orderId,jdbcType=VARCHAR}, #{resultData,jdbcType=LONGVARCHAR})</insert>
-  <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item 
-    <trim prefix="(" suffix=")" suffixOverrides=","> 
-      <if test="id != null">id,</if>  
-      <if test="payTime != null">pay_time,</if>  
-      <if test="payValue != null">pay_value,</if>  
-      <if test="remark != null">remark,</if>  
-      <if test="paymentModeId != null">payment_mode_id,</if>  
-      <if test="orderId != null">order_id,</if>  
-      <if test="resultData != null">result_data,</if> 
-    </trim>  
-    <trim prefix="values (" suffix=")" suffixOverrides=","> 
-      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
-      <if test="payTime != null">#{payTime,jdbcType=TIMESTAMP},</if>  
-      <if test="payValue != null">#{payValue,jdbcType=DECIMAL},</if>  
-      <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
-      <if test="paymentModeId != null">#{paymentModeId},</if>  
-      <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>  
-      <if test="resultData != null">#{resultData,jdbcType=LONGVARCHAR},</if> 
-    </trim> 
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item 
-    <set> 
-      <if test="payTime != null">pay_time = #{payTime,jdbcType=TIMESTAMP},</if>  
-      <if test="payValue != null">pay_value = #{payValue,jdbcType=DECIMAL},</if>  
-      <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
-      <if test="paymentModeId != null">payment_mode_id = #{paymentModeId},</if>  
-      <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>  
-      <if test="resultData != null">result_data = #{resultData,jdbcType=LONGVARCHAR},</if> 
-    </set> where id = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId}, order_id = #{orderId,jdbcType=VARCHAR}, result_data = #{resultData,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId}, order_id = #{orderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
-  <select id="selectList" resultType="OrderPaymentItem">select * from tb_order_payment_item</select>
-  <select id="selectByOrderId" resultType="OrderPaymentItem">
+    <resultMap id="BaseResultMap" type="com.resto.shop.web.model.OrderPaymentItem">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="pay_time" property="payTime" jdbcType="TIMESTAMP"/>
+        <result column="pay_value" property="payValue" jdbcType="DECIMAL"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="payment_mode_id" property="paymentModeId" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.resto.shop.web.model.OrderPaymentItem" extends="BaseResultMap">
+        <result column="result_data" property="resultData" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, pay_time, pay_value, remark, payment_mode_id, order_id</sql>
+    <sql id="Blob_Column_List">result_data</sql>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">select
+        <include refid="Base_Column_List"/> ,
+        <include refid="Blob_Column_List"/> from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_order_payment_item where id = #{id,jdbcType=VARCHAR}</delete>
+    <insert id="insert" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item (id, pay_time, pay_value, remark, payment_mode_id, order_id, result_data) values (#{id,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{payValue,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{paymentModeId}, #{orderId,jdbcType=VARCHAR}, #{resultData,jdbcType=LONGVARCHAR})</insert>
+    <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">insert into tb_order_payment_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="payTime != null">pay_time,</if>
+            <if test="payValue != null">pay_value,</if>
+            <if test="remark != null">remark,</if>
+            <if test="paymentModeId != null">payment_mode_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="resultData != null">result_data,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=VARCHAR},</if>
+            <if test="payTime != null">#{payTime,jdbcType=TIMESTAMP},</if>
+            <if test="payValue != null">#{payValue,jdbcType=DECIMAL},</if>
+            <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+            <if test="paymentModeId != null">#{paymentModeId},</if>
+            <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>
+            <if test="resultData != null">#{resultData,jdbcType=LONGVARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item
+        <set>
+            <if test="payTime != null">pay_time = #{payTime,jdbcType=TIMESTAMP},</if>
+            <if test="payValue != null">pay_value = #{payValue,jdbcType=DECIMAL},</if>
+            <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>
+            <if test="paymentModeId != null">payment_mode_id = #{paymentModeId},</if>
+            <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>
+            <if test="resultData != null">result_data = #{resultData,jdbcType=LONGVARCHAR},</if>
+        </set> where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId}, order_id = #{orderId,jdbcType=VARCHAR}, result_data = #{resultData,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OrderPaymentItem">update tb_order_payment_item set pay_time = #{payTime,jdbcType=TIMESTAMP}, pay_value = #{payValue,jdbcType=DECIMAL}, remark = #{remark,jdbcType=VARCHAR}, payment_mode_id = #{paymentModeId}, order_id = #{orderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+    <select id="selectList" resultType="OrderPaymentItem">select * from tb_order_payment_item</select>
+    <select id="selectByOrderId" resultType="OrderPaymentItem">
   	select * from tb_order_payment_item where order_id=#{0}
   </select>
-  
-  <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
+
+    <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
   SELECT SUM(pay_value) payValue, payment_mode_id  FROM tb_order_payment_item
 	WHERE order_id IN (
 		SELECT id FROM tb_order o WHERE o.production_status in (2,3) AND o.shop_detail_id = #{shopId}
@@ -66,14 +66,14 @@
 	)
 	GROUP BY payment_mode_id
   </select>
-  
-  <!-- 根据时间查询 订单充值记录，用于报表统计时使用 -->
-  <select id="selectChargeOrderByDate" resultType="OrderPaymentItem">
+
+    <!-- 根据时间查询 订单充值记录，用于报表统计时使用 -->
+    <select id="selectChargeOrderByDate" resultType="OrderPaymentItem">
   	SELECT SUM(charge_money) payValue from tb_charge_order where order_state = 1 and shop_detail_id = #{shopId} and 
   	<![CDATA[ create_time >= #{beginDate} AND create_time < #{endDate} ]]>
-  </select>
-  
-  <select id="selectIncomeList" resultType="com.resto.brand.web.dto.IncomeReportDto">
+    </select>
+
+    <select id="selectIncomeList" resultType="com.resto.brand.web.dto.IncomeReportDto">
 		 <![CDATA[  
 		SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
 		(SELECT
@@ -115,5 +115,52 @@
         WHERE ap.payment_mode_id IS NOT NULL
         GROUP BY ap.payment_mode_id
     </select>
-  
+
+    <select id="selectListByResultData" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate} and
+           result_data like'%累计退款金额大于支付金额%'
+        ]]>
+
+    </select>
+
+
+    <select id="selectListByResultDataByNoFile" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate} and
+           result_data like'%No such file or directory%'
+        ]]>
+
+    </select>
+
+    <select id="selectOrderMoneyByBrandIdGroupByOrderId" resultType="Order">
+        SELECT id,sum(pay_value)as order_money from tb_order_payment_item
+        WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate}
+        ]]>
+        GROUP BY order_id
+    </select>
+
+    <select id="selectShopIncomeList" resultType="OrderPaymentItem">
+        SELECT
+        o.shop_detail_id,
+        sum(oi.pay_value) pay_value,
+        oi.payment_mode_id
+        FROM
+        tb_order_payment_item oi
+        INNER JOIN tb_order o ON o.id = oi.order_id
+        WHERE
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND  o.brand_id = #{brandId}
+        GROUP BY
+        o.shop_detail_id,
+        oi.payment_mode_id
+    </select>
+
 </mapper>

@@ -386,6 +386,49 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 
+    /**
+     * 根据订单状态和生产状态查询指定店铺的订单
+     * @param shopId
+     * @param orderStates
+     * @param productionStates
+     * @return
+     */
+    List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
+
+    /**
+     * 查询所有不正常的订单(并非异常订单)
+     * 原因：所有支付的订单(2,10,11,12) 都会去打印，如果打印机有问题或连结不上最终也只会到异常订单里面 不会出现 0,1的情况
+     * 所以出现已支付但是生产状态是0,1的都是不正常的订单
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<Order> selectExceptionOrderListBybrandId(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("brandId") String brandId);
+
+    /**
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<Order> selectHasPayListOrderByBrandId(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+
+    int  selectArticleSum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+    BigDecimal  selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+    /**
+     * 手动取消订单
+     * @param brandId
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<Order> selectNeedCacelOrderList(@Param("brandId") String brandId, @Param("begin") Date begin, @Param("end") Date end);
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单
 	 * @param shopId

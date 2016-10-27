@@ -537,6 +537,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
     }
 
+    @Override
+    public boolean cancelExceptionOrder(String orderId) {
+        Order order = selectById(orderId);
+        if (order.getAllowCancel() && order.getProductionStatus() != ProductionStatus.PRINTED && (order.getOrderState().equals(OrderState.SUBMIT) || order.getOrderState() == OrderState.PAYMENT)) {
+            order.setAllowCancel(false);
+            order.setClosed(true);
+            order.setAllowAppraise(false);
+            order.setAllowContinueOrder(false);
+            order.setOrderState(OrderState.CANCEL);
+            update(order);
+            refundOrder(order);
+            log.info("取消订单成功:" + order.getId());
+            return true;
+        } else {
+            log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
+            return false;
+        }
+    }
+
+    @Override
+    public List<Order> selectNeedCacelOrderList(String brandId, String beginTime, String endTime) {
+        Date begin = DateUtil.getformatBeginDate(beginTime);
+        Date end = DateUtil.getformatEndDate(endTime);
+        return orderMapper.selectNeedCacelOrderList(brandId,begin,end);
+    }
+
 
     @Override
     public Boolean checkRefundLimit(Order order) {
@@ -552,7 +578,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.getProductionStatus().equals(ProductionStatus.NOT_PRINT))
                         || (order.getOrderState().equals(OrderState.PAYMENT) &&
                         order.getProductionStatus().equals(ProductionStatus.NOT_ORDER)))
-                   || (order.getOrderState().equals(OrderState.SUBMIT) && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER))  
+                   || (order.getOrderState().equals(OrderState.SUBMIT) && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER))
                 ;
                 break;
             default:
@@ -625,7 +651,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if(historyItem==null){
             orderPaymentItemService.insert(item);
-           payOrderSuccess(order);
+            payOrderSuccess(order);
         }else{
             log.warn("该笔支付记录已经处理过:"+item.getId());
         }
@@ -1416,9 +1442,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date end = DateUtil.getformatEndDate(endDate);
         Brand brand = brandService.selectById(brandId);
         int totalNum = 0;
-        brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
+        //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        //brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum);
+        brandArticleReportDto bo = new brandArticleReportDto();
+
+        totalNum = orderMapper.selectArticleSum(begin, end, brandId);
+
+        BigDecimal totalMoney = BigDecimal.ZERO;
+        totalMoney = orderMapper.selectConfirmMoney(begin,end,brandId);
+        bo.setSellIncome(totalMoney);
+        bo.setTotalNum(totalNum);
         bo.setBrandName(brand.getBrandName());
         return bo;
     }
@@ -2468,6 +2501,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	
 	public void sendWxRefundMsg(Order order){
 		if (checkRefundLimit(order)) {
+    @Override
+    public void cleanShopOrder(String shopId) {
+        String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
+        String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
+        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+        for(Order order : orderList){
+            if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+                sendWxRefundMsg(order);
+            }
+        }
+    }
+
+    public void sendWxRefundMsg(Order order){
+        if (checkRefundLimit(order)) {
             autoRefundOrder(order.getId());
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
@@ -2681,5 +2728,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         jsonResult.setData(order);
         return jsonResult;
+    }
+    }
+    @Override
+    public List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+
+        List<Order> list = orderMapper.selectExceptionOrderListBybrandId(begin,end,brandId);
+
+        return list;
+    }
+
+    @Override
+    public List<Order> selectHasPayListOrderByBrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayListOrderByBrandId(begin,end,brandId);
+    }
+
+    @Override
+    public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate,String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayOrderPayMentItemListBybrandId(begin,end,brandId);
     }
 }
