@@ -151,7 +151,7 @@ public class OrderAspect {
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
         try {
-            String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
@@ -217,8 +217,8 @@ public class OrderAspect {
     public void createCallMessage(Order order) throws Throwable {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-//        WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
     }
 
@@ -330,7 +330,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
 
-            String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
     }
@@ -362,7 +362,7 @@ public class OrderAspect {
 
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
-            String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
     }
@@ -379,7 +379,7 @@ public class OrderAspect {
             msg.append("您有一个红包未领取\n");
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "'>点击领取</a>");
 
-            String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("发送评论通知成功:" + msg + result);
         }
         try {
@@ -412,7 +412,7 @@ public class OrderAspect {
         msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=account'>")
                 .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
                 .append(rewardMoney).append("元红包返利").append("</a>");
-        String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+        String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
     }
 
@@ -459,7 +459,7 @@ public class OrderAspect {
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
 
-            String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("发送订单取消通知成功:" + msg + result);
 
             MQMessageProducer.sendNoticeOrderMessage(order);
@@ -484,7 +484,7 @@ public class OrderAspect {
         StringBuffer msg = new StringBuffer();
         msg.append("交易码:" + order.getVerCode() + "\n");
         msg.append("请留意餐厅叫号信息");
-        String result = WeChatUtils.sendCustomerWaitNumberMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("发送取餐信息成功:" + result);
     }
 
