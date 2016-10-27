@@ -2499,19 +2499,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 	}
 	
-	public void sendWxRefundMsg(Order order){
-		if (checkRefundLimit(order)) {
-    @Override
-    public void cleanShopOrder(String shopId) {
-        String[] orderStates = new String[]{OrderState.PAYMENT+""};//已付款
-        String[] productionStates = new String[]{ProductionStatus.NOT_ORDER+"",ProductionStatus.NOT_ORDER+""};//已付款未下单和异常订单
-        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
-        for(Order order : orderList){
-            if(!order.getClosed()){//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-                sendWxRefundMsg(order);
-            }
-        }
-    }
 
     public void sendWxRefundMsg(Order order){
         if (checkRefundLimit(order)) {
@@ -2729,7 +2716,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         jsonResult.setData(order);
         return jsonResult;
     }
-    }
+
     @Override
     public List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String brandId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
@@ -2748,9 +2735,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate,String brandId) {
-        Date begin = DateUtil.getformatBeginDate(beginDate);
-        Date end = DateUtil.getformatEndDate(endDate);
-        return  orderMapper.selectHasPayOrderPayMentItemListBybrandId(begin,end,brandId);
+    public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate, String brandId) {
+        return null;
     }
+
 }

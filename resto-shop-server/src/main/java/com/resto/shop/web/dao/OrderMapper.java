@@ -430,14 +430,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Order> selectNeedCacelOrderList(@Param("brandId") String brandId, @Param("begin") Date begin, @Param("end") Date end);
 	/**
-	 * 根据订单状态和生产状态查询指定店铺的订单
-	 * @param shopId
-	 * @param orderStates
-	 * @param productionStates
-	 * @return
-	 */
-	List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
-	/**
 	 * 获取所有桌号加菜列表
 	 * @param shopId
 	 * @return

@@ -420,9 +420,7 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectNeedCacelOrderList(String currentBrandId, String s, String s1);
-	void updateOrderChild(String orderId);
 
-	void cleanShopOrder(String shopId);
 
 	/**
 	 * 根据订单获取订单信息

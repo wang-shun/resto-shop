@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.RedisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +52,9 @@ public class TotalIncomeController extends GenericController {
 
     @Resource
     ChargeOrderService chargeOrderService;
+
+    @Resource
+    RedisService redisService;
 
     @RequestMapping("/list")
     public void list() {
@@ -182,6 +186,17 @@ public class TotalIncomeController extends GenericController {
     }
 
     private Map<String,Object> getIncomeReportList(String beginDate, String endDate) {
+        try{
+            //添加缓存逻辑
+            //从缓存中获取品牌和店铺信息
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
         //查询所有的店铺
         List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
 
