@@ -1790,6 +1790,15 @@
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
     </select>
 
+    <select id="selectNeedCacelOrderList" resultType="Order">
+        SELECT
+        o.id , o.order_state,o.order_money ,oi.pay_value,oi.payment_mode_id  from tb_order o
+        INNER JOIN tb_order_payment_item oi
+        on o.id = oi.order_id
+        WHERE  o.brand_id = #{brandId} and o.order_state =1 AND o.production_status=0
+        and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}]]>
+    </select>
+
 
 </mapper>
 

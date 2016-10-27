@@ -509,6 +509,32 @@ public  class OrderServiceImpl extends GenericServiceImpl<Order, String> impleme
         }
     }
 
+    @Override
+    public boolean cancelExceptionOrder(String orderId) {
+        Order order = selectById(orderId);
+        if (order.getAllowCancel() && order.getProductionStatus() != ProductionStatus.PRINTED && (order.getOrderState().equals(OrderState.SUBMIT) || order.getOrderState() == OrderState.PAYMENT)) {
+            order.setAllowCancel(false);
+            order.setClosed(true);
+            order.setAllowAppraise(false);
+            order.setAllowContinueOrder(false);
+            order.setOrderState(OrderState.CANCEL);
+            update(order);
+            refundOrder(order);
+            log.info("取消订单成功:" + order.getId());
+            return true;
+        } else {
+            log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
+            return false;
+        }
+    }
+
+    @Override
+    public List<Order> selectNeedCacelOrderList(String brandId, String beginTime, String endTime) {
+        Date begin = DateUtil.getformatBeginDate(beginTime);
+        Date end = DateUtil.getformatEndDate(endTime);
+        return orderMapper.selectNeedCacelOrderList(brandId,begin,end);
+    }
+
 
     @Override
     public Boolean checkRefundLimit(Order order) {

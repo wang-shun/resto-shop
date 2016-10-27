@@ -419,7 +419,12 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     BigDecimal  selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
-
-
-
+    /**
+     * 手动取消订单
+     * @param brandId
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<Order> selectNeedCacelOrderList(@Param("brandId") String brandId, @Param("begin") Date begin, @Param("end") Date end);
 }

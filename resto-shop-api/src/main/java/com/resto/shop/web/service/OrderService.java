@@ -402,4 +402,15 @@ public interface OrderService extends GenericService<Order, String> {
     void updateOrderChild(String orderId);
 
     void cleanShopOrder(String shopId);
+
+    public boolean cancelExceptionOrder(String orderId);
+
+    /**
+     * 查询所有已提交单位支付的订单
+     * @param currentBrandId
+     * @param s
+     * @param s1
+     * @return
+     */
+    List<Order> selectNeedCacelOrderList(String currentBrandId, String s, String s1);
 }
