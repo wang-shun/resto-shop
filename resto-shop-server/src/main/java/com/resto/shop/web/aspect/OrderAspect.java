@@ -280,6 +280,7 @@ public class OrderAspect {
                     if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
+                        sendPaySuccessMsg(order);
                     }
                 }
                 if (order.getOrderMode() != null) {
