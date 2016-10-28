@@ -18,10 +18,11 @@
     <result column="type" jdbcType="INTEGER" property="type" />
     <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+     <result column="meal_item_id" property="mealItemId"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, article_name, article_designation, count, original_price, unit_price, final_price, 
-    remark, sort, status, order_id, article_id, type, parent_id, create_time
+    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -227,11 +228,11 @@
   </select>
   <insert id="insertBatch">
   	insert into tb_order_item 
-  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id) 
+  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id,meal_item_id)
   	values
   	<foreach collection="list" item="t" separator="," >
   		(#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId})
+  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId})
   	</foreach>
   </insert>
   

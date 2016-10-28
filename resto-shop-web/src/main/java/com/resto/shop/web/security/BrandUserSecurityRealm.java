@@ -11,21 +11,22 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.springframework.stereotype.Component;
 
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.Permission;
 import com.resto.brand.web.model.Role;
-import com.resto.brand.web.service.PermissionService;
 import com.resto.brand.web.service.RoleService;
 import com.resto.brand.web.service.BrandUserService;
+import org.springframework.stereotype.Component;
 
 /**
  * 用户身份验证，以及
  * @author Diamond
  * @date 2016年3月24日 
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 @Component(value="securityRealm")
+
 public class BrandUserSecurityRealm extends AuthorizingRealm {
 
 	@Resource
@@ -35,7 +36,7 @@ public class BrandUserSecurityRealm extends AuthorizingRealm {
     private RoleService roleService;
 
 	@Resource
-    private PermissionService permissionService;
+    private com.resto.brand.web.service.PermissionService  brandPermissionService;
 
     /**
      * 权限检查
@@ -50,7 +51,7 @@ public class BrandUserSecurityRealm extends AuthorizingRealm {
         System.err.println(role);
         authorizationInfo.addRole(role.getRoleSign());
 
-        final List<Permission> permissions = permissionService.selectPermissionsByRoleId(role.getId());
+        final List<Permission> permissions = brandPermissionService.selectPermissionsByRoleId(role.getId());
         for (Permission permission : permissions) {
             // 添加权限
             authorizationInfo.addStringPermission(permission.getPermissionSign());

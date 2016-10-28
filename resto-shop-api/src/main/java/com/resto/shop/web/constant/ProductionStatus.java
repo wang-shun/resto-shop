@@ -30,6 +30,5 @@ public class ProductionStatus {
 	 * 已下单未打印
 	 */
 	public final static int NOT_PRINT = 5;
-
 	
 }

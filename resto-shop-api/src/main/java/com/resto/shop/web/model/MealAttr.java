@@ -13,7 +13,29 @@ public class MealAttr {
 
     private Integer printSort;
 
+    private Integer choiceType;
+
     private List<MealItem> mealItems;
+
+    private Integer choiceCount;
+
+
+
+    final public Integer getChoiceCount() {
+        return choiceCount;
+    }
+
+    final public void setChoiceCount(Integer choiceCount) {
+        this.choiceCount = choiceCount;
+    }
+
+    final public Integer getChoiceType() {
+        return choiceType;
+    }
+
+    final public void setChoiceType(Integer choiceType) {
+        this.choiceType = choiceType;
+    }
 
     final public Integer getPrintSort() {
         return printSort;

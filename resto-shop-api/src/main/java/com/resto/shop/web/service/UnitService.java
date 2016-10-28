@@ -12,13 +12,23 @@ public interface UnitService extends GenericService<Unit, String> {
 
    List<Unit> getUnits(String shopId);
 
-   void insertDetail(Unit unit);
+   List<Unit> getUnitsByArticleId(String shopId,String articleId);
+
+   Unit insertDetail(Unit unit);
 
    Unit getUnitById(String id);
 
    void initUnit(Unit unit);
 
    List<Unit> getUnitByArticleid(String articleId);
+
+   void insertArticleRelation(String articleId,List<Unit> units);
+
+   void updateArticleRelation(String articleId,List<Unit> units);
+
+   void deleteUnit(String id);
+
+   void modifyUnit(Unit unit);
 
 
 }

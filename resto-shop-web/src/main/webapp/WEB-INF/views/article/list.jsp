@@ -15,13 +15,14 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-    .print-sort{
+
+    .print-sort {
 
     }
 </style>
 <div id="control">
 
-    <div class="modal fade" id="article-dialog" v-if="showform">
+    <div class="modal fade" id="article-dialog" v-if="showform" @click="cleanRemark">
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -33,7 +34,8 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品类别</label>
                                 <div class="col-md-7">
-                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId">
+                                    <select class="form-control" name="articleFamilyId" v-model="m.articleFamilyId"
+                                            required="required">
                                         <option :value="f.id" v-for="f in articlefamilys">
                                             {{f.name}}
                                         </option>
@@ -50,14 +52,16 @@
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品单位</label>
                                 <div class="col-md-7">
-                                    <input type="text" class="form-control" name="unit" v-model="m.unit">
+                                    <input type="text" class="form-control" name="unit" v-model="m.unit"
+                                           required="required">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">价格</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="price" v-model="m.price"
-                                           required="required">
+                                           required="required" pattern="\d{1,10}(\.\d{1,2})?$"
+                                           title="价格只能输入数字,且只能保存两位小数！">
                                 </div>
                             </div>
                             <div class="form-group col-md-4">
@@ -80,10 +84,16 @@
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
                                                v-model="m.activated">上架
                                     </label>
-                                    <span v-if="m.articleType != 2" >
+                                    <span v-if="m.articleType != 2">
                                         <label class="radio-inline">
                                             <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
                                                    v-model="m.isEmpty">沽清
+                                        </label>
+                                    </span>
+                                    <span>
+                                        <label class="radio-inline">
+                                            <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                                   v-model="m.isHidden">隐藏
                                         </label>
                                     </span>
                                 </div>
@@ -144,7 +154,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5" v-if="m.articleType==1">
+                            <div class="form-group col-md-5">
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">
                                     <textarea rows="3" class="form-control" name="description"
@@ -160,6 +170,7 @@
                                                 <input type="checkbox" name="kitchenList" :value="kitchen.id"
                                                        v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
                                             </label>
+                                            <div id="kitchenRemark"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -171,9 +182,10 @@
                                                 <input type="checkbox" name="supportTimes" :value="time.id"
                                                        v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
                                             </label>
-                                            <label>
+                                            <label v-if="supportTimes.length>0">
                                                 <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
                                             </label>
+                                            <div id="supportTimeRemark"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -201,10 +213,12 @@
                                 </div>
                             </div>
                             <div class="clearfix"></div>
+
+
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">推荐餐品包</label>
                                 <div class="col-md-10">
-                                    <select  name="recommendId"  v-model="m.recommendId" >
+                                    <select name="recommendId" v-model="m.recommendId">
                                         <option value="">未选择餐品包</option>
                                         <option :value="f.id" v-for="f in recommendList">
                                             {{f.name}}
@@ -215,14 +229,93 @@
                             <%--<div class="form-group col-md-10" v-if="m.articleType==1">--%>
                             <%--<label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>--%>
                             <%--<div class="col-md-10">--%>
-                                <%--<select  name="unitId"  v-model="m.unitId" >--%>
-                                    <%--<option value="selected">未选择规格包</option>--%>
-                                    <%--<option :value="f.id" v-for="f in unitList">--%>
-                                        <%--{{f.name}}--%>
-                                    <%--</option>--%>
-                                <%--</select>--%>
+                            <%--<select  name="unitId"  v-model="m.unitId" >--%>
+                            <%--<option value="selected">未选择规格包</option>--%>
+                            <%--<option :value="f.id" v-for="f in unitList">--%>
+                            <%--{{f.name}}--%>
+                            <%--</option>--%>
+                            <%--</select>--%>
                             <%--</div>--%>
-                        <%--</div>--%>
+                            <%--</div>--%>
+
+
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
+                                <label class="col-md-2 text-right">规格属性（新）<label style="color:red">注：与旧版规格只能使用一个</label></label>
+                                <div class="col-md-10">
+                                    <%--<div class="article-attr" v-for="attr in unitList">--%>
+                                    <%--<label class="article-attr-label">{{attr.name}}:</label>--%>
+									<span class="article-units">
+										<label v-for="attr in unitList">
+                                            <input type="checkbox"
+                                                   v-model="attr.isUsed" v-bind:true-value="1" v-bind:false-value="0"
+                                                   id="{{attr.id}}" @click="clickUnit(attr)">
+                                            {{attr.name}}
+                                        </label>
+									</span>
+                                    <%--</div>--%>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group col-md-10" v-for="select in selectedUnit.unitList">
+                                <div class="col-md-10">
+                                    <label class="col-md-2 ">规格属性: {{select.name}}</label>
+                                    <label class="col-md-2 ">是否单选: <input type="checkbox" v-bind:true-value="0"
+                                                                          v-bind:false-value="1"
+                                                                          v-model="select.choiceType"></label>
+                                    <%--<div class="col-md-7 radio-list">--%>
+
+
+                                    <%--</div>--%>
+
+                                </div>
+                                <%--<div class="col-md-10">--%>
+
+
+                                <%--&lt;%&ndash;<label for="choice{{select.id}}">是否单选: </label>&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;<input type="checkbox" id="choice{{select.id}}"&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;v-model="select.choiceType" v-bind:true-value="0" v-bind:false-value="1"/>&ndash;%&gt;--%>
+                                <%--&lt;%&ndash;</span>&ndash;%&gt;--%>
+                                <%--</div>--%>
+
+                                <div class="col-md-10">
+                                    <div class="flex-row">
+                                        <div class="flex-1 text-right">规格</div>
+                                        <div class="flex-1">差价</div>
+                                        <div class="flex-1">排序</div>
+                                        <div class="flex-1">是否启用</div>
+
+                                    </div>
+                                    <div class="flex-row " v-for="detail in select.details">
+                                        <label class="flex-1 control-label">{{detail.name}}</label>
+                                        <div class="flex-1">
+                                            <input type="text" class="form-control"
+                                                   v-model="detail.price" :value="detail.price==null?0:detail.price" id="price{{detail.id}}" required="required"/>
+                                        </div>
+                                        <div class="flex-1">
+                                            <input type="text" class="form-control" name="sort"
+                                                   v-model="detail.sort" id="sort{{detail.id}}" required="required"
+                                            />
+                                        </div>
+                                        <div class="flex-1">
+                                            <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                                   @click="changeUsed(select,detail)" v-model="detail.isUsed"
+                                                   style="width:70px;height:30px">
+                                            <%--<input type="radio" required name="type{{detail.id}}"--%>
+                                            <%--checked v-model="detail.isUsed"     @click="changeUsed(select,detail,1)"> 是--%>
+                                            <%--<input type="radio" required name="type{{detail.id}}"--%>
+                                            <%--v-model="detail.isUsed"   @click="changeUsed(select,detail,0)"> 否--%>
+
+                                            <%--<input type="checkbox" id="{{detail.id}}" checked="detail.isUsed == 1" v-model="detail.isUsed"--%>
+                                            <%--@click="changeUsed(select,detail)" style="width:70px;height:30px">--%>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">餐品规格</label>
                                 <div class="col-md-10">
@@ -236,6 +329,8 @@
                                     </div>
                                 </div>
                             </div>
+
+
                             <div class="form-group col-md-10" v-if="allUnitPrice.length">
                                 <label class="col-md-2 control-label">规格价格</label>
                                 <div class="col-md-10">
@@ -266,7 +361,7 @@
                                         <div class="flex-2">
                                             <input type="text" class="form-control" name="stockWorkingDay"
                                                    id="workingDay" v-model="u.stockWorkingDay"
-                                                   onchange="changeStockWeekend()"  />
+                                                   onchange="changeStockWeekend()"/>
                                         </div>
                                         <div class="flex-2">
                                             <input type="text" class="form-control" name="stockWeekend"
@@ -293,7 +388,7 @@
                                     <div class="portlet-body">
                                         <div class="portlet box blue-hoki"
                                              v-for="attr in m.mealAttrs | orderBy  'sort'">
-                                            <div class="portlet-title" >
+                                            <div class="portlet-title">
                                                 <div class="caption">
                                                     <label class="control-label">&nbsp;</label>
                                                     <div class="pull-right">
@@ -311,13 +406,37 @@
                                                 </div>
 
                                                 <div class="caption">
-                                                    <label class="control-label col-md-4" style="width:120px">打印排序&nbsp;</label>
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">打印排序&nbsp;</label>
                                                     <div class="col-md-4">
                                                         <input class="form-control" type="text" v-model="attr.printSort"
-                                                               required="required"  name="printSort" lazy onblur="checkSort(this)">
+                                                               required="required" name="printSort" lazy
+                                                               onblur="checkSort(this)">
                                                     </div>
 
                                                 </div>
+
+
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">选择类型&nbsp;</label>
+                                                    <div class="col-md-4">
+                                                        <select class="form-control" style="width:150px"
+                                                                name="choiceType" v-model="attr.choiceType"
+                                                                v-on:change="choiceTypeChange(attr)">
+                                                            <option value="0">必选</option>
+                                                            <option value="1">任选</option>
+                                                        </select>
+
+
+                                                    </div>
+                                                    <div class="col-md-4" v-if="attr.choiceType == 0">
+                                                        <input class="form-control" type="text"
+                                                               v-model="attr.choiceCount"
+                                                               required="required">
+                                                    </div>
+                                                </div>
+
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
                                                        @click="delMealAttr(attr)"></a>
@@ -353,8 +472,8 @@
                                                         </div>
                                                         <div class="flex-1 radio-list">
                                                             <label class="radio-inline">
-                                                                <input type="radio" :name="attr.name" :value="true"
-                                                                       v-model="item.isDefault"
+                                                                <input type="checkbox" :name="attr.name" :value="true"  v-bind:disabled="attr.choiceType == 1"
+                                                                       v-model="item.isDefault && attr.choiceType == 0"
                                                                        @change="itemDefaultChange(attr,item)"/>
                                                                 设为默认
                                                             </label>
@@ -400,7 +519,7 @@
                     <div class="modal-footer">
                         <input type="hidden" name="id" v-model="m.id"/>
                         <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary" >保存</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -486,20 +605,21 @@
 
 <script>
 
-    function checkSort(t){
-        if($(t).val() == ''){
+    var action;
+    function checkSort(t) {
+        if ($(t).val() == '') {
             return;
         }
         var v = $(t).val();
         var count = 0;
         var attr = document.getElementsByName("printSort");
-        for(var i = 0;i< attr.length;i++){
-            if(v == attr[i].value){
-                count ++;
+        for (var i = 0; i < attr.length; i++) {
+            if (v == attr[i].value) {
+                count++;
             }
         }
 
-        if(count > 1){
+        if (count > 1) {
             alert("打印排序添加重复");
             $(t).val('');
         }
@@ -517,7 +637,7 @@
             2: "套餐"
         }
         var tb = $table.DataTable({
-            "lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+            "lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
             ajax: {
                 url: "article/list_all",
                 dataSrc: ""
@@ -648,12 +768,13 @@
                     mixins: [C.formVueMix],
                     data: {
                         articlefamilys: [],
-                        recommendList:[],
+                        recommendList: [],
                         supportTimes: [],
                         kitchenList: [],
                         checkedUnit: [],
                         articleattrs: [],
-                        unitList:[],
+                        unitList: [],
+                        selectedUnit: new HashMap(),
                         articleunits: {},
                         unitPrices: [],
                         mealtempList: [],
@@ -664,12 +785,18 @@
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
-                            for (var i in attr.mealItems) {
-                                var m = attr.mealItems[i];
-                                if (m != item) {
-                                    m.isDefault = false;
-                                }
+                            if(item.isDefault){
+                                item.isDefault = false;
+                            }else{
+                                item.isDefault = true;
                             }
+
+//                            for (var i in attr.mealItems) {
+//                                var m = attr.mealItems[i];
+//                                if (m != item) {
+//                                    m.isDefault = false;
+//                                }
+//                            }
                         },
                         updateAttrItems: function () {
                             this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
@@ -680,6 +807,29 @@
                         },
                         removeArticleItem: function (mealItem) {
                             this.choiceArticleShow.items.$remove(mealItem);
+                        },
+
+                        changeUsed: function (select, item, type) {
+                            var use;
+                            if (item.isUsed == 0 || !item.isUsed) {
+                                use = 1;
+                                item.isUsed = 1;
+
+                            } else {
+                                use = 0;
+                                item.isUsed = 0;
+                            }
+                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
+                                if (this.selectedUnit.unitList[i].id == select.id) {
+                                    for (var k = 0; i < this.selectedUnit.unitList[i].details.length; k++) {
+                                        if (this.selectedUnit.unitList[i].details[k].id == item.id) {
+                                            this.selectedUnit.unitList[i].details[k].isUsed = use;
+                                            break;
+                                        }
+
+                                    }
+                                }
+                            }
                         },
                         addArticleItem: function (art) {
                             var item = {
@@ -696,6 +846,32 @@
                                 item.isDefault = true;
                             }
                             this.choiceArticleShow.items.push(item);
+                        },
+                        clickUnit: function (attr) {
+                            if (!this.selectedUnit.unitList) {
+                                this.selectedUnit.unitList = [];
+                            }
+
+                            var contains = false;
+                            for (var i = 0; i < this.selectedUnit.unitList.length; i++) {
+
+                                if (this.selectedUnit.unitList[i].id == attr.id) {
+                                    contains = true;
+                                    this.selectedUnit.unitList.$remove(attr);
+                                    this.selectedUnit.unitList.$remove(this.selectedUnit.unitList[i]);
+                                    break;
+                                }
+                            }
+
+                            if (!contains) {
+                                for (var i = 0; i < attr.details.length; i++) {
+                                    attr.details[i].isUsed = 1;
+                                    attr.details[i].price = null;
+                                }
+                                this.selectedUnit.unitList.push(attr);
+                            }
+
+
                         },
                         addMealItem: function (meal) {
                             this.choiceArticleShow.show = true;
@@ -714,6 +890,13 @@
                             this.m.mealAttrs.$remove(meal);
                         }
                         ,
+                        choiceTypeChange: function (attr) {
+                            if (attr.choiceType == 1) {
+
+                            }else{
+
+                            }
+                        },
                         addMealAttr: function () {
                             var sort = this.maxMealAttrSort + 1;
                             this.m.mealAttrs.push({
@@ -762,6 +945,8 @@
                         }
                         ,
                         create: function (article_type) {
+                            var that = this;
+                            action = "create";
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
 //                                recommendId:this.recommendList[0].id,
@@ -773,11 +958,25 @@
                                 showDesc: true,
                                 showBig: true,
                                 isEmpty: false,
+                                stockWorkingDay: 100,
+                                stockWeekend: 50,
                                 sort: 0,
+                                units: [],
                                 articleType: article_type,
                             };
-                            this.checkedUnit = [];
+
                             this.showform = true;
+                            this.selectedUnit = [];
+
+
+                            var list = {
+                                unitList: []
+                            }
+                            this.selectedUnit = list;
+                            $.post("unit/list_all", null, function (data) {
+                                that.unitList = data;
+                            });
+
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -792,11 +991,30 @@
                         }
                         ,
                         edit: function (model) {
+                            this.selectedUnit = [];
+
+
+                            var list = {
+                                unitList: []
+                            }
+                            this.selectedUnit = list;
+
                             var that = this;
-                            that.showform = true;
-                            that.checkedUnit = [];
+
+
+                            action = "edit";
+
                             $.post("article/list_one_full", {id: model.id}, function (result) {
                                 var article = result.data;
+
+                                that.checkedUnit = [];
+                                that.showform = true;
+
+                                that.selectedUnit.unitList = [];
+                                for (var i = 0; i < article.units.length; i++) {
+                                    that.selectedUnit.unitList.push(article.units[i]);
+                                }
+
                                 article.mealAttrs || (article.mealAttrs = []);
                                 that.m = article;
                                 if (article.hasUnit && article.hasUnit != " " && article.hasUnit.length) {
@@ -810,6 +1028,11 @@
                                 if (!article.kitchenList) {
                                     article.kitchenList = [];
                                 }
+
+
+                            });
+                            $.post("unit/list_all_id", {articleId: model.id}, function (data) {
+                                that.unitList = data;
                             });
 
                         }
@@ -826,13 +1049,67 @@
                         ,
                         changeColor: function (val) {
                             $(".color-mini").minicolors("value", val);
-                        }
-                        ,
+                        },
+                        cleanRemark: function () {
+                            $("#kitchenRemark").html("");
+                            $("#supportTimeRemark").html("");
+                        },
+                        checkNull: function () {
+                            if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
+                                $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
+                                return true;
+                            }
+                            if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+                                $("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
+                                return true;
+                            }
+                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
+                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
+                                return true;
+                            }
+                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
+                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
+                                return true;
+                            }
+                            return false;
+                        },
                         save: function (e) {
+
+                            var attrs = this.m.mealAttrs;
+                            for (var i = 0; i < attrs.length; i++) {
+                                var attr = attrs[i];
+                                var count = 0;
+                                for (var k = 0; k < attr.mealItems.length; k++) {
+                                    if (attr.mealItems[k].isDefault) {
+                                        count++;
+                                    }
+                                }
+                                if (attr.choiceType == 0) {
+                                    if (attr.choiceCount != count) {
+                                        C.errorMsg("默认选中项与必选数量不等");
+                                        return;
+                                    }
+                                }
+                            }
+
+
+                            if (this.checkNull()) {//验证必选项(出参厨房和供应时间)
+                                return;
+                            }
                             var that = this;
                             var action = $(e.target).attr("action");
                             this.m.articlePrices = this.unitPrices;
                             this.m.hasUnit = this.checkedUnit.join() || " ";
+                            this.m.units = [];
+                            for (var i = 0; i < that.selectedUnit.unitList.length; i++) {
+                                this.m.units.push({
+                                    id: that.selectedUnit.unitList[i].id,
+                                    choiceType: that.selectedUnit.unitList[i].choiceType,
+                                    details: that.selectedUnit.unitList[i].details,
+                                });
+                            }
+
+
                             var m = this.m;
 
                             var jsonData = JSON.stringify(this.m);
@@ -914,7 +1191,6 @@
                             }
 
 
-
                             function getAll(allData) {
                                 var root = [];
                                 for (var i in allData) {
@@ -994,6 +1270,7 @@
                                 $(".modal-backdrop.fade.in").remove();
                             }
                         });
+
                         this.$watch("m", function () {
                             if (this.m.id) {
                                 $('.color-mini').minicolors("value", this.m.controlColor);
@@ -1008,9 +1285,7 @@
                         $.post("recommend/list_all", null, function (data) {
                             that.recommendList = data;
                         });
-                        $.post("unit/list_all", null, function (data) {
-                            that.unitList = data;
-                        });
+
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;
                         });

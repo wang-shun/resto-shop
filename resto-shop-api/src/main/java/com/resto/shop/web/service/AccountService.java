@@ -29,5 +29,8 @@ public interface AccountService extends GenericService<Account, String> {
 
 	BigDecimal payOrder(Order order, BigDecimal payMoney, Customer customer);
 
+	BigDecimal houFuPayOrder(Order order, BigDecimal payMoney, Customer customer);
+
+
 
 }

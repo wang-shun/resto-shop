@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -82,9 +83,13 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order getOrderInfo(String orderId);
 
-	public List<Order> selectHistoryOrderList(String currentShopId, Date date);
+	public List<Order> selectHistoryOrderList(String currentShopId, Date date,Integer shopMode);
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);
+
+
+
+	public List<Order> getOrderNoPayList(String currentShopId, Date date);
 
 
 	public Order cancelOrderPos(String orderId) throws AppException;
@@ -296,9 +301,9 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
 
     //查询店铺所有的已消费的订单
-    public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
+	public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
 
-
+    
 	//查询订单关联评论的内容
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 
@@ -332,16 +337,25 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 打印厨房小票
+     *
      * @param oid
      * @return
      */
     List<Map<String, Object>>  printKitchenReceipt(String oid);
 
+    /**
+     * 获取所有桌号加菜列表
+     *
+     * @param shopId
+     * @return
+     */
+    List<Order> getTableNumberAll(String shopId);
 
     List<OrderArticleDto> selectOrderArticle(String currentBrandId,String beginDate,String endDate);
 
     /**
      * 查询品牌菜品销售  用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -351,6 +365,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询店铺菜品销售 用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -360,12 +375,14 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询订单详情 用于中间数据库
+     *
      * @param beginDate
      * @param endDate
      * @param currentBrandId
      * @return
      */
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
+
 
     /**
      * 查询所有的已经消费的订单
@@ -375,5 +392,43 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectAllAlreadyConsumed(String currentBrandId, String beginDate, String endDate);
+
+
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
+
+	Order payOrderModeFive(String orderId);
+
+	Order payPrice(BigDecimal factMoney,String orderId);
+
+	void useRedPrice(BigDecimal factMoney,String orderId);
+
+	void updateOrderChild(String orderId);
+
+	void cleanShopOrder(String shopId);
+
+	/**
+	 * 根据订单获取订单信息
+	 *
+	 * @return
+	 */
+	Order getOrderDetail(String orderId);
+
+	/**
+	 * 获取员工订单
+	 *
+	 * @return
+	 */
+	List<Order> getOrderByEmployee(String employeeId, String shopId);
+
+	JSONResult createOrderByEmployee(Order order) throws AppException;
+
+
 
 }
