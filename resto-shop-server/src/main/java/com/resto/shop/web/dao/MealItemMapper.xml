@@ -158,7 +158,7 @@
             and a.state = 1
         </if>
         <if test="show != ''">
-            and a.current_working_stock > 0 and a.is_empty = 0
+            and a.current_working_stock > 0 and a.is_empty = 0 order by it.sort
         </if>
     </select>
     <insert id="insertBatch">

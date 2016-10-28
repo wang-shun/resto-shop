@@ -107,9 +107,10 @@ public class OrderAspect {
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                 MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
             }
-            if (order.getOrderState().equals(OrderState.SUBMIT)) {
-                //			long delay = 1000*60*15;//15分钟后自动取消订单
-                //			MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+            //自动取消订单，不包含后付款模式
+            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() != ShopMode.HOUFU_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
+            	long delay = 1000*60*60*2;//两个小时后自动取消订单
+                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
             } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode() != ShopMode.TABLE_MODE) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
@@ -218,6 +219,7 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
         WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
     }
 

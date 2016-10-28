@@ -188,10 +188,10 @@
             columns : [
                 {
                     title : "优惠券所属",//
-                    data : "shopDetailId",
+                    data : "shopName",
                     createdCell:function (td,tdData) {
                         if(tdData!=null){
-                            $(td).html("店铺用")
+                            $(td).html(tdData+"用")
                         }else{
                             $(td).html("品牌用")
                         }

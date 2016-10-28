@@ -70,12 +70,14 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             Long tempTime = (getNumber.getEatTime().getTime() - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)).setScale(2,   BigDecimal.ROUND_HALF_UP);             //最终价钱
 
-
-            if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                getNumber.setFinalMoney(getNumber.getHighMoney());
-            }else{
-                getNumber.setFinalMoney(endMoney);
+            if(getNumber.getCallNumberTime() == null){
+                if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
+                    getNumber.setFinalMoney(getNumber.getHighMoney());
+                }else{
+                    getNumber.setFinalMoney(endMoney);
+                }
             }
+
 
         } else if(state == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_TWO);
@@ -83,10 +85,12 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
             //计算最终等位红包价格
             Long tempTime = (getNumber.getPassNumberTime().getTime()  - getNumber.getCreateTime().getTime()) / 1000;  //等待的时间
             BigDecimal endMoney = getNumber.getFlowMoney().multiply(new BigDecimal(tempTime)).setScale(2,   BigDecimal.ROUND_HALF_UP);             //最终价钱
-            if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
-                getNumber.setFinalMoney(getNumber.getHighMoney());
-            }else{
-                getNumber.setFinalMoney(endMoney);
+            if(getNumber.getCallNumberTime() == null){
+                if(endMoney.subtract(getNumber.getHighMoney()).doubleValue() > 0){
+                    getNumber.setFinalMoney(getNumber.getHighMoney());
+                }else{
+                    getNumber.setFinalMoney(endMoney);
+                }
             }
         }
         getNumberMapper.updateByPrimaryKeySelective(getNumber);

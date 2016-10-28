@@ -56,7 +56,7 @@
 	  	<if test="articleId!=null ">
 	  		article_id=#{articleId}
 	  	</if>
-  	</where>
+  	</where> order by sort
   </select>
   <delete id="deleteByIds">
   	delete from tb_meal_attr where id in 

@@ -75,7 +75,9 @@ public class NewCustomCoupon {
         this.shopDetailId = shopDetailId;
     }
 
-    private  Integer isBrand;
+    private  Integer isBrand;//是否是品牌优惠券 1，是 0，店铺优惠券
+
+    private String shopName;//如果是店铺优惠券，显示店铺的名字
 
     public Boolean getActivty() {
         return isActivty;
@@ -119,6 +121,14 @@ public class NewCustomCoupon {
 
     public String getName() {
         return name;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 
     public void setName(String name) {

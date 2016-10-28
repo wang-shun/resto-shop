@@ -78,8 +78,8 @@ var shopTable = $("#shopTable").DataTable({
 		},
         {
             title: "编号",
-            data : "numberCode"
-
+            data : "numberCode",
+			defaultContent:""
         },
 		{
 			title : "销量(份)",

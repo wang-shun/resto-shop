@@ -104,18 +104,18 @@
     
     <select id="selectByPrimaryKey" resultType="GetNumber">
         select <include refid="Base_Column_List" /> from tb_get_number where id = #{id}
+        and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
     </select>
 
     <select id="selectCount" resultType="GetNumber">
         select id from tb_get_number where table_type = #{tableType}
         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
-        <if test="date != null">
-            and #{date} >= create_time
-        </if>
+        and #{date} >= create_time
     </select>
 
     <select id="getWaitInfoByCustomerId" resultType="GetNumber">
         select * from tb_get_number where shop_detail_id = #{shopId}
+        and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
         and customer_id = #{customerId} order by create_time desc limit 1
     </select>
 </mapper>
