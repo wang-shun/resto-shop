@@ -158,7 +158,12 @@
 						是
 					</label>
 				</div>
-				<div class="form-group" id="serviceDiv" style="display: none">
+				<div class="form-group" id="serviceDivOne" style="display: none">
+					<label>名称</label>
+					<input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
+					<input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
+				</div>
+				<div class="form-group" id="serviceDivTwo" style="display: none">
 					<label>服务费/每人</label>
 					<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required">
 				</div>
@@ -175,11 +180,13 @@
 <script>
 
 	function showServicePrice(){
-		$('#serviceDiv').show();
+		$('#serviceDivOne').show();
+		$('#serviceDivTwo').show();
 	}
 
 	function hideServicePrice(){
-		$('#serviceDiv').hide();
+		$('#serviceDivOne').hide();
+		$('#serviceDivTwo').hide();
 	}
 	$(document).ready(function(){
 
@@ -253,9 +260,11 @@
 					console.log(result.data);
 	 				vueObj.m=result.data;
 					if(result.data.isUseServicePrice == 1){
-						$('#serviceDiv').show();
+						$('#serviceDivOne').show();
+						$('#serviceDivTwo').show();
 					}else{
-						$('#serviceDiv').hide();
+						$('#serviceDivOne').hide();
+						$('#serviceDivTwo').hide();
 					}
 				}
 			})
