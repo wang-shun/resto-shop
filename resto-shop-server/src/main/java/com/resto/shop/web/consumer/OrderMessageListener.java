@@ -211,13 +211,12 @@ public class OrderMessageListener implements MessageListener {
     }
 
     private void sendShareMsg(Appraise appraise) {
-
         StringBuffer msg = new StringBuffer("感谢您的评价 ，分享好友\n");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());
         log.info("分享人:" + customer.getNickname());
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + appraise.getShopDetailId() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("分享完毕:" );
