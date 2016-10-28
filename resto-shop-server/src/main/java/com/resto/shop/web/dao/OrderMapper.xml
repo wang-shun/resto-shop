@@ -67,16 +67,6 @@
         <result column="service_price" property="servicePrice"/>
     </resultMap>
 
-
-    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
-        <id column="id"  property="id"/>
-        <result column="order_money" property="orderMoney"/>
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <result column="payment_mode_id" property="paymentModeId"/>
-            <result column="pay_value" property="payValue"/>
-        </collection>
-    </resultMap>
-
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
