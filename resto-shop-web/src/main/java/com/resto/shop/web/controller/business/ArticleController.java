@@ -1,20 +1,5 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
-
- import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
- import com.resto.shop.web.service.UnitService;
- import org.apache.commons.lang3.StringUtils;
- import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.service.BrandService;
@@ -22,129 +7,150 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
-import com.resto.shop.web.service.ArticlePriceService;
-import com.resto.shop.web.service.ArticleService;
-import com.resto.shop.web.service.FreedayService;
+import com.resto.shop.web.service.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 
 @Controller
 @RequestMapping("article")
-public class ArticleController extends GenericController{
+public class ArticleController extends GenericController {
 
-	@Resource
-	FreedayService freedayService;
+    @Resource
+    FreedayService freedayService;
 
-	@Resource
-	ArticleService articleService;
+    @Resource
+    ArticleService articleService;
 
-	@Resource
-	ArticlePriceService articlePriceService;
+    @Resource
+    ArticlePriceService articlePriceService;
 
-	@Resource
-	BrandSettingService brandSettingService;
+    @Resource
+    BrandSettingService brandSettingService;
 
-	@Resource
-	BrandService brandService;
+    @Resource
+    BrandService brandService;
 
-	@Autowired
-	private UnitService unitService;
-	
-	@RequestMapping("/list")
-    public void list(){
+    @Autowired
+    private UnitService unitService;
+
+    @Autowired
+    private ArticleRecommendService articleRecommendService;
+
+    @RequestMapping("/list")
+    public void list() {
     }
 
-	@RequestMapping("/list_all")
-	@ResponseBody
-	public List<Article> listData(){
-		List<Article> articles =  articleService.selectList(getCurrentShopId());
-		return articles;
-	}
-	
-	@RequestMapping("list_one")
-	@ResponseBody
-	public Result list_one(String id){
-		Article article = articleService.selectById(id);
-		return getSuccessResult(article);
-	}
-	
-	@RequestMapping("list_one_full")
-	@ResponseBody
-	public Result list_one_full(String id){
-		Article article = articleService.selectFullById(id,"");
-		article.setUnits(unitService.getUnitByArticleid(id));
-		return getSuccessResult(article);
-	}
+    @RequestMapping("/list_all")
+    @ResponseBody
+    public List<Article> listData() {
+        List<Article> articles = articleService.selectList(getCurrentShopId());
+        return articles;
+    }
+
+    @RequestMapping("list_one")
+    @ResponseBody
+    public Result list_one(String id) {
+        Article article = articleService.selectById(id);
+        return getSuccessResult(article);
+    }
+
+    @RequestMapping("list_one_full")
+    @ResponseBody
+    public Result list_one_full(String id) {
+        Article article = articleService.selectFullById(id, "");
+        article.setUnits(unitService.getUnitByArticleid(id));
+        return getSuccessResult(article);
+    }
 
 
-	@RequestMapping("save")
-	@ResponseBody
-	public Result create(@Valid @RequestBody Article article){
-		article.setShopDetailId(getCurrentShopId());
-		article.setUpdateUserId(getCurrentUserId());
-		article.setUpdateTime(new Date());	
-		if(StringUtils.isEmpty(article.getId())){
-			article.setCreateUserId(getCurrentUserId());
-			articleService.save(article);
-		}else{
-			articleService.update(article);
-			List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
-			if(article.getIsEmpty() == true){
-				articleService.clearStock(article.getId(),getCurrentShopId());
-			}else {
-				if(article.getArticleType() == 1 && list.size() ==0) {
-					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
-						articleService.editStock(article.getId(), article.getStockWeekend(),getCurrentShopId());
-					} else {
-						articleService.editStock(article.getId(), article.getStockWorkingDay(),getCurrentShopId());
-					}
-				} else if (article.getArticleType() == 1 && list.size() !=0){
-					if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
-						for(ArticlePrice ap : list){
-							articleService.editStock(ap.getId(), ap.getStockWeekend(),getCurrentShopId());
-						}
-					} else {
-						for(ArticlePrice ap : list){
-							articleService.editStock(ap.getId(), ap.getStockWorkingDay(),getCurrentShopId());
-						}
-					}
-				}
-			}
-			if(article.getActivated() == true){
-				articleService.setActivated(article.getId(), 1);
-			}else{
-				articleService.setActivated(article.getId(), 0);
-			}
-		}
+    @RequestMapping("save")
+    @ResponseBody
+    public Result create(@Valid @RequestBody Article article) {
+        article.setShopDetailId(getCurrentShopId());
+        article.setUpdateUserId(getCurrentUserId());
+        article.setUpdateTime(new Date());
+        String id = article.getId();
+        if (StringUtils.isEmpty(article.getId())) {
+            article.setCreateUserId(getCurrentUserId());
+            id = articleService.save(article).getId();
+            unitService.insertArticleRelation(id, article.getUnits());
+        } else {
+
+            articleService.update(article);
+            List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
+            if (article.getIsEmpty() == true) {
+                articleService.clearStock(article.getId(), getCurrentShopId());
+            } else {
+                if (article.getArticleType() == 1 && list.size() == 0) {
+                    if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+                        articleService.editStock(article.getId(), article.getStockWeekend(), getCurrentShopId());
+                    } else {
+                        articleService.editStock(article.getId(), article.getStockWorkingDay(), getCurrentShopId());
+                    }
+                } else if (article.getArticleType() == 1 && list.size() != 0) {
+                    if (freedayService.selectExists(new Date(), article.getShopDetailId())) {
+                        for (ArticlePrice ap : list) {
+                            articleService.editStock(ap.getId(), ap.getStockWeekend(), getCurrentShopId());
+                        }
+                    } else {
+                        for (ArticlePrice ap : list) {
+                            articleService.editStock(ap.getId(), ap.getStockWorkingDay(), getCurrentShopId());
+                        }
+                    }
+                }
+            }
+            if (article.getActivated() == true) {
+                articleService.setActivated(article.getId(), 1);
+            } else {
+                articleService.setActivated(article.getId(), 0);
+            }
+
+            unitService.updateArticleRelation(id, article.getUnits());
+        }
+
         articleService.initStock();
-		return Result.getSuccess();
+        return Result.getSuccess();
     }
-	
-	@RequestMapping("delete")
-	@ResponseBody
-	public Result delete(String id){
-		articleService.delete(id);
-		return Result.getSuccess();
-	}
 
-	public boolean IsFreeday(Date time){
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(time);
-		int dayForWeek = 0;
-		if(cal.get(Calendar.DAY_OF_WEEK) == 1){
-			dayForWeek = 7;
-		}else{
-			dayForWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
-		}
-		if(dayForWeek > 5){
-			return false;
-		}
-		return true;
-	}
+    @RequestMapping("delete")
+    @ResponseBody
+    public Result delete(String id) {
+        articleService.delete(id);
+        //联动删除在推荐餐品包中的id
+        articleRecommendService.deleteRecommendByArticleId(id);
+        return Result.getSuccess();
+    }
 
-	@RequestMapping("singo_article")
-	@ResponseBody
-	public List<Article> getSingoList(){
-		List<Article> result =  articleService.getSingoArticle(getCurrentShopId());
-		return result;
-	}
+    public boolean IsFreeday(Date time) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(time);
+        int dayForWeek = 0;
+        if (cal.get(Calendar.DAY_OF_WEEK) == 1) {
+            dayForWeek = 7;
+        } else {
+            dayForWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        }
+        if (dayForWeek > 5) {
+            return false;
+        }
+        return true;
+    }
+
+    @RequestMapping("singo_article")
+    @ResponseBody
+    public List<Article> getSingoList() {
+        List<Article> result = articleService.getSingoArticle(getCurrentShopId());
+        return result;
+    }
 }

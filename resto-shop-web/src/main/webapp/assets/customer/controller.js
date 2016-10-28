@@ -124,6 +124,7 @@ var Controller = function(controlId,datatable){
 	 * 加载表单，并绑定默认表单 错误提示 和 相关处理
 	 */
 	this.loadForm = function loadForm(options){
+
 		var defaults = {
 			title:"表单",
 			url:"",
@@ -332,6 +333,7 @@ var Controller = function(controlId,datatable){
 	 * }
 	 */
 	this.createFormBtn=function(o){
+		console.log("---")
 		var classString = o.style||"btn btn-xs blue";
 		var button = $("<button>");
 		button.addClass(classString);

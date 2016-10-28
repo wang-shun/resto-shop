@@ -33,8 +33,6 @@ public class OrderConsumer{
 		consumer.start();
 		log.info("消费者启动成功！TOPIC:"+MQSetting.TOPIC_RESTO_SHOP+"  CID:"+MQSetting.CID_SHOP);
 	}
-	
-	
 
 	@PreDestroy
 	public void stopConsumer(){

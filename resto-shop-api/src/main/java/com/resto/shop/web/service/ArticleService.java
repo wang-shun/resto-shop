@@ -54,4 +54,8 @@ public interface ArticleService extends GenericService<Article, String> {
 	Boolean setActivated(String articleId,Integer activated);
 
 	List<Article> getSingoArticle(String shopId);
+
+	void deleteRecommendId(String recommendId);
+
+	void saveLog(Integer result,String taskId);
 }

@@ -9,6 +9,7 @@ import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.service.ArticleRecommendService;
+import com.resto.shop.web.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,9 @@ public class RecommendController extends GenericController {
 
     @Autowired
     private BrandSettingService brandSettingService;
+
+    @Autowired
+    private ArticleService articleService;
 
     @RequestMapping("/articleList")
     public ModelAndView index(){
@@ -55,6 +59,8 @@ public class RecommendController extends GenericController {
     @ResponseBody
     public Result delete(String id){
         articleRecommendService.delete(id);
+        //将餐品设置成 无推荐餐品
+        articleService.deleteRecommendId(id);
         return Result.getSuccess();
     }
 

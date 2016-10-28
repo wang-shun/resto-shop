@@ -95,6 +95,7 @@
 
 
 
+
     <select id="selectIncomeListByShopId" resultType="com.resto.brand.web.dto.IncomeReportDto">
         SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
         (SELECT

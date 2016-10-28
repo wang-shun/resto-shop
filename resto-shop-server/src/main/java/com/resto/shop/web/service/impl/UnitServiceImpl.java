@@ -10,6 +10,7 @@ import com.resto.shop.web.model.UnitDetail;
 import com.resto.shop.web.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,12 +33,21 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     }
 
     @Override
-    public void insertDetail(Unit unit) {
+    public List<Unit> getUnitsByArticleId(String shopId, String articleId) {
+        return unitMapper.getUnitsByArticleId(shopId, articleId);
+    }
+
+    @Override
+    public Unit insertDetail(Unit unit) {
         for (UnitDetail unitDetail : unit.getDetails()) {
             String detailId = ApplicationUtils.randomUUID();
             unitDetail.setId(detailId);
             unitMapper.insertDetail(unit.getId(), unitDetail);
         }
+
+
+        return  unit;
+
     }
 
     @Override
@@ -53,5 +63,52 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     @Override
     public List<Unit> getUnitByArticleid(String articleId) {
         return unitMapper.getUnitByArticleid(articleId);
+    }
+
+    @Override
+    public void insertArticleRelation(String articleId, List<Unit> units) {
+        for(Unit unit : units){
+            String id = ApplicationUtils.randomUUID();
+            unit.setChoiceType(unit.getChoiceType() == null ? 1 : unit.getChoiceType());
+            unitMapper.insertArticleRelation(articleId,id,unit);
+            for(UnitDetail unitDetail : unit.getDetails()){
+                String detailID = ApplicationUtils.randomUUID();
+                unitMapper.insertUnitDetailRelation(detailID,id,unitDetail);
+            }
+        }
+    }
+
+    @Override
+    public void updateArticleRelation(String articleId, List<Unit> units) {
+        unitMapper.deleteArticleUnit(articleId);
+        insertArticleRelation(articleId, units);
+    }
+
+    @Override
+    public void deleteUnit(String id) {
+        List<String> ids = unitMapper.getUnitNew(id);
+        unitMapper.deleteUnit(ids);
+        unitMapper.deleteUnitNew(id);
+
+    }
+
+    @Override
+    public void modifyUnit(Unit unit) {
+        //首先得到使用该规格的菜品关系列表
+        List<String> ids = unitMapper.getUnitNew(unit.getId());
+
+        for(String id: ids){
+            //删除多余的规格
+            unitMapper.deleteUnitMore(id,unit.getDetails());
+            //遍历每个菜品关系
+            for(UnitDetail unitDetail : unit.getDetails()){
+                //拿到每个明细
+                int count = unitMapper.getUnitByRelation(unitDetail.getId(),id);
+                if(count == 0){ //不存在
+                    unitDetail.setPrice(new BigDecimal(0));
+                    unitMapper.insertUnitDetailRelation(ApplicationUtils.randomUUID(),id,unitDetail);
+                }
+            }
+        }
     }
 }

@@ -69,4 +69,9 @@ public class ArticleRecommendServiceImpl extends GenericServiceImpl<ArticleRecom
     public ArticleRecommend getRecommentByArticleId(String articleId, String shopId) {
         return articleRecommendMapper.getRecommendByArticleId(articleId, shopId);
     }
+
+    @Override
+    public void deleteRecommendByArticleId(String articleId) {
+         articleRecommendMapper.deleteRecommendByArticleId(articleId);
+    }
 }
