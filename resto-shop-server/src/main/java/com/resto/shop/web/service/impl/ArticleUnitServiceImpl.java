@@ -31,6 +31,13 @@ public class ArticleUnitServiceImpl extends GenericServiceImpl<ArticleUnit, Inte
 		return articleunitMapper.selectListByAttrId(attrId);
 	}
 
+    @Override
+    public int insertByAuto(ArticleUnit articleUnit) {
+        return articleunitMapper.insertByAuto(articleUnit);
+    }
 
-    
+    @Override
+    public ArticleUnit selectSame(String name, String attrId) {
+        return articleunitMapper.selectSame(name, attrId);
+    }
 }

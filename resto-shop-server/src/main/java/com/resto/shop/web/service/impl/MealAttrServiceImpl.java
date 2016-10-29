@@ -88,4 +88,5 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 	}
 
 
+
 }

@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
+import com.resto.shop.web.model.Article;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -32,5 +33,11 @@ public interface ArticleAttrMapper extends GenericDao<ArticleAttr, Integer>{
      * @return
      */
     void insertInfo(ArticleAttr record);
+
+    List<ArticleAttr> selectListByArticleId(String articleId);
+
+    int insertByAuto(ArticleAttr articleAttr);
+
+    ArticleAttr selectSame(@Param("name") String name,@Param("shopId") String shopId);
     
 }

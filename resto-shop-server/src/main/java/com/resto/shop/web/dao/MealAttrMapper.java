@@ -23,4 +23,5 @@ public interface MealAttrMapper  extends GenericDao<MealAttr,Integer> {
 	List<MealAttr> selectList(@Param("articleId")String article_id);
 
 	void deleteByIds(@Param("ids") List<Integer> ids);
+
 }

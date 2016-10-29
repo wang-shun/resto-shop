@@ -97,5 +97,20 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
 				articleUnitMapper.insertSelective(articleUnit);
 			}
 		}
-	} 
+	}
+
+	@Override
+	public List<ArticleAttr> selectListByArticleId(String articleId) {
+		return articleattrMapper.selectListByArticleId(articleId);
+	}
+
+	@Override
+	public int insertByAuto(ArticleAttr articleAttr) {
+		return articleattrMapper.insertByAuto(articleAttr);
+	}
+
+	@Override
+	public ArticleAttr selectSame(String name, String shopId) {
+		return articleattrMapper.selectSame(name, shopId);
+	}
 }

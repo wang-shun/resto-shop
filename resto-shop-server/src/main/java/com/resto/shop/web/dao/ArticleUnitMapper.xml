@@ -90,5 +90,16 @@
   <delete id="deleteByAttrId" parameterType="java.lang.Integer">
     UPDATE tb_article_unit set state=0 where tb_article_attr_id = #{id,jdbcType=INTEGER}
   </delete>
+
+  <insert id="insertByAuto" parameterType="ArticleUnit" useGeneratedKeys="true" keyProperty="id">
+insert into tb_article_unit (name, sort,
+      tb_article_attr_id)
+    values ( #{name,jdbcType=VARCHAR}, #{sort,jdbcType=DECIMAL},
+      #{tbArticleAttrId,jdbcType=INTEGER})
+  </insert>
+
+  <select id="selectSame" resultType="ArticleUnit">
+    select * from tb_article_unit where name = #{name} and tb_article_attr_id = #{attrId}
+  </select>
   
 </mapper>
