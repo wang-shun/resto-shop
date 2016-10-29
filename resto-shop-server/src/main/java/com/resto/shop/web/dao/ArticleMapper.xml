@@ -38,13 +38,16 @@
         <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
         <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
         <result column="recommend_id" property="recommendId"/>
+        <result column="newUnit" property="newUnit"/>
+        <result column="is_hidden" property="isHidden"/>
+        <result column="recommendCount" property="recommendCount"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id
+      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id,is_hidden
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -67,7 +70,7 @@
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,recommend_id)
+      is_remind,article_type,stock_working_day,stock_weekend,recommend_id,is_hidden)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -79,7 +82,7 @@
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
-      #{recommendId,jdbcType=VARCHAR})
+      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -189,6 +192,9 @@
             <if test="recommendId != null">
                 recommend_id,
             </if>
+            <if test="isHidden != null">
+                is_hidden,
+            </if>
 
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -297,7 +303,9 @@
             <if test="recommendId != null">
                 #{recommendId},
             </if>
-
+            <if test="isHidden != null">
+                #{isHidden},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -404,7 +412,9 @@
             <if test="recommendId != null">
                 recommend_id = #{recommendId},
             </if>
-
+            <if test="isHidden != null">
+                is_hidden = #{isHidden}
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -444,7 +454,8 @@
       stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
       stock_weekend = #{stockWeekend,jdbcType=INTEGER},
       current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
-      recommend_id = #{recommendId,jdbcType=VARCHAR}
+      recommend_id = #{recommendId,jdbcType=VARCHAR},
+      is_hidden = #{isHidden,isRemind,jdbcType=BIT}
 
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -467,8 +478,10 @@
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
   	a.show_big,	a.description,a.photo_small,a.is_empty,
-  	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,
-  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock
+  	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,
+  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
+  	(select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
+  	if(a.recommend_id is not null,1,0) as recommendCount
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
 	AND a.shop_detail_id=#{0}
@@ -648,13 +661,26 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
 
 
     <select id="getSingoArticle" resultType="Article">
-       select tb_article_family.name as articleFamilyName,
-       tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
+        select tb_article_family.name as articleFamilyName,
+        tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
         from tb_article
         left join tb_article_family on tb_article.article_family_id = tb_article_family.id
-where state =1 and activated =1
-and article_type =1
-and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
-and tb_article.shop_detail_id = #{shopId}
+        where state =1 and activated =1
+        and article_type =1
+        and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
+        and tb_article.shop_detail_id = #{shopId}
     </select>
+
+
+    <update id="deleteRecommendId">
+        update tb_article
+        set recommend_id = null
+        where recommend_id = #{recommendId}
+    </update>
+
+    <insert id="saveLog">
+        insert into tb_print_log
+        (taskId,result)
+        values (#{taskId},#{result})
+    </insert>
 </mapper>

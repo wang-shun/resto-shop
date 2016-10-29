@@ -147,4 +147,38 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		return realPay;
 	}
 
+	@Override
+	public BigDecimal houFuPayOrder(Order order,BigDecimal payMoney, Customer customer) {
+		Account account = selectById(customer.getAccountId());  //找到用户帐户
+		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
+		if(balance==null){
+			balance = BigDecimal.ZERO;
+		}
+		//计算剩余红包金额
+		BigDecimal redPackageMoney = account.getRemain().subtract(balance);
+		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT);  //得出真实支付的值
+		//算出 支付比例
+		BigDecimal redPay = BigDecimal.ZERO;
+		if(realPay.compareTo(BigDecimal.ZERO)>0){ //如果支付金额大于0
+			if(redPackageMoney.compareTo(realPay)>=0){ //如果红包金额足够支付所有金额，则只添加红包金额支付项
+				redPay = realPay;
+			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
+				redPay = redPackageMoney;
+				BigDecimal remainPay = realPay.subtract(redPay).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
+				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
+			}
+		}
+		if(redPay.compareTo(BigDecimal.ZERO)>0){
+			OrderPaymentItem item = new OrderPaymentItem();
+			item.setId(ApplicationUtils.randomUUID());
+			item.setOrderId(order.getId());
+			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
+			item.setPayTime(new Date());
+			item.setPayValue(redPay);
+			item.setRemark("余额(红包)支付:" + item.getPayValue());
+			item.setResultData(account.getId());
+			orderPaymentItemService.insert(item);
+		}
+		return realPay;
+	}
 }

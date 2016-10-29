@@ -26,5 +26,7 @@ public interface ArticleRecommendMapper extends GenericDao<ArticleRecommend, Str
     ArticleRecommend getRecommendByArticleId(@Param("articleId") String articleId,
                                                         @Param("shopId") String shopIds);
 
+    int deleteRecommendByArticleId(String id);
+
 
 }
