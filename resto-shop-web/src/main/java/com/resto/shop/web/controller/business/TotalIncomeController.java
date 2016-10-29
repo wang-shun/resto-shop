@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.resto.brand.core.util.JsonUtils;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
@@ -190,116 +191,126 @@ public class TotalIncomeController extends GenericController {
     }
 
     private Map<String,Object> getIncomeReportList(String beginDate, String endDate) {
+
+        Brand brand = null;
+        List<ShopDetail> shopDetailList = null;
         try{
             //添加缓存逻辑
             //从缓存中获取品牌和店铺信息
             String cacheBrand = redisService.get(getCurrentBrandId()+"brand_name");
             String  cacheShopDetails  = redisService.get(getCurrentBrandId()+"shop_names");
             if(StringUtils.isNotEmpty(cacheBrand)){
-                Brand  brand =MAPPER.readValue(cacheBrand,Brand.class);
+               // brand =MAPPER.readValue(cacheBrand,Brand.class);
+                brand = JsonUtils.jsonToPojo(cacheBrand,Brand.class);
             }
             if(StringUtils.isNotEmpty(cacheShopDetails)){
-                List<ShopDetail> shopDetailList = (List<ShopDetail>) MAPPER.readValue(cacheShopDetails,ShopDetail.class);
+                // shopDetailList = (List<ShopDetail>) MAPPER.readValue(cacheShopDetails,ShopDetail.class);
+                shopDetailList = JsonUtils.jsonToList(cacheShopDetails,ShopDetail.class);
             }
-
-        }catch (Exception e){
-
-        }
-
-        try {
-            Brand brand = brandService.selectById(getCurrentBrandId());
-            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-            redisService.set(getCurrentBrandId()+"brand_name",MAPPER.writeValueAsString(brand),60*60*24*30*3);
-            redisService.set(getCurrentBrandId()+"brand_name",MAPPER.writeValueAsString(shopDetailList),60*60*24*30*3);
         }catch (Exception e){
             e.printStackTrace();
         }
-        return  null;
 
-        //查询所有的店铺
-//        List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-//
-//        List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
-//
-//        //给每个店铺的订单总额  红包支付总额 微信支付总额 ...附初始值
-//        for(ShopDetail s : shopDetailList){
-//            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId());
-//            shopIncomeDtos.add(sin);
-//        }
-//        //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.店铺名字 8 店铺 ID
-//        //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
-//        //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
-//        //     String shopDetailId
-//        //查询订单支付
-//        List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
-//
-//        if(!orderPaymentItemList.isEmpty()){
-//            for(ShopIncomeDto si :shopIncomeDtos){
-//                for(OrderPaymentItem oi : orderPaymentItemList){
-//                    if(si.getShopDetailId().equals(oi.getShopDetailId())){
-//                        switch (oi.getPaymentModeId()) {
-//                            case PayMode.WEIXIN_PAY:
-//                                si.setWechatIncome(oi.getPayValue());
-//                                break;
-//                            case PayMode.ACCOUNT_PAY:
-//                                si.setRedIncome(oi.getPayValue());
-//                                break;
-//                            case PayMode.COUPON_PAY:
-//                                si.setCouponIncome(oi.getPayValue());
-//                                break;
-//                            case PayMode.CHARGE_PAY:
-//                                si.setChargeAccountIncome(oi.getPayValue());
-//                                break;
-//                            case PayMode.REWARD_PAY:
-//                                si.setChargeGifAccountIncome(oi.getPayValue());
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//                        // BigDecimal wechatIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome
-//                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome());
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//        List<BrandIncomeDto> brandIncomeDtos = new ArrayList<>();
-//        //封装品牌的数据
-//        Brand brand = brandService.selectById(getCurrentBrandId());
-//        // 初始化品牌的信息
-//        BigDecimal wechatIncome = BigDecimal.ZERO;
-//        BigDecimal redIncome = BigDecimal.ZERO;
-//        BigDecimal couponIncome = BigDecimal.ZERO;
-//        BigDecimal chargeAccountIncome = BigDecimal.ZERO;
-//        BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
-//
-//        if (!shopIncomeDtos.isEmpty()) {
-//            for (ShopIncomeDto sdto : shopIncomeDtos) {
-//                wechatIncome = wechatIncome.add(sdto.getWechatIncome());
-//                redIncome = redIncome.add(sdto.getRedIncome());
-//                couponIncome = couponIncome.add(sdto.getCouponIncome());
-//                chargeAccountIncome=chargeAccountIncome.add(sdto.getChargeAccountIncome());
-//                chargeGifAccountIncome = chargeGifAccountIncome.add(sdto.getChargeGifAccountIncome());
-//            }
-//        }
-//
-//        BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
-//        brandIncomeDto.setWechatIncome(wechatIncome);
-//        brandIncomeDto.setRedIncome(redIncome);
-//        brandIncomeDto.setCouponIncome(couponIncome);
-//        brandIncomeDto.setChargeAccountIncome(chargeAccountIncome);
-//        brandIncomeDto.setChargeGifAccountIncome(chargeGifAccountIncome);
-//        brandIncomeDto.setBrandName(brand.getBrandName());
-//        //BigDecimal wechatIncome,BigDecimal accountIncome,BigDecimal couponIncome,BigDecimal chargeAccountIncome,BigDecimal chargeGifAccountIncome
-//
-//        brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome);
-//        brandIncomeDtos.add(brandIncomeDto);
-//
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("shopIncome", shopIncomeDtos);
-//        map.put("brandIncome", brandIncomeDtos);
-//        return map;
+        if(brand==null){
+            brand = brandService.selectById(getCurrentBrandId());
+            try{
+                redisService.set(getCurrentBrandId()+"brand_name",MAPPER.writeValueAsString(brand),60*60*24*30*3);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if(shopDetailList==null){
+            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+            try{
+                redisService.set(getCurrentBrandId()+"shop_names",MAPPER.writeValueAsString(shopDetailList),60*60*24*30*3);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+
+        //封装店铺的信息
+        List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
+        //给每个店铺的订单总额  红包支付总额 微信支付总额 ...附初始值
+        for(ShopDetail s : shopDetailList){
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
+            shopIncomeDtos.add(sin);
+        }
+        //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.等位红包支付 7.店铺名字 8 店铺 ID
+        //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
+        //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
+        //     String shopDetailId
+        //查询订单支付
+        List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
+        if(!orderPaymentItemList.isEmpty()){
+            for(ShopIncomeDto si :shopIncomeDtos){
+                for(OrderPaymentItem oi : orderPaymentItemList){
+                    if(si.getShopDetailId().equals(oi.getShopDetailId())){
+                        switch (oi.getPaymentModeId()) {
+                            case PayMode.WEIXIN_PAY:
+                                si.setWechatIncome(oi.getPayValue());
+                                break;
+                            case PayMode.ACCOUNT_PAY:
+                                si.setRedIncome(oi.getPayValue());
+                                break;
+                            case PayMode.COUPON_PAY:
+                                si.setCouponIncome(oi.getPayValue());
+                                break;
+                            case PayMode.CHARGE_PAY:
+                                si.setChargeAccountIncome(oi.getPayValue());
+                                break;
+                            case PayMode.REWARD_PAY:
+                                si.setChargeGifAccountIncome(oi.getPayValue());
+                                break;
+                            case PayMode.WAIT_MONEY:
+                                si.setWaitNumberIncome(oi.getPayValue());
+                                break;
+                            default:
+                                break;
+                        }
+                        // BigDecimal wechatIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome
+                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome());
+                    }
+                }
+            }
+        }
+
+        List<BrandIncomeDto> brandIncomeDtos = new ArrayList<>();
+        //封装品牌的数据
+        // 初始化品牌的信息
+        BigDecimal wechatIncome = BigDecimal.ZERO;
+        BigDecimal redIncome = BigDecimal.ZERO;
+        BigDecimal couponIncome = BigDecimal.ZERO;
+        BigDecimal chargeAccountIncome = BigDecimal.ZERO;
+        BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
+        BigDecimal waitNumberIncome = BigDecimal.ZERO;
+
+        if (!shopIncomeDtos.isEmpty()) {
+            for (ShopIncomeDto sdto : shopIncomeDtos) {
+                wechatIncome = wechatIncome.add(sdto.getWechatIncome());
+                redIncome = redIncome.add(sdto.getRedIncome());
+                couponIncome = couponIncome.add(sdto.getCouponIncome());
+                chargeAccountIncome=chargeAccountIncome.add(sdto.getChargeAccountIncome());
+                chargeGifAccountIncome = chargeGifAccountIncome.add(sdto.getChargeGifAccountIncome());
+                waitNumberIncome = waitNumberIncome.add(sdto.getWaitNumberIncome());
+            }
+        }
+
+        BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
+        brandIncomeDto.setWechatIncome(wechatIncome);
+        brandIncomeDto.setRedIncome(redIncome);
+        brandIncomeDto.setCouponIncome(couponIncome);
+        brandIncomeDto.setChargeAccountIncome(chargeAccountIncome);
+        brandIncomeDto.setChargeGifAccountIncome(chargeGifAccountIncome);
+        brandIncomeDto.setBrandName(brand.getBrandName());
+        brandIncomeDto.setWaitNumberIncome(waitNumberIncome);
+        //BigDecimal wechatIncome,BigDecimal accountIncome,BigDecimal couponIncome,BigDecimal chargeAccountIncome,BigDecimal chargeGifAccountIncome
+        brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome);
+        brandIncomeDtos.add(brandIncomeDto);
+        Map<String, Object> map = new HashMap<>();
+        map.put("shopIncome", shopIncomeDtos);
+        map.put("brandIncome", brandIncomeDtos);
+        return map;
     }
 
     /**

@@ -1,14 +1,12 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
@@ -57,6 +55,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderItemMapper orderitemMapper;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Resource
     private CustomerService customerService;
@@ -124,6 +124,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private GetNumberService getNumberService;
 
+    @Autowired
+    private  RedisService redisService;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -290,12 +292,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         orderItemService.insertItems(order.getOrderItems());
         BigDecimal payMoney = totalMoney.add(order.getServicePrice());
-
         // 使用优惠卷
-
-
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
-
         if(order.getWaitMoney().doubleValue() > 0){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
@@ -1608,17 +1606,52 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        //查询出所有店铺并设置默认值
-        List<ShopDetail> shopLists = shopDetailService.selectByBrandId(brandId);
+        //从缓存中命中品牌和所有店铺并设置默认值
+       // List<ShopDetail> shopLists = shopDetailService.selectByBrandId(brandId);
+        //Brand b = brandService.selectById(brandId);
+        List<ShopDetail> shopDetailList = null;
+        Brand brand = null;
+        try{
+            //添加缓存逻辑
+            //从缓存中获取品牌和店铺信息
+            String cacheBrand = redisService.get(brandId+"brand_name");
+            String  cacheShopDetails  = redisService.get(brandId+"shop_names");
+            if(StringUtils.isNotEmpty(cacheBrand)){
+                // brand =MAPPER.readValue(cacheBrand,Brand.class);
+                brand = JsonUtils.jsonToPojo(cacheBrand,Brand.class);
+            }
+            if(StringUtils.isNotEmpty(cacheShopDetails)){
+                // shopDetailList = (List<ShopDetail>) MAPPER.readValue(cacheShopDetails,ShopDetail.class);
+                shopDetailList = JsonUtils.jsonToList(cacheShopDetails,ShopDetail.class);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(brand==null){
+            brand = brandService.selectById(brandId);
+            try{
+                redisService.set(brandId+"brand_name",MAPPER.writeValueAsString(brand),60*60*24*30*3);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        if(shopDetailList==null){
+            shopDetailList = shopDetailService.selectByBrandId(brandId);
+            try{
+                redisService.set(brandId+"shop_names",MAPPER.writeValueAsString(shopDetailList),60*60*24*30*3);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         List<OrderPayDto> orderList = new ArrayList<>();
-        for (ShopDetail shopDetail : shopLists) {
+        for (ShopDetail shopDetail : shopDetailList) {
             OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
             orderList.add(ot);
         }
         //查询后台数据
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
-        Brand b = brandService.selectById(brandId);
-        OrderPayDto brandPayDto = new OrderPayDto(b.getBrandName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+        OrderPayDto brandPayDto = new OrderPayDto(brand.getBrandName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
         //品牌订单总额初始值
         BigDecimal d = BigDecimal.ZERO;
 
@@ -1671,29 +1704,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             average = d.divide(new BigDecimal(String.valueOf(number)), 2, BigDecimal.ROUND_HALF_UP);
         }
         brandPayDto.setAverage(average);
-
         //品牌营销撬动率
         brandPayDto.setMarketPrize(marketPrize);
-
         Map<String, Object> map = new HashMap<>();
-
         //遍历订单中的是否含有这个店铺的id 有的话说明这个店铺有订单那么修改初始值
         for (OrderPayDto sd : orderList) {
             //店铺订单的总额初始值
             BigDecimal ds1 = BigDecimal.ZERO;
-
             //店铺实际支付初始值
             BigDecimal ds2 = BigDecimal.ZERO;
-
             //店铺虚拟支付初始值
             BigDecimal ds3 = BigDecimal.ZERO;
-
-            //店铺平均订单金额
-            // BigDecimal saverage = BigDecimal.ZERO;
-
-            //店铺订单数目初始值
             int snumber = 0;
-
             Set<String> sids = new HashSet<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
@@ -1704,7 +1726,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (sids.size() > 0) {
                         snumber = sids.size();
                     }
-
                     //店铺实际支付
                     if (os.getPaymentModeId() == 1 || os.getPaymentModeId() == 6) {
                         ds2 = ds2.add(os.getPayValue());
@@ -1715,35 +1736,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-
-            // String smarketPrize="";//营销撬动率
-
             //赋值店铺订单总额
             sd.setOrderMoney(ds1);
-
             //赋值店铺订单数目
             sd.setNumber(snumber);
-
             //赋值店铺的订单平均金额
             if (snumber > 0) {
                 //sd.setAverage(ds1.divide(new BigDecimal(String.valueOf(snumber))).setScale(2, BigDecimal.ROUND_HALF_UP));
                 sd.setAverage(ds1.divide(new BigDecimal(String.valueOf(snumber)), 2, BigDecimal.ROUND_HALF_UP));
             }
-
             //赋值店铺营销撬动率
             if (ds3.compareTo(BigDecimal.ZERO) > 0) {
                 //sd.setMarketPrize(ds2.divide(ds3).setScale(2, BigDecimal.ROUND_HALF_UP)+"");
                 sd.setMarketPrize(ds2.divide(ds3, 2, BigDecimal.ROUND_HALF_UP) + "");
             }
-
         }
-
-
-        //--------------------------------------
 
         map.put("shopId", orderList);
         map.put("brandId", brandPayDto);
-
         return map;
     }
 
