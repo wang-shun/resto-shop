@@ -147,6 +147,7 @@
         GROUP BY order_id
     </select>
 
+    <!-- 品牌收入报表 2016-10-29 -->
     <select id="selectShopIncomeList" resultType="OrderPaymentItem">
         SELECT
         o.shop_detail_id,

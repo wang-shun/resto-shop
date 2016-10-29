@@ -37,14 +37,6 @@ public class OrderPaymentItem {
         this.shopDetailId = shopDetailId;
     }
 
-    public BigDecimal getFactIncome() {
-        return factIncome;
-    }
-
-    public void setFactIncome(BigDecimal factIncome) {
-        this.factIncome = factIncome;
-    }
-
     public String getId() {
         return id;
     }

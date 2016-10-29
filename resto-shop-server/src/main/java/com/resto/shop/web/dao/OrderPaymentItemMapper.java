@@ -66,7 +66,8 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     List<Order> selectOrderMoneyByBrandIdGroupByOrderId(@Param("beginDate")Date begin,@Param("endDate")  Date end);
 
     /**
-     * 新报表查询订单收入
+     * 品牌收入报表查询
+     * 2016-10-29
      * @param begin
      * @param end
      * @param brandId

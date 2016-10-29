@@ -22,6 +22,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
@@ -1657,7 +1658,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 e.printStackTrace();
             }
         }
-
         List<OrderPayDto> orderList = new ArrayList<>();
         for (ShopDetail shopDetail : shopDetailList) {
             OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
@@ -1682,6 +1682,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int number = 0;
         //品牌订单营销撬动率
         String marketPrize = "";
+        List<String> ids = new ArrayList<>();
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
