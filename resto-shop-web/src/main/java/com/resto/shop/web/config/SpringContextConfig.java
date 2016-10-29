@@ -313,6 +313,8 @@ public class SpringContextConfig {
     }
 
 
+
+
     @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {
         return proxy.create(com.resto.brand.web.service.EmployeeService.class);

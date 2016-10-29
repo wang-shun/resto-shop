@@ -3,6 +3,7 @@ package com.resto.shop.web.config;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.service.ThirdService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -76,5 +77,6 @@ public class ServerConfig {
 	@Bean
     public  com.resto.brand.web.service.PermissionService    brandPermissionService(){return  proxy.create( com.resto.brand.web.service.PermissionService.class);}
 
-
+	@Bean
+	public ThirdService hungerService(){ return proxy.create(ThirdService.class) ;}
 }
