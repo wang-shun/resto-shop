@@ -67,16 +67,6 @@
         <result column="service_price" property="servicePrice"/>
     </resultMap>
 
-
-    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
-        <id column="id"  property="id"/>
-        <result column="order_money" property="orderMoney"/>
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <result column="payment_mode_id" property="paymentModeId"/>
-            <result column="pay_value" property="payValue"/>
-        </collection>
-    </resultMap>
-
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
@@ -86,6 +76,7 @@
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus" />
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -108,6 +99,15 @@
                 <id column="articleFamily_id" property="id"/>
                 <result column="articleFamilyName" property="name"/>
             </association>
+        </collection>
+    </resultMap>
+
+    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
+        <id column="id"  property="id"/>
+        <result column="order_money" property="orderMoney"/>
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+           <result column="payment_mode_id" property="paymentModeId"/>
+          <result column="pay_value" property="payValue"/>
         </collection>
     </resultMap>
 
@@ -139,6 +139,25 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
     </resultMap>
+
+
+
+    <resultMap id="orderPaymentlist" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+
+
+
 
     <resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -925,32 +944,90 @@
         and closed=0 ORDER BY print_order_time
     </select>
 
-    <!--<select id="selectArticleSumCountByData" resultType="com.resto.brand.web.dto.brandArticleReportDto">-->
-    <!--select sum(r.count) as totalNum,sum(r.final_price) as sellIncome from (SELECT-->
-    <!--DISTINCT(t.order_id),t.article_name,t.count,t.final_price-->
-    <!--FROM-->
-    <!--tb_order_item t-->
-    <!--INNER JOIN tb_order t2 ON t2.id = t.order_id-->
-    <!--INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id-->
-    <!--INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)-->
-    <!--WHERE-->
-    <!--t2.brand_id = #{brandId}-->
-    <!--AND t2.order_state IN (2, 10, 11, 12)-->
-    <!--AND t2.production_status IN(2,3)-->
-    <!--AND t.type != 3-->
-    <!--AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>-->
-    <!--) as r-->
-    <!--</select>-->
+    <!--<select id="selectArticleSumCountByData" resultType="integer">-->
 
-    <!--菜品销售总数-->
-    <select id="selectArticleSum" resultType="Integer">
-        SELECT sum(t.count) from tb_order_item t WHERE order_id in (
-        SELECT id from tb_order o WHERE
-        o.order_state in(2,10,11,12) and o.production_status in (2,3)
-        and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-        and o.brand_id=#{brandId}
-        ) and  t.type!=3
+    <!--SELECT IFNULL(sum(CASE WHEN type=3 THEN 0 ELSE count END),0)totalNum FROM tb_order_item WHERE order_id in(-->
+    <!--SELECT-->
+    <!--distinct o.id-->
+    <!--FROM-->
+    <!--tb_order o-->
+    <!--INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id-->
+    <!--WHERE-->
+    <!--o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND-->
+    <!--<![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}-->
+    <!--)-->
+<!--</select>-->
+
+<!--查询品牌菜品的总数 -->
+    <select id="selectBrandArticleSum" resultType="integer">
+        SELECT sum(t.count)totalNum FROM
+        (
+        SELECT count,type FROM tb_order_item oi WHERE order_id in(
+        SELECT
+        distinct o.id
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
+        ) as t WHERE t.type!=3
+
     </select>
+
+    <!--查询品牌菜品销售的总价-->
+    <select id="selectBrandArticleSell" resultType="BigDecimal">
+        SELECT sum(t.final_price)sellIncome FROM
+        (
+        SELECT final_price FROM tb_order_item oi WHERE order_id in(
+        SELECT
+        distinct o.id
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+       <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
+        ) as t
+    </select>
+
+    <!--查询品牌下每个店铺的菜品数目卖的和-->
+    <select id="selectShopArticleSum" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+        SELECT sum(t.count)totalNum,od.shop_detail_id shopId FROM
+        (
+        SELECT count,order_id,type FROM tb_order_item oi WHERE order_id in(
+        SELECT
+        distinct o.id
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
+        )) as t INNER JOIN tb_order od on t.order_id = od.id WHERE t.type!=3 GROUP BY od.shop_detail_id
+    </select>
+
+
+    <!--查询品牌下每个店铺所有菜品卖的钱的和-->
+    <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+        SELECT sum(t.final_price)sellIncome,od.shop_detail_id shopId FROM
+        (
+        SELECT final_price,order_id FROM tb_order_item oi WHERE order_id in(
+        SELECT
+        distinct o.id
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
+        )) as t INNER JOIN tb_order od on t.order_id = od.id  GROUP BY od.shop_detail_id
+    </select>
+
+
+
+
+
 
 
 
@@ -1268,7 +1345,7 @@
 
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
-        select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles from (	SELECT
+        select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.peference as  numberCode from (	SELECT
         t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         t.count,
@@ -1329,9 +1406,10 @@ order by ${sort}
     </select>
 
 
-    <select id="selectMoneyAndNumByDate" resultType="com.resto.shop.web.model.Order">
+    <select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">
         SELECT
         o.shop_detail_id,
+        o.order_money,
         o.id,
         oi.payment_mode_id,
         oi.pay_value
@@ -1339,7 +1417,7 @@ order by ${sort}
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (10, 11, 12) and
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
     </select>
 
@@ -1423,6 +1501,7 @@ order by ${sort}
         SELECT
         o.shop_detail_id,
         o.id,
+        o.production_status,
         o.create_time,
         o.distribution_mode_id,
         o.ver_code,

@@ -144,7 +144,14 @@ public class BrandUserController extends GenericController{
 		brandUserService.creatBrandUser(brandUser);
 		return Result.getSuccess();
 	}
-	
+
+
+    @RequestMapping("/modify")
+    @ResponseBody
+    public Result modify(@Valid BrandUser brandUser){
+        brandUserService.update(brandUser);
+        return Result.getSuccess();
+    }
 	
 	@RequestMapping("/checkusername")
 	@ResponseBody

@@ -49,7 +49,7 @@ public class OrderController extends GenericController{
     public void list(){
     }
 	
-	//查询已消费订单的订单份数和订单金额
+	//查询已消费订单的订单总数和订单金额，
 	@ResponseBody
 	@RequestMapping("brand_data")
 	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
@@ -138,21 +138,16 @@ public class OrderController extends GenericController{
 		//return orderService.selectListByTime(beginDate,endDate,shopId);
 				//查询店铺名称
 				ShopDetail shop = shopDetailService.selectById(shopId);
-				
 				List<OrderDetailDto> listDto = new ArrayList<>();
-				
-			
 				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 				for (Order o : list) {
 					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "");			
-					
 					if(o.getCustomer()!=null){
 						//手机号
 						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
 							ot.setTelephone(o.getCustomer().getTelephone());
 						}
 					}
-					
 					//订单状态
 					if(o.getOrderState()!=null){
 						switch (o.getOrderState()) {
@@ -163,7 +158,7 @@ public class OrderController extends GenericController{
 							if(o.getProductionStatus()==0){
 								ot.setOrderState("已付款");
 							}else if(o.getProductionStatus()==2){
-								ot.setOrderState("已打印");
+								ot.setOrderState("已消费");
 							}else if(o.getProductionStatus()==5){
 								ot.setOrderState("异常订单");
 							}
@@ -184,15 +179,10 @@ public class OrderController extends GenericController{
 						case 12:
 							ot.setOrderState("已分享");
 							break;
-
 						default:
 							break;
 						}
-						
-						
 					}
-					
-					
 					//订单评价
 					//判断是否为空，不是所有订单都评价
 					
@@ -213,23 +203,14 @@ public class OrderController extends GenericController{
 						case 5:
 							ot.setLevel("五星");
 							break;
-
 						default:
 							break;
 						}
-						
 					}
-				
-						
 					//订单支付
-					
 					if(o.getOrderPaymentItems()!=null){
-						
 						if(!o.getOrderPaymentItems().isEmpty()){
-							
-
 							for(OrderPaymentItem oi : o.getOrderPaymentItems()){
-								
 								if(null!=oi.getPaymentModeId()){
 									switch (oi.getPaymentModeId()) {
 									case 1:
@@ -251,33 +232,20 @@ public class OrderController extends GenericController{
 										break;
 									}
 								}
-								
 							}
-						
-							
 						}
-							
-						
 					}
-					//设置营销撬动率  (订单金额-实际支付金额)/实际支付的金额
-					
+					//设置营销撬动率  实际/虚拟
 					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
-					
 					BigDecimal temp = o.getOrderMoney().subtract(real);
-					
 					String incomPrize = "";
-					
-					if(temp.compareTo(BigDecimal.ZERO)!=0){
+					if(temp.compareTo(BigDecimal.ZERO)>0){
 						incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
 					}
-					
 					ot.setIncomePrize(incomPrize);
-					
 					//订单金额
 					ot.setOrderMoney(o.getOrderMoney());
-					
 					listDto.add(ot);
-					
 				}
 				return listDto;
 	}

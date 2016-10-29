@@ -337,6 +337,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 打印厨房小票
+     *
      * @param oid
      * @return
      */
@@ -354,6 +355,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询品牌菜品销售  用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -363,6 +365,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询店铺菜品销售 用于中间数据库
+     *
      * @param currentBrandId
      * @param beginDate
      * @param endDate
@@ -372,12 +375,24 @@ public interface OrderService extends GenericService<Order, String> {
 
     /**
      * 查询订单详情 用于中间数据库
+     *
      * @param beginDate
      * @param endDate
      * @param currentBrandId
      * @return
      */
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
+
+
+    /**
+     * 查询所有的已经消费的订单
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Order> selectAllAlreadyConsumed(String currentBrandId, String beginDate, String endDate);
+
 
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单

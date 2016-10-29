@@ -44,14 +44,14 @@ import com.resto.shop.web.service.OrderPaymentItemService;
 @RequestMapping("totalIncome")
 public class TotalIncomeController extends GenericController {
 
-    @Resource
-    BrandService brandService;
+	@Resource
+	BrandService brandService;
 
-    @Resource
-    ShopDetailService shopDetailService;
+	@Resource
+	ShopDetailService shopDetailService;
 
-    @Resource
-    OrderPaymentItemService orderpaymentitemService;
+	@Resource
+	OrderPaymentItemService orderpaymentitemService;
 
     @Resource
     ChargeOrderService chargeOrderService;
