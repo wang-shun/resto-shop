@@ -369,9 +369,9 @@ public class SyncDataController extends GenericController {
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
         //1.查退款失败原因为： 累计退款金额大于支付金额
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
-
         if(!orderPaymentItemList.isEmpty()){
             for(OrderPaymentItem oi : orderPaymentItemList){
+                System.err.println(oi.getOrderId());
                 Order order = orderService.selectById(oi.getOrderId());
                 //插入数据
                 //查询店铺的名字
@@ -390,18 +390,11 @@ public class SyncDataController extends GenericController {
 
         //1.查退款失败原因为： 没有证书
         List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
-
-
-
-
         //查询订单项丢失
         //查询所有的订单和它的订单项(不考虑 orderstate 和productionStatus)
         List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
         if(!orderExceptionList.isEmpty()){
             for(Order order : orderExceptionList){
-                if("e6f374a27ac04cfea5f221462e5cb303".equals(order.getId())){
-                    System.out.println("找到了这个订单-----------------------------------------------------------");
-                }
                 if(!order.getOrderPaymentItems().isEmpty()){
                     BigDecimal temp = BigDecimal.ZERO;
                     for(OrderPaymentItem oi : order.getOrderPaymentItems()){

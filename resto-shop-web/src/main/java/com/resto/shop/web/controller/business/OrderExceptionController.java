@@ -10,6 +10,7 @@
  import org.springframework.web.bind.annotation.ResponseBody;
 
  import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
  import java.util.List;
 
  @Controller
@@ -24,9 +25,13 @@
       */
          @RequestMapping("cancelExceptionOrder")
          @ResponseBody
-     public Result executeCancelOrder(){
+     public Result executeCancelOrder(String beginDate, String endDate, HttpServletRequest request){
+             //获取时间
+             String begin = request.getParameter("beginDate");
+             String end = request.getParameter("endDate");
+
              //查询所有已提交但未支付的定的那
-             List<Order> orderList = orderService.selectNeedCacelOrderList(getCurrentBrandId(),"2016-9-01","2016-10-25");
+             List<Order> orderList = orderService.selectNeedCacelOrderList(getCurrentBrandId(),begin,end);
              for(Order order :orderList){
                  if (order.getOrderState() == OrderState.SUBMIT) {
                      System.err.println("自动取消订单:" + order.getId());
