@@ -288,7 +288,7 @@ dt,dd{
 						$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
 						$("#content").html(data.appraise!=null ? data.appraise.content:null);
 // 					}
-					$("#orderState").html(getState(data.orderState));
+					$("#orderState").html(getState(data.orderState,data.productionStatus));
 					$('#articleList').text("");
 
 					for (var i = 0; i < data.orderItems.length; i++) {
@@ -349,17 +349,31 @@ dt,dd{
 		return levelName;
 	}
 
-	function getState(state) {
+	function getState(state,productionStatus) {
 		var orderState = '';
 		switch (state) {
-		case 2:
-			orderState = "已支付"
+            case 1:
+                orderState = "未支付";
+                break;
+            case 2:
+             if(productionStatus==0){
+                orderState= "已付款";
+             }else if(productionStatus==2){
+                 orderState = "已消费";
+             }else if(productionStatus==5){
+                 orderState = "异常订单";
+             }
 			break;
 		case 9:
 			orderState = "已取消";
 			break;
 		case 10:
 			orderState = "已确认";
+             if(productionStatus==5){
+                 orderState = "异常订单";
+             } else {
+                 orderState = "已消费";
+             }
 			break;
 		case 11:
 			orderState = "已评价";

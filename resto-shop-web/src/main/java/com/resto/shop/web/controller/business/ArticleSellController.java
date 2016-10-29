@@ -78,7 +78,8 @@ public class ArticleSellController extends GenericController{
 //		list.add(saleReportDto);
 //		return list;
 //	}
-	
+
+
 	@RequestMapping("/list_brand")
 	@ResponseBody
 	public brandArticleReportDto list_brand(String beginDate,String endDate){
@@ -304,7 +305,7 @@ public class ArticleSellController extends GenericController{
 		//暂时查全部
 		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
 		String[][] headers = {{"分类","25"},{"菜名","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"}};
-		
+
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{

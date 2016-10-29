@@ -300,10 +300,10 @@ public interface OrderService extends GenericService<Order, String> {
 	//查询品牌所有已消费的订单
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
 
-	//查询店铺所有的已消费的订单
+    //查询店铺所有的已消费的订单
 	public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
 
-
+    
 	//查询订单关联评论的内容
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 
@@ -384,6 +384,15 @@ public interface OrderService extends GenericService<Order, String> {
     List<Order> selectListByTimeAndBrandId(String currentBrandId,String beginDate, String endDate);
 
 
+    /**
+     * 查询所有的已经消费的订单
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Order> selectAllAlreadyConsumed(String currentBrandId, String beginDate, String endDate);
+
 
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单
@@ -419,6 +428,7 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> getOrderByEmployee(String employeeId, String shopId);
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
+
 
 
 }

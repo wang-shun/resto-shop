@@ -16,7 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
 import com.resto.shop.web.model.ChargeOrder;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.OrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +54,9 @@ public class TotalIncomeController extends GenericController {
     @Resource
     ChargeOrderService chargeOrderService;
 
+    @Resource
+    private OrderService orderService;
+
 	@RequestMapping("/list")
 	public void list() {
 	}
@@ -58,114 +64,122 @@ public class TotalIncomeController extends GenericController {
 	// 封装品牌和店铺收入需要的数据
 	public Map<String, Object> getIncomeReportList(String beginDate, String endDate) {
 		// 查询品牌和店铺的收入情况
-		List<IncomeReportDto> incomeReportList = orderpaymentitemService.selectIncomeList(getCurrentBrandId(),
-				beginDate, endDate);
+	//	List<IncomeReportDto> incomeReportList = orderpaymentitemService.selectIncomeList(getCurrentBrandId(), beginDate, endDate);
+
+        //查询所有已消费的订单
+        List<Order> list = orderService.selectAllAlreadyConsumed(getCurrentBrandId(),beginDate,endDate);
+
+       // 封装brand所需要的数据结构
+
+        Brand brand = brandService.selectById(getCurrentBrandId());
+        List<BrandIncomeDto> brandIncomeList = new ArrayList<>();
+        BrandIncomeDto in = new BrandIncomeDto();
+        // 初始化品牌的信息
+        BigDecimal wechatIncome = BigDecimal.ZERO;
+        BigDecimal redIncome = BigDecimal.ZERO;
+        BigDecimal couponIncome = BigDecimal.ZERO;
+        BigDecimal chargeAccountIncome = BigDecimal.ZERO;
+        BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
+        BigDecimal totalIncome = BigDecimal.ZERO;
+
+        if(!list.isEmpty()){
+            for(Order o :list){
+              totalIncome = totalIncome.add(o.getOrderMoney());
+                if(!o.getOrderPaymentItems().isEmpty()){
+                    for(OrderPaymentItem oi : o.getOrderPaymentItems()){
+                        switch (oi.getPaymentModeId()) {
+                            case PayMode.WEIXIN_PAY:
+                                wechatIncome=wechatIncome.add(oi.getPayValue());
+                                break;
+                            case PayMode.ACCOUNT_PAY:
+                                redIncome=redIncome.add(oi.getPayValue());
+                                break;
+                            case PayMode.COUPON_PAY:
+                                couponIncome=couponIncome.add(oi.getPayValue());
+                                break;
+                            case PayMode.CHARGE_PAY:
+                                chargeAccountIncome=chargeAccountIncome.add(oi.getPayValue());
+                                break;
+                            case PayMode.REWARD_PAY:
+                                chargeGifAccountIncome=chargeGifAccountIncome.add(oi.getPayValue());
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        in.setBrandId(brand.getId());
+        in.setBrandName(brand.getBrandName());
+        in.setWechatIncome(wechatIncome);
+        in.setRedIncome(redIncome);
+        in.setCouponIncome(couponIncome);
+        in.setChargeAccountIncome(chargeAccountIncome);
+        in.setChargeGifAccountIncome(chargeGifAccountIncome);
+        in.setTotalIncome(totalIncome);
+        brandIncomeList.add(in);
+
 		// 封装店铺所需要的数据结构
 		List<ShopDetail> listShop = shopDetailService.selectByBrandId(getCurrentBrandId());
 		List<ShopIncomeDto> shopIncomeList = new ArrayList<>();
-		Map<String, ShopIncomeDto> hm = new HashMap<>();
-		for (int i = 0; i < listShop.size(); i++) {// 实际有多少个店铺显示多少个数据
-			ShopIncomeDto sin = new ShopIncomeDto();
-			sin.setShopDetailId(listShop.get(i).getId());
-			sin.setShopName(listShop.get(i).getName());
-			// 设置每个店铺初始营业额为零
-			BigDecimal temp = BigDecimal.ZERO;
-			sin.setWechatIncome(temp);
-			sin.setRedIncome(temp);
-			sin.setCouponIncome(temp);
-			sin.setChargeAccountIncome(temp);
-			sin.setChargeGifAccountIncome(temp);
-			sin.setTotalIncome(temp, temp, temp, temp, temp);
-
-            //查询此店铺的充值金额
-            List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId( beginDate,endDate,sin.getShopDetailId());
-            BigDecimal factShopTemp = temp;
-
-            for (ChargeOrder co : chargeOrderList) {
-                factShopTemp = factShopTemp.add(co.getChargeMoney());
+        for(ShopDetail s :listShop){
+            ShopIncomeDto sin = new ShopIncomeDto();
+            sin.setShopDetailId(s.getId());
+            sin.setShopName(s.getName());
+            List<Order> list2 = new ArrayList<>();
+            if(!list.isEmpty()){
+                for(Order so :list){
+                    if(so.getShopDetailId().equals(sin.getShopDetailId())){
+                        list2.add(so);
+                    }
+                }
             }
+            // 设置每个店铺初始营业额为零
+            BigDecimal sRedIncome = BigDecimal.ZERO;
+            BigDecimal sWechatIncome = BigDecimal.ZERO;//
+            BigDecimal sTotalIncome = BigDecimal.ZERO;
+            BigDecimal sCouponIncome = BigDecimal.ZERO;
+            BigDecimal sChargeAccountIncome = BigDecimal.ZERO;
+            BigDecimal sChargeGifAccountIncome = BigDecimal.ZERO;
 
-			String s = "" + i;
-			hm.put(s, sin);
-			if (!incomeReportList.isEmpty()) {
-				for (IncomeReportDto in : incomeReportList) {
-					if (hm.get(s).getShopDetailId().equals(in.getShopDetailId())) {
-						switch (in.getPayMentModeId()) {
-						case PayMode.WEIXIN_PAY:
-							hm.get(s).setWechatIncome(in.getPayValue());
-							break;
-						case PayMode.ACCOUNT_PAY:
-							hm.get(s).setRedIncome(in.getPayValue());
-							break;
-						case PayMode.COUPON_PAY:
-							hm.get(s).setCouponIncome(in.getPayValue());
-							break;
-						case PayMode.CHARGE_PAY:
-							hm.get(s).setChargeAccountIncome(in.getPayValue());
-							break;
-						case PayMode.REWARD_PAY:
-							hm.get(s).setChargeGifAccountIncome(in.getPayValue());
-							break;
+            if(!list2.isEmpty()){
+                for(Order sso:list2){
+                    sTotalIncome = sTotalIncome.add(sso.getOrderMoney());
+                    if(!sso.getOrderPaymentItems().isEmpty()){
+                        for(OrderPaymentItem soi :sso.getOrderPaymentItems()){
+                            switch (soi.getPaymentModeId()) {
+                                case PayMode.WEIXIN_PAY:
+                                    sWechatIncome=sWechatIncome.add(soi.getPayValue());
+                                    break;
+                                case PayMode.ACCOUNT_PAY:
+                                    sRedIncome=sRedIncome.add(soi.getPayValue());
+                                    break;
+                                case PayMode.COUPON_PAY:
+                                    sCouponIncome=sCouponIncome.add(soi.getPayValue());
+                                    break;
+                                case PayMode.CHARGE_PAY:
+                                    sChargeAccountIncome=sChargeAccountIncome.add(soi.getPayValue());
+                                    break;
+                                case PayMode.REWARD_PAY:
+                                    sChargeGifAccountIncome=sChargeGifAccountIncome.add(soi.getPayValue());
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
 
-						default:
-							break;
-						}
-						hm.get(s).setTotalIncome(hm.get(s).getWechatIncome(), hm.get(s).getRedIncome(),
-								hm.get(s).getCouponIncome(), hm.get(s).getChargeAccountIncome(),
-								hm.get(s).getChargeGifAccountIncome());
-                        hm.get(s).setFactIncome(factShopTemp.add(hm.get(s).getWechatIncome()));
-					}
-				}
-			}
-			shopIncomeList.add(hm.get(s));
-		}
-		// 封装brand所需要的数据结构
-
-		Brand brand = brandService.selectById(getCurrentBrandId());
-		List<BrandIncomeDto> brandIncomeList = new ArrayList<>();
-		BrandIncomeDto in = new BrandIncomeDto();
-		// 初始化品牌的信息
-		BigDecimal wechatIncome = BigDecimal.ZERO;
-		BigDecimal redIncome = BigDecimal.ZERO;
-		BigDecimal couponIncome = BigDecimal.ZERO;
-		BigDecimal chargeAccountIncome = BigDecimal.ZERO;
-		BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
-        BigDecimal factBrandIncome = BigDecimal.ZERO;
-
-		if (!incomeReportList.isEmpty()) {
-			for (IncomeReportDto income : incomeReportList) {
-				if (income.getPaymentModeId() == PayMode.WEIXIN_PAY) {
-					wechatIncome = wechatIncome.add(income.getPayValue()).setScale(2);
-				} else if (income.getPayMentModeId() == PayMode.ACCOUNT_PAY) {
-					redIncome = redIncome.add(income.getPayValue()).setScale(2);
-				} else if (income.getPayMentModeId() == PayMode.COUPON_PAY) {
-					couponIncome = couponIncome.add(income.getPayValue()).setScale(2);
-				} else if (income.getPaymentModeId() == PayMode.CHARGE_PAY) {
-					chargeAccountIncome = chargeAccountIncome.add(income.getPayValue()).setScale(2);
-				} else if (income.getPayMentModeId() == PayMode.REWARD_PAY) {
-					chargeGifAccountIncome = chargeGifAccountIncome.add(income.getPayValue()).setScale(2);
-				}
-			}
-		}
-        in.setBrandId(brand.getId());
-		in.setBrandName(brand.getBrandName());
-		in.setWechatIncome(wechatIncome);
-		in.setRedIncome(redIncome);
-		in.setCouponIncome(couponIncome);
-		in.setChargeAccountIncome(chargeAccountIncome);
-		in.setChargeGifAccountIncome(chargeGifAccountIncome);
-		in.setTotalIncome(in.getWechatIncome(), in.getRedIncome(), in.getCouponIncome(), in.getChargeAccountIncome(),
-				in.getChargeGifAccountIncome());
-
-        //查询品牌的充值记录
-        List<ChargeOrder> brandChargeList = chargeOrderService.selectByDateAndBrandId(beginDate,endDate,brand.getId());
-        for(ChargeOrder co : brandChargeList){
-           factBrandIncome = factBrandIncome.add(co.getChargeMoney());
+                    }
+                }
+            }
+            sin.setWechatIncome(sWechatIncome);
+            sin.setTotalIncome(sTotalIncome);
+            sin.setChargeAccountIncome(sChargeAccountIncome);
+            sin.setChargeGifAccountIncome(sChargeGifAccountIncome);
+            sin.setCouponIncome(sCouponIncome);
+            sin.setRedIncome(sRedIncome);
+            shopIncomeList.add(sin);
         }
-        factBrandIncome = factBrandIncome.add(in.getWechatIncome());
-        in.setFactIncome(factBrandIncome);
-
-		brandIncomeList.add(in);
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopIncome", shopIncomeList);
 		map.put("brandIncome", brandIncomeList);
@@ -218,10 +232,16 @@ public class TotalIncomeController extends GenericController {
 		map.put("reportTitle", "品牌收入条目");// 表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = { { "品牌", "20" }, {"营收总额(元)","16"},{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
-				 { "充值赠送支付(元)", "23" } };
-		String[] columns = { "name","factIncome", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
-				 "chargeGifAccountIncome" };
+//		String[][] headers = { { "品牌", "20" }, {"营收总额(元)","16"},{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
+//				 { "充值赠送支付(元)", "23" } };
+
+        String[][] headers = { { "品牌", "20" },{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
+                { "充值赠送支付(元)", "23" } };
+//		String[] columns = { "name","totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
+//				 "chargeGifAccountIncome" };
+
+        String[] columns = { "name", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
+                "chargeGifAccountIncome" };
 		
 		List<ReportIncomeDto> result = new LinkedList<>();
 		List<BrandIncomeDto> brandresult = (List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");

@@ -5,13 +5,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.resto.brand.web.dto.*;
-import com.resto.shop.web.model.OrderItem;
-import com.resto.shop.web.model.OrderPaymentItem;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderArticleDto;
+import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
     int deleteByPrimaryKey(String id);
@@ -162,7 +165,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param brandId
 	 * @return
 	 */
-    brandArticleReportDto selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
+    Integer selectArticleSumCountByData(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("brandId")String brandId);
 	
 	
 	/**
@@ -376,15 +379,53 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Map<String,Object>> selectShopArticleSellList(@Param("shopId") String shopId, @Param("beginDate") Date begin, @Param("endDate") Date end);
 
-	/**
-	 * 查询店铺下所有的已消费的订单
-	 * @param begin
-	 * @param end
-	 * @param shopId
-	 * @return
-	 */
 
-	List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
+    /**
+     * 查询品牌菜品的总销量
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    int selectBrandArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌菜品的总价值
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+
+    BigDecimal selectBrandArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌下每个店铺的菜品销量和
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<ShopArticleReportDto> selectShopArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询品牌下每个店铺的菜品销售和
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询店铺下所有的已消费的订单
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+
+    List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 
 	/**
 	 * 根据订单状态和生产状态查询指定店铺的订单
@@ -408,5 +449,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<OrderItem> selectOrderItems(String orderId);
 
 	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
+
 
 }
