@@ -3,10 +3,7 @@ package com.resto.shop.web.aspect;
 import javax.annotation.Resource;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,7 +31,7 @@ public class BindPhoneAspect {
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 	
-	@After("bindPhone()")
+	@AfterReturning("bindPhone()")
 	public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
 		String customerId = (String) pj.getArgs()[1];
 		Integer couponType = (Integer) pj.getArgs()[2];
