@@ -32,44 +32,46 @@ public class BindPhoneAspect {
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 
-//	@Around("bindPhone()")
-//	public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
-//		String customerId = (String) pj.getArgs()[1];
-//		Integer couponType = (Integer) pj.getArgs()[2];
-//        String shopId = (String) pj.getArgs()[3];
-//		Customer cus = customerService.selectById(customerId);
-//		boolean isFirstBind = !cus.getIsBindPhone();
-//		Object obj = pj.proceed();
-//		if(isFirstBind){
-//			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
-//			//如果有分享者，那么给分享者发消息
-//			if(!StringUtils.isEmpty(cus.getShareCustomer())){
-//				MQMessageProducer.sendNoticeShareMessage(cus);
-//			}
-//			log.info("首次绑定手机，执行指定动作");
-//
-//		}else{
-//			log.info("不是首次绑定，无任何动作");
-//		}
-//		return obj;
-//	}
-
-	@AfterReturning(value = "bindPhone()", returning = "customer")
-	public void bindPhoneAround(JoinPoint jp, Customer customer) throws Throwable{
-		boolean isFirstBind = !customer.getIsBindPhone();
-		Integer couponType = (Integer) jp.getArgs()[2];
-		String shopId = (String) jp.getArgs()[3];
+	@Around("bindPhone()")
+	public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
+		String customerId = (String) pj.getArgs()[1];
+		Integer couponType = (Integer) pj.getArgs()[2];
+        String shopId = (String) pj.getArgs()[3];
+		String shareCustomer = (String) pj.getArgs()[4];
+		Customer cus = customerService.selectById(customerId);
+		boolean isFirstBind = !cus.getIsBindPhone();
+		Object obj = pj.proceed();
 		if(isFirstBind){
-			newCustomerCouponService.giftCoupon(customer,couponType,shopId);
+			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
-			if(!StringUtils.isEmpty(customer.getShareCustomer())){
-				MQMessageProducer.sendNoticeShareMessage(customer);
+//			if(!StringUtils.isEmpty(cus.getShareCustomer())){
+			if(!StringUtils.isEmpty(shareCustomer)){
+				MQMessageProducer.sendNoticeShareMessage(cus);
 			}
 			log.info("首次绑定手机，执行指定动作");
 
 		}else{
 			log.info("不是首次绑定，无任何动作");
 		}
+		return obj;
 	}
+
+//	@AfterReturning(value = "bindPhone()", returning = "customer")
+//	public void bindPhoneAround(JoinPoint jp, Customer customer) throws Throwable{
+//		boolean isFirstBind = !customer.getIsBindPhone();
+//		Integer couponType = (Integer) jp.getArgs()[2];
+//		String shopId = (String) jp.getArgs()[3];
+//		if(isFirstBind){
+//			newCustomerCouponService.giftCoupon(customer,couponType,shopId);
+//			//如果有分享者，那么给分享者发消息
+//			if(!StringUtils.isEmpty(customer.getShareCustomer())){
+//				MQMessageProducer.sendNoticeShareMessage(customer);
+//			}
+//			log.info("首次绑定手机，执行指定动作");
+//
+//		}else{
+//			log.info("不是首次绑定，无任何动作");
+//		}
+//	}
 
 }
