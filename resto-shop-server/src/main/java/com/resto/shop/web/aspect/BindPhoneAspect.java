@@ -39,13 +39,15 @@ public class BindPhoneAspect {
 		String customerId = (String) pj.getArgs()[1];
 		Integer couponType = (Integer) pj.getArgs()[2];
         String shopId = (String) pj.getArgs()[3];
+		String shareCustomer = (String) pj.getArgs()[4];
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
-			if(!StringUtils.isEmpty(cus.getShareCustomer())){
+			//if(!StringUtils.isEmpty(cus.getShareCustomer())){
+			if(shareCustomer != null){
 				MQMessageProducer.sendNoticeShareMessage(cus);
 			}
 			log.info("首次绑定手机，执行指定动作");
