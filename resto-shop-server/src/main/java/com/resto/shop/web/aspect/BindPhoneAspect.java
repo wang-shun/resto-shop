@@ -68,7 +68,7 @@ public class BindPhoneAspect {
 //			if(!StringUtils.isEmpty(cus.getShareCustomer())){
 			if(!StringUtils.isEmpty(shareCustomer)){
 //				MQMessageProducer.sendNoticeShareMessage(cus);
-				Customer sc = customerService.selectById(cus.getShareCustomer());
+				Customer sc = customerService.selectById(shareCustomer);
 				ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(cus.getBrandId());
 				BigDecimal sum = new BigDecimal(0);
 				List<Coupon> couponList = new ArrayList<>();
@@ -89,7 +89,7 @@ public class BindPhoneAspect {
 						.append(cus.getNickname()).append("如到店消费您将获得").append(shareSetting.getMinMoney())
 						.append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
-				log.info("异步发送分享注册微信通知ID:" + cus.getShareCustomer() + " 内容:" + msg);
+				log.info("异步发送分享注册微信通知ID:" + shareCustomer + " 内容:" + msg);
 				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
 
 			}
