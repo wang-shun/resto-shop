@@ -90,7 +90,7 @@ public class BindPhoneAspect {
 						.append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
 				log.info("异步发送分享注册微信通知ID:" + cus.getShareCustomer() + " 内容:" + msg);
-				WeChatUtils.sendCustomerMsgASync(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
+				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
 
 			}
 			log.info("首次绑定手机，执行指定动作");
