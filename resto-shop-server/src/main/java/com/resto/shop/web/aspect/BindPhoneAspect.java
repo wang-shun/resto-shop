@@ -34,20 +34,18 @@ public class BindPhoneAspect {
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 	
-	@Around("bindPhone()")
+	@After("bindPhone()")
 	public Object bindPhoneAround(ProceedingJoinPoint pj) throws Throwable{
 		String customerId = (String) pj.getArgs()[1];
 		Integer couponType = (Integer) pj.getArgs()[2];
         String shopId = (String) pj.getArgs()[3];
-		String shareCustomer = (String) pj.getArgs()[4];
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
-			//if(!StringUtils.isEmpty(cus.getShareCustomer())){
-			if(shareCustomer != null){
+			if(!StringUtils.isEmpty(cus.getShareCustomer())){
 				MQMessageProducer.sendNoticeShareMessage(cus);
 			}
 			log.info("首次绑定手机，执行指定动作");
