@@ -106,7 +106,6 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setId(currentCustomerId);
 		customer.setShareCustomer(shareCustomer);
 		update(customer);
-		customer.setCouponType(couponType);
 		return customer;
 	}
 

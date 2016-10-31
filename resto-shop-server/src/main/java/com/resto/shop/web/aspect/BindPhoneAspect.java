@@ -2,6 +2,7 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
@@ -54,10 +55,12 @@ public class BindPhoneAspect {
 //	}
 
 	@AfterReturning(value = "bindPhone()", returning = "customer")
-	public void bindPhoneAround(Customer customer) throws Throwable{
+	public void bindPhoneAround(JoinPoint jp, Customer customer) throws Throwable{
 		boolean isFirstBind = !customer.getIsBindPhone();
+		Integer couponType = (Integer) jp.getArgs()[2];
+		String shopId = (String) jp.getArgs()[3];
 		if(isFirstBind){
-			newCustomerCouponService.giftCoupon(customer,customer.getCouponType(),customer.getLastOrderShop());
+			newCustomerCouponService.giftCoupon(customer,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
 			if(!StringUtils.isEmpty(customer.getShareCustomer())){
 				MQMessageProducer.sendNoticeShareMessage(customer);
