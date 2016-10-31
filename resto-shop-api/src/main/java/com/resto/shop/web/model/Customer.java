@@ -52,6 +52,16 @@ public class Customer implements Serializable{
 
     private Integer isNowRegister;
 
+    private Integer couponType;
+
+    public Integer getCouponType() {
+        return couponType;
+    }
+
+    public void setCouponType(Integer couponType) {
+        this.couponType = couponType;
+    }
+
     public void setIsNowRegister(Integer isNowRegister) {
         this.isNowRegister = isNowRegister;
     }
