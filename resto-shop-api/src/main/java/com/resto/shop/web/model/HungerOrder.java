@@ -1,0 +1,295 @@
+package com.resto.shop.web.model;
+
+import com.resto.brand.core.util.DateUtil;
+import org.json.JSONObject;
+import org.omg.CORBA.OBJ_ADAPTER;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by KONATA on 2016/10/31.
+ * 饿了吗订单
+ */
+public class HungerOrder {
+
+    //主键
+    private Long id;
+    //送货地址
+    private String address;
+    //送货人姓名
+    private String consignee;
+    //创建时间
+    private Date createdAt;
+    //配送费
+    private BigDecimal deliverFee;
+    //送达时间
+    private Date deliverTime;
+    //订单备注
+    private String description;
+    //是否开发票（1：是  0否）
+    private Integer invoice;
+    //是否预定单（1 是  0 否）
+    private Integer isBook;
+    //是否在线支付 （1 是 0 否）
+    private Integer isOnlinePaid;
+    //饿了吗订单id
+    private String orderId;
+    //顾客联系电话
+    private String phoneList;
+    //饿了吗餐厅id
+    private Integer restaurantId;
+    //饿了吗餐厅名称
+    private String restaurantName;
+    //餐厅数量
+    private Integer restaurantNumber;
+    //订单状态(-5 等待支付 -4 支付失败 -1 已取消 0 未处理 2 已处理 11 已确认)
+    private Integer statusCode;
+    //订单总价(减去优惠后的价格)
+    private BigDecimal totalPrice;
+    //菜价加上配送费和打包费的价格
+    private BigDecimal originalPrice;
+    //饿了吗用户id
+    private Integer userId;
+    //饿了吗用户名称
+    private String userName;
+    //订单收货地址经纬度，例如：31.2538,121.4185
+    private String deliveryGeo;
+    //送货地址
+    private String deliveryPoiAddress;
+
+    //额外费用
+    private List<HungerOrderExtra> extra;
+
+    //饿了吗订单明细分组
+    private List<HungerOrderGroup> groups;
+
+    final public List<HungerOrderGroup> getGroups() {
+        return groups;
+    }
+
+    final public void setGroups(List<HungerOrderGroup> groups) {
+        this.groups = groups;
+    }
+
+    final public List<HungerOrderExtra> getExtra() {
+        return extra;
+    }
+
+    final public void setExtra(List<HungerOrderExtra> extra) {
+        this.extra = extra;
+    }
+
+    final public Long getId() {
+        return id;
+    }
+
+    final public void setId(Long id) {
+        this.id = id;
+    }
+
+    final public String getAddress() {
+        return address;
+    }
+
+    final public void setAddress(String address) {
+        this.address = address;
+    }
+
+    final public String getConsignee() {
+        return consignee;
+    }
+
+    final public void setConsignee(String consignee) {
+        this.consignee = consignee;
+    }
+
+    final public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    final public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    final public BigDecimal getDeliverFee() {
+        return deliverFee;
+    }
+
+    final public void setDeliverFee(BigDecimal deliverFee) {
+        this.deliverFee = deliverFee;
+    }
+
+    final public Date getDeliverTime() {
+        return deliverTime;
+    }
+
+    final public void setDeliverTime(Date deliverTime) {
+        this.deliverTime = deliverTime;
+    }
+
+    final public String getDescription() {
+        return description;
+    }
+
+    final public void setDescription(String description) {
+        this.description = description;
+    }
+
+    final public Integer getInvoice() {
+        return invoice;
+    }
+
+    final public void setInvoice(Integer invoice) {
+        this.invoice = invoice;
+    }
+
+    final public Integer getIsBook() {
+        return isBook;
+    }
+
+    final public void setIsBook(Integer isBook) {
+        this.isBook = isBook;
+    }
+
+    final public Integer getIsOnlinePaid() {
+        return isOnlinePaid;
+    }
+
+    final public void setIsOnlinePaid(Integer isOnlinePaid) {
+        this.isOnlinePaid = isOnlinePaid;
+    }
+
+    final public String getOrderId() {
+        return orderId;
+    }
+
+    final public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    final public String getPhoneList() {
+        return phoneList;
+    }
+
+    final public void setPhoneList(String phoneList) {
+        this.phoneList = phoneList;
+    }
+
+    final public Integer getRestaurantId() {
+        return restaurantId;
+    }
+
+    final public void setRestaurantId(Integer restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    final public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    final public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    final public Integer getRestaurantNumber() {
+        return restaurantNumber;
+    }
+
+    final public void setRestaurantNumber(Integer restaurantNumber) {
+        this.restaurantNumber = restaurantNumber;
+    }
+
+    final public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    final public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    final public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    final public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    final public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    final public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    final public Integer getUserId() {
+        return userId;
+    }
+
+    final public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    final public String getUserName() {
+        return userName;
+    }
+
+    final public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    final public String getDeliveryGeo() {
+        return deliveryGeo;
+    }
+
+    final public void setDeliveryGeo(String deliveryGeo) {
+        this.deliveryGeo = deliveryGeo;
+    }
+
+    final public String getDeliveryPoiAddress() {
+        return deliveryPoiAddress;
+    }
+
+    final public void setDeliveryPoiAddress(String deliveryPoiAddress) {
+        this.deliveryPoiAddress = deliveryPoiAddress;
+    }
+
+    public HungerOrder() {}
+    public HungerOrder(JSONObject object) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        address = object.optString("address");
+        consignee = object.optString("consignee");
+        if(!StringUtils.isEmpty(object.optString("created_at"))){
+            createdAt = sdf.parse(object.optString("created_at"));
+        }
+
+        deliverFee = object.optBigDecimal("deliver_fee",new BigDecimal(0));
+        if(!StringUtils.isEmpty(object.optString("deliver_time"))){
+            deliverTime = sdf.parse(object.optString("deliver_time"));
+        }
+
+        description = object.optString("description");
+        invoice = object.optInt("invoice");
+        isBook = object.optInt("is_book");
+        isOnlinePaid = object.optInt("is_online_paid");
+        orderId = object.optString("order_id");
+        phoneList = object.optString("phone_list");
+        restaurantId = object.optInt("restaurant_id");
+        restaurantName = object.optString("restaurant_name");
+        restaurantName = object.optString("restaurant_number");
+        statusCode = object.optInt("status_code");
+        totalPrice = object.optBigDecimal("total_price",new BigDecimal(0));
+        originalPrice = object.optBigDecimal("original_price",new BigDecimal(0));
+        userId = object.optInt("user_id");
+        userName = object.optString("user_name");
+        deliveryGeo = object.optString("delivery_geo");
+        deliveryPoiAddress = object.optString("delivery_poi_address");
+
+    }
+}
