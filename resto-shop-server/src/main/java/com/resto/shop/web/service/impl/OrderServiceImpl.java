@@ -1020,6 +1020,59 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+    public Map<String, Object> printHungerTicket(HungerOrder order, List<HungerOrderDetail> orderItems, ShopDetail shopDetail, Printer printer) {
+        if (printer == null) {
+            return null;
+        }
+        List<Map<String, Object>> items = new ArrayList<>();
+        int sum = 0;
+        for (HungerOrderDetail article : orderItems) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", article.getPrice());
+            item.put("ARTICLE_NAME", article.getName());
+            item.put("ARTICLE_COUNT", article.getQuantity());
+            sum += article.getQuantity();
+            items.add(item);
+        }
+
+
+        Map<String, Object> print = new HashMap<>();
+        print.put("TABLE_NO", "");
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getId());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", new Date().getTime() + "-" + order.getId());
+        data.put("ITEMS", items);
+
+        data.put("DISTRIBUTION_MODE", "饿了吗订单");
+        data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", "");
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", "");
+        data.put("PAYMENT_AMOUNT", order.getTotalPrice());
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+
+        data.put("ARTICLE_COUNT", sum);
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+
+        print.put("TICKET_TYPE", TicketType.RECEIPT);
+        data.put("ORDER_NUMBER", "");
+
+
+
+        return print;
+    }
+
+
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
