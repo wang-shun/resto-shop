@@ -29,9 +29,9 @@ import com.resto.shop.web.config.SessionKey;
 
 
 public abstract class GenericController{
-	
+
 	protected Logger log = LoggerFactory.getLogger(getClass());
-	
+
 
 	public Result getSuccessResult() {
 		return getSuccessResult(null);
@@ -149,21 +149,20 @@ public abstract class GenericController{
 	public String getCurrentShopId(){
 		return getCurrentBrandUser().getShopDetailId();
 	}
-	
+
 	public String getCurrentBrandId(){
 		return getCurrentBrandUser().getBrandId();
 	}
-	
+
 	public BrandUser getCurrentBrandUser(){
 		return (BrandUser) getRequest().getSession().getAttribute(SessionKey.USER_INFO);
 	}
-	
+
 	public String getCurrentUserId(){
 		return getCurrentBrandUser().getId();
 	}
 
 	public String getBrandName(){
-		
 		return getCurrentBrandUser().getBrandName();
 	}
 	

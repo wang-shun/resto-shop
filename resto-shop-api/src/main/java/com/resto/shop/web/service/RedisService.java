@@ -50,8 +50,6 @@ public interface RedisService {
     String set(final String key, final String value, final Integer seconds);
 
 
-    
-
 
 
 }

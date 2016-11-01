@@ -76,10 +76,21 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     List<OrderPaymentItem> selectShopIncomeList(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
     /**
+     * pos端店铺收入报表查询
+     * 2016-10-29
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+    List<OrderPaymentItem> selectShopIncomeListByShopId(@Param("beginDate")Date begin,@Param("endDate") Date end, @Param("shopId")String shopId);
+    /**
      * 查询异常订单 订单退款失败 没有证书
      * @param begin
      * @param end
      * @return
      */
     List<OrderPaymentItem> selectListByResultDataByNoFile(@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+
 }

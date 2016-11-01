@@ -33,5 +33,16 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      */
     List<OrderPaymentItem> selectShopIncomeList(String beginDate, String endDate, String currentBrandId);
 
+    /**
+     * 2016-10-29
+     * 用于pos端查询店铺的收入
+     * @param beginDate
+     * @param endDate
+     * @param shopId
+     * @return
+     */
+    List<OrderPaymentItem> selectShopIncomeListByShopId(String beginDate, String endDate, String shopId);
+
+
     List<OrderPaymentItem> selectListByResultDataByNoFile(String beginDate, String endDate);
 }

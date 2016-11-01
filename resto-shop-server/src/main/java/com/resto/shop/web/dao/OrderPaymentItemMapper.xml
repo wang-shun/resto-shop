@@ -167,4 +167,26 @@
         oi.payment_mode_id
     </select>
 
+
+
+    <!--(pos端) 店铺收入报表 2016-10-29 -->
+    <select id="selectShopIncomeListByShopId" resultType="OrderPaymentItem">
+        SELECT
+        o.shop_detail_id,
+        sum(oi.pay_value) pay_value,
+        oi.payment_mode_id
+        FROM
+        tb_order_payment_item oi
+        INNER JOIN tb_order o ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (10, 11, 2, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.shop_detail_id =  #{shopId}
+        GROUP BY
+        oi.payment_mode_id
+    </select>
+
+
 </mapper>
