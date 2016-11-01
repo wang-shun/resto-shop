@@ -112,4 +112,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
         Date end =  DateUtil.getformatEndDate(endDate);
         return orderpaymentitemMapper.selectListByResultDataByNoFile(begin,end);
     }
+
+    @Override
+    public OrderPaymentItem selectByOrderIdAndResultData(String orderId) {
+        return orderpaymentitemMapper.selectByOrderIdAndResultData(orderId);
+    }
 }

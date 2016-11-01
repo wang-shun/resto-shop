@@ -92,5 +92,12 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      */
     List<OrderPaymentItem> selectListByResultDataByNoFile(@Param("beginDate") Date begin, @Param("endDate") Date end);
 
-
+    /**
+     *
+     * 查询退款证书丢失的订单项
+     * 2016-11-1
+     * @param orderId
+     * @return
+     */
+    OrderPaymentItem selectByOrderIdAndResultData(String orderId);
 }

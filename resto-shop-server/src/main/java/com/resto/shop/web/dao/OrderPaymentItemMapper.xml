@@ -121,7 +121,7 @@
         <![CDATA[
             pay_time>#{beginDate} and
             pay_time <#{endDate} and
-           result_data like'%累计退款金额大于支付金额%'
+           result_data = '{}'
         ]]>
 
     </select>
@@ -186,6 +186,14 @@
         AND o.shop_detail_id =  #{shopId}
         GROUP BY
         oi.payment_mode_id
+    </select>
+
+
+
+    <select id="selectByOrderIdAndResultData" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+       order_id = #{orderId} AND
+      result_data = '{}'
     </select>
 
 

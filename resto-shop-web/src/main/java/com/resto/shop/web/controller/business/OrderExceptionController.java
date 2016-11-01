@@ -4,6 +4,8 @@
  import com.resto.shop.web.constant.OrderState;
  import com.resto.shop.web.controller.GenericController;
  import com.resto.shop.web.model.Order;
+ import com.resto.shop.web.model.OrderPaymentItem;
+ import com.resto.shop.web.service.OrderPaymentItemService;
  import com.resto.shop.web.service.OrderService;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,9 @@
 
      @Resource
      private OrderService orderService;
+
+     @Resource
+     private OrderPaymentItemService  orderPaymentItemService;
      /**
       *手动取消已提交但未支付的订单
       * @return
@@ -36,6 +41,29 @@
                  }
 
              }
+         return Result.getSuccess();
+     }
+
+
+     /**
+      *手动取消没有退款证书的订单
+      * @return
+      */
+     @RequestMapping("cancelNoRootOrder")
+     @ResponseBody
+     public Result executecancelNoRootOrder(String orderId){
+         //查询所有已提交但未支付的定的那
+         //更改订单状态为 2，0 和可以取消is_allows=1
+         Order o = orderService.selectById(orderId);
+         o.setOrderState(2);
+         o.setProductionStatus(0);
+         o.setAllowCancel(true);
+         //查寻orderpaymentItem中result_data 为 {}
+        OrderPaymentItem oi =  orderPaymentItemService.selectByOrderIdAndResultData(orderId);
+         //删除该订单项
+         orderPaymentItemService.delete(oi.getId());
+         orderService.update(o);
+         orderService.cancelExceptionOrder(orderId);
          return Result.getSuccess();
      }
 

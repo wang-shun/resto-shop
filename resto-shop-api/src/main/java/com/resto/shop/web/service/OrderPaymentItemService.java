@@ -45,4 +45,12 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
 
 
     List<OrderPaymentItem> selectListByResultDataByNoFile(String beginDate, String endDate);
+
+    /**
+     * 查询退款证书丢失的订单项
+     * 2016-10-29
+     * @param orderId
+     * @return
+     */
+    OrderPaymentItem selectByOrderIdAndResultData(String orderId);
 }

@@ -380,7 +380,7 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("累计退款金额大于支付金额");
+                orderException.setWhy("退款证书丢失");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
