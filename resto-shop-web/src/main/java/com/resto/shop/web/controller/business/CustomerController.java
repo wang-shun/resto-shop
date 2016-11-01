@@ -58,6 +58,9 @@ public class CustomerController extends GenericController{
 		customerService.delete(id);
 		return Result.getSuccess();
 	}
-	
+
+
+
+
 	
 }
