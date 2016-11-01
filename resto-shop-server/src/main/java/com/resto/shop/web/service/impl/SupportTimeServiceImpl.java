@@ -61,6 +61,7 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 		c.setTime(now);
 		int freeDaybin = isFreeDay?1<<8:1<<7;
 		//int weekDay = c.get(Calendar.DAY_OF_WEEK)-1;  //这里周末等于1 所以全部减一
+
         //设置 weekDay
         int weekDay = c.get(Calendar.DAY_OF_WEEK);
         if(weekDay != 1){//如果为周一到周六，则默认减2。

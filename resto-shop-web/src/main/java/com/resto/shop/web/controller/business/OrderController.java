@@ -299,8 +299,12 @@ public class OrderController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
+	@RequestMapping("/refund")
+	public void refund(String orderId){
+		orderService.cancelOrder(orderId);
+	}
 	
 	
 }

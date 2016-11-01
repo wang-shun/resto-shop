@@ -79,4 +79,23 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated);
 
 	List<Article> getSingoArticle(String shopId);
+
+	int deleteRecommendId(String recommendId);
+
+	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
+
+
+	int selectPidAndShopId(@Param("shopId") String shopId,@Param("articleId") String articleId);
+
+
+	/**
+	 * 得到套餐下的全部子品
+	 * @param articleId
+	 * @return
+     */
+	List<Article> getArticleByMeal(String articleId);
+
+	Article selectByPid(@Param("pId") String pId,@Param("shopId") String shopId);
+
+
 }

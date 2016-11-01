@@ -5,11 +5,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.resto.brand.web.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.OrderArticleDto;
+import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
 
 public interface OrderMapper  extends GenericDao<Order,String> {
     int deleteByPrimaryKey(String id);
@@ -72,12 +77,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	/**
 	 * 查询某天的历史订单
+	 * 根据店铺模式查询不同状态的历史订单。（2016-10-11，已取消此功能，改为所有模式的店铺的历史订单都不为取消状态和未支付状态）
 	 * @param currentShopId
 	 * @param dateBegin
 	 * @param dateEnd
-	 * @return
+	 * @param shopMode
+     * @return
 	 */
-	List<Order> selectHistoryOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+	List<Order> selectHistoryOrderList(@Param("shopId") String currentShopId, @Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd, @Param("shopMode") Integer shopMode);
 
 	/**
 	 * 查询某天的异常订单
@@ -87,6 +94,17 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
+	/**
+	 * 查询未付款的订单（后付模式）
+	 * @param currentShopId
+	 * @param dateBegin
+	 * @param dateEnd
+     * @return
+     */
+	List<Order> getOrderNoPayList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
 
 	void clearPushOrder(String id, int notOrder);
 
@@ -131,6 +149,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectByParentId(String parentOrderId);
 
 	List<String> selectChildIdsByParentId(String id);
+
+	List<String> selectChildIdsByParentIdByFive(String id);
 
 	String selectNewCustomerPackageId(String currentCustomerId, String currentShopId);
 
@@ -359,6 +379,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Map<String,Object>> selectShopArticleSellList(@Param("shopId") String shopId, @Param("beginDate") Date begin, @Param("endDate") Date end);
 
+
     /**
      * 查询品牌菜品的总销量
      * @param begin
@@ -395,4 +416,39 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+    /**
+     * 查询店铺下所有的已消费的订单
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+
+    List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
+
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
+	/**
+	 * 获取所有桌号加菜列表
+	 * @param shopId
+	 * @return
+     */
+	List<Order> getTableNumberAll(@Param("shopId") String shopId);
+
+	Order getOrderDetail(String orderId);
+
+	List<OrderPaymentItem> selectOrderPaymentItems(String orderId);
+
+	List<OrderItem> selectOrderItems(String orderId);
+
+	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
+
+
 }

@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import java.math.BigDecimal;
+
 /**
  * Created by KONATA on 2016/9/11.
  */
@@ -12,8 +14,25 @@ public class UnitDetail {
 
     private Integer sort;
 
+    private Integer isUsed;
 
+    private BigDecimal price ;
 
+    final public BigDecimal getPrice() {
+        return price;
+    }
+
+    final public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    final public Integer getIsUsed() {
+        return isUsed;
+    }
+
+    final public void setIsUsed(Integer isUsed) {
+        this.isUsed = isUsed;
+    }
 
     final public Integer getSort() {
         return sort;

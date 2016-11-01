@@ -14,5 +14,7 @@ public interface MealItemService extends GenericService<MealItem, Integer> {
 	List<MealItem> selectByAttrIds(List<Integer> ids,String show);
 
 	List<MealItem> selectByIds(Integer[] mealItemIds);
+
+	List<MealItem> selectByAttrId(Integer attrId);
     
 }

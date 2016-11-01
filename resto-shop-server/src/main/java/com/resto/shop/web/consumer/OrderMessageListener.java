@@ -8,10 +8,7 @@ import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.model.ShopMode;
-import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -20,10 +17,7 @@ import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -110,7 +105,16 @@ public class OrderMessageListener implements MessageListener {
         ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
         if (shareCustomer != null && shareSetting != null) {
             BigDecimal sum = new BigDecimal(0);
-            List<Coupon> couponList = couponService.listCouponByStatus("0", customer.getId());
+            List<Coupon> couponList = new ArrayList<>();
+            //品牌专属优惠券
+            List<Coupon> couponList1 = couponService.listCouponByStatus("0", customer.getId(),customer.getBrandId(),null);
+            couponList.addAll(couponList1);
+            List<ShopDetail> listShop = shopDetailService.selectByBrandId(customer.getBrandId());
+            for(ShopDetail s : listShop){
+                //店铺专属优惠券
+                List<Coupon> couponList2 = couponService.listCouponByStatus("0", customer.getId(),null,s.getId());
+                couponList.addAll(couponList2);
+            }
             for (Coupon coupon : couponList) {
                 sum = sum.add(coupon.getValue());
             }
@@ -142,10 +146,10 @@ public class OrderMessageListener implements MessageListener {
             if(order.getOrderMode()!=null){
                 switch (order.getOrderMode()) {
                     case ShopMode.TABLE_MODE:
-                        sb.append("桌号:"+order.getTableNumber()+"\n");
+                        sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
                         break;
                     default:
-                        sb.append("取餐码："+order.getVerCode()+"\n");
+                        sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
                         break;
                 }
             }
@@ -204,13 +208,12 @@ public class OrderMessageListener implements MessageListener {
     }
 
     private void sendShareMsg(Appraise appraise) {
-
         StringBuffer msg = new StringBuffer("感谢您的评价 ，分享好友\n");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());
         log.info("分享人:" + customer.getNickname());
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("分享完毕:" );
@@ -242,6 +245,33 @@ public class OrderMessageListener implements MessageListener {
         if (order.getOrderState() == OrderState.SUBMIT) {
             log.info("自动取消订单:" + obj.getString("orderId"));
             orderService.cancelOrder(obj.getString("orderId"));
+            log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+            StringBuilder sb = new StringBuilder("亲,今日未完成支付的订单已被系统自动取消,欢迎下次再来本店消费\n");
+            sb.append("订单编号:"+order.getSerialNumber()+"\n");
+            if(order.getOrderMode()!=null){
+                switch (order.getOrderMode()) {
+                    case ShopMode.TABLE_MODE:
+                        sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                        break;
+                    default:
+                        sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                        break;
+                }
+            }
+            if( order.getShopName()==null||"".equals(order.getShopName())){
+                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+            }
+            sb.append("就餐店铺："+order.getShopName()+"\n");
+            sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+            sb.append("订单明细：\n");
+            List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+            for(OrderItem item : orderItem){
+                sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+            }
+            sb.append("订单金额："+order.getOrderMoney()+"\n");
+            WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }

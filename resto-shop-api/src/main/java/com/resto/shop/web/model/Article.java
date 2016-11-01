@@ -1,25 +1,25 @@
 package com.resto.shop.web.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 @JsonInclude(Include.NON_NULL)
 public class Article {
-	
-	/**
-	 * 单品
-	 */
-	public static final int ARTICLE_TYPE_SIGNLE=1; 
-	/**
-	 * 套餐
-	 */
-	public static final int ARTICLE_TYPE_MEALS=2; 
-	
+
+    /**
+     * 单品
+     */
+    public static final int ARTICLE_TYPE_SIGNLE = 1;
+    /**
+     * 套餐
+     */
+    public static final int ARTICLE_TYPE_MEALS = 2;
+
     private String id;
 
     private String name;
@@ -67,37 +67,39 @@ public class Article {
     private BigDecimal fansPrice;
 
     private Boolean hasMultPrice;
-    
+
     private String hasUnit;
-    
+
     private String peference;
-    
+
     private String unit;
-    
+
     private ArticleFamily articleFamily;
-    
+
     private Boolean showBig;
 
     private Boolean showDesc;
-    
+
     private Boolean isRemind;
-    
+
     private String controlColor;
-    
+
     private Integer articleType;
-    
+
     private Long likes;
-    
+
     private List<MealAttr> mealAttrs;
-    
-	/**
+
+    private Integer isHidden;
+
+    /**
      * 用于保存 类型名称
      */
     private String articleFamilyName;
-    
-    private List<ArticlePrice> articlePrices= new ArrayList<>();
-    private Integer [] supportTimes;
-    private Integer [] kitchenList;
+
+    private List<ArticlePrice> articlePrices = new ArrayList<>();
+    private Integer[] supportTimes;
+    private Integer[] kitchenList;
 
     //工作日库存
     private Integer stockWorkingDay;
@@ -113,6 +115,44 @@ public class Article {
 
     //规格属性
     private List<Unit> units;
+
+    private Integer newUnit;
+
+    private Integer recommendCount;
+
+    private String pId;
+
+    final public String getpId() {
+        return pId;
+    }
+
+    final public void setpId(String pId) {
+        this.pId = pId;
+    }
+
+    final public Integer getRecommendCount() {
+        return recommendCount;
+    }
+
+    final public void setRecommendCount(Integer recommendCount) {
+        this.recommendCount = recommendCount;
+    }
+
+    final public Integer getIsHidden() {
+        return isHidden;
+    }
+
+    final public void setIsHidden(Integer isHidden) {
+        this.isHidden = isHidden;
+    }
+
+    final public Integer getNewUnit() {
+        return newUnit;
+    }
+
+    final public void setNewUnit(Integer newUnit) {
+        this.newUnit = newUnit;
+    }
 
     final public List<Unit> getUnits() {
         return units;
@@ -155,14 +195,14 @@ public class Article {
     }
 
     public ArticleFamily getArticleFamily() {
-  		return articleFamily;
-  	}
+        return articleFamily;
+    }
 
-  	public void setArticleFamily(ArticleFamily articleFamily) {
-  		this.articleFamily = articleFamily;
-  	}
+    public void setArticleFamily(ArticleFamily articleFamily) {
+        this.articleFamily = articleFamily;
+    }
 
-    
+
     public String getId() {
         return id;
     }
@@ -280,14 +320,14 @@ public class Article {
     }
 
     public List<ArticlePrice> getArticlePrices() {
-		return articlePrices;
-	}
+        return articlePrices;
+    }
 
-	public void setArticlePrices(List<ArticlePrice> articlePrices) {
-		this.articlePrices = articlePrices;
-	}
+    public void setArticlePrices(List<ArticlePrice> articlePrices) {
+        this.articlePrices = articlePrices;
+    }
 
-	public void setShowSaleNumber(Long showSaleNumber) {
+    public void setShowSaleNumber(Long showSaleNumber) {
         this.showSaleNumber = showSaleNumber;
     }
 
@@ -363,109 +403,109 @@ public class Article {
         this.hasMultPrice = hasMultPrice;
     }
 
-	public String getHasUnit() {
-		return hasUnit;
-	}
+    public String getHasUnit() {
+        return hasUnit;
+    }
 
-	public void setHasUnit(String hasUnit) {
-		this.hasUnit = hasUnit;
-	}
+    public void setHasUnit(String hasUnit) {
+        this.hasUnit = hasUnit;
+    }
 
-	public Integer[] getSupportTimes() {
-		return supportTimes;
-	}
+    public Integer[] getSupportTimes() {
+        return supportTimes;
+    }
 
-	public void setSupportTimes(Integer[] supportTimes) {
-		this.supportTimes = supportTimes;
-	}
+    public void setSupportTimes(Integer[] supportTimes) {
+        this.supportTimes = supportTimes;
+    }
 
-	public String getUnit() {
-		return unit;
-	}
+    public String getUnit() {
+        return unit;
+    }
 
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
-	public String getPeference() {
-		return peference;
-	}
+    public String getPeference() {
+        return peference;
+    }
 
-	public void setPeference(String peference) {
-		this.peference = peference;
-	}
+    public void setPeference(String peference) {
+        this.peference = peference;
+    }
 
-	public Integer[] getKitchenList() {
-		return kitchenList;
-	}
+    public Integer[] getKitchenList() {
+        return kitchenList;
+    }
 
-	public void setKitchenList(Integer[] kitchenList) {
-		this.kitchenList = kitchenList;
-	}
+    public void setKitchenList(Integer[] kitchenList) {
+        this.kitchenList = kitchenList;
+    }
 
-	public String getArticleFamilyName() {
-		return articleFamilyName;
-	}
+    public String getArticleFamilyName() {
+        return articleFamilyName;
+    }
 
-	public void setArticleFamilyName(String articleFamilyName) {
-		this.articleFamilyName = articleFamilyName;
-	}
+    public void setArticleFamilyName(String articleFamilyName) {
+        this.articleFamilyName = articleFamilyName;
+    }
 
-	public Boolean getShowBig() {
-		return showBig;
-	}
+    public Boolean getShowBig() {
+        return showBig;
+    }
 
-	public String getControlColor() {
-		return controlColor;
-	}
+    public String getControlColor() {
+        return controlColor;
+    }
 
-	public void setShowBig(Boolean showBig) {
-		this.showBig = showBig;
-	}
+    public void setShowBig(Boolean showBig) {
+        this.showBig = showBig;
+    }
 
-	public void setControlColor(String controlColor) {
-		this.controlColor = controlColor;
-	}
+    public void setControlColor(String controlColor) {
+        this.controlColor = controlColor;
+    }
 
-	public Boolean getShowDesc() {
-		return showDesc;
-	}
+    public Boolean getShowDesc() {
+        return showDesc;
+    }
 
-	public Boolean getIsRemind() {
-		return isRemind;
-	}
+    public Boolean getIsRemind() {
+        return isRemind;
+    }
 
-	public void setShowDesc(Boolean showDesc) {
-		this.showDesc = showDesc;
-	}
+    public void setShowDesc(Boolean showDesc) {
+        this.showDesc = showDesc;
+    }
 
-	public void setIsRemind(Boolean isRemind) {
-		this.isRemind = isRemind;
-	}
+    public void setIsRemind(Boolean isRemind) {
+        this.isRemind = isRemind;
+    }
 
-	public Integer getArticleType() {
-		return articleType;
-	}
+    public Integer getArticleType() {
+        return articleType;
+    }
 
-	public void setArticleType(Integer articleType) {
-		this.articleType = articleType;
-	}
+    public void setArticleType(Integer articleType) {
+        this.articleType = articleType;
+    }
 
-	public List<MealAttr> getMealAttrs() {
-		return mealAttrs;
-	}
+    public List<MealAttr> getMealAttrs() {
+        return mealAttrs;
+    }
 
-	public void setMealAttrs(List<MealAttr> mealAttrs) {
-		this.mealAttrs = mealAttrs;
-	}
+    public void setMealAttrs(List<MealAttr> mealAttrs) {
+        this.mealAttrs = mealAttrs;
+    }
 
-	public Long getLikes() {
-		return likes;
-	}
+    public Long getLikes() {
+        return likes;
+    }
 
-	public void setLikes(Long likes) {
-		this.likes = likes;
-	}
-	
-	
+    public void setLikes(Long likes) {
+        this.likes = likes;
+    }
+
+
 }

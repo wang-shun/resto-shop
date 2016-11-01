@@ -22,7 +22,7 @@
         <link href="<%=resourcePath%>/assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
         <link href="<%=resourcePath%>/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<%=resourcePath%>/assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" />
-        <link href="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+        <link href="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.css" rel="stylesheet" type="text/css" />
         <!-- END GLOBAL MANDATORY STYLES -->
         <!-- BEGIN PAGE LEVEL PLUGINS -->
         <link href="<%=resourcePath%>/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" type="text/css" />
@@ -53,6 +53,7 @@
         <link rel="stylesheet" href="<%=resourcePath %>/assets/customer/css/custom.css"/>
         <!-- END THEME LAYOUT STYLES -->
 		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
+        <link href="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
         
     <!-- END HEAD -->
 
@@ -155,6 +156,9 @@
 		<script src="<%=resourcePath%>/assets/customer/utils.js" type="text/javascript" charset="utf-8"></script>
         <script src="<%=resourcePath%>/assets/customer/vue-components.js?v=1" type="text/javascript" charset="utf-8"></script>
 		<script src="<%=resourcePath%>/assets/customer/controller.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.js" type="text/javascript"></script>
+
 
 		<!-- 百度编辑器 -->
 	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.config.js"></script><!-- 配置文件 -->

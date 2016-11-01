@@ -7,21 +7,28 @@
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" v-model="searchDate.beginDate" readonly="readonly" id="beginDate">
+		    <input type="text" class="form-control form_datetime" v-model="searchDate.beginDate" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly" id="endDate">
+		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
+		  
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
+                 
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
+          
+<!--              <button type="button" class="btn yellow" @click="benxun">本询</button> -->
+             
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
+             
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
+		  
 		</form>
 		<br/>
-	</div>
+	<div>
 		
 </div>
 <br/>
@@ -39,7 +46,7 @@
   <div class="tab-content">
   	<!-- 菜品销售报表 -->
     <div role="tabpanel" class="tab-pane active" id="dayReport">
-    	<!-- 品牌菜品销售表 -->
+    	<!-- 品牌菜品销售表   -->
     	<div class="panel panel-success">
 		  <div class="panel-heading text-center">
 		  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表
@@ -96,9 +103,11 @@
            </div>
            <!-- /.modal-dialog -->
        </div>
+
+
     <!-- 店铺菜品销售表 -->
     <div role="tabpanel" class="tab-pane" id="revenueCount">
-    	<div class="panel panel-primary" style="border-color:white;">
+    	<div class="panel panel-primary" style="border-color:write;">
 		  	<!-- 店铺菜品销售表 -->
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
@@ -132,7 +141,7 @@
 		</div>
     </div>
   </div>
-  </div>
+  
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 
@@ -182,6 +191,7 @@ var vueObj = new Vue({
 					return ;
 				}
 				var num = this.getNumActive();
+				console.log(num);
 				switch (num)
 				{
 				case 1:
@@ -189,8 +199,9 @@ var vueObj = new Vue({
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
 	 					that.brandReport.sellIncome=result.sellIncome;
+	 					//tb2.ajax.reload();
+	 					toastr.success("查询成功");
 	 				});
-                    tb2.ajax.reload();
 				  break;
 				case 2:
 					$.post("articleSell/list_shop", this.getDate(null), function(result) {
@@ -277,13 +288,7 @@ var vueObj = new Vue({
 			var date = new Date().format("yyyy-MM-dd");
 			this.searchDate.beginDate = date;
 			this.searchDate.endDate = date;
-			//this.searchInfo();
-            var that = this;
-            $.post("articleSell/list_brand", this.getDate(null), function(result) {
-                that.brandReport.brandName = result.brandName;
-                that.brandReport.totalNum = result.totalNum;
-                that.brandReport.sellIncome=result.sellIncome;
-            });
+			this.searchInfo();
 		}
 	})
 	
@@ -309,7 +314,12 @@ var tb2 = $("#articleSellTable").DataTable({
 		{
 			title : "菜名",
 			data : "articleName",
-		},  
+		},
+        {
+          title : "编号",
+           data : "numberCode",
+           defaultContent:"",
+        },
 		{
 			title : "销量(份)",
 			data : "brandSellNum",
@@ -342,9 +352,7 @@ $('#ulTab a').click(function (e) {
 		  $.post("articleSell/list_brand", vueObj.getDate(null), function(result) {
 				vueObj.brandReport.brandName = result.brandName;
 				vueObj.brandReport.totalNum = result.totalNum;
-                vueObj.brandReport.sellIncome = result.sellIncome;
 			});
-          tb2.ajax.reload();
 		  break;
 		case 2:
 			$.post("articleSell/list_shop", vueObj.getDate(null), function(result) {
@@ -379,9 +387,9 @@ var language = {
         "sSortDescending": ": 以降序排列此列"
     }
 };
-
-function Trim(str){
-    return str.replace(/(^\s*)|(\s*$)/g, "");
+function Trim(str)
+{ 
+    return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
 
 </script>

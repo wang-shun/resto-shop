@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.exception.AppException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -59,8 +60,11 @@ public class CustomerController extends GenericController{
 		return Result.getSuccess();
 	}
 
+//    //测试获取优惠券
+//    @RequestMapping("test/coupon")
+//    public void testCoupon(String phone,String customerId,Integer couponType) throws AppException {
+//        customerService.bindPhone(phone, customerId, couponType,getCurrentShopId());
+//    }
 
 
-
-	
 }

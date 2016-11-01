@@ -54,4 +54,21 @@ public interface ArticleService extends GenericService<Article, String> {
 	Boolean setActivated(String articleId,Integer activated);
 
 	List<Article> getSingoArticle(String shopId);
+
+	void deleteRecommendId(String recommendId);
+
+	void saveLog(Integer result,String taskId);
+
+
+	/**
+	 * 菜品库分配菜品
+	 */
+	void assignArticle(String [] shopList,String articleList[]);
+
+	/**
+	 * 分配套餐
+	 * @param shopList
+	 * @param articleList
+     */
+	void assignTotal(String [] shopList,String articleList[]);
 }

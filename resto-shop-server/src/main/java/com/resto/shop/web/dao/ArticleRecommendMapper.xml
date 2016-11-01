@@ -86,4 +86,8 @@
 where t2.shop_detail_id = #{shopId} and t.id = #{articleId}
 
     </select>
+
+    <delete id="deleteRecommendByArticleId">
+        delete from tb_recommend_article where article_id = #{id}
+    </delete>
 </mapper>

@@ -15,11 +15,17 @@ public class ShopCart {
 
     private Integer distributionModeId;
 
+    private String userId;
+
     private String shopType;
 
     private Integer pid;
 
     private List<ShopCart> currentItem;
+
+    public String getUserId() { return userId; }
+
+    public void setUserId(String userId) { this.userId = userId; }
 
     public List<ShopCart> getCurrentItem() { return currentItem; }
 

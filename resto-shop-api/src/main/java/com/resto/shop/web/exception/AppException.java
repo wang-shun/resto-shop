@@ -23,6 +23,7 @@ public class AppException extends Exception{
 	public static final ErrorMsg ORDER_IS_CLOSED = new ErrorMsg(15, "订单已经被取消!");
 	public static final ErrorMsg ORDER_IS_PRINTED = new ErrorMsg(16, "该订单已经打印过了！");
 	public static final ErrorMsg ORDER_IS_NULL = new ErrorMsg(17, "该订单不存在或无商品信息！");
+    public static final ErrorMsg COUPON_IS_SHOP = new ErrorMsg(18, "不是该店铺的优惠券！");
 	
 	
 	public AppException(ErrorMsg msg) {

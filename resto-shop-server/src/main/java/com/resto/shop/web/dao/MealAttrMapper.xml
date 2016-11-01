@@ -8,8 +8,12 @@
     <result column="sort" property="sort" jdbcType="INTEGER"/>
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
     <result column="print_sort" property="printSort" jdbcType="INTEGER"/>
+
+    <result column="choice_count" property="choiceCount"/>
+    <result column="choice_type" property="choiceType"/>
+
   </resultMap>
-  <sql id="Base_Column_List">id, name, sort, article_id,print_sort</sql>
+  <sql id="Base_Column_List">id, name, sort, article_id,print_sort,choice_type,choice_count</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_meal_attr where id = #{id,jdbcType=INTEGER}
   </select>
@@ -23,6 +27,8 @@
       <if test="sort != null">sort,</if>  
       <if test="articleId != null">article_id,</if>
       <if test="printSort != null">print_sort,</if>
+      <if test="choiceType != null">choice_type,</if>
+      <if test="choiceCount != null">choice_count,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
@@ -30,6 +36,8 @@
       <if test="sort != null">#{sort,jdbcType=INTEGER},</if>  
       <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if>
       <if test="printSort != null">#{printSort,jdbcType=INTEGER},</if>
+      <if test="choiceType != null">#{choiceType,jdbcType=INTEGER},</if>
+      <if test="choiceCount != null">#{choiceCount,jdbcType=INTEGER}</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.MealAttr">update tb_meal_attr 
@@ -38,6 +46,8 @@
       <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if>
       <if test="printSort != null">print_sort = #{printSort,jdbcType=INTEGER},</if>
+      <if test="choiceType != null">choice_type = #{choiceType,jdbcType=INTEGER}</if>
+      <if test="choiceCount != null">choice_count = #{choiceCount,jdbcType=INTEGER}</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.MealAttr">update tb_meal_attr set name = #{name,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER},article_id = #{articleId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
@@ -46,10 +56,12 @@
 	  	<if test="articleId!=null ">
 	  		article_id=#{articleId}
 	  	</if>
-  	</where>
+  	</where> order by sort
   </select>
   <delete id="deleteByIds">
   	delete from tb_meal_attr where id in 
   	<foreach collection="ids" open="(" separator="," close=")" item="id">#{id}</foreach>
   </delete>
+
+
 </mapper>

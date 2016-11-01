@@ -157,9 +157,9 @@
         <if test="show != ''">
             and a.state = 1
         </if>
-        <if test="show != ''"> 
-            and a.current_working_stock > 0 and a.is_empty = 0 
-        </if> 
+        <if test="show != ''">
+            and a.current_working_stock > 0 and a.is_empty = 0 order by it.sort
+        </if>
     </select>
     <insert id="insertBatch">
         insert into tb_meal_item
@@ -173,5 +173,9 @@
         <foreach collection="ids" open="(" close=")" separator="," item="id">
             #{id}
         </foreach>
+    </select>
+
+    <select id="selectByAttrId" resultType="MealItem">
+        select * from tb_meal_item where meal_attr_id = #{attrId}
     </select>
 </mapper>
