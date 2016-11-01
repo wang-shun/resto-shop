@@ -334,9 +334,6 @@ public class OrderController extends GenericController{
 
 
 
-	@RequestMapping("/refund")
-	public void refund(String orderId){
-		orderService.cancelOrder(orderId);
-	}
+
 	
 }
