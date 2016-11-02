@@ -959,20 +959,11 @@
 <!--</select>-->
 
 <!--查询品牌菜品的总数 -->
-    <select id="selectBrandArticleSum" resultType="integer">
-        SELECT sum(t.count)totalNum FROM
-        (
-        SELECT count,type FROM tb_order_item oi WHERE order_id in(
-        SELECT
-        distinct o.id
-        FROM
-        tb_order o
-        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
-        WHERE
-        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
-        ) as t WHERE t.type!=3
-
+    <select id="selectBrandArticleNum" resultType="integer">
+       SELECT SUM(oi.count)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
+        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and oi.type!=3
+        AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
 
     <!--查询品牌菜品销售的总价-->
@@ -1025,20 +1016,18 @@
     </select>
 
 
-
-
-
-
-
-
     <select id="selectConfirmMoney" resultType="BigDecimal">
-        SELECT sum(o.order_money) from tb_order o WHERE
-        o.order_state in(2,10,11,12) and o.production_status in (2,3)
+        SELECT
+	sum(oi.final_price) totalMoney
+FROM
+	tb_order o
+INNER JOIN tb_order_item oi ON o.id = oi.order_id
+WHERE
+	o.order_state IN (10, 2, 11, 12)
+AND o.production_status IN (2, 3)
         and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and o.brand_id=#{brandId}
     </select>
-
-
 
     <!-- 品牌菜品销售 -->
     <select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -1344,8 +1333,21 @@
 </select>
 
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
-
-        select r.type, r.articleId, r.article_name,sum(r.count) as brandSellNum,r.articleFamilyId,r.articleFamilyName,r.peference,r.sort,r.order_id,sum(r.final_price) as salles,r.peference as  numberCode from (	SELECT
+        SELECT
+        r.type,
+        r.articleId,
+        r.article_name,
+        sum(r.count) AS brandSellNum,
+        r.articleFamilyId,
+        r.articleFamilyName,
+        r.peference,
+        r.sort,
+        r.order_id,
+        sum(r.final_price) AS salles,
+        r.peference AS numberCode
+        FROM
+        (
+        SELECT
         t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         t.count,
@@ -1355,23 +1357,21 @@
         t5.peference,
         t4.sort,
         t.type,
-        t4.peference as numberCode,
+        t4.peference AS numberCode,
         t.final_price
         FROM
         tb_order_item t
         INNER JOIN tb_order t2 ON t2.id = t.order_id
-        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
         INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
-        t2.order_state in (2,10,11,12)
-        and t2.production_status in (2,3)
-        and
-      <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
-        ) as r
-        GROUP BY r.article_name
-order by ${sort}
-
+        t2.order_state IN (2, 10, 11, 12)
+        AND t2.production_status IN (2, 3) AND
+        <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
+        ) AS r
+        GROUP BY
+        r.article_name
+        ORDER BY ${sort}
     </select>
 
 

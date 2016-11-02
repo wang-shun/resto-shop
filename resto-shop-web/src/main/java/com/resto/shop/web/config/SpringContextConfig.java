@@ -326,12 +326,6 @@ public class SpringContextConfig {
     }
 
     @Bean
-    public RedisService redisService() {
-        return proxy.create(RedisService.class);
-    }
-
-
-    @Bean
     public OrderExceptionService orderExceptionService() {
         return proxy.create(OrderExceptionService.class);
     }

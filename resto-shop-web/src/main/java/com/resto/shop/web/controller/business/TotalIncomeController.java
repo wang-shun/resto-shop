@@ -17,10 +17,8 @@ import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.util.JsonUtils;
-import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.RedisService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.BrandIncomeDto;
-import com.resto.brand.web.dto.IncomeReportDto;
 import com.resto.brand.web.dto.ReportIncomeDto;
 import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.brand.web.model.Brand;
@@ -56,9 +53,6 @@ public class TotalIncomeController extends GenericController {
     @Resource
     ChargeOrderService chargeOrderService;
 
-    @Resource
-    RedisService redisService;
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @RequestMapping("/list")
@@ -79,38 +73,10 @@ public class TotalIncomeController extends GenericController {
      * @return
      */
     private Map<String,Object> getIncomeReportList(String beginDate, String endDate) {
-        Brand brand = null;
-        List<ShopDetail> shopDetailList = null;
-        try{
-            //添加缓存逻辑
-            //从缓存中获取品牌和店铺信息
-            String cacheBrand = redisService.get(getCurrentBrandId()+"brand_name");
-            String  cacheShopDetails  = redisService.get(getCurrentBrandId()+"shop_names");
-            if(StringUtils.isNotEmpty(cacheBrand)){
-                brand = JsonUtils.jsonToPojo(cacheBrand,Brand.class);
-            }
-            if(StringUtils.isNotEmpty(cacheShopDetails)){
-                shopDetailList = JsonUtils.jsonToList(cacheShopDetails,ShopDetail.class);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        if(brand==null){
-            brand = brandService.selectById(getCurrentBrandId());
-            try{
-                redisService.set(getCurrentBrandId()+"brand_name",MAPPER.writeValueAsString(brand),60*60*24*30*3);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+        //从session中获取该品牌的信息
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
-            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-            try{
-                redisService.set(getCurrentBrandId()+"shop_names",MAPPER.writeValueAsString(shopDetailList),60*60*24*30*3);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+                shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
@@ -182,7 +148,7 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setCouponIncome(couponIncome);
         brandIncomeDto.setChargeAccountIncome(chargeAccountIncome);
         brandIncomeDto.setChargeGifAccountIncome(chargeGifAccountIncome);
-        brandIncomeDto.setBrandName(brand.getBrandName());
+        brandIncomeDto.setBrandName(getBrandName());
         brandIncomeDto.setWaitNumberIncome(waitNumberIncome);
         brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome);
         brandIncomeDtos.add(brandIncomeDto);
@@ -209,38 +175,9 @@ public class TotalIncomeController extends GenericController {
     public void exprotBrandExcel(@RequestParam("beginDate") String beginDate, @RequestParam("endDate") String endDate,
                                  HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {
 
-        Brand brand = null;
-        List<ShopDetail> shopDetailList = null;
-        try{
-            //添加缓存逻辑
-            //从缓存中获取品牌和店铺信息
-            String cacheBrand = redisService.get(getCurrentBrandId()+"brand_name");
-            String  cacheShopDetails  = redisService.get(getCurrentBrandId()+"shop_names");
-            if(StringUtils.isNotEmpty(cacheBrand)){
-                brand = JsonUtils.jsonToPojo(cacheBrand,Brand.class);
-            }
-            if(StringUtils.isNotEmpty(cacheShopDetails)){
-                shopDetailList = JsonUtils.jsonToList(cacheShopDetails,ShopDetail.class);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        if(brand==null){
-            brand = brandService.selectById(getCurrentBrandId());
-            try{
-                redisService.set(getCurrentBrandId()+"brand_name",MAPPER.writeValueAsString(brand),60*60*24*30*3);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-            try{
-                redisService.set(getCurrentBrandId()+"shop_names",MAPPER.writeValueAsString(shopDetailList),60*60*24*30*3);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
         }
         // 导出文件名
         String str = "营业总额报表"+beginDate+"至"+endDate+".xls";
@@ -253,7 +190,7 @@ public class TotalIncomeController extends GenericController {
         shopName.substring(0, shopName.length() - 1);
 
         Map<String, String> map = new HashMap<>();
-        map.put("brandName", brand.getBrandName());
+        map.put("brandName", getBrandName());
         map.put("shops", shopName);
         map.put("beginDate", beginDate);
         map.put("reportType", "品牌营业额报表");// 表的头，第一行内容

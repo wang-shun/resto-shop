@@ -4,17 +4,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.resto.brand.core.util.CookieUtils;
-import com.resto.brand.core.util.JsonUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.shop.web.config.RedisKey;
-import com.resto.shop.web.service.RedisService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -53,9 +46,6 @@ public class BrandUserController extends GenericController{
     @Resource
     private RoleService roleService;
 
-    @Resource
-    private RedisService redisService;
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
     /**
      * 用户登录
@@ -89,12 +79,13 @@ public class BrandUserController extends GenericController{
 
             // 验证成功在Session中保存用户信息
             final BrandUser authUserInfo = brandUserService.selectByUsername(brandUser.getUsername());
-            ShopDetail shopDetail = shopDetailService.selectById(authUserInfo.getShopDetailId());
             HttpSession session = request.getSession();
             session.setAttribute(SessionKey.USER_INFO, authUserInfo);
             session.setAttribute(SessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
-            session.setAttribute(SessionKey.CURRENT_SHOP_NAME, shopDetail.getName());
+            session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
+            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+            session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
         } catch (AuthenticationException e) {
             // 身份验证失败
             model.addAttribute("error", e.getMessage());

@@ -8,9 +8,6 @@ import javax.annotation.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.JsonUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.dao.ArticleAttrMapper;
 import com.resto.shop.web.dao.ArticleUnitMapper;
 import com.resto.shop.web.model.ArticleAttr;
@@ -18,8 +15,6 @@ import com.resto.shop.web.model.ArticleUnit;
 import com.resto.shop.web.service.ArticleAttrService;
 
 import cn.restoplus.rpc.server.RpcService;
-import com.resto.shop.web.service.RedisService;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -31,12 +26,6 @@ public class ArticleAttrServiceImpl extends GenericServiceImpl<ArticleAttr, Inte
     private ArticleAttrMapper articleattrMapper;
     @Resource
     private ArticleUnitMapper articleUnitMapper;
-
-    @Resource
-    private RedisService redisService;
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
 
     @Override
     public GenericDao<ArticleAttr, Integer> getDao() {

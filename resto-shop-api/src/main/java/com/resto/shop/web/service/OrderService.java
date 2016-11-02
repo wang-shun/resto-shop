@@ -9,6 +9,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -223,7 +224,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId);
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
 	
 	/**
 	 * 获取店铺菜品的销售数据
@@ -258,11 +259,12 @@ public interface OrderService extends GenericService<Order, String> {
 	 * 查询订单数目和订单金额
 	 * @param beginDate
 	 * @param endDate
-	 * @param currentBrandId
+	 * @param brandName
+     * @param shopDetails
 	 * @return
 	 */
 
-	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
+	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
 	/**

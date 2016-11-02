@@ -83,7 +83,7 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/list_brand")
 	@ResponseBody
 	public brandArticleReportDto list_brand(String beginDate,String endDate){
-		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId());
+		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId(),getBrandName());
 	}
 	
 	

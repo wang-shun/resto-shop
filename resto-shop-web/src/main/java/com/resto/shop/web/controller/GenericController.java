@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.resto.brand.web.model.ShopDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -165,6 +166,10 @@ public abstract class GenericController{
 	public String getBrandName(){
 		return getCurrentBrandUser().getBrandName();
 	}
+
+    public List<ShopDetail> getCurrentShopDetails(){
+        return (List<ShopDetail>) getRequest().getSession().getAttribute(SessionKey.CURRENT_SHOP_NAMES);
+    }
 	
 	public String getBaseUrl(){
 		HttpServletRequest request = getRequest();
