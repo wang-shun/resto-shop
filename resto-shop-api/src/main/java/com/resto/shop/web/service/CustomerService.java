@@ -16,7 +16,7 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Customer register(Customer customer);
     void updateCustomer(Customer customer);
 
-	void bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId) throws AppException;
+	Customer bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId,String shareCustomer) throws AppException;
     
 	/**
 	 * 根据ID才查询用户昵称和手机号码
