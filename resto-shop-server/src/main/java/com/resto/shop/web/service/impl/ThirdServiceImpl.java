@@ -91,7 +91,7 @@ public class ThirdServiceImpl implements ThirdService {
 
         }
 
-        List<Map<String, Object>> kitchenTicket = printKitchen(hungerOrder, details,shopDetail);
+        List<Map<String, Object>> kitchenTicket = printKitchen(hungerOrder, details, shopDetail);
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
@@ -100,7 +100,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-    public List<Map<String, Object>> printKitchen(HungerOrder order, List<HungerOrderDetail> articleList,ShopDetail shopDetail) {
+    public List<Map<String, Object>> printKitchen(HungerOrder order, List<HungerOrderDetail> articleList, ShopDetail shopDetail) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<HungerOrderDetail>> kitchenArticleMap = new HashMap<String, List<HungerOrderDetail>>();
         //厨房信息
@@ -109,7 +109,7 @@ public class ThirdServiceImpl implements ThirdService {
         int sum = 0;
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(item.getName());
+            Article article = articleMapper.selectByName(item.getName(),shopDetail.getId());
             String articleId = article.getId();
             sum += item.getQuantity();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
@@ -138,7 +138,6 @@ public class ThirdServiceImpl implements ThirdService {
             if (printer == null) {
                 continue;
             }
-
 
 
             //生成厨房小票
@@ -270,7 +269,7 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                     if (check) {
-                        result = hungerPush(map, brandSetting,brandId);
+                        result = hungerPush(map, brandSetting, brandId);
                     }
                     break;
                 default:
@@ -282,7 +281,7 @@ public class ThirdServiceImpl implements ThirdService {
         return result;
     }
 
-    private Boolean hungerPush(Map map, BrandSetting brandSetting,String brandId) throws Exception {
+    private Boolean hungerPush(Map map, BrandSetting brandSetting, String brandId) throws Exception {
         String pushAction;
         if (StringUtils.isEmpty(map.get("push_action"))) {
             return false;
@@ -291,12 +290,12 @@ public class ThirdServiceImpl implements ThirdService {
 
         }
         if (pushAction.equals(PushAction.NEW_ORDER)) { //新订   单
-            String[] ids =  addHungerOrder(map, brandSetting);
+            String[] ids = addHungerOrder(map, brandSetting);
             //扣除库存
-            for(String id : ids){
+            for (String id : ids) {
                 HungerOrder order = hungerOrderMapper.selectById(id);
                 String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
-                MQMessageProducer.sendPlatformOrderMessage(id,PlatformType.E_LE_ME,brandId,shopId);
+                MQMessageProducer.sendPlatformOrderMessage(id, PlatformType.E_LE_ME, brandId, shopId);
             }
 
         } else if (pushAction.equals(PushAction.ORDER_STATUS_UPDATGE)) { //订单状态更新
@@ -422,7 +421,7 @@ public class ThirdServiceImpl implements ThirdService {
 
 
     private Boolean updateStock(String name, String shopId, Integer count, String type) throws AppException {
-        Article article = articleMapper.selectByName(name);
+        Article article = articleMapper.selectByName(name, shopId);
         orderMapper.updateArticleStock(article.getId(), type, count);
         orderMapper.setEmpty(article.getId());
 
