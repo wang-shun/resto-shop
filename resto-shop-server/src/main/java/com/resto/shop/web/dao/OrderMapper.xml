@@ -1589,6 +1589,7 @@ order by ${sort}
         <set>
             <if test="type=='minus'">
                 current_working_stock = current_working_stock - #{count}
+              where current_working_stock - #{count} >= 0
             </if>
             <if test="type == 'add'">
                 current_working_stock = current_working_stock +  #{count}
