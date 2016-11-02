@@ -25,4 +25,6 @@ public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
 	List<ArticlePrice> selectByArticleId(String articleId);
 
 	List<ArticlePrice> selectList(@Param("shopId") String shopDetailId);
+
+    ArticlePrice selectByArticle(@Param("articleId") String articleId,@Param("unitId") int unitId);
 }

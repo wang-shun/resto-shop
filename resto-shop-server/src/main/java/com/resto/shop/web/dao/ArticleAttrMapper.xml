@@ -95,4 +95,25 @@
 		and shop_detail_id = #{shopId} 
 	</if>
   </select>
+
+  <select id="selectListByArticleId" resultType="ArticleAttr">
+select * from tb_article_attr where id in
+ (  select tb_article_attr_id from tb_article_unit where id in
+  (  select unit_ids from tb_article_price where article_id = #{articleId})
+  GROUP BY tb_article_attr_id)
+  </select>
+
+
+  <insert id="insertByAuto" parameterType="ArticleAttr" useGeneratedKeys="true" keyProperty="id">
+ insert into tb_article_attr (name, sort,
+      shop_detail_id)
+    values (#{name,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER},
+      #{shopDetailId,jdbcType=VARCHAR})
+  </insert>
+
+
+  <select id="selectSame" resultType="ArticleAttr">
+    select * from tb_article_attr where name = #{name} and shop_detail_id = #{shopId}
+  </select>
+
 </mapper>

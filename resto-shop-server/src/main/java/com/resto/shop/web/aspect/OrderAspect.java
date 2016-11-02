@@ -145,6 +145,11 @@ public class OrderAspect {
         }
         msg.append("就餐店铺：" + order.getShopName() + "\n");
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        if(setting.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0){
+            msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+        }
         msg.append("订单明细：\n");
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
         for (OrderItem item : orderItem) {
@@ -277,6 +282,9 @@ public class OrderAspect {
                         MQMessageProducer.sendModelFivePaySuccess(order);
                     }
                 }
+                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
+                    sendPaySuccessMsg(order);
+                }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
@@ -322,7 +330,7 @@ public class OrderAspect {
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if(setting.getIsUseServicePrice() == 1){
-                msg.append("服务费：" + order.getServicePrice() + "\n");
+                msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
 
             msg.append("订单明细：\n");
@@ -449,7 +457,7 @@ public class OrderAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
             if(setting.getIsUseServicePrice() == 1){
-                msg.append("服务费：" + order.getServicePrice() + "\n");
+                msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
 
 

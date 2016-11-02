@@ -49,7 +49,7 @@ public class OrderController extends GenericController{
     public void list(){
     }
 	
-	//查询已消费订单的订单总数和订单金额，
+	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
 	@RequestMapping("brand_data")
 	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
@@ -299,8 +299,9 @@ public class OrderController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
-	
+
+	@RequestMapping("/refund")
+	public void refund(String orderId){
+		orderService.cancelOrder(orderId);
+	}
 }

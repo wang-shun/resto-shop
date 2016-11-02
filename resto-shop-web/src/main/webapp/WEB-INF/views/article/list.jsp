@@ -1243,6 +1243,7 @@
                                 }
                             }
                             this.unitPrices = allItems;
+
                             return allItems;
                         }
                     }

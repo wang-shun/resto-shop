@@ -120,6 +120,16 @@ public class Article {
 
     private Integer recommendCount;
 
+    private String pId;
+
+    final public String getpId() {
+        return pId;
+    }
+
+    final public void setpId(String pId) {
+        this.pId = pId;
+    }
+
     final public Integer getRecommendCount() {
         return recommendCount;
     }

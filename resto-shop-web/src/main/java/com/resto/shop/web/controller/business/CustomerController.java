@@ -60,11 +60,11 @@ public class CustomerController extends GenericController{
 		return Result.getSuccess();
 	}
 
-    //测试获取优惠券
-    @RequestMapping("test/coupon")
-    public void testCoupon(String phone,String customerId,Integer couponType) throws AppException {
-        customerService.bindPhone(phone, customerId, couponType,getCurrentShopId());
-    }
+//    //测试获取优惠券
+//    @RequestMapping("test/coupon")
+//    public void testCoupon(String phone,String customerId,Integer couponType) throws AppException {
+//        customerService.bindPhone(phone, customerId, couponType,getCurrentShopId());
+//    }
 
 
 }
