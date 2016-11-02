@@ -112,8 +112,18 @@ public class MQMessageProducer {
 	}
 
 	
-	public static void sendPlaceOrderMessage(Order order) {
+	public static void sendPlatformOrderMessage(String id,Integer type,String brandId,String shopId) {
  		JSONObject obj  = new JSONObject();
+		obj.put("id", id);
+		obj.put("type", type);
+		obj.put("brandId", brandId);
+		obj.put("shopId",shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_PLATFORM_ORDER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	public static void sendPlaceOrderMessage(Order order) {
+		JSONObject obj  = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
 		obj.put("tableNumber", order.getTableNumber());
@@ -125,7 +135,7 @@ public class MQMessageProducer {
 		obj.put("parentOrderId", order.getParentOrderId());
 		obj.put("originalAmount", order.getOriginalAmount());
 		obj.put("orderMoney", order.getOrderMoney());
-        obj.put("serialNumber",order.getSerialNumber());
+		obj.put("serialNumber",order.getSerialNumber());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}

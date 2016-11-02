@@ -15,6 +15,7 @@ import com.resto.shop.web.dao.HungerOrderMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.KitchenService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.PrinterService;
@@ -250,7 +251,8 @@ public class ThirdServiceImpl implements ThirdService {
     @Override
     public Boolean orderAccept(Map map, BrandSetting brandSetting) {
         String pushType = map.get("pushType").toString();
-        List<Platform> platformList = platformService.selectByBrandId(map.get("brandId").toString());
+        String brandId = map.get("brandId").toString();
+        List<Platform> platformList = platformService.selectByBrandId(brandId);
         Boolean result = false;
         if (CollectionUtils.isEmpty(platformList)) {
             return false;
@@ -268,7 +270,7 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                     if (check) {
-                        result = hungerPush(map, brandSetting);
+                        result = hungerPush(map, brandSetting,brandId);
                     }
                     break;
                 default:
@@ -280,7 +282,7 @@ public class ThirdServiceImpl implements ThirdService {
         return result;
     }
 
-    private Boolean hungerPush(Map map, BrandSetting brandSetting) throws Exception {
+    private Boolean hungerPush(Map map, BrandSetting brandSetting,String brandId) throws Exception {
         String pushAction;
         if (StringUtils.isEmpty(map.get("push_action"))) {
             return false;
@@ -289,8 +291,13 @@ public class ThirdServiceImpl implements ThirdService {
 
         }
         if (pushAction.equals(PushAction.NEW_ORDER)) { //新订   单
-            addHungerOrder(map, brandSetting);
+            String[] ids =  addHungerOrder(map, brandSetting);
             //扣除库存
+            for(String id : ids){
+                HungerOrder order = hungerOrderMapper.selectById(id);
+                String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
+                MQMessageProducer.sendPlatformOrderMessage(id,PlatformType.E_LE_ME,brandId,shopId);
+            }
 
         } else if (pushAction.equals(PushAction.ORDER_STATUS_UPDATGE)) { //订单状态更新
             updateHungerOrder(map.get("eleme_order_id").toString(), Integer.valueOf(map.get("new_status").toString()));
@@ -346,7 +353,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-    private void addHungerOrder(Map map, BrandSetting brandSetting) throws Exception {
+    private String[] addHungerOrder(Map map, BrandSetting brandSetting) throws Exception {
         String orderIds = map.get("eleme_order_ids").toString();
         String[] ids = orderIds.split(","); //得到饿了吗的新增订单列表
         for (String id : ids) {
@@ -410,6 +417,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
 
         }
+        return ids;
     }
 
 
