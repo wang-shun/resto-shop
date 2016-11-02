@@ -79,4 +79,7 @@ public class ServerConfig {
 
 	@Bean
 	public ThirdService hungerService(){ return proxy.create(ThirdService.class) ;}
+
+	@Bean
+	public PlatformService platformService(){ return proxy.create(PlatformService.class) ;};
 }

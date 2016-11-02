@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.web.model.BrandSetting;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,4 +12,9 @@ import java.util.Map;
 public interface ThirdService {
 
     Boolean orderAccept(Map map, BrandSetting brandSetting);
+
+
+    public List<Map<String, Object>> printOrderByPlatform(String platformId, Integer type);
+
+
 }

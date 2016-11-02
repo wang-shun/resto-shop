@@ -74,4 +74,12 @@
         set status_code = #{state}
         where order_id = #{orderId}
     </update>
+
+    <select id="selectDetailsById" resultType="HungerOrderDetail">
+        select * from tb_hunger_order_detail where order_id = #{id}
+    </select>
+
+    <select id="selectById" resultType="HungerOrder">
+        select * from tb_hunger_order where order_id = #{orderId}
+    </select>
 </mapper>
