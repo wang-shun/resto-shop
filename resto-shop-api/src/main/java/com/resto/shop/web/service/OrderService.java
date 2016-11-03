@@ -228,11 +228,12 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	/**
 	 * 获取店铺菜品的销售数据
+     * 2016-11-3
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 */
-	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId);
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
 	
 	/**
 	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)

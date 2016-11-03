@@ -1455,10 +1455,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId) {
+    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId,List<ShopDetail>shopDetails) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+        if(shopDetails.isEmpty()){
+            shopDetails=shopDetailService.selectByBrandId(brandId);
+        }
         //查询品牌下每个店铺的菜品销量，菜品销售额 和占品牌销售的比率(和品牌一样需要分开计算数量和总价--套餐问题)
 
         //查询每个店铺的菜品销量的和
@@ -1484,7 +1486,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
-        for (ShopDetail shop : list_shopDetail) {
+        for (ShopDetail shop : shopDetails) {
             ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
             listArticles.add(st);
         }
