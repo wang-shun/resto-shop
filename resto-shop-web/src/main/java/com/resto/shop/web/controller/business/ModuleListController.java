@@ -51,7 +51,7 @@ public class ModuleListController extends GenericController{
             }
         }
 
-		return list2;
+        return list2;
 	}
 	
 	@RequestMapping("edit/{sign}")
