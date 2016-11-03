@@ -42,4 +42,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
 
 	Boolean checkRegistered(String id);
+
+	Customer selectByOpenIdInfo(String openId);
 }
