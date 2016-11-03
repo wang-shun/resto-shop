@@ -1912,7 +1912,7 @@ GROUP BY r.table_number
         brand_id=#{brandId}
         AND
         <![CDATA[ create_time >#{beginDate} AND create_time  <#{endDate}]]>
-        and order_state in(2,10,11,12) and production_status in (0,1,5)
+        AND order_state IN(2,10,11,12) AND  production_status NOT  in (2,3)
     </select>
 
     <select id="selectHasPayListOrderByBrandId" resultType="Order">

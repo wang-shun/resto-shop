@@ -339,7 +339,6 @@ public class SyncDataController extends GenericController {
     @RequestMapping("syncOrderException")
     @ResponseBody
     public Result syncOrderException(String beginDate, String endDate,String brandName) {
-        System.out.println("订单--------------------------------------------------");
         List<Order> orderList = orderService.selectExceptionOrderListBybrandId(beginDate,endDate,getCurrentBrandId());
         if(!orderList.isEmpty()){
             for(Order o :orderList){
@@ -356,6 +355,7 @@ public class SyncDataController extends GenericController {
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderExceptionService.insert(orderException);
+                System.err.println("插入的订单id为"+o.getId());
             }
         }
         return getSuccessResult();
@@ -367,12 +367,18 @@ public class SyncDataController extends GenericController {
     @RequestMapping("syncOrderPaymentItemException")
     @ResponseBody
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
-        //1.查退款失败原因为： 累计退款金额大于支付金额
+        //
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
+        //1.查退款失败原因为： 没有证书
+        List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
+        List<OrderPaymentItem> olist = new ArrayList<>();
+        olist.addAll(orderPaymentItemList);
+        olist.addAll(orderPaymentItemList2);
 
-        if(!orderPaymentItemList.isEmpty()){
-            for(OrderPaymentItem oi : orderPaymentItemList){
+        if(!olist.isEmpty()){
+            for(OrderPaymentItem oi : olist){
                 Order order = orderService.selectById(oi.getOrderId());
+                System.err.println("改订单为退款证书丢失："+order.getId());
                 //插入数据
                 //查询店铺的名字
                 ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -388,20 +394,11 @@ public class SyncDataController extends GenericController {
             }
         }
 
-        //1.查退款失败原因为： 没有证书
-        List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
-
-
-
-
         //查询订单项丢失
         //查询所有的订单和它的订单项(不考虑 orderstate 和productionStatus)
         List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
         if(!orderExceptionList.isEmpty()){
             for(Order order : orderExceptionList){
-                if("e6f374a27ac04cfea5f221462e5cb303".equals(order.getId())){
-                    System.out.println("找到了这个订单-----------------------------------------------------------");
-                }
                 if(!order.getOrderPaymentItems().isEmpty()){
                     BigDecimal temp = BigDecimal.ZERO;
                     for(OrderPaymentItem oi : order.getOrderPaymentItems()){
@@ -413,7 +410,7 @@ public class SyncDataController extends GenericController {
                         //查询店铺的名字
                         ShopDetail shopDetail = shopDetailService.selectById(order2.getShopDetailId());
                         //插入数据
-
+                        System.err.println("订单项丢失："+order.getId());
                         OrderException orderException = new OrderException();
                         orderException.setOrderId(order2.getId());
                         orderException.setOrderMoney(order2.getOrderMoney());

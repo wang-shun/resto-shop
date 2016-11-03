@@ -61,14 +61,11 @@
          //查寻orderpaymentItem中result_data 为 {}
         OrderPaymentItem oi =  orderPaymentItemService.selectByOrderIdAndResultData(orderId);
          //删除该订单项
-         if(null!=oi.getId()){
+         if(null!=oi){
              orderPaymentItemService.delete(oi.getId());
          }
          orderService.update(o);
          orderService.cancelExceptionOrder(orderId);
          return Result.getSuccess();
      }
-
-
-
  }
