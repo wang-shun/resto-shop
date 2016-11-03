@@ -60,6 +60,8 @@ public class BrandUserController extends GenericController{
         	if(redirect == null){
         		redirect = "";
         	}
+
+
             Subject subject = SecurityUtils.getSubject(); //获取shiro管理的用户对象 主要储存了用户的角色和用户的权限
             // 已登陆则 跳到首页
             if (subject.isAuthenticated()) {
