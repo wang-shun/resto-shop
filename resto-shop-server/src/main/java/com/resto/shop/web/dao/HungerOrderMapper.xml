@@ -25,7 +25,15 @@
         <result column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
         <result column="delivery_geo" property="deliveryGeo"/>
+        <result column="article_sum" property="sum"/>
         <result column="delivery_poi_address" property="deliveryPoiAddress"/>
+        <collection property="details" javaType="List" ofType="HungerOrderDetail">
+            <id column="detail_id" property="id"/>
+            <result column="detail_name" property="name"/>
+            <result column="detail_price" property="price"/>
+            <result column="detail_quantity" property="quantity"/>
+            <result column="detail_specs" property="specs"/>
+        </collection>
     </resultMap>
 
     <!--插入饿了吗订单-->
@@ -79,7 +87,24 @@
         select * from tb_hunger_order_detail where order_id = #{id}
     </select>
 
-    <select id="selectById" resultType="HungerOrder">
+    <select id="selectByOrderId" resultType="HungerOrder">
         select * from tb_hunger_order where order_id = #{orderId}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select t.*,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
+         t2.specs as detail_specs ,sum(t2.quantity) as article_sum  from tb_hunger_order t
+          left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
+
+
+         where t.id = #{id}
+    </select>
+
+    <select id="getOutFoodList" resultMap="BaseResultMap">
+        select t.*,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
+         t2.specs as detail_specs ,sum(t2.quantity) as article_sum from tb_hunger_order t
+        left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
+        where t.restaurant_id = #{restaurantId}
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.created_at,'%d %b %y')
     </select>
 </mapper>

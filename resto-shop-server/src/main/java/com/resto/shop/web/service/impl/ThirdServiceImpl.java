@@ -79,7 +79,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     private List<Map<String, Object>> printElemeOrder(String orderId) {
         List<Map<String, Object>> printTask = new ArrayList<>();
-        HungerOrder hungerOrder = hungerOrderMapper.selectById(orderId);
+        HungerOrder hungerOrder = hungerOrderMapper.selectByOrderId(orderId);
         List<HungerOrderDetail> details = hungerOrderMapper.selectDetailsById(hungerOrder.getOrderId());
         ShopDetail shopDetail = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId());
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
@@ -110,6 +110,9 @@ public class ThirdServiceImpl implements ThirdService {
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
             Article article = articleMapper.selectByName(item.getName(),shopDetail.getId());
+            if(article == null){
+                continue;
+            }
             String articleId = article.getId();
             sum += item.getQuantity();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
@@ -143,10 +146,17 @@ public class ThirdServiceImpl implements ThirdService {
             //生成厨房小票
             for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
+                String articleName = article.getName();
+                if(article.getSpecs() != null){
+                    JSONArray jsonArray = new JSONArray(article.getSpecs());
+                    for(int i = 0;i< jsonArray.length();i++){
+                        articleName +=  ( "(" + jsonArray.get(i) + ")" );
+                    }
+                }
                 List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
                 Map<String, Object> item = new HashMap<String, Object>();
                 item.put("SUBTOTAL", article.getQuantity() * article.getPrice().doubleValue());
-                item.put("ARTICLE_NAME", article.getName());
+                item.put("ARTICLE_NAME", articleName);
                 item.put("ARTICLE_COUNT", article.getQuantity());
                 items.add(item);
 
@@ -204,9 +214,16 @@ public class ThirdServiceImpl implements ThirdService {
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
         for (HungerOrderDetail article : orderItems) {
+            String articleName = article.getName();
+            if(article.getSpecs() != null){
+                JSONArray jsonArray = new JSONArray(article.getSpecs());
+                for(int i = 0;i< jsonArray.length();i++){
+                    articleName +=  ( "(" + jsonArray.get(i) + ")" );
+                }
+            }
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", article.getPrice().doubleValue() * article.getQuantity());
-            item.put("ARTICLE_NAME", article.getName());
+            item.put("ARTICLE_NAME", articleName);
             item.put("ARTICLE_COUNT", article.getQuantity());
             sum += article.getQuantity();
             items.add(item);
@@ -214,7 +231,7 @@ public class ThirdServiceImpl implements ThirdService {
 
 
         Map<String, Object> print = new HashMap<>();
-        print.put("TABLE_NO", "");
+        print.put("TABLE_NO", "  "+order.getConsignee());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getOrderId());
@@ -232,7 +249,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", "");
+        data.put("TABLE_NUMBER", "  " +order.getConsignee());
         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -241,7 +258,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("STATUS", 0);
 
         print.put("TICKET_TYPE", TicketType.RECEIPT);
-        data.put("ORDER_NUMBER", "");
+        data.put("ORDER_NUMBER", order.getConsignee());
 
         return print;
     }
@@ -273,7 +290,7 @@ public class ThirdServiceImpl implements ThirdService {
                     }
                     break;
                 default:
-                    return false;
+                   break;
             }
         } catch (Exception e) {
             return false;
@@ -290,16 +307,21 @@ public class ThirdServiceImpl implements ThirdService {
 
         }
         if (pushAction.equals(PushAction.NEW_ORDER)) { //新订   单
-            String[] ids = addHungerOrder(map, brandSetting);
+            addHungerOrder(map, brandSetting);
             //扣除库存
-            for (String id : ids) {
-                HungerOrder order = hungerOrderMapper.selectById(id);
-                String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
-                MQMessageProducer.sendPlatformOrderMessage(id, PlatformType.E_LE_ME, brandId, shopId);
-            }
+//            for (String id : ids) {
+//                HungerOrder order = hungerOrderMapper.selectByOrderId(id);
+//                String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
+//                MQMessageProducer.sendPlatformOrderMessage(id, PlatformType.E_LE_ME, brandId, shopId);
+//            }
 
         } else if (pushAction.equals(PushAction.ORDER_STATUS_UPDATGE)) { //订单状态更新
             updateHungerOrder(map.get("eleme_order_id").toString(), Integer.valueOf(map.get("new_status").toString()));
+            if( Integer.valueOf(map.get("new_status").toString()).equals(ProductionStatus.PRINTED)){
+                HungerOrder order = hungerOrderMapper.selectByOrderId(map.get("eleme_order_id").toString());
+                String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
+                MQMessageProducer.sendPlatformOrderMessage(map.get("eleme_order_id").toString(), PlatformType.E_LE_ME, brandId, shopId);
+            }
         } else if (pushAction.equals(PushAction.REFUND_ORDER)) { //退单
             String orderId = map.get("eleme_order_id").toString();
             updateHungerOrder(map.get("eleme_order_id").toString(), Integer.valueOf(map.get("refund_status").toString()));
@@ -422,6 +444,9 @@ public class ThirdServiceImpl implements ThirdService {
 
     private Boolean updateStock(String name, String shopId, Integer count, String type) throws AppException {
         Article article = articleMapper.selectByName(name, shopId);
+        if(article == null){
+            return null;
+        }
         orderMapper.updateArticleStock(article.getId(), type, count);
         orderMapper.setEmpty(article.getId());
 
@@ -429,5 +454,58 @@ public class ThirdServiceImpl implements ThirdService {
         orderMapper.setStockBySuit(shopId);
         return true;
     }
+
+
+    @Override
+    public List<HungerOrder> getOutFoodList(String shopId) {
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        List<HungerOrder> hungerOrders = hungerOrderMapper.getOutFoodList(shopDetail.getRestaurantId());
+        return hungerOrders;
+    }
+
+
+    @Override
+    public HungerOrder getOutFoodInfo(String id) {
+        HungerOrder order =  hungerOrderMapper.selectById(id);
+        order.setShopName(shopDetailService.selectByRestaurantId(order.getRestaurantId()).getName());
+        return order;
+    }
+
+
+
+    public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
+        // 根据id查询订单
+        HungerOrder order = hungerOrderMapper.selectById(orderId);
+        //查询店铺
+        ShopDetail shopDetail = shopDetailService.selectByRestaurantId(order.getRestaurantId());
+        List<HungerOrderDetail> orderDetails = hungerOrderMapper.selectDetailsById(order.getOrderId());
+        if (selectPrinterId == null) {
+            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            if (printer.size() > 0) {
+                return printTicket(order, orderDetails, shopDetail, printer.get(0));
+            }
+        } else {
+            Printer p = printerService.selectById(selectPrinterId);
+            return printTicket(order, orderDetails, shopDetail, p);
+        }
+        return null;
+    }
+
+
+    @Override
+    public List<Map<String, Object>> printKitchenReceipt(String oid) {
+        HungerOrder order = hungerOrderMapper.selectById(oid);
+        List<HungerOrderDetail> details = hungerOrderMapper.selectDetailsById(order.getOrderId());
+        ShopDetail shopDetail = shopDetailService.selectByRestaurantId(order.getRestaurantId());
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, details, shopDetail);
+        if (!kitchenTicket.isEmpty()) {
+            printTask.addAll(kitchenTicket);
+        }
+
+        return printTask;
+    }
+
+
 
 }

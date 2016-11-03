@@ -62,11 +62,42 @@ public class HungerOrder {
     //送货地址
     private String deliveryPoiAddress;
 
+    //菜品总数
+    private Integer sum;
+
     //额外费用
     private List<HungerOrderExtra> extra;
 
     //饿了吗订单明细分组
     private List<HungerOrderGroup> groups;
+
+    private List<HungerOrderDetail> details;
+
+    private String shopName;
+
+    final public String getShopName() {
+        return shopName;
+    }
+
+    final public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    final public Integer getSum() {
+        return sum;
+    }
+
+    final public void setSum(Integer sum) {
+        this.sum = sum;
+    }
+
+    final public List<HungerOrderDetail> getDetails() {
+        return details;
+    }
+
+    final public void setDetails(List<HungerOrderDetail> details) {
+        this.details = details;
+    }
 
     final public List<HungerOrderGroup> getGroups() {
         return groups;

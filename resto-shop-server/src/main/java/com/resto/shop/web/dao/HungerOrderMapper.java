@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import com.resto.shop.web.model.*;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,10 @@ public interface HungerOrderMapper {
 
     List<HungerOrderDetail> selectDetailsById(String id);
 
-    HungerOrder selectById(String orderId);
+    HungerOrder selectByOrderId(String orderId);
+
+    List<HungerOrder> getOutFoodList(@Param("restaurantId") String restaurantId);
+
+    HungerOrder selectById(String id);
 
 }
