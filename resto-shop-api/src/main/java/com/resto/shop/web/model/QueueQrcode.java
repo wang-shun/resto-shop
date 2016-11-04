@@ -16,6 +16,8 @@ public class QueueQrcode {
     private Date createTime;
 
     private Date endTime;
+    
+    private String type;
 
     public String getId() {
         return id;
@@ -72,4 +74,12 @@ public class QueueQrcode {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 }
