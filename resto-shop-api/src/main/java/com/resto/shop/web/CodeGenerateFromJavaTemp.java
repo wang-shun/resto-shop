@@ -32,7 +32,7 @@ public class CodeGenerateFromJavaTemp {
 	final static String ServicePath = BasePath+"resto-shop-api/src/main/java/com/resto/shop/web/service/";
 	final static String ServiceImpl = BasePath+"resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
 	final static String JspPath = BasePath+"resto-shop-web/src/main/webapp/WEB-INF/views/";
-	final static String ControllerPath = "resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
+	final static String ControllerPath = BasePath+"resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
 	final static String DaoMapperPath = DaoPath;
 	final static String TempPath = BasePath+"resto-shop-api/source-temps/";
 	final static String ModelClassName =BasePath+"resto-shop-api/src/main/java/com/resto/shop/web/model/";
