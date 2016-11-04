@@ -106,6 +106,7 @@
         <id column="id"  property="id"/>
         <result column="order_money" property="orderMoney"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <result column="id" property="id"/>
            <result column="payment_mode_id" property="paymentModeId"/>
           <result column="pay_value" property="payValue"/>
         </collection>
