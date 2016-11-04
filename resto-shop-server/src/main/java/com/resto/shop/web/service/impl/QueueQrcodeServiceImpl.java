@@ -20,6 +20,10 @@ public class QueueQrcodeServiceImpl extends GenericServiceImpl<QueueQrcode, Stri
     @Override
     public GenericDao<QueueQrcode, String> getDao() {
         return queueqrcodeMapper;
-    } 
+    }
 
+    @Override
+    public QueueQrcode selectByIdEndtime(String id) {
+        return queueqrcodeMapper.selectByIdEndtime(id);
+    }
 }

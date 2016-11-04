@@ -53,4 +53,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.QueueQrcode">update tb_queue_qrcode set brand_id = #{brandId,jdbcType=VARCHAR}, shop_id = #{shopId,jdbcType=VARCHAR}, sign = #{sign,jdbcType=VARCHAR}, create_user = #{createUser,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, end_time = #{endTime,jdbcType=TIMESTAMP}, type = #{type,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="QueueQrcode">select * from tb_queue_qrcode</select>
+
+  <select id="selectByIdEndtime" resultType="QueueQrcode">
+      select * from tb_queue_qrcode where id = #{id} and end_time > now()
+  </select>
 </mapper>
