@@ -74,7 +74,7 @@
   </select>
   
   <select id="selectIncomeList" resultType="com.resto.brand.web.dto.IncomeReportDto">
-		 <![CDATA[
+		 <![CDATA[  
 		SELECT ap.shop_detail_id,ap.brand_id,ap.payment_mode_id paymentModeId,SUM(ap.pay_value)payValue FROM
 		(SELECT
 			o.shop_detail_id, o.brand_id,oi.payment_mode_id ,oi.pay_value,oi.pay_time
@@ -115,5 +115,86 @@
         WHERE ap.payment_mode_id IS NOT NULL
         GROUP BY ap.payment_mode_id
     </select>
-  
+
+    <select id="selectListByResultData" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate} and
+           result_data = '{}'
+        ]]>
+
+    </select>
+
+
+    <select id="selectListByResultDataByNoFile" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate} and
+           result_data like'%No such file or directory%'
+        ]]>
+
+    </select>
+
+    <select id="selectOrderMoneyByBrandIdGroupByOrderId" resultType="Order">
+        SELECT id,sum(pay_value)as order_money from tb_order_payment_item
+        WHERE
+        <![CDATA[
+            pay_time>#{beginDate} and
+            pay_time <#{endDate}
+        ]]>
+        GROUP BY order_id
+    </select>
+
+    <!-- 品牌收入报表 2016-10-29 -->
+    <select id="selectShopIncomeList" resultType="OrderPaymentItem">
+        SELECT
+        o.shop_detail_id,
+        sum(oi.pay_value) pay_value,
+        oi.payment_mode_id
+        FROM
+        tb_order_payment_item oi
+        INNER JOIN tb_order o ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (10, 11, 2, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.brand_id =  #{brandId}
+        GROUP BY
+        o.shop_detail_id,
+        oi.payment_mode_id
+    </select>
+
+
+
+    <!--(pos端) 店铺收入报表 2016-10-29 -->
+    <select id="selectShopIncomeListByShopId" resultType="OrderPaymentItem">
+        SELECT
+        o.shop_detail_id,
+        sum(oi.pay_value) pay_value,
+        oi.payment_mode_id
+        FROM
+        tb_order_payment_item oi
+        INNER JOIN tb_order o ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (10, 11, 2, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.shop_detail_id =  #{shopId}
+        GROUP BY
+        oi.payment_mode_id
+    </select>
+
+
+
+    <select id="selectByOrderIdAndResultData" resultType="OrderPaymentItem">
+        SELECT id,order_id from tb_order_payment_item WHERE
+       order_id = #{orderId} AND
+      result_data = '{}'
+    </select>
+
+
 </mapper>

@@ -89,11 +89,6 @@ var tb1 = $("#brandReportTable").DataTable({
 			title : "品牌",
 			data : "brandName",
 		},       
-//		{
-//			title : "营收总额(元)",
-//			data : "factIncome",
-//			defaultContent:'0'
-//		},
 		 {
             title : "订单总额(元)",
             data : "totalIncome",
@@ -114,12 +109,15 @@ var tb1 = $("#brandReportTable").DataTable({
 			title : "优惠券支付收入(元)",
 			data : "couponIncome",
 		},       
-		
-		{                 
+		{
 			title : "充值赠送支付(元)",
 			data : "chargeGifAccountIncome",
-		},       
-	]
+		},
+        {
+            title : "等位红包支付(元)",
+            data : "waitNumberIncome",
+        },
+    ]
 	
 });
 
@@ -160,7 +158,11 @@ var tb2 = $("#shopReportTable").DataTable({
 		{                 
 			title : "充值赠送支付(元)",
 			data : "chargeGifAccountIncome",
-		},       
+		},
+        {
+            title : "等位红包支付(元)",
+            data : "waitNumberIncome",
+        },
 	]
 	
 });

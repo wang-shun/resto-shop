@@ -47,17 +47,17 @@
 		  			<thead>
 					<tr>
 						<th>品牌</th>
+                        <th>订单总额(元)</th>
 						<th>订单总数(份)</th>
-						<th>订单总额(元)</th>
 						<th>订单平均金额(元)</th>
 						<th>营销撬动率</th>
 					</tr>
 				</thead>
 				<tbody>
 						<td><strong>{{brandOrder.name}}</strong></td>
-						<td>{{brandOrder.number}}</td>	
 						<td>{{brandOrder.orderMoney}}</td>
-						<td>{{brandOrder.average}}</td>
+                        <td>{{brandOrder.number}}</td>
+                        <td>{{brandOrder.average}}</td>
 						<td>{{brandOrder.marketPrize}}</td>
 					</tr>
 				</tbody>
@@ -69,8 +69,8 @@
 		  			<thead>
 					<tr>
 						<th>店铺名称</th>
-						<th>订单总数(份)</th>
 						<th>订单总额(元)</th>
+                        <th>订单总数(份)</th>
 						<th>订单平均金额(元)</th>
 						<th>营销撬动率</th>
 						<th>操作</th>
@@ -79,9 +79,9 @@
 				<tbody>
 					<tr v-for="shop in shopOrderList">
 						<td><strong>{{shop.name}}</strong></td>
-						<td>{{shop.number}}</td>	
 						<td>{{shop.orderMoney}}</td>
-						<td>{{shop.average}}</td>
+                        <td>{{shop.number}}</td>
+                        <td>{{shop.average}}</td>
 						<td>{{shop.marketPrize}}</td>
 						<td><button class="btn btn-sm btn-success"
 								@click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>

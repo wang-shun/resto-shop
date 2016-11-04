@@ -67,14 +67,10 @@ public class appraiseReportController extends GenericController{
 
 	private Map<String,Object> getSuccess(String beginDate,String endDate){
 		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId());
-		Brand brand = brandService.selectById(getCurrentBrandId());
-		
 		int appraiseNum=0;//评价单数
 		int totalNum = 0;//已消费订单数
-		
 		BigDecimal orderMoney = BigDecimal.ZERO;//订单总额
 		BigDecimal redMoney = BigDecimal.ZERO;//评论红包总额
-		
 		int oneStart=0;
 		int twoStart=0;
 		int threeStart=0;
@@ -114,7 +110,7 @@ public class appraiseReportController extends GenericController{
 		}
 		
 		//设置品牌
-		brandAppraise.setBrandName(brand.getBrandName());
+		brandAppraise.setBrandName(getBrandName());
 		
 		//设置评价单数
 		brandAppraise.setAppraiseNum(appraiseNum);
@@ -139,23 +135,20 @@ public class appraiseReportController extends GenericController{
 		
 		//店铺数据
 		
-		List<ShopDetail> shoplist =  shopDetailService.selectByBrandId(getCurrentBrandId());
+		List<ShopDetail> shoplist = getCurrentShopDetails();
+        if(!shoplist.isEmpty()){
+            shoplist = shopDetailService.selectByBrandId(getCurrentBrandId());
+        }
 		
 		List<AppraiseDto> shopAppraiseList = new ArrayList<>();
-		
 		for (ShopDetail s : shoplist) {
 			AppraiseDto shopAppraise = new AppraiseDto(s.getId(),s.getName(), appraiseNum, "", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
 			//每个店铺设置默认值
 			int appraiseNum2=0;//评价单数
 			int totalNum2 = 0;//已消费订单数
-			
 			BigDecimal orderMoney2 = BigDecimal.ZERO;//订单总额
 			BigDecimal redMoney2 = BigDecimal.ZERO;//评论红包总额
-			
 			//设置红包撬动率
-			
-			
-			
 			int oneStart2=0;
 			int twoStart2=0;
 			int threeStart2=0;
@@ -190,7 +183,6 @@ public class appraiseReportController extends GenericController{
 					//
 					totalNum2++;
 				}
-				
 			}
 			
 			//设置评价单数

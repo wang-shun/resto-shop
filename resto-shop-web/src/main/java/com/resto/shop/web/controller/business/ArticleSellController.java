@@ -83,14 +83,14 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/list_brand")
 	@ResponseBody
 	public brandArticleReportDto list_brand(String beginDate,String endDate){
-		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId());
+		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId(),getBrandName());
 	}
 	
 	
 	@RequestMapping("/list_shop")
 	@ResponseBody
 	public List<ShopArticleReportDto> list_shop(String beginDate,String endDate){
-		List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId());
+		List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId(),getCurrentShopDetails());
 		return list;
 	}
 	
@@ -162,16 +162,13 @@ public class ArticleSellController extends GenericController{
 		List<ArticleSellDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
 		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
 		String shopName="";
-		for (ShopDetail shopDetail : shops) {
+		for (ShopDetail shopDetail : getCurrentShopDetails()) {
 			shopName += shopDetail.getName()+",";
 		}
 		//去掉最后一个逗号
 		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", brand.getBrandName());
+		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
@@ -334,16 +331,14 @@ public class ArticleSellController extends GenericController{
 		List<ShopArticleReportDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
 		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
 		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
 		String shopName="";
-		for (ShopDetail shopDetail : shops) {
+		for (ShopDetail shopDetail : getCurrentShopDetails()) {
 			shopName += shopDetail.getName()+",";
 		}
 		//去掉最后一个逗号
 		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", brand.getBrandName());
+		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
@@ -362,7 +357,7 @@ public class ArticleSellController extends GenericController{
 //			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
 //		}
 		//暂时查全部
-		result = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId());
+		result = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId(),getCurrentShopDetails());
 		String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"}};
 		
 		//定义excel工具类对象

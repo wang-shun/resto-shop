@@ -58,7 +58,7 @@ public class OrderController extends GenericController{
 	}
 	
 	private Map<String,Object> getResult(String beginDate,String endDate){
-		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId());
+		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 	}
 	
 	
@@ -68,6 +68,11 @@ public class OrderController extends GenericController{
 	@RequestMapping("brand_excel")
 	@ResponseBody
 	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
+        if(shopDetailList==null){
+            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+        }
 		//导出文件名
 		String fileName = "品牌订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
@@ -82,15 +87,12 @@ public class OrderController extends GenericController{
 		result.addAll((Collection<? extends OrderPayDto>) resultMap.get("shopId"));
 		result.add((OrderPayDto) resultMap.get("brandId"));
 		
-		Brand brand = brandService.selectById(getCurrentBrandId());
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
 		String shopName="";
-		for (ShopDetail shopDetail : shops) {
+		for (ShopDetail shopDetail : shopDetailList) {
 			shopName += shopDetail.getName()+",";
 		}
 		Map<String,String> map = new HashMap<>();
-		map.put("brandName", brand.getBrandName());
+		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌订单报表");//表的头，第一行内容

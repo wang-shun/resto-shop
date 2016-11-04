@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.resto.brand.web.model.ShopDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
@@ -29,9 +30,9 @@ import com.resto.shop.web.config.SessionKey;
 
 
 public abstract class GenericController{
-	
+
 	protected Logger log = LoggerFactory.getLogger(getClass());
-	
+
 
 	public Result getSuccessResult() {
 		return getSuccessResult(null);
@@ -149,23 +150,26 @@ public abstract class GenericController{
 	public String getCurrentShopId(){
 		return getCurrentBrandUser().getShopDetailId();
 	}
-	
+
 	public String getCurrentBrandId(){
 		return getCurrentBrandUser().getBrandId();
 	}
-	
+
 	public BrandUser getCurrentBrandUser(){
 		return (BrandUser) getRequest().getSession().getAttribute(SessionKey.USER_INFO);
 	}
-	
+
 	public String getCurrentUserId(){
 		return getCurrentBrandUser().getId();
 	}
 
 	public String getBrandName(){
-		
 		return getCurrentBrandUser().getBrandName();
 	}
+
+    public List<ShopDetail> getCurrentShopDetails(){
+        return (List<ShopDetail>) getRequest().getSession().getAttribute(SessionKey.CURRENT_SHOP_NAMES);
+    }
 	
 	public String getBaseUrl(){
 		HttpServletRequest request = getRequest();

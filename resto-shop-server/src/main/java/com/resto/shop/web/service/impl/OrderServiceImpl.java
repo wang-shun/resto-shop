@@ -1,14 +1,12 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
@@ -24,6 +22,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
@@ -57,6 +56,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderItemMapper orderitemMapper;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Resource
     private CustomerService customerService;
@@ -123,7 +124,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private GetNumberService getNumberService;
-
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -292,10 +292,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal payMoney = totalMoney.add(order.getServicePrice());
 
         // 使用优惠卷
-
-
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
-
         if(order.getWaitMoney().doubleValue() > 0){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
@@ -537,6 +534,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
     }
 
+    @Override
+    public boolean cancelExceptionOrder(String orderId) {
+        Order order = selectById(orderId);
+        if (order.getAllowCancel() && order.getProductionStatus() != ProductionStatus.PRINTED && (order.getOrderState().equals(OrderState.SUBMIT) || order.getOrderState() == OrderState.PAYMENT)) {
+            order.setAllowCancel(false);
+            order.setClosed(true);
+            order.setAllowAppraise(false);
+            order.setAllowContinueOrder(false);
+            order.setOrderState(OrderState.CANCEL);
+            update(order);
+            refundOrder(order);
+            log.info("取消订单成功:" + order.getId());
+            return true;
+        } else {
+            log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
+            return false;
+        }
+    }
+
+    @Override
+    public List<Order> selectNeedCacelOrderList(String brandId, String beginTime, String endTime) {
+        Date begin = DateUtil.getformatBeginDate(beginTime);
+        Date end = DateUtil.getformatEndDate(endTime);
+        return orderMapper.selectNeedCacelOrderList(brandId,begin,end);
+    }
+
 
     @Override
     public Boolean checkRefundLimit(Order order) {
@@ -552,7 +575,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.getProductionStatus().equals(ProductionStatus.NOT_PRINT))
                         || (order.getOrderState().equals(OrderState.PAYMENT) &&
                         order.getProductionStatus().equals(ProductionStatus.NOT_ORDER)))
-                   || (order.getOrderState().equals(OrderState.SUBMIT) && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER))  
+                   || (order.getOrderState().equals(OrderState.SUBMIT) && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER))
                 ;
                 break;
             default:
@@ -1413,26 +1436,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-
     @Override
-    public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId) {
+    /**
+     * 2016-11-2
+     */
+    public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId,String brandName) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        Brand brand = brandService.selectById(brandId);
-        //查询菜品的总销量
-        int totalNum = orderMapper.selectBrandArticleSum(begin, end, brandId);
-        //查询菜品的总价格
-        BigDecimal  d = orderMapper.selectBrandArticleSell(begin,end,brandId);
-        brandArticleReportDto bo = new brandArticleReportDto(brand.getBrandName(), totalNum,d);
+        int totalNum = 0;
+        //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
+        //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
+        brandArticleReportDto bo = new brandArticleReportDto();
+        totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        BigDecimal totalMoney = BigDecimal.ZERO;
+        totalMoney = orderMapper.selectConfirmMoney(begin,end,brandId);
+        bo.setSellIncome(totalMoney);
+        bo.setTotalNum(totalNum);
+        bo.setBrandName(brandName);
         return bo;
     }
 
 
     @Override
-    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId) {
+    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId,List<ShopDetail>shopDetails) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
+        if(shopDetails.isEmpty()){
+            shopDetails=shopDetailService.selectByBrandId(brandId);
+        }
         //查询品牌下每个店铺的菜品销量，菜品销售额 和占品牌销售的比率(和品牌一样需要分开计算数量和总价--套餐问题)
 
         //查询每个店铺的菜品销量的和
@@ -1458,7 +1489,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
-        for (ShopDetail shop : list_shopDetail) {
+        for (ShopDetail shop : shopDetails) {
             ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
             listArticles.add(st);
         }
@@ -1589,57 +1620,59 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId) {
+    /**
+     * 2016-11-2
+     */
+    public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName,List<ShopDetail> shopDetailList) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        //查询出所有店铺并设置默认值
-        List<ShopDetail> shopLists = shopDetailService.selectByBrandId(brandId);
-        List<OrderPayDto> orderList = new ArrayList<>();
-        for (ShopDetail shopDetail : shopLists) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
-            orderList.add(ot);
-        }
+
         //查询后台数据
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
-        Brand b = brandService.selectById(brandId);
-        OrderPayDto brandPayDto = new OrderPayDto(b.getBrandName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+        //封装品牌的数据
+        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
         //品牌订单总额初始值
         BigDecimal d = BigDecimal.ZERO;
-
         //品牌实际支付初始值
         BigDecimal d1 = BigDecimal.ZERO;
-
         //品牌虚拟支付初始值
         BigDecimal d2 = BigDecimal.ZERO;
-
         //品牌平均订单金额
         BigDecimal average = BigDecimal.ZERO;
-
         //品牌订单数目初始值
         int number = 0;
         //品牌订单营销撬动率
         String marketPrize = "";
+        Set<String> ids = new HashSet<>();
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
             d = d.add(o.getOrderMoney());
             //品牌订单数目
-            number++;
+            ids.add(o.getId());
             if(!o.getOrderPaymentItems().isEmpty()){
-                for(OrderPaymentItem oi : o.getOrderPaymentItems()){
+                for(OrderPaymentItem oi :o.getOrderPaymentItems()){
                     //品牌实际支付
                     if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
                         d1 = d1.add(oi.getPayValue());
                     }
-                    //品牌虚拟支付
-                    if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7) {
+                    //品牌虚拟支付(加上等位红包支付)
+                    if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7||oi.getPaymentModeId() == 8) {
                         d2 = d2.add(oi.getPayValue());
                     }
                 }
             }
         }
 
+        if (d2.compareTo(BigDecimal.ZERO) > 0) {
+            //marketPrize = d1.divide(d2.setScale(2, BigDecimal.ROUND_HALF_UP))+"";
+            marketPrize = d1.divide(d2, 2, BigDecimal.ROUND_HALF_UP) + "";
+        }
         brandPayDto.setOrderMoney(d);
+        if (ids != null && ids.size() > 0) {
+            number = ids.size();
+        }
+
         //品牌订单数目
         brandPayDto.setNumber(number);
         //品牌订单平均值
@@ -1648,47 +1681,51 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             average = d.divide(new BigDecimal(String.valueOf(number)), 2, BigDecimal.ROUND_HALF_UP);
         }
         brandPayDto.setAverage(average);
+        //品牌营销撬动率
+        brandPayDto.setMarketPrize(marketPrize);
 
-        //品牌营销撬动率  实际/虚拟
-        if (d2.compareTo(BigDecimal.ZERO) > 0) {
-            //sd.setMarketPrize(ds2.divide(ds3).setScale(2, BigDecimal.ROUND_HALF_UP)+"");
-            brandPayDto.setMarketPrize(d1.divide(d2, 2, BigDecimal.ROUND_HALF_UP) + "");
+        //封装店铺的数据
+        List<OrderPayDto> shopPayDto = new ArrayList<>();
+        for (ShopDetail shopDetail : shopDetailList) {
+            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+            shopPayDto.add(ot);
         }
 
         //遍历订单中的是否含有这个店铺的id 有的话说明这个店铺有订单那么修改初始值
-        for (OrderPayDto sd : orderList) {
+        for (OrderPayDto sd : shopPayDto) {
             //店铺订单的总额初始值
             BigDecimal ds1 = BigDecimal.ZERO;
-
             //店铺实际支付初始值
             BigDecimal ds2 = BigDecimal.ZERO;
-
             //店铺虚拟支付初始值
             BigDecimal ds3 = BigDecimal.ZERO;
-
             //店铺平均订单金额
-            // BigDecimal saverage = BigDecimal.ZERO;
-
+            BigDecimal saverage = BigDecimal.ZERO;
             //店铺订单数目初始值
             int snumber = 0;
 
+            Set<String> sids = new HashSet<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
-                    //计算店铺订单总额
-                    ds1 = ds1.add(os.getOrderMoney());
-                    //计算店铺的订单数目
-                    snumber++;
                     if(!os.getOrderPaymentItems().isEmpty()){
-                        for(OrderPaymentItem oi :os.getOrderPaymentItems()){
+                        for(OrderPaymentItem oi : os.getOrderPaymentItems()){
                             //店铺实际支付
                             if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
                                 ds2 = ds2.add(oi.getPayValue());
                             }
                             //店铺虚拟支付
-                            if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7) {
+                            if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7||oi.getPaymentModeId()==8) {
                                 ds3 = ds3.add(oi.getPayValue());
                             }
                         }
+                    }
+
+                    //计算店铺订单总额
+                    ds1 = ds1.add(os.getOrderMoney());
+                    //计算店铺的订单数目
+                    sids.add(os.getId());
+                    if (sids.size() > 0) {
+                        snumber = sids.size();
                     }
                 }
             }
@@ -1712,13 +1749,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //sd.setMarketPrize(ds2.divide(ds3).setScale(2, BigDecimal.ROUND_HALF_UP)+"");
                 sd.setMarketPrize(ds2.divide(ds3, 2, BigDecimal.ROUND_HALF_UP) + "");
             }
-
         }
+        Map<String,Object> map = new HashMap<>();
 
-
-        //--------------------------------------
-        Map<String, Object> map = new HashMap<>();
-        map.put("shopId", orderList);
+        map.put("shopId", shopPayDto);
         map.put("brandId", brandPayDto);
 
         return map;
@@ -2494,8 +2528,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}
 	}
 	
-	public void sendWxRefundMsg(Order order){
-		if (checkRefundLimit(order)) {
+
+    public void sendWxRefundMsg(Order order){
+        if (checkRefundLimit(order)) {
             autoRefundOrder(order.getId());
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
@@ -2710,4 +2745,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         jsonResult.setData(order);
         return jsonResult;
     }
+
+    @Override
+    public List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+
+        List<Order> list = orderMapper.selectExceptionOrderListBybrandId(begin,end,brandId);
+
+        return list;
+    }
+
+    @Override
+    public List<Order> selectHasPayListOrderByBrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayListOrderByBrandId(begin,end,brandId);
+    }
+
+    @Override
+    public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate, String brandId) {
+        return null;
+    }
+
 }

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -44,7 +45,8 @@ public class BrandUserController extends GenericController{
 
     @Resource
     private RoleService roleService;
-    
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     /**
      * 用户登录
      * 
@@ -58,6 +60,8 @@ public class BrandUserController extends GenericController{
         	if(redirect == null){
         		redirect = "";
         	}
+
+
             Subject subject = SecurityUtils.getSubject(); //获取shiro管理的用户对象 主要储存了用户的角色和用户的权限
             // 已登陆则 跳到首页
             if (subject.isAuthenticated()) {
@@ -74,20 +78,16 @@ public class BrandUserController extends GenericController{
             }
         	// 身份验证
             subject.login(new UsernamePasswordToken(brandUser.getUsername(),pwd));
-            
+
             // 验证成功在Session中保存用户信息
             final BrandUser authUserInfo = brandUserService.selectByUsername(brandUser.getUsername());
-            
-            
-            ShopDetail shopDetail = shopDetailService.selectById(authUserInfo.getShopDetailId());
-            
             HttpSession session = request.getSession();
             session.setAttribute(SessionKey.USER_INFO, authUserInfo);
             session.setAttribute(SessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
-            session.setAttribute(SessionKey.CURRENT_SHOP_NAME, shopDetail.getName());
-            
-            
+            session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
+            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+            session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
         } catch (AuthenticationException e) {
             // 身份验证失败
             model.addAttribute("error", e.getMessage());

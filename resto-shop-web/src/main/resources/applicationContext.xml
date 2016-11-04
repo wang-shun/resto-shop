@@ -9,17 +9,9 @@
     http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/tx
-    http://www.springframework.org/schema/tx/spring-tx.xsd
-    http://www.springframework.org/schema/jdbc
-    http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-    http://www.springframework.org/schema/cache
-    http://www.springframework.org/schema/cache/spring-cache.xsd
     http://www.springframework.org/schema/aop
     http://www.springframework.org/schema/aop/spring-aop.xsd
-    http://www.springframework.org/schema/util
-    http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
-
+  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
     <!-- 自动扫描resto包 ,将带有注解的类 纳入spring容器管理 -->
     <context:component-scan base-package="com.resto.shop.web"></context:component-scan>
 
@@ -28,23 +20,10 @@
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath*:application.properties</value>
-                <value>classpath*:redis.properties</value>
                 <value>classpath*:rpc.properties</value>
             </list>
         </property>
     </bean>
-
-    <!-- redis 配置 -->
-
-    <bean id="connectionFactory"
-          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-          p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.pass}"/>
-
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="connectionFactory"/>
-    </bean>
-
 
     <bean id="serviceDiscovery" class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceDiscovery">
         <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
@@ -61,15 +40,8 @@
     <!-- 配置使Spring采用CGLIB代理 -->
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
-    <!-- Cache配置 -->
-    <cache:annotation-driven cache-manager="cacheManager"/>
-
-    <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
-        <constructor-arg ref="redisTemplate"></constructor-arg>
-    </bean>
-
-	<task:annotation-driven/>
-	<context:annotation-config/>
-	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-	<context:component-scan base-package=" com.resto.shop.web.task"/>
+    <task:annotation-driven/>
+    <context:annotation-config/>
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+    <context:component-scan base-package=" com.resto.shop.web.task"/>
 </beans>

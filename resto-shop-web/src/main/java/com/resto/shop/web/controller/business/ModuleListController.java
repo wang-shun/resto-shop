@@ -1,5 +1,6 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -37,9 +38,20 @@ public class ModuleListController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
+    /**
+     * 2016-11-3
+     */
 	public List<ModuleList> listData(){
 		List<ModuleList> list =  modulelistService.selectListWithHas(getCurrentBrandId());
-		return list;
+        //隐藏没有开发完的功能
+        List<ModuleList> list2 = new ArrayList<>();
+        for(ModuleList moduleList : list){
+            if(moduleList.getIsOpen()){
+                list2.add(moduleList);
+            }
+        }
+
+        return list2;
 	}
 	
 	@RequestMapping("edit/{sign}")

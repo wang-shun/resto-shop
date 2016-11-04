@@ -160,4 +160,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public Boolean checkRegistered(String id) {
 		return customerMapper.checkRegistered(id) > 0;
 	}
+
+	@Override
+	public Customer selectByOpenIdInfo(String openId) {
+		return customerMapper.selectByOpenId(openId);
+	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +21,8 @@ public class ArticleAttrController extends GenericController{
 
 	@Resource
 	ArticleAttrService articleattrService;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 	
 	@RequestMapping("/list")
     public void list(){

@@ -24,9 +24,6 @@ public class SpringContextConfig {
         return getProxy(PermissionService.class);
     }
 
-
-
-
     @Bean
     public RoleService roleService() {
         return getProxy(RoleService.class);
@@ -333,6 +330,11 @@ public class SpringContextConfig {
     @Bean
     public RolePermissionService rolePermissionService() {
         return proxy.create(RolePermissionService.class);
+    }
+
+    @Bean
+    public OrderExceptionService orderExceptionService() {
+        return proxy.create(OrderExceptionService.class);
     }
 
 

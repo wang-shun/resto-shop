@@ -9,6 +9,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -223,15 +224,16 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId);
+	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
 	
 	/**
 	 * 获取店铺菜品的销售数据
+     * 2016-11-3
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 */
-	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId);
+	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
 	
 	/**
 	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)
@@ -258,11 +260,12 @@ public interface OrderService extends GenericService<Order, String> {
 	 * 查询订单数目和订单金额
 	 * @param beginDate
 	 * @param endDate
-	 * @param currentBrandId
+	 * @param brandName
+     * @param shopDetails
 	 * @return
 	 */
 
-	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate, String currentBrandId);
+	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
 	/**
@@ -300,10 +303,10 @@ public interface OrderService extends GenericService<Order, String> {
 	//查询品牌所有已消费的订单
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
 
-    //查询店铺所有的已消费的订单
+	//查询店铺所有的已消费的订单
 	public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
 
-    
+
 	//查询订单关联评论的内容
 	public List<Order> selectAppraiseByShopId(String beginDate, String endDate, String shopId);
 
@@ -409,9 +412,33 @@ public interface OrderService extends GenericService<Order, String> {
 
 	void useRedPrice(BigDecimal factMoney,String orderId);
 
-	void updateOrderChild(String orderId);
+    List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String currentBrandId);
 
-	void cleanShopOrder(String shopId);
+    List<Order> selectHasPayListOrderByBrandId(String beginDate, String endDate, String currentBrandId);
+
+    /**
+     * 查询所有订单和该订单下的订单项  (用于报表的异常订单项中查询订单项是否和订单的金额一致 也就是看有没有订单项丢失)
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate,String brandId);
+
+    void updateOrderChild(String orderId);
+
+    void cleanShopOrder(String shopId);
+
+    public boolean cancelExceptionOrder(String orderId);
+
+    /**
+     * 查询所有已提交单位支付的订单
+     * @param currentBrandId
+     * @param s
+     * @param s1
+     * @return
+     */
+    List<Order> selectNeedCacelOrderList(String currentBrandId, String s, String s1);
+
 
 	/**
 	 * 根据订单获取订单信息
@@ -428,7 +455,6 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> getOrderByEmployee(String employeeId, String shopId);
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
-
 
 
 }
