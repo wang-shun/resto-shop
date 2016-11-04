@@ -78,7 +78,7 @@
       *单独取消微信支付的钱
       * @return
       */
-     @RequestMapping("cancelNoRootOrder")
+     @RequestMapping("cancelWXPayOrder")
      @ResponseBody
      public Result executecancelWXPayOrder(String orderId){
          //查询所有已提交但未支付的定的那
