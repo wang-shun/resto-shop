@@ -49,7 +49,7 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-    @Scheduled(cron = "00  54 16 * * ?")   //每天12点执行
+    @Scheduled(cron = "00  44 18 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
         //查询所有的品牌

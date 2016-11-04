@@ -367,16 +367,11 @@ public class SyncDataController extends GenericController {
     @RequestMapping("syncOrderPaymentItemException")
     @ResponseBody
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
-        //
+        //1.查退款失败原因为： 累计退款金额大于支付金额
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
-        //1.查退款失败原因为： 没有证书
-        List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
-        List<OrderPaymentItem> olist = new ArrayList<>();
-        olist.addAll(orderPaymentItemList);
-        olist.addAll(orderPaymentItemList2);
 
-        if(!olist.isEmpty()){
-            for(OrderPaymentItem oi : olist){
+        if(!orderPaymentItemList.isEmpty()){
+            for(OrderPaymentItem oi : orderPaymentItemList){
                 Order order = orderService.selectById(oi.getOrderId());
                 System.err.println("改订单为退款证书丢失："+order.getId());
                 //插入数据
@@ -386,7 +381,7 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("退款证书丢失");
+                orderException.setWhy("累计退款金额大于支付金额");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
