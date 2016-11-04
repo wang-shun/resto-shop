@@ -1,8 +1,9 @@
 package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.QueueQrcode;
+import com.resto.brand.core.generic.GenericDao;
 
-public interface QueueQrcodeMapper {
+public interface QueueQrcodeMapper  extends GenericDao<QueueQrcode,String> {
     int deleteByPrimaryKey(String id);
 
     int insert(QueueQrcode record);
