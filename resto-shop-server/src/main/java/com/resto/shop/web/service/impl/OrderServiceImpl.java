@@ -383,7 +383,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setVerCode(parentOrder.getVerCode());
             order.setCustomerCount(parentOrder.getCustomerCount());
         }else{
-            Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId());
+            Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(),order.getShopDetailId());
             if(lastOrder != null && lastOrder.getParentOrderId() != null){
                 Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
                 if(parent != null && parent.getAllowContinueOrder()){
@@ -2715,8 +2715,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order getLastOrderByCustomer(String customerId) {
-        Order order =  orderMapper.getLastOrderByCustomer(customerId);
+    public Order getLastOrderByCustomer(String customerId,String shopId) {
+        Order order =  orderMapper.getLastOrderByCustomer(customerId,shopId);
         if(order != null && order.getParentOrderId() != null){
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if(parent != null && parent.getAllowContinueOrder()){
