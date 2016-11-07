@@ -384,13 +384,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCustomerCount(parentOrder.getCustomerCount());
         }else{
             Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId());
-            if(lastOrder != null && lastOrder.getAllowContinueOrder()){
-                order.setParentOrderId(lastOrder.getId());
-                Order parentOrder = selectById(order.getParentOrderId());
-                order.setTableNumber(parentOrder.getTableNumber());
-                order.setVerCode(parentOrder.getVerCode());
-                order.setCustomerCount(parentOrder.getCustomerCount());
+            if(lastOrder.getParentOrderId() != null){
+                Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
+                if(parent != null && parent.getAllowContinueOrder()){
+                    order.setParentOrderId(lastOrder.getId());
+                    Order parentOrder = selectById(order.getParentOrderId());
+                    order.setTableNumber(parentOrder.getTableNumber());
+                    order.setVerCode(parentOrder.getVerCode());
+                    order.setCustomerCount(parentOrder.getCustomerCount());
+                }
+            }else{
+                if(lastOrder != null && lastOrder.getAllowContinueOrder()){
+                    order.setParentOrderId(lastOrder.getId());
+                    Order parentOrder = selectById(order.getParentOrderId());
+                    order.setTableNumber(parentOrder.getTableNumber());
+                    order.setVerCode(parentOrder.getVerCode());
+                    order.setCustomerCount(parentOrder.getCustomerCount());
+                }
             }
+
+
 
 
 
@@ -2704,6 +2717,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order getLastOrderByCustomer(String customerId) {
-        return orderMapper.getLastOrderByCustomer(customerId);
+        Order order =  orderMapper.getLastOrderByCustomer(customerId);
+        if(order.getParentOrderId() != null){
+            Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+            if(parent != null && parent.getAllowContinueOrder()){
+                return parent;
+            }
+        }else{
+            return order;
+        }
+
+        return null;
+
     }
 }
