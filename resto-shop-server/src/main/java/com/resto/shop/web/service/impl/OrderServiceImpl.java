@@ -2701,4 +2701,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         jsonResult.setData(order);
         return jsonResult;
     }
+
+    @Override
+    public Order getLastOrderByCustomer(String customerId) {
+        return orderMapper.getLastOrderByCustomer(customerId);
+    }
 }
