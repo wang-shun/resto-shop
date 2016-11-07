@@ -1833,6 +1833,11 @@ GROUP BY r.table_number
         order by create_time DESC;
 
     </select>
+
+    <select id="getLastOrderByCustomer" resultType="Order">
+        select * from tb_order where customer_id = #{customerId}
+        order by create_time desc limit 1
+    </select>
 </mapper>
 
 
