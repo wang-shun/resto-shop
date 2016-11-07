@@ -375,10 +375,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
 
-        Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId());
-        if(lastOrder != null && lastOrder.getAllowContinueOrder()){
-            order.setParentOrderId(lastOrder.getId());
-        }
 
 
         if (order.getParentOrderId() != null) {
@@ -386,6 +382,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setTableNumber(parentOrder.getTableNumber());
             order.setVerCode(parentOrder.getVerCode());
             order.setCustomerCount(parentOrder.getCustomerCount());
+        }else{
+            Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId());
+            if(lastOrder != null && lastOrder.getAllowContinueOrder()){
+                order.setParentOrderId(lastOrder.getId());
+            }
+            Order parentOrder = selectById(order.getParentOrderId());
+            order.setTableNumber(parentOrder.getTableNumber());
+            order.setVerCode(parentOrder.getVerCode());
+            order.setCustomerCount(parentOrder.getCustomerCount());
+
+
         }
         //判断是否是后付款模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
