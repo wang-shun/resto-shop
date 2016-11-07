@@ -206,7 +206,11 @@ dt,dd{
 		}, {
 			title : "充值赠送金额支付",
 			data : "rewardPay"
-		}, {
+		},{
+                title : "等位支付",
+                data : "waitRedPay",
+            },
+            {
 			title : "营销撬动率",
 			data : 'incomePrize'
 		}, {

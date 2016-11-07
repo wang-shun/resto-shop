@@ -143,7 +143,7 @@ public class OrderController extends GenericController{
 				List<OrderDetailDto> listDto = new ArrayList<>();
 				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 				for (Order o : list) {
-					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "");			
+					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "");
 					if(o.getCustomer()!=null){
 						//手机号
 						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
@@ -230,6 +230,8 @@ public class OrderController extends GenericController{
 									case 7:
 										ot.setRewardPay(oi.getPayValue());
 										break;
+                                        case 8:
+                                            ot.setWaitRedPay(oi.getPayValue());
 									default:
 										break;
 									}
@@ -274,11 +276,10 @@ public class OrderController extends GenericController{
 		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","incomePrize","level","orderState"};
 		//定义数据
 		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
-		Brand brand = brandService.selectById(getCurrentBrandId());
 		//获取店铺名称
 		ShopDetail s = shopDetailService.selectById(shopId);
 		Map<String,String> map = new HashMap<>();
-		map.put("brandName", brand.getBrandName());
+		map.put("brandName", getBrandName());
 		map.put("shops", s.getName());
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺订单报表");//表的头，第一行内容
@@ -287,7 +288,7 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
+		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{
