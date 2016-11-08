@@ -28,4 +28,6 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     List<Map<String, Object>> appraiseMonthCount(String currentShopId);
 
 	Appraise selectDetailedById(String appraiseId);
+
+    List<Appraise> selectDeatilByOrderId(String orderId);
 }

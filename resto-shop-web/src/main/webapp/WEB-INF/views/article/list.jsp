@@ -1083,6 +1083,17 @@
                                 $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
                                 return true;
                             }
+                          	//if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
+                            //    $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
+                            //    return true;
+                            //}
+                            if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+                                //$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
+                                //return true;
+                                if(!confirm("是否不选择出餐厨房！")){
+                                	return true;
+                                }
+                            }
                             return false;
                         },
                         save: function (e) {
