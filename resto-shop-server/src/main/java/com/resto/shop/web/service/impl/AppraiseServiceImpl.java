@@ -189,7 +189,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		List<Appraise> apprises = appraiseMapper.selectDeatilByOrderId(orderId);
 		if(apprises.size() > 0){
 			return apprises.get(0);
+		}else{
+			return null;
 		}
-		return null;
 	}
 }
