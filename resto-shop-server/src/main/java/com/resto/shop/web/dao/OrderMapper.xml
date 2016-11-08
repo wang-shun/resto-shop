@@ -1925,7 +1925,7 @@ GROUP BY r.table_number
     </select>
 
 
-    <!-- -->
+    <!--查询所有异常订单 -->
     <select id="selectHasPayOrderPayMentItemListBybrandId" resultMap="consumedOrderByshopId">
         SELECT
         o.id , o.order_money ,oi.pay_value,oi.payment_mode_id  from tb_order o

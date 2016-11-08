@@ -22,7 +22,6 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
-import com.sun.org.apache.xerces.internal.xs.StringList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
@@ -2747,6 +2746,45 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
+    public boolean cancelWXPayOrder(String orderId) {
+        Order order = selectById(orderId);
+        if (order.getAllowCancel() && order.getProductionStatus() != ProductionStatus.PRINTED && (order.getOrderState().equals(OrderState.SUBMIT) || order.getOrderState() == OrderState.PAYMENT)) {
+            order.setAllowCancel(false);
+            order.setClosed(true);
+            order.setAllowAppraise(false);
+            order.setAllowContinueOrder(false);
+            order.setOrderState(OrderState.CANCEL);
+            update(order);
+            refundWXPAYOrder(order);
+            log.info("取消订单成功:" + order.getId());
+            return true;
+        } else {
+            log.warn("取消订单失败，订单状态订单状态或者订单可取消字段为false" + order.getId());
+            return false;
+        }
+    }
+
+    private void refundWXPAYOrder(Order order) {
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        for (OrderPaymentItem item : payItemsList) {
+            String newPayItemId = ApplicationUtils.randomUUID();
+            switch (item.getPaymentModeId()) {
+                case PayMode.WEIXIN_PAY:
+                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                    JSONObject obj = new JSONObject(item.getResultData());
+                    Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                            obj.getInt("total_fee"), obj.getInt("total_fee"), config.getAppid(), config.getMchid(),
+                            config.getMchkey(), config.getPayCertPath());
+                    item.setResultData(new JSONObject(result).toString());
+                    break;
+            }
+            item.setId(newPayItemId);
+            item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+            orderPaymentItemService.insert(item);
+        }
+    }
+
+    @Override
     public List<Order> selectExceptionOrderListBybrandId(String beginDate, String endDate, String brandId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
@@ -2765,7 +2803,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> selectHasPayOrderPayMentItemListBybrandId(String beginDate, String endDate, String brandId) {
-        return null;
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectHasPayOrderPayMentItemListBybrandId(begin,end,brandId);
     }
 
 }

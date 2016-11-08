@@ -12,6 +12,7 @@
  import org.springframework.web.bind.annotation.ResponseBody;
 
  import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
  import java.util.List;
 
  @Controller
@@ -29,9 +30,13 @@
       */
          @RequestMapping("cancelExceptionOrder")
          @ResponseBody
-     public Result executeCancelOrder(){
+     public Result executeCancelOrder(String beginDate, String endDate, HttpServletRequest request){
+             //获取时间
+             String begin = request.getParameter("beginDate");
+             String end = request.getParameter("endDate");
+
              //查询所有已提交但未支付的定的那
-             List<Order> orderList = orderService.selectNeedCacelOrderList(getCurrentBrandId(),"2016-9-01","2016-10-25");
+             List<Order> orderList = orderService.selectNeedCacelOrderList(getCurrentBrandId(),begin,end);
              for(Order order :orderList){
                  if (order.getOrderState() == OrderState.SUBMIT) {
                      System.err.println("自动取消订单:" + order.getId());
@@ -68,4 +73,29 @@
          orderService.cancelExceptionOrder(orderId);
          return Result.getSuccess();
      }
+
+     /**
+      *单独取消微信支付的钱
+      * @return
+      */
+     @RequestMapping("cancelWXPayOrder")
+     @ResponseBody
+     public Result executecancelWXPayOrder(String orderId){
+         //查询所有已提交但未支付的定的那
+         //更改订单状态为 2，0 和可以取消is_allows=1
+         Order o = orderService.selectById(orderId);
+         o.setOrderState(2);
+         o.setProductionStatus(0);
+         o.setAllowCancel(true);
+         //查寻orderpaymentItem中result_data 为 {}
+         OrderPaymentItem oi =  orderPaymentItemService.selectByOrderIdAndResultData(orderId);
+         //删除该订单项
+         if(null!=oi){
+             orderPaymentItemService.delete(oi.getId());
+         }
+         orderService.update(o);
+         orderService.cancelWXPayOrder(orderId);
+         return Result.getSuccess();
+     }
+
  }

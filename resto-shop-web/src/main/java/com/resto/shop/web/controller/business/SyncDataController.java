@@ -367,16 +367,11 @@ public class SyncDataController extends GenericController {
     @RequestMapping("syncOrderPaymentItemException")
     @ResponseBody
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
-        //
+        //1.查退款失败原因为： 累计退款金额大于支付金额
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
-        //1.查退款失败原因为： 没有证书
-        List<OrderPaymentItem> orderPaymentItemList2 = orderpaymentitemService.selectListByResultDataByNoFile(beginDate,endDate);
-        List<OrderPaymentItem> olist = new ArrayList<>();
-        olist.addAll(orderPaymentItemList);
-        olist.addAll(orderPaymentItemList2);
 
-        if(!olist.isEmpty()){
-            for(OrderPaymentItem oi : olist){
+        if(!orderPaymentItemList.isEmpty()){
+            for(OrderPaymentItem oi : orderPaymentItemList){
                 Order order = orderService.selectById(oi.getOrderId());
                 System.err.println("改订单为退款证书丢失："+order.getId());
                 //插入数据
@@ -386,7 +381,7 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("退款证书丢失");
+                orderException.setWhy("累计退款金额大于支付金额");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
@@ -399,28 +394,28 @@ public class SyncDataController extends GenericController {
         List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
         if(!orderExceptionList.isEmpty()){
             for(Order order : orderExceptionList){
-                if(!order.getOrderPaymentItems().isEmpty()){
                     BigDecimal temp = BigDecimal.ZERO;
-                    for(OrderPaymentItem oi : order.getOrderPaymentItems()){
-                        temp=temp.add(oi.getPayValue());
+                    if(!order.getOrderPaymentItems().isEmpty()){
+                        for(OrderPaymentItem oi : order.getOrderPaymentItems()){
+                            temp=temp.add(oi.getPayValue());
+                        }
+                        if(order.getOrderMoney().compareTo(temp)!=0){
+                            Order order2 = orderService.selectById(order.getId());
+                            //插入数据
+                            //查询店铺的名字
+                            ShopDetail shopDetail = shopDetailService.selectById(order2.getShopDetailId());
+                            //插入数据
+                            System.err.println("订单项丢失："+order.getId());
+                            OrderException orderException = new OrderException();
+                            orderException.setOrderId(order2.getId());
+                            orderException.setOrderMoney(order2.getOrderMoney());
+                            orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,order.getOrderMoney()));
+                            orderException.setShopName(shopDetail.getName());
+                            orderException.setCreateTime(order2.getCreateTime());
+                            orderException.setBrandName(brandName);
+                            orderExceptionService.insert(orderException);
+                        }
                     }
-                    if(order.getOrderMoney().compareTo(temp)!=0){
-                        Order order2 = orderService.selectById(order.getId());
-                        //插入数据
-                        //查询店铺的名字
-                        ShopDetail shopDetail = shopDetailService.selectById(order2.getShopDetailId());
-                        //插入数据
-                        System.err.println("订单项丢失："+order.getId());
-                        OrderException orderException = new OrderException();
-                        orderException.setOrderId(order2.getId());
-                        orderException.setOrderMoney(order2.getOrderMoney());
-                        orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,order.getOrderMoney()));
-                        orderException.setShopName(shopDetail.getName());
-                        orderException.setCreateTime(order2.getCreateTime());
-                        orderException.setBrandName(brandName);
-                        orderExceptionService.insert(orderException);
-                    }
-                }
             }
 
         }
