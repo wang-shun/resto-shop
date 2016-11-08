@@ -136,10 +136,10 @@ public class Order implements Serializable{
 
     private String waitId;
 
-    private Integer isShare = 0;
+    private Integer isShare;
 
     public Integer getIsShare() {
-        return isShare;
+        return isShare = 0;
     }
 
     public void setIsShare(Integer isShare) {
