@@ -103,4 +103,8 @@
 	ORDER BY CREATE_TIME DESC
 	LIMIT 0,10
   </select>
+
+  <select id="selectDeatilByOrderId" resultType="java.util.HashMap">
+    select <include refid="Base_Column_List"/> from tb_appraise where order_id = #{orderId,jdbcType=VARCHAR}
+  </select>
 </mapper>

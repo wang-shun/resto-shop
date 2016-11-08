@@ -37,4 +37,6 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 			Integer minLevel);
 
 	Appraise selectDetailedById(String appraiseId);
+
+	Appraise selectDeatilByOrderId(String orderId);
 }
