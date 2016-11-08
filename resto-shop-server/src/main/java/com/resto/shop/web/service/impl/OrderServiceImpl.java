@@ -716,7 +716,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
-        if (order.getPrintOrderTime() == null) {
+        if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
                 order.setAllowContinueOrder(true);
