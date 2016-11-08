@@ -1593,6 +1593,9 @@ AND o.production_status IN (2, 3)
             </if>
         </set>
         where id = #{articleId}
+        <if test="type=='minus'">
+            and current_working_stock -  #{count} > 0
+        </if>
     </update>
 
     <update id="setEmpty">
