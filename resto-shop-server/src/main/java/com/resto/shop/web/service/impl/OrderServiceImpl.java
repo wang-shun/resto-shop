@@ -368,9 +368,40 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
             order.setTableNumber(order.getVerCode());
         }
+
+
+
+
+
         if (order.getParentOrderId() != null) {
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
+            order.setVerCode(parentOrder.getVerCode());
+            order.setCustomerCount(parentOrder.getCustomerCount());
+        }else{
+            Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(),order.getShopDetailId());
+            if(lastOrder != null && lastOrder.getParentOrderId() != null){
+                Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
+                if(parent != null && parent.getAllowContinueOrder()){
+                    order.setParentOrderId(parent.getId());
+                    order.setTableNumber(parent.getTableNumber());
+                    order.setVerCode(parent.getVerCode());
+                    order.setCustomerCount(parent.getCustomerCount());
+                }
+            }else{
+                if(lastOrder != null && lastOrder.getAllowContinueOrder()){
+                    order.setParentOrderId(lastOrder.getId());
+                    Order parentOrder = selectById(order.getParentOrderId());
+                    order.setTableNumber(parentOrder.getTableNumber());
+                    order.setVerCode(parentOrder.getVerCode());
+                    order.setCustomerCount(parentOrder.getCustomerCount());
+                }
+            }
+
+
+
+
+
         }
         //判断是否是后付款模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
@@ -707,7 +738,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
-        if (order.getPrintOrderTime() == null) {
+        if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
                 order.setAllowContinueOrder(true);
@@ -2743,6 +2774,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         jsonResult.setData(order);
         return jsonResult;
+    }
+
+    @Override
+    public Order getLastOrderByCustomer(String customerId,String shopId) {
+        Order order =  orderMapper.getLastOrderByCustomer(customerId,shopId);
+        if(order != null && order.getParentOrderId() != null){
+            Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+            if(parent != null && parent.getAllowContinueOrder()){
+                return parent;
+            }
+        }else{
+            return order;
+        }
+
+        return null;
+
     }
 
     @Override

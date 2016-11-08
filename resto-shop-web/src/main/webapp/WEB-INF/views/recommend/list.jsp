@@ -68,6 +68,34 @@
                                                 </div>
 
 
+
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">出单类型&nbsp;</label>
+                                                    <div class="col-md-4" >
+
+                                                        <select class="form-control" style="width:150px;padding-right: 15px"
+                                                                id="printType" v-model="m.printType" name="printType"
+                                                                v-on:change="choiceTypeChange()" >
+                                                            <option value="1" >整单</option>
+                                                            <option value="0" >分单</option>
+                                                        </select>
+
+
+                                                    </div>
+
+                                                    <div class="col-md-4" id="articleKitchen" style="display: none">
+                                                        <select class="form-control" name="kitchenId"
+                                                                v-model="m.kitchenId" id="totalKitchen">
+                                                            <option value="-1">(选择厨房)</option>
+                                                            <option :value="k.id" v-for="k in kitchenList">
+                                                                {{k.name}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
                                                        @click="delMealAttr(attr)"></a>
@@ -81,6 +109,7 @@
                                                         <div class="flex-2">餐品价格</div>
                                                         <div class="flex-1">排序</div>
                                                         <div class="flex-1">最大购买数量</div>
+                                                        <div class="flex-1" v-if="printType == 0">指定厨房出单</div>
                                                         <div class="flex-1">移除</div>
                                                     </div>
                                                     <div class="flex-row">
@@ -103,6 +132,15 @@
                                                             <input type="text" class="form-control"
                                                                    v-model="attr.maxCount" name="maxCount"
                                                                    required="required" lazy/>
+                                                        </div>
+                                                        <div class="flex-1 radio-list" v-if="printType == 0">
+                                                            <select class="form-control" name="kitchenId"
+                                                                    v-model="attr.kitchenId">
+                                                                <option value="-1">(选择厨房)</option>
+                                                                <option :value="k.id" v-for="k in kitchenList">
+                                                                    {{k.name}}
+                                                                </option>
+                                                            </select>
                                                         </div>
                                                         <div class="flex-1">
                                                             <button class="btn red" type="button"
@@ -326,6 +364,7 @@
                         unitPrices: [],
                         mealtempList: [],
                         articleList: [],
+                        printType:0,
                         choiceTemp: "",
                         lastChoiceTemp: "",
                         allArticles: allArticles,
@@ -340,7 +379,16 @@
                                 }
                             }
                         },
+                        choiceTypeChange:function(){
 
+                            if(  $('#printType').val() == 1){
+                                this.printType = 1;
+                                $('#articleKitchen').css("display","block");
+                            }else{
+                                $('#articleKitchen').css("display","none");
+                                this.printType = 0;
+                            }
+                        },
                         updateAttrItems: function () {
 //                            this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
                             var items = $.extend(true, {}, this.choiceArticleShow).items;
@@ -476,7 +524,11 @@
                             this.articles = [];
                             articleList = all.concat();
 
-
+                            if(  $('#printType').val() == 1){
+                                this.printType = 1;
+                            }else{
+                                this.printType = 0;
+                            }
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -494,16 +546,30 @@
                             var that = this;
                             action = "edit";
                             recommendId = model.id;
-                            that.showform = true;
+
                             that.checkedUnit = [];
+                            that.showform = true;
                             $.post("recommend/getRecommendById", {id: model.id}, function (result) {
                                 $('#recommendName').val(result.name);
                                 $('#maxCount').val(result.count);
+                                $('#printType').val(result.printType);
+                                $('#totalKitchen').val(result.kitchenId);
                                 that.articles = [];
-                                for (var i = 0; i < result.articles.length; i++) {
-                                    that.articles.push(result.articles[i]);
+                                if(  $('#printType').val() == 1){
+                                    that.printType = 1;
+                                    $('#articleKitchen').css("display","block");
+                                }else{
+                                    that.printType = 0;
+                                    $('#articleKitchen').css("display","none");
                                 }
-//
+
+                                if(result.articles != null){
+                                    for (var i = 0; i < result.articles.length; i++) {
+                                        that.articles.push(result.articles[i]);
+                                    }
+                                }
+
+
 //                                var article = result.data;
 //                                article.articles || (article.articles = []);
 //                                that.m = article;
@@ -542,13 +608,29 @@
                             this.m.prices = this.unitPrices;
                             this.m.hasUnit = this.checkedUnit.join() || " ";
                             var m = this.m;
+                            if($('#printType').val() == "1" &&
+                                    ($('#totalKitchen').val() == "-1" || !$('#totalKitchen').val())){
+                                C.errorMsg( "未选择出餐厨房!");
+                                return;
+                            }
 
                             var data = {
                                 name: $('#recommendName').val(),
                                 count: $('#maxCount').val(),
-                                id : recommendId
+                                id : recommendId,
+                                printType:$('#printType').val(),
+                                kitchenId:$('#totalKitchen').val()
                             };
                             data.articles = this.articles;
+                            if($('#printType').val() == 0){
+                                for(var i = 0;i <  data.articles.length;i++){
+                                    if( data.articles[i].kitchenId == null ||  data.articles[i].kitchenId ==  "-1"){
+                                        C.errorMsg( "未选择出餐厨房!");
+                                        return;
+                                    }
+                                }
+                            }
+
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);
                             var url;

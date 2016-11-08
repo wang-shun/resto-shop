@@ -19,8 +19,27 @@ public class ArticleRecommend {
 
     private String shopId;
 
+    private Integer printType;
+
+    private String kitchenId;
 
     private List<ArticleRecommendPrice> articles;
+
+    public String getKitchenId() {
+        return kitchenId;
+    }
+
+    public void setKitchenId(String kitchenId) {
+        this.kitchenId = kitchenId;
+    }
+
+    public Integer getPrintType() {
+        return printType;
+    }
+
+    public void setPrintType(Integer printType) {
+        this.printType = printType;
+    }
 
     final public String getShopId() {
         return shopId;
