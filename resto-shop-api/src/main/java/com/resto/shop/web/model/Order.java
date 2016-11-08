@@ -136,7 +136,7 @@ public class Order implements Serializable{
 
     private String waitId;
 
-    private Integer isShare;
+    private Integer isShare = 0;
 
     public Integer getIsShare() {
         return isShare;
