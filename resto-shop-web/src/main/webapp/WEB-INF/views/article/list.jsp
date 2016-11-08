@@ -1055,7 +1055,15 @@
                             $("#supportTimeRemark").html("");
                         },
                         checkNull: function () {
-                            //if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
+                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
+                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
+                                return true;
+                            }
+                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
+                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
+                                return true;
+                            }
+                          	//if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
                             //    $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
                             //    return true;
                             //}
@@ -1065,14 +1073,6 @@
                                 if(!confirm("是否不选择出餐厨房！")){
                                 	return true;
                                 }
-                            }
-                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
-                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
-                                return true;
-                            }
-                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
-                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
-                                return true;
                             }
                             return false;
                         },
