@@ -38,6 +38,11 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
 
     @Override
+    public List<OrderPaymentItem> selectByOrderId(String orderId) {
+        return orderpaymentitemMapper.selectByOrderId(orderId);
+    }
+
+    @Override
     public List<OrderPaymentItem> selectByOrderIdList(String orderId) {
         return orderpaymentitemMapper.selectByOrderIdList(orderId);
     }
