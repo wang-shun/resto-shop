@@ -362,7 +362,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     private HungerOrder getHungerOrderById(String orderId, BrandSetting brandSetting) throws Exception {
         JSONObject json = new JSONObject(HungerUtil.HungerConnection(new HashMap<String, String>(),
-                "/order/" + orderId + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret()));
+                "/order/" + orderId + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(),RequestMethod.GET));
         if (json.optString("code").equals(CodeType.SUCCESS)) {
             JSONObject order = json.getJSONObject("data");
             HungerOrder hungerOrder = new HungerOrder(order);
@@ -379,7 +379,7 @@ public class ThirdServiceImpl implements ThirdService {
         String[] ids = orderIds.split(","); //得到饿了吗的新增订单列表
         for (String id : ids) {
             JSONObject json = new JSONObject(HungerUtil.HungerConnection(new HashMap<String, String>(),
-                    "/order/" + id + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret()));
+                    "/order/" + id + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(),RequestMethod.GET));
             if (json.optString("code").equals(CodeType.SUCCESS)) {
                 JSONObject order = json.getJSONObject("data");
                 HungerOrder hungerOrder = new HungerOrder(order);
