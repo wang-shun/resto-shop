@@ -366,6 +366,7 @@ public class OrderAspect {
                 money.append(PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()))
                         .append(":  ").append(orderPaymentItem.getPayValue()).append(" ");
             }
+            log.info("88888888888888888888888"+money.toString());
             StringBuffer msg = new StringBuffer();
             BigDecimal sum = order.getOrderMoney();
             List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
@@ -378,9 +379,9 @@ public class OrderAspect {
                 sum = sum.add(order.getServicePrice());
             }
 
-
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money.toString()).append(") ");
+            log.info("99999999999999999999999999"+msg.toString());
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
