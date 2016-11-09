@@ -360,7 +360,7 @@ public class OrderAspect {
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderIdList(order.getId());
             log.info("88888888888888888888888"+paymentItems.size());
             StringBuilder money = new StringBuilder("(");
             for (OrderPaymentItem orderPaymentItem : paymentItems) {
