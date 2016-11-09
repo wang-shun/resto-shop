@@ -361,7 +361,6 @@ public class OrderAspect {
             for (OrderPaymentItem orderPaymentItem : paymentItems) {
                 money.append(PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()))
                         .append(":  ").append(orderPaymentItem.getPayValue()).append(" ");
-
             }
             StringBuffer msg = new StringBuffer();
             BigDecimal sum = order.getOrderMoney();
@@ -382,6 +381,8 @@ public class OrderAspect {
         }
 
     }
+
+
 
     @AfterReturning(value = "confirmOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
