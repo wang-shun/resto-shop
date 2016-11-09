@@ -2485,7 +2485,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 child.setAllowContinueOrder(false);
                 update(child);
                 //插入 支付项
-                insertOrderPaymentItem(child, child.getOriginalAmount());
+//                insertOrderPaymentItem(child, child.getOriginalAmount());
                 //计算 订单总额
                 totalMoney = totalMoney.add(child.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
@@ -2496,7 +2496,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         
         return order;
     }
-    
+
+    @Override
+    public Order payOrderWXModeFive(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+
+        if (order.getOrderState() < OrderState.PAYMENT) {
+            order.setOrderState(OrderState.PAYMENT);
+            order.setAllowCancel(false);
+            order.setAllowContinueOrder(false);
+            update(order);
+        }
+
+        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        for (Order child : orders) {
+            if (child.getOrderState() < OrderState.PAYMENT) {
+                child.setOrderState(OrderState.PAYMENT);
+                child.setAllowCancel(false);
+                child.setAllowContinueOrder(false);
+                update(child);
+
+            }
+        }
+
+
+
+        return order;
+    }
+
     public void insertOrderPaymentItem(Order order,BigDecimal totalMoney){
     	OrderPaymentItem item = new OrderPaymentItem();
         item.setId(ApplicationUtils.randomUUID());
