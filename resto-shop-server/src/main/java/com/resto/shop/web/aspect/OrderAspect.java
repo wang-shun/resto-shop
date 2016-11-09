@@ -338,13 +338,17 @@ public class OrderAspect {
             if(setting.getIsUseServicePrice() == 1){
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
-
+            BigDecimal sum = order.getOrderMoney();
+            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+            for (Order child : orders) { //遍历子订单
+                sum = sum.add(child.getOrderMoney());
+            }
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
-
+            msg.append("订单金额：" + sum + "\n");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
