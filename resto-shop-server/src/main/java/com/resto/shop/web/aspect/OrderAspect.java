@@ -176,7 +176,7 @@ public class OrderAspect {
             sendPaySuccessMsg(order);
         }
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-            orderService.payOrderModeFive(order.getId());
+            orderService.payOrderWXModeFive(order.getId());
         }
     }
 
@@ -208,6 +208,12 @@ public class OrderAspect {
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderModeFive(..))")
     public void payOrderModeFive() {
+    }
+
+    ;
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderWXModeFive(..))")
+    public void payOrderWXModeFive() {
     }
 
     ;
@@ -344,7 +350,7 @@ public class OrderAspect {
 
     }
 
-    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
+    @AfterReturning(value = "payOrderModeFive()||payPrice()||payOrderWXModeFive()", returning = "order")
     public void payContent(Order order) {
         if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
@@ -353,7 +359,7 @@ public class OrderAspect {
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
             String money = "(";
             for (OrderPaymentItem orderPaymentItem : paymentItems) {
-                money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
+                money += (PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ");
 
             }
             StringBuffer msg = new StringBuffer();
