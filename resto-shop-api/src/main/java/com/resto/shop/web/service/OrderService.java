@@ -456,6 +456,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
 
+	Order getLastOrderByCustomer(String customerId,String shopId);
+
 
     public boolean cancelWXPayOrder(String orderId);
 }

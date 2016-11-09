@@ -3,6 +3,7 @@ package com.resto.shop.web.config;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.service.ThirdService;
 import com.resto.shop.web.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,7 @@ public class ServerConfig {
 		return proxy.create(WechatConfigService.class);
 	}
 
-	
+
 	@Bean
 	public BrandUserService brandUserService(){
 		return proxy.create(BrandUserService.class);
@@ -82,5 +83,9 @@ public class ServerConfig {
         return  proxy.create(OrderExceptionService.class);
     }
 
+	@Bean
+	public ThirdService hungerService(){ return proxy.create(ThirdService.class) ;}
 
+	@Bean
+	public PlatformService platformService(){ return proxy.create(PlatformService.class) ;};
 }

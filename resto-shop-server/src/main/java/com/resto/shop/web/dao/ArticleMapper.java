@@ -97,5 +97,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Article selectByPid(@Param("pId") String pId,@Param("shopId") String shopId);
 
+	Article selectByName(@Param("name") String name,@Param("shopId") String shopId);
+
 
 }

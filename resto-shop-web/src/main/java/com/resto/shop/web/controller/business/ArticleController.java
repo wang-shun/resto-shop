@@ -4,6 +4,7 @@ package com.resto.shop.web.controller.business;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.PlatformService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
@@ -47,6 +48,9 @@ public class ArticleController extends GenericController {
     @Autowired
     private ArticleRecommendService articleRecommendService;
 
+    @Autowired
+    private PlatformService platformService;
+
     @RequestMapping("/list")
     public void list() {
     }
@@ -70,6 +74,8 @@ public class ArticleController extends GenericController {
     public Result list_one_full(String id) {
         Article article = articleService.selectFullById(id, "");
         article.setUnits(unitService.getUnitByArticleid(id));
+//        List<Platform> platforms =  platformService.selectByBrandId(getCurrentBrandId());
+//        article.setPlatforms(platforms);
         return getSuccessResult(article);
     }
 

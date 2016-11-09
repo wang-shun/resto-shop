@@ -234,6 +234,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public PlatformService platformService() {
+        return getProxy(PlatformService.class);
+    }
+
+    @Bean
     public MealTempService mealTempService() {
         return getProxy(MealTempService.class);
     }
@@ -308,6 +313,8 @@ public class SpringContextConfig {
     public EmployeeService employeeService() {
         return getProxy(EmployeeService.class);
     }
+
+
 
 
     @Bean

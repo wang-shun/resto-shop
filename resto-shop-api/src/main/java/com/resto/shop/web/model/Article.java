@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.resto.brand.web.model.Platform;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -121,6 +122,27 @@ public class Article {
     private Integer recommendCount;
 
     private String pId;
+
+    //饿了吗名称
+    private String elemeName;
+
+    private List<Platform> platforms;
+
+    final public List<Platform> getPlatforms() {
+        return platforms;
+    }
+
+    final public void setPlatforms(List<Platform> platforms) {
+        this.platforms = platforms;
+    }
+
+    final public String getElemeName() {
+        return elemeName;
+    }
+
+    final public void setElemeName(String elemeName) {
+        this.elemeName = elemeName;
+    }
 
     final public String getpId() {
         return pId;

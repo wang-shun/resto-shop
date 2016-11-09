@@ -8,6 +8,8 @@
         <result column="name" property="name"/>
         <result column="is_used" property="isUsed"/>
         <result column="count" property="count"/>
+        <result column="print_type" property="printType"/>
+        <result column="kitchen_id" property="kitchenId"/>
         <collection property="articles" javaType="List" ofType="com.resto.shop.web.model.ArticleRecommendPrice">
             <id column="article_recommend_price_id" property="id"/>
             <result column="article_id" property="articleId"/>
@@ -15,12 +17,13 @@
             <result column="price" property="price"/>
             <result column="max_count" property="maxCount"/>
             <result column="sort" property="sort"/>
+            <result column="article_kitchen_id" property="kitchenId"/>
         </collection>
     </resultMap>
 
     <select id="getRecommendList" resultMap="RecommendResultMap">
-        select t.id,t.name,t.count,t.is_used,t.sort,t2.id as article_recommend_price_id,t2.article_id,t2.article_name
-        ,t2.price,t2.max_count,t2.sort as count from tb_recommend t
+        select t.id,t.name,t.count,t.is_used,t.sort,t2.id as article_recommend_price_id,t2.article_id,t2.article_name,t.print_type,t.kitchen_Id,
+        t2.price,t2.max_count,t2.sort as count,t2.kitchen_id as article_kitchen_id from tb_recommend t
         left join tb_recommend_article t2 on t2.recommend_id = t.id
          where t.shop_detail_id = #{shopId}
         and t.is_used = 0
@@ -29,18 +32,18 @@
 
     <insert id="insertSelective" parameterType="ArticleRecommend" >
        insert into tb_recommend
-       (id,count,name,shop_detail_id)
-       values(#{id},#{count},#{name},#{shopId})
+       (id,count,name,shop_detail_id,print_type,kitchen_id)
+       values(#{id},#{count},#{name},#{shopId},#{printType},#{kitchenId})
     </insert>
 
     <insert id="insertRecommendArticle">
 
         insert into tb_recommend_article
-        (recommend_id,article_id,max_count,price,article_name,sort)
+        (recommend_id,article_id,max_count,price,article_name,sort,kitchen_id)
         VALUES
         (#{recommendId}
         ,#{articleRecommendPrice.articleId},#{articleRecommendPrice.maxCount},#{articleRecommendPrice.price}
-        ,#{articleRecommendPrice.articleName},#{articleRecommendPrice.sort}
+        ,#{articleRecommendPrice.articleName},#{articleRecommendPrice.sort},#{articleRecommendPrice.kitchenId}
 
         )
     </insert>
@@ -53,18 +56,23 @@
                 name = #{name},
             </if>
             <if test="count != null">
-                count = #{count}
+                count = #{count},
             </if>
-
+            <if test="printType != null">
+                print_type = #{printType},
+            </if>
+            <if test="kitchenId != null">
+                kitchen_id = #{kitchenId}
+            </if>
         </set>
         where id = #{id}
 
     </update>
 
     <select id="getRecommendById" resultMap="RecommendResultMap">
-        select t.id,t.name,t.count,t.is_used,
+        select t.id,t.name,t.count,t.is_used,t.print_type,t.kitchen_id,
         t2.id as article_recommend_price_id,t2.article_id,t2.max_count,t2.price,t2.article_name,
-        t2.sort
+        t2.sort,t2.kitchen_id  as  article_kitchen_id
         from tb_recommend t
         left join tb_recommend_article t2 on t2.recommend_id = t.id
         where t.id = #{id}
@@ -80,7 +88,7 @@
     </delete>
 
     <select id="getRecommendByArticleId" resultMap="RecommendResultMap">
-        select t3.article_name,t3.price,t3.article_id,t3.max_count,t2.count from tb_article t
+        select t3.article_name,t3.price,t3.article_id,t3.max_count,t2.count,t3.kitchen_id as article_kitchen_id  from tb_article t
       INNER JOIN tb_recommend t2 on t2.id = t.recommend_id
       INNER JOIN tb_recommend_article t3 on t3.recommend_id = t2.id
 where t2.shop_detail_id = #{shopId} and t.id = #{articleId}
