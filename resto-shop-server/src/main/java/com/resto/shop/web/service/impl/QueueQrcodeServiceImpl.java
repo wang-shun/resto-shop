@@ -26,4 +26,9 @@ public class QueueQrcodeServiceImpl extends GenericServiceImpl<QueueQrcode, Stri
     public QueueQrcode selectByIdEndtime(String id) {
         return queueqrcodeMapper.selectByIdEndtime(id);
     }
+
+    @Override
+    public QueueQrcode selectLastQRcode(String shopId) {
+        return queueqrcodeMapper.selectLastQRcode(shopId);
+    }
 }

@@ -17,4 +17,6 @@ public interface QueueQrcodeMapper  extends GenericDao<QueueQrcode,String> {
     int updateByPrimaryKey(QueueQrcode record);
 
     QueueQrcode selectByIdEndtime(String id);
+
+    QueueQrcode selectLastQRcode(String shopId);
 }

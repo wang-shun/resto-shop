@@ -57,4 +57,8 @@
   <select id="selectByIdEndtime" resultType="QueueQrcode">
       select * from tb_queue_qrcode where id = #{id} and end_time > now()
   </select>
+
+  <select id="selectLastQRcode" resultType="QueueQrcode">
+      select * from tb_queue_qrcode where shop_id = #{shopId} order by create_time desc limit 1
+  </select>
 </mapper>
