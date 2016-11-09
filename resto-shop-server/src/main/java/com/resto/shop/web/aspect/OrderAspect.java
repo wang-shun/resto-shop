@@ -361,7 +361,7 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderIdList(order.getId());
-            log.info("88888888888888888888888"+paymentItems.size());
+            log.info(order.getId()+"88888888888888888888888"+paymentItems.size());
             StringBuilder money = new StringBuilder("(");
             for (OrderPaymentItem orderPaymentItem : paymentItems) {
                 money.append(PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()))
