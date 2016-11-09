@@ -356,11 +356,12 @@ public class OrderAspect {
 
     @AfterReturning(value = "payOrderModeFive()||payPrice()||payOrderWXModeFive()", returning = "order")
     public void payContent(Order order) {
+        List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderIdList(order.getId());
         if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderIdList(order.getId());
+
             log.info(order.getId()+"88888888888888888888888"+paymentItems.size());
             StringBuilder money = new StringBuilder("(");
             for (OrderPaymentItem orderPaymentItem : paymentItems) {

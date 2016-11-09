@@ -59,7 +59,7 @@
   </select>
 
   <select id="selectByOrderIdList" resultType="OrderPaymentItem">
-  	select * from tb_order_payment_item where order_id=#{orderId}
+  	select * from tb_order_payment_item where order_id=#{orderId} and payment_mode_id in (1,2,3,4,5,6,7,8,9)
   </select>
   
   <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
