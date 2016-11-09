@@ -136,6 +136,16 @@ public class Order implements Serializable{
 
     private String waitId;
 
+    private Integer isShare;
+
+    public Integer getIsShare() {
+        return isShare;
+    }
+
+    public void setIsShare(Integer isShare) {
+        this.isShare = isShare;
+    }
+
     final public String getWaitId() {
         return waitId;
     }
