@@ -357,9 +357,10 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-            String money = "(";
+            StringBuilder money = new StringBuilder("(");
             for (OrderPaymentItem orderPaymentItem : paymentItems) {
-                money += (PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ");
+                money.append(PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()))
+                        .append(":  ").append(orderPaymentItem.getPayValue()).append(" ");
 
             }
             StringBuffer msg = new StringBuffer();
@@ -376,7 +377,7 @@ public class OrderAspect {
 
 
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
-            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
+            msg.append("支付成功。订单金额：").append(sum).append(money.toString()).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
