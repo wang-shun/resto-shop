@@ -1575,9 +1575,10 @@ AND o.production_status IN (2, 3)
                 current_working_stock = current_working_stock +  #{count}
             </if>
         </set>
-
         where id = #{articleId}
-        
+        <if test="type=='minus'">
+            and current_working_stock -  #{count} >= 0
+        </if>
     </update>
 
     <update id="updateArticlePriceStock">
@@ -1592,7 +1593,7 @@ AND o.production_status IN (2, 3)
         </set>
         where id = #{articleId}
         <if test="type=='minus'">
-            and current_working_stock -  #{count} > 0
+            and current_working_stock -  #{count} >= 0
         </if>
     </update>
 
