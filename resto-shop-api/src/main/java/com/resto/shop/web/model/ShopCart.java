@@ -23,6 +23,16 @@ public class ShopCart {
 
     private List<ShopCart> currentItem;
 
+    private Integer attrId;
+
+    public Integer getAttrId() {
+        return attrId;
+    }
+
+    public void setAttrId(Integer attrId) {
+        this.attrId = attrId;
+    }
+
     public String getUserId() { return userId; }
 
     public void setUserId(String userId) { this.userId = userId; }

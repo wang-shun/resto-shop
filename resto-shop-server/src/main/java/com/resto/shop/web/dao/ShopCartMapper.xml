@@ -12,13 +12,14 @@
         <result column="shop_type" property="shopType" jdbcType="VARCHAR" />
         <result column="pid" property="pid" javaType="INTEGER" />
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="attr_id" property="attrId" jdbcType="INTEGER" />
     </resultMap>
-    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id</sql>
+    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select
         <include refid="Base_Column_List"/> from tb_shop_cart where id = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">delete from tb_shop_cart where id = #{id,jdbcType=INTEGER}</delete>
-    <insert id="insert" parameterType="com.resto.shop.web.model.ShopCart" useGeneratedKeys="true" keyProperty="id">insert into tb_shop_cart (id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id) values (#{id,jdbcType=INTEGER}, #{number,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{shopType,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR})</insert>
+    <insert id="insert" parameterType="com.resto.shop.web.model.ShopCart" useGeneratedKeys="true" keyProperty="id">insert into tb_shop_cart (id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id) values (#{id,jdbcType=INTEGER}, #{number,jdbcType=INTEGER}, #{customerId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER}, #{shopType,jdbcType=VARCHAR}, #{pid,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{attrId,jdbcType=INTEGER})</insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.ShopCart" useGeneratedKeys="true" keyProperty="id">insert into tb_shop_cart
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -30,6 +31,7 @@
             <if test="shopType != null">shop_type,</if>
             <if test="pid != null">pid,</if>
             <if test="userId != null">user_id,</if>
+            <if test="attrId != null">attr_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
@@ -41,6 +43,7 @@
             <if test="shopType != null">#{shopType,jdbcType=VARCHAR},</if>
             <if test="pid != null">#{pid,jdbcType=INTEGER},</if>
             <if test="userId != null">#{userId,jdbcType=VARCHAR},</if>
+            <if test="attrId != null">#{attrId,jdbcType=INTEGER},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
@@ -52,26 +55,26 @@
             <if test="distributionModeId != null">distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},</if>
             <if test="shopType != null">shop_type = #{shopType,jdbcType=VARCHAR},</if>
             <if test="pid != null">pid = #{pid,jdbcType=INTEGER},</if>
-            <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR}</if>
+            <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR},</if>
+            <if test="attrId != null">attr_id = #{attrId,jdbcType=VARCHAR},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, shop_type = #{shopType,jdbcType=VARCHAR}, pid = #{pid,jdbcType=INTEGER}, user_id = #{userId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, shop_type = #{shopType,jdbcType=VARCHAR}, pid = #{pid,jdbcType=INTEGER}, user_id = #{userId,jdbcType=VARCHAR}, attr_id = #{attrId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
     <select id="selectList" resultType="ShopCart">select * from tb_shop_cart</select>
 
     <!-- 查询购物车明细 -->
     <select id="listUserAndShop" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id from tb_shop_cart
         where distribution_mode_id=#{distributionModeId} and customer_id=#{customerId} and shop_detail_id=#{shopDetailId}
     </select>
 
-    <!-- 查询购物车明细 -->
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id from tb_shop_cart
         where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id from tb_shop_cart
         where
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
@@ -90,6 +93,7 @@
             <if test="shopType != null">shop_type = #{shopType,jdbcType=VARCHAR},</if>
             <if test="pid != null">pid = #{pid,jdbcType=INTEGER},</if>
             <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR},</if>
+            <if test="attrId != null">attr_id = #{attrId,jdbcType=VARCHAR},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
