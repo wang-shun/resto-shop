@@ -776,7 +776,7 @@
         id,
         ver_code,
         article_count,
-        table_number，
+        table_number,
         parent_order_id
         FROM
         tb_order
