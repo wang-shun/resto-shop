@@ -376,7 +376,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
 //        if(!order.getOrderMode().equals(ShopMode.HOUFU_ORDER)){
-        if (!StringUtils.isEmpty(order.getTableNumber())) {
+//        if (!StringUtils.isEmpty(order.getTableNumber())) {
             if (order.getParentOrderId() != null) {
                 Order parentOrder = selectById(order.getParentOrderId());
                 order.setTableNumber(parentOrder.getTableNumber());
@@ -402,7 +402,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
 
-            }
+//            }
 
 
 //            }
