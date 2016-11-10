@@ -371,32 +371,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
 
-
-
-        if (order.getParentOrderId() != null) {
-            Order parentOrder = selectById(order.getParentOrderId());
-            order.setTableNumber(parentOrder.getTableNumber());
-            order.setVerCode(parentOrder.getVerCode());
-            order.setCustomerCount(parentOrder.getCustomerCount());
-        }else{
-            Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(),order.getShopDetailId());
-            if(lastOrder != null && lastOrder.getParentOrderId() != null){
-                Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
-                if(parent != null && parent.getAllowContinueOrder()){
-                    order.setParentOrderId(parent.getId());
-                    order.setTableNumber(parent.getTableNumber());
-                    order.setVerCode(parent.getVerCode());
-                    order.setCustomerCount(parent.getCustomerCount());
-                }
+        if(!order.getOrderMode().equals(ShopMode.HOUFU_ORDER)){
+            if (order.getParentOrderId() != null) {
+                Order parentOrder = selectById(order.getParentOrderId());
+                order.setTableNumber(parentOrder.getTableNumber());
+                order.setVerCode(parentOrder.getVerCode());
+                order.setCustomerCount(parentOrder.getCustomerCount());
             }else{
-                if(lastOrder != null && lastOrder.getAllowContinueOrder()){
-                    order.setParentOrderId(lastOrder.getId());
-                    Order parentOrder = selectById(order.getParentOrderId());
-                    order.setTableNumber(parentOrder.getTableNumber());
-                    order.setVerCode(parentOrder.getVerCode());
-                    order.setCustomerCount(parentOrder.getCustomerCount());
+                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(),order.getShopDetailId());
+                if(lastOrder != null && lastOrder.getParentOrderId() != null){
+                    Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
+                    if(parent != null && parent.getAllowContinueOrder()){
+                        order.setParentOrderId(parent.getId());
+                        order.setTableNumber(parent.getTableNumber());
+                        order.setVerCode(parent.getVerCode());
+                        order.setCustomerCount(parent.getCustomerCount());
+                    }
+                }else{
+                    if(lastOrder != null && lastOrder.getAllowContinueOrder()){
+                        order.setParentOrderId(lastOrder.getId());
+                        Order parentOrder = selectById(order.getParentOrderId());
+                        order.setTableNumber(parentOrder.getTableNumber());
+                        order.setVerCode(parentOrder.getVerCode());
+                        order.setCustomerCount(parentOrder.getCustomerCount());
+                    }
                 }
+
+
             }
+
 
 
 
