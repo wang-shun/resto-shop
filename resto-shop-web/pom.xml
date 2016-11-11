@@ -193,10 +193,10 @@
 			<artifactId>jstl</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>redis.clients</groupId>-->
+			<!--<artifactId>jedis</artifactId>-->
+		<!--</dependency>-->
 
 
 		<!-- start apache -->
