@@ -176,7 +176,7 @@ public class OrderAspect {
             sendPaySuccessMsg(order);
         }
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-            orderService.payOrderModeFive(order.getId());
+            orderService.payOrderWXModeFive(order.getId());
         }
     }
 
@@ -212,6 +212,12 @@ public class OrderAspect {
 
     ;
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderWXModeFive(..))")
+    public void payOrderWXModeFive() {
+    }
+
+    ;
+
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payPrice(..))")
     public void payPrice() {
@@ -228,7 +234,7 @@ public class OrderAspect {
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()", returning = "order")
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
@@ -332,49 +338,55 @@ public class OrderAspect {
             if(setting.getIsUseServicePrice() == 1){
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
-
-            msg.append("订单明细：\n");
-            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
-            for (OrderItem item : orderItem) {
-                msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
-            }
-
-            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        }
-
-    }
-
-    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
-    public void payContent(Order order) {
-        if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
-                && order.getProductionStatus() == ProductionStatus.PRINTED) {
-            Customer customer = customerService.selectById(order.getCustomerId());
-            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-            String money = "(";
-            for (OrderPaymentItem orderPaymentItem : paymentItems) {
-                money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
-
-            }
-            StringBuffer msg = new StringBuffer();
             BigDecimal sum = order.getOrderMoney();
             List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
-
-            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if(setting.getIsUseServicePrice() == 1){
-                sum = sum.add(order.getServicePrice());
+            msg.append("订单明细：\n");
+            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+            for (OrderItem item : orderItem) {
+                msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
-
-
-            msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
-            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
+            msg.append("订单金额：" + sum + "\n");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
 
     }
+
+//    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
+//    public void payContent(Order order) {
+//        if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
+//                && order.getProductionStatus() == ProductionStatus.PRINTED) {
+//            Customer customer = customerService.selectById(order.getCustomerId());
+//            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+//            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+//            String money = "(";
+//            for (OrderPaymentItem orderPaymentItem : paymentItems) {
+//                money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
+//
+//            }
+//            StringBuffer msg = new StringBuffer();
+//            BigDecimal sum = order.getOrderMoney();
+//            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+//            for (Order child : orders) { //遍历子订单
+//                sum = sum.add(child.getOrderMoney());
+//            }
+//
+//            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+//            if(setting.getIsUseServicePrice() == 1){
+//                sum = sum.add(order.getServicePrice());
+//            }
+//
+//
+//            msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
+//            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
+//            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//        }
+//
+//    }
+
+
 
     @AfterReturning(value = "confirmOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {

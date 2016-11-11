@@ -1575,8 +1575,10 @@ AND o.production_status IN (2, 3)
                 current_working_stock = current_working_stock +  #{count}
             </if>
         </set>
-
         where id = #{articleId}
+        <if test="type=='minus'">
+            and current_working_stock -  #{count} >= 0
+        </if>
     </update>
 
     <update id="updateArticlePriceStock">
@@ -1590,6 +1592,9 @@ AND o.production_status IN (2, 3)
             </if>
         </set>
         where id = #{articleId}
+        <if test="type=='minus'">
+            and current_working_stock -  #{count} >= 0
+        </if>
     </update>
 
     <update id="setEmpty">
@@ -1902,6 +1907,13 @@ GROUP BY r.table_number
         and order_state = 1 and production_status != 5
         and table_number is not null
         order by create_time DESC;
+
+    </select>
+
+    <select id="getLastOrderByCustomer" resultType="Order">
+        select * from tb_order where customer_id = #{customerId}
+        and shop_detail_id = #{shopId}
+        order by create_time desc limit 1
 
     </select>
 

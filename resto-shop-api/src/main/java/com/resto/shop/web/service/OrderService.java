@@ -408,6 +408,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	Order payOrderModeFive(String orderId);
 
+	Order payOrderWXModeFive(String orderId);
+
 	Order payPrice(BigDecimal factMoney,String orderId);
 
 	void useRedPrice(BigDecimal factMoney,String orderId);
@@ -455,6 +457,8 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> getOrderByEmployee(String employeeId, String shopId);
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
+
+	Order getLastOrderByCustomer(String customerId,String shopId);
 
 
     public boolean cancelWXPayOrder(String orderId);

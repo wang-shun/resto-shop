@@ -107,7 +107,7 @@ public class Order implements Serializable{
 
     private Long employeeId;
 
-     /**
+    /**
      * 用于保存 订单的 菜品名称（查询时使用）
      */
     private List<String> articleNames;
@@ -135,6 +135,16 @@ public class Order implements Serializable{
     private BigDecimal waitMoney;
 
     private String waitId;
+
+    private Integer isShare;
+
+    public Integer getIsShare() {
+        return isShare;
+    }
+
+    public void setIsShare(Integer isShare) {
+        this.isShare = isShare;
+    }
 
     final public String getWaitId() {
         return waitId;
@@ -416,7 +426,7 @@ public class Order implements Serializable{
         return useCoupon;
     }
 
-     public void setUseCoupon(String useCoupon) {
+    public void setUseCoupon(String useCoupon) {
 
         this.useCoupon = useCoupon;
     }

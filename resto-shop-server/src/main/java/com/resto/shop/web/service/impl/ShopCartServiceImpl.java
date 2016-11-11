@@ -53,6 +53,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
                 shopcartMapper.updateShopCartItem(shopCartItem);
             } else if (shopCartItem != null && number <= 0) {
                 deleteShopCartItem(shopCartItem.getId());
+            }else if(shopCart != null && number <= 0){
+                shopcartMapper.delMealArticle(shopCart.getId().toString());
             }
         }
         return 0;

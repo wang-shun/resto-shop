@@ -425,7 +425,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                         mealAttrService.insert(attr);
                         for(MealItem mealItem : mealItems){
                             mealItem.setMealAttrId(attr.getId());
-                            mealItem.setArticleId(articleMapper.selectByPid(articleId,shopId).getId());
+                            mealItem.setArticleId(articleMapper.selectByPid(mealItem.getArticleId(),shopId).getId());
                             mealItem.setId(null);
                             mealItemService.insert(mealItem);
                         }

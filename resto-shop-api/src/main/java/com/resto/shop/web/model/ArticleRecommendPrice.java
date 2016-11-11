@@ -24,6 +24,16 @@ public class ArticleRecommendPrice {
 
     private BigDecimal price;
 
+    private String kitchenId;
+
+
+    public String getKitchenId() {
+        return kitchenId;
+    }
+
+    public void setKitchenId(String kitchenId) {
+        this.kitchenId = kitchenId;
+    }
 
     final public String getId() {
         return id;

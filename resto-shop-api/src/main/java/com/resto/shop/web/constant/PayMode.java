@@ -10,6 +10,7 @@ public class PayMode {
 	public static final int CHARGE_PAY = 6; //充值金额支付
 	public static final int REWARD_PAY = 7; //充值赠送的金额支付
     public static final int WAIT_MONEY = 8; //等位红包
+    public static final int HUNGER_MONEY = 9; //饿了吗
 	
 	public static String getPayModeName(int state){
 	    switch (state) {
@@ -29,6 +30,8 @@ public class PayMode {
             	return "充值赠送支付";
             case WAIT_MONEY:
                 return "等位红包支付";
+            case HUNGER_MONEY:
+                return "饿了吗支付";
             default:
                 return "未知";
             }
