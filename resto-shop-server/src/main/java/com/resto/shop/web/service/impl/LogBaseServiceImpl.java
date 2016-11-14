@@ -10,6 +10,7 @@ import com.resto.shop.web.dao.LogBaseMapper;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.LogBase;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.LogBaseService;
 
 import javax.annotation.Resource;
@@ -30,17 +31,29 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type) {
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart, Integer type) {
         if(type == LogBaseState.INTO){
-            intoLog(shopDetail, customer, order);
+            intoLog(shopDetail, customer, order, shopCart);
+        } else if (type == LogBaseState.REPLACE){
+            replaceLog(shopDetail, customer, order, shopCart);
         }
     }
 
     //当用户进入店铺是记录log
-    public void intoLog(ShopDetail shopDetail, Customer customer, Order order){
+    public void intoLog(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进入了店铺");
+        logBase.setDesc("当前店铺为"+shopDetail.getName());
+        insert(logBase);
+    }
+
+    //当用户切换店铺的时候记录log
+    public void replaceLog(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"切换了店铺");
+        logBase.setDesc("当前店铺为"+shopDetail.getName());
         insert(logBase);
     }
 
