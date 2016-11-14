@@ -797,7 +797,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem item : articleList) {
             //得到当前菜品 所关联的厨房信息
             String articleId = item.getArticleId();
-            if (item.getType() == OrderItemType.UNITPRICE) {
+            if (item.getType() == OrderItemType.UNITPRICE) { //单品
                 if (articleId.length() > 32) {
                     articleId = item.getArticleId().substring(0, 32);
                 } else {
@@ -811,7 +811,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
-
                     Kitchen kitchen = kitchenService.getItemKitchenId(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();
