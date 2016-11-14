@@ -273,7 +273,7 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","incomePrize","level","orderState"};
+		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","incomePrize","level","orderState"};
 		//定义数据
 		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
 		//获取店铺名称
