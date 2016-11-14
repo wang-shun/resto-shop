@@ -9,7 +9,7 @@ import com.resto.shop.web.model.*;
  */
 public interface LogBaseService extends GenericService<LogBase, String> {
 
-    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type);
+    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type);
 
     void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Article article, Integer type, Integer number);
 

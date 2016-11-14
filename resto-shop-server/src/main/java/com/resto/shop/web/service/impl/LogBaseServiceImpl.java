@@ -51,8 +51,10 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type) {
-
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type) {
+        if(type == LogBaseState.BUY){
+            buyLog(shopDetail, customer, order);
+        }
     }
 
     //当用户进入店铺是记录log
@@ -110,6 +112,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"清空了购物车");
         logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //当用户下单的时候记得log
+    public void buyLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"下单了");
+        logBase.setDesc(new JSONObject(order).toString());
         insert(logBase);
     }
 
