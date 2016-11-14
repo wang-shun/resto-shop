@@ -7,14 +7,12 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.LogBaseState;
 import com.resto.shop.web.dao.LogBaseMapper;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.LogBase;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.ShopCart;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.LogBaseService;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import org.json.JSONObject;
 
 /**
  * Created by carl on 2016/11/14.
@@ -31,16 +29,18 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart, Integer type) {
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type) {
         if(type == LogBaseState.INTO){
-            intoLog(shopDetail, customer, order, shopCart);
+            intoLog(shopDetail, customer, order, article);
         } else if (type == LogBaseState.REPLACE){
-            replaceLog(shopDetail, customer, order, shopCart);
+            replaceLog(shopDetail, customer, order, article);
+        } else if (type == LogBaseState.CHOICE){
+            choiceLog(shopDetail, customer, order, article);
         }
     }
 
     //当用户进入店铺是记录log
-    public void intoLog(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart){
+    public void intoLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进入了店铺");
@@ -49,11 +49,20 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户切换店铺的时候记录log
-    public void replaceLog(ShopDetail shopDetail, Customer customer, Order order, ShopCart shopCart){
+    public void replaceLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"切换了店铺");
         logBase.setDesc("当前店铺为"+shopDetail.getName());
+        insert(logBase);
+    }
+
+    //当用户选择菜品的时候记录log
+    public void choiceLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"选择了菜品");
+        logBase.setDesc(new JSONObject(article).toString());
         insert(logBase);
     }
 
