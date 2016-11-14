@@ -25,7 +25,7 @@
             <if test="customerId != null">customer_id,</if>
             <if test="nickname != null">nickname,</if>
             <if test="remark != null">remark,</if>
-            <if test="desc != null">desc,</if>
+            <if test="desc != null">`desc`,</if>
             <if test="createTime != null">create_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
