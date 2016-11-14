@@ -52,7 +52,7 @@ public class LogBase {
     }
 
     public void setCustomerId(String customerId) {
-        customerId = customerId;
+        this.customerId = customerId;
     }
 
     public String getNickname() {
