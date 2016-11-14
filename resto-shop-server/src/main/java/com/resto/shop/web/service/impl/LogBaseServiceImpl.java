@@ -48,6 +48,10 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, String desc, Integer type) {
         if(type == LogBaseState.CHOICE_T){
             choiceTLog(shopDetail, customer, order, desc);
+        } else if(type == LogBaseState.CANEL_T){
+            canelTLog(shopDetail, customer, order, desc);
+        } else if(type == LogBaseState.EMPTY){
+            emtypLog(shopDetail, customer, order, desc);
         }
     }
 
@@ -82,12 +86,30 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //当用户选择套餐的时候记录log
+    //当用户添加套餐的时候记录log
     public void choiceTLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"选择了套餐");
+        logBase.setRemark(customer.getNickname()+"添加了套餐");
         logBase.setDesc(new JSONObject(desc).toString());
+        insert(logBase);
+    }
+
+    //当用户撤销套餐的时候记录log
+    public void canelTLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"撤销了套餐");
+        logBase.setDesc("ArticleId为："+desc+" 套餐被撤销");
+        insert(logBase);
+    }
+
+    //当用户清空购物车的时候记录log
+    public void emtypLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"清空了购物车");
+        logBase.setDesc(desc);
         insert(logBase);
     }
 

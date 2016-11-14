@@ -9,7 +9,6 @@ public class LogBaseState {
     public final static int REPLACE = 2; //更换店铺
     public final static int CHOICE_D = 3;  //选择单品
     public final static int CHOICE_T = 4;  //选择套餐
-    public final static int CANEL_D = 5;  //取消单品
     public final static int CANEL_T = 6;  //取消套餐
     public static final int EMPTY = 7; //清空菜品
     public static final int PAY = 8;  //买单
