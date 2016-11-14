@@ -47,10 +47,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {
                 insertShopCart(shopCart);
-                return shopCart.getId();
+                return number;
             } else if (shopCartItem != null && number > 0) {
                 shopCartItem.setNumber(number);
                 shopcartMapper.updateShopCartItem(shopCartItem);
+                return number - shopCartItem.getNumber();
             } else if (shopCartItem != null && number <= 0) {
                 deleteShopCartItem(shopCartItem.getId());
             }else if(shopCart != null && number <= 0){

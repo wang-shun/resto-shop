@@ -34,8 +34,13 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             intoLog(shopDetail, customer, order, article);
         } else if (type == LogBaseState.REPLACE){
             replaceLog(shopDetail, customer, order, article);
-        } else if (type == LogBaseState.CHOICE_D){
-            choiceDLog(shopDetail, customer, order, article);
+        }
+    }
+
+    @Override
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type, Integer number) {
+        if(type == LogBaseState.CHOICE_D){
+            choiceDLog(shopDetail, customer, order, article, number);
         }
     }
 
@@ -65,10 +70,14 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户选择单品的时候记录log
-    public void choiceDLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
+    public void choiceDLog(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer number){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"选择了单品");
+        if(number > 0){
+            logBase.setRemark(customer.getNickname()+"添加了"+number+"份"+article.getName()+"的单品");
+        } else {
+            logBase.setRemark(customer.getNickname()+"撤销了"+Math.abs(number)+"份"+article.getName()+"的单品");
+        }
         logBase.setDesc(new JSONObject(article).toString());
         insert(logBase);
     }
