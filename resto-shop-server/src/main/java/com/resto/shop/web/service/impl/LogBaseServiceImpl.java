@@ -34,8 +34,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             intoLog(shopDetail, customer, order, article);
         } else if (type == LogBaseState.REPLACE){
             replaceLog(shopDetail, customer, order, article);
-        } else if (type == LogBaseState.CHOICE){
-            choiceLog(shopDetail, customer, order, article);
+        } else if (type == LogBaseState.CHOICE_D){
+            choiceDLog(shopDetail, customer, order, article);
+        }
+    }
+
+    @Override
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, String desc, Integer type) {
+        if(type == LogBaseState.CHOICE_T){
+            choiceTLog(shopDetail, customer, order, desc);
         }
     }
 
@@ -57,12 +64,21 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //当用户选择菜品的时候记录log
-    public void choiceLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
+    //当用户选择单品的时候记录log
+    public void choiceDLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"选择了菜品");
+        logBase.setRemark(customer.getNickname()+"选择了单品");
         logBase.setDesc(new JSONObject(article).toString());
+        insert(logBase);
+    }
+
+    //当用户选择套餐的时候记录log
+    public void choiceTLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"选择了套餐");
+        logBase.setDesc(new JSONObject(desc).toString());
         insert(logBase);
     }
 
