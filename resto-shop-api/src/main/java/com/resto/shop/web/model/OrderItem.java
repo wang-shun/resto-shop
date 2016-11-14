@@ -38,7 +38,7 @@ public class OrderItem {
 
     private Integer type;
     
-    private String[] mealItems;
+    private Integer[] mealItems;
     
     private String parentId;
 
@@ -199,11 +199,11 @@ public class OrderItem {
 		this.type = type;
 	}
 
-    public String[] getMealItems() {
+    public Integer[] getMealItems() {
         return mealItems;
     }
 
-    public void setMealItems(String[] mealItems) {
+    public void setMealItems(Integer[] mealItems) {
         this.mealItems = mealItems;
     }
 
