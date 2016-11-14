@@ -11,7 +11,7 @@ public interface LogBaseService extends GenericService<LogBase, String> {
 
     void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type);
 
-    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type, Integer number);
+    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Article article, Integer type, Integer number);
 
-    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, String desc, Integer type);
+    void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, String desc, Integer type);
 }

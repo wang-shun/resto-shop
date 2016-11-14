@@ -29,34 +29,34 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type) {
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, String desc, Integer type) {
         if(type == LogBaseState.INTO){
-            intoLog(shopDetail, customer, order, article);
+            intoLog(shopDetail, customer, desc);
         } else if (type == LogBaseState.REPLACE){
-            replaceLog(shopDetail, customer, order, article);
-        }
-    }
-
-    @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type, Integer number) {
-        if(type == LogBaseState.CHOICE_D){
-            choiceDLog(shopDetail, customer, order, article, number);
-        }
-    }
-
-    @Override
-    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, String desc, Integer type) {
-        if(type == LogBaseState.CHOICE_T){
-            choiceTLog(shopDetail, customer, order, desc);
+            replaceLog(shopDetail, customer, desc);
+        } else if(type == LogBaseState.CHOICE_T){
+            choiceTLog(shopDetail, customer, desc);
         } else if(type == LogBaseState.CANEL_T){
-            canelTLog(shopDetail, customer, order, desc);
+            canelTLog(shopDetail, customer, desc);
         } else if(type == LogBaseState.EMPTY){
-            emtypLog(shopDetail, customer, order, desc);
+            emtypLog(shopDetail, customer, desc);
         }
+    }
+
+    @Override
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Article article, Integer type, Integer number) {
+        if(type == LogBaseState.CHOICE_D){
+            choiceDLog(shopDetail, customer, article, number);
+        }
+    }
+
+    @Override
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer type) {
+
     }
 
     //当用户进入店铺是记录log
-    public void intoLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
+    public void intoLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进入了店铺");
@@ -65,7 +65,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户切换店铺的时候记录log
-    public void replaceLog(ShopDetail shopDetail, Customer customer, Order order, Article article){
+    public void replaceLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"切换了店铺");
@@ -74,7 +74,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户选择单品的时候记录log
-    public void choiceDLog(ShopDetail shopDetail, Customer customer, Order order, Article article, Integer number){
+    public void choiceDLog(ShopDetail shopDetail, Customer customer, Article article, Integer number){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         if(number > 0){
@@ -87,7 +87,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户添加套餐的时候记录log
-    public void choiceTLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+    public void choiceTLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"添加了套餐");
@@ -96,7 +96,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户撤销套餐的时候记录log
-    public void canelTLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+    public void canelTLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"撤销了套餐");
@@ -105,7 +105,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     }
 
     //当用户清空购物车的时候记录log
-    public void emtypLog(ShopDetail shopDetail, Customer customer, Order order, String desc){
+    public void emtypLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"清空了购物车");
