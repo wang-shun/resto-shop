@@ -55,12 +55,11 @@ public class BrandUserController extends GenericController{
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect,@RequestParam(defaultValue="false")boolean isMD5) {
+    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect) {
         try {
         	if(redirect == null){
         		redirect = "";
         	}
-
 
             Subject subject = SecurityUtils.getSubject(); //获取shiro管理的用户对象 主要储存了用户的角色和用户的权限
             // 已登陆则 跳到首页
@@ -71,11 +70,7 @@ public class BrandUserController extends GenericController{
                 model.addAttribute("error", "参数错误！");
                 return "login";
             }
-            
-            String pwd = brandUser.getPassword();
-            if(!isMD5){//如果是正常登录，则需进行MD5加密后验证，默认为正常登录（用于给HttpClient 开后门）
-            	pwd = ApplicationUtils.pwd( brandUser.getPassword());
-            }
+            String pwd = ApplicationUtils.pwd( brandUser.getPassword());
         	// 身份验证
             subject.login(new UsernamePasswordToken(brandUser.getUsername(),pwd));
 
@@ -93,6 +88,7 @@ public class BrandUserController extends GenericController{
             model.addAttribute("error", e.getMessage());
             return "login";
         }
+        System.out.println("用户登录  end");
         return "redirect:/"+redirect;
     }
 

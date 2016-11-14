@@ -67,13 +67,11 @@ public class BrandUserSecurityRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String username = String.valueOf(token.getPrincipal());
         String password = new String((char[]) token.getCredentials());        
-        
     	// 通过数据库进行验证
     	final BrandUser authentication = brandUserService.authentication(new BrandUser(username, password));
     	if (authentication == null) {
     		throw new AuthenticationException("用户名或密码错误.");
     	}
-        
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(username, password, getName());
         return authenticationInfo;
     }
