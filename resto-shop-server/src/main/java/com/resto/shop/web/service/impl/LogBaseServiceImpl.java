@@ -54,6 +54,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type) {
         if(type == LogBaseState.BUY){
             buyLog(shopDetail, customer, order);
+        }else if(type == LogBaseState.BUYSCAN){
+            buyScanLog(shopDetail, customer, order);
         }
     }
 
@@ -119,7 +121,16 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void buyLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"下单了");
+        logBase.setRemark(customer.getNickname()+"未扫码下单了");
+        logBase.setDesc(new JSONObject(order).toString());
+        insert(logBase);
+    }
+
+    //当用户扫码下单的时候记得log
+    public void buyScanLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了");
         logBase.setDesc(new JSONObject(order).toString());
         insert(logBase);
     }

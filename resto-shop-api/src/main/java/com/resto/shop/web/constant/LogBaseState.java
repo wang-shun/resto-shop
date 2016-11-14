@@ -12,8 +12,9 @@ public class LogBaseState {
     public final static int CANEL_T = 5;  //取消套餐
     public static final int EMPTY = 6; //清空菜品
     public static final int BUY = 7;  //下单
-    public static final int PAY = 8;  //买单
-    public static final int ADD = 9;  //加菜
-    public static final int SCAN = 10;  //扫码
-    public static final int STAMP = 11;  //打印
+    public static final int BUYSCAN = 8;  //下单已经下单
+    public static final int PAY = 9;  //买单
+    public static final int ADD = 10;  //加菜
+    public static final int SCAN = 11;  //扫码
+    public static final int STAMP = 12;  //打印
 }
