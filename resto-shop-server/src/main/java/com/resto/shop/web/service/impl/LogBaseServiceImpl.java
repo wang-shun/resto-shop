@@ -40,6 +40,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             canelTLog(shopDetail, customer, desc);
         } else if(type == LogBaseState.EMPTY){
             emtypLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.FAIL){
+            failLog(shopDetail, customer, desc);
         }
     }
 
@@ -56,6 +58,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             buyLog(shopDetail, customer, order);
         }else if(type == LogBaseState.BUYSCAN){
             buyScanLog(shopDetail, customer, order);
+        }else if(type == LogBaseState.BUY_ADD){
+            buyAddLog(shopDetail, customer, order);
         }
     }
 
@@ -117,7 +121,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //当用户下单的时候记得log
+    //当用户下单的时候记录log
     public void buyLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
@@ -126,11 +130,28 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //当用户扫码下单的时候记得log
+    //当用户扫码下单的时候记录log
     public void buyScanLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"先扫码进入后下单了");
+        logBase.setDesc(new JSONObject(order).toString());
+        insert(logBase);
+    }
+
+    //当用户下单失败的时候记录log
+    public void failLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+desc);
+        insert(logBase);
+    }
+
+    //当用户加菜的时候记录log
+    public void buyAddLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"加菜下单成功");
         logBase.setDesc(new JSONObject(order).toString());
         insert(logBase);
     }

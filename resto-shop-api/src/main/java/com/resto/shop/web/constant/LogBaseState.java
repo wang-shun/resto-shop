@@ -14,7 +14,8 @@ public class LogBaseState {
     public static final int BUY = 7;  //下单
     public static final int BUYSCAN = 8;  //下单已经下单
     public static final int PAY = 9;  //买单
-    public static final int ADD = 10;  //加菜
+    public static final int BUY_ADD = 10;  //加菜
     public static final int SCAN = 11;  //扫码
     public static final int STAMP = 12;  //打印
+    public static final int FAIL = 13;  //下单失败
 }
