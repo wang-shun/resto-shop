@@ -126,6 +126,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
+    @Resource
+    private LogBaseService logBaseService;
+
     @Autowired
     private GetNumberService getNumberService;
 
@@ -757,6 +760,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             order.setAllowCancel(false);
             update(order);
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Customer customer = customerService.selectById(order.getCustomerId());
+            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.SCAN);
             return order;
         }
         throw new AppException(AppException.ORDER_IS_PRINTED);
