@@ -50,6 +50,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             scanLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.PRINT){
             printLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.APPRAISE){
+            appraiseLog(shopDetail, customer, desc);
         }
     }
 
@@ -220,6 +222,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单已打印");
+        insert(logBase);
+    }
+
+    //用户评价订单时记录log
+    public void appraiseLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"评价了一份订单");
+        logBase.setDesc("AppraiseId为："+desc+" 的订单被评论了");
         insert(logBase);
     }
 
