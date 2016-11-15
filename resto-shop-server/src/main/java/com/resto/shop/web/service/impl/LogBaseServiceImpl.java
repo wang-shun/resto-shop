@@ -99,7 +99,9 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         if(number > 0){
             logBase.setRemark(customer.getNickname()+"添加了"+number+"份"+article.getName()+"的单品");
-        } else {
+        }else if(number == 0){
+            logBase.setRemark(customer.getNickname()+"撤销了1份"+article.getName()+"的单品");
+        }else {
             logBase.setRemark(customer.getNickname()+"撤销了"+Math.abs(number)+"份"+article.getName()+"的单品");
         }
         logBase.setDesc(new JSONObject(article).toString());
