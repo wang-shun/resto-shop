@@ -21,4 +21,5 @@ public class LogBaseState {
     public static final int CANCEL_ORDER = 15;  //取消订单
     public static final int FAIL = 16;  //下单失败
     public static final int APPRAISE = 17;  //评价订单
+    public static final int SHARE = 18;  //分享订单
 }
