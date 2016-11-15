@@ -95,7 +95,6 @@ public class MQMessageProducer {
 		obj.put("brandId", appraise.getBrandId());
 		obj.put("id", appraise.getId());
 		obj.put("customerId", appraise.getCustomerId());
-		obj.put("shopDetailId", appraise.getShopDetailId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOW_ORDER,obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
