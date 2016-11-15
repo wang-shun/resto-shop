@@ -219,8 +219,8 @@ public class OrderMessageListener implements MessageListener {
         msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
-        ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
+//        ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
+//        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("分享完毕:" );
     }
