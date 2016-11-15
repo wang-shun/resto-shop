@@ -115,7 +115,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"添加了套餐");
-        logBase.setDesc(new JSONObject(desc).toString());
+        logBase.setDesc(desc);
         insert(logBase);
     }
 
