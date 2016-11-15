@@ -1014,11 +1014,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("SUBTOTAL", article.getFinalPrice());
             item.put("ARTICLE_NAME", article.getArticleName());
             item.put("ARTICLE_COUNT", article.getCount());
-
             items.add(item);
         }
-
-
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
 
         if (brandSetting.getIsUseServicePrice() == 1) {
@@ -1026,12 +1023,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("SUBTOTAL", order.getServicePrice());
             item.put("ARTICLE_NAME", brandSetting.getServiceName());
             item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
-
             items.add(item);
-
         }
-
-
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
@@ -1063,23 +1056,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         print.put("TICKET_TYPE", TicketType.RECEIPT);
         data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-
 //
 //        //添加当天小票的打印的序号
 //        data.put("NUMBER", nextNumber(shopDetail.getId(), order.getId()));
 //
 //        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
-//
-//
-//
-//
-//
-//
-//
 //        print.put("TABLE_NO", order.getTableNumber());
 //
-
-
+        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order.getId(), LogBaseState.PRINT_TICKET);
         return print;
     }
 

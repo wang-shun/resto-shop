@@ -54,6 +54,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             appraiseLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.SHARE){
             shareLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.PRINT_TICKET){
+            printTicketLog(shopDetail, customer, desc);
         }
     }
 
@@ -242,6 +244,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"收到了评价分享的推送");
         logBase.setDesc("AppraiseId为："+desc+" 的评论已推送");
+        insert(logBase);
+    }
+
+    //
+    public void printTicketLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"打印了总单");
+        logBase.setDesc(desc);
         insert(logBase);
     }
 
