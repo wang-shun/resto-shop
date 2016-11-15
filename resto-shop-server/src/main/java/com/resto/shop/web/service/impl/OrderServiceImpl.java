@@ -126,6 +126,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
+    @Resource
+    private LogBaseService logBaseService;
+
     @Autowired
     private GetNumberService getNumberService;
 
@@ -757,6 +760,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             order.setAllowCancel(false);
             update(order);
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Customer customer = customerService.selectById(order.getCustomerId());
+            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
         }
         throw new AppException(AppException.ORDER_IS_PRINTED);
@@ -797,7 +803,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem item : articleList) {
             //得到当前菜品 所关联的厨房信息
             String articleId = item.getArticleId();
-            if (item.getType() == OrderItemType.UNITPRICE) {
+            if (item.getType() == OrderItemType.UNITPRICE) { //单品
                 if (articleId.length() > 32) {
                     articleId = item.getArticleId().substring(0, 32);
                 } else {
@@ -811,7 +817,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
-
                     Kitchen kitchen = kitchenService.getItemKitchenId(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();

@@ -31,10 +31,14 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public int updateShopCart(ShopCart shopCart) {
+    public Integer updateShopCart(ShopCart shopCart) {
         //先查询当前客户是否有该商品的 购物车的条目
         Integer number = shopCart.getNumber();
-        ShopCart shopCartItem = new ShopCart();
+        Integer oldNumber = new Integer(0);
+        ShopCart shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
+        if(shopCartItem != null){
+            oldNumber = shopCartItem.getNumber();
+        }
         if(shopCart.getShopType().equals(ShopCarType.TAOCAN)){
             insertShopCart(shopCart);
             return shopCart.getId();
@@ -47,10 +51,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {
                 insertShopCart(shopCart);
-                return shopCart.getId();
+                return number;
             } else if (shopCartItem != null && number > 0) {
                 shopCartItem.setNumber(number);
                 shopcartMapper.updateShopCartItem(shopCartItem);
+                return number - oldNumber;
             } else if (shopCartItem != null && number <= 0) {
                 deleteShopCartItem(shopCartItem.getId());
             }else if(shopCart != null && number <= 0){
