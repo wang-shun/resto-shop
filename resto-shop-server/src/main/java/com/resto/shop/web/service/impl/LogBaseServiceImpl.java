@@ -42,6 +42,14 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             emtypLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.FAIL){
             failLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.CANCEL_ORDER){
+            canelOrderLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.PAY){
+            payLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.SCAN){
+            scanLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.PRINT){
+            printLog(shopDetail, customer, desc);
         }
     }
 
@@ -56,8 +64,12 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type) {
         if(type == LogBaseState.BUY){
             buyLog(shopDetail, customer, order);
-        }else if(type == LogBaseState.BUYSCAN){
+        }else if(type == LogBaseState.BUY_PAY){
+            buyPayLog(shopDetail, customer, order);
+        }else if(type == LogBaseState.BUY_SCAN){
             buyScanLog(shopDetail, customer, order);
+        }else if(type == LogBaseState.BUY_SCAN_PAY){
+            buyScanPayLog(shopDetail, customer, order);
         }else if(type == LogBaseState.BUY_ADD){
             buyAddLog(shopDetail, customer, order);
         }
@@ -121,20 +133,38 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //当用户下单的时候记录log
+    //当用户下单未付款的时候记录log
     public void buyLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"未扫码下单了");
+        logBase.setRemark(customer.getNickname()+"未扫码下单了未付款");
         logBase.setDesc(new JSONObject(order).toString());
         insert(logBase);
     }
 
-    //当用户扫码下单的时候记录log
+    //当用户下单已付款的时候记录log
+    public void buyPayLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"未扫码下单了已付款");
+        logBase.setDesc(new JSONObject(order).toString());
+        insert(logBase);
+    }
+
+    //当用户扫码下单未付款的时候记录log
     public void buyScanLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了");
+        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了未付款");
+        logBase.setDesc(new JSONObject(order).toString());
+        insert(logBase);
+    }
+
+    //当用户扫码下单已付款的时候记录log
+    public void buyScanPayLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了已付款");
         logBase.setDesc(new JSONObject(order).toString());
         insert(logBase);
     }
@@ -153,6 +183,41 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"加菜下单成功");
         logBase.setDesc(new JSONObject(order).toString());
+        insert(logBase);
+    }
+
+    //用户取消订单时记录log
+    public void canelOrderLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"取消了一份订单");
+        logBase.setDesc("OrderId为："+desc+" 的订单被取消");
+        insert(logBase);
+    }
+
+    //用户买单的时记录log
+    public void payLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"支付了一份订单");
+        logBase.setDesc("OrderId为："+desc+" 的订单被支付了");
+        insert(logBase);
+    }
+
+    //用户扫码时记录log
+    public void scanLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"扫码了一份订单");
+        logBase.setDesc("OrderId为："+desc+" 的订单被扫码了");
+        insert(logBase);
+    }
+
+    //用户order订单打印时记录log
+    public void printLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"的订单打印指令已成功发出并被接受");
         insert(logBase);
     }
 

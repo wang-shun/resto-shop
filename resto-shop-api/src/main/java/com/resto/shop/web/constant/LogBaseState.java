@@ -12,10 +12,13 @@ public class LogBaseState {
     public final static int CANEL_T = 5;  //取消套餐
     public static final int EMPTY = 6; //清空菜品
     public static final int BUY = 7;  //下单
-    public static final int BUYSCAN = 8;  //下单已经下单
-    public static final int PAY = 9;  //买单
-    public static final int BUY_ADD = 10;  //加菜
-    public static final int SCAN = 11;  //扫码
-    public static final int STAMP = 12;  //打印
-    public static final int FAIL = 13;  //下单失败
+    public static final int BUY_PAY = 8;  //下单买单
+    public static final int BUY_SCAN = 9;  //下单已经下单
+    public static final int BUY_SCAN_PAY = 10;  //下单买单
+    public static final int PAY = 11;  //买单
+    public static final int BUY_ADD = 12;  //加菜
+    public static final int SCAN = 13;  //扫码
+    public static final int PRINT = 14;  //打印
+    public static final int CANCEL_ORDER = 15;  //取消订单
+    public static final int FAIL = 16;  //下单失败
 }
