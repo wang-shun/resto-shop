@@ -217,7 +217,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void printLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"的订单打印指令已成功发出并被接受");
+        logBase.setRemark(customer.getNickname()+"的订单已打印");
         insert(logBase);
     }
 

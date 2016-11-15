@@ -762,7 +762,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Customer customer = customerService.selectById(order.getCustomerId());
-            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.SCAN);
+            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
         }
         throw new AppException(AppException.ORDER_IS_PRINTED);
