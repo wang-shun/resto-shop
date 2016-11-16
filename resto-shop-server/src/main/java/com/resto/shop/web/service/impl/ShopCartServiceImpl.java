@@ -58,7 +58,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
                 return number - oldNumber;
             } else if (shopCartItem != null && number <= 0) {
                 deleteShopCartItem(shopCartItem.getId());
-            }else if(shopCart != null && number <= 0){
+            }else if(shopCart != null && number <= 0 &&  shopCart.getId() != null){
                 shopcartMapper.delMealArticle(shopCart.getId().toString());
             }
         }
@@ -69,9 +69,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         shopcartMapper.deleteByPrimaryKey(id);
     }
 
-    private int insertShopCart(ShopCart shopCart) {
+    private Integer insertShopCart(ShopCart shopCart) {
         shopcartMapper.insertSelective(shopCart);
-        int farId = shopCart.getId();
+        Integer farId = shopCart.getId();
         return farId;
     }
 
