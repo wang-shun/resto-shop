@@ -26,4 +26,5 @@ public class LogBaseState {
     public static final int REGISTER = 20;  //注册
     public static final int FIRST_SHARE_PAY = 21;  //分享买单
     public static final int WX_RECHANGE = 22; //微信充值
+    public static final int PRINT_KITCHEN = 23;  //打印厨房
 }
