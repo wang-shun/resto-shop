@@ -69,9 +69,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         shopcartMapper.deleteByPrimaryKey(id);
     }
 
-    private int insertShopCart(ShopCart shopCart) {
+    private Integer insertShopCart(ShopCart shopCart) {
         shopcartMapper.insertSelective(shopCart);
-        int farId = shopCart.getId();
+        Integer farId = shopCart.getId();
         return farId;
     }
 
