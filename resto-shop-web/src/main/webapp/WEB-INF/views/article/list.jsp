@@ -1179,7 +1179,7 @@
                                         break;
                                     }
                                 }
-                                if (!has && art.articleType == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
+                                if (!has && art.articleType == 1 && art.state == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
                                     arts.push(art);
                                 }
                             }
