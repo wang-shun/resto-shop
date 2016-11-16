@@ -9,8 +9,8 @@ import com.resto.shop.web.model.LogBase;
  */
 public interface LogBaseMapper  extends GenericDao<LogBase,String> {
 
-    int insert(GetNumber getNumber);
+    int insert(LogBase logBase);
 
-    int insertSelective(GetNumber getNumber);
+    int insertSelective(LogBase logBase);
 
 }
