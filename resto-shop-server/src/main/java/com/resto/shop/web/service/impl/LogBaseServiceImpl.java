@@ -240,6 +240,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单已打印");
+        logBase.setDesc(desc);
         insert(logBase);
     }
 
