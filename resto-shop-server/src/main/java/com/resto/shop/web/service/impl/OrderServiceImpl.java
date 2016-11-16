@@ -936,7 +936,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 printTask.add(print);
             }
         }
-        logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
+//        logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
         return printTask;
     }
 
