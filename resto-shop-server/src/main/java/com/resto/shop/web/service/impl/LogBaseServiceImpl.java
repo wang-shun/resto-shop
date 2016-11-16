@@ -101,7 +101,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进入了店铺");
         logBase.setDesc("当前店铺为"+shopDetail.getName());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户切换店铺的时候记录log
@@ -110,7 +110,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"切换了店铺");
         logBase.setDesc("当前店铺为"+shopDetail.getName());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户选择单品的时候记录log
@@ -125,7 +125,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             logBase.setRemark(customer.getNickname()+"撤销了"+Math.abs(number)+"份"+article.getName()+"的单品");
         }
         logBase.setDesc(article.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户添加套餐的时候记录log
@@ -134,7 +134,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"添加了套餐");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户撤销套餐的时候记录log
@@ -143,7 +143,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"撤销了套餐");
         logBase.setDesc("ArticleId为："+desc+" 套餐被撤销");
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户清空购物车的时候记录log
@@ -152,7 +152,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"清空了购物车");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户下单未付款的时候记录log
@@ -161,7 +161,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"未扫码下单了未付款");
         logBase.setDesc(order.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户下单已付款的时候记录log
@@ -170,7 +170,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"未扫码下单了已付款");
         logBase.setDesc(order.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户扫码下单未付款的时候记录log
@@ -179,7 +179,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"先扫码进入后下单了未付款");
         logBase.setDesc(order.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户扫码下单已付款的时候记录log
@@ -188,7 +188,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"先扫码进入后下单了已付款");
         logBase.setDesc(order.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户下单失败的时候记录log
@@ -196,7 +196,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //当用户加菜的时候记录log
@@ -205,7 +205,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"加菜下单成功");
         logBase.setDesc(order.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户取消订单时记录log
@@ -214,7 +214,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"取消了一份订单");
         logBase.setDesc("OrderId为："+desc+" 的订单被取消");
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户买单的时记录log
@@ -223,7 +223,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"支付了一份订单");
         logBase.setDesc("OrderId为："+desc+" 的订单被支付了");
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户扫码时记录log
@@ -232,7 +232,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"扫码了一份订单");
         logBase.setDesc("OrderId为："+desc+" 的订单被扫码了");
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户order订单打印时记录log
@@ -241,7 +241,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单已打印");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户评价订单时记录log
@@ -250,7 +250,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"评价了一份订单");
         logBase.setDesc("评论的AppraiseId为："+desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户收到分享推送时记录log
@@ -259,7 +259,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"收到了评价分享的推送");
         logBase.setDesc("AppraiseId为："+desc+" 的评论已推送");
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //打印总单的时记录log
@@ -268,7 +268,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"打印了总单");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户注册时记录log
@@ -277,7 +277,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"用户注册了会员");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户是分享注册用户且首单时记录log
@@ -286,7 +286,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"首次买单");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //用户微信充值时记录log
@@ -295,7 +295,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进行微信充值");
         logBase.setDesc(chargeOrder.getId());
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //厨打时记录log
@@ -304,7 +304,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"厨打订单");
         logBase.setDesc(desc);
-        insert(logBase);
+        logBaseMapper.insertSelective(logBase);
     }
 
     //通用添加用户店铺时间信息
