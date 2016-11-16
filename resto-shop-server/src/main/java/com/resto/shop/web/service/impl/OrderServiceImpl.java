@@ -762,7 +762,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Customer customer = customerService.selectById(order.getCustomerId());
-            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
+//            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
         }
         throw new AppException(AppException.ORDER_IS_PRINTED);
@@ -1038,7 +1038,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
 //        print.put("TABLE_NO", order.getTableNumber());
 //
-        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order.getId(), LogBaseState.PRINT_TICKET);
+//        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order.getId(), LogBaseState.PRINT_TICKET);
         return print;
     }
 
@@ -1156,7 +1156,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
-
 
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
