@@ -122,7 +122,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         }else {
             logBase.setRemark(customer.getNickname()+"撤销了"+Math.abs(number)+"份"+article.getName()+"的单品");
         }
-        logBase.setDesc(new JSONObject(article).toString());
+        logBase.setDesc(article.getId());
         insert(logBase);
     }
 
@@ -158,7 +158,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"未扫码下单了未付款");
-        logBase.setDesc(new JSONObject(order).toString());
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 
@@ -167,7 +167,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"未扫码下单了已付款");
-        logBase.setDesc(new JSONObject(order).toString());
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 
@@ -176,7 +176,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"先扫码进入后下单了未付款");
-        logBase.setDesc(new JSONObject(order).toString());
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 
@@ -185,7 +185,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"先扫码进入后下单了已付款");
-        logBase.setDesc(new JSONObject(order).toString());
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 
@@ -202,7 +202,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"加菜下单成功");
-        logBase.setDesc(new JSONObject(order).toString());
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 
@@ -291,7 +291,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"进行微信充值");
-        logBase.setDesc(new JSONObject(chargeOrder).toString());
+        logBase.setDesc(chargeOrder.getId());
         insert(logBase);
     }
 
