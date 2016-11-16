@@ -1096,6 +1096,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getOrderInfo(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null){
+            return null;
+        }
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
         order.setOrderItems(orderItems);
         Customer cus = customerService.selectById(order.getCustomerId());
