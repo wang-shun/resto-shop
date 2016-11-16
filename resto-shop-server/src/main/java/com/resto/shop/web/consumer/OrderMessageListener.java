@@ -220,8 +220,8 @@ public class OrderMessageListener implements MessageListener {
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
         ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
         log.info("分享完毕:" );
     }
 
