@@ -30,55 +30,55 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
 
     @Override
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, String desc, Integer type) {
-        if(type == LogBaseState.INTO){
-            intoLog(shopDetail, customer, desc);
-        } else if (type == LogBaseState.REPLACE){
-            replaceLog(shopDetail, customer, desc);
-        } else if(type == LogBaseState.CHOICE_T){
-            choiceTLog(shopDetail, customer, desc);
-        } else if(type == LogBaseState.CANEL_T){
-            canelTLog(shopDetail, customer, desc);
-        } else if(type == LogBaseState.EMPTY){
-            emtypLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.FAIL){
-            failLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.CANCEL_ORDER){
-            canelOrderLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.PAY){
-            payLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.SCAN){
-            scanLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.PRINT){
-            printLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.APPRAISE){
-            appraiseLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.SHARE){
-            shareLog(shopDetail, customer, desc);
-        }else if(type == LogBaseState.PRINT_TICKET){
-            printTicketLog(shopDetail, customer, desc);
-        }
+//        if(type == LogBaseState.INTO){
+//            intoLog(shopDetail, customer, desc);
+//        } else if (type == LogBaseState.REPLACE){
+//            replaceLog(shopDetail, customer, desc);
+//        } else if(type == LogBaseState.CHOICE_T){
+//            choiceTLog(shopDetail, customer, desc);
+//        } else if(type == LogBaseState.CANEL_T){
+//            canelTLog(shopDetail, customer, desc);
+//        } else if(type == LogBaseState.EMPTY){
+//            emtypLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.FAIL){
+//            failLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.CANCEL_ORDER){
+//            canelOrderLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.PAY){
+//            payLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.SCAN){
+//            scanLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.PRINT){
+//            printLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.APPRAISE){
+//            appraiseLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.SHARE){
+//            shareLog(shopDetail, customer, desc);
+//        }else if(type == LogBaseState.PRINT_TICKET){
+//            printTicketLog(shopDetail, customer, desc);
+//        }
     }
 
     @Override
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Article article, Integer type, Integer number) {
-        if(type == LogBaseState.CHOICE_D){
-            choiceDLog(shopDetail, customer, article, number);
-        }
+//        if(type == LogBaseState.CHOICE_D){
+//            choiceDLog(shopDetail, customer, article, number);
+//        }
     }
 
     @Override
     public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, Order order, Integer type) {
-        if(type == LogBaseState.BUY){
-            buyLog(shopDetail, customer, order);
-        }else if(type == LogBaseState.BUY_PAY){
-            buyPayLog(shopDetail, customer, order);
-        }else if(type == LogBaseState.BUY_SCAN){
-            buyScanLog(shopDetail, customer, order);
-        }else if(type == LogBaseState.BUY_SCAN_PAY){
-            buyScanPayLog(shopDetail, customer, order);
-        }else if(type == LogBaseState.BUY_ADD){
-            buyAddLog(shopDetail, customer, order);
-        }
+//        if(type == LogBaseState.BUY){
+//            buyLog(shopDetail, customer, order);
+//        }else if(type == LogBaseState.BUY_PAY){
+//            buyPayLog(shopDetail, customer, order);
+//        }else if(type == LogBaseState.BUY_SCAN){
+//            buyScanLog(shopDetail, customer, order);
+//        }else if(type == LogBaseState.BUY_SCAN_PAY){
+//            buyScanPayLog(shopDetail, customer, order);
+//        }else if(type == LogBaseState.BUY_ADD){
+//            buyAddLog(shopDetail, customer, order);
+//        }
     }
 
     //当用户进入店铺是记录log
