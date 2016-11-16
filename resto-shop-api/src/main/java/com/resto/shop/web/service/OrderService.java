@@ -292,7 +292,14 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
 
-	//查询订单的详细信息(客户和菜品以及菜品信息分类)
+	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
+
+    /**
+     * 2016-11-06
+     * 新增查看微信支付单号
+     * @param orderId
+     * @return
+     */
 	public Order selectOrderDetails(String orderId);
 
 	Boolean setOrderPrintFail(String orderId);
