@@ -11,14 +11,12 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.LogBaseState;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderItem;
-import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -57,12 +55,12 @@ public class OrderAspect {
     ShareSettingService shareSettingService;
     @Resource
     RedConfigService redConfigService;
-
     @Resource
     OrderService orderService;
-
     @Resource
     OrderPaymentItemService orderPaymentItemService;
+    @Resource
+    LogBaseService logBaseService;
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
@@ -414,7 +412,7 @@ public class OrderAspect {
                             log.info("是被分享用户，并且分享设置已启用:" + customer.getId() + " oid:" + order.getId() + " setting:" + shareSetting.getId());
                             BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting, order, shareCustomer, customer);
                             log.info("准备发送返利通知");
-                            sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney);
+                            sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney,order);
                         }
                     }
                 }
@@ -427,13 +425,14 @@ public class OrderAspect {
     }
 
     private void sendRewardShareMsg(Customer shareCustomer, Customer customer, WechatConfig config,
-                                    BrandSetting setting, BigDecimal rewardMoney) {
+                                    BrandSetting setting, BigDecimal rewardMoney, Order order) {
         StringBuffer msg = new StringBuffer();
         rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=account'>")
                 .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
                 .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+        logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
         log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
     }
 
