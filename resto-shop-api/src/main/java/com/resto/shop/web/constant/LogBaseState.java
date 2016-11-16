@@ -23,4 +23,7 @@ public class LogBaseState {
     public static final int APPRAISE = 17;  //评价订单
     public static final int SHARE = 18;  //分享订单
     public static final int PRINT_TICKET = 19;  //打印总单
+    public static final int REGISTER = 20;  //注册
+    public static final int FIRST_SHARE_PAY = 21;  //分享买单
+    public static final int WX_RECHANGE = 22; //微信充值
 }

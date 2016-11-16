@@ -13,6 +13,7 @@ import com.resto.shop.web.service.LogBaseService;
 import javax.annotation.Resource;
 import java.util.Date;
 import org.json.JSONObject;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by carl on 2016/11/14.
@@ -56,6 +57,17 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             shareLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.PRINT_TICKET){
             printTicketLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.REGISTER){
+            registerLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.FIRST_SHARE_PAY){
+            firstSharePayLog(shopDetail, customer, desc);
+        }
+    }
+
+    @Override
+    public void insertLogBaseInfoState(ShopDetail shopDetail, Customer customer, ChargeOrder chargeOrder, Integer type) {
+        if(type == LogBaseState.WX_RECHANGE){
+            WXRechangeLog(shopDetail, customer, chargeOrder);
         }
     }
 
@@ -247,12 +259,39 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //
+    //打印总单的时记录log
     public void printTicketLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"打印了总单");
         logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //用户注册时记录log
+    public void registerLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"用户注册了会员");
+        logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //用户是分享注册用户且首单时记录log
+    public void firstSharePayLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"首次买单");
+        logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //用户微信充值时记录log
+    public void WXRechangeLog(ShopDetail shopDetail, Customer customer, ChargeOrder chargeOrder){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"进行微信充值");
+        logBase.setDesc(new JSONObject(chargeOrder).toString());
         insert(logBase);
     }
 
