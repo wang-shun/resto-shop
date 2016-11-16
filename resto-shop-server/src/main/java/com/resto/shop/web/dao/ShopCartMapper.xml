@@ -79,7 +79,7 @@
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
         customer_id =#{customerId} and
-        shop_detail_id =#{shopDetailId}
+        shop_detail_id =#{shopDetailId} limit 1
     </select>
 
     <update id="updateShopCartItem" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
