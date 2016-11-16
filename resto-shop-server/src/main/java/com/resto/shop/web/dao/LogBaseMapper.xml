@@ -9,12 +9,12 @@
         <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
         <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
-        <result column="desc" property="desc" jdbcType="VARCHAR"/>
+        <result column="desc" property="desc" />
         <result column="create_time" property="createTime"/>
     </resultMap>
-    <sql id="Base_Column_List">id, shop_id, shop_name, customer_id, nickname, remark, desc, create_time</sql>
+    <sql id="Base_Column_List">id, shop_id, shop_name, customer_id, nickname, remark, `desc`, create_time</sql>
 
-    <insert id="insert" parameterType="com.resto.shop.web.model.LogBase">insert into tb_log_base (id, shop_id, shop_name, customer_id, nickname, remark, desc, create_time)
+    <insert id="insert" parameterType="com.resto.shop.web.model.LogBase">insert into tb_log_base (id, shop_id, shop_name, customer_id, nickname, remark, `desc`, create_time)
         values (#{id},#{shopId},#{shopName},#{customerId},#{nickname},#{remark},#{desc},#{createTime})
     </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.LogBase">insert into tb_log_base
