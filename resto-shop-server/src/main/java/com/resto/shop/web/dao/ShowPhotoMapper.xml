@@ -43,5 +43,7 @@
   <select id="selectList" resultType="ShowPhoto">select * from tb_show_photo</select>
   <select id="selectListByShopId" resultType="ShowPhoto">
   	select * from tb_show_photo where shop_detail_id = #{shopId}
+  	GROUP BY title
+  	order by id desc
   </select>
 </mapper>
