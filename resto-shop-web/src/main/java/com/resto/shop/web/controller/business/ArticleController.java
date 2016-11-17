@@ -11,7 +11,6 @@ import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -143,10 +142,11 @@ public class ArticleController extends GenericController {
                 mess.append(art.getName()+"，");
             }
             if(articles.size() != 0){
-                JSONObject json  = new JSONObject();
-                json.put("success", false);
-                json.put("message", "删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
-                return getSuccessResult(json);
+                Result result = new Result();
+                result.setSuccess(false);
+                result.setMessage("删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
+                result.setStatusCode(100);
+                return getSuccessResult(result);
             }
         }
         articleService.delete(id);
