@@ -126,6 +126,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
+    @Resource
+    private LogBaseService logBaseService;
+
     @Autowired
     private GetNumberService getNumberService;
 
@@ -757,6 +760,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             order.setAllowCancel(false);
             update(order);
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Customer customer = customerService.selectById(order.getCustomerId());
+//            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
         }
         throw new AppException(AppException.ORDER_IS_PRINTED);
@@ -797,7 +803,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem item : articleList) {
             //得到当前菜品 所关联的厨房信息
             String articleId = item.getArticleId();
-            if (item.getType() == OrderItemType.UNITPRICE) {
+            if (item.getType() == OrderItemType.UNITPRICE) { //单品
                 if (articleId.length() > 32) {
                     articleId = item.getArticleId().substring(0, 32);
                 } else {
@@ -811,7 +817,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
-
                     Kitchen kitchen = kitchenService.getItemKitchenId(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();
@@ -823,9 +828,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
                 }
-
             }
-
 
             if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
                 if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
@@ -842,7 +845,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 } else {
                     continue;
                 }
-//
             } else {
                 if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                     List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
@@ -857,7 +859,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
                 }
-
             }
         }
 
@@ -868,7 +869,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         String modeText = getModeText(order);//就餐模式
         String serialNumber = order.getSerialNumber();//序列号
-
+        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         //编列 厨房菜品 集合
         for (String kitchenId : kitchenArticleMap.keySet()) {
             Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
@@ -876,8 +877,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (printer == null) {
                 continue;
             }
-
-
             //生成厨房小票
             for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
@@ -896,14 +895,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             child_item.put("ARTICLE_COUNT", obj.getCount());
                             items.add(child_item);
                         }
-
-
                     }
                 }
-                ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+
                 //保存基本信息
-
-
                 Map<String, Object> print = new HashMap<String, Object>();
                 print.put("TABLE_NO", tableNumber);
 
@@ -926,37 +921,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 data.put("TABLE_NUMBER", tableNumber);
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
-
-
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
                 data.put("ARTICLE_COUNT", order.getArticleCount());
                 print.put("DATA", data);
-
                 print.put("STATUS", 0);
-
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
-
-
-//
                 //添加当天打印订单的序号
                 data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                 //保存打印配置信息
-//
-//
-//
-//
-//
 //                print.put("ORDER_ID", serialNumber);
 //                print.put("KITCHEN_NAME", kitchen.getName());
-//
 //                print.put("TABLE_NO", tableNumber);
-
-
                 //添加到 打印集合
                 printTask.add(print);
             }
         }
-
+//        logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
         return printTask;
     }
 
@@ -1009,11 +989,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("SUBTOTAL", article.getFinalPrice());
             item.put("ARTICLE_NAME", article.getArticleName());
             item.put("ARTICLE_COUNT", article.getCount());
-
             items.add(item);
         }
-
-
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
 
         if (brandSetting.getIsUseServicePrice() == 1) {
@@ -1021,12 +998,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("SUBTOTAL", order.getServicePrice());
             item.put("ARTICLE_NAME", brandSetting.getServiceName());
             item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
-
             items.add(item);
-
         }
-
-
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
@@ -1058,23 +1031,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         print.put("TICKET_TYPE", TicketType.RECEIPT);
         data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-
 //
 //        //添加当天小票的打印的序号
 //        data.put("NUMBER", nextNumber(shopDetail.getId(), order.getId()));
 //
 //        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
-//
-//
-//
-//
-//
-//
-//
 //        print.put("TABLE_NO", order.getTableNumber());
 //
-
-
+//        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order.getId(), LogBaseState.PRINT_TICKET);
         return print;
     }
 
@@ -1107,6 +1071,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getOrderInfo(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null){
+            return null;
+        }
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
         order.setOrderItems(orderItems);
         Customer cus = customerService.selectById(order.getCustomerId());
@@ -1189,7 +1156,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
-
 
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 

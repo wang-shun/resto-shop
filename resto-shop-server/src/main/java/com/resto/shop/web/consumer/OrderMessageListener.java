@@ -13,6 +13,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.LogBaseState;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
@@ -54,6 +55,8 @@ public class OrderMessageListener implements MessageListener {
     OrderItemService orderItemService;
     @Resource
     ShopDetailService shopDetailService;
+    @Resource
+    LogBaseService logBaseService;
 
     @Override
     public Action consume(Message message, ConsumeContext context) {
@@ -216,7 +219,9 @@ public class OrderMessageListener implements MessageListener {
         msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
+        ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
         log.info("分享完毕:" );
     }
 

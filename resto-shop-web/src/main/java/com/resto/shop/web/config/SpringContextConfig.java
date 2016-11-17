@@ -315,7 +315,8 @@ public class SpringContextConfig {
     }
 
 
-
+    @Bean
+    public LogBaseService logBaseService() { return  proxy.create(LogBaseService.class); }
 
     @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {

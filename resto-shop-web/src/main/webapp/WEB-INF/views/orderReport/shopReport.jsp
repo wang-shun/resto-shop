@@ -77,6 +77,8 @@ dt,dd{
 					<dd id="shopName"></dd>
 					<dt>订单编号：</dt>
 					<dd id="orderId"></dd>
+                    <dt>微信支付单号：</dt>
+                    <dd id="orderPaymentItem_id"></dd>
 					<dt>订单时间：</dt>
 					<dd id="createTime"></dd>
 					<dt>就餐模式：</dt>
@@ -286,6 +288,11 @@ dt,dd{
                     if (typeof(data.customer) !="undefined") {
                         telephone = data.customer.telephone;
                     }
+                    var orderPaymentItem_id="";
+                    if(typeof (data.orderPaymentItem)!="undefined"){
+                        orderPaymentItem_id=data.orderPaymentItem.id;
+                    }
+                    $("#orderPaymentItem_id").html(orderPaymentItem_id);
                     $("#telephone").html(telephone);
 					$("#orderMoney").html(data.orderMoney + "元");
 // 					if (data.appraise) {

@@ -54,7 +54,7 @@
                                 <label class="col-md-5 control-label">饿了么名称</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="elemeName" v-model="m.elemeName"
-                                           required="required">
+                                           >
                                 </div>
                             </div>
 
@@ -1179,7 +1179,7 @@
                                         break;
                                     }
                                 }
-                                if (!has && art.articleType == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
+                                if (!has && art.articleType == 1 && art.state == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
                                     arts.push(art);
                                 }
                             }

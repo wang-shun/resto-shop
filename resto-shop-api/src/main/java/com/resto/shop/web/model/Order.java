@@ -138,6 +138,17 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    //新增微信支付单号
+    public OrderPaymentItem orderPaymentItem;
+
+    public OrderPaymentItem getOrderPaymentItem() {
+        return orderPaymentItem;
+    }
+
+    public void setOrderPaymentItem(OrderPaymentItem orderPaymentItem) {
+        this.orderPaymentItem = orderPaymentItem;
+    }
+
     public Integer getIsShare() {
         return isShare;
     }

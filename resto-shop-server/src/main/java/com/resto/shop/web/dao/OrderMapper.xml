@@ -89,6 +89,11 @@
             <result column="content" property="content"/>
         </association>
 
+        <association property="orderPaymentItem" javaType="com.resto.shop.web.model.OrderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </association>
+
         <collection property="orderItems" javaType="List" ofType="orderItem">
             <id column="orderItem_id" property="id"/>
             <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
@@ -803,8 +808,10 @@
         WHERE
         shop_detail_id=#{shopId}
         AND
-        <![CDATA[ push_order_time>#{dateBegin} AND push_order_time<#{dateEnd}]]>
-        and production_status = 5 and order_state != 9 and print_times = 0
+        <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
+        and( (production_status = 5 and order_state != 9 and print_times = 0) or
+         (production_status = 1 and order_state != 9 and print_times = 0 and now() - push_order_time > 90  ) )
+
         order by push_order_time DESC;
     </select>
 
@@ -1489,7 +1496,8 @@ AND o.production_status IN (2, 3)
         ap.level ,
         ap.content,
         f.id articleFamily_id,
-        f.name articleFamilyName
+        f.name articleFamilyName,
+        opi.id as orderPaymentItem_id
         FROM
         tb_order o
         LEFT JOIN tb_order_item oi ON o.id = oi.order_id
@@ -1497,8 +1505,9 @@ AND o.production_status IN (2, 3)
         LEFT JOIN tb_appraise ap on o.id = ap.order_id
         LEFT JOIN tb_article r on left(oi.article_id,32) = r.id
         LEFT JOIN tb_article_family f on f.id = r.article_family_id
+        INNER JOIN tb_order_payment_item opi on o.id = opi.order_id
         WHERE
-        o.id = #{orderId}
+        o.id = #{orderId} AND  opi.payment_mode_id=1
 
     </select>
 
