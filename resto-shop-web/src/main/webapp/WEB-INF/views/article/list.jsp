@@ -734,7 +734,7 @@
                     createdCell: function (td, tdData, rowData, row) {
                         var operator = [
                             <s:hasPermission name="article/delete">
-                            C.createDelBtn(tdData, "article/delete"),
+                            C.createDelBtnArticle(tdData, "article/delete"),
                             </s:hasPermission>
                             <s:hasPermission name="article/edit">
                             C.createEditBtn(rowData),

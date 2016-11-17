@@ -5,11 +5,13 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.PlatformService;
+import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -132,6 +134,21 @@ public class ArticleController extends GenericController {
     @RequestMapping("delete")
     @ResponseBody
     public Result delete(String id) {
+        Article article = articleService.selectById(id);
+        if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+            //单品时校验
+            List<Article> articles = articleService.delCheckArticle(id);
+            StringBuffer mess = new StringBuffer();
+            for(Article art : articles){
+                mess.append(art.getName()+"，");
+            }
+            if(articles.size() != 0){
+                JSONObject json  = new JSONObject();
+                json.put("success", false);
+                json.put("message", "删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
+                return getSuccessResult(json);
+            }
+        }
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);

@@ -715,4 +715,13 @@ GROUP BY article_id
         select * from  tb_article where eleme_name = #{name} and state = 1
         and shop_detail_id = #{shopId}
     </select>
+
+    <select id="delCheckArticle" resultType="Article">
+        select t4.name from tb_article t
+        left join tb_meal_item t2 on t2.article_id = t.id
+        left join tb_meal_attr t3 on t3.id = t2.meal_attr_id
+        left join tb_article t4 on t4.id = t3.article_id
+        where t2.article_id = #{id}
+        and t4.state = 1 and t4.article_type = 2
+    </select>
 </mapper>
