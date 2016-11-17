@@ -118,4 +118,11 @@
         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
         and customer_id = #{customerId} order by create_time desc limit 1
     </select>
+
+    <select id="getWaitNumber" resultType="java.lang.Integer">
+        select count(1) from tb_get_number
+         WHERE shop_detail_id = #{shopDetailId} and state = 0
+          and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+           and table_type = #{tableType} and #{createTime} > create_time
+    </select>
 </mapper>

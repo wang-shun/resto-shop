@@ -28,4 +28,6 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     GetNumber getWaitInfoByCustomerId(@Param("customerId") String customerId,@Param("shopId") String shopId);
 
+    Integer getWaitNumber(GetNumber getNumber);
+
 }
