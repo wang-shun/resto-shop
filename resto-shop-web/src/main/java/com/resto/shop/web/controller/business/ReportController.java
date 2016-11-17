@@ -3,16 +3,14 @@
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.resto.brand.core.util.DateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,7 +99,12 @@ public class ReportController extends GenericController{
 	public Result reportList(String beginDate,String endDate,String sort){
 		//菜品销售记录
 		//return getSuccessResult(orderItemService.selectSaleArticleByDate(getCurrentShopId() ,beginDate, endDate,sort));
-		
+		if(beginDate==null){
+			beginDate= DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+		}
+		if(endDate==null){
+			endDate= DateUtil.formatDate(new Date(),"yyyy-MM-dd");
+		}
 		return getSuccessResult(orderService.selectShopArticleByDate(getCurrentShopId(), beginDate, endDate, sort));
 	}
 	
