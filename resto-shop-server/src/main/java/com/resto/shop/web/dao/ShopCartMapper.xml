@@ -79,6 +79,7 @@
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
         customer_id =#{customerId} and
+         pid is not null and
         shop_detail_id =#{shopDetailId} limit 1
     </select>
 
