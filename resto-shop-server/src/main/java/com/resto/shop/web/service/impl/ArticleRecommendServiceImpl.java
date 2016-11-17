@@ -78,12 +78,12 @@ public class ArticleRecommendServiceImpl extends GenericServiceImpl<ArticleRecom
     }
 
     @Override
-    public ArticleRecommendPrice selectByRecommendArticleInfo(String recommendId, String ArticleId) {
-        return articleRecommendMapper.selectByRecommendArticleInfo(recommendId, ArticleId);
+    public List<ArticleRecommendPrice> selectByRecommendArticleInfo(String articleId) {
+        return articleRecommendMapper.selectByRecommendArticleInfo( articleId);
     }
 
     @Override
-    public void updatePriceById(ArticleRecommendPrice articleRecommendPrice) {
-        articleRecommendMapper.updatePriceById(articleRecommendPrice);
+    public void updatePriceById(BigDecimal price, String id) {
+        articleRecommendMapper.updatePriceById(price, id);
     }
 }

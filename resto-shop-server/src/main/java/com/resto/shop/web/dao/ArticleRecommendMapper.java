@@ -29,7 +29,7 @@ public interface ArticleRecommendMapper extends GenericDao<ArticleRecommend, Str
 
     int deleteRecommendByArticleId(String id);
 
-    ArticleRecommendPrice selectByRecommendArticleInfo(@Param("recommendId") String recommendId, @Param("ArticleId") String ArticleId);
+    List<ArticleRecommendPrice> selectByRecommendArticleInfo(String ArticleId);
 
-    void updatePriceById(ArticleRecommendPrice articleRecommendPrice);
+    void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id);
 }
