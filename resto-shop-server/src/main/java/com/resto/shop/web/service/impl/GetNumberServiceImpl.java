@@ -42,6 +42,11 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     }
 
     @Override
+    public int getWaitNumber(GetNumber getNumber) {
+        return getNumberMapper.getWaitNumber(getNumber);
+    }
+
+    @Override
     public Integer selectCount(String tableType,Date date) {
         return getNumberMapper.selectCount(tableType,date).size();
     }
