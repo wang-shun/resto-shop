@@ -113,4 +113,9 @@
     <delete id="delMealArticle">
         delete from tb_shop_cart where id = #{0} or pid = #{0}
     </delete>
+
+    <delete id="delMealItem">
+      delete from tb_shop_cart where  pid = #{0}
+    </delete>
+
 </mapper>
