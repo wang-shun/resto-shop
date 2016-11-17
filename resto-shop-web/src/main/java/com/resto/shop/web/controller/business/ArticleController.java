@@ -95,12 +95,12 @@ public class ArticleController extends GenericController {
             id = articleService.save(article).getId();
             unitService.insertArticleRelation(id, article.getUnits());
         } else {
-
             articleService.update(article);
             //修改单品的时候如果存在推荐餐包 联动修改
             if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
                 ArticleRecommendPrice articleRecommendPrice = articleRecommendService.selectByRecommendArticleInfo(article.getRecommendId(), article.getId());
-                articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(), articleRecommendPrice.getId());
+                articleRecommendPrice.setPrice(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice());
+                articleRecommendService.updatePriceById(articleRecommendPrice);
             }
 
             List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
@@ -130,10 +130,8 @@ public class ArticleController extends GenericController {
             } else {
                 articleService.setActivated(article.getId(), 0);
             }
-
             unitService.updateArticleRelation(id, article.getUnits());
         }
-
         articleService.initStock();
         return Result.getSuccess();
     }

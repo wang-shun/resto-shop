@@ -83,7 +83,7 @@ public class ArticleRecommendServiceImpl extends GenericServiceImpl<ArticleRecom
     }
 
     @Override
-    public void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id) {
-        articleRecommendMapper.updatePriceById(price, id);
+    public void updatePriceById(ArticleRecommendPrice articleRecommendPrice) {
+        articleRecommendMapper.updatePriceById(articleRecommendPrice);
     }
 }

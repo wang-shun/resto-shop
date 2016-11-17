@@ -104,6 +104,12 @@ where t2.shop_detail_id = #{shopId} and t.id = #{articleId}
     </select>
 
     <update id="updatePriceById">
-        update tb_recommend_article set price = #{price} where id = #{id}
+        update tb_recommend_article
+        <set>
+            <if test="price != null">
+                name = #{price},
+            </if>
+        </set>
+        where id = #{id}
     </update>
 </mapper>

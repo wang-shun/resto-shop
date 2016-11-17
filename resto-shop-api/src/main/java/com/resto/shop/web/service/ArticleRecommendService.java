@@ -28,5 +28,5 @@ public interface ArticleRecommendService extends GenericService<ArticleRecommend
 
     ArticleRecommendPrice selectByRecommendArticleInfo(String recommendId,String ArticleId);
 
-    void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id);
+    void updatePriceById(ArticleRecommendPrice articleRecommendPrice);
 }

@@ -31,5 +31,5 @@ public interface ArticleRecommendMapper extends GenericDao<ArticleRecommend, Str
 
     ArticleRecommendPrice selectByRecommendArticleInfo(@Param("recommendId") String recommendId, @Param("ArticleId") String ArticleId);
 
-    void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id);
+    void updatePriceById(ArticleRecommendPrice articleRecommendPrice);
 }
