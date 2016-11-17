@@ -116,8 +116,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
         List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
         article.setSupportTimes(supportTimesIds.toArray(new Integer[0]));
-
-
         return article;
     }
 
@@ -193,7 +191,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<ArticleStock> getStock(String shopId, String familyId, Integer empty, Integer activated) {
-
         FreeDay day = freedayMapper.selectByDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"), shopId);
         int freeDay = 0;
         if (day == null) {
@@ -285,7 +282,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 List<ArticleAttr> articleAttrs = articleAttrService.selectListByArticleId(articleId);
                 StringBuilder hasUnit = new StringBuilder();
 
-
                 if (!CollectionUtils.isEmpty(articleAttrs)) {
                     for (ArticleAttr articleAttr : articleAttrs) {
                         //得到要复制的规格
@@ -302,7 +298,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             articleAttr.setShopDetailId(shopId);
                             articleAttrService.update(articleAttr);
                         }
-
                         for (ArticleUnit articleUnit : articleUnits) {
                             ArticlePrice articlePrice = articlePriceServer.selectByArticle(articleId, articleUnit.getId());
                             if (articlePrice == null) {
@@ -317,9 +312,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                                 articleUnit.setId(sameUnit.getId());
                                 articleUnit.setTbArticleAttrId(articleAttr.getId());
                                 articleUnitService.update(articleUnit);
-
                             }
-
                             hasUnit.append(articleUnit.getId()).append(",");
 
                             ArticlePrice copy = articlePriceServer.selectById(article.getId() + "@" + articlePrice.getUnitIds());
@@ -334,17 +327,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                                 articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
                                 articlePriceServer.insert(articlePrice);
                             }
-
-
                         }
                     }
-
                 }
-
-
                 if (!StringUtils.isEmpty(hasUnit.toString())) {
                     article.setHasUnit(hasUnit.toString().substring(0, hasUnit.length() - 1));
-
                 }
                 article.setpId(articleId);
                 //判断要复制的菜品是否已经在该店铺下生成过
@@ -354,35 +341,25 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     //todo
                     article.setId(copy.getId());
                     articleMapper.updateByPrimaryKeySelective(article);
-
                 }else{
                     articleMapper.insert(article);
                 }
-
-
-
-
             }
         }
     }
-
 
     @Override
     public void assignTotal(String[] shopList, String[] articleList) {
         for (String articleId : articleList) { //遍历菜品
             Article article = articleMapper.selectByPrimaryKey(articleId); //得到菜品
-
             //循环店铺
             for (String shopId : shopList) {
-
                 if (article.getArticleType().equals(ArticleType.TOTAL_ARTICLE)) { //套餐
                     //如果是套餐的话，先获取套餐下的全部单品
                     List<Article> articles = articleMapper.getArticleByMeal(articleId);
                     for (Article art : articles) {
-
                         art.setShopDetailId(shopId);
                         art.setpId(art.getId());
-
                         //得到菜品分类
                         ArticleFamily family = articleFamilyService.selectById(art.getArticleFamilyId());
                         ArticleFamily articleFamily = articleFamilyService.checkSame(shopId, family.getName());
@@ -413,12 +390,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             articleMapper.insert(art);
                         }
                     }
-
 //                    //得到要复制的套餐属性
                     List<MealAttr> attrs =  mealAttrService.selectList(articleId);
                     for(MealAttr attr : attrs){
                         //循环旧的套餐属性
-//
                         List<MealItem> mealItems =  mealItemService.selectByAttrId(attr.getId());
                         attr.setId(null);
                         attr.setArticleId(articleMapper.selectByPid(article.getId(),shopId).getId());
@@ -429,15 +404,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             mealItem.setId(null);
                             mealItemService.insert(mealItem);
                         }
-
                     }
-
                 }
             }
         }
+    }
 
-
-
-
+    @Override
+    public List<Article> delCheckArticle(String id) {
+        return articleMapper.delCheckArticle(id);
     }
 }

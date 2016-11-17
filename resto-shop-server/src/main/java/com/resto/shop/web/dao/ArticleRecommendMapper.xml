@@ -98,4 +98,12 @@ where t2.shop_detail_id = #{shopId} and t.id = #{articleId}
     <delete id="deleteRecommendByArticleId">
         delete from tb_recommend_article where article_id = #{id}
     </delete>
+
+    <select id="selectByRecommendArticleInfo" resultType="com.resto.shop.web.model.ArticleRecommendPrice">
+        select id,price from tb_recommend_article where article_id = #{ArticleId}
+    </select>
+
+    <update id="updatePriceById">
+        update tb_recommend_article set price = #{price} where id = #{id}
+    </update>
 </mapper>

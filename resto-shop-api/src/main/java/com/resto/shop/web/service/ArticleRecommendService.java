@@ -3,7 +3,9 @@ package com.resto.shop.web.service;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
+import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -23,4 +25,8 @@ public interface ArticleRecommendService extends GenericService<ArticleRecommend
     ArticleRecommend getRecommentByArticleId(String articleId,String shopId);
 
     void deleteRecommendByArticleId(String articleId);
+
+    List<ArticleRecommendPrice> selectByRecommendArticleInfo(String ArticleId);
+
+    void updatePriceById(BigDecimal price, String id);
 }

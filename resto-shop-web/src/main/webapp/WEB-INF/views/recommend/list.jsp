@@ -185,7 +185,11 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">添加 菜品项</h4>
+                    <h4 class="modal-title">添加 菜品项
+                        <span style="float: right">
+                            搜索：<input type="search" class="form-control input-sm input-small input-inline" v-model="searchNameLike" />
+                        </span>
+                    </h4>
                 </div>
                 <div class="modal-body auto-height">
                     <div class="row">
@@ -204,7 +208,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleShow.itemsLess">
+                                <tr v-for="art in choiceArticleShow.itemsLess  | filterBy searchNameLike ">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -364,11 +368,13 @@
                         unitPrices: [],
                         mealtempList: [],
                         articleList: [],
+                        searchArticle:null,
                         printType:0,
                         choiceTemp: "",
                         lastChoiceTemp: "",
                         allArticles: allArticles,
-                        choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
+                        choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""},
+                        searchNameLike : "",
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {

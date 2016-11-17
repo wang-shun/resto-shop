@@ -71,4 +71,11 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @param articleList
      */
 	void assignTotal(String [] shopList,String articleList[]);
+
+	/**
+	 * 删除单品时候校验
+	 * @param id
+	 * @return
+     */
+	List<Article> delCheckArticle(String id);
 }

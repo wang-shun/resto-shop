@@ -5,6 +5,7 @@ import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -28,5 +29,7 @@ public interface ArticleRecommendMapper extends GenericDao<ArticleRecommend, Str
 
     int deleteRecommendByArticleId(String id);
 
+    List<ArticleRecommendPrice> selectByRecommendArticleInfo(String ArticleId);
 
+    void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id);
 }

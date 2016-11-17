@@ -354,13 +354,14 @@ var Controller = function(controlId,datatable){
 						tb.ajax.reload();
 						_C.simpleMsg("删除成功");
 					}else{
-						errorMsg(result.message);
+						_C.errorMsg(result.message,"删除失败");
 					}
 				});
 			});
 		});
 		return button;
 	}
+
 	this.createEditBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
 		button.click(function(){

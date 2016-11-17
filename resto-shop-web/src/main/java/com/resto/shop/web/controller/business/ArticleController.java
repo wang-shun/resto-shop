@@ -5,9 +5,12 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.PlatformService;
+import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
+import com.resto.shop.web.model.ArticleRecommend;
+import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,8 +95,15 @@ public class ArticleController extends GenericController {
             id = articleService.save(article).getId();
             unitService.insertArticleRelation(id, article.getUnits());
         } else {
-
             articleService.update(article);
+            //修改单品的时候如果存在推荐餐包 联动修改
+            if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+                List<ArticleRecommendPrice> articleRecommendPrice = articleRecommendService.selectByRecommendArticleInfo(article.getId());
+                for(ArticleRecommendPrice ar : articleRecommendPrice){
+                    articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(),ar.getId());
+                }
+            }
+
             List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
             if (article.getIsEmpty() == true) {
                 articleService.clearStock(article.getId(), getCurrentShopId());
@@ -121,10 +131,8 @@ public class ArticleController extends GenericController {
             } else {
                 articleService.setActivated(article.getId(), 0);
             }
-
             unitService.updateArticleRelation(id, article.getUnits());
         }
-
         articleService.initStock();
         return Result.getSuccess();
     }
@@ -132,6 +140,22 @@ public class ArticleController extends GenericController {
     @RequestMapping("delete")
     @ResponseBody
     public Result delete(String id) {
+        Article article = articleService.selectById(id);
+        if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+            //单品时校验
+            List<Article> articles = articleService.delCheckArticle(id);
+            if(articles.size() != 0){
+                StringBuffer mess = new StringBuffer();
+                for(Article art : articles){
+                    mess.append(art.getName()+"，");
+                }
+                Result result = new Result();
+                result.setSuccess(false);
+                result.setMessage("删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
+                result.setStatusCode(100);
+                return result;
+            }
+        }
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
