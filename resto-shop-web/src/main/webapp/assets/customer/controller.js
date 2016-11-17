@@ -350,12 +350,11 @@ var Controller = function(controlId,datatable){
 		button.click(function(){
 			_C.delConfirmDialog(function(){
 				_C.ajax(delUrl,{id:value},function(result){
-					alert(JSON.stringify(result));
 					if(result.success){
 						tb.ajax.reload();
 						_C.simpleMsg("删除成功");
 					}else{
-						errorMsg(result.message);
+						_C.errorMsg(result.message,"删除失败");
 					}
 				});
 			});
