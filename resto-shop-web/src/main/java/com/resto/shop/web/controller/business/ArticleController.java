@@ -137,11 +137,11 @@ public class ArticleController extends GenericController {
         if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
             //单品时校验
             List<Article> articles = articleService.delCheckArticle(id);
-            StringBuffer mess = new StringBuffer();
-            for(Article art : articles){
-                mess.append(art.getName()+"，");
-            }
             if(articles.size() != 0){
+                StringBuffer mess = new StringBuffer();
+                for(Article art : articles){
+                    mess.append(art.getName()+"，");
+                }
                 Result result = new Result();
                 result.setSuccess(false);
                 result.setMessage("删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
