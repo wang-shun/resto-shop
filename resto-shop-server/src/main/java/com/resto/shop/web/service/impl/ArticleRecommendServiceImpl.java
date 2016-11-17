@@ -7,9 +7,11 @@ import com.resto.shop.web.dao.ArticleRecommendMapper;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.ArticleRecommendService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -73,5 +75,15 @@ public class ArticleRecommendServiceImpl extends GenericServiceImpl<ArticleRecom
     @Override
     public void deleteRecommendByArticleId(String articleId) {
          articleRecommendMapper.deleteRecommendByArticleId(articleId);
+    }
+
+    @Override
+    public ArticleRecommendPrice selectByRecommendArticleInfo(String recommendId, String ArticleId) {
+        return articleRecommendMapper.selectByRecommendArticleInfo(recommendId, ArticleId);
+    }
+
+    @Override
+    public void updatePriceById(@Param("price") BigDecimal price, @Param("id") String id) {
+        articleRecommendMapper.updatePriceById(price, id);
     }
 }

@@ -9,6 +9,8 @@ import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
+import com.resto.shop.web.model.ArticleRecommend;
+import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +97,12 @@ public class ArticleController extends GenericController {
         } else {
 
             articleService.update(article);
+            //修改单品的时候如果存在推荐餐包 联动修改
+            if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+                ArticleRecommendPrice articleRecommendPrice = articleRecommendService.selectByRecommendArticleInfo(article.getRecommendId(), article.getId());
+                articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(), articleRecommendPrice.getId());
+            }
+
             List<ArticlePrice> list = articlePriceService.selectByArticleId(article.getId());
             if (article.getIsEmpty() == true) {
                 articleService.clearStock(article.getId(), getCurrentShopId());
