@@ -9,10 +9,18 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 
 <html>
 	<head>
-		<title></title>
+		<title>店铺管理</title>
+		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
 	</head>
-	<body>
+	<body style="text-align: center;">
 		<h1>404</h1>
 		<h2>没有找到该页面哦！！</h2>
+		<p>3秒后将自动返回首页</p>
+		<a href="<%=basePath%>">点此返回首页</a>
 	</body>
+	<script type="text/javascript">
+		setTimeout(function(){
+			window.location.href="<%=basePath%>"; 
+		}, 3000);
+	</script>
 </html>
