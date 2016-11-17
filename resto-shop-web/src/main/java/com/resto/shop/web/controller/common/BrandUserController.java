@@ -8,6 +8,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.resto.shop.web.config.SessionKey;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -27,8 +29,8 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandUserService;
 import com.resto.brand.web.service.RoleService;
 import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
+
 
 /**
  * 商家用户控制器
@@ -47,6 +49,7 @@ public class BrandUserController extends GenericController{
     private RoleService roleService;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * 用户登录
      * 
@@ -55,7 +58,7 @@ public class BrandUserController extends GenericController{
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect) {
+    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect,@RequestParam(defaultValue="false")boolean isMD5) {
         try {
         	if(redirect == null){
         		redirect = "";
@@ -70,7 +73,12 @@ public class BrandUserController extends GenericController{
                 model.addAttribute("error", "参数错误！");
                 return "login";
             }
-            String pwd = ApplicationUtils.pwd( brandUser.getPassword());
+            
+            String pwd = brandUser.getPassword();
+            if(!isMD5){//如果是正常登录，则需进行MD5加密后验证，默认为正常登录（用于给HttpClient 开后门）
+            	pwd = ApplicationUtils.pwd( brandUser.getPassword());
+
+            }
         	// 身份验证
             subject.login(new UsernamePasswordToken(brandUser.getUsername(),pwd));
 
@@ -83,14 +91,24 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
+
+//            HttpSession session = request.getSession();
+//            session.setAttribute(RedisSessionKey.USER_INFO, JsonUtils.objectToJson(authUserInfo));//存用户的信息
+//            session.setAttribute(RedisSessionKey.CURRENT_USER_NAME,authUserInfo.getUsername());//存用户的名字
+//            session.setAttribute(RedisSessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());//存当前品牌的id
+//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());//存当前店铺的id
+//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());//存当前店铺的名字
+//            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAMES, JsonUtils.objectToJson(shopDetailList));//存当前品牌所有的店铺
         } catch (AuthenticationException e) {
             // 身份验证失败
             model.addAttribute("error", e.getMessage());
             return "login";
         }
-        System.out.println("用户登录  end");
         return "redirect:/"+redirect;
     }
+
+
 
     /**
      * 用户登出
