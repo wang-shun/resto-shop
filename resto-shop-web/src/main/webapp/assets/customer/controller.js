@@ -350,24 +350,7 @@ var Controller = function(controlId,datatable){
 		button.click(function(){
 			_C.delConfirmDialog(function(){
 				_C.ajax(delUrl,{id:value},function(result){
-					if(result.success){
-						tb.ajax.reload();
-						_C.simpleMsg("删除成功");
-					}else{
-						errorMsg(result.message);
-					}
-				});
-			});
-		});
-		return button;
-	}
-
-	//删除菜品单独判断套餐下是否存在
-	this.createDelBtnArticle = function(value,delUrl,successCbk){
-		var button = $("<button class='btn btn-xs red'>").html(name||"删除");
-		button.click(function(){
-			_C.delConfirmDialog(function(){
-				_C.ajax(delUrl,{id:value},function(result){
+					alert(JSON.stringify(result));
 					if(result.success){
 						tb.ajax.reload();
 						_C.simpleMsg("删除成功");

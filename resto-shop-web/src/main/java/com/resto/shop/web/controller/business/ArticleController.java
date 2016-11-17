@@ -146,7 +146,7 @@ public class ArticleController extends GenericController {
                 result.setSuccess(false);
                 result.setMessage("删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
                 result.setStatusCode(100);
-                return getSuccessResult(result);
+                return result;
             }
         }
         articleService.delete(id);
