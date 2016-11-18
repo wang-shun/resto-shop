@@ -318,6 +318,10 @@ public class SpringContextConfig {
     @Bean
     public LogBaseService logBaseService() { return  proxy.create(LogBaseService.class); }
 
+
+    @Bean
+    public SysErrorService sysErrorService() { return  proxy.create(SysErrorService.class); }
+
     @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {
         return proxy.create(com.resto.brand.web.service.EmployeeService.class);
