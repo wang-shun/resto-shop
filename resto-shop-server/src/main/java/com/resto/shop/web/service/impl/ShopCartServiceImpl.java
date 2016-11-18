@@ -100,5 +100,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         shopcartMapper.delMealArticle(id);
     }
 
-
+    @Override
+    public void delMealItem(String articleId) {
+        shopcartMapper.delMealItem(articleId);
+    }
 }

@@ -20,4 +20,6 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     List<ShopCart> listUserShopCart(String userId, String shopId, Integer distributionModeId);
 
     void delMealArticle(String id);
+
+    void delMealItem(String articleId);
 }
