@@ -92,4 +92,9 @@ public class ServerConfig {
 
     @Bean
     public LogBaseService logBaseService(){ return  proxy.create(LogBaseService.class); }
+
+    @Bean
+    public  PictureService pictureService(){
+        return  proxy.create(PictureService.class);
+    }
 }
