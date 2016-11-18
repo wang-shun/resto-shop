@@ -750,7 +750,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
-                order.setAllowContinueOrder(true);
+                if(order.getOrderMode() != ShopMode.CALL_NUMBER){
+                    order.setAllowContinueOrder(true);
+                }
             } else {
                 log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
                 order.setAllowContinueOrder(false);
