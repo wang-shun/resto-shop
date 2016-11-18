@@ -44,8 +44,7 @@
 							placeholder="如有多个桌号，请使用逗号分隔。">
 					</div>
 				</div>
-				<input type="hidden" name="brandSign" id="brandSign"> <input
-					type="hidden" name="shopName" id="shopName">
+				<input type="hidden" name="shopName" id="shopName">
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-3">
 						<button type="button" id="btn_shop_run" class="btn green">执&nbsp;&nbsp;行</button>

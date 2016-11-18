@@ -11,8 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.SysError;
+import com.resto.brand.web.service.SysErrorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,11 +32,13 @@ import com.resto.brand.core.feature.orm.mybatis.Page;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.shop.web.config.SessionKey;
 
-
+@Component
 public abstract class GenericController{
 
 	protected Logger log = LoggerFactory.getLogger(getClass());
 
+	@Autowired
+	private SysErrorService sysErrorService;
 
 	public Result getSuccessResult() {
 		return getSuccessResult(null);
@@ -45,20 +51,21 @@ public abstract class GenericController{
 		JSONResult<Object> result = new JSONResult<Object>(data); 
 		return result;
 	}
-	
-	
-	@ExceptionHandler
-	@ResponseBody
-	public void otherExceptionHandler(HttpServletRequest request,HttpServletResponse response,Exception ex) throws IOException{
-		log.info("Error Begin-------------------------------------");
-		log.error(ex.toString());
-		ex.printStackTrace();
-		log.info("Error End-------------------------------------");
-		request.setAttribute("errorType", ex.getClass().getName());
-		request.setAttribute("error", ex.toString());
-		response.sendError(500, ex.getClass().getSimpleName());
+
+
+
+	@ExceptionHandler(value = {Exception.class})
+	public void throwExceptionHandler(HttpServletRequest request,HttpServletResponse response,Exception ex){
+		SysError sysError = new SysError();
+		sysError.setShopDetailId(getCurrentShopId() == null ? null : getCurrentShopId());
+		sysError.setBrandId(getCurrentBrandId() == null ? null : getCurrentBrandId());
+		sysError.setErrorMsg(ex.getMessage());
+		sysError.setErrorType(ex.toString());
+		sysError.setApiUrl(request.getRequestURL().toString());
+		sysErrorService.insert(sysError);
 	}
-	
+
+
 	@ExceptionHandler(BindException.class)
 	@ResponseBody
 	public Result bindException(BindException bindEx){
@@ -146,13 +153,21 @@ public abstract class GenericController{
 	public JSONPObject getJSONPObject(Object data){
 		return new JSONPObject(getRequest().getParameter("callback"), data);
 	}
-	
+
 	public String getCurrentShopId(){
-		return getCurrentBrandUser().getShopDetailId();
+		if( getCurrentBrandUser() != null){
+			return getCurrentBrandUser().getShopDetailId();
+		}else{
+			return null;
+		}
 	}
 
 	public String getCurrentBrandId(){
-		return getCurrentBrandUser().getBrandId();
+		if(getCurrentBrandUser() != null){
+			return getCurrentBrandUser().getBrandId();
+		}else{
+			return null;
+		}
 	}
 
 	public BrandUser getCurrentBrandUser(){

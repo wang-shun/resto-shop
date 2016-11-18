@@ -55,8 +55,10 @@ public class QrCodeController extends GenericController{
 
 	@RequestMapping("/run")
 	@ResponseBody
-	public Result run(String shopId,String shopName, Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ,String brandSign,HttpServletRequest request)
+	public Result run(String shopId,String shopName, Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ,HttpServletRequest request)
 			throws IOException, InterruptedException, WriterException {
+		Brand brand = brandService.selectById(getCurrentBrandId());
+		String brandSign = brand.getBrandSign();
 		String fileSavePath = getFilePath(request,null);
 		deleteFile(new File(fileSavePath));//删除历史生成的文件
 		String filepath = getFilePath(request,shopName);
