@@ -111,6 +111,7 @@
         <id column="id"  property="id"/>
         <result column="order_money" property="orderMoney"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItemId" property="id"/>
            <result column="payment_mode_id" property="paymentModeId"/>
           <result column="pay_value" property="payValue"/>
         </collection>
@@ -1952,7 +1953,7 @@ GROUP BY r.table_number
     <!--查询所有异常订单 -->
     <select id="selectHasPayOrderPayMentItemListBybrandId" resultMap="consumedOrderByshopId">
         SELECT
-        o.id , o.order_money ,oi.pay_value,oi.payment_mode_id  from tb_order o
+        o.id , o.order_money ,oi.id as orderPaymentItemId,oi.pay_value,oi.payment_mode_id  from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state !=9
