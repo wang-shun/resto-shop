@@ -58,4 +58,7 @@
         where id = #{id,jdbcType=VARCHAR}
     </update>
 
+    <update id="updateCancelPraise" parameterType="com.resto.shop.web.model.AppraisePraise">
+        update tb_appraise_praise set is_del = 1 where id = #{id}
+    </update>
 </mapper>

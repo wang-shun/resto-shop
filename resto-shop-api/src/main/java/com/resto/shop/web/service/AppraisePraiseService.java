@@ -7,4 +7,7 @@ import com.resto.shop.web.model.AppraisePraise;
  * Created by carl on 2016/11/20.
  */
 public interface AppraisePraiseService extends GenericService<AppraisePraise, String> {
+
+    void updateCancelPraise(String id);
+
 }

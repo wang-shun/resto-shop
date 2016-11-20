@@ -18,4 +18,6 @@ public interface AppraisePraiseMapper extends GenericDao<AppraisePraise,String> 
     int updateByPrimaryKeySelective(AppraisePraise appraisePraise);
 
     int updateByPrimaryKey(AppraisePraise appraisePraise);
+
+    void updateCancelPraise(String id);
 }
