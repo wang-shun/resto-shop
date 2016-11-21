@@ -367,7 +367,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
         order.setOriginalAmount(totalMoney.add(order.getServicePrice()));// 原价
         order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
-        order.setOrderMoney(totalMoney); // 订单实际金额
+        order.setOrderMoney(totalMoney.add(order.getServicePrice())); // 订单实际金额
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
         order.setPrintTimes(0);
 
