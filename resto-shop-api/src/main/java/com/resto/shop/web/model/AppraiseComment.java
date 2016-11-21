@@ -27,6 +27,19 @@ public class AppraiseComment {
 
     private String nickName;
 
+    /**
+     * 回复的对象昵称
+     */
+    private String replyName;
+
+    public String getReplyName() {
+        return replyName;
+    }
+
+    public void setReplyName(String replyName) {
+        this.replyName = replyName;
+    }
+
     public String getNickName() {
         return nickName;
     }
