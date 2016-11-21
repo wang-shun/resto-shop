@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -55,10 +56,34 @@ public class Appraise {
      * 是否能打赏
      */
     private Boolean canReward;
-    
 
+    /**
+     * 点赞
+     */
+    private List<AppraisePraise> appraisePraises;
 
-	final public String getBrandId() {
+    /**
+     *  评论
+     */
+    private List<AppraiseComment> appraiseComments;
+
+    public List<AppraisePraise> getAppraisePraises() {
+        return appraisePraises;
+    }
+
+    public void setAppraisePraises(List<AppraisePraise> appraisePraises) {
+        this.appraisePraises = appraisePraises;
+    }
+
+    public List<AppraiseComment> getAppraiseComments() {
+        return appraiseComments;
+    }
+
+    public void setAppraiseComments(List<AppraiseComment> appraiseComments) {
+        this.appraiseComments = appraiseComments;
+    }
+
+    final public String getBrandId() {
         return brandId;
     }
 

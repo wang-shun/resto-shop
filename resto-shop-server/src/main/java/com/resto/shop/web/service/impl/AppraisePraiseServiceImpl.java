@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.AppraisePraiseMapper;
@@ -7,10 +8,12 @@ import com.resto.shop.web.model.AppraisePraise;
 import com.resto.shop.web.service.AppraisePraiseService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by carl on 2016/11/20.
  */
+@RpcService
 public class AppraisePraiseServiceImpl extends GenericServiceImpl<AppraisePraise, String> implements AppraisePraiseService {
 
     @Resource
@@ -22,7 +25,17 @@ public class AppraisePraiseServiceImpl extends GenericServiceImpl<AppraisePraise
     }
 
     @Override
-    public void updateCancelPraise(String id) {
-        appraisePraiseMapper.updateCancelPraise(id);
+    public void updateCancelPraise(String appraiseId, String customerId, Integer isDel) {
+        appraisePraiseMapper.updateCancelPraise(appraiseId, customerId, isDel);
+    }
+
+    @Override
+    public List<AppraisePraise> appraisePraiseList(String appraiseId) {
+        return appraisePraiseMapper.appraisePraiseList(appraiseId);
+    }
+
+    @Override
+    public AppraisePraise selectByAppraiseIdCustomerId(String appraiseId, String customerId) {
+        return appraisePraiseMapper.selectByAppraiseIdCustomerId(appraiseId, customerId);
     }
 }

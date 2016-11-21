@@ -21,6 +21,19 @@ public class AppraisePraise {
 
     private String brandId;
 
+    /**
+     * 评论者照片
+     */
+    private String headPhoto;
+
+    public String getHeadPhoto() {
+        return headPhoto;
+    }
+
+    public void setHeadPhoto(String headPhoto) {
+        this.headPhoto = headPhoto;
+    }
+
     public String getId() {
         return id;
     }

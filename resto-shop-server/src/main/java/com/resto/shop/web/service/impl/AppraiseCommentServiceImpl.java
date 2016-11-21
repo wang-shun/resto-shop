@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.AppraiseCommentMapper;
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
 /**
  * Created by carl on 2016/11/20.
  */
+@RpcService
 public class AppraiseCommentServiceImpl extends GenericServiceImpl<AppraiseComment, String> implements AppraiseCommentService {
 
     @Resource

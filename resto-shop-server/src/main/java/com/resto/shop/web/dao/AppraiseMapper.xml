@@ -75,7 +75,7 @@
   <select id="selectList" resultType="Appraise">select * from tb_appraise</select>
   
   <select id="listAppraise" resultType="Appraise">
-  	 SELECT a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo
+  	 SELECT a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo
   	  from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id   	  
   	  where shop_detail_id=#{currentShopId} and LEVEL &gt;= #{minLevel}
   	  	and LEVEL &lt;= #{maxLevel} ORDER BY create_time DESC LIMIT #{currentPage},#{showCount}

@@ -59,6 +59,14 @@
     </update>
 
     <update id="updateCancelPraise" parameterType="com.resto.shop.web.model.AppraisePraise">
-        update tb_appraise_praise set is_del = 1 where id = #{id}
+        update tb_appraise_praise set is_del = #{isDel} where appraise_id = #{appraiseId} and customer_id = #{customerId}
     </update>
+
+    <select id="appraisePraiseList" resultType="com.resto.shop.web.model.AppraisePraise">
+        select a.*,c.head_photo from tb_appraise_praise a LEFT JOIN tb_customer c on a.customer_id = c.id  where appraise_id = #{appraiseId} and is_del = 0
+    </select>
+
+    <select id="selectByAppraiseIdCustomerId" resultType="com.resto.shop.web.model.AppraisePraise">select
+        <include refid="Base_Column_List"/> from tb_appraise_praise where appraise_id = #{appraiseId} and customer_id = #{customerId}
+    </select>
 </mapper>
