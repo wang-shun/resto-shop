@@ -8,6 +8,7 @@ import com.resto.shop.web.model.AppraiseComment;
 import com.resto.shop.web.service.AppraiseCommentService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by carl on 2016/11/20.
@@ -21,5 +22,10 @@ public class AppraiseCommentServiceImpl extends GenericServiceImpl<AppraiseComme
     @Override
     public GenericDao<AppraiseComment, String> getDao() {
         return appraiseCommentMapper;
+    }
+
+    @Override
+    public List<AppraiseComment> appraiseCommentList(String appraiseId) {
+        return appraiseCommentMapper.appraiseCommentList(appraiseId);
     }
 }

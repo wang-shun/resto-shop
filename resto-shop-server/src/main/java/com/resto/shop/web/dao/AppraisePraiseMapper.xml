@@ -63,7 +63,7 @@
     </update>
 
     <select id="appraisePraiseList" resultType="com.resto.shop.web.model.AppraisePraise">
-        select a.*,c.head_photo from tb_appraise_praise a LEFT JOIN tb_customer c on a.customer_id = c.id  where appraise_id = #{appraiseId} and is_del = 0
+        select a.*,c.head_photo from tb_appraise_praise a LEFT JOIN tb_customer c on a.customer_id = c.id  where a.appraise_id = #{appraiseId} and a.is_del = 0 order by a.create_time
     </select>
 
     <select id="selectByAppraiseIdCustomerId" resultType="com.resto.shop.web.model.AppraisePraise">select

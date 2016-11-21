@@ -3,6 +3,8 @@ package com.resto.shop.web.dao;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.AppraiseComment;
 
+import java.util.List;
+
 /**
  * Created by carl on 2016/11/20.
  */
@@ -18,4 +20,6 @@ public interface AppraiseCommentMapper extends GenericDao<AppraiseComment,String
     int updateByPrimaryKeySelective(AppraiseComment appraiseComment);
 
     int updateByPrimaryKey(AppraiseComment appraiseComment);
+
+    List<AppraiseComment> appraiseCommentList(String appraiseId);
 }

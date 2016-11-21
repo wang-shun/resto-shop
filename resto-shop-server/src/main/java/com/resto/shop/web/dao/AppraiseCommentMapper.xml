@@ -66,4 +66,8 @@
         pid = #{pid,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}
     </update>
 
+    <select id="appraiseCommentList" resultType="com.resto.shop.web.model.AppraiseComment">
+        select a.*,c.nickname from tb_appraise_comment a LEFT JOIN tb_customer c on a.customer_id = c.id  where a.appraise_id = #{appraiseId} and a.is_del = 0 order by a.create_time
+    </select>
+
 </mapper>
