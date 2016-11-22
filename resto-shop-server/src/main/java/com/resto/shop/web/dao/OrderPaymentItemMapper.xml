@@ -155,7 +155,7 @@
     <select id="selectShopIncomeList" resultType="OrderPaymentItem">
         SELECT
         o.shop_detail_id,
-        oi. pay_value,
+        sum(oi. pay_value)pay_value,
         oi.payment_mode_id
         FROM
         tb_order_payment_item oi
@@ -163,8 +163,10 @@
         WHERE
         o.order_state IN (10, 11, 2, 12)
         AND o.production_status IN (2, 3)
+        AND o.brand_id=#{brandId}
         AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+         GROUP BY o.shop_detail_id,oi.payment_mode_id
     </select>
 
 
@@ -173,7 +175,7 @@
     <select id="selectShopIncomeListByShopId" resultType="OrderPaymentItem">
         SELECT
         o.shop_detail_id,
-        oi. pay_value,
+        sum(oi. pay_value)pay_value,
         oi.payment_mode_id
         FROM
         tb_order_payment_item oi
