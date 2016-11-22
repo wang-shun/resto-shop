@@ -65,6 +65,7 @@
         <result column="orderCount" property="orderCount"/>
         <result column="orderTotal" property="orderTotal"/>
         <result column="service_price" property="servicePrice"/>
+        <result column="pay_mode" property="payMode"/>
     </resultMap>
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
@@ -111,6 +112,7 @@
         <id column="id"  property="id"/>
         <result column="order_money" property="orderMoney"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItemId" property="id"/>
            <result column="payment_mode_id" property="paymentModeId"/>
           <result column="pay_value" property="payValue"/>
         </collection>
@@ -232,7 +234,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price
+        last_order_time,customer_count,service_price,pay_mode
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -414,6 +416,9 @@
             <if test="servicePrice != null">
                 service_price,
             </if>
+            <if test="payMode != null">
+                pay_mode,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -528,7 +533,10 @@
                 #{lastOrderTime,jdbcType=TIMESTAMP},
             </if>
             <if test="servicePrice != null">
-                #{servicePrice,jdbcType=DECIMAL}
+                #{servicePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="payMode != null">
+                #{payMode}
             </if>
         </trim>
     </insert>
@@ -1952,7 +1960,7 @@ GROUP BY r.table_number
     <!--查询所有异常订单 -->
     <select id="selectHasPayOrderPayMentItemListBybrandId" resultMap="consumedOrderByshopId">
         SELECT
-        o.id , o.order_money ,oi.pay_value,oi.payment_mode_id  from tb_order o
+        o.id , o.order_money ,oi.id as orderPaymentItemId,oi.pay_value,oi.payment_mode_id  from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state !=9

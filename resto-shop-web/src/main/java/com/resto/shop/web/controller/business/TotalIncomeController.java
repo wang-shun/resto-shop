@@ -17,6 +17,8 @@ import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.util.JsonUtils;
+import com.resto.brand.web.dto.IncomeReportDto;
+import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
 import org.apache.commons.lang3.StringUtils;
@@ -85,12 +87,14 @@ public class TotalIncomeController extends GenericController {
             ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
             shopIncomeDtos.add(sin);
         }
+
         //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.等位红包支付 7.店铺名字 8 店铺 ID
         //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
         //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
         //     String shopDetailId
         //查询订单支付
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
+
         if(!orderPaymentItemList.isEmpty()){
             for(ShopIncomeDto si :shopIncomeDtos){
                 for(OrderPaymentItem oi : orderPaymentItemList){
@@ -122,6 +126,41 @@ public class TotalIncomeController extends GenericController {
                 }
             }
         }
+
+
+
+
+//        if(!orderPaymentItemList.isEmpty()){
+//            for(ShopIncomeDto si :shopIncomeDtos){
+//                for(OrderPaymentItem oi : orderPaymentItemList){
+//                    if(si.getShopDetailId().equals(oi.getShopDetailId())){
+//                        switch (oi.getPaymentModeId()) {
+//                            case PayMode.WEIXIN_PAY:
+//                                si.setWechatIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.ACCOUNT_PAY:
+//                                si.setRedIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.COUPON_PAY:
+//                                si.setCouponIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.CHARGE_PAY:
+//                                si.setChargeAccountIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.REWARD_PAY:
+//                                si.setChargeGifAccountIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.WAIT_MONEY:
+//                                si.setWaitNumberIncome(oi.getPayValue());
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome());
+//                    }
+//                }
+//            }
+//        }
 
         List<BrandIncomeDto> brandIncomeDtos = new ArrayList<>();
         //封装品牌的数据

@@ -390,7 +390,6 @@ public class SyncDataController extends GenericController {
         }
 
         //查询订单项丢失
-        //查询所有的订单和它的订单项(不考虑 orderstate 和productionStatus)
         List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
         if(!orderExceptionList.isEmpty()){
             for(Order order : orderExceptionList){
