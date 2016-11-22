@@ -65,6 +65,7 @@
         <result column="orderCount" property="orderCount"/>
         <result column="orderTotal" property="orderTotal"/>
         <result column="service_price" property="servicePrice"/>
+        <result column="pay_mode" property="payMode"/>
     </resultMap>
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
@@ -233,7 +234,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price
+        last_order_time,customer_count,service_price,pay_mode
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
