@@ -11,10 +11,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
-import com.resto.shop.web.constant.LogBaseState;
-import com.resto.shop.web.constant.OrderState;
-import com.resto.shop.web.constant.PayMode;
-import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -236,6 +233,9 @@ public class OrderAspect {
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
+                if(order.getPayMode().equals(OrderPayMode.ALI_PAY)){
+                    return;
+                }
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
