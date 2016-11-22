@@ -1976,7 +1976,7 @@ GROUP BY r.table_number
         and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}]]>
     </select>
 
-    <select id="getLastOrderByTableNumber">
+    <select id="getLastOrderByTableNumber" resultType="Order">
         select * from tb_order where table_number = #{tableNumber} and order_state = 1 order by create_time desc limit 1
     </select>
 
