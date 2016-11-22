@@ -532,7 +532,7 @@
                 #{lastOrderTime,jdbcType=TIMESTAMP},
             </if>
             <if test="servicePrice != null">
-                #{servicePrice,jdbcType=DECIMAL}
+                #{servicePrice,jdbcType=DECIMAL},
             </if>
             <if test="payMode != null">
                 #{payMode}
