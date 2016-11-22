@@ -30,6 +30,11 @@ public class AppraisePraiseServiceImpl extends GenericServiceImpl<AppraisePraise
     }
 
     @Override
+    public void updateCancelPraise(AppraisePraise appraisePraise) {
+        appraisePraiseMapper.insertSelective(appraisePraise);
+    }
+
+    @Override
     public List<AppraisePraise> appraisePraiseList(String appraiseId) {
         return appraisePraiseMapper.appraisePraiseList(appraiseId);
     }

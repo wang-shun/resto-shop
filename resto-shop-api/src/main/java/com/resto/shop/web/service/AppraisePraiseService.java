@@ -12,6 +12,8 @@ public interface AppraisePraiseService extends GenericService<AppraisePraise, St
 
     void updateCancelPraise(String appraiseId, String customerId, Integer isDel);
 
+    void updateCancelPraise(AppraisePraise appraisePraise);
+
     List<AppraisePraise> appraisePraiseList(String appraiseId);
 
     AppraisePraise selectByAppraiseIdCustomerId(String appraiseId, String customerId);
