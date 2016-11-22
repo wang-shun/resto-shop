@@ -469,4 +469,12 @@ public interface OrderService extends GenericService<Order, String> {
 
 
     public boolean cancelWXPayOrder(String orderId);
+
+
+	/**
+	 * 查找该桌位最新的未消费订单
+	 * @param tableNumber
+	 * @return
+	 */
+	Order getLastOrderByTableNumber(String tableNumber);
 }
