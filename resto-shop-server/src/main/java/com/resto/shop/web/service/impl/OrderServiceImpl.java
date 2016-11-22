@@ -2858,4 +2858,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectHasPayOrderPayMentItemListBybrandId(begin, end, brandId);
     }
 
+    @Override
+    public Order getLastOrderByTableNumber(String tableNumber) {
+        return orderMapper.getLastOrderByTableNumber(tableNumber);
+    }
 }

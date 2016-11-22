@@ -170,6 +170,11 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
+        if(order != null && order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.PAYMENT)
+                && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderWXModeFive(order.getId());
         }
