@@ -92,7 +92,7 @@ public class ReportDataTask{
     
 //    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 29 13 * * ?")   //每天12点执行
+//    @Scheduled(cron = "00 29 13 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
     	
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4

@@ -71,4 +71,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @param articleList
      */
 	void assignTotal(String [] shopList,String articleList[]);
+	
+	void updateArticleImg(Article article);
 }

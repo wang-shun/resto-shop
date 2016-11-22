@@ -1,4 +1,4 @@
-<%@ page language="java" pageEncoding="utf-8" %>
+<%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <style>
@@ -160,6 +160,7 @@
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
                                                      @error="uploadError"></img-file-upload>
+                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" width="80px" height="40px" class="img-rounded">                 
                                 </div>
                             </div>
 
@@ -689,7 +690,11 @@
                     data: "photoSmall",
                     defaultContent: "",
                     createdCell: function (td, tdData) {
-                        $(td).html("<img src='/" + tdData + "' style='height:40px;width:80px;'/>")
+                    	if(tdData !=null && tdData.substring(0,4)=="http"){
+                			$(td).html("<img src='" + tdData + "' class='img-rounded' style='height:40px;width:80px;'/>")
+                		}else{
+                			$(td).html("<img src='/" + tdData + "' class='img-rounded' style='height:40px;width:80px;'/>")
+                		}
                     }
                 },
                 {
@@ -1064,25 +1069,6 @@
                             $("#supportTimeRemark").html("");
                         },
                         checkNull: function () {
-                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
-                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
-                                return true;
-                            }
-                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
-                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
-                                return true;
-                            }
-                          	//if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
-                            //    $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
-                            //    return true;
-                            //}
-                            if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
-                                //$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
-                                //return true;
-                                if(!confirm("是否不选择出餐厨房！")){
-                                	return true;
-                                }
-                            }
                             if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
                                 $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
                                 return true;
