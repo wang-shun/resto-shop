@@ -90,9 +90,13 @@ public class TotalIncomeController extends GenericController {
         //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
         //     String shopDetailId
         //查询订单支付
+        Map<String,OrderPaymentItem> orderPaymentItemMap = new HashMap<>();
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
+
         if(!orderPaymentItemList.isEmpty()){
             for(ShopIncomeDto si :shopIncomeDtos){
+
+
                 for(OrderPaymentItem oi : orderPaymentItemList){
                     if(si.getShopDetailId().equals(oi.getShopDetailId())){
                         switch (oi.getPaymentModeId()) {
@@ -122,6 +126,41 @@ public class TotalIncomeController extends GenericController {
                 }
             }
         }
+
+
+
+
+//        if(!orderPaymentItemList.isEmpty()){
+//            for(ShopIncomeDto si :shopIncomeDtos){
+//                for(OrderPaymentItem oi : orderPaymentItemList){
+//                    if(si.getShopDetailId().equals(oi.getShopDetailId())){
+//                        switch (oi.getPaymentModeId()) {
+//                            case PayMode.WEIXIN_PAY:
+//                                si.setWechatIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.ACCOUNT_PAY:
+//                                si.setRedIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.COUPON_PAY:
+//                                si.setCouponIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.CHARGE_PAY:
+//                                si.setChargeAccountIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.REWARD_PAY:
+//                                si.setChargeGifAccountIncome(oi.getPayValue());
+//                                break;
+//                            case PayMode.WAIT_MONEY:
+//                                si.setWaitNumberIncome(oi.getPayValue());
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome());
+//                    }
+//                }
+//            }
+//        }
 
         List<BrandIncomeDto> brandIncomeDtos = new ArrayList<>();
         //封装品牌的数据
