@@ -28,4 +28,10 @@ public class AppraiseCommentServiceImpl extends GenericServiceImpl<AppraiseComme
     public List<AppraiseComment> appraiseCommentList(String appraiseId) {
         return appraiseCommentMapper.appraiseCommentList(appraiseId);
     }
+
+    @Override
+    public AppraiseComment insertComment(AppraiseComment appraiseComment) {
+        appraiseCommentMapper.insertSelective(appraiseComment);
+        return appraiseComment;
+    }
 }

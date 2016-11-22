@@ -12,4 +12,5 @@ public interface AppraiseCommentService extends GenericService<AppraiseComment, 
 
     List<AppraiseComment> appraiseCommentList(String appraiseId);
 
+    AppraiseComment insertComment(AppraiseComment appraiseComment);
 }
