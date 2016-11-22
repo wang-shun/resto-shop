@@ -17,6 +17,8 @@ import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.util.JsonUtils;
+import com.resto.brand.web.dto.IncomeReportDto;
+import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
 import org.apache.commons.lang3.StringUtils;
@@ -81,27 +83,20 @@ public class TotalIncomeController extends GenericController {
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
         //给每个店铺的订单总额  红包支付总额 微信支付总额 ...附初始值
-//        for(ShopDetail s : shopDetailList){
-//            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
-//            shopIncomeDtos.add(sin);
-//        }
-
-        for(int i=0;i<shopDetailList.size();i++){
-
-
+        for(ShopDetail s : shopDetailList){
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
+            shopIncomeDtos.add(sin);
         }
+
         //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.等位红包支付 7.店铺名字 8 店铺 ID
         //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
         //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
         //     String shopDetailId
         //查询订单支付
-        Map<String,OrderPaymentItem> orderPaymentItemMap = new HashMap<>();
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
 
         if(!orderPaymentItemList.isEmpty()){
             for(ShopIncomeDto si :shopIncomeDtos){
-
-
                 for(OrderPaymentItem oi : orderPaymentItemList){
                     if(si.getShopDetailId().equals(oi.getShopDetailId())){
                         switch (oi.getPaymentModeId()) {
