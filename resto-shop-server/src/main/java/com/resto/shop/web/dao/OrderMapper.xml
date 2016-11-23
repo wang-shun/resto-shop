@@ -740,9 +740,10 @@
                      separator="," close=")">
                 #{state}
             </foreach>
+            or order_state = 1)
         </if>
         and parent_order_id is null
-        ) or (order_state = 1 )
+
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
