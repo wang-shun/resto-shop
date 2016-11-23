@@ -79,7 +79,7 @@ public class TableCodeController extends GenericController{
     public  Result checkCodeNumber(String codeNumber){
         Result result = new Result();
         result.setSuccess(true);
-        TableCode tableCode = tablecodeService.selectByCodeNumber(codeNumber);
+        TableCode tableCode = tablecodeService.selectByCodeNumber(codeNumber,getCurrentShopId());
         if(tableCode!=null){
             result.setSuccess(false);
             result.setMessage("桌位号重复了请重新填写");
