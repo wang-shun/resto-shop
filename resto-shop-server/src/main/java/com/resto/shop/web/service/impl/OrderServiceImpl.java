@@ -643,7 +643,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    private void refundOrder(Order order) throws AlipayApiException {
+    private void refundOrder(Order order){
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
@@ -677,8 +677,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             brandSetting.getAliPrivateKey(),
                             brandSetting.getAliPublicKey());
                     Map map = new HashMap();
-                    map.put("out_trade_no",order.getId());
-                    map.put("refund_amount",order.getPaymentAmount());
+                    map.put("out_trade_no", order.getId());
+                    map.put("refund_amount", order.getPaymentAmount());
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
                     break;
@@ -721,8 +721,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private boolean validOrderCanPush(Order order) throws AppException {
-        if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY
-                && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER)&& order.getOrderState().equals(OrderState.SUBMIT)){
+        if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY
+                && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER) && order.getOrderState().equals(OrderState.SUBMIT)) {
             return true;
         }
 
@@ -764,7 +764,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
-                if(order.getOrderMode() != ShopMode.CALL_NUMBER){
+                if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
                     order.setAllowContinueOrder(true);
                 }
             } else {
@@ -1087,7 +1087,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getOrderInfo(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        if(order == null){
+        if (order == null) {
             return null;
         }
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
