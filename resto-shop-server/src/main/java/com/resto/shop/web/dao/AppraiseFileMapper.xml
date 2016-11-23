@@ -52,5 +52,7 @@
         file_url = #{fileUrl,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}
         where id = #{id,jdbcType=VARCHAR}
     </update>
-
+    <select id="appraiseFileList" resultType="com.resto.shop.web.model.AppraiseFile">
+        select * from tb_appraise_file where appraise_id = #{appraiseId}  order by a.create_time
+    </select>
 </mapper>

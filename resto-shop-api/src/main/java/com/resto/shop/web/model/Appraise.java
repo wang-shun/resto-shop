@@ -67,6 +67,19 @@ public class Appraise {
      */
     private List<AppraiseComment> appraiseComments;
 
+    /**
+     * 照片
+     */
+    private List<AppraiseFile> appraiseFiles;
+
+    public List<AppraiseFile> getAppraiseFiles() {
+        return appraiseFiles;
+    }
+
+    public void setAppraiseFiles(List<AppraiseFile> appraiseFiles) {
+        this.appraiseFiles = appraiseFiles;
+    }
+
     public List<AppraisePraise> getAppraisePraises() {
         return appraisePraises;
     }
