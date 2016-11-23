@@ -1,7 +1,6 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
-import com.alipay.api.AlipayApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
@@ -643,7 +642,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    private void refundOrder(Order order){
+    private void refundOrder(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
@@ -1859,7 +1858,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
-        o.setShopName(shop.getName());
+        if(shop != null){
+            o.setShopName(shop.getName());
+        }
+
         return o;
     }
 
