@@ -3,6 +3,8 @@ package com.resto.shop.web.dao;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.AppraiseFile;
 
+import java.util.List;
+
 /**
  * Created by carl on 2016/11/20.
  */
@@ -18,4 +20,6 @@ public interface AppraiseFileMapper extends GenericDao<AppraiseFile,String> {
     int updateByPrimaryKeySelective(AppraiseFile appraiseFile);
 
     int updateByPrimaryKey(AppraiseFile appraiseFile);
+
+    List<AppraiseFile> appraiseFileList(String appraiseId);
 }
