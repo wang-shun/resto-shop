@@ -733,16 +733,15 @@
     <!-- 根据 店铺ID 和 用户ID 分页查询订单列表 -->
     <select id="orderList" resultType="Order">
         SELECT * from tb_order where shop_detail_id = #{shopId} and
-        customer_id = #{customerId}
+        (( customer_id = #{customerId}
         <if test="orderState != null and orderState != '' ">
-            and ( ORDER_STATE in
+            and   ORDER_STATE in
             <foreach collection="orderState" item="state" open="("
                      separator="," close=")">
                 #{state}
             </foreach>
-            or order_state = 1)
         </if>
-        and parent_order_id is null
+        and parent_order_id is null ) or (customer_id = #{customerId} and order_state = 1))
 
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}

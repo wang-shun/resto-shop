@@ -193,4 +193,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			return null;
 		}
 	}
+
+	@Override
+	public Appraise selectAppraiseByCustomerId(String customerId,String shopId) {
+		return appraiseMapper.selectAppraiseByCustomerId(customerId,shopId);
+	}
 }

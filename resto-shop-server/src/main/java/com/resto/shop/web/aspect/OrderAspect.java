@@ -104,8 +104,8 @@ public class OrderAspect {
             }
             //自动取消订单，不包含后付款模式
             if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() != ShopMode.HOUFU_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
-            	long delay = 1000*60*60*2;//两个小时后自动取消订单
-                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+//            	long delay = 1000*60*60*2;//两个小时后自动取消订单
+//                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
             } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode() != ShopMode.TABLE_MODE) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
@@ -170,10 +170,11 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
-//        if(order != null && order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)  && order.getOrderState() == OrderState.PAYMENT
-//                && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
-//            MQMessageProducer.sendPlaceOrderMessage(order);
-//        }
+        if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
+                order.getOrderState().equals(OrderState.PAYMENT)
+                && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderWXModeFive(order.getId());
@@ -238,9 +239,9 @@ public class OrderAspect {
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-//                if(order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)  && order.getOrderState().equals(OrderState.SUBMIT)){
-//                    return;
-//                }
+                if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
+                    return;
+                }
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 

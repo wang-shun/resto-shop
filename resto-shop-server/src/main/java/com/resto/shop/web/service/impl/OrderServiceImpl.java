@@ -6,10 +6,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -110,6 +107,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     PrinterService printerService;
+
+    @Autowired
+    AppraiseService appraiseService;
 
     @Resource
     MealItemService mealItemService;
@@ -519,7 +519,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer[] orderState = new Integer[]{OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM};
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
-            if (order.getParentOrderId() != null) {
+            if (order.getParentOrderId() != null  && order.getOrderState() != OrderState.SUBMIT) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
@@ -673,6 +673,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case PayMode.WAIT_MONEY:
                     getNumberService.refundWaitMoney(order);
                     break;
+                case PayMode.ALI_PAY: //如果是支付宝支付
+                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                    AliPayUtils.connection(brandSetting.getAliAppId(),
+                            brandSetting.getAliPrivateKey(),
+                            brandSetting.getAliPublicKey());
+                    Map map = new HashMap();
+                    map.put("out_trade_no", order.getId());
+                    map.put("refund_amount", order.getPaymentAmount());
+                    String resultJson = AliPayUtils.refundPay(map);
+                    item.setResultData(new JSONObject(resultJson).toString());
+                    break;
             }
             item.setId(newPayItemId);
             item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
@@ -712,11 +723,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private boolean validOrderCanPush(Order order) throws AppException {
-
-//        if(order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)
-//                && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER) && order.getOrderState().equals(OrderState.SUBMIT)){ //支付宝支付
-//            return true;
-//        }
+        if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY
+                && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER) && order.getOrderState().equals(OrderState.SUBMIT)) {
+            return true;
+        }
 
         if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
             log.error("立即下单失败: " + order.getId());
@@ -756,7 +766,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
-                if(order.getOrderMode() != ShopMode.CALL_NUMBER){
+                if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
                     order.setAllowContinueOrder(true);
                 }
             } else {
@@ -926,7 +936,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 data.put("RESTAURANT_ADDRESS", shop.getAddress());
                 data.put("REDUCTION_AMOUNT", order.getReductionAmount());
                 data.put("RESTAURANT_TEL", shop.getPhone());
-                data.put("TABLE_NUMBER", tableNumber);
+                Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+                StringBuilder star = new StringBuilder();
+                if(appraise != null && appraise.getLevel() < 5){
+                    for(int i = 0;i< appraise.getLevel();i++){
+                        star.append("★");
+                    }
+                }
+                data.put("TABLE_NUMBER", tableNumber+star.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -1022,14 +1039,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         data.put("ITEMS", items);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        if(appraise != null && appraise.getLevel() < 5){
+            for(int i = 0;i< appraise.getLevel();i++){
+                star.append("★");
+            }
 
+        }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("TABLE_NUMBER", order.getTableNumber()+star.toString());
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -1079,7 +1103,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getOrderInfo(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        if(order == null){
+        if (order == null) {
             return null;
         }
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
@@ -1851,7 +1875,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
-        o.setShopName(shop.getName());
+        if(shop != null){
+            o.setShopName(shop.getName());
+        }
+
         return o;
     }
 
