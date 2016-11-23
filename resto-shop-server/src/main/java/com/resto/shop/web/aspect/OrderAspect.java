@@ -170,7 +170,7 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
-        if(order != null && order.getPayMode() == OrderPayMode.ALI_PAY  && order.getOrderState() == OrderState.PAYMENT
+        if(order != null && order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)  && order.getOrderState() == OrderState.PAYMENT
                 && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
