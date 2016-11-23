@@ -713,7 +713,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private boolean validOrderCanPush(Order order) throws AppException {
 
-        if(order.getPayMode() == OrderPayMode.ALI_PAY
+        if(order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)
                 && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER) && order.getOrderState().equals(OrderState.SUBMIT)){ //支付宝支付
             return true;
         }
