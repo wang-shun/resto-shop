@@ -939,7 +939,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
                 StringBuilder star = new StringBuilder();
                 if(appraise != null && appraise.getLevel() < 5){
-                    star.append("★");
+                    for(int i = 0;i< appraise.getLevel();i++){
+                        star.append("★");
+                    }
                 }
                 data.put("TABLE_NUMBER", tableNumber+star);
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
@@ -1040,7 +1042,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
         StringBuilder star = new StringBuilder();
         if(appraise != null && appraise.getLevel() < 5){
-            star.append("★");
+            for(int i = 0;i< appraise.getLevel();i++){
+                star.append("★");
+            }
+
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
