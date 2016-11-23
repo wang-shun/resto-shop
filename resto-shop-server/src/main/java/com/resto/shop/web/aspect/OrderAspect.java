@@ -170,10 +170,10 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
-        if(order != null && order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.PAYMENT)
-                && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
-            MQMessageProducer.sendPlaceOrderMessage(order);
-        }
+//        if(order != null && order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)  && order.getOrderState() == OrderState.PAYMENT
+//                && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+//            MQMessageProducer.sendPlaceOrderMessage(order);
+//        }
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderWXModeFive(order.getId());
@@ -238,9 +238,9 @@ public class OrderAspect {
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-                if(order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.SUBMIT)){
-                    return;
-                }
+//                if(order.getPayMode() != null && order.getPayMode().equals(OrderPayMode.ALI_PAY)  && order.getOrderState().equals(OrderState.SUBMIT)){
+//                    return;
+//                }
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
