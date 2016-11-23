@@ -238,7 +238,7 @@ public class OrderAspect {
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-                if(order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.SUBMIT)){
+                if(order.getPayMode() == OrderPayMode.ALI_PAY  && order.getOrderState().equals(OrderState.SUBMIT)){
                     return;
                 }
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
