@@ -1,15 +1,13 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.alipay.api.AlipayApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -645,7 +643,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    private void refundOrder(Order order) {
+    private void refundOrder(Order order) throws AlipayApiException {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
@@ -672,6 +670,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.WAIT_MONEY:
                     getNumberService.refundWaitMoney(order);
+                    break;
+                case PayMode.ALI_PAY: //如果是支付宝支付
+                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                    AliPayUtils.connection(brandSetting.getAliAppId(),
+                            brandSetting.getAliPrivateKey(),
+                            brandSetting.getAliPublicKey());
+                    Map map = new HashMap();
+                    map.put("out_trade_no",order.getId());
+                    map.put("refund_amount",order.getPaymentAmount());
+                    String resultJson = AliPayUtils.refundPay(map);
+                    item.setResultData(new JSONObject(resultJson).toString());
                     break;
             }
             item.setId(newPayItemId);
