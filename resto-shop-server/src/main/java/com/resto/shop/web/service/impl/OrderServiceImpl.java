@@ -108,6 +108,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     PrinterService printerService;
 
+    @Autowired
+    AppraiseService appraiseService;
+
     @Resource
     MealItemService mealItemService;
 
@@ -933,7 +936,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 data.put("RESTAURANT_ADDRESS", shop.getAddress());
                 data.put("REDUCTION_AMOUNT", order.getReductionAmount());
                 data.put("RESTAURANT_TEL", shop.getPhone());
-                data.put("TABLE_NUMBER", tableNumber);
+                Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+                StringBuilder star = new StringBuilder();
+                if(appraise != null && appraise.getLevel() < 5){
+                    star.append("★");
+                }
+                data.put("TABLE_NUMBER", tableNumber+star);
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -1029,14 +1037,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         data.put("ITEMS", items);
-
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        if(appraise != null && appraise.getLevel() < 5){
+            star.append("★");
+        }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("TABLE_NUMBER", order.getTableNumber()+star);
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
