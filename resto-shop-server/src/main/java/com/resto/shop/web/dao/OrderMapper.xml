@@ -735,13 +735,15 @@
         SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
         <if test="orderState != null and orderState != '' ">
-            and ORDER_STATE in
+            and ( ORDER_STATE in
             <foreach collection="orderState" item="state" open="("
                      separator="," close=")">
                 #{state}
             </foreach>
+            or order_state = 1)
         </if>
         and parent_order_id is null
+
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
