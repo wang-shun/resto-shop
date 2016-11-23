@@ -170,7 +170,8 @@ public class OrderAspect {
         if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
-        if(order != null && order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.PAYMENT)
+        if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
+                order.getOrderState().equals(OrderState.PAYMENT)
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
@@ -238,7 +239,7 @@ public class OrderAspect {
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-                if(order.getPayMode().equals(OrderPayMode.ALI_PAY) && order.getOrderState().equals(OrderState.SUBMIT)){
+                if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
                     return;
                 }
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
