@@ -943,7 +943,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         star.append("★");
                     }
                 }
-                data.put("TABLE_NUMBER", tableNumber+star);
+                data.put("TABLE_NUMBER", tableNumber+star.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -1053,7 +1053,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber()+star);
+        data.put("TABLE_NUMBER", order.getTableNumber()+star.toString());
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
