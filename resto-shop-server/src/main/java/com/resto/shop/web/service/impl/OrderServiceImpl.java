@@ -1203,7 +1203,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        List<Map<String, Object>> kitchenTicket = null;
+        List<Map<String, Object>> kitchenTicket = new ArrayList<>();
         if(setting.getIsPrintPayAfter().equals(Common.NO)){
             kitchenTicket    = printKitchen(order, items);
         }
