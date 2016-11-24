@@ -290,6 +290,12 @@ public class OrderAspect {
                     if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
+                        if(order.getPrintTimes() == 0){
+                            order.setPrintTimes(order.getPrintTimes()+1);
+                            orderService.update(order);
+                            MQMessageProducer.sendPlaceOrderMessage(order);
+                        }
+
                     }
                 }
                 if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){

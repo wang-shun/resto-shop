@@ -766,7 +766,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
-        if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)) {
+        if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)
+                || order.getOrderMode().equals(ShopMode.HOUFU_ORDER) ) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
                 if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
@@ -781,8 +782,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             order.setAllowCancel(false);
             update(order);
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-            Customer customer = customerService.selectById(order.getCustomerId());
+//            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+//            Customer customer = customerService.selectById(order.getCustomerId());
 //            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
         }
@@ -1182,7 +1183,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if (setting.getAutoPrintTotal().intValue() == 0 && !order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
+        if (setting.getAutoPrintTotal().intValue() == 0) {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
                 if (ticket != null) {
@@ -1192,10 +1193,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
+        if(order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
+                && setting.getIsPrintPayAfter().equals(Common.YES)){
+            for (Printer printer : ticketPrinter) {
+                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
+            }
+        }
+
+
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
         //如果是外带，添加一张外带小票
-        if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
+        if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
             for (Printer printer : packagePrinter) {
                 Map<String, Object> packageTicket = printTicket(order, items, shop, printer);
