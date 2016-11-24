@@ -1182,7 +1182,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if (setting.getAutoPrintTotal().intValue() == 0) {
+        if (setting.getAutoPrintTotal().intValue() == 0 && !order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
                 if (ticket != null) {
