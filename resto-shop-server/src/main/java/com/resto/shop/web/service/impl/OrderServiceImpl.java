@@ -1203,8 +1203,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
+        List<Map<String, Object>> kitchenTicket = null;
+        if(setting.getIsPrintPayAfter().equals(Common.NO)){
+            kitchenTicket    = printKitchen(order, items);
+        }
 
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+
 
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
