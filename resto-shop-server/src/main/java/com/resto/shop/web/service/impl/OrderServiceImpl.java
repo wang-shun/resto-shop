@@ -2271,7 +2271,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getServicePrice());
+            item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
             item.put("FAMILY_NAME", brandSetting.getServiceName());
             productItems.add(item);
         }
