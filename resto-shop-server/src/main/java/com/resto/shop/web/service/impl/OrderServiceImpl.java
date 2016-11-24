@@ -1203,10 +1203,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        List<Map<String, Object>> kitchenTicket = new ArrayList<>();
-        if(setting.getIsPrintPayAfter().equals(Common.NO)){
-            kitchenTicket    = printKitchen(order, items);
-        }
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
 
 
@@ -1221,7 +1218,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!kitchenTicket.isEmpty()) {
+        if (!kitchenTicket.isEmpty() && !order.getOrderState().equals(OrderState.PAYMENT)) {
             printTask.addAll(kitchenTicket);
         }
         return printTask;
