@@ -22,4 +22,6 @@ public interface AppraiseCommentMapper extends GenericDao<AppraiseComment,String
     int updateByPrimaryKey(AppraiseComment appraiseComment);
 
     List<AppraiseComment> appraiseCommentList(String appraiseId);
+
+    int selectByCustomerCount(String customerId);
 }

@@ -34,4 +34,9 @@ public class AppraiseCommentServiceImpl extends GenericServiceImpl<AppraiseComme
         appraiseCommentMapper.insertSelective(appraiseComment);
         return appraiseComment;
     }
+
+    @Override
+    public int selectByCustomerCount(String customerId) {
+        return appraiseCommentMapper.selectByCustomerCount(customerId);
+    }
 }

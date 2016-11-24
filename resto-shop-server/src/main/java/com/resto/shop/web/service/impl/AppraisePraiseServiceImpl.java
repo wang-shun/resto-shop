@@ -43,4 +43,9 @@ public class AppraisePraiseServiceImpl extends GenericServiceImpl<AppraisePraise
     public AppraisePraise selectByAppraiseIdCustomerId(String appraiseId, String customerId) {
         return appraisePraiseMapper.selectByAppraiseIdCustomerId(appraiseId, customerId);
     }
+
+    @Override
+    public int selectByCustomerCount(String customerId) {
+        return appraisePraiseMapper.selectByCustomerCount(customerId);
+    }
 }
