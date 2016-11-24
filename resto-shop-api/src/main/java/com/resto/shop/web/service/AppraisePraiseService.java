@@ -18,4 +18,5 @@ public interface AppraisePraiseService extends GenericService<AppraisePraise, St
 
     AppraisePraise selectByAppraiseIdCustomerId(String appraiseId, String customerId);
 
+    int selectByCustomerCount(String customerId);
 }

@@ -69,4 +69,8 @@
     <select id="selectByAppraiseIdCustomerId" resultType="com.resto.shop.web.model.AppraisePraise">select
         <include refid="Base_Column_List"/> from tb_appraise_praise where appraise_id = #{appraiseId} and customer_id = #{customerId}
     </select>
+
+    <select id="selectByCustomerCount" resultType="java.lang.Integer">
+        select count(*) from tb_appraise_praise where customer_id = #{customerId} and is_del = 0
+    </select>
 </mapper>

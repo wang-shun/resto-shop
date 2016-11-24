@@ -41,4 +41,8 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	Appraise selectDeatilByOrderId(String orderId);
 
 	Appraise selectAppraiseByCustomerId(String customerId,String shopId);
+
+	List<Appraise> selectCustomerAllAppraise(String customerId, Integer currentPage, Integer showCount);
+
+	int selectByCustomerCount(String customerId);
 }

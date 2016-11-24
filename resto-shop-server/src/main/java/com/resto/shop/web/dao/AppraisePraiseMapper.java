@@ -27,4 +27,6 @@ public interface AppraisePraiseMapper extends GenericDao<AppraisePraise,String> 
     List<AppraisePraise> appraisePraiseList(String appraiseId);
 
     AppraisePraise selectByAppraiseIdCustomerId(@Param("appraiseId") String appraiseId, @Param("customerId") String customerId);
+
+    int selectByCustomerCount(String customerId);
 }
