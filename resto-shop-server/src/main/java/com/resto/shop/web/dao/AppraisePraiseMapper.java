@@ -10,6 +10,7 @@ import java.util.List;
  * Created by carl on 2016/11/20.
  */
 public interface AppraisePraiseMapper extends GenericDao<AppraisePraise,String> {
+
     int deleteByPrimaryKey(String id);
 
     int insert(AppraisePraise appraisePraise);
