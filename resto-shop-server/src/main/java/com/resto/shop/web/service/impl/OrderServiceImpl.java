@@ -1196,11 +1196,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
                 && setting.getIsPrintPayAfter().equals(Common.YES)){
             List<OrderItem> child = orderItemService.listByParentId(orderId);
-            child.addAll(items);
             for(OrderItem orderItem : child){
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
                 order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
+            child.addAll(items);
+
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, child, shop, printer);
                 if (ticket != null) {
