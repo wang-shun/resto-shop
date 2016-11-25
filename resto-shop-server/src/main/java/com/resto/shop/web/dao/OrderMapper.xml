@@ -814,7 +814,8 @@
         id,
         ver_code,
         article_count,
-        table_number
+        table_number,
+        originalAmount
         FROM
         tb_order
         WHERE
