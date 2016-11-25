@@ -1177,6 +1177,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
+
+
+
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -1192,8 +1195,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
                 && setting.getIsPrintPayAfter().equals(Common.YES)){
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            child.addAll(items);
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+                Map<String, Object> ticket = printTicket(order, child, shop, printer);
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
