@@ -1218,7 +1218,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!kitchenTicket.isEmpty() && !order.getOrderState().equals(OrderState.PAYMENT)) {
+        if (!kitchenTicket.isEmpty() && !order.getOrderState().equals(OrderState.PAYMENT) && order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
+            printTask.addAll(kitchenTicket);
+        }
+        if (!kitchenTicket.isEmpty() && !order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
             printTask.addAll(kitchenTicket);
         }
         return printTask;
