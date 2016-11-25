@@ -21,7 +21,7 @@ public interface TableCodeMapper  extends GenericDao<TableCode,String> {
 
     TableCode selectByName(String name);
 
-    TableCode selectByCodeNumber(String codeNumber);
+    TableCode selectByCodeNumber(@Param("codeNumber")String codeNumber,@Param("shopId")String shopId);
 
     List<TableCode> selectListByShopId(String shopId);
 
