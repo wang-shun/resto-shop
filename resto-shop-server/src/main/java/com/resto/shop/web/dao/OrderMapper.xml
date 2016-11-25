@@ -791,7 +791,8 @@
         ver_code,
         article_count,
         table_number,
-        parent_order_id
+        parent_order_id,
+        originalAmount
         FROM
         tb_order
         WHERE
