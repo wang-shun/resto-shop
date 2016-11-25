@@ -23,7 +23,7 @@ public interface AppraisePraiseMapper extends GenericDao<AppraisePraise,String> 
 
     int updateByPrimaryKey(AppraisePraise appraisePraise);
 
-    void updateCancelPraise(@Param("appraiseId") String appraiseId, @Param("customerId") String customerId, @Param("isDel") Integer isDel);
+    AppraisePraise updateCancelPraise(@Param("appraiseId") String appraiseId, @Param("customerId") String customerId, @Param("isDel") Integer isDel);
 
     List<AppraisePraise> appraisePraiseList(String appraiseId);
 

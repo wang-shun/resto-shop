@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface AppraisePraiseService extends GenericService<AppraisePraise, String> {
 
-    void updateCancelPraise(String appraiseId, String customerId, Integer isDel);
+    AppraisePraise updateCancelPraise(String appraiseId, String customerId, Integer isDel);
 
-    void updateCancelPraise(AppraisePraise appraisePraise);
+    AppraisePraise updateCancelPraise(AppraisePraise appraisePraise);
 
     List<AppraisePraise> appraisePraiseList(String appraiseId);
 
