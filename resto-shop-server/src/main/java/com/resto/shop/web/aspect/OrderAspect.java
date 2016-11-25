@@ -248,20 +248,20 @@ public class OrderAspect {
 				if (order.getEmployeeId() == null) {
 					MQMessageProducer.sendPlaceOrderMessage(order);
 					log.info("检查打印异常");
-					int times = setting.getReconnectTimes();
-					int seconds = setting.getReconnectSecond();
-					for (int i = 0; i < times; i++) {
-						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-					}
+//					int times = setting.getReconnectTimes();
+//					int seconds = setting.getReconnectSecond();
+//					for (int i = 0; i < times; i++) {
+//						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+//					}
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
 						MQMessageProducer.sendPlaceOrderMessage(order);
-						log.info("检查打印异常");
-						int times = setting.getReconnectTimes();
-						int seconds = setting.getReconnectSecond();
-						for (int i = 0; i < times; i++) {
-							MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-						}
+//						log.info("检查打印异常");
+//						int times = setting.getReconnectTimes();
+//						int seconds = setting.getReconnectSecond();
+//						for (int i = 0; i < times; i++) {
+//							MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+//						}
 					}
 				}
                // MQMessageProducer.sendPlaceOrderMessage(order);
@@ -290,6 +290,12 @@ public class OrderAspect {
                     if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
+                        if(order.getPrintTimes() == 0){
+                            order.setPrintTimes(order.getPrintTimes()+1);
+                            orderService.update(order);
+                            MQMessageProducer.sendPlaceOrderMessage(order);
+                        }
+
                     }
                 }
                 if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
