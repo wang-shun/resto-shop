@@ -519,17 +519,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer[] orderState = new Integer[]{OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM};
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
-            if (order.getParentOrderId() != null  && !order.getOrderState().equals(OrderState.SUBMIT)) {
+            if (order.getParentOrderId() != null) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
             order.setOrderItems(itemList);
-            if(order.getParentOrderId() != null  && !order.getOrderState().equals(OrderState.SUBMIT)){
-                List<String> childIds = selectChildIdsByParentId(order.getId());
-                List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
-                order.getOrderItems().addAll(childItems);
-            }
-
+            List<String> childIds = selectChildIdsByParentId(order.getId());
+            List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
+            order.getOrderItems().addAll(childItems);
         }
         return order;
     }
