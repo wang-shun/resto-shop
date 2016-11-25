@@ -26,8 +26,9 @@ public class AppraisePraiseServiceImpl extends GenericServiceImpl<AppraisePraise
 
     @Override
     public AppraisePraise updateCancelPraise(String appraiseId, String customerId, Integer isDel) {
-        return appraisePraiseMapper.updateCancelPraise(appraiseId, customerId, isDel);
-
+        appraisePraiseMapper.updateCancelPraise(appraiseId, customerId, isDel);
+        AppraisePraise appraisePraise = appraisePraiseMapper.selectByAppraiseIdCustomerId(appraiseId, customerId);
+        return appraisePraise;
     }
 
     @Override
