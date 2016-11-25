@@ -1197,6 +1197,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 && setting.getIsPrintPayAfter().equals(Common.YES)){
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             child.addAll(items);
+            for(OrderItem orderItem : child){
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            }
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, child, shop, printer);
                 if (ticket != null) {
@@ -1220,10 +1224,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!kitchenTicket.isEmpty() && !order.getOrderState().equals(OrderState.PAYMENT) && order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
+        if (!kitchenTicket.isEmpty() &&  order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
             printTask.addAll(kitchenTicket);
         }
-        if (!kitchenTicket.isEmpty() && !order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
+        if (!kitchenTicket.isEmpty() && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             printTask.addAll(kitchenTicket);
         }
         return printTask;
