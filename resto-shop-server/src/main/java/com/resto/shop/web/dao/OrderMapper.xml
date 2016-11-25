@@ -792,7 +792,7 @@
         article_count,
         table_number,
         parent_order_id,
-        originalAmount
+        original_amount
         FROM
         tb_order
         WHERE
