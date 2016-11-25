@@ -25,7 +25,7 @@
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
       <if test="payTime != null">pay_time,</if>  
-      <if test="payValue != null">pay_value,</if>  
+      pay_value,
       <if test="remark != null">remark,</if>  
       <if test="paymentModeId != null">payment_mode_id,</if>  
       <if test="orderId != null">order_id,</if>  
@@ -33,7 +33,7 @@
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
-      <if test="payTime != null">#{payTime,jdbcType=TIMESTAMP},</if>  
+      now(),
       <if test="payValue != null">#{payValue,jdbcType=DECIMAL},</if>  
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
       <if test="paymentModeId != null">#{paymentModeId},</if>  
