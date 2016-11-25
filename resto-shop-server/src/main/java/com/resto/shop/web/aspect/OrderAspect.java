@@ -454,7 +454,7 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
-            msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss") + " 的订单" + "已被商家取消\n");
+            msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
             msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
             if (order.getOrderMode() != null) {
                 switch (order.getOrderMode()) {
