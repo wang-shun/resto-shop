@@ -22,7 +22,8 @@
 						    <label>图片地址</label>
 						    <img src="" id="picUrl"/>
 							<input type="hidden" name="picUrl" v-model="m.picUrl">
-							<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+							<input type="hidden" name="photoSquare" v-model="m.photoSquare">
+							<img-file-upload-square  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload-square>
 											    
 						</div>
 						</div>
@@ -99,6 +100,7 @@
 			methods:{
 				uploadSuccess:function(url){
 					$("[name='picUrl']").val(url).trigger("change");
+					$("[name='photoSquare']").val(url.small).trigger("change");
 					C.simpleMsg("上传成功");
 					$("#picUrl").attr("src","/"+url);
 				},
