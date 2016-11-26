@@ -733,7 +733,7 @@
     <!-- 根据 店铺ID 和 用户ID 分页查询订单列表 -->
     <select id="orderList" resultType="Order">
         SELECT * from tb_order where shop_detail_id = #{shopId} and
-        customer_id = #{customerId}
+        customer_id = #{customerId}   and  ( (order_state != 1 and  parent_order_id is null) or order_state = 1)
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
             <foreach collection="orderState" item="state" open="("
@@ -741,7 +741,7 @@
                 #{state}
             </foreach>
         </if>
-        and parent_order_id is null
+
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
@@ -1980,7 +1980,9 @@ GROUP BY r.table_number
     </select>
 
     <select id="getLastOrderByTableNumber" resultType="Order">
-        select * from tb_order where table_number = #{tableNumber} and order_state = 1 order by create_time desc limit 1
+        select * from tb_order where table_number = #{tableNumber} and order_state = 1
+         and pay_mode = 2
+         order by create_time desc limit 1
     </select>
 
 
