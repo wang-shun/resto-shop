@@ -246,12 +246,12 @@ public class OrderAspect {
 
 				if (order.getEmployeeId() == null) {
 					MQMessageProducer.sendPlaceOrderMessage(order);
-					log.info("检查打印异常");
-					int times = setting.getReconnectTimes();
-					int seconds = setting.getReconnectSecond();
-					for (int i = 0; i < times; i++) {
-						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-					}
+//					log.info("检查打印异常");
+//					int times = setting.getReconnectTimes();
+//					int seconds = setting.getReconnectSecond();
+//					for (int i = 0; i < times; i++) {
+//						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+//					}
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
 						MQMessageProducer.sendPlaceOrderMessage(order);
@@ -453,7 +453,7 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
-            msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:ss") + " 的订单" + "已被商家取消\n");
+            msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
             msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
             if (order.getOrderMode() != null) {
                 switch (order.getOrderMode()) {
