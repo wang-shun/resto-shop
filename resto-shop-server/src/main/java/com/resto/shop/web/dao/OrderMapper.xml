@@ -824,7 +824,7 @@
         WHERE
         shop_detail_id=#{shopId}
         AND
-        and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and closed=0 and order_state in (2,10,11,12)
         and parent_order_id is null
         order by create_time DESC;
