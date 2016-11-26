@@ -144,6 +144,17 @@ public class Order implements Serializable{
     //菜品总数量（包含加菜）
     private int totalCount;
 
+    //加菜次数
+    private int childCount;
+
+    public int getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(int childCount) {
+        this.childCount = childCount;
+    }
+
     public int getTotalCount() {
         return totalCount;
     }
