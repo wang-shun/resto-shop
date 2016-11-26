@@ -811,16 +811,20 @@
     </select>
 
     <select id="listHoufuFinishedOrder" resultType="Order">
-        SELECT
+SELECT
         push_order_time,
         id,
         ver_code,
         article_count,
         table_number,
         parent_order_id,
-        original_amount
+        original_amount,
+        amount_with_children,
+        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount
         FROM
         tb_order
+
+
         WHERE
         shop_detail_id=#{shopId}
         AND
@@ -828,6 +832,7 @@
         and closed=0 and order_state in (2,10,11,12)
         and parent_order_id is null
         order by create_time DESC;
+
     </select>
 
     <select id="selectErrorOrderList" resultType="Order">

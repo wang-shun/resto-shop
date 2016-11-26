@@ -141,6 +141,17 @@ public class Order implements Serializable{
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
 
+    //菜品总数量（包含加菜）
+    private int totalCount;
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
     public OrderPaymentItem getOrderPaymentItem() {
         return orderPaymentItem;
     }
