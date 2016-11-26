@@ -1,11 +1,14 @@
 package com.resto.shop.web.task;
+
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandUserService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.service.OrderService;
-import org.apache.http.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -16,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -24,7 +28,7 @@ import java.util.*;
  * 定时任务。
  */
 @Component("reportExceptionTask")
-public class ReportExceptionTask {
+public class SmsCheckTask {
 
     @Autowired
     BrandUserService brandUserService;
@@ -37,27 +41,24 @@ public class ReportExceptionTask {
     @Autowired
     OrderService orderService;
 
-    static Logger log = Logger.getLogger(ReportExceptionTask.class);
+    static Logger log = Logger.getLogger(SmsCheckTask.class);
 
     //链接前缀
     static String urlBase = "http://localhost:8086";//http://op.restoplus.cn
     //登入的url
     String loginUrl = urlBase + "/shop/branduser/login";
 
-    String orderExceptionUrl = urlBase + "/shop/syncData/syncOrderException";
-    String orderPayMentItemExceptionUrl = urlBase + "/shop/syncData/syncOrderPaymentItemException";
+    String smsUrl = urlBase + "/shop/syncData/sms";
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-    @Scheduled(cron = "00  26 14 * * ?")   //每天12点执行
+   // @Scheduled(cron = "00  26 14 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
         //查询所有的品牌
         List<Brand> brandList = brandService.selectList();
         for (Brand brand : brandList) {
-            //!"测试专用品牌".equals(brand.getBrandName())&&!"餐加生态".equals(brand.getBrandName())&&!"简厨".equals(brand.getBrandName())
 
-            if(!"测试专用品牌".equals(brand.getBrandName())&&!"餐加".equals(brand.getBrandName())&&!"港都小排挡".equals(brand.getBrandName())&&!"夜狼音乐餐吧".equals(brand.getBrandName())&&!"座头市".equals(brand.getBrandName()) ){
                 //获取品牌用户
                 BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brand.getId(), 8);
                 //创建 Client 对象
@@ -78,21 +79,13 @@ public class ReportExceptionTask {
                     Map<String, String> requestMap = new HashMap<>();
                     requestMap.put("beginDate", "2016-11-19");
                     requestMap.put("endDate", "2016-11-25");
-                    requestMap.put("brandName",brand.getBrandName());
+                    requestMap.put("brandId",brand.getId());
                     //循环执行 URLMap 中的链接
-                    HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
-                    HttpResponse httpResponse2 = doPost(client, orderPayMentItemExceptionUrl, requestMap);
-                    if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        log.info("执行了插入异常订单的请求");
-                    } else {
-                        log.info("--------------HttpClient 登录失败！");
-                    }
+                    HttpResponse httpResponse2 = doPost(client, smsUrl, requestMap);
                     if(httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
                         log.info("执行了插入异常订单项的请求");
                     }
                 }
-
-            }
             }
 
     }

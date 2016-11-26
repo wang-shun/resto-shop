@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.service.CustomerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -55,6 +57,9 @@ public class SyncDataController extends GenericController {
 
     @Resource
     private OrderExceptionService orderExceptionService;
+
+    @Resource
+    CustomerService customerService;
 
 
     // 品牌总收入，旗下所有店铺收入总和
@@ -438,4 +443,17 @@ public class SyncDataController extends GenericController {
     public static double sub(BigDecimal d1,BigDecimal d2){
         return d1.subtract(d2).doubleValue();
     }
+
+    // 查询所有的已经注册的用户
+    @RequestMapping("sms")
+    @ResponseBody
+    public Result sms(String beginDate, String endDate,String brandId) {
+        List<Customer> customers = customerService.selectListByBrandIdHasRegister(beginDate,endDate,brandId);
+        //存到brand端
+
+        return getSuccessResult(customers);
+    }
+
+
+
 }

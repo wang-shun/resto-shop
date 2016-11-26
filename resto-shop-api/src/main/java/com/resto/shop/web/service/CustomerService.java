@@ -44,4 +44,12 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Boolean checkRegistered(String id);
 
 	Customer selectByOpenIdInfo(String openId);
+
+    /**
+     * 查询时间段内的注册用户
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<Customer> selectListByBrandIdHasRegister(String beginDate, String endDate,String brandId);
 }
