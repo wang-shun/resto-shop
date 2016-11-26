@@ -273,5 +273,10 @@ order by t.print_sort asc
 		where <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.order_state IN (2, 10, 11, 12)
         AND o.production_status IN (2, 3) 
   </select>
+
+  <select id="listByParentId" resultType="OrderItem">
+    select * from tb_order_item
+    where order_id in (select id from tb_order where parent_order_id = #{orderId})
+  </select>
   
 </mapper>

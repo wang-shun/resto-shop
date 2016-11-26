@@ -519,12 +519,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer[] orderState = new Integer[]{OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM};
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
-            if (order.getParentOrderId() != null  && !order.getOrderState().equals(OrderState.SUBMIT)) {
+            if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
             order.setOrderItems(itemList);
-            if(order.getParentOrderId() != null  && !order.getOrderState().equals(OrderState.SUBMIT)){
+            if((order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )){
                 List<String> childIds = selectChildIdsByParentId(order.getId());
                 List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
                 order.getOrderItems().addAll(childItems);
@@ -1180,6 +1180,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
+
+
+
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -1195,8 +1198,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
                 && setting.getIsPrintPayAfter().equals(Common.YES)){
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for(OrderItem orderItem : child){
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            }
+            child.addAll(items);
+
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+                Map<String, Object> ticket = printTicket(order, child, shop, printer);
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -1218,7 +1228,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!kitchenTicket.isEmpty() && !order.getOrderState().equals(OrderState.PAYMENT)) {
+        if (!kitchenTicket.isEmpty() &&  order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
+            printTask.addAll(kitchenTicket);
+        }
+        if (!kitchenTicket.isEmpty() && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             printTask.addAll(kitchenTicket);
         }
         return printTask;

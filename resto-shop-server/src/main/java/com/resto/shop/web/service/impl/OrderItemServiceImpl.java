@@ -42,6 +42,12 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         return getOrderItemsWithChild(orderItems);
     }
 
+
+    @Override
+    public List<OrderItem> listByParentId(String orderId) {
+        return orderitemMapper.listByParentId(orderId);
+    }
+
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
         log.debug("这里查看套餐子项: ");
         Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
