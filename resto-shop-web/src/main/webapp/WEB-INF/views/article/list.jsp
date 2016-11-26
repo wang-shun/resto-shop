@@ -158,8 +158,9 @@
                                 <label class="col-md-5 control-label">餐品图片</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
-                                    <img-file-upload class="form-control" @success="uploadSuccess"
-                                                     @error="uploadError"></img-file-upload>
+                                    <input type="hidden" name="photoSquare" v-model="m.photoSquare">
+                                    <img-file-upload-square class="form-control" @success="uploadSuccess"
+                                                     @error="uploadError"></img-file-upload-square>
                                 </div>
                             </div>
 
@@ -995,7 +996,8 @@
                         ,
                         uploadSuccess: function (url) {
                             console.log(url);
-                            $("[name='photoSmall']").val(url).trigger("change");
+                            $("[name='photoSmall']").val(url.big).trigger("change");
+                            $("[name='photoSquare']").val(url.small).trigger("change");
                             C.simpleMsg("上传成功");
                             $("#photoSmall").attr("src", "/" + url);
                         }
