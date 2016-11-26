@@ -844,7 +844,7 @@ SELECT
         ver_code,
         article_count,
         table_number,
-        originalAmount
+        original_amount
         FROM
         tb_order
         WHERE
