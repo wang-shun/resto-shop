@@ -295,12 +295,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
-        orderItemService.insertItems(order.getOrderItems());
-        BigDecimal payMoney = totalMoney;
-        if(order.getServicePrice() != null){
-            payMoney = payMoney.add(order.getServicePrice());
+        if(order.getServicePrice() == null){
+            order.setServicePrice(new BigDecimal(0));
         }
-
+        orderItemService.insertItems(order.getOrderItems());
+        BigDecimal payMoney = totalMoney.add(order.getServicePrice());
 
         // 使用优惠卷
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
