@@ -996,6 +996,7 @@
                         ,
                         uploadSuccess: function (url) {
                             console.log(url);
+                            alert(url.small);
                             $("[name='photoSmall']").val(url.big).trigger("change");
                             $("[name='photoSquare']").val(url.small).trigger("change");
                             C.simpleMsg("上传成功");

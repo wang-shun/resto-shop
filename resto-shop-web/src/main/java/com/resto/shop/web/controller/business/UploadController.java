@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.ImageUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +52,9 @@ public class UploadController  extends GenericController {
 		BufferedImage bis = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
 		String finalFileSquare = ImageUtil.imageBytesScale(bis, systemPath, filePath + "/");
 		JSONObject json = new JSONObject();
-		json.put("big",filePath+"/"+finalFile.getName());
-		json.put("small",finalFileSquare);
-		return getSuccessResult();
+		Map<String, String> map=new HashMap<String, String>();
+		map.put("big",filePath+"/"+finalFile.getName());
+		map.put("small",finalFileSquare);
+		return getSuccessResult(map);
 	}
 }
