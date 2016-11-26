@@ -296,7 +296,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         orderItemService.insertItems(order.getOrderItems());
-        BigDecimal payMoney = totalMoney.add(order.getServicePrice());
+        if(order.getServicePrice() != null){
+            BigDecimal payMoney = totalMoney.add(order.getServicePrice());
+        }
+
 
         // 使用优惠卷
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
