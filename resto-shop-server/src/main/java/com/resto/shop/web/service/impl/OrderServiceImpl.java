@@ -522,9 +522,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
+            List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
+            order.setOrderItems(itemList);
             if((order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )){
-                List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
-                order.setOrderItems(itemList);
                 List<String> childIds = selectChildIdsByParentId(order.getId());
                 List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
                 order.getOrderItems().addAll(childItems);
