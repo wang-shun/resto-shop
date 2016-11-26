@@ -99,7 +99,7 @@
 			mixins:[C.formVueMix],
 			methods:{
 				uploadSuccess:function(url){
-					$("[name='picUrl']").val(url).trigger("change");
+					$("[name='picUrl']").val(url.big).trigger("change");
 					$("[name='photoSquare']").val(url.small).trigger("change");
 					C.simpleMsg("上传成功");
 					$("#picUrl").attr("src","/"+url);
