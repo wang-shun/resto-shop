@@ -128,6 +128,16 @@ public class Article {
 
     private List<Platform> platforms;
 
+    private String photoSquare;
+
+    public String getPhotoSquare() {
+        return photoSquare;
+    }
+
+    public void setPhotoSquare(String photoSquare) {
+        this.photoSquare = photoSquare;
+    }
+
     final public List<Platform> getPlatforms() {
         return platforms;
     }
