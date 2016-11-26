@@ -137,6 +137,7 @@ public class MQMessageProducer {
 		obj.put("originalAmount", order.getOriginalAmount());
 		obj.put("orderMoney", order.getOrderMoney());
 		obj.put("serialNumber",order.getSerialNumber());
+		obj.put("printTimes",order.getPrintTimes());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
