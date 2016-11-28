@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * 定时任务。
  */
-@Component("reportExceptionTask")
+@Component("smsTask")
 public class SmsCheckTask {
 
     @Autowired
