@@ -19,6 +19,8 @@ public class AppraiseFile {
 
     private Integer sort;
 
+    private String photoSquare;
+
     public String getId() {
         return id;
     }
@@ -65,5 +67,13 @@ public class AppraiseFile {
 
     public void setSort(Integer sort) {
         this.sort = sort;
+    }
+
+    public String getPhotoSquare() {
+        return photoSquare;
+    }
+
+    public void setPhotoSquare(String photoSquare) {
+        this.photoSquare = photoSquare;
     }
 }
