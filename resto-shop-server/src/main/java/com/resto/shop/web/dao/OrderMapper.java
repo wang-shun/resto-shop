@@ -488,7 +488,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
 
 
-	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId);
+	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
 	Order getLastOrderByTableNumber(String tableNumber);
 
