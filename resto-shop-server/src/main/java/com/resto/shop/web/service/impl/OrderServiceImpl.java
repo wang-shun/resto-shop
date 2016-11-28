@@ -2529,7 +2529,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                                              String[] productionStates) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if(shopDetail.getShopMode() == ShopMode.HOUFU_ORDER){
-            return orderMapper.listHoufuFinishedOrder(shopId);
+            return orderMapper.listHoufuUnFinishedOrder(shopId);
         } else{
             return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
         }
