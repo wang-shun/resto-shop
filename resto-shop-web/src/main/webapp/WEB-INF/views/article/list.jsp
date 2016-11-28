@@ -978,19 +978,17 @@
                                 units: [],
                                 articleType: article_type,
                             };
-
                             this.showform = true;
                             this.selectedUnit = [];
-
-
                             var list = {
                                 unitList: []
                             }
+
                             this.selectedUnit = list;
+                            that.checkedUnit=[];//新建的时候把餐品规格都设置为非选中状态
                             $.post("unit/list_all", null, function (data) {
                                 that.unitList = data;
                             });
-
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -1006,8 +1004,6 @@
                         ,
                         edit: function (model) {
                             this.selectedUnit = [];
-
-
                             var list = {
                                 unitList: []
                             }
@@ -1205,7 +1201,7 @@
                             return parseInt(sort);
                         }
                         ,
-                        allUnitPrice: function () {
+                        allUnitPrice: function (data) {
                             var result = [];
                             console.log(this.checkedUnit);
                             for (var i = 0; i < this.articleattrs.length; i++) {
