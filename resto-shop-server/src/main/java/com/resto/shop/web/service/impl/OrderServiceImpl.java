@@ -389,8 +389,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setVerCode(parentOrder.getVerCode());
                 order.setCustomerCount(parentOrder.getCustomerCount());
             } else {
-                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(),brandSetting.getCloseContinueTime());
+                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId());
                 if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                     Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
                     if (parent != null && parent.getAllowContinueOrder()) {
@@ -2871,9 +2870,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order getLastOrderByCustomer(String customerId, String shopId) {
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId,brandSetting.getCloseContinueTime());
+        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId);
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
