@@ -112,8 +112,8 @@
                                 <label class="col-md-5 control-label">显示</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
-                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
-                                               v-model="m.showBig">大图
+                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig" @click="checkShowBig()">大图
+                                        <%--<input type="checkbox"   v-model="m.showBig" @click="checkShowBig()">大图--%>
                                     </label>
                                     <label class="radio-inline">
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
@@ -432,8 +432,8 @@
                                                     <div class="col-md-4">
                                                         <select class="form-control" style="width:150px"
                                                                 name="choiceType" v-model="attr.choiceType"
-                                                                v-on:change="choiceTypeChange(attr)">
-                                                            <option value="0">必选</option>
+                                                                v-on:change="choiceTypeChange(attr)" >
+                                                            <option value="0" selected="selected">必选</option>
                                                             <option value="1">任选</option>
                                                         </select>
 
@@ -490,7 +490,7 @@
                                                         <div class="flex-1 radio-list">
                                                             <select class="form-control" name="kitchenId"
                                                                     v-model="item.kitchenId">
-                                                                <option value="-1">(选择厨房)</option>
+                                                                <option value="-1" selected="selected">(选择厨房)</option>
                                                                 <option :value="k.id" v-for="k in kitchenList">
                                                                     {{k.name}}
                                                                 </option>
@@ -1059,6 +1059,9 @@
                                 return;
                             }
                             tb.search(val).draw();
+                        },
+                        checkShowBig : function () {
+                            console.log("11");
                         }
                         ,
                         changeColor: function (val) {
