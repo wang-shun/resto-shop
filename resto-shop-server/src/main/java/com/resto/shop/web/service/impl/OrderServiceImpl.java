@@ -998,6 +998,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for(OrderItem orderItem : child){
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            }
+            orderItems.addAll(child);
+        }
+
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
@@ -2007,6 +2017,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        }
         System.out.println("----------------------------1234");
 
+        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            items.addAll(child);
+        }
+
+
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
         //如果是外带，添加一张外带小票
@@ -2934,5 +2950,82 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getLastOrderByTableNumber(String tableNumber) {
         return orderMapper.getLastOrderByTableNumber(tableNumber);
+    }
+
+
+    @Override
+    public List<Order> getChildItem(String orderId) {
+        List<Order> childs = orderMapper.selectByParentId(orderId);
+        List<Order> result = new ArrayList<>();
+        for(Order child : childs){
+            Order order = getOrderInfo(child.getId());
+            result.add(order);
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public void updateOrderItem(String orderId, Integer count, String orderItemId,Integer type) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        if(type == 0 ){ //如果要修改的是服务费
+            order.setCustomerCount(count);
+            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+            if(order.getAmountWithChildren().doubleValue() > 0){
+                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+            }
+            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+            order.setServicePrice(setting.getServicePrice().multiply(new BigDecimal(count)));
+            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+            if(order.getAmountWithChildren().doubleValue() > 0){
+                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+            }
+            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
+
+            update(order);
+        }else{ //修改的是菜品
+            OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
+            order.setArticleCount(order.getArticleCount() - orderItem.getCount());
+            order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(orderItem.getFinalPrice()));
+            order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
+            if(order.getAmountWithChildren().doubleValue() > 0){
+                order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
+            }
+
+            orderItem.setCount(count);
+            orderItem.setFinalPrice(orderItem.getUnitPrice().multiply(new BigDecimal(count)));
+            orderitemMapper.updateByPrimaryKeySelective(orderItem);
+            order.setArticleCount(order.getArticleCount() + orderItem.getCount());
+            order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+            order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+            order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            if(order.getAmountWithChildren().doubleValue() > 0){
+                order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
+            }
+
+
+            update(order);
+
+        }
+
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            if (order.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(order.getParentOrderId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(order.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
+
+            }
+        }
     }
 }

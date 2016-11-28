@@ -477,4 +477,13 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	Order getLastOrderByTableNumber(String tableNumber);
+
+	/**
+	 * 返回子订单的菜品项
+	 * @param orderId
+	 * @return
+	 */
+	List<Order> getChildItem(String orderId);
+
+	void updateOrderItem(String orderId,Integer count,String orderItemId,Integer type);
 }

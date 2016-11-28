@@ -240,6 +240,7 @@
             parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
+        ,(select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount
         from tb_order
         where id = #{id,jdbcType=VARCHAR}
     </select>
@@ -654,6 +655,9 @@
             </if>
             <if test="lastOrderTime != null">
                 last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="servicePrice != null">
+                service_price = #{servicePrice},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -1929,7 +1933,9 @@ GROUP BY r.table_number
 
     <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
-        SELECT * from tb_order where shop_detail_id = #{shopId}
+        SELECT tb_order.*,
+        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount
+        from tb_order where shop_detail_id = #{shopId}
         <if test="orderStates != null and orderStates != '' ">
             and ORDER_STATE in
             <foreach collection="orderStates" item="state" open="("

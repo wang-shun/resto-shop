@@ -3,7 +3,9 @@ package com.resto.shop.web.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -146,6 +148,18 @@ public class Order implements Serializable{
 
     //加菜次数
     private int childCount;
+
+    //子订单的菜品项 ，key为子订单id
+    private Map<String,List<OrderItem>> childItems;
+
+
+    public Map<String, List<OrderItem>> getChildItems() {
+        return childItems;
+    }
+
+    public void setChildItems(Map<String, List<OrderItem>> childItems) {
+        this.childItems = childItems;
+    }
 
     public int getChildCount() {
         return childCount;
