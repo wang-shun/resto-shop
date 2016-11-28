@@ -2967,7 +2967,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void updateOrderItem(String orderId, Integer count, String orderItemId,Integer type) {
+    public Result updateOrderItem(String orderId, Integer count, String orderItemId,Integer type) {
+        Result result = new Result();
         Order order = orderMapper.selectByPrimaryKey(orderId);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if(type == 0 ){ //如果要修改的是服务费
@@ -2990,6 +2991,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else{ //修改的是菜品
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
+            if(order.getArticleCount() - orderItem.getCount() == 0 && count == 0){
+                result.setSuccess(false);
+                result.setMessage("菜品数量不可为空");
+                return result;
+            }
+
+
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(orderItem.getFinalPrice()));
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
@@ -3008,6 +3016,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
             }
 
+            if(orderItem.getCount() == 0){
+                orderitemMapper.deleteByPrimaryKey(orderItem.getId());
+            }
 
             update(order);
 
@@ -3027,5 +3038,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
+        result.setSuccess(true);
+        return result;
     }
 }
