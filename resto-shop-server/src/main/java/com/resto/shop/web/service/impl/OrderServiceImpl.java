@@ -2991,7 +2991,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else{ //修改的是菜品
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
-            if(order.getArticleCount() - orderItem.getCount() == 0 && count == 0){
+            if(order.getArticleCount() == 0 && count == 0){
                 result.setSuccess(false);
                 result.setMessage("菜品数量不可为空");
                 return result;
