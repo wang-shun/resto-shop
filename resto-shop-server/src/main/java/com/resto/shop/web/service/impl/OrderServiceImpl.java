@@ -3000,14 +3000,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             update(order);
         }else{ //修改的是菜品
+
+
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
-            if(order.getArticleCount() == 0 && count == 0){
-                result.setSuccess(false);
-                result.setMessage("菜品数量不可为空");
-                return result;
-            }
 
+            if(order.getParentOrderId() == null){
+                if(order.getArticleCount() == 0 && count == 0){
+                    result.setSuccess(false);
+                    result.setMessage("菜品数量不可为空");
+                    return result;
+                }
+            }
 
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(orderItem.getFinalPrice()));
