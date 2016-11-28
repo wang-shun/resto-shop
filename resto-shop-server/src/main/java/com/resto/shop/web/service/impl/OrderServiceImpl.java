@@ -2528,11 +2528,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectByOrderSatesAndProductionStates(String shopId, String[] orderStates,
                                                              String[] productionStates) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        Date begin = DateUtil.getDateBegin(new Date());
-        Date end = DateUtil.getDateEnd(new Date());
         if(shopDetail.getShopMode() == ShopMode.HOUFU_ORDER){
-            return orderMapper.selectHistoryOrderList(shopId, begin, end, shopDetail.getShopMode());
-        }else{
+            return orderMapper.listHoufuFinishedOrder(shopId);
+        } else{
             return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
         }
 
