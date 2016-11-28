@@ -21,12 +21,11 @@
     }
 </style>
 <div id="control">
-
     <div class="modal fade" id="article-dialog" v-if="showform" @click="cleanRemark">
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">表单</h4>
+                    <h4 class="modal-title text-center"><strong>{{formTitle}}</strong></h4>
                 </div>
                 <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
                     <div class="modal-body auto-height">
@@ -602,8 +601,8 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="article/add">
-                <button class="btn blue" @click="create(2)">新建套餐</button>
-                <button class="btn green" @click="create(1)">新建餐品</button>
+                <button class="btn blue" @click="create(2,'新建套餐')">新建套餐</button>
+                <button class="btn green" @click="create(1,'新建餐品')">新建餐品</button>
             </s:hasPermission>
             <div class="clearfix"></div>
         </div>
@@ -795,6 +794,7 @@
                         lastChoiceTemp: "",
                         allArticles: allArticles,
                         searchNameLike : "",
+                        formTitle : "",
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
                     },
                     methods: {
@@ -958,7 +958,7 @@
                             }
                         }
                         ,
-                        create: function (article_type) {
+                        create: function (article_type,title) {
                             var that = this;
                             action = "create";
                             this.m = {
@@ -979,6 +979,7 @@
                                 articleType: article_type,
                             };
                             this.showform = true;
+                            this.formTitle = title;
                             this.selectedUnit = [];
                             var list = {
                                 unitList: []
@@ -1011,7 +1012,7 @@
 
                             var that = this;
 
-
+                            that.formTitle="编辑菜品";
                             action = "edit";
 
                             $.post("article/list_one_full", {id: model.id}, function (result) {
