@@ -88,6 +88,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<Order>listHoufuFinishedOrder(String shopId);
 
+	List<Order>listHoufuUnFinishedOrder(String shopId);
+
 	/**
 	 * 查询某天的异常订单
 	 * @param currentShopId
@@ -488,7 +490,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
 
 
-	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId);
+	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
 	Order getLastOrderByTableNumber(String tableNumber);
 

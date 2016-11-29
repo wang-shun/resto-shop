@@ -94,6 +94,7 @@ WHERE
         tb_table_code
         WHERE
         code_number = #{codeNumber}
+        and shop_detail_id = #{shopId}
     </select>
 
 

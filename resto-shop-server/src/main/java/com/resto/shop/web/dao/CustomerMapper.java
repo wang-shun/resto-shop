@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -42,4 +43,12 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	void updateFirstOrderTime(String id);
 
 	Integer checkRegistered(String id);
+
+    /**
+     * 查询某个时间段内的注册用户
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<Customer> selectListByBrandIdHasRegister(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
 }

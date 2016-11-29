@@ -15,7 +15,7 @@
 						<div class="form-body">
 						<div class="form-group">
 						    <label>显示的标题名称</label>
-						    <input type="text" class="form-control" name="title" v-model="m.title">
+						    <input type="text" class="form-control" name="title" required v-model="m.title"  >
 						</div>
 						
 						<div class="form-group">
@@ -107,6 +107,14 @@
 				uploadError:function(msg){
 					C.errorMsg(msg);
 				},
+                save:function(e){
+                    var that = this;
+                    var formDom = e.target;
+                    C.ajaxFormEx(formDom,function(){
+                        that.cancel();
+                        tb.ajax.reload();
+                    });
+                },
 			}
 		});
 		C.vue=vueObj;

@@ -841,6 +841,33 @@ SELECT
 
     </select>
 
+    <select id="listHoufuUnFinishedOrder" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        ver_code,
+        article_count,
+        table_number,
+        parent_order_id,
+        original_amount,
+        order_mode,
+        amount_with_children,
+        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
+        FROM
+        tb_order
+
+
+        WHERE
+        shop_detail_id=#{shopId}
+        AND
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state = 1
+        and parent_order_id is null
+        order by create_time DESC;
+
+    </select>
+
     <select id="selectErrorOrderList" resultType="Order">
         SELECT
         push_order_time,
@@ -1551,9 +1578,9 @@ AND o.production_status IN (2, 3)
         LEFT JOIN tb_appraise ap on o.id = ap.order_id
         LEFT JOIN tb_article r on left(oi.article_id,32) = r.id
         LEFT JOIN tb_article_family f on f.id = r.article_family_id
-        INNER JOIN tb_order_payment_item opi on o.id = opi.order_id
+        LEFT JOIN tb_order_payment_item opi on o.id = opi.order_id
         WHERE
-        o.id = #{orderId} AND  opi.payment_mode_id=1
+        o.id = #{orderId}
 
     </select>
 
@@ -1971,6 +1998,7 @@ GROUP BY r.table_number
         select * from tb_order where customer_id = #{customerId}
         and shop_detail_id = #{shopId}
         and ((order_mode = 5 and order_state = 1) or (order_mode != 5) )
+        and now() - create_time > #{time}
         order by create_time desc limit 1
 
     </select>

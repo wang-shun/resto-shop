@@ -21,12 +21,11 @@
     }
 </style>
 <div id="control">
-
     <div class="modal fade" id="article-dialog" v-if="showform" @click="cleanRemark">
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">表单</h4>
+                    <h4 class="modal-title text-center"><strong>{{formTitle}}</strong></h4>
                 </div>
                 <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
                     <div class="modal-body auto-height">
@@ -112,8 +111,8 @@
                                 <label class="col-md-5 control-label">显示</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
-                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
-                                               v-model="m.showBig">大图
+                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig" @click="checkShowBig()">大图
+                                        <%--<input type="checkbox"   v-model="m.showBig" @click="checkShowBig()">大图--%>
                                     </label>
                                     <label class="radio-inline">
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
@@ -433,8 +432,8 @@
                                                     <div class="col-md-4">
                                                         <select class="form-control" style="width:150px"
                                                                 name="choiceType" v-model="attr.choiceType"
-                                                                v-on:change="choiceTypeChange(attr)">
-                                                            <option value="0">必选</option>
+                                                                v-on:change="choiceTypeChange(attr)" >
+                                                            <option value="0" selected="selected">必选</option>
                                                             <option value="1">任选</option>
                                                         </select>
 
@@ -491,7 +490,7 @@
                                                         <div class="flex-1 radio-list">
                                                             <select class="form-control" name="kitchenId"
                                                                     v-model="item.kitchenId">
-                                                                <option value="-1">(选择厨房)</option>
+                                                                <option value="-1" selected="selected">(选择厨房)</option>
                                                                 <option :value="k.id" v-for="k in kitchenList">
                                                                     {{k.name}}
                                                                 </option>
@@ -603,8 +602,8 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="article/add">
-                <button class="btn blue" @click="create(2)">新建套餐</button>
-                <button class="btn green" @click="create(1)">新建餐品</button>
+                <button class="btn blue" @click="create(2,'新建套餐')">新建套餐</button>
+                <button class="btn green" @click="create(1,'新建餐品')">新建餐品</button>
             </s:hasPermission>
             <div class="clearfix"></div>
         </div>
@@ -796,6 +795,7 @@
                         lastChoiceTemp: "",
                         allArticles: allArticles,
                         searchNameLike : "",
+                        formTitle : "",
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
                     },
                     methods: {
@@ -959,7 +959,7 @@
                             }
                         }
                         ,
-                        create: function (article_type) {
+                        create: function (article_type,title) {
                             var that = this;
                             action = "create";
                             this.m = {
@@ -979,19 +979,18 @@
                                 units: [],
                                 articleType: article_type,
                             };
-
                             this.showform = true;
+                            this.formTitle = title;
                             this.selectedUnit = [];
-
-
                             var list = {
                                 unitList: []
                             }
+
                             this.selectedUnit = list;
+                            that.checkedUnit=[];//新建的时候把餐品规格都设置为非选中状态
                             $.post("unit/list_all", null, function (data) {
                                 that.unitList = data;
                             });
-
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -1008,8 +1007,6 @@
                         ,
                         edit: function (model) {
                             this.selectedUnit = [];
-
-
                             var list = {
                                 unitList: []
                             }
@@ -1017,7 +1014,7 @@
 
                             var that = this;
 
-
+                            that.formTitle="编辑菜品";
                             action = "edit";
 
                             $.post("article/list_one_full", {id: model.id}, function (result) {
@@ -1061,6 +1058,9 @@
                                 return;
                             }
                             tb.search(val).draw();
+                        },
+                        checkShowBig : function () {
+                            console.log("11");
                         }
                         ,
                         changeColor: function (val) {
@@ -1204,7 +1204,7 @@
                             return parseInt(sort);
                         }
                         ,
-                        allUnitPrice: function () {
+                        allUnitPrice: function (data) {
                             var result = [];
                             console.log(this.checkedUnit);
                             for (var i = 0; i < this.articleattrs.length; i++) {
