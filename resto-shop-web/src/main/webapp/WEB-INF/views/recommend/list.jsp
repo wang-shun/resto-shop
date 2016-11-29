@@ -109,7 +109,7 @@
                                                         <div class="flex-2">餐品价格</div>
                                                         <div class="flex-1">排序</div>
                                                         <div class="flex-1">最大购买数量</div>
-                                                        <div class="flex-1" v-if="printType == 0">指定厨房出单</div>
+                                                        <%--<div class="flex-1" v-if="printType == 0">指定厨房出单</div>--%>
                                                         <div class="flex-1">移除</div>
                                                     </div>
                                                     <div class="flex-row">
@@ -133,15 +133,15 @@
                                                                    v-model="attr.maxCount" name="maxCount"
                                                                    required="required" lazy/>
                                                         </div>
-                                                        <div class="flex-1 radio-list" v-if="printType == 0">
-                                                            <select class="form-control" name="kitchenId"
-                                                                    v-model="attr.kitchenId">
-                                                                <option value="-1">(选择厨房)</option>
-                                                                <option :value="k.id" v-for="k in kitchenList">
-                                                                    {{k.name}}
-                                                                </option>
-                                                            </select>
-                                                        </div>
+                                                        <%--<div class="flex-1 radio-list" v-if="printType == 0">--%>
+                                                            <%--<select class="form-control" name="kitchenId"--%>
+                                                                    <%--v-model="attr.kitchenId">--%>
+                                                                <%--<option value="-1">(选择厨房)</option>--%>
+                                                                <%--<option :value="k.id" v-for="k in kitchenList">--%>
+                                                                    <%--{{k.name}}--%>
+                                                                <%--</option>--%>
+                                                            <%--</select>--%>
+                                                        <%--</div>--%>
                                                         <div class="flex-1">
                                                             <button class="btn red" type="button"
                                                                     @click="removeMealItem(attr)">移除

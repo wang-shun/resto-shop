@@ -25,6 +25,16 @@ public class ShopCart {
 
     private Integer attrId;
 
+    private String recommendId;
+
+    public String getRecommendId() {
+        return recommendId;
+    }
+
+    public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
     public Integer getAttrId() {
         return attrId;
     }
