@@ -2544,7 +2544,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal totalMoney = BigDecimal.ZERO;//计算订单原价，不使用任何优惠方式
         Order order = orderMapper.selectByPrimaryKey(orderId);
         totalMoney = totalMoney.add(order.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
-        totalMoney = totalMoney.add(order.getServicePrice() == null ? new BigDecimal(0): order.getServicePrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        totalMoney = totalMoney.add(order.getServicePrice() == null ? new BigDecimal(0): order.getServicePrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
