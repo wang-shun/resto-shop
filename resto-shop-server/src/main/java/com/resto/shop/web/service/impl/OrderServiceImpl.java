@@ -2632,9 +2632,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 sum = sum.add(child.getOrderMoney());
             }
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if(setting.getIsUseServicePrice() == 1){
-                sum = sum.add(order.getServicePrice());
-            }
+//            if(setting.getIsUseServicePrice() == 1){
+//                sum = sum.add(order.getServicePrice());
+//            }
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
