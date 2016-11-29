@@ -58,6 +58,6 @@
         where id = #{id,jdbcType=VARCHAR}
     </update>
     <select id="appraiseFileList" resultType="com.resto.shop.web.model.AppraiseFile">
-        select * from tb_appraise_file where appraise_id = #{appraiseId}  order by create_time
+        select * from tb_appraise_file where appraise_id = #{appraiseId}  order by sort
     </select>
 </mapper>
