@@ -815,6 +815,7 @@
                             all = data;
                         });
                         $.post("articlefamily/list_all", null, function (data) {
+                            console.log(data);
                             that.articlefamilys = data;
                         });
                         $.post("supporttime/list_all", null, function (data) {

@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.ShareSetting;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
@@ -165,4 +166,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public Customer selectByOpenIdInfo(String openId) {
 		return customerMapper.selectByOpenId(openId);
 	}
+
+    @Override
+    public List<Customer> selectListByBrandIdHasRegister(String beginDate, String endDate,String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  customerMapper.selectListByBrandIdHasRegister(begin,end,brandId);
+    }
 }

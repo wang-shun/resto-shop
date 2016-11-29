@@ -691,6 +691,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         and article_type =1
         and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
         and tb_article.shop_detail_id = #{shopId}
+        and tb_article.id not in (SELECT article_id from tb_article_unit_new)
     </select>
 
 

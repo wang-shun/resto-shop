@@ -247,6 +247,12 @@ public class OrderAspect {
 
 				if (order.getEmployeeId() == null) {
 					MQMessageProducer.sendPlaceOrderMessage(order);
+//					log.info("检查打印异常");
+//					int times = setting.getReconnectTimes();
+//					int seconds = setting.getReconnectSecond();
+//					for (int i = 0; i < times; i++) {
+//						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+//					}
 					log.info("检查打印异常");
 //					int times = setting.getReconnectTimes();
 //					int seconds = setting.getReconnectSecond();

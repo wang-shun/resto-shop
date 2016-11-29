@@ -13,7 +13,7 @@ public interface TableCodeService extends GenericService<TableCode, String> {
 
     TableCode selectByName(String name);
 
-    TableCode selectByCodeNumber(String codeNumber);
+    TableCode selectByCodeNumber(String codeNumber,String shopId);
 
     TableCode selectByPersonNumber(Integer personNumber,String shopId);
 

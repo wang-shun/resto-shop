@@ -57,8 +57,8 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
     }
 
     @Override
-    public TableCode selectByCodeNumber(String codeNumber) {
-        return tablecodeMapper.selectByCodeNumber(codeNumber);
+    public TableCode selectByCodeNumber(String codeNumber,String shopId) {
+        return tablecodeMapper.selectByCodeNumber(codeNumber,shopId);
     }
 
     @Override

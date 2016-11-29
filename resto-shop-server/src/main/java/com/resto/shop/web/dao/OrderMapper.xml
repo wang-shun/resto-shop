@@ -1578,9 +1578,9 @@ AND o.production_status IN (2, 3)
         LEFT JOIN tb_appraise ap on o.id = ap.order_id
         LEFT JOIN tb_article r on left(oi.article_id,32) = r.id
         LEFT JOIN tb_article_family f on f.id = r.article_family_id
-        INNER JOIN tb_order_payment_item opi on o.id = opi.order_id
+        LEFT JOIN tb_order_payment_item opi on o.id = opi.order_id
         WHERE
-        o.id = #{orderId} AND  opi.payment_mode_id=1
+        o.id = #{orderId}
 
     </select>
 

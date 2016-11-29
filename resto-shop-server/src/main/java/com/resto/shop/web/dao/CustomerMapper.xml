@@ -295,4 +295,14 @@
   <select id="checkRegistered" resultType="java.lang.Integer">
     select count(1) from tb_customer where id = #{0} and telephone is null
   </select>
+
+    <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
+        select id, wechat_id, nickname, telephone, head_photo, is_bind_phone,
+    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
+    city, country, last_order_shop WHERE  is_bind_phone = 1
+    AND
+    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
+    </select>
+
+
 </mapper>
