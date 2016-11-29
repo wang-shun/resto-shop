@@ -863,6 +863,7 @@ SELECT
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state = 1
+        and table_number is not null
         and parent_order_id is null
         order by create_time DESC;
 
