@@ -2544,6 +2544,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal totalMoney = BigDecimal.ZERO;//计算订单原价，不使用任何优惠方式
         Order order = orderMapper.selectByPrimaryKey(orderId);
         totalMoney = totalMoney.add(order.getOriginalAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
+        totalMoney = totalMoney.add(order.getServicePrice() == null ? new BigDecimal(0): order.getServicePrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
@@ -3003,6 +3004,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
+            if(orderItem.getType() == OrderItemType.MEALS_CHILDREN){
+                result.setSuccess(false);
+                result.setMessage("套餐子品暂不支持修改");
+                return result;
+            }
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
             if(order.getParentOrderId() == null){
@@ -3054,6 +3060,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         result.setSuccess(true);
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        StringBuffer msg = new StringBuffer();
+        msg.append("您的订单信息已被商家确认!" + "\n");
+        msg.append("订单编号:" + order.getSerialNumber() + "\n");
+        msg.append("桌号：" + order.getTableNumber() + "\n");
+        msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
+        msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+        if(setting.getIsUseServicePrice() == 1){
+            msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+        }
+        BigDecimal sum = order.getOrderMoney();
+        List<Order> orders = selectByParentId(order.getId()); //得到子订单
+        for (Order child : orders) { //遍历子订单
+            sum = sum.add(child.getOrderMoney());
+        }
+        msg.append("订单明细：\n");
+        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+        for (OrderItem item : orderItem) {
+            msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+        }
+        msg.append("订单金额：" + sum + "\n");
+        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
 }

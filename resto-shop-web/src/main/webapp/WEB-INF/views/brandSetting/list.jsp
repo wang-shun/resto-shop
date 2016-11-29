@@ -146,7 +146,18 @@
 						分单出单
 					</label>
 				</div>
-
+				<div class="form-group">
+					<div class="control-label">买单后出总单（后付款模式）</div>
+					<label>
+						<input type="radio" name="isPrintPayAfter" v-model="m.isPrintPayAfter" value="1">
+						开启
+					</label>
+					<label>
+						<input type="radio" name="isPrintPayAfter"
+							   v-model="m.isPrintPayAfter" value="0">
+						未开启
+					</label>
+				</div>
 				<div class="form-group">
 					<div class="control-label">是否启用服务费</div>
 					<label >
