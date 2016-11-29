@@ -78,7 +78,7 @@
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommendId from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id from tb_shop_cart
         where
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
