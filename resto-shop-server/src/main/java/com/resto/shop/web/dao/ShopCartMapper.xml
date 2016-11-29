@@ -36,6 +36,7 @@
             <if test="attrId != null">attr_id,</if>
             <if test="recommendId != null">recommend_id,</if>
             <if test="recommendArticleId != null">recommend_article_id,</if>
+
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
