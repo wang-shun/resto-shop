@@ -3004,6 +3004,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
+            if(orderItem.getType() == OrderItemType.MEALS_CHILDREN){
+                result.setSuccess(false);
+                result.setMessage("套餐子品暂不支持修改");
+                return result;
+            }
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
             if(order.getParentOrderId() == null){
