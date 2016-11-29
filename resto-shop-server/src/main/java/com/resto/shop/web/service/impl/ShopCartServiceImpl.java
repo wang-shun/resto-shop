@@ -50,6 +50,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         }
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {
+                log.info(shopCart.getRecommendArticleId());
                 insertShopCart(shopCart);
                 return number;
             } else if (shopCartItem != null && number > 0) {
