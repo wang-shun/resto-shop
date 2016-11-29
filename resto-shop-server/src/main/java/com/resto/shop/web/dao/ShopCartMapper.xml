@@ -14,8 +14,9 @@
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
         <result column="attr_id" property="attrId" jdbcType="INTEGER" />
         <result column="recommend_id" property="recommendId"/>
+        <result column="recommend_article_id" property="recommendArticleId"/>
     </resultMap>
-    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id</sql>
+    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id,recommend_article_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select
         <include refid="Base_Column_List"/> from tb_shop_cart where id = #{id,jdbcType=INTEGER}
     </select>
@@ -34,6 +35,7 @@
             <if test="userId != null">user_id,</if>
             <if test="attrId != null">attr_id,</if>
             <if test="recommendId != null">recommend_id,</if>
+            <if test="recommendArticleId != null">recommend_article_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
@@ -47,6 +49,7 @@
             <if test="userId != null">#{userId,jdbcType=VARCHAR},</if>
             <if test="attrId != null">#{attrId,jdbcType=INTEGER},</if>
             <if test="recommendId != null">#{recommendId},</if>
+            <if test="recommendArticleId != null">#{recommendArticleId},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
@@ -61,6 +64,7 @@
             <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR},</if>
             <if test="attrId != null">attr_id = #{attrId,jdbcType=VARCHAR},</if>
             <if test="recommendId != null">recommend_id = #{recommendId,jdbcType=VARCHAR},</if>
+            <if test="recommendArticleId != null">recommend_article_id = #{recommendArticleId},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, shop_type = #{shopType,jdbcType=VARCHAR}, pid = #{pid,jdbcType=INTEGER}, user_id = #{userId,jdbcType=VARCHAR}, attr_id = #{attrId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
@@ -68,17 +72,17 @@
 
     <!-- 查询购物车明细 -->
     <select id="listUserAndShop" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id from tb_shop_cart
         where distribution_mode_id=#{distributionModeId} and customer_id=#{customerId} and shop_detail_id=#{shopDetailId}
     </select>
 
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id from tb_shop_cart
         where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id from tb_shop_cart
         where
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
@@ -99,6 +103,7 @@
             <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR},</if>
             <if test="attrId != null">attr_id = #{attrId,jdbcType=VARCHAR},</if>
             <if test="recommendId != null">recommend_id = #{recommendId,jdbcType=VARCHAR},</if>
+            <if test="recommendArticleId != null">recommend_article_id = #{recommendArticleId,jdbcType=VARCHAR},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
