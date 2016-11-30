@@ -39,6 +39,8 @@ public class OrderItem {
     private Integer type;
     
     private Integer[] mealItems;
+
+    private Integer[] recommendList;
     
     private String parentId;
 
@@ -62,6 +64,24 @@ public class OrderItem {
     private BigDecimal price;
 
     private Integer mealItemId;
+
+    private String recommendId;
+
+    public String getRecommendId() {
+        return recommendId;
+    }
+
+    public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
+    public Integer[] getRecommendList() {
+        return recommendList;
+    }
+
+    public void setRecommendList(Integer[] recommendList) {
+        this.recommendList = recommendList;
+    }
 
     final public Integer getMealItemId() {
         return mealItemId;

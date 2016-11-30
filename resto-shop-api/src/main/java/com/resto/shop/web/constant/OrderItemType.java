@@ -6,5 +6,9 @@ public class OrderItemType {
 	public static final int SETMEALS = 3; //套餐类型
 	public static final int MEALS_CHILDREN = 4; //套餐子项
 
-	public static final int UNIT_NEW = 5;
+	public static final int UNIT_NEW = 5; //新规格
+
+	public static final int RECOMMEND = 6; //推荐餐包
+
+
 }
