@@ -51,7 +51,7 @@ public class AppraiseAspect {
             Appraise appraise = appraiseService.selectById(appraisePraise.getAppraiseId());
             Customer aCustomer = customerService.selectById(appraise.getCustomerId());
             ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-            Brand brand = brandService.selectById(appraise.getBrandId());
+            Brand brand = brandService.selectById(aCustomer.getBrandId());
             Customer customer = customerService.selectById(appraisePraise.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
@@ -69,7 +69,7 @@ public class AppraiseAspect {
             Appraise appraise = appraiseService.selectById(appraiseComment.getAppraiseId());
             Customer appCustomer = customerService.selectById(appraise.getCustomerId());
             ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-            Brand brand = brandService.selectById(appraise.getBrandId());
+            Brand brand = brandService.selectById(appCustomer.getBrandId());
             Customer customer = customerService.selectById(appraiseComment.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
