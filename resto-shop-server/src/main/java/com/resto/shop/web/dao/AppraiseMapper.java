@@ -36,4 +36,6 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     List<Appraise> selectCustomerAllAppraise(@Param(value = "customerId") String customerId, @Param(value = "currentPage") Integer currentPage, @Param(value = "showCount") Integer showCount);
 
     int selectByCustomerCount(String customerId);
+
+    List<Appraise> selectByGoodAppraise();
 }
