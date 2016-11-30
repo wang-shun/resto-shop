@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 @Component
 @Aspect
 public class AppraiseAspect {
+
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Resource
