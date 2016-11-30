@@ -206,6 +206,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     price = a.getPrice();
                     fans_price = a.getFansPrice();
                     break;
+                case OrderItemType.RECOMMEND:
+                    // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(a.getName());
+                    org_price = a.getPrice();
+                    price = a.getPrice();
+                    fans_price = a.getFansPrice();
+                    break;
                 case OrderItemType.UNITPRICE:
                     ArticlePrice p = articlePriceMap.get(item.getArticleId());
                     a = articleMap.get(p.getArticleId());
@@ -2416,6 +2424,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
+            case OrderItemType.RECOMMEND:
+                //如果是单品无规格，直接判断菜品是否有库存
+                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                result = current >= count;
+                msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
+                        current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
+                break;
             default:
                 log.debug("未知菜品分类");
                 break;
@@ -2457,6 +2472,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMapper.setEmpty(orderItem.getArticleId());
                     break;
                 case OrderItemType.UNIT_NEW:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
+                    orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
+                    orderMapper.setEmpty(orderItem.getArticleId());
+                    break;
+                case OrderItemType.RECOMMEND:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     orderMapper.updateArticleStock(orderItem.getArticleId(), StockType.STOCK_MINUS, orderItem.getCount());
                     orderMapper.setEmpty(orderItem.getArticleId());
