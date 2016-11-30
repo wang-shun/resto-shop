@@ -3234,7 +3234,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             sum = sum.add(child.getOrderMoney());
         }
         msg.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getParentOrderId() == null ? order.getId() : order.getParentOrderId());
+        List<OrderItem> child = orderItemService.listByParentId(orderId);
+        for (OrderItem item : child) {
+            order.setOriginalAmount(order.getOriginalAmount().add(item.getFinalPrice()));
+            order.setPaymentAmount(order.getPaymentAmount().add(item.getFinalPrice()));
+        }
+        orderItem.addAll(child);
         for (OrderItem item : orderItem) {
             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
