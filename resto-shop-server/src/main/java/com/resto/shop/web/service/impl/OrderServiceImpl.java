@@ -137,6 +137,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper;
     }
 
+    @Autowired
+    ArticleRecommendMapper articleRecommendMapper;
+
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
         String[] states = null;
@@ -287,7 +290,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item, articleCount);
             } else if (item.getType() == OrderItemType.UNIT_NEW) {
                 check = checkArticleList(item, item.getCount());
-            }else if (item.getType() == OrderItemType.RECOMMEND){
+            } else if (item.getType() == OrderItemType.RECOMMEND) {
                 check = checkArticleList(item, item.getCount());
             }
 
@@ -305,7 +308,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
-        if(order.getServicePrice() == null){
+        if (order.getServicePrice() == null) {
             order.setServicePrice(new BigDecimal(0));
         }
         orderItemService.insertItems(order.getOrderItems());
@@ -400,7 +403,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setCustomerCount(parentOrder.getCustomerCount());
             } else {
                 BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(),brandSetting.getCloseContinueTime());
+                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(), brandSetting.getCloseContinueTime());
                 if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                     Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
                     if (parent != null && parent.getAllowContinueOrder()) {
@@ -533,12 +536,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer[] orderState = new Integer[]{OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM};
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
-            if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )) {
+            if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER)) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
             order.setOrderItems(itemList);
-            if((order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER )){
+            if ((order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER)) {
                 List<String> childIds = selectChildIdsByParentId(order.getId());
                 List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
                 order.getOrderItems().addAll(childItems);
@@ -781,7 +784,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
         if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)
-                || order.getOrderMode().equals(ShopMode.HOUFU_ORDER) ) {
+                || order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
                 if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
@@ -834,6 +837,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
+        Map<String,List<String>> recommendMap = new HashMap<>();
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
@@ -883,6 +887,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             } else {
                 if (item.getType() != OrderItemType.MEALS_CHILDREN) {
+                    if (item.getType() == OrderItemType.RECOMMEND) {
+                        ArticleRecommend articleRecommend = articleRecommendMapper.getRecommendById(item.getRecommendId());
+                        if (articleRecommend.getPrintType() == PrinterType.KITCHEN) {
+                            String kitchenId = articleRecommend.getKitchenId();
+                            if(!recommendMap.containsKey(kitchenId)){
+                                recommendMap.put(kitchenId, new ArrayList<String>());
+                            }
+                            recommendMap.get(kitchenId).add(item.getRecommendId());
+                        } else {
+                            List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+                            for (Kitchen kitchen : kitchenList) {
+                                String kitchenId = kitchen.getId().toString();
+                                kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                                //判断 厨房集合中 是否已经包含当前厨房信息
+                                if (!kitchenArticleMap.containsKey(kitchenId)) {
+                                    //如果没有 则新建
+                                    kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                                }
+                                kitchenArticleMap.get(kitchenId).add(item);
+                            }
+                        }
+                    }
+                } else {
                     List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
                     for (Kitchen kitchen : kitchenList) {
                         String kitchenId = kitchen.getId().toString();
@@ -894,7 +921,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
+
                 }
+
+
             }
         }
 
@@ -954,14 +984,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 data.put("RESTAURANT_ADDRESS", shop.getAddress());
                 data.put("REDUCTION_AMOUNT", order.getReductionAmount());
                 data.put("RESTAURANT_TEL", shop.getPhone());
-                Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+                Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
                 StringBuilder star = new StringBuilder();
-                if(appraise != null && appraise.getLevel() < 5){
-                    for(int i = 0;i< appraise.getLevel();i++){
+                if (appraise != null && appraise.getLevel() < 5) {
+                    for (int i = 0; i < appraise.getLevel(); i++) {
                         star.append("★");
                     }
                 }
-                data.put("TABLE_NUMBER", tableNumber+star.toString());
+                data.put("TABLE_NUMBER", tableNumber + star.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -979,6 +1009,78 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 printTask.add(print);
             }
         }
+
+        for (String kitchenId : recommendMap.keySet()) {
+            Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
+            Printer printer = printerService.selectById(kitchen.getPrinterId());//得到打印机信息
+            if (printer == null) {
+                continue;
+            }
+
+
+            //生成厨房小票
+            for (String recommendId : recommendMap.get(kitchenId)) {
+                //保存 菜品的名称和数量
+                List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+                Map<String, Object> item = new HashMap<String, Object>();
+                List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId,order.getId());
+                for(OrderItem orderItem : orderItems){
+                    item.put("SUBTOTAL", orderItem.getFinalPrice());
+                    item.put("ARTICLE_NAME", orderItem.getArticleName());
+                    item.put("ARTICLE_COUNT", orderItem.getCount());
+                    items.add(item);
+                }
+
+
+
+
+                //保存基本信息
+                Map<String, Object> print = new HashMap<String, Object>();
+                print.put("TABLE_NO", tableNumber);
+
+                print.put("KITCHEN_NAME", kitchen.getName());
+                print.put("PORT", printer.getPort());
+                print.put("ORDER_ID", serialNumber);
+                print.put("IP", printer.getIp());
+                String print_id = ApplicationUtils.randomUUID();
+                print.put("PRINT_TASK_ID", print_id);
+                print.put("ADD_TIME", new Date());
+
+                Map<String, Object> data = new HashMap<String, Object>();
+                data.put("ORDER_ID", serialNumber);
+                data.put("ITEMS", items);
+                data.put("DISTRIBUTION_MODE", modeText);
+                data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+                data.put("RESTAURANT_ADDRESS", shop.getAddress());
+                data.put("REDUCTION_AMOUNT", order.getReductionAmount());
+                data.put("RESTAURANT_TEL", shop.getPhone());
+                Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+                StringBuilder star = new StringBuilder();
+                if (appraise != null && appraise.getLevel() < 5) {
+                    for (int i = 0; i < appraise.getLevel(); i++) {
+                        star.append("★");
+                    }
+                }
+                data.put("TABLE_NUMBER", tableNumber + star.toString());
+                data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+                data.put("RESTAURANT_NAME", shop.getName());
+                data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
+                data.put("ARTICLE_COUNT", order.getArticleCount());
+                print.put("DATA", data);
+                print.put("STATUS", 0);
+                print.put("TICKET_TYPE", TicketType.KITCHEN);
+                //添加当天打印订单的序号
+                data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+                //保存打印配置信息
+//                print.put("ORDER_ID", serialNumber);
+//                print.put("KITCHEN_NAME", kitchen.getName());
+//                print.put("TABLE_NO", tableNumber);
+                //添加到 打印集合
+                printTask.add(print);
+            }
+        }
+
+
 //        logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
         return printTask;
     }
@@ -1010,9 +1112,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 查询订单菜品
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
 
-        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
-            for(OrderItem orderItem : child){
+            for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
                 order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
@@ -1067,10 +1169,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         data.put("ITEMS", items);
-        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(),order.getShopDetailId());
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
-        if(appraise != null && appraise.getLevel() < 5){
-            for(int i = 0;i< appraise.getLevel();i++){
+        if (appraise != null && appraise.getLevel() < 5) {
+            for (int i = 0; i < appraise.getLevel(); i++) {
                 star.append("★");
             }
 
@@ -1081,7 +1183,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber()+star.toString());
+        data.put("TABLE_NUMBER", order.getTableNumber() + star.toString());
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -1146,9 +1248,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {
         Date begin = DateUtil.getDateBegin(date);
         Date end = DateUtil.getDateEnd(date);
-        if(shopMode == ShopMode.HOUFU_ORDER){
+        if (shopMode == ShopMode.HOUFU_ORDER) {
             return orderMapper.listHoufuFinishedOrder(currentShopId);
-        }else{
+        } else {
             return orderMapper.selectHistoryOrderList(currentShopId, begin, end, shopMode);
         }
 
@@ -1211,7 +1313,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
 
 
-
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -1225,10 +1326,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if(order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
-                && setting.getIsPrintPayAfter().equals(Common.YES)){
+        if (order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
+                && setting.getIsPrintPayAfter().equals(Common.YES)) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
-            for(OrderItem orderItem : child){
+            for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
                 order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
@@ -1245,7 +1346,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
 
-
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
@@ -1257,7 +1357,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!kitchenTicket.isEmpty() &&  order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
+        if (!kitchenTicket.isEmpty() && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
             printTask.addAll(kitchenTicket);
         }
         if (!kitchenTicket.isEmpty() && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
@@ -1933,7 +2033,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
-        if(shop != null){
+        if (shop != null) {
             o.setShopName(shop.getName());
         }
 
@@ -2028,7 +2128,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        }
         System.out.println("----------------------------1234");
 
-        if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             items.addAll(child);
         }
@@ -2550,12 +2650,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectByOrderSatesAndProductionStates(String shopId, String[] orderStates,
                                                              String[] productionStates) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        if(shopDetail.getShopMode() == ShopMode.HOUFU_ORDER){
+        if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
             return orderMapper.listHoufuUnFinishedOrder(shopId);
-        } else{
+        } else {
             return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
         }
-
 
 
     }
@@ -2934,7 +3033,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order getLastOrderByCustomer(String customerId, String shopId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId,brandSetting.getCloseContinueTime());
+        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
@@ -3021,7 +3120,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> getChildItem(String orderId) {
         List<Order> childs = orderMapper.selectByParentId(orderId);
         List<Order> result = new ArrayList<>();
-        for(Order child : childs){
+        for (Order child : childs) {
             Order order = getOrderInfo(child.getId());
             result.add(order);
         }
@@ -3031,14 +3130,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Result updateOrderItem(String orderId, Integer count, String orderItemId,Integer type) {
+    public Result updateOrderItem(String orderId, Integer count, String orderItemId, Integer type) {
         Result result = new Result();
         Order order = orderMapper.selectByPrimaryKey(orderId);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if(type == 0 ){ //如果要修改的是服务费
+        if (type == 0) { //如果要修改的是服务费
             order.setCustomerCount(count);
             order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
-            if(order.getAmountWithChildren().doubleValue() > 0){
+            if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
             }
             order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
@@ -3046,25 +3145,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setServicePrice(setting.getServicePrice().multiply(new BigDecimal(count)));
             order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
             order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
-            if(order.getAmountWithChildren().doubleValue() > 0){
+            if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
             }
             order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
 
             update(order);
-        }else{ //修改的是菜品
+        } else { //修改的是菜品
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
-            if(orderItem.getType() == OrderItemType.MEALS_CHILDREN){
+            if (orderItem.getType() == OrderItemType.MEALS_CHILDREN) {
                 result.setSuccess(false);
                 result.setMessage("套餐子品暂不支持修改");
                 return result;
             }
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
-            if(order.getParentOrderId() == null){
-                if(order.getArticleCount() == 0 && count == 0){
+            if (order.getParentOrderId() == null) {
+                if (order.getArticleCount() == 0 && count == 0) {
                     result.setSuccess(false);
                     result.setMessage("菜品数量不可为空");
                     return result;
@@ -3074,7 +3173,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(orderItem.getFinalPrice()));
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
-            if(order.getAmountWithChildren().doubleValue() > 0){
+            if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
             }
 
@@ -3085,11 +3184,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
             order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
-            if(order.getAmountWithChildren().doubleValue() > 0){
+            if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
             }
 
-            if(orderItem.getCount() == 0){
+            if (orderItem.getCount() == 0) {
                 orderitemMapper.deleteByPrimaryKey(orderItem.getId());
             }
 
@@ -3120,8 +3219,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         msg.append("桌号：" + order.getTableNumber() + "\n");
         msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-        if(setting.getIsUseServicePrice() == 1){
-            msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+        if (setting.getIsUseServicePrice() == 1) {
+            msg.append(setting.getServiceName() + "：" + order.getServicePrice() + "\n");
         }
         BigDecimal sum = order.getOrderMoney();
         List<Order> orders = selectByParentId(order.getId()); //得到子订单
