@@ -883,6 +883,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             } else {
                 if (item.getType() != OrderItemType.MEALS_CHILDREN) {
+
+
                     List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
                     for (Kitchen kitchen : kitchenList) {
                         String kitchenId = kitchen.getId().toString();
