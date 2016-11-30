@@ -75,7 +75,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			string = sendMsgComment(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
 		}
 
-		
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);

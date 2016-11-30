@@ -63,6 +63,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             firstSharePayLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.PRINT_KITCHEN){
             printKitchenLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.REFUSE_ORDER){
+            refuseOrderLog(shopDetail, customer, desc);
         }
     }
 
@@ -303,6 +305,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"厨打订单");
+        logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //
+    public void refuseOrderLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"的订单被商家拒绝了");
         logBase.setDesc(desc);
         insert(logBase);
     }
