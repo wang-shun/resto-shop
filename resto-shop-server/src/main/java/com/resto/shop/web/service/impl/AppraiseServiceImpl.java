@@ -208,4 +208,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public int selectByCustomerCount(String customerId) {
 		return appraiseMapper.selectByCustomerCount(customerId);
 	}
+
+	@Override
+	public List<Appraise> selectByGoodAppraise() {
+		return appraiseMapper.selectByGoodAppraise();
+	}
 }

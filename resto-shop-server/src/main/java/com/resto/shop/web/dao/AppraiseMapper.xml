@@ -123,4 +123,8 @@
   <select id="selectByCustomerCount" resultType="java.lang.Integer">
     select count(*) from tb_appraise where customer_id = #{customerId} and status = 1
   </select>
+
+  <select id="selectByGoodAppraise" resultType="Appraise">
+    select <include refid="Base_Column_List"/> from tb_appraise where level = 5 and picture_url is not null order by create_time desc limit 500
+  </select>
 </mapper>

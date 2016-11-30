@@ -59,7 +59,7 @@
     </update>
 
     <update id="updateCancelPraise" parameterType="com.resto.shop.web.model.AppraisePraise">
-        update tb_appraise_praise set is_del = #{isDel} where appraise_id = #{appraiseId} and customer_id = #{customerId}
+        update tb_appraise_praise set is_del = #{isDel}, create_time = now() where appraise_id = #{appraiseId} and customer_id = #{customerId}
     </update>
 
     <select id="appraisePraiseList" resultType="com.resto.shop.web.model.AppraisePraise">
