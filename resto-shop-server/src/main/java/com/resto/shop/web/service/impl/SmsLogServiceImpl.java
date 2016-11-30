@@ -58,16 +58,23 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     
 	@Override
-	public String sendCode(String phone, String code, String brandId,String shopId) {
+	public String sendCode(String phone, String code, String brandId, String shopId, int smsLogType) {
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
 		//查询
 		//BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
         BrandUser brandUser = brandUserService.selectOneByBrandId(b.getId());
-		
+
 		//发送短信返回
-		String string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
-		
+		String string = null;
+		if(smsLogType == SmsLogType.AUTO_CODE){
+			string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
+		}else if(smsLogType == SmsLogType.PRAISE){
+			string = sendMsgPraise(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
+		}else if(smsLogType == SmsLogType.COMMENT){
+			string = sendMsgComment(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
+		}
+
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
@@ -116,6 +123,54 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
 	
 	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser){
+		//判断该品牌账户的余额是否充足
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
+		//获取剩余短信条数
+		int remindNum = smsAcount.getRemainderNum();
+		String [] arrs = smsAcount.getSmsRemind().split(",");
+		//判断剩余短信条数是否大于设定的最小可发短信值
+		if(remindNum<this.getMinStr(arrs)){
+			//我们提醒商家充值
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone());
+			log.info("剩余短信为"+remindNum+"条无法发短信");
+			//返回false标记让商家无法发短信
+			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
+		}else{
+			//剩余短信在设置的范围内
+			if(this.isHave(arrs, remindNum+"")){
+				//发短信提醒商家
+				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone());
+			}
+		}
+		//商家给客户发短信
+		return SMSUtils.sendCode(sign, serviceName, code, phone);
+	}
+
+	public String sendMsgPraise(String sign,String serviceName,String code,String phone,BrandUser brandUser){
+		//判断该品牌账户的余额是否充足
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
+		//获取剩余短信条数
+		int remindNum = smsAcount.getRemainderNum();
+		String [] arrs = smsAcount.getSmsRemind().split(",");
+		//判断剩余短信条数是否大于设定的最小可发短信值
+		if(remindNum<this.getMinStr(arrs)){
+			//我们提醒商家充值
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone());
+			log.info("剩余短信为"+remindNum+"条无法发短信");
+			//返回false标记让商家无法发短信
+			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
+		}else{
+			//剩余短信在设置的范围内
+			if(this.isHave(arrs, remindNum+"")){
+				//发短信提醒商家
+				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone());
+			}
+		}
+		//商家给客户发短信
+		return SMSUtils.sendCode(sign, serviceName, code, phone);
+	}
+
+	public String sendMsgComment(String sign,String serviceName,String code,String phone,BrandUser brandUser){
 		//判断该品牌账户的余额是否充足
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取剩余短信条数
