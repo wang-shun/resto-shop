@@ -287,6 +287,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item, articleCount);
             } else if (item.getType() == OrderItemType.UNIT_NEW) {
                 check = checkArticleList(item, item.getCount());
+            }else if (item.getType() == OrderItemType.RECOMMEND){
+                check = checkArticleList(item, item.getCount());
             }
 
 
