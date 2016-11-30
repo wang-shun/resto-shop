@@ -913,20 +913,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
                         }
-                    }
-                } else {
-                    List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
-                    for (Kitchen kitchen : kitchenList) {
-                        String kitchenId = kitchen.getId().toString();
-                        kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-                        //判断 厨房集合中 是否已经包含当前厨房信息
-                        if (!kitchenArticleMap.containsKey(kitchenId)) {
-                            //如果没有 则新建
-                            kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                    } else {
+                        List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+                        for (Kitchen kitchen : kitchenList) {
+                            String kitchenId = kitchen.getId().toString();
+                            kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                            //判断 厨房集合中 是否已经包含当前厨房信息
+                            if (!kitchenArticleMap.containsKey(kitchenId)) {
+                                //如果没有 则新建
+                                kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                            }
+                            kitchenArticleMap.get(kitchenId).add(item);
                         }
-                        kitchenArticleMap.get(kitchenId).add(item);
-                    }
 
+                    }
                 }
 
 
