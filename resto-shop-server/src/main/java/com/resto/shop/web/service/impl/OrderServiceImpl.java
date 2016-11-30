@@ -3219,22 +3219,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         result.setSuccess(true);
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+
+        Order parent = null;
+        if(order.getParentOrderId() != null){
+            parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+        }else{
+            parent = order;
+        }
+
         StringBuffer msg = new StringBuffer();
         msg.append("您的订单信息已被商家确认!" + "\n");
-        msg.append("订单编号:" + order.getSerialNumber() + "\n");
-        msg.append("桌号：" + order.getTableNumber() + "\n");
-        msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
-        msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+        msg.append("订单编号:" + parent.getSerialNumber() + "\n");
+        msg.append("桌号：" + parent.getTableNumber() + "\n");
+        msg.append("就餐店铺：" + shopDetailService.selectById(parent.getShopDetailId()).getName() + "\n");
+        msg.append("订单时间：" + DateFormatUtils.format(parent.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
         if (setting.getIsUseServicePrice() == 1) {
-            msg.append(setting.getServiceName() + "：" + order.getServicePrice() + "\n");
+            msg.append(setting.getServiceName() + "：" + parent.getServicePrice() + "\n");
         }
-        BigDecimal sum = order.getOrderMoney();
-        List<Order> orders = selectByParentId(order.getId()); //得到子订单
+        BigDecimal sum = parent.getOrderMoney();
+        List<Order> orders = selectByParentId(parent.getId()); //得到子订单
         for (Order child : orders) { //遍历子订单
             sum = sum.add(child.getOrderMoney());
         }
         msg.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getParentOrderId() == null ? order.getId() : order.getParentOrderId());
+        List<OrderItem> orderItem = orderItemService.listByOrderId( parent.getId());
         if(order.getParentOrderId() != null){
             List<OrderItem> child = orderItemService.listByParentId(order.getParentOrderId());
             for (OrderItem item : child) {
