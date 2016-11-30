@@ -281,7 +281,8 @@ order by t.print_sort asc
   </select>
 
   <select id="getOrderItemByRecommendId" resultType="OrderItem">
-    select * from tb_order_item
+    select sum(count) as count,article_name,sum(final_price) as final_price  from tb_order_item
     where order_id = #{orderId} and recommend_id = #{recommendId}
+    GROUP BY article_id
   </select>
 </mapper>
