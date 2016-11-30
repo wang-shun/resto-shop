@@ -891,10 +891,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         ArticleRecommend articleRecommend = articleRecommendMapper.getRecommendById(item.getRecommendId());
                         if (articleRecommend.getPrintType() == PrinterType.KITCHEN) {
                             String kitchenId = articleRecommend.getKitchenId();
+                            Kitchen kitchen = kitchenService.selectById(Integer.valueOf(kitchenId));
+                            kitchenMap.put(kitchenId, kitchen);
                             if(!recommendMap.containsKey(kitchenId)){
                                 recommendMap.put(kitchenId, new ArrayList<String>());
                             }
-                            recommendMap.get(kitchenId).add(item.getRecommendId());
+                            if(!recommendMap.get(kitchenId).contains(item.getRecommendId())){
+                                recommendMap.get(kitchenId).add(item.getRecommendId());
+                            }
+
                         } else {
                             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
                             for (Kitchen kitchen : kitchenList) {
@@ -1022,9 +1027,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for (String recommendId : recommendMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
                 List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-                Map<String, Object> item = new HashMap<String, Object>();
+
                 List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId,order.getId());
                 for(OrderItem orderItem : orderItems){
+                    Map<String, Object> item = new HashMap<String, Object>();
                     item.put("SUBTOTAL", orderItem.getFinalPrice());
                     item.put("ARTICLE_NAME", orderItem.getArticleName());
                     item.put("ARTICLE_COUNT", orderItem.getCount());

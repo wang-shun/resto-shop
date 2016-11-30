@@ -282,6 +282,6 @@ order by t.print_sort asc
 
   <select id="getOrderItemByRecommendId" resultType="OrderItem">
     select * from tb_order_item
-    where order_id = #{orderId} and recommendId = #{recommendId}
+    where order_id = #{orderId} and recommend_id = #{recommendId}
   </select>
 </mapper>
