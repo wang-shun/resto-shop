@@ -82,8 +82,7 @@ public class AppraiseAspect {
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
             //继续发送给你回复的人
             if(appraiseComment.getPid() != null && appraiseComment.getPid().length() > 30){
-                AppraiseComment faComment = appraiseCommentService.selectById(appraiseComment.getPid());
-                Customer faCustomer = customerService.selectById(faComment.getCustomerId());
+                Customer faCustomer = customerService.selectById(appraiseComment.getPid());
                 if(faCustomer.getWechatId() != appCustomer.getWechatId()){
                     WeChatUtils.sendCustomerMsg(msg.toString(), faCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
                 }
