@@ -837,7 +837,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
-        Map<String,List<String>> recommendMap = new HashMap<>();
+        Map<String, List<String>> recommendMap = new HashMap<>();
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
@@ -893,10 +893,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             String kitchenId = articleRecommend.getKitchenId();
                             Kitchen kitchen = kitchenService.selectById(Integer.valueOf(kitchenId));
                             kitchenMap.put(kitchenId, kitchen);
-                            if(!recommendMap.containsKey(kitchenId)){
+                            if (!recommendMap.containsKey(kitchenId)) {
                                 recommendMap.put(kitchenId, new ArrayList<String>());
                             }
-                            if(!recommendMap.get(kitchenId).contains(item.getRecommendId())){
+                            if (!recommendMap.get(kitchenId).contains(item.getRecommendId())) {
                                 recommendMap.get(kitchenId).add(item.getRecommendId());
                             }
 
@@ -1028,16 +1028,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //保存 菜品的名称和数量
                 List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 
-                List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId,order.getId());
-                for(OrderItem orderItem : orderItems){
+                List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId, order.getId());
+                for (OrderItem orderItem : orderItems) {
                     Map<String, Object> item = new HashMap<String, Object>();
                     item.put("SUBTOTAL", orderItem.getFinalPrice());
                     item.put("ARTICLE_NAME", orderItem.getArticleName());
                     item.put("ARTICLE_COUNT", orderItem.getCount());
                     items.add(item);
                 }
-
-
 
 
                 //保存基本信息
@@ -1322,7 +1320,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if (setting.getAutoPrintTotal().intValue() == 0 && !order.getOrderState().equals(OrderState.PAYMENT)) {
+        if (setting.getAutoPrintTotal().intValue() == 0 &&
+                (order.getOrderMode() != ShopMode.HOUFU_ORDER || (order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER))) {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
                 if (ticket != null) {
@@ -3221,9 +3220,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 
         Order parent = null;
-        if(order.getParentOrderId() != null){
+        if (order.getParentOrderId() != null) {
             parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
-        }else{
+        } else {
             parent = order;
         }
 
@@ -3242,8 +3241,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             sum = sum.add(child.getOrderMoney());
         }
         msg.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId( parent.getId());
-        if(order.getParentOrderId() != null){
+        List<OrderItem> orderItem = orderItemService.listByOrderId(parent.getId());
+        if (order.getParentOrderId() != null) {
             List<OrderItem> child = orderItemService.listByParentId(order.getParentOrderId());
             for (OrderItem item : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(item.getFinalPrice()));
