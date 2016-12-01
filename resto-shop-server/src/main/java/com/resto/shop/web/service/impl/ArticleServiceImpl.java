@@ -13,6 +13,7 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -413,5 +414,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> delCheckArticle(String id) {
         return articleMapper.delCheckArticle(id);
+    }
+
+    @Override
+    public void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare) {
+        articleMapper.updatePhotoSquare(id, photoSquare);
     }
 }
