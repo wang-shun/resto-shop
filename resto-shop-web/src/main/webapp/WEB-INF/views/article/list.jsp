@@ -431,12 +431,10 @@
                                                            style="width:120px">选择类型&nbsp;</label>
                                                     <div class="col-md-4">
                                                         <select class="form-control" style="width:150px"
-                                                                name="choiceType" v-model="attr.choiceType"
-                                                                v-on:change="choiceTypeChange(attr)" >
-                                                            <option value="0" selected="selected">必选</option>
+                                                                name="choiceType" v-model="attr.choiceType" v-on:change="choiceTypeChange(attr)" >
+                                                            <option value="0" >必选</option>
                                                             <option value="1">任选</option>
                                                         </select>
-
 
                                                     </div>
                                                     <div class="col-md-4" v-if="attr.choiceType == 0">
@@ -445,6 +443,8 @@
                                                                required="required">
                                                     </div>
                                                 </div>
+
+
 
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
@@ -907,9 +907,9 @@
                         ,
                         choiceTypeChange: function (attr) {
                             if (attr.choiceType == 1) {
-
+                                console.log(attr.choiceType)
                             }else{
-
+                                console.log(attr.choiceType);
                             }
                         },
                         addMealAttr: function () {
@@ -918,6 +918,7 @@
                                 name: "套餐属性" + sort,
                                 sort: sort,
                                 mealItems: [],
+                                choiceType : 0
                             });
                         }
                         ,
@@ -979,6 +980,7 @@
                                 units: [],
                                 articleType: article_type,
                             };
+
                             this.showform = true;
                             this.formTitle = title;
                             this.selectedUnit = [];
@@ -1006,6 +1008,7 @@
                         }
                         ,
                         edit: function (model) {
+                            console.log(model);
                             this.selectedUnit = [];
                             var list = {
                                 unitList: []
@@ -1013,7 +1016,7 @@
                             this.selectedUnit = list;
 
                             var that = this;
-
+//                            that.attr.choiceType=1;
                             that.formTitle="编辑菜品";
                             action = "edit";
 
