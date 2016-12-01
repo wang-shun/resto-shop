@@ -81,7 +81,7 @@ public class AppraiseAspect {
             msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "的评论，快去<a href='" + url+ "'>回复TA</a>吧~\n");
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
             //继续发送给你回复的人
-            if(!StringUtils.isEmpty(appraiseComment.getPid())){
+            if(appraiseComment.getPid() != null && appraiseComment.getPid().length() > 30){
                 AppraiseComment faComment = appraiseCommentService.selectById(appraiseComment.getPid());
                 Customer faCustomer = customerService.selectById(faComment.getCustomerId());
                 if(faCustomer.getWechatId() != appCustomer.getWechatId()){
