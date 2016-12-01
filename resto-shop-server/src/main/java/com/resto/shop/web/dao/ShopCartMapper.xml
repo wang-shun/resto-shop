@@ -88,7 +88,7 @@
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
         customer_id =#{customerId} and
-         pid = 0 and
+        pid = 0 and shop_type = #{shopType} and
         shop_detail_id =#{shopDetailId} limit 1
     </select>
 
@@ -128,5 +128,4 @@
     <delete id="delMealItem">
       delete from tb_shop_cart where  pid = #{0}
     </delete>
-
 </mapper>
