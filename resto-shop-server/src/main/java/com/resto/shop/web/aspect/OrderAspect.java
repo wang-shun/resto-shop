@@ -176,6 +176,13 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
+
+        if(order != null && order.getPayMode() == OrderPayMode.WX_PAY && order.getOrderState() == OrderState.PAYMENT
+                && order.getTableNumber() != null){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+
+
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderWXModeFive(order.getId());
         }
