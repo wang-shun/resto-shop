@@ -53,7 +53,7 @@ public class AppraiseAspect {
     public void updateCancelPraiseAfter(AppraisePraise appraisePraise) {
         if(appraisePraise.getIsDel() == 0){
             Appraise appraise = appraiseService.selectById(appraisePraise.getAppraiseId());
-            if(appraise.getCustomerId() != appraisePraise.getCustomerId()){
+            if(!appraise.getCustomerId().equals(appraisePraise.getCustomerId())){
                 Customer aCustomer = customerService.selectById(appraise.getCustomerId());
                 ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
                 Brand brand = brandService.selectById(aCustomer.getBrandId());
@@ -81,13 +81,13 @@ public class AppraiseAspect {
         StringBuffer msg = new StringBuffer();
         String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
         msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "的评论，快去<a href='" + url+ "'>回复TA</a>吧~\n");
-        if(appraise.getCustomerId() != appraiseComment.getCustomerId()){
+        if(!appraise.getCustomerId().equals(appraiseComment.getCustomerId())){
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
         //继续发送给你回复的人
         if(appraiseComment.getPid() != null && appraiseComment.getPid().length() > 30){
             Customer faCustomer = customerService.selectById(appraiseComment.getPid());
-            if(faCustomer.getWechatId() != appCustomer.getWechatId()){
+            if(!faCustomer.getWechatId().equals(appCustomer.getWechatId())){
                 WeChatUtils.sendCustomerMsg(msg.toString(), faCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
             }
         }
