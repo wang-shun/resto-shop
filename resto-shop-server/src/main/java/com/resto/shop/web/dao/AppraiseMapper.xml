@@ -96,7 +96,7 @@
 	SELECT COUNT(1) AS COUNT,AVG(LEVEL)*20 AVG_SCORE,
 	CASE WHEN DAY(create_time) BETWEEN 1 AND 10 THEN DATE_FORMAT(create_time,'%Y.%m.01~10')
 	WHEN DAY(create_time) BETWEEN 11 AND 20 THEN DATE_FORMAT(create_time,'%Y.%m.11~20')
-	ELSE CONCAT(DATE_FORMAT(create_time,'%Y.%m.21~'),DAY(LAST_DAY(CURDATE())))
+	ELSE CONCAT(DATE_FORMAT(create_time,'%Y.%m.21~'),DAY(LAST_DAY(create_time)))
 	END AS YEARMONTH FROM tb_appraise 
 	where shop_detail_id=#{0}
 	GROUP BY YEARMONTH
