@@ -11,6 +11,7 @@ import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.AppraiseComment;
 import com.resto.shop.web.model.AppraisePraise;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.service.AppraiseCommentService;
 import com.resto.shop.web.service.AppraiseService;
 import com.resto.shop.web.service.CustomerService;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -19,6 +20,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 
@@ -41,6 +43,8 @@ public class AppraiseAspect {
     private ShopDetailService shopDetailService;
     @Resource
     private BrandService brandService;
+    @Resource
+    private AppraiseCommentService appraiseCommentService;
 
     @Pointcut("execution(* com.resto.shop.web.service.AppraisePraiseService.updateCancelPraise(..))")
     public void updateCancelPraise(){};
@@ -76,5 +80,13 @@ public class AppraiseAspect {
             String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
             msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "的评论，快去<a href='" + url+ "'>回复TA</a>吧~\n");
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+            //继续发送给你回复的人
+            if(!StringUtils.isEmpty(appraiseComment.getPid())){
+                AppraiseComment faComment = appraiseCommentService.selectById(appraiseComment.getPid());
+                Customer faCustomer = customerService.selectById(faComment.getCustomerId());
+                if(faCustomer.getWechatId() != appCustomer.getWechatId()){
+                    WeChatUtils.sendCustomerMsg(msg.toString(), faCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+                }
+            }
     }
 }
