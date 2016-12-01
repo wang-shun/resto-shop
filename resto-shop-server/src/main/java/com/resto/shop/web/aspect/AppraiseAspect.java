@@ -55,7 +55,7 @@ public class AppraiseAspect {
             Customer customer = customerService.selectById(appraisePraise.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
-            String url = "http://" + brand.getBrandSign() + ".restoplus.cn/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
+            String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
             msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "的评论点了赞，快去<a href='" + url+ "'>回复TA</a>吧~\n");
             WeChatUtils.sendCustomerMsg(msg.toString(), aCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
@@ -73,7 +73,7 @@ public class AppraiseAspect {
             Customer customer = customerService.selectById(appraiseComment.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             StringBuffer msg = new StringBuffer();
-            String url = "http://" + brand.getBrandSign() + ".restoplus.cn/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
+            String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
             msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "的评论，快去<a href='" + url+ "'>回复TA</a>吧~\n");
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
