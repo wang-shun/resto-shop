@@ -29,6 +29,26 @@ public class ShopCart {
 
     private String recommendArticleId;
 
+    private String unitNewId;
+
+    private List<ShopCart> unitList;
+
+    public List<ShopCart> getUnitList() {
+        return unitList;
+    }
+
+    public void setUnitList(List<ShopCart> unitList) {
+        this.unitList = unitList;
+    }
+
+    public String getUnitNewId() {
+        return unitNewId;
+    }
+
+    public void setUnitNewId(String unitNewId) {
+        this.unitNewId = unitNewId;
+    }
+
     public String getRecommendArticleId() {
         return recommendArticleId;
     }

@@ -59,6 +59,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             }
         } else if (shopCart.getShopType().equals(ShopCarType.CAOBAODANPIN)){
             insertShopCart(shopCart);
+        } else if (shopCart.getShopType().equals(ShopCarType.XINGUIGE)){
+            insertShopCart(shopCart);
+            return shopCart.getId();
+        } else if (shopCart.getShopType().equals(ShopCarType.XINGUIGECAOBAODANPIN)){
+            insertShopCart(shopCart);
         }
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {

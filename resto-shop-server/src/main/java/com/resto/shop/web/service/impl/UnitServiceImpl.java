@@ -111,4 +111,9 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
             }
         }
     }
+
+    @Override
+    public UnitDetail selectUnitDetail(String id) {
+        return unitMapper.selectUnitDetail(id);
+    }
 }

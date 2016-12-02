@@ -147,5 +147,7 @@ where t.id = #{articleId}
         and article_unit_id = #{relationId}
     </select>
     
-
+    <select id="selectUnitDetail" resultType="com.resto.shop.web.model.UnitDetail">
+        select * from tb_unit_detail where id = #{id}
+    </select>
 </mapper>

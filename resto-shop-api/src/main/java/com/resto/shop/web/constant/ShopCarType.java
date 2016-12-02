@@ -10,4 +10,6 @@ public class ShopCarType {
     public static final String TAOCANDANPIN = "3";  //套餐单品
     public static final String CAOBAO = "4";  //推荐餐包
     public static final String CAOBAODANPIN = "5";  //推荐餐包单品
+    public static final String XINGUIGE = "6";   //新规格单品
+    public static final String XINGUIGECAOBAODANPIN = "7";  //新规格推荐餐包单品
 }
