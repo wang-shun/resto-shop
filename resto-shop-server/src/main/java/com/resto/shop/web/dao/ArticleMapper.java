@@ -100,4 +100,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	Article selectByName(@Param("name") String name,@Param("shopId") String shopId);
 
 	List<Article> delCheckArticle(String id);
+
+	void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare);
 }

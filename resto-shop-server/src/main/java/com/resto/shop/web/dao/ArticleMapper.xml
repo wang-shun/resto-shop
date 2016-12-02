@@ -738,4 +738,10 @@ GROUP BY article_id
         where t2.article_id = #{id}
         and t4.state = 1 and t4.article_type = 2
     </select>
+
+    <update id="updatePhotoSquare" parameterType="com.resto.shop.web.model.Article">
+    update tb_article
+    set photo_square = #{photoSquare}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
 </mapper>
