@@ -176,6 +176,20 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
+
+        if(order != null  && order.getOrderState() == OrderState.PAYMENT
+                && order.getTableNumber() != null && order.getOrderMode() == ShopMode.TABLE_MODE){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+
+
+        if(order != null  && order.getOrderState() == OrderState.PAYMENT
+                && order.getOrderMode() == ShopMode.CALL_NUMBER){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+
+
+
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             orderService.payOrderWXModeFive(order.getId());
         }
@@ -249,31 +263,16 @@ public class OrderAspect {
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
 				if (order.getEmployeeId() == null) {
-					MQMessageProducer.sendPlaceOrderMessage(order);
-//					log.info("检查打印异常");
-//					int times = setting.getReconnectTimes();
-//					int seconds = setting.getReconnectSecond();
-//					for (int i = 0; i < times; i++) {
-//						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-//					}
-					log.info("检查打印异常");
-//					int times = setting.getReconnectTimes();
-//					int seconds = setting.getReconnectSecond();
-//					for (int i = 0; i < times; i++) {
-//						MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-//					}
+                    if(order.getPrintOrderTime() == null){
+                        MQMessageProducer.sendPlaceOrderMessage(order);
+                    }
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
 						MQMessageProducer.sendPlaceOrderMessage(order);
-//						log.info("检查打印异常");
-//						int times = setting.getReconnectTimes();
-//						int seconds = setting.getReconnectSecond();
-//						for (int i = 0; i < times; i++) {
-//							MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-//						}
+//
 					}
 				}
-               // MQMessageProducer.sendPlaceOrderMessage(order);
+
 
 
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
@@ -282,12 +281,12 @@ public class OrderAspect {
                     log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
                     sendPaySuccessMsg(order);
                 }
-                //log.info("检查打印异常");
-                //int times = setting.getReconnectTimes();
-                //int seconds = setting.getReconnectSecond();
-                //for (int i = 0; i < times; i++) {
-                  //  MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-                //}
+                log.info("检查打印异常");
+                int times = setting.getReconnectTimes();
+                int seconds = setting.getReconnectSecond();
+                for (int i = 0; i < times; i++) {
+                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+                }
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");

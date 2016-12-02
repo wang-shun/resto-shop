@@ -47,6 +47,18 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             return shopCart.getId();
         } else if (shopCart.getShopType().equals(ShopCarType.DANPIN)) {
             shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
+        } else if (shopCart.getShopType().equals(ShopCarType.CAOBAO)){
+            if(shopCartItem == null){
+                insertShopCart(shopCart);
+                return shopCart.getId();
+            }else{
+                shopCartItem.setNumber(shopCart.getNumber());
+                shopcartMapper.updateShopCartItem(shopCartItem);
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+                return shopCartItem.getId();
+            }
+        } else if (shopCart.getShopType().equals(ShopCarType.CAOBAODANPIN)){
+            insertShopCart(shopCart);
         }
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {
@@ -57,7 +69,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
                 shopCartItem.setNumber(number);
                 shopcartMapper.updateShopCartItem(shopCartItem);
                 return number - oldNumber;
-            }else if(shopCart != null){
+            } else if (shopCart != null){
                 if(number <= 0 &&  shopCart.getId() != null){
                     shopcartMapper.delMealArticle(shopCart.getId().toString());
                 }else if(number <= 0 &&  shopCart.getId() == null && shopCartItem.getId() != null){
