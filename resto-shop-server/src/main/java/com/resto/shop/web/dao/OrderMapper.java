@@ -490,4 +490,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order getLastOrderByTableNumber(String tableNumber);
 
+    List<Order> selectHasPayListHouFuOrderByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 }

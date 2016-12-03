@@ -1,10 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -395,9 +392,11 @@ public class SyncDataController extends GenericController {
         }
 
         //查询订单项丢失
-        List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
-        if(!orderExceptionList.isEmpty()){
-            for(Order order : orderExceptionList){
+
+        if(!brandName.equals("花千锅")){
+            List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
+            if(!orderExceptionList.isEmpty()){
+                for(Order order : orderExceptionList){
                     BigDecimal temp = BigDecimal.ZERO;
                     if(!order.getOrderPaymentItems().isEmpty()){
                         for(OrderPaymentItem oi : order.getOrderPaymentItems()){
@@ -420,10 +419,47 @@ public class SyncDataController extends GenericController {
                             orderExceptionService.insert(orderException);
                         }
                     }
+                }
+
             }
 
-        }
+        }else {
+            //查询所有的已支付的订单(2,10,11,12) (2.3) 27f56b31669f4d43805226709874b530
+            //通过品牌名字查询品牌
+            String brandId = "27f56b31669f4d43805226709874b530";
+            List<Order> orderList = orderService.selectHasPayListHouFuOrderByBrandId(beginDate,endDate,brandId);
 
+            //查询所有的父订单
+            Set<String> orderSet = new HashSet<>();
+            for(Order order:orderList){
+                if(order.getParentOrderId()!=null){
+                    orderSet.add(order.getParentOrderId());
+                }
+            }
+
+            List<String> stringList = new ArrayList<>(orderSet);
+            //所有的父订单的id
+            for(String s: stringList){
+                //父订单
+                Order o = orderService.selectOrderDetails(s);
+                //子订单
+                List<Order>  childList = orderService.selectByParentId(s);
+                BigDecimal  temp = BigDecimal.ZERO;
+                for(Order ochild : childList){
+                    temp = temp.add(ochild.getOrderMoney());
+                }
+                BigDecimal total = temp.add(o.getOrderMoney());
+                //判断各个订单的总额 是否和 主订单的
+                if(o.getAmountWithChildren().compareTo(total)>0){
+                    OrderException orderException = new OrderException();
+                    orderException.setOrderId(o.getId());
+                    orderException.setOrderMoney(o.getOrderMoney());
+                    orderException.setWhy("后付款模式 总订单价格和子订单和价格有差"+sub(total,o.getAmountWithChildren()));
+                    orderException.setBrandName(brandName);
+                    orderExceptionService.insert(orderException);
+                }
+            }
+        }
 
         return  getSuccessResult();
     }

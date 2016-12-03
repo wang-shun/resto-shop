@@ -2862,4 +2862,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order getLastOrderByTableNumber(String tableNumber) {
         return orderMapper.getLastOrderByTableNumber(tableNumber);
     }
+
+    @Override
+    public List<Order> selectHasPayListHouFuOrderByBrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return orderMapper.selectHasPayListHouFuOrderByBrandId(begin, end, brandId);
+    }
 }

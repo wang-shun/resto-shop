@@ -1980,6 +1980,16 @@ GROUP BY r.table_number
         select * from tb_order where table_number = #{tableNumber} and order_state = 1 order by create_time desc limit 1
     </select>
 
+
+
+<!-- 查询所有的后付款已支付的订单-->
+    <select id="selectHasPayListHouFuOrderByBrandId" resultType="Order">
+        SELECT
+        o.id , o.order_money ,o.order_state,o.production_status,o.payment_amount, o.amount_with_children,o.service_price,o.parent_order_id from tb_order o
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND  o.production_status in (2,3)
+        and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+    </select>
+
 </mapper>
 
 
