@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.resto.brand.web.model.OrderException;
+import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.model.OrderItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -44,6 +47,10 @@ public class OrderController extends GenericController{
 	private BrandService brandService;
 	@Resource
 	private ShopDetailService shopDetailService;
+
+
+	@Resource
+    private OrderExceptionService orderExceptionService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -307,4 +314,34 @@ public class OrderController extends GenericController{
 	public void refund(String orderId){
 		orderService.cancelOrder(orderId);
 	}
+
+	@RequestMapping("houFuChekc")
+    @ResponseBody
+    public  Result checkHoufu(String beginDate,String endDate){
+        List<Order> orderList = orderService.selectOrderListItemByBrandId(beginDate,endDate,getCurrentBrandId());
+        if(!orderList.isEmpty()){
+            for(Order o :orderList){
+                BigDecimal temp = BigDecimal.ZERO;
+                for(OrderItem oi:o.getOrderItems()){
+                    temp=temp.add(oi.getFinalPrice());//查询所有的菜品的总价
+                }
+                //判断当前的订单的总额orderMoney 是否=菜品价格+服务费
+                if(o.getOrderMoney().compareTo(temp.add(o.getServicePrice()))!=0){
+                    OrderException orderException = new OrderException();
+                    orderException.setOrderId(o.getId());
+                    orderException.setOrderMoney(o.getOrderMoney());
+                    orderException.setWhy("服务费+菜品费不等于订单价格");
+                    orderException.setShopName("花千锅");
+                    orderException.setCreateTime(o.getCreateTime());
+                    orderException.setBrandName(getBrandName());
+                    orderExceptionService.insert(orderException);
+
+                }
+            }
+        }
+	    return  getSuccessResult();
+
+    }
+
+
 }

@@ -477,4 +477,13 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	Order getLastOrderByTableNumber(String tableNumber);
+
+    /**
+     * 查询已完成订单  ---级对应的订单的菜品-
+     * @param beginDate
+     * @param endDate
+     * @param currentBrandId
+     * @return
+     */
+    List<Order> selectOrderListItemByBrandId(String beginDate, String endDate, String currentBrandId);
 }

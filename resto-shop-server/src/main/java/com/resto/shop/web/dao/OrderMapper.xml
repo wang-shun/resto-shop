@@ -111,6 +111,8 @@
     <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
         <id column="id"  property="id"/>
         <result column="order_money" property="orderMoney"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItemId" property="id"/>
            <result column="payment_mode_id" property="paymentModeId"/>
@@ -1839,6 +1841,21 @@ GROUP BY r.table_number
 
 
 
+    <resultMap id="getOrderItemList" type="Order">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="original_amount" property="originalAmount"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="service_price" property="servicePrice" />
+        <collection property="orderItems" javaType="List" ofType="orderItem">
+            <id column="orderItemId" property="id"/>
+            <result column="final_price" property="finalPrice" />
+        </collection>
+    </resultMap>
+
     <resultMap id="EmployeeResultMap" type="Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="tableNumber" property="tableNumber"/>
@@ -1865,12 +1882,7 @@ GROUP BY r.table_number
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
 
-
-
-
     </resultMap>
-
-
 
     <select id="getOrderByEmployee" resultMap="EmployeeResultMap">
         select t.id,ifnull(t.table_no,t.table_number) as tableNumber,t.article_count,t.order_state,
@@ -1960,10 +1972,17 @@ GROUP BY r.table_number
     <!--查询所有异常订单 -->
     <select id="selectHasPayOrderPayMentItemListBybrandId" resultMap="consumedOrderByshopId">
         SELECT
-        o.id , o.order_money ,oi.id as orderPaymentItemId,oi.pay_value,oi.payment_mode_id  from tb_order o
+        o.id ,
+        o.order_mode,
+        o.order_money ,
+        o.amount_with_children,
+        oi.id as orderPaymentItemId,
+        oi.pay_value,
+        oi.payment_mode_id
+        from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state !=9
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
     </select>
 
@@ -1978,6 +1997,28 @@ GROUP BY r.table_number
 
     <select id="getLastOrderByTableNumber" resultType="Order">
         select * from tb_order where table_number = #{tableNumber} and order_state = 1 order by create_time desc limit 1
+    </select>
+
+
+    <select id="selectOrderListItemByBrandId" resultMap="getOrderItemList">
+        SELECT
+	o.id,
+	o.original_amount,
+	o.payment_amount,
+	o.order_money,
+	o.amount_with_children,
+	o.parent_order_id,
+	o.service_price,
+	oi.id as orderItemId,
+	oi.final_price
+FROM
+	tb_order o
+INNER JOIN tb_order_item oi ON o.id = oi.order_id
+WHERE
+	o.order_state IN (2, 10, 11, 12)
+AND o.production_status IN (2, 3)
+    and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND  o.brand_id = #{brandId}
     </select>
 
 </mapper>
