@@ -130,6 +130,16 @@ public class Article {
 
     private String photoSquare;
 
+    private Integer mealFeeNumber;
+
+    public Integer getMealFeeNumber() {
+        return mealFeeNumber;
+    }
+
+    public void setMealFeeNumber(Integer mealFeeNumber) {
+        this.mealFeeNumber = mealFeeNumber;
+    }
+
     public String getPhotoSquare() {
         return photoSquare;
     }

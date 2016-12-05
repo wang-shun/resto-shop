@@ -43,6 +43,7 @@
         <result column="recommendCount" property="recommendCount"/>
         <result column="eleme_name" property="elemeName"/>
         <result column="photo_square" property="photoSquare"/>
+        <result column="meal_fee_number" property="mealFeeNumber"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
@@ -50,7 +51,7 @@
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
     is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
-    recommend_id,is_hidden,eleme_name,photo_square
+    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -74,7 +75,7 @@
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
       is_remind,article_type,stock_working_day,stock_weekend,
-      recommend_id,is_hidden,pId,eleme_name,photo_square)
+      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -87,7 +88,7 @@
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
       #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
-      #{photoSquare})
+      #{photoSquare},#{mealFeeNumber})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -206,6 +207,9 @@
             <if test="photoSquare != null">
                 photo_square,
             </if>
+            <if test="mealFeeNumber != null">
+                meal_fee_number,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -322,6 +326,9 @@
             <if test="photoSquare != null">
                 #{photoSquare},
             </if>
+            <if test="mealFeeNumber != null">
+                #{mealFeeNumber},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -437,6 +444,9 @@
             <if test="photoSquare != null">
                 photo_square = #{photoSquare},
             </if>
+            <if test="mealFeeNumber != null">
+                meal_fee_number = #{mealFeeNumber},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -478,7 +488,8 @@
       current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
       recommend_id = #{recommendId,jdbcType=VARCHAR},
       is_hidden = #{isHidden,isRemind,jdbcType=BIT},
-      photo_square = #{photoSquare}
+      photo_square = #{photoSquare},
+      meal_fee_number = #{mealFeeNumber}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
