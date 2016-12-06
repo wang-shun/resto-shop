@@ -208,7 +208,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleShow.itemsLess  | filterBy searchNameLike ">
+                                <tr v-for="art in  choiceArticleShow.itemsLess  | filterBy searchNameLike ">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -628,14 +628,14 @@
                                 kitchenId:$('#totalKitchen').val()
                             };
                             data.articles = this.articles;
-                            if($('#printType').val() == 0){
-                                for(var i = 0;i <  data.articles.length;i++){
-                                    if( data.articles[i].kitchenId == null ||  data.articles[i].kitchenId ==  "-1"){
-                                        C.errorMsg( "未选择出餐厨房!");
-                                        return;
-                                    }
-                                }
-                            }
+//                            if($('#printType').val() == 0){
+//                                for(var i = 0;i <  data.articles.length;i++){
+//                                    if( data.articles[i].kitchenId == null ||  data.articles[i].kitchenId ==  "-1"){
+//                                        C.errorMsg( "未选择出餐厨房!");
+//                                        return;
+//                                    }
+//                                }
+//                            }
 
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);

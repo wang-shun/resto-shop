@@ -20,10 +20,12 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
      <result column="meal_item_id" property="mealItemId"/>
      <result column="recommend_id" property="recommendId"/>
+     <result column="orgin_count" property="orginCount"/>
+     <result column="refund_count" property="refundCount"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, article_name, article_designation, count, original_price, unit_price, final_price, 
-    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id,recommend_id
+    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -40,13 +42,13 @@
       count, original_price, unit_price, 
       final_price, remark, sort, 
       status, order_id, article_id, 
-      type, parent_id, create_time
+      type, parent_id, create_time,orgin_count
       )
     values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{articleDesignation,jdbcType=VARCHAR}, 
       #{count,jdbcType=INTEGER}, #{originalPrice,jdbcType=DECIMAL}, #{unitPrice,jdbcType=DECIMAL}, 
       #{finalPrice,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, 
-      #{type,jdbcType=INTEGER}, #{parentId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      #{type,jdbcType=INTEGER}, #{parentId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},#{count,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderItem">
@@ -97,6 +99,9 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="count != null">
+        orgin_count,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -144,6 +149,9 @@
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">
@@ -190,6 +198,9 @@
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refundCount != null">
+        refund_count = #{refundCount} + refund_count,
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}

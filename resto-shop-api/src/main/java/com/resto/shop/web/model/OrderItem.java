@@ -67,6 +67,28 @@ public class OrderItem {
 
     private String recommendId;
 
+    //退菜数量
+    private Integer refundCount;
+
+    //原始购买的菜品数量
+    private Integer orginCount;
+
+    public Integer getRefundCount() {
+        return refundCount;
+    }
+
+    public void setRefundCount(Integer refundCount) {
+        this.refundCount = refundCount;
+    }
+
+    public Integer getOrginCount() {
+        return orginCount;
+    }
+
+    public void setOrginCount(Integer orginCount) {
+        this.orginCount = orginCount;
+    }
+
     public String getRecommendId() {
         return recommendId;
     }
