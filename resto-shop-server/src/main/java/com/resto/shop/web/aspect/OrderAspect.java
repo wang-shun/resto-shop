@@ -132,15 +132,19 @@ public class OrderAspect {
                     break;
             }
         }
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (order.getShopName() == null || "".equals(order.getShopName())) {
-            order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+            order.setShopName(shopDetail.getName());
         }
         msg.append("就餐店铺：" + order.getShopName() + "\n");
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if(setting.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0){
+        if(setting.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1){
             msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+        }
+        if(setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
+            msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
         }
         msg.append("订单明细：\n");
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());

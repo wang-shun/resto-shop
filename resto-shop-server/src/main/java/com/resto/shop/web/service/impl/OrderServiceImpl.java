@@ -1167,7 +1167,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getMealFeePrice());
             item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-            item.put("ARTICLE_COUNT", 0);
+            item.put("ARTICLE_COUNT", order.getMealAllNumber());
             items.add(item);
         }
         Map<String, Object> print = new HashMap<>();
@@ -2454,7 +2454,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() ==1){
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", 0);
+            item.put("SUBTOTAL", order.getMealAllNumber());
             item.put("FAMILY_NAME", shopDetail.getMealFeeName());
             productItems.add(item);
         }
