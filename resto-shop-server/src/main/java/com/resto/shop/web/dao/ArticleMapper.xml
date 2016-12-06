@@ -510,7 +510,7 @@
     </select>
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
-  	a.show_big,	a.description,a.photo_small,a.is_empty,
+  	a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
   	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,
   	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
   	(select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
