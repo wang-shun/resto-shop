@@ -2002,6 +2002,7 @@ GROUP BY r.table_number
         and ((order_mode = 5 and order_state = 1) or (order_mode != 5) )
         and now() - create_time > #{time}
         and table_number is not null
+        and distribution_mode_id = 1
         order by create_time desc limit 1
 
     </select>
