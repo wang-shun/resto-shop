@@ -3,10 +3,7 @@ package com.resto.shop.web.aspect;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.model.ShopMode;
-import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -342,6 +339,7 @@ public class OrderAspect {
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             StringBuffer msg = new StringBuffer();
             if (order.getParentOrderId() == null) {
                 msg.append("下单成功!" + "\n");
@@ -350,11 +348,14 @@ public class OrderAspect {
             }
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
-            msg.append("就餐店铺：" + shopDetailService.selectById(order.getShopDetailId()).getName() + "\n");
+            msg.append("就餐店铺：" + shopDetail.getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if(setting.getIsUseServicePrice() == 1){
+            if(setting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+            }
+            if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
+                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
             }
             BigDecimal sum = order.getOrderMoney();
             List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
@@ -467,6 +468,7 @@ public class OrderAspect {
         if (order != null) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             StringBuffer msg = new StringBuffer();
             msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
             msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
@@ -481,17 +483,18 @@ public class OrderAspect {
                 }
             }
             if (order.getShopName() == null || "".equals(order.getShopName())) {
-                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+                order.setShopName(shopDetail.getName());
             }
             msg.append("就餐店铺：" + order.getShopName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
-            if(setting.getIsUseServicePrice() == 1){
+            if(setting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
-
-
+            if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
+                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+            }
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {

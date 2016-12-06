@@ -152,6 +152,15 @@ public class Order implements Serializable{
     //子订单的菜品项 ，key为子订单id
     private Map<String,List<OrderItem>> childItems;
 
+    private BigDecimal mealFeePrice;
+
+    public BigDecimal getMealFeePrice() {
+        return mealFeePrice;
+    }
+
+    public void setMealFeePrice(BigDecimal mealFeePrice) {
+        this.mealFeePrice = mealFeePrice;
+    }
 
     public Map<String, List<OrderItem>> getChildItems() {
         return childItems;
