@@ -308,4 +308,11 @@ order by t.print_sort asc
     where order_id = #{orderId} and recommend_id = #{recommendId}
     GROUP BY article_id
   </select>
+
+  <update id="refundArticle">
+     update tb_order_item
+     set `count` = `count` - #{count},
+     refund_count = refund_count + #{count}
+     where id = #{id}
+  </update>
 </mapper>

@@ -486,4 +486,6 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> getChildItem(String orderId);
 
 	Result updateOrderItem(String orderId,Integer count,String orderItemId,Integer type);
+
+	void refundArticle(Order order);
 }

@@ -3258,4 +3258,53 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
+
+    @Override
+    public void refundArticle(Order order) {
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        for (OrderPaymentItem item : payItemsList) {
+            String newPayItemId = ApplicationUtils.randomUUID();
+            switch (item.getPaymentModeId()) {
+                case PayMode.WEIXIN_PAY:
+                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                    JSONObject obj = new JSONObject(item.getResultData());
+                    Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                            obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), config.getAppid(), config.getMchid(),
+                            config.getMchkey(), config.getPayCertPath());
+                    item.setResultData(new JSONObject(result).toString());
+                    break;
+            }
+            item.setId(newPayItemId);
+            item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
+            orderPaymentItemService.insert(item);
+        }
+
+
+        //退款完成后变更订单项
+        for(OrderItem orderItem : order.getOrderItems()){
+            if(orderItem.getType().equals(ArticleType.ARTICLE)){
+                orderitemMapper.refundArticle(orderItem.getId(),orderItem.getCount());
+            }else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
+                Order o = orderMapper.selectByPrimaryKey(order.getId());
+                o.setCustomerCount(o.getCustomerCount() - orderItem.getCount());
+                o.setPaymentAmount(o.getPaymentAmount().subtract(o.getServicePrice()));
+                if (o.getAmountWithChildren().doubleValue() > 0) {
+                    o.setAmountWithChildren(o.getAmountWithChildren().subtract(o.getServicePrice()));
+                }
+                BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
+                o.setOrderMoney(o.getOrderMoney().subtract(o.getServicePrice()));
+                o.setOriginalAmount(o.getOriginalAmount().subtract(o.getServicePrice()));
+                o.setServicePrice(setting.getServicePrice().multiply(new BigDecimal(o.getCustomerCount())));
+                o.setPaymentAmount(o.getPaymentAmount().add(o.getServicePrice()));
+                o.setOrderMoney(o.getOrderMoney().add(o.getServicePrice()));
+                if (o.getAmountWithChildren().doubleValue() > 0) {
+                    o.setAmountWithChildren(o.getAmountWithChildren().add(o.getServicePrice()));
+                }
+                o.setOriginalAmount(o.getOriginalAmount().add(o.getServicePrice()));
+
+                update(o);
+            }
+
+        }
+    }
 }
