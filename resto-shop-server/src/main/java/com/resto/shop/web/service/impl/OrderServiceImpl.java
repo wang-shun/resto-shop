@@ -3281,11 +3281,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         //退款完成后变更订单项
+        Order o = orderMapper.selectByPrimaryKey(order.getId());
         for(OrderItem orderItem : order.getOrderItems()){
             if(orderItem.getType().equals(ArticleType.ARTICLE)){
                 orderitemMapper.refundArticle(orderItem.getId(),orderItem.getCount());
             }else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
-                Order o = orderMapper.selectByPrimaryKey(order.getId());
+
                 o.setCustomerCount(o.getCustomerCount() - orderItem.getCount());
                 o.setPaymentAmount(o.getPaymentAmount().subtract(o.getServicePrice()));
                 if (o.getAmountWithChildren().doubleValue() > 0) {
@@ -3306,5 +3307,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
+        Customer customer = customerService.selectById(o.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        WeChatUtils.sendCustomerMsg("啦啦啦啦啦啊", customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 }
