@@ -3285,6 +3285,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for(OrderItem orderItem : order.getOrderItems()){
             if(orderItem.getType().equals(ArticleType.ARTICLE)){
                 orderitemMapper.refundArticle(orderItem.getId(),orderItem.getCount());
+                o.setArticleCount(o.getArticleCount() - orderItem.getCount());
+                update(o);
             }else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
 
                 o.setCustomerCount(o.getCustomerCount() - orderItem.getCount());
