@@ -3264,20 +3264,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
 
         for (OrderPaymentItem item : payItemsList) {
+
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.WEIXIN_PAY:
-                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
-                    JSONObject obj = new JSONObject(item.getResultData());
-                    Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                            obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), config.getAppid(), config.getMchid(),
-                            config.getMchkey(), config.getPayCertPath());
-                    item.setResultData(new JSONObject(result).toString());
-                    break;
+                    if(item.getPayValue().doubleValue() > 0){
+                        WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                        JSONObject obj = new JSONObject(item.getResultData());
+                        Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                                obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), config.getAppid(), config.getMchid(),
+                                config.getMchkey(), config.getPayCertPath());
+                        item.setResultData(new JSONObject(result).toString());
+                        item.setId(newPayItemId);
+                        item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
+                        orderPaymentItemService.insert(item);
+                        break;
+                    }
+
             }
-            item.setId(newPayItemId);
-            item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
-            orderPaymentItemService.insert(item);
+
         }
 
 
