@@ -252,11 +252,11 @@
   </select>
   <insert id="insertBatch">
   	insert into tb_order_item 
-  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id,meal_item_id,recommend_id)
+  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id,meal_item_id,recommend_id,orgin_count)
   	values
   	<foreach collection="list" item="t" separator="," >
   		(#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId})
+  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count})
   	</foreach>
   </insert>
   

@@ -3337,7 +3337,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
         msg.append("订单明细:").append("\n");
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
-        if (o.getBaseCustomerCount() > 0) {
+        if (o.getBaseCustomerCount()  != null) {
             msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount()).append("\n");
         }
         for (OrderItem orderItem : o.getOrderItems()) {
@@ -3345,7 +3345,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("订单金额:").append(o.getBaseMoney()).append("\n");
         msg.append("退菜明细:").append("\n");
-        if (o.getBaseCustomerCount() != o.getCustomerCount()) {
+        if (o.getBaseCustomerCount() != null && o.getBaseCustomerCount() != o.getCustomerCount()) {
             msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount() - o.getCustomerCount()).append("\n");
         }
         for (OrderItem orderItem : o.getOrderItems()) {
