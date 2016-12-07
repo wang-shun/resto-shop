@@ -8,20 +8,15 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.ShopMode;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -139,6 +134,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     ArticleRecommendMapper articleRecommendMapper;
+
+    @Autowired
+    WxServerConfigService wxServerConfigService;
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
@@ -3262,7 +3260,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void refundArticle(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-
+        //退款完成后变更订单项
+        Order o = getOrderInfo(order.getId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         for (OrderPaymentItem item : payItemsList) {
 
             String newPayItemId = ApplicationUtils.randomUUID();
@@ -3271,9 +3271,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if(item.getPayValue().doubleValue() > 0){
                         WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
                         JSONObject obj = new JSONObject(item.getResultData());
-                        Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                                obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), config.getAppid(), config.getMchid(),
-                                config.getMchkey(), config.getPayCertPath());
+                        Map<String, String> result = new HashMap<>();
+                        if(shopDetail.getWxServerId() == null){
+                            result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                                    obj.getInt("total_fee"),
+                                    order.getRefundMoney().multiply(new BigDecimal(100)).intValue(),StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
+                                    StringUtils.isEmpty(shopDetail.getPayCertPath()) ?  config.getPayCertPath() : shopDetail.getPayCertPath());
+                        }else{
+                            WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+
+                            result = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
+                                    obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+                        }
+
+
                         item.setResultData(new JSONObject(result).toString());
                         item.setId(newPayItemId);
                         item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
@@ -3286,8 +3300,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        //退款完成后变更订单项
-        Order o = getOrderInfo(order.getId());
+
         int customerCount = 0;
         BigDecimal servicePrice = new BigDecimal(0);
         BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
