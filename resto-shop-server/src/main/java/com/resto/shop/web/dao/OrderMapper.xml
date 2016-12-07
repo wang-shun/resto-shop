@@ -911,6 +911,7 @@ SELECT
         ver_code,
         article_count,
         table_number,
+        original_amount,
         parent_order_id
         FROM
         tb_order
