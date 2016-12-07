@@ -3262,6 +3262,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void refundArticle(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
@@ -3281,36 +3282,87 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         //退款完成后变更订单项
-        Order o = orderMapper.selectByPrimaryKey(order.getId());
-        for(OrderItem orderItem : order.getOrderItems()){
-            if(orderItem.getType().equals(ArticleType.ARTICLE)){
-                orderitemMapper.refundArticle(orderItem.getId(),orderItem.getCount());
-                o.setArticleCount(o.getArticleCount() - orderItem.getCount());
-                update(o);
-            }else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
-
-                o.setCustomerCount(o.getCustomerCount() - orderItem.getCount());
-                o.setPaymentAmount(o.getPaymentAmount().subtract(o.getServicePrice()));
-                if (o.getAmountWithChildren().doubleValue() > 0) {
-                    o.setAmountWithChildren(o.getAmountWithChildren().subtract(o.getServicePrice()));
-                }
-                BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
-                o.setOrderMoney(o.getOrderMoney().subtract(o.getServicePrice()));
-                o.setOriginalAmount(o.getOriginalAmount().subtract(o.getServicePrice()));
-                o.setServicePrice(setting.getServicePrice().multiply(new BigDecimal(o.getCustomerCount())));
-                o.setPaymentAmount(o.getPaymentAmount().add(o.getServicePrice()));
-                o.setOrderMoney(o.getOrderMoney().add(o.getServicePrice()));
-                if (o.getAmountWithChildren().doubleValue() > 0) {
-                    o.setAmountWithChildren(o.getAmountWithChildren().add(o.getServicePrice()));
-                }
-                o.setOriginalAmount(o.getOriginalAmount().add(o.getServicePrice()));
-
-                update(o);
+        Order o = getOrderInfo(order.getId());
+        int refundCount = 0;
+        int customerCount = 0;
+        BigDecimal servicePrice = new BigDecimal(0);
+        BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
+        for (OrderItem orderItem : order.getOrderItems()) {
+            if (orderItem.getType().equals(ArticleType.ARTICLE)) {
+                orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
+                refundCount += orderItem.getCount();
+            } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
+                customerCount = o.getCustomerCount() - orderItem.getCount();
+                servicePrice = setting.getServicePrice().multiply(new BigDecimal(customerCount));
             }
-
         }
+        BigDecimal total = new BigDecimal(0);
+        for (OrderItem item : o.getOrderItems()) {
+            total = total.add(item.getFinalPrice());
+        }
+
+        o.setArticleCount(o.getArticleCount() - refundCount);
+        o.setCustomerCount(customerCount);
+        o.setPaymentAmount(total.add(servicePrice));
+        o.setOriginalAmount(total.add(servicePrice));
+        o.setServicePrice(servicePrice);
+        o.setOrderMoney(o.getOrderMoney().add(o.getServicePrice()));
+        update(o);
+
+
+
+        if(o.getParentOrderId() != null){
+            updateOrderChild(o.getId());
+        }
+
+
+
+
+
         Customer customer = customerService.selectById(o.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-        WeChatUtils.sendCustomerMsg("啦啦啦啦啦啊", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+        StringBuilder msg = new StringBuilder("亲，您");
+        msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
+                .append("会在24小时内退还至您的微信账户，请注意查收！\n");
+        msg.append("订单编号:\n");
+        msg.append(o.getSerialNumber()).append("\n");
+        msg.append("桌号:").append(o.getTableNumber()).append("\n");
+        msg.append("就餐店铺:").append(shopDetail.getName()).append("\n");
+        msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
+        msg.append("订单明细:").append("\n");
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+        if (o.getBaseCustomerCount() > 0) {
+            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount()).append("\n");
+        }
+        for (OrderItem orderItem : o.getOrderItems()) {
+            msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getOrginCount()).append("\n");
+        }
+        msg.append("订单金额:").append(o.getBaseMoney()).append("\n");
+        msg.append("退菜明细:").append("\n");
+        if (o.getBaseCustomerCount() != o.getCustomerCount()) {
+            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount() - o.getCustomerCount()).append("\n");
+        }
+        for (OrderItem orderItem : o.getOrderItems()) {
+            if (orderItem.getRefundCount() > 0) {
+                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getRefundCount()).append("\n");
+            }
+        }
+        msg.append("退菜金额:").append(o.getBaseMoney().subtract(o.getOrderMoney())).append("\n");
+        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+    }
+
+
+    @Override
+    public boolean checkOrder(Order order) {
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        BigDecimal sum = new BigDecimal(0);
+        for (OrderPaymentItem item : payItemsList) {
+            if (item.getPaymentModeId() == PayMode.WEIXIN_PAY) {
+                sum = sum.add(item.getPayValue());
+            }
+        }
+
+        return order.getRefundMoney().doubleValue() <= sum.doubleValue();
     }
 }

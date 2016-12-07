@@ -420,6 +420,12 @@
             <if test="payMode != null">
                 pay_mode,
             </if>
+            <if test="orderMoney != null">
+                base_money,
+            </if>
+            <if test="customerCount != null">
+                base_customer_count,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -537,7 +543,13 @@
                 #{servicePrice,jdbcType=DECIMAL},
             </if>
             <if test="payMode != null">
-                #{payMode}
+                #{payMode},
+            </if>
+            <if test="orderMoney != null">
+                #{orderMoney},
+            </if>
+            <if test="customerCount != null">
+                #{customerCount},
             </if>
         </trim>
     </insert>

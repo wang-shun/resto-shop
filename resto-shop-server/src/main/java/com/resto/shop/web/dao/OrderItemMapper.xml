@@ -312,7 +312,8 @@ order by t.print_sort asc
   <update id="refundArticle">
      update tb_order_item
      set `count` = `count` - #{count},
-     refund_count = refund_count + #{count}
+     refund_count = refund_count + #{count},
+     final_price = unit_price * `count`
      where id = #{id}
   </update>
 </mapper>

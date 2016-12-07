@@ -149,10 +149,34 @@ public class Order implements Serializable{
     //加菜次数
     private int childCount;
 
+    //订单原始金额（退菜前）
+    private BigDecimal baseMoney;
+
+
+
     //子订单的菜品项 ，key为子订单id
     private Map<String,List<OrderItem>> childItems;
 
     private BigDecimal refundMoney;
+
+    //订单原始人数（退菜前）
+    private Integer baseCustomerCount;
+
+    public Integer getBaseCustomerCount() {
+        return baseCustomerCount;
+    }
+
+    public void setBaseCustomerCount(Integer baseCustomerCount) {
+        this.baseCustomerCount = baseCustomerCount;
+    }
+
+    public BigDecimal getBaseMoney() {
+        return baseMoney;
+    }
+
+    public void setBaseMoney(BigDecimal baseMoney) {
+        this.baseMoney = baseMoney;
+    }
 
     public BigDecimal getRefundMoney() {
         return refundMoney;
