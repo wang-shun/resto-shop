@@ -259,7 +259,7 @@ public class OrderAspect {
                 if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
                     return;
                 }
-                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+//                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
 				if (order.getEmployeeId() == null) {
@@ -282,11 +282,11 @@ public class OrderAspect {
                     sendPaySuccessMsg(order);
                 }
                 log.info("检查打印异常");
-                int times = setting.getReconnectTimes();
-                int seconds = setting.getReconnectSecond();
-                for (int i = 0; i < times; i++) {
-                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-                }
+//                int times = setting.getReconnectTimes();
+//                int seconds = setting.getReconnectSecond();
+//                for (int i = 0; i < times; i++) {
+//                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
+//                }
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
