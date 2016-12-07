@@ -148,6 +148,7 @@ public class Order implements Serializable{
         this.childList = childList;
     }
 
+
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
 

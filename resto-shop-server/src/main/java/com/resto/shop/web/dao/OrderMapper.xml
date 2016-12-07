@@ -136,6 +136,7 @@
         <result column="production_status" property="productionStatus"/>
         <result column="parent_order_id" property="parentOrderId"/>
         <result column="service_price" property="servicePrice"/>
+        <result column="order_mode" property="orderMode"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -1486,6 +1487,7 @@ AND o.production_status IN (2, 3)
         o.order_state,
         o.production_status,
         o.service_price,
+        o.order_mode,
         c.telephone,
         a.level,
         oi.pay_value,

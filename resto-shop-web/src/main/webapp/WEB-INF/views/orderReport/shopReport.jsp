@@ -74,8 +74,11 @@ dt,dd{
 				<dl class="dl-horizontal">
 					<dt>店铺名称：</dt>
 					<dd id="shopName"></dd>
-					<dt>订单编号：</dt>
-					<dd id="orderId"></dd>
+                    <dt>订单编号：</dt>
+                    <dd id="orderId"></dd>
+
+                    <div id="addOrderDiv"></div>
+
                     <dt>微信支付单号：</dt>
                     <dd id="orderPaymentItem_id"></dd>
 					<dt>订单时间：</dt>
@@ -203,8 +206,9 @@ dt,dd{
 			title : "微信支付",
 			data : "weChatPay",
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+			    console.log(row);
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 
@@ -212,40 +216,40 @@ dt,dd{
 			title : "红包支付",
 			data : "accountPay",
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 		}, {
 			title : "优惠券支付",
 			data : "couponPay",
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 		}, {
 			title : "充值金额支付",
 			data : "chargePay",
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 		}, {
 			title : "充值赠送金额支付",
 			data : "rewardPay",
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 		},{
                 title : "等位支付",
                 data : "waitRedPay",
                 createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true){
-                        $(td).html("加")
+                    if(row.childOrder==true&&row.orderMode==5){
+                        $(td).html("--")
                     }
                 }
             },
@@ -253,16 +257,16 @@ dt,dd{
 			title : "营销撬动率",
 			data : 'incomePrize',
             createdCell:function (td,tdData,row) {
-                if(row.childOrder==true){
-                    $(td).html("加")
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
                 }
             }
 		}, {
 			title : "评价",
 			data : "level",
             createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true){
-                        $(td).html("加")
+                    if(row.childOrder==true&&row.orderMode==5){
+                        $(td).html("--")
                     }
                 }
             }, {
@@ -324,6 +328,16 @@ dt,dd{
 				if (result) {
 					var data = result.data;
 					console.log(data);
+
+                    if(data.orderMode == 5){
+                        $("#addOrderDiv").html("");//清空上一次的内容
+                        $(data.childList).each(function(index , item){
+                            var str = "<dt>加菜订单编号["+(++index)+"]：</dt> <dd >"+item.id+"</dd>";
+                            $("#addOrderDiv").append(str);
+                        });
+                    }
+
+
 					$("#shopName").html(data.shopName);
 					$("#orderId").html(data.id);
 					$("#createTime").html(

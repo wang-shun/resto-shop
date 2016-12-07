@@ -250,7 +250,7 @@ public class OrderController extends GenericController{
 					    //该订单是子订单
                         ot.setChildOrder(true);
                     }
-
+                    ot.setOrderMode(o.getOrderMode());
 					//设置营销撬动率  实际/虚拟
 					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
 					BigDecimal temp = o.getOrderMoney().subtract(real);
