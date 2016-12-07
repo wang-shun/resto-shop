@@ -185,6 +185,25 @@ public class Order implements Serializable{
     public void setRefundMoney(BigDecimal refundMoney) {
         this.refundMoney = refundMoney;
     }
+    private BigDecimal mealFeePrice;
+
+    private Integer mealAllNumber;
+
+    public Integer getMealAllNumber() {
+        return mealAllNumber;
+    }
+
+    public void setMealAllNumber(Integer mealAllNumber) {
+        this.mealAllNumber = mealAllNumber;
+    }
+
+    public BigDecimal getMealFeePrice() {
+        return mealFeePrice;
+    }
+
+    public void setMealFeePrice(BigDecimal mealFeePrice) {
+        this.mealFeePrice = mealFeePrice;
+    }
 
     public Map<String, List<OrderItem>> getChildItems() {
         return childItems;

@@ -124,4 +124,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public void delMealItem(String articleId) {
         shopcartMapper.delMealItem(articleId);
     }
+
+    @Override
+    public ShopCart selectByUuId(String uuid) {
+        return shopcartMapper.selectByUuId(uuid);
+    }
+
 }

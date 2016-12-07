@@ -6,6 +6,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.UnitMapper;
 import com.resto.shop.web.model.Unit;
+import com.resto.shop.web.model.UnitArticle;
 import com.resto.shop.web.model.UnitDetail;
 import com.resto.shop.web.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,7 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     }
 
     @Override
-    public UnitDetail selectUnitDetail(String id) {
+    public List<UnitArticle> selectUnitDetail(String id) {
         return unitMapper.selectUnitDetail(id);
     }
 }

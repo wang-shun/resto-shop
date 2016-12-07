@@ -292,7 +292,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item, item.getCount());
             }
 
-
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
 
@@ -309,8 +308,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getServicePrice() == null) {
             order.setServicePrice(new BigDecimal(0));
         }
+        if(order.getMealFeePrice() == null){
+            order.setMealFeePrice(new BigDecimal(0));
+        }
         orderItemService.insertItems(order.getOrderItems());
         BigDecimal payMoney = totalMoney.add(order.getServicePrice());
+        payMoney = payMoney.add(order.getMealFeePrice());
 
         // 使用优惠卷
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
@@ -379,9 +382,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setArticleCount(articleCount); // 订单餐品总数
         order.setClosed(false); // 订单是否关闭 否
         order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-        order.setOriginalAmount(totalMoney.add(order.getServicePrice()));// 原价
+        order.setOriginalAmount(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice()));// 原价
         order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
-        order.setOrderMoney(totalMoney.add(order.getServicePrice())); // 订单实际金额
+        order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
         order.setPrintTimes(0);
 
@@ -1149,12 +1152,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             items.add(item);
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        ShopDetail shopDetail1 = shopDetailService.selectById(order.getShopDetailId());
 
-        if (brandSetting.getIsUseServicePrice() == 1) {
+        if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getServicePrice());
             item.put("ARTICLE_NAME", brandSetting.getServiceName());
             item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
+            items.add(item);
+        }
+        if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail1.getIsMealFee() == 1){
+            Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", order.getMealFeePrice());
+            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+            item.put("ARTICLE_COUNT", order.getMealAllNumber());
             items.add(item);
         }
         Map<String, Object> print = new HashMap<>();
@@ -2433,13 +2444,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             productItems.add(productItem);
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        if (brandSetting.getIsUseServicePrice() == 1) {
+        if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
             item.put("FAMILY_NAME", brandSetting.getServiceName());
             productItems.add(item);
         }
-
+        if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() ==1){
+            Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", order.getMealAllNumber());
+            item.put("FAMILY_NAME", shopDetail.getMealFeeName());
+            productItems.add(item);
+        }
 
         return print;
 

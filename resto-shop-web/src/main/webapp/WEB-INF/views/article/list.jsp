@@ -107,7 +107,6 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">显示</label>
                                 <div class="col-md-7 radio-list">
@@ -146,7 +145,12 @@
                                     <span class="btn btn-default" @click="changeColor('#fff')">白</span>
                                 </div>
                             </div>
-
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">餐盒数量</label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" name="mealFeeNumber" v-model="m.mealFeeNumber">
+                                </div>
+                            </div>
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品编号</label>
                                 <div class="col-md-7">
@@ -162,7 +166,6 @@
                                                      @error="uploadError"></img-file-upload>
                                 </div>
                             </div>
-
                             <div class="form-group col-md-5">
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">

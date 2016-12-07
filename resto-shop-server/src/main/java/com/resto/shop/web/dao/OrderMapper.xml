@@ -68,6 +68,8 @@
         <result column="pay_mode" property="payMode"/>
         <result column="base_money" property="baseMoney"/>
         <result column="base_customer_count" property="baseCustomerCount"/>
+        <result column="meal_fee_price" property="mealFeePrice"/>
+        <result column="meal_all_number" property="mealAllNumber"/>
     </resultMap>
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
@@ -236,7 +238,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count
+        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -428,6 +430,12 @@
             <if test="customerCount != null">
                 base_customer_count,
             </if>
+            <if test="mealFeePrice != null">
+                meal_fee_price,
+            </if>
+            <if test="mealAllNumber != null">
+                meal_all_number,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -553,6 +561,12 @@
             <if test="customerCount != null">
                 #{customerCount},
             </if>
+            <if test="mealFeePrice != null">
+                #{mealFeePrice},
+            </if>
+            <if test="mealAllNumber != null">
+                #{mealAllNumber},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -672,6 +686,12 @@
             </if>
             <if test="servicePrice != null">
                 service_price = #{servicePrice},
+            </if>
+            <if test="mealFeePrice != null">
+                meal_fee_price = #{mealFeePrice},
+            </if>
+            <if test="mealAllNumber != null">
+                meal_all_number = #{mealAllNumber},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -2071,13 +2091,6 @@ GROUP BY r.table_number
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
-
-    <update id="refundServicePrice">
-        update tb_order
-        set customer_count = #{customerCount},
-        service_price = #{servicePrice}
-        where id = #{id}
-    </update>
 </mapper>
 
 
