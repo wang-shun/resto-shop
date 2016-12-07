@@ -3326,11 +3326,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void updateArticle(Order order) {
         BigDecimal total = new BigDecimal(0);
         Order o = getOrderInfo(order.getId());
+        int base = 0;
         int sum = 0 ;
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
             if(item.getRefundCount() > 0){
                 sum += item.getRefundCount();
+                base += item.getOrginCount();
             }
         }
 
@@ -3338,7 +3340,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             o.setServicePrice(new BigDecimal(0));
         }
 
-        o.setArticleCount(o.getArticleCount() - sum);
+        o.setArticleCount(base - sum);
         o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(total.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
