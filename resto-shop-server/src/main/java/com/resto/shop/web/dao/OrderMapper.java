@@ -495,5 +495,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order getLastOrderByTableNumber(String tableNumber);
 
 	BigDecimal getServicePrice(String shopId);
-
+	
+	public List<Order> selectWXOrderItems(String serialNumber);
 }

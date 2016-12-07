@@ -42,7 +42,7 @@ public class OrderState {
 		case NOT_SUBMIT:
 			return "购物车";
 		case SUBMIT:
-			return "未付款";
+			return "已提交,未付款";
 		case PAYMENT:
 			return "已支付";
 		case EXPIRED:

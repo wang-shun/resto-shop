@@ -486,4 +486,11 @@ public interface OrderService extends GenericService<Order, String> {
 	List<Order> getChildItem(String orderId);
 
 	Result updateOrderItem(String orderId,Integer count,String orderItemId,Integer type);
+	
+	/**
+     * 微信端查询:以流水号查询订单详情
+     * @param serialNumber
+     * @return
+     */
+    public List<Order> selectWXOrderItems(String serialNumber);
 }

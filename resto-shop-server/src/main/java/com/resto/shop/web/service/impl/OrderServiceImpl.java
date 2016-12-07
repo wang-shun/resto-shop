@@ -3258,4 +3258,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
+    
+    @Override
+    public List<Order> selectWXOrderItems(String serialNumber) {
+    	return orderMapper.selectWXOrderItems(serialNumber);
+    }
 }

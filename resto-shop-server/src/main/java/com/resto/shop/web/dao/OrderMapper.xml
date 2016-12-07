@@ -66,6 +66,10 @@
         <result column="orderTotal" property="orderTotal"/>
         <result column="service_price" property="servicePrice"/>
         <result column="pay_mode" property="payMode"/>
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+        	<result column="pay_value" property="payValue"/>
+			<result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
     </resultMap>
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
@@ -2056,6 +2060,13 @@ GROUP BY r.table_number
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
+    
+    <select id="selectWXOrderItems" parameterType="String" resultMap="BaseResultMap">
+		select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
+		print_order_time,call_number_time,topi.pay_value,topi.payment_mode_id
+		from tb_order tod inner join tb_order_payment_item topi on tod.id = topi.order_id
+		where tod.serial_number =  #{serialNumber} 
+	</select>
 </mapper>
 
 
