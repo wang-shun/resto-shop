@@ -160,7 +160,7 @@
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
                                                      @error="uploadError"></img-file-upload>
-                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" width="80px" height="40px" class="img-rounded">                 
+                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name"  onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">                 
                                 </div>
                             </div>
 
@@ -691,9 +691,10 @@
                     defaultContent: "",
                     createdCell: function (td, tdData) {
                     	if(tdData !=null && tdData.substring(0,4)=="http"){
-                			$(td).html("<img src='" + tdData + "' class='img-rounded' style='height:40px;width:80px;'/>")
+                			$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
                 		}else{
-                			$(td).html("<img src='/" + tdData + "' class='img-rounded' style='height:40px;width:80px;'/>")
+                			$(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+                			//$(td).html("<img src='/" + tdData + "' class='img-rounded' onerror='this.src=assets/pages/img/defaultImg.png' style='height:40px;width:80px;'/>")
                 		}
                     }
                 },
