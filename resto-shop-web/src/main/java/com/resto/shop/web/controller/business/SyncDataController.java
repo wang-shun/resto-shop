@@ -405,7 +405,7 @@ public class SyncDataController extends GenericController {
                         }
                         BigDecimal  orderMoney = order.getOrderMoney();
                         //如果当前的店铺的模式为后付款模式 并且该订单的amountWithChildren不为0则orderMoney选择
-                        if(order.getOrderState()==5&&order.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                        if(order.getOrderMode()==5&&order.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                             orderMoney = order.getAmountWithChildren();
                         }
 

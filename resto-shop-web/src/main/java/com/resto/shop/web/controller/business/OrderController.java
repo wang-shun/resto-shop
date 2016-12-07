@@ -150,7 +150,7 @@ public class OrderController extends GenericController{
 				List<OrderDetailDto> listDto = new ArrayList<>();
 				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 				for (Order o : list) {
-					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "");
+					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
 					if(o.getCustomer()!=null){
 						//手机号
 						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
@@ -246,6 +246,11 @@ public class OrderController extends GenericController{
 							}
 						}
 					}
+					if(null!=o.getParentOrderId()){
+					    //该订单是子订单
+                        ot.setChildOrder(true);
+                    }
+
 					//设置营销撬动率  实际/虚拟
 					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
 					BigDecimal temp = o.getOrderMoney().subtract(real);
@@ -267,6 +272,11 @@ public class OrderController extends GenericController{
 	@ResponseBody
 	public Result showDetail(String orderId){
 		Order o = orderService.selectOrderDetails(orderId);
+		List<Order> childList = orderService.selectListByParentId(orderId);
+		if(!childList.isEmpty()){
+                o.setChildList(childList);
+        }
+
 		return getSuccessResult(o);
 	}
 	

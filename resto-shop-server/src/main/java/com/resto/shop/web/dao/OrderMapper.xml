@@ -78,6 +78,9 @@
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="production_status" property="productionStatus" />
+        <result column="service_price" property="servicePrice" />
+        <result column="parent_order_id" property="parentOrderId" />
+        <result column="order_mode" property="orderMode" />
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -131,6 +134,8 @@
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="production_status" property="productionStatus"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="service_price" property="servicePrice"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -934,6 +939,11 @@
         and order_state != 9
     </select>
 
+    <select id="selectListByParentId" resultType="Order">
+        select * from tb_order
+        where parent_order_id=#{orderId}
+    </select>
+
     <select id="selectChildIdsByParentIdByFive" resultType="String">
          select id from
         tb_order where parent_order_id=#{0}
@@ -1467,6 +1477,7 @@ AND o.production_status IN (2, 3)
         SELECT
         o.id,
         o.brand_id,
+        o.parent_order_id,
         o.shop_detail_id,
         o.create_time,
         o.distribution_mode_id,
@@ -1474,6 +1485,7 @@ AND o.production_status IN (2, 3)
         o.order_money,
         o.order_state,
         o.production_status,
+        o.service_price,
         c.telephone,
         a.level,
         oi.pay_value,
@@ -1498,6 +1510,8 @@ AND o.production_status IN (2, 3)
         o.ver_code,
         o.order_state,
         o.order_money,
+        o.service_price,
+        o.order_mode,
         oi.id orderItem_id,
         oi.article_name,
         oi.count,

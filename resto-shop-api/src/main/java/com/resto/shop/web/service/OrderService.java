@@ -486,4 +486,11 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectOrderListItemByBrandId(String beginDate, String endDate, String currentBrandId);
+
+    /**
+     * 查询该订单所有的子订单（包含已取消的）
+     * @param orderId
+     * @return
+     */
+    List<Order> selectListByParentId(String orderId);
 }

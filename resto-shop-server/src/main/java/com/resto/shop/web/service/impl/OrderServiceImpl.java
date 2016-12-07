@@ -2869,4 +2869,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date end = DateUtil.getformatEndDate(endDate);
         return orderMapper.selectOrderListItemByBrandId(begin, end, brandId);
     }
+
+    @Override
+    public List<Order> selectListByParentId(String orderId) {
+        return  orderMapper.selectListByParentId(orderId);
+    }
 }
