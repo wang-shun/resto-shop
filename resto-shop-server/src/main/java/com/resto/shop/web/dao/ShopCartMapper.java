@@ -36,4 +36,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     void delMealArticle(String id);
 
     void delMealItem(String articleId);
+
+    ShopCart selectByUuId(String uuid);
 }
