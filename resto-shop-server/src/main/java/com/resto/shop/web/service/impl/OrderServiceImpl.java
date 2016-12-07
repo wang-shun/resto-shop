@@ -3288,34 +3288,67 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
-        int refundCount = 0;
         int customerCount = 0;
         BigDecimal servicePrice = new BigDecimal(0);
         BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
         for (OrderItem orderItem : order.getOrderItems()) {
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
-                refundCount += orderItem.getCount();
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                 customerCount = o.getCustomerCount() - orderItem.getCount();
                 servicePrice = setting.getServicePrice().multiply(new BigDecimal(customerCount));
+                orderMapper.refundServicePrice(o.getId(),servicePrice,customerCount);
             }
         }
-        BigDecimal total = new BigDecimal(0);
-        for (OrderItem item : o.getOrderItems()) {
-            total = total.add(item.getFinalPrice());
+
+
+
+    }
+
+
+    @Override
+    public boolean checkOrder(Order order) {
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        BigDecimal sum = new BigDecimal(0);
+        for (OrderPaymentItem item : payItemsList) {
+            if (item.getPaymentModeId() == PayMode.WEIXIN_PAY) {
+                sum = sum.add(item.getPayValue());
+            }
         }
 
-        o.setArticleCount(o.getArticleCount() - refundCount);
-        o.setCustomerCount(customerCount);
-        o.setPaymentAmount(total.add(servicePrice));
-        o.setOriginalAmount(total.add(servicePrice));
-        o.setServicePrice(servicePrice);
-        o.setOrderMoney(o.getOrderMoney().add(o.getServicePrice()));
+        return order.getRefundMoney().doubleValue() <= sum.doubleValue();
+    }
+
+
+
+
+    @Override
+    public void updateArticle(Order order) {
+        BigDecimal total = new BigDecimal(0);
+        Order o = getOrderInfo(order.getId());
+        int sum = 0 ;
+        for (OrderItem item : o.getOrderItems()) {
+            total = total.add(item.getFinalPrice());
+            if(item.getRefundCount() > 0){
+                sum += item.getRefundCount();
+            }
+        }
+
+        if(o.getServicePrice() == null){
+            o.setServicePrice(new BigDecimal(0));
+        }
+
+        o.setArticleCount(o.getArticleCount() - sum);
+        o.setPaymentAmount(total.add(o.getServicePrice()));
+        o.setOriginalAmount(total.add(o.getServicePrice()));
+        o.setOrderMoney(total.add(o.getServicePrice()));
         update(o);
+    }
 
+    @Override
+    public void refundArticleMsg(Order order) {
 
-
+        Order o = getOrderInfo(order.getId());
         if(o.getParentOrderId() != null){
             updateOrderChild(o.getId());
         }
@@ -3355,19 +3388,5 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("退菜金额:").append(o.getBaseMoney().subtract(o.getOrderMoney())).append("\n");
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    }
-
-
-    @Override
-    public boolean checkOrder(Order order) {
-        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        BigDecimal sum = new BigDecimal(0);
-        for (OrderPaymentItem item : payItemsList) {
-            if (item.getPaymentModeId() == PayMode.WEIXIN_PAY) {
-                sum = sum.add(item.getPayValue());
-            }
-        }
-
-        return order.getRefundMoney().doubleValue() <= sum.doubleValue();
     }
 }

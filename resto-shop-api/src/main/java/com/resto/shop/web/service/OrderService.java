@@ -491,4 +491,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	boolean checkOrder(Order order);
 
+	void refundArticleMsg(Order order);
+
+	void updateArticle(Order order);
+
 }

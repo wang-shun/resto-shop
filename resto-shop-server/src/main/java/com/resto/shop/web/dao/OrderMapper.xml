@@ -2070,6 +2070,13 @@ GROUP BY r.table_number
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
+
+    <update id="refundServicePrice">
+        update tb_order
+        set customer_count = #{customerCount},
+        service_price = #{servicePrice}
+        where id = #{id}
+    </update>
 </mapper>
 
 

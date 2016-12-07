@@ -496,4 +496,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	BigDecimal getServicePrice(String shopId);
 
+	void refundServicePrice(@Param("id") String id,@Param("servicePrice") BigDecimal servicePrice,@Param("customerCount") Integer customerCount);
 }
