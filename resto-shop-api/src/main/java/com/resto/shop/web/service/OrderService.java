@@ -495,4 +495,20 @@ public interface OrderService extends GenericService<Order, String> {
 
 	void updateArticle(Order order);
 
+
+    /**
+     * 查询已完成订单  ---级对应的订单的菜品-
+     * @param beginDate
+     * @param endDate
+     * @param currentBrandId
+     * @return
+     */
+    List<Order> selectOrderListItemByBrandId(String beginDate, String endDate, String currentBrandId);
+
+    /**
+     * 查询该订单所有的子订单（包含已取消的）
+     * @param orderId
+     * @return
+     */
+    List<Order> selectListByParentId(String orderId);
 }

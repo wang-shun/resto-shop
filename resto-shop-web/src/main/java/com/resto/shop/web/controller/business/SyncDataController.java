@@ -386,7 +386,7 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("累计退款金额大于支付金额");
+                orderException.setWhy("订单退款有问题");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
@@ -403,7 +403,13 @@ public class SyncDataController extends GenericController {
                         for(OrderPaymentItem oi : order.getOrderPaymentItems()){
                             temp=temp.add(oi.getPayValue());
                         }
-                        if(order.getOrderMoney().compareTo(temp)!=0){
+                        BigDecimal  orderMoney = order.getOrderMoney();
+                        //如果当前的店铺的模式为后付款模式 并且该订单的amountWithChildren不为0则orderMoney选择
+                        if(order.getOrderMode()==5&&order.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            orderMoney = order.getAmountWithChildren();
+                        }
+
+                        if(orderMoney.compareTo(temp)!=0){
                             Order order2 = orderService.selectById(order.getId());
                             //插入数据
                             //查询店铺的名字
@@ -413,7 +419,7 @@ public class SyncDataController extends GenericController {
                             OrderException orderException = new OrderException();
                             orderException.setOrderId(order2.getId());
                             orderException.setOrderMoney(order2.getOrderMoney());
-                            orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,order.getOrderMoney()));
+                            orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,orderMoney));
                             orderException.setShopName(shopDetail.getName());
                             orderException.setCreateTime(order2.getCreateTime());
                             orderException.setBrandName(brandName);
@@ -423,10 +429,9 @@ public class SyncDataController extends GenericController {
             }
 
         }
-
-
         return  getSuccessResult();
     }
+
 
     //设置 BigDecimal 默认值为 0
     public BigDecimal getBigDecimal(BigDecimal data){

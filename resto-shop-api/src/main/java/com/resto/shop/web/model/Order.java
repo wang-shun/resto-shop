@@ -140,6 +140,17 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    private  List<Order> childList; //子订单
+
+    public List<Order> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<Order> childList) {
+        this.childList = childList;
+    }
+
+
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
 

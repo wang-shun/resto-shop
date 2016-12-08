@@ -1866,7 +1866,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            d = d.add(o.getOrderMoney());
+            if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                d=d.add(o.getAmountWithChildren());
+            }else {
+                d = d.add(o.getOrderMoney());
+            }
             //品牌订单数目
             ids.add(o.getId());
             if (!o.getOrderPaymentItems().isEmpty()) {
@@ -3158,6 +3162,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order getLastOrderByTableNumber(String tableNumber) {
         return orderMapper.getLastOrderByTableNumber(tableNumber);
+    }
+
+    @Override
+    public List<Order> selectOrderListItemByBrandId(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return orderMapper.selectOrderListItemByBrandId(begin, end, brandId);
+    }
+
+    @Override
+    public List<Order> selectListByParentId(String orderId) {
+        return  orderMapper.selectListByParentId(orderId);
     }
 
 

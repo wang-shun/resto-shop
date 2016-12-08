@@ -58,7 +58,6 @@ dt,dd{
 	</div>
 </div>
 
-<!-- 查看 数据库配置 详细信息  Modal  start-->
 <div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -75,8 +74,11 @@ dt,dd{
 				<dl class="dl-horizontal">
 					<dt>店铺名称：</dt>
 					<dd id="shopName"></dd>
-					<dt>订单编号：</dt>
-					<dd id="orderId"></dd>
+                    <dt>订单编号：</dt>
+                    <dd id="orderId"></dd>
+
+                    <div id="addOrderDiv"></div>
+
                     <dt>微信支付单号：</dt>
                     <dd id="orderPaymentItem_id"></dd>
 					<dt>订单时间：</dt>
@@ -95,6 +97,12 @@ dt,dd{
 					<dd id="content"></dd>
 					<dt>状&nbsp;&nbsp;态：</dt>
 					<dd id="orderState"></dd>
+                    <dt>菜品总价：</dt>
+                    <dd id="articleTotalPrice"></dd>
+                    <dt>服&nbsp;务&nbsp;费：</dt>
+                    <dd id="servicePrice"></dd>
+                    <%--<dt>餐盒费：</dt>--%>
+                    <%--<dd id="mealFreePrice"></dd>--%>
 				</dl>
 			</div>
 			<div class="table-scrollable">
@@ -113,6 +121,7 @@ dt,dd{
 					</tbody>
 				</table>
 			</div>
+
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-block btn-primary" data-dismiss="modal"
@@ -170,7 +179,7 @@ dt,dd{
 				return d;
 			}
 		},
-		order: [[ 1, 'desc' ]],
+		order: [[2,'desc'],[ 1, 'desc' ]],
 		columns : [ {
 			title : "店铺",
 			data : "shopName",
@@ -195,30 +204,72 @@ dt,dd{
 			data : "orderMoney"
 		}, {
 			title : "微信支付",
-			data : "weChatPay"
+			data : "weChatPay",
+            createdCell:function (td,tdData,row) {
+			    console.log(row);
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
+
 		}, {
 			title : "红包支付",
-			data : "accountPay"
+			data : "accountPay",
+            createdCell:function (td,tdData,row) {
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
 		}, {
 			title : "优惠券支付",
-			data : "couponPay"
+			data : "couponPay",
+            createdCell:function (td,tdData,row) {
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
 		}, {
 			title : "充值金额支付",
-			data : "chargePay"
+			data : "chargePay",
+            createdCell:function (td,tdData,row) {
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
 		}, {
 			title : "充值赠送金额支付",
-			data : "rewardPay"
+			data : "rewardPay",
+            createdCell:function (td,tdData,row) {
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
 		},{
                 title : "等位支付",
                 data : "waitRedPay",
+                createdCell:function (td,tdData,row) {
+                    if(row.childOrder==true&&row.orderMode==5){
+                        $(td).html("--")
+                    }
+                }
             },
             {
 			title : "营销撬动率",
-			data : 'incomePrize'
+			data : 'incomePrize',
+            createdCell:function (td,tdData,row) {
+                if(row.childOrder==true&&row.orderMode==5){
+                    $(td).html("--")
+                }
+            }
 		}, {
 			title : "评价",
 			data : "level",
-		}, {
+            createdCell:function (td,tdData,row) {
+                    if(row.childOrder==true&&row.orderMode==5){
+                        $(td).html("--")
+                    }
+                }
+            }, {
 			title : "订单状态",
 			data : "orderState",
 			createdCell : function(td,tdData){
@@ -276,6 +327,17 @@ dt,dd{
 			success : function(result) {
 				if (result) {
 					var data = result.data;
+					console.log(data);
+
+                    if(data.orderMode == 5){
+                        $("#addOrderDiv").html("");//清空上一次的内容
+                        $(data.childList).each(function(index , item){
+                            var str = "<dt>加菜订单编号["+(++index)+"]：</dt> <dd >"+item.id+"</dd>";
+                            $("#addOrderDiv").append(str);
+                        });
+                    }
+
+
 					$("#shopName").html(data.shopName);
 					$("#orderId").html(data.id);
 					$("#createTime").html(
@@ -302,6 +364,8 @@ dt,dd{
 					$("#orderState").html(getState(data.orderState,data.productionStatus));
 					$('#articleList').text("");
 
+					var articleTotalPrice = 0;
+
 					for (var i = 0; i < data.orderItems.length; i++) {
 						var obj = data.orderItems[i];
 						var article = "<tr><td>" + obj.articleFamily.name
@@ -309,7 +373,12 @@ dt,dd{
 								+ obj.unitPrice + "</td><td>" + obj.count
 								+ "</td><td>" + obj.finalPrice + "</td></tr>";
 						$('#articleList').append(article);
+                        articleTotalPrice+=obj.finalPrice;
 					}
+
+					$("#articleTotalPrice").html(articleTotalPrice+"元");
+					$("#servicePrice").html(data.servicePrice+"元");
+					$("#mealFreePrice").html(data.mealFreePrice+"元");
 					//-----------------------------------------------------------------------
 
 					// 					 var oLogin = $("#orderDetail").html();
