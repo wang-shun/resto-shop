@@ -81,4 +81,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	List<Article> delCheckArticle(String id);
 
 	void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare);
+	
+	void updateArticleImg(Article article);
 }

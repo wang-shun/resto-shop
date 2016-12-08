@@ -420,4 +420,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare) {
         articleMapper.updatePhotoSquare(id, photoSquare);
     }
+
+	@Override
+	public void updateArticleImg(Article article) {
+		articleMapper.updateByPrimaryKeySelective(article);
+	}
 }
