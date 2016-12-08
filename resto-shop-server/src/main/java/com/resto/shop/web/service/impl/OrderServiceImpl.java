@@ -2444,15 +2444,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             productItems.add(productItem);
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
+        if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
             item.put("FAMILY_NAME", brandSetting.getServiceName());
             productItems.add(item);
         }
-        if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() ==1){
+        if(brandSetting.getIsMealFee() == 1 && shopDetail.getIsMealFee() ==1){
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getMealAllNumber());
+            item.put("SUBTOTAL", orderMapper.getMealALLNumber(shopDetail.getId()));
             item.put("FAMILY_NAME", shopDetail.getMealFeeName());
             productItems.add(item);
         }
