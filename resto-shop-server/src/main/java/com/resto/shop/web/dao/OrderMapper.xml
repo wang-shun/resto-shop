@@ -1627,7 +1627,7 @@ AND o.production_status IN (2, 3)
     </update>
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
-        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  t.order_money as orderTotal from tb_order t
+        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  t.original_amount as orderTotal from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
@@ -2094,6 +2094,12 @@ GROUP BY r.table_number
 
     <select id="getMealALLNumber" resultType="java.lang.Integer">
         select sum(meal_all_number) from tb_order where shop_detail_id = #{shopId}
+        and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state in (2,10,11,12) and production_status in (2,3)
+    </select>
+
+    <select id="getCustomerPerson" resultType="java.lang.Integer">
+        select sum(customer_count) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>

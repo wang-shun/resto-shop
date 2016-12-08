@@ -2443,6 +2443,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             productItem.put("FAMILY_NAME", articleFamily.getName());
             productItems.add(productItem);
         }
+//        Map<String, Object> itemHeng = new HashMap<>();
+//        itemHeng.put("SUBTOTAL", 0);
+//        itemHeng.put("FAMILY_NAME", "-----------------------------------------------");
+//        productItems.add(itemHeng);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
@@ -2456,6 +2460,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("FAMILY_NAME", shopDetail.getMealFeeName());
             productItems.add(item);
         }
+        Map<String, Object> itemPerson = new HashMap<>();
+        itemPerson.put("SUBTOTAL", orderMapper.getCustomerPerson(shopDetail.getId()));
+        itemPerson.put("FAMILY_NAME", "就餐人数");
+        productItems.add(itemPerson);
 
         return print;
 
