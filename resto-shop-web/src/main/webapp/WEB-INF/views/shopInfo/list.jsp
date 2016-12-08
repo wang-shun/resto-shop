@@ -37,6 +37,18 @@
 							<label>餐盒费/盒</label>
 							<input type="test" class="form-control" name="mealFeePrice" placeholder="(建议输入整数)" v-model="m.mealFeePrice" required="required">
 						</div>
+						<div class="form-group">
+                                <div class="control-label">开启支付宝支付</div>
+                                <label>
+                                    <input type="radio" name="aliPay" v-model="m.aliPay" value="1">
+                                    开启
+                                </label>
+                                <label>
+                                    <input type="radio" name="aliPay"
+                                           v-model="m.aliPay" value="0">
+                                    未开启
+                                </label>
+                        </div>
 					</div>
 					<input class="btn green" type="submit" value="保存" />
 					<a class="btn default" @click="cancel">取消</a>
@@ -116,7 +128,7 @@
 		
 		function initContent(){
 			$.ajax({
-				url:"shopDetailManage/list_one",
+				url:"shopInfo/list_one",
 				success:function(result){
 					console.log(result.data);
 					vueObj.m=result.data;
