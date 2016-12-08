@@ -3361,8 +3361,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             total = total.add(item.getFinalPrice());
             if(item.getRefundCount() > 0){
                 sum += item.getRefundCount();
-                base += item.getOrginCount();
+
             }
+            base += item.getOrginCount();
         }
 
         if(o.getServicePrice() == null){
