@@ -163,6 +163,7 @@
         <result column="order_state" property="orderState" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
 
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItem_id" property="id"/>
@@ -1411,6 +1412,7 @@ AND o.production_status IN (2, 3)
     <select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">
         SELECT
         o.shop_detail_id,
+        o.amount_with_children,
         o.order_money,
         o.id,
         oi.payment_mode_id,
