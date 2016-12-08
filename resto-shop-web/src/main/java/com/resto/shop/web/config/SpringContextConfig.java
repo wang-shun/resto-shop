@@ -342,11 +342,6 @@ public class SpringContextConfig {
         return proxy.create(OrderExceptionService.class);
     }
 
-    @Bean
-    public PictureService pictureService() {
-        return proxy.create(PictureService.class);
-    }
-
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

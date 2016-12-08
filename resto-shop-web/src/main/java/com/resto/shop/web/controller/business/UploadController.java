@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,10 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.resto.brand.core.entity.PictureResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.FileUpload;
+import com.resto.brand.core.util.UploadFilesUtil;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.PictureService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
@@ -38,8 +36,6 @@ import com.resto.shop.web.service.ArticleService;
 @RequestMapping("upload")
 @RestController
 public class UploadController extends GenericController {
-	@Resource
-	private PictureService pictureService;
 
 	@Resource
 	private BrandService brandService;
@@ -66,7 +62,7 @@ public class UploadController extends GenericController {
 
 	@RequestMapping("file")
 	@ResponseBody
-	public String uploadFile(MultipartFile file, HttpServletRequest request) throws IOException {
+	public Result uploadFile(MultipartFile file, HttpServletRequest request) throws IOException {
 		String type = request.getParameter("type");
 		String systemPath = request.getServletContext().getRealPath("");
 		systemPath = systemPath.replaceAll("\\\\", "/");
@@ -74,9 +70,12 @@ public class UploadController extends GenericController {
 		systemPath = systemPath.substring(0, lastR) + "/";
 		String filePath = "upload/files/" + DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		File finalFile = FileUpload.fileUp(file, systemPath + filePath, UUID.randomUUID().toString(), type);
-		PictureResult result = pictureService.uploadPic(finalFile);
-//		return result.getUrl();
-		return filePath+"/"+finalFile.getName();
+		PictureResult picResult = UploadFilesUtil.uploadPic(finalFile);
+		if(picResult.getError() == 0){
+			return getSuccessResult(picResult.getUrl());
+		}else{
+			return new Result(false);
+		}
 	}
 
 	@RequestMapping("moveFile")
@@ -101,7 +100,7 @@ public class UploadController extends GenericController {
 					String localPath = download(article.getId(),oldPath);
 					if(localPath!=null && localPath!=""){
 						File file = new File(localPath);
-						PictureResult result = pictureService.uploadPic(file);
+						PictureResult result = UploadFilesUtil.uploadPic(file);
 						System.out.println("【上传到资源服务器成功】"+result.getUrl());
 						if (result.getError() == 0) {//判断是否成功
 							Article updateArticle = new Article();
