@@ -14,6 +14,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.CouponMapper;
+import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Order;
@@ -22,6 +23,8 @@ import com.resto.shop.web.service.CouponService;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -36,6 +39,12 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public GenericDao<Coupon, String> getDao() {
         return couponMapper;
     }
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    OrderMapper orderMapper;
 
     @Override
     public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
@@ -147,6 +156,11 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		coupon.setIsUsed(true);
 		coupon.setRemark("后付款消费优惠券");
 		update(coupon);
+
+
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        order.setPaymentAmount(order.getPaymentAmount().subtract(coupon.getValue()));
+        orderService.update(order);
 
 		OrderPaymentItem item = new OrderPaymentItem();
 		item.setId(ApplicationUtils.randomUUID());

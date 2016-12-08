@@ -672,7 +672,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String newPayItemId = ApplicationUtils.randomUUID();
             int  refundTotal = 0;
             if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
-                refundTotal = orderMapper.getRefundSumByOrderId(order.getId()).multiply(new BigDecimal(100)).intValue();
+                BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId());
+                if(sum != null){
+                    refundTotal = sum.multiply(new BigDecimal(100)).intValue();
+                }
+
             }
 
             if(refundTotal == order.getPaymentAmount().multiply(new BigDecimal(100)).intValue()){
@@ -2813,6 +2817,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             accountService.payOrder(order, factMoney, customer);
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
+            order.setPaymentAmount(order.getPaymentAmount().subtract(factMoney));
             order.setAllowContinueOrder(false);
             update(order);
             List<Order> orders = orderMapper.selectByParentId(order.getId());
