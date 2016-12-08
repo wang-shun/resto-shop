@@ -670,6 +670,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
+            int  refundTotal = 0;
+            if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
+                refundTotal = orderMapper.getRefundSumByOrderId(order.getId()).multiply(new BigDecimal(100)).intValue();
+            }
+
+            if(refundTotal == order.getPaymentAmount().multiply(new BigDecimal(100)).intValue()){
+                continue;
+            }
+
+
+
+
             switch (item.getPaymentModeId()) {
                 case PayMode.COUPON_PAY:
                     couponService.refundCoupon(item.getResultData());
@@ -686,8 +698,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case PayMode.WEIXIN_PAY:
                     WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
                     JSONObject obj = new JSONObject(item.getResultData());
+                    int refund = obj.getInt("total_fee") - refundTotal;
                     Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                            obj.getInt("total_fee"), obj.getInt("total_fee"), config.getAppid(), config.getMchid(),
+                            obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
                             config.getMchkey(), config.getPayCertPath());
                     item.setResultData(new JSONObject(result).toString());
                     break;

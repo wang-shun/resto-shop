@@ -500,5 +500,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Integer getMealALLNumber(String shopId);
 
+	BigDecimal getRefundSumByOrderId(String orderId);
+
 	Integer getCustomerPerson(String shopId);
 }
