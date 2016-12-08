@@ -2104,6 +2104,12 @@ GROUP BY r.table_number
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
+
+    <select id="getRefundSumByOrderId" resultType="java.math.BigDecimal">
+        select sum(pay_value) from tb_order_payment_item
+        where order_id = #{orderId} and payment_mode_id = 1
+        and 0 > pay_value
+    </select>
 </mapper>
 
 
