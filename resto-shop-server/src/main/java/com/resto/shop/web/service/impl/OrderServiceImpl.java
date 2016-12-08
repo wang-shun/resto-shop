@@ -679,7 +679,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
 
-            if(refundTotal == order.getPaymentAmount().multiply(new BigDecimal(100)).intValue()){
+            if(item.getPaymentModeId() == PayMode.WEIXIN_PAY && item.getPayValue().doubleValue() < 0){
+                continue;
+            }
+
+
+            if(refundTotal == order.getPaymentAmount().multiply(new BigDecimal(100)).intValue() ){ //如果退款金额 等于订单应付金额
                 continue;
             }
 
