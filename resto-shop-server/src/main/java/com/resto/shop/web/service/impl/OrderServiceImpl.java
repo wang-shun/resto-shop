@@ -1180,7 +1180,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getServicePrice());
-            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
                 item.put("ARTICLE_NAME", "就餐人数");
             }else{
                 item.put("ARTICLE_NAME", brandSetting.getServiceName());
@@ -2479,10 +2479,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        itemHeng.put("FAMILY_NAME", "-----------------------------------------------");
 //        productItems.add(itemHeng);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
+        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
+
         if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
-            item.put("FAMILY_NAME", brandSetting.getServiceName());
+            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
+                item.put("FAMILY_NAME", "就餐人数");
+            }else{
+                item.put("FAMILY_NAME", brandSetting.getServiceName());
+            }
             productItems.add(item);
         }
         if(brandSetting.getIsMealFee() == 1 && shopDetail.getIsMealFee() ==1){
