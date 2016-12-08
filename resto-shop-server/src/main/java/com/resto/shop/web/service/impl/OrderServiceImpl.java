@@ -1175,11 +1175,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         ShopDetail shopDetail1 = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
         if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getServicePrice());
-            item.put("ARTICLE_NAME", brandSetting.getServiceName());
+            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+                item.put("ARTICLE_NAME", "就餐人数");
+            }else{
+                item.put("ARTICLE_NAME", brandSetting.getServiceName());
+            }
             item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
             items.add(item);
         }
