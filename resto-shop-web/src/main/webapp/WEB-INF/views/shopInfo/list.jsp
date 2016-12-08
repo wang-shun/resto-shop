@@ -20,22 +20,22 @@
 						<div class="form-group">
 							<div class="control-label">是否启用餐盒费</div>
 							<label>
-								<input type="radio" name="isMealFee" onchange="showMealFee()" v-model="m.isMealFee" value="1">
+								<input type="radio" name="isMealFee" v-model="m.isMealFee" value="1">
 								是
 							</label>
 							<label>
-								<input type="radio" name="isMealFee"  v-model="m.isMealFee" value="0" onchange="hideMealFee()">
+								<input type="radio" name="isMealFee"  v-model="m.isMealFee" value="0">
 								否
 							</label>
 						</div>
-						<div class="form-group" id="mealFeeDivOne" style="display: none">
+						<div class="form-group" v-if="m.isMealFee==1">
 							<label>名称</label>
-							<input type="test" class="form-control" name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费" required="required">
-							<input type="test" class="form-control" name="mealFeeName" v-if="m.mealFeeName" v-model="m.mealFeeName" required="required">
+							<input type="text" class="form-control" name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费" required="required">
+							<input type="text" class="form-control" name="mealFeeName" v-if="m.mealFeeName" v-model="m.mealFeeName" required="required">
 						</div>
-						<div class="form-group" id="mealFeeDivTwo" style="display: none">
+						<div class="form-group" v-if="m.isMealFee==1">
 							<label>餐盒费/盒</label>
-							<input type="test" class="form-control" name="mealFeePrice" placeholder="(建议输入整数)" v-model="m.mealFeePrice" required="required">
+							<input type="text" class="form-control" name="mealFeePrice" placeholder="(建议输入整数)" v-model="m.mealFeePrice" required="required">
 						</div>
 						<div class="form-group">
                                 <div class="control-label">开启支付宝支付</div>
@@ -59,15 +59,6 @@
 </div>
 
 <script>
-	function showMealFee(){
-		$('#mealFeeDivOne').show();
-		$('#mealFeeDivTwo').show();
-	}
-
-	function hideMealFee(){
-		$('#mealFeeDivOne').hide();
-		$('#mealFeeDivTwo').hide();
-	}
 	$(document).ready(function(){
 		initContent();
 		toastr.options = {
@@ -101,7 +92,7 @@
 				save:function(e){
 					var formDom = e.target;
 					$.ajax({
-						url:"shopDetailManage/modify",
+						url:"shopInfo/modify",
 						data:$(formDom).serialize(),
 						success:function(result){
 							if(result.success){
