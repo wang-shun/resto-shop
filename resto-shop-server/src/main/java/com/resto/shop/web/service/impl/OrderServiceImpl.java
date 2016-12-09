@@ -3325,7 +3325,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
-
+    
     @Override
     public void refundArticle(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
@@ -3432,16 +3432,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundArticleMsg(Order order) {
-
         Order o = getOrderInfo(order.getId());
         if(o.getParentOrderId() != null){
             updateOrderChild(o.getId());
         }
-
-
-
-
-
         Customer customer = customerService.selectById(o.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
@@ -3473,5 +3467,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("退菜金额:").append(o.getBaseMoney().subtract(o.getOrderMoney())).append("\n");
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+    }
+
+    @Override
+    public List<Order> selectWXOrderItems(String serialNumber) {
+    	return orderMapper.selectWXOrderItems(serialNumber);
     }
 }
