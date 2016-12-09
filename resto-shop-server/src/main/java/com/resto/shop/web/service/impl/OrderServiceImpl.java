@@ -735,6 +735,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
                     break;
+                case PayMode.ARTICLE_BACK_PAY:
+                    Customer customer = customerService.selectById(order.getCustomerId());
+                    accountService.addAccount(new BigDecimal(-1).multiply(item.getPayValue()),customer.getAccountId(),"整单退款，扣除退菜金额超出微信支付金额",PayMode.ACCOUNT_PAY);
+                    break;
             }
             item.setId(newPayItemId);
             item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
@@ -3391,7 +3395,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             OrderPaymentItem back = new OrderPaymentItem();
                             back.setId(ApplicationUtils.randomUUID());
                             back.setOrderId(order.getId());
-                            back.setPaymentModeId(PayMode.CHARGE_PAY);
+                            back.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
                             back.setPayTime(new Date());
                             back.setPayValue(backMoney);
                             back.setRemark("退菜返回余额:" + backMoney);
