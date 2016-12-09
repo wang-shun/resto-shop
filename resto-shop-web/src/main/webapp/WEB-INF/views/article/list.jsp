@@ -691,9 +691,6 @@
                     title: "图片",
                     data: "photoSmall",
                     defaultContent: "",
-                    createdCell: function (td, tdData) {
-                        $(td).html("<img src='/" + tdData + "' style='height:40px;width:80px;'/>")
-                    }
                 },
                 {
                     title: "排序",

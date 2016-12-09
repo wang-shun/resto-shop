@@ -117,10 +117,13 @@ public class TotalIncomeController extends GenericController {
                             case PayMode.WAIT_MONEY:
                                 si.setWaitNumberIncome(oi.getPayValue());
                                 break;
+                            case PayMode.MONEY_PAY:
+                                si.setOtherPayment(oi.getPayValue());
+                                break;
                             default:
                                 break;
                         }
-                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome());
+                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment());
                     }
                 }
             }
@@ -135,6 +138,7 @@ public class TotalIncomeController extends GenericController {
         BigDecimal chargeAccountIncome = BigDecimal.ZERO;
         BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
         BigDecimal waitNumberIncome = BigDecimal.ZERO;
+        BigDecimal otherPayment = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
                 wechatIncome = wechatIncome.add(sdto.getWechatIncome());
@@ -143,6 +147,7 @@ public class TotalIncomeController extends GenericController {
                 chargeAccountIncome=chargeAccountIncome.add(sdto.getChargeAccountIncome());
                 chargeGifAccountIncome = chargeGifAccountIncome.add(sdto.getChargeGifAccountIncome());
                 waitNumberIncome = waitNumberIncome.add(sdto.getWaitNumberIncome());
+                otherPayment = otherPayment.add(sdto.getOtherPayment() == null? new BigDecimal(0) : sdto.getOtherPayment());
             }
         }
         BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
