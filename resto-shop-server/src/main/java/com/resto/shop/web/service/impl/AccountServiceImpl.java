@@ -76,7 +76,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		account.setRemain(account.getRemain().add(value));
 		addLog(value, account, remark, AccountLogType.INCOME,source);
 		update(account);
-	} 
+	}
 
 	private void addLog(BigDecimal money,Account account,String remark,int type,int source){
 		AccountLog acclog = new AccountLog();
