@@ -506,4 +506,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectOrderListItemByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     List<Order> selectListByParentId(@Param("orderId") String orderId);
+	
+	public List<Order> selectWXOrderItems(String serialNumber);
 }

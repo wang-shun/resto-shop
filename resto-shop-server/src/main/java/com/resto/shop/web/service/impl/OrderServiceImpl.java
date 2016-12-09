@@ -195,6 +195,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem item : order.getOrderItems()) {
             Article a = null;
             BigDecimal org_price = null;
+            int mealFeeNumber = 0 ;
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
@@ -206,6 +207,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     org_price = a.getPrice();
                     price = a.getPrice();
                     fans_price = a.getFansPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
                 case OrderItemType.RECOMMEND:
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -214,6 +216,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     org_price = a.getPrice();
                     price = a.getPrice();
                     fans_price = a.getFansPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
                 case OrderItemType.UNITPRICE:
                     ArticlePrice p = articlePriceMap.get(item.getArticleId());
@@ -222,6 +225,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     org_price = p.getPrice();
                     price = p.getPrice();
                     fans_price = p.getFansPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
                 case OrderItemType.UNIT_NEW:
                     a = articleMap.get(item.getArticleId());
@@ -229,6 +233,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     org_price = item.getPrice();
                     price = item.getPrice();
                     fans_price = item.getPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
                 case OrderItemType.SETMEALS:
                     a = articleMap.get(item.getArticleId());
@@ -239,12 +244,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
                     item.setChildren(new ArrayList<OrderItem>());
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     for (MealItem mealItem : items) {
                         OrderItem child = new OrderItem();
                         Article ca = articleMap.get(mealItem.getArticleId());
                         child.setId(ApplicationUtils.randomUUID());
                         child.setMealItemId(mealItem.getId());
                         child.setArticleName(mealItem.getName());
+                        child.setMealFeeNumber(0);
                         child.setArticleId(ca.getId());
                         child.setCount(item.getCount());
                         child.setArticleDesignation(ca.getDescription());
@@ -264,6 +271,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 default:
                     throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
             }
+            item.setMealFeeNumber(mealFeeNumber);
             item.setArticleDesignation(a.getDescription());
             item.setOriginalPrice(org_price);
             item.setStatus(1);
@@ -2502,11 +2510,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("FAMILY_NAME", shopDetail.getMealFeeName());
             productItems.add(item);
         }
-        Map<String, Object> itemPerson = new HashMap<>();
-        itemPerson.put("SUBTOTAL", orderMapper.getCustomerPerson(shopDetail.getId()));
-        itemPerson.put("FAMILY_NAME", "就餐人数");
-        productItems.add(itemPerson);
-
         return print;
 
     }
@@ -3342,7 +3345,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
-
+    
     @Override
     public void refundArticle(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
@@ -3449,16 +3452,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundArticleMsg(Order order) {
-
         Order o = getOrderInfo(order.getId());
         if(o.getParentOrderId() != null){
             updateOrderChild(o.getId());
         }
-
-
-
-
-
         Customer customer = customerService.selectById(o.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
@@ -3490,5 +3487,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("退菜金额:").append(o.getBaseMoney().subtract(o.getOrderMoney())).append("\n");
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+    }
+
+    @Override
+    public List<Order> selectWXOrderItems(String serialNumber) {
+    	return orderMapper.selectWXOrderItems(serialNumber);
     }
 }
