@@ -80,7 +80,7 @@
 								<div class="input-group">
 									<input type="number" class="form-control"
 										placeholder="支付折扣" name="aliPayDiscount" min="1" max="100"
-										v-model="m.aliPayDiscount" required="required">
+										v-model="m.aliPayDiscount">
 									<div class="input-group-addon">
 										<b>%</b>
 									</div>
