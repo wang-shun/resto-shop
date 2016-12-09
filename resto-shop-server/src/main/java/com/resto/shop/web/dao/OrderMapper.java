@@ -462,7 +462,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
 
-    int  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     BigDecimal  selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 

@@ -268,6 +268,8 @@ public interface OrderService extends GenericService<Order, String> {
 	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
+
+
 	/**
 	 * 根据时间 查询 当前选择店铺已完成的订单的 菜品分类销售详情(品牌端显示)
 	 * @param beginDate
@@ -511,4 +513,6 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectListByParentId(String orderId);
+
+    List<Order> selectHoufuOrderList(String beginDate, String endDate, String currentBrandId);
 }

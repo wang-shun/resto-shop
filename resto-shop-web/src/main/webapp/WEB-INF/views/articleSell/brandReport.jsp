@@ -239,7 +239,6 @@ $("#searchReport").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	sort = "desc";
-	debugger;
 	var num = getNumActive()
 	 switch(num){
 	  case 1:

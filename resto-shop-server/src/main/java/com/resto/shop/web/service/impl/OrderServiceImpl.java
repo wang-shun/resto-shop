@@ -1672,7 +1672,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        int totalNum = 0;
+        Integer totalNum = 0;
         //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         brandArticleReportDto bo = new brandArticleReportDto();
@@ -1954,7 +1954,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
 
                     //计算店铺订单总额
-                    ds1 = ds1.add(os.getOrderMoney());
+                    if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                        ds1=ds1.add(os.getAmountWithChildren());
+                    }else {
+                        ds1 = ds1.add(os.getOrderMoney());
+                    }
+
                     //计算店铺的订单数目
                     sids.add(os.getId());
                     if (sids.size() > 0) {
@@ -3190,6 +3195,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Order> selectListByParentId(String orderId) {
         return  orderMapper.selectListByParentId(orderId);
+    }
+
+    @Override
+    public List<Order> selectHoufuOrderList(String beginDate, String endDate, String brandId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
     }
 
 

@@ -349,6 +349,38 @@ public class OrderController extends GenericController{
                 }
             }
         }
+
+
+        List<Order> orderPayList = orderService.selectHoufuOrderList(beginDate, endDate, getCurrentBrandId());
+        if(!orderPayList.isEmpty()){
+            for(Order od : orderPayList ){
+                   BigDecimal temp = BigDecimal.ZERO;
+                   if(od.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                       temp = od.getAmountWithChildren();
+                   }else {
+                       temp= od.getOrderMoney();
+                   }
+
+                   BigDecimal tempoi = BigDecimal.ZERO;
+                   for( OrderPaymentItem oi :od.getOrderPaymentItems()){
+                       tempoi=tempoi.add(oi.getPayValue());
+                   }
+                   if(temp.compareTo(tempoi)!=0){
+                       OrderException orderException2 = new OrderException();
+                       orderException2.setOrderId(od.getId());
+                       orderException2.setOrderMoney(od.getOrderMoney());
+                       orderException2.setWhy("支付项比支付金额");
+                       orderException2.setShopName("花千锅");
+                       orderException2.setCreateTime(od.getCreateTime());
+                       orderException2.setBrandName(getBrandName());
+                       orderExceptionService.insert(orderException2);
+
+                   }
+
+
+            }
+        }
+
 	    return  getSuccessResult();
 
     }

@@ -1090,7 +1090,7 @@ SELECT
 
 <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="integer">
-       SELECT SUM(oi.count)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
+       SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
         WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and oi.type!=3
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
@@ -1137,7 +1137,7 @@ SELECT
 
     <select id="selectConfirmMoney" resultType="BigDecimal">
         SELECT
-	sum(oi.final_price) totalMoney
+	ifnull(sum(oi.final_price),0.00) totalMoney
 FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
