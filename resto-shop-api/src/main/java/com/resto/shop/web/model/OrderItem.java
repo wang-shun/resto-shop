@@ -73,6 +73,17 @@ public class OrderItem {
     //原始购买的菜品数量
     private Integer orginCount;
 
+    //餐盒数量
+    private Integer mealFeeNumber;
+
+    public Integer getMealFeeNumber() {
+        return mealFeeNumber;
+    }
+
+    public void setMealFeeNumber(Integer mealFeeNumber) {
+        this.mealFeeNumber = mealFeeNumber;
+    }
+
     public Integer getRefundCount() {
         return refundCount;
     }
