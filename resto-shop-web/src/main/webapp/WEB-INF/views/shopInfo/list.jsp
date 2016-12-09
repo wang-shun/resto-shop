@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 
-<div id="control">
+<div id="control" class="row">
 	<div class="col-md-offset-3 col-md-6">
 		<div class="portlet light bordered">
 			<div class="portlet-title">
@@ -20,6 +20,206 @@
 								<div class="input-group">
 									<input type="text" class="form-control" name="name"
 										:value="m.name" placeholder="必填" required="required">
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">店铺图片：</label>
+							<div class="col-sm-5">
+								<div class="input-group">
+									<input type="hidden" name="shopImg" v-model="m.shopImg">
+									<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">评论最小金额：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="text" class="form-control" name="appraiseMinMoney"
+                                       v-model="m.appraiseMinMoney">
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">红包提醒倒计时(秒)：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="number" class="form-control" name="autoConfirmTime" 
+									v-model="m.autoConfirmTime" required="required" placeholder="(建议输入整数)"
+									min="0">
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">最迟加菜时间(秒)：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="number" class="form-control" name="closeContinueTime" 
+									v-model="m.closeContinueTime" required="required" placeholder="(建议输入整数)"
+									min="0">
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">选择配送模式：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="1">
+										是
+									</label>
+									<label>
+										<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0"> 
+										否
+									</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">红包弹窗：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="1">
+										是
+									</label>
+									<label>
+										<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="0"> 
+										否
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">好评最少字数：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="number" class="form-control" name="goodAppraiseLength" 
+									v-model="m.goodAppraiseLength" placeholder="(建议输入整数)" min= "0">
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">差评最少字数：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="number" class="form-control" name="badAppraiseLength" 
+									v-model="m.badAppraiseLength" placeholder="(建议输入整数)" min = "0">
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">打印总单：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="0">
+										是
+									</label>
+									<label>
+										<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="1">
+										否
+									</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">启用推荐餐包：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="1">
+										是
+									</label>
+									<label>
+										<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="0">
+										否
+									</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">套餐出单方式：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="printType" v-model="m.printType" value="0">
+										整单出单
+									</label>
+									<label>
+										<input type="radio" name="printType" v-model="m.printType" value="1">
+										分单出单
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label>
+										<input type="radio" name="isPrintPayAfter" v-model="m.isPrintPayAfter" value="1">
+										开
+									</label>
+									<label>
+										<input type="radio" name="isPrintPayAfter"
+											   v-model="m.isPrintPayAfter" value="0">
+										关
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">启用服务费：</label>
+							<div class="col-sm-9">
+								<div>
+									<label>
+										<input type="radio" name="isUseServicePrice" 
+										v-model="m.isUseServicePrice" value="1">
+										是
+									</label>
+									<label >
+										<input type="radio" name="isUseServicePrice"  
+										v-model="m.isUseServicePrice" value="0"">
+										否
+									</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group" v-if="m.isUseServicePrice==1">
+							<label class="col-sm-3 control-label">名称：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="text" class="form-control"
+										name="serviceName" v-if="!m.serviceName" value="服务费" required="required"> 
+								   <input type="text"
+										class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" 
+										required="required">
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group" v-if="m.isUseServicePrice==1">
+							<label class="col-sm-3 control-label">服务费/每人：</label>
+							<div class="col-sm-9">
+								<div class="input-group">
+									<input type="number" placeholder="(建议输入整数)" class="form-control" name="servicePrice" 
+									v-model="m.servicePrice" required="required" min="0">
 								</div>
 							</div>
 						</div>
@@ -78,7 +278,7 @@
 							<label class="col-sm-3 control-label">支付折扣：</label>
 							<div class="col-sm-4">
 								<div class="input-group">
-									<input type="number" class="form-control"
+									<input type="number" class="form-control" placeholder="(建议输入整数)"
 										placeholder="支付折扣" name="aliPayDiscount" min="1" max="100"
 										v-model="m.aliPayDiscount">
 									<div class="input-group-addon">
@@ -151,6 +351,13 @@
 				cancel : function() {
 					initContent();
 
+				},
+				uploadSuccess:function(url){
+					$("[name='shopImg']").val(url).trigger("change");
+					toastr.success("上传成功！");
+				},
+				uploadError:function(msg){
+					toastr.error("上传失败");
 				}
 			}
 		});
