@@ -12,6 +12,7 @@ public class PayMode {
     public static final int WAIT_MONEY = 8; //等位红包
     public static final int HUNGER_MONEY = 9; //饿了吗
     public static final int ALI_PAY = 10; //支付宝
+
 	
 	public static String getPayModeName(int state){
 	    switch (state) {

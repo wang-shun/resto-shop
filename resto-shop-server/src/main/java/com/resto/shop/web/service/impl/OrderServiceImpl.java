@@ -3352,6 +3352,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+        Customer customer = customerService.selectById(o.getCustomerId());
+        int refundMoney =  order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
         for (OrderPaymentItem item : payItemsList) {
 
             String newPayItemId = ApplicationUtils.randomUUID();
@@ -3361,10 +3363,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
                         JSONObject obj = new JSONObject(item.getResultData());
                         Map<String, String> result = new HashMap<>();
+                        int total = obj.getInt("total_fee");
                         if(shopDetail.getWxServerId() == null){
-                            result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                                    obj.getInt("total_fee"),
-                                    order.getRefundMoney().multiply(new BigDecimal(100)).intValue(),StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                            result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),total
+                                    ,total > refundMoney ? refundMoney : total
+                                    ,StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
                                     StringUtils.isEmpty(shopDetail.getPayCertPath()) ?  config.getPayCertPath() : shopDetail.getPayCertPath());
@@ -3372,7 +3375,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
 
                             result = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
-                                    obj.getInt("total_fee"), order.getRefundMoney().multiply(new BigDecimal(100)).intValue(), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                    total,total > refundMoney ? refundMoney : total , wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                         }
 
@@ -3381,12 +3384,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setId(newPayItemId);
                         item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
                         orderPaymentItemService.insert(item);
+                        if(total < refundMoney){ //如果要退款的金额 比实际微信支付要大
+                            int charge = refundMoney - total ;
+                            BigDecimal wxBack = new BigDecimal(total).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+                            BigDecimal backMoney = new BigDecimal(charge).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+                            OrderPaymentItem back = new OrderPaymentItem();
+                            back.setId(ApplicationUtils.randomUUID());
+                            back.setOrderId(order.getId());
+                            back.setPaymentModeId(PayMode.CHARGE_PAY);
+                            back.setPayTime(new Date());
+                            back.setPayValue(backMoney);
+                            back.setRemark("退菜返回余额:" + backMoney);
+
+                            back.setResultData("总退款金额"+order.getRefundMoney()+",微信支付返回"+wxBack+",余额返回"+backMoney);
+                            orderPaymentItemService.insert(back);
+                            accountService.addAccount(backMoney,customer.getAccountId(),"退菜金额超出微信支付金额",PayMode.ACCOUNT_PAY);
+                        }
                         break;
                     }
 
             }
 
         }
+
 
 
 
