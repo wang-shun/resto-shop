@@ -2497,11 +2497,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.put("FAMILY_NAME", shopDetail.getMealFeeName());
             productItems.add(item);
         }
-        Map<String, Object> itemPerson = new HashMap<>();
-        itemPerson.put("SUBTOTAL", orderMapper.getCustomerPerson(shopDetail.getId()));
-        itemPerson.put("FAMILY_NAME", "就餐人数");
-        productItems.add(itemPerson);
-
         return print;
 
     }
