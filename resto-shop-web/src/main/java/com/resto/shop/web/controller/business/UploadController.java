@@ -78,8 +78,8 @@ public class UploadController extends GenericController {
 		}
 	}
 
-	@RequestMapping("moveFile")
-	@ResponseBody
+//	@RequestMapping("moveFile")
+//	@ResponseBody
 	public Result moveFile() throws Exception {
 		Brand barnd = brandService.selectById(getCurrentBrandId());
 		String baseUrl = barnd.getWechatImgUrl();
