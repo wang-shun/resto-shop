@@ -29,11 +29,13 @@
 				    <label>微信欢迎图片</label>
 				    <input type="hidden" name="wechatWelcomeImg" v-model="m.wechatWelcomeImg">
 					<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+					<img v-if="m.wechatWelcomeImg" :src="m.wechatWelcomeImg" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 				</div>
 				<div class="form-group">
 				    <label>红包Logo</label>
 				    <input type="hidden" name="redPackageLogo" v-model="m.redPackageLogo">
 					<img-file-upload  class="form-control" @success="setRedPackage" @error="uploadError"></img-file-upload>
+					<img v-if="m.redPackageLogo" :src="m.redPackageLogo" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 				</div>
 				
 				<div class="form-group">

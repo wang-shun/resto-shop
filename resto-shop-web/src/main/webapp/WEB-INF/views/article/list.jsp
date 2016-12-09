@@ -164,7 +164,7 @@
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
                                                      @error="uploadError"></img-file-upload>
-                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name"  onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">                 
+                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">                 
                                 </div>
                             </div>
                             <div class="form-group col-md-5">

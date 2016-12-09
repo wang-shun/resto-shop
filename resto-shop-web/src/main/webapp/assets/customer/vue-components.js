@@ -32,8 +32,12 @@ Vue.component('img-file-upload', {
 					 contentType:false,
 					 processData:false
 				}).then(
-					function (url){
-						that.$dispatch("success",url);
+					function (result){
+						if(result.success){
+							that.$dispatch("success",result.data);
+						}else{
+							that.$dispatch("error","后台抱错了，稍后再试试吧！");
+						}
 					},
 					function (){
 						that.$dispatch("error","文件上传失败");

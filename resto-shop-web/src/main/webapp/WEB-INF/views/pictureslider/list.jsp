@@ -22,9 +22,9 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">图片路径：</label>
 								<div class="col-sm-8">
-									<img src="" id="pictureUrl"/>
 								    <input type="hidden" name="pictureUrl" v-model="m.pictureUrl">
 								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError" cut="false"></img-file-upload>
+								    <img v-if="m.pictureUrl" :src="m.pictureUrl" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 								</div>
 							</div>
 							<div class="form-group">
@@ -79,7 +79,7 @@
 					data : "pictureUrl",
 					defaultContent:'',
 					createdCell:function(td,tdData){
-						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
+						$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
 					}
 				},                 
 				{                 
@@ -112,7 +112,6 @@
 				uploadSuccess:function(url){
 					$("[name='pictureUrl']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
-					$("#pictureUrl").attr("src","/"+url);
 				},
 				uploadError:function(msg){
 					C.errorMsg(msg);

@@ -20,10 +20,9 @@
 						
 						<div class="form-group">
 						    <label>图片地址</label>
-						    <img src="" id="picUrl"/>
 							<input type="hidden" name="picUrl" v-model="m.picUrl">
 							<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
-											    
+							<img v-if="m.picUrl" :src="m.picUrl" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">				    
 						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -69,7 +68,7 @@
 					data : "picUrl",
 					defaultContent:'',
 					createdCell:function(td,tdData){
-						$(td).html("<img src='/"+tdData+"' style='height:40px;width:80px;'/>")
+						$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
 					}
 				},                 
 				{
@@ -100,7 +99,6 @@
 				uploadSuccess:function(url){
 					$("[name='picUrl']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
-					$("#picUrl").attr("src","/"+url);
 				},
 				uploadError:function(msg){
 					C.errorMsg(msg);
