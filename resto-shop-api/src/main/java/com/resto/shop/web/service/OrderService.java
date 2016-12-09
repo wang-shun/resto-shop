@@ -511,4 +511,12 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
     List<Order> selectListByParentId(String orderId);
+
+    List<Order> selectHoufuOrderList(String beginDate, String endDate, String currentBrandId);
+	/**
+     * 微信端查询:以流水号查询订单详情
+     * @param serialNumber
+     * @return
+     */
+    public List<Order> selectWXOrderItems(String serialNumber);
 }

@@ -31,4 +31,22 @@ public class ProductionStatus {
 	 */
 	public final static int NOT_PRINT = 5;
 	
+	public static String getStatusName(Integer productionStatus){
+		switch (productionStatus) {
+		case ProductionStatus.NOT_ORDER:
+			return "已付款,未下单";
+		case ProductionStatus.HAS_ORDER:
+			return "已支付,并且已下单";
+		case ProductionStatus.PRINTED:
+			return "已打印";
+		case ProductionStatus.HAS_CALL:
+			return "已叫号";
+		case ProductionStatus.GET_IT:
+			return "已取餐";
+		case ProductionStatus.NOT_PRINT:
+			return "已下单,未打印";
+		default:
+			return "未知状态";
+		}
+	}
 }

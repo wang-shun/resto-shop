@@ -191,7 +191,6 @@ var vueObj = new Vue({
 					return ;
 				}
 				var num = this.getNumActive();
-				console.log(num);
 				switch (num)
 				{
 				case 1:
@@ -199,7 +198,7 @@ var vueObj = new Vue({
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
 	 					that.brandReport.sellIncome=result.sellIncome;
-	 					//tb2.ajax.reload();
+	 					tb2.ajax.reload();
 	 					toastr.success("查询成功");
 	 				});
 				  break;
