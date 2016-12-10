@@ -184,6 +184,8 @@ public class OrderAspect {
         }
 
 
+
+
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
@@ -192,6 +194,7 @@ public class OrderAspect {
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+//            MQMessageProducer.sendPlaceOrderMessage(order);
             orderService.payOrderWXModeFive(order.getId());
         }
     }
@@ -302,7 +305,7 @@ public class OrderAspect {
                         if(order.getPrintTimes() == 0){
                             order.setPrintTimes(order.getPrintTimes()+1);
                             orderService.update(order);
-                            MQMessageProducer.sendPlaceOrderMessage(order);
+                            MQMessageProducer.sendPlaceOrderMessageAgain(order,5000);
                         }
 
                     }
@@ -502,7 +505,9 @@ public class OrderAspect {
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {
-                msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+                if(item.getCount() > 0){
+                    msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+                }
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
 

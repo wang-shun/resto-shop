@@ -117,10 +117,16 @@ public class TotalIncomeController extends GenericController {
                             case PayMode.WAIT_MONEY:
                                 si.setWaitNumberIncome(oi.getPayValue());
                                 break;
+                            case PayMode.MONEY_PAY:
+                                si.setOtherPayment(oi.getPayValue());
+                                break;
+                            case PayMode.ALI_PAY:
+                                si.setAliPayment(oi.getPayValue());
+                                break;
                             default:
                                 break;
                         }
-                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome());
+                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment());
                     }
                 }
             }
@@ -135,6 +141,8 @@ public class TotalIncomeController extends GenericController {
         BigDecimal chargeAccountIncome = BigDecimal.ZERO;
         BigDecimal chargeGifAccountIncome = BigDecimal.ZERO;
         BigDecimal waitNumberIncome = BigDecimal.ZERO;
+        BigDecimal otherPayment = BigDecimal.ZERO;
+        BigDecimal aliPayment = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
                 wechatIncome = wechatIncome.add(sdto.getWechatIncome());
@@ -143,6 +151,8 @@ public class TotalIncomeController extends GenericController {
                 chargeAccountIncome=chargeAccountIncome.add(sdto.getChargeAccountIncome());
                 chargeGifAccountIncome = chargeGifAccountIncome.add(sdto.getChargeGifAccountIncome());
                 waitNumberIncome = waitNumberIncome.add(sdto.getWaitNumberIncome());
+                otherPayment = otherPayment.add(sdto.getOtherPayment() == null? new BigDecimal(0) : sdto.getOtherPayment());
+                aliPayment = aliPayment.add(sdto.getAliPayment() == null ? new BigDecimal(0) : sdto.getAliPayment());
             }
         }
         BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
@@ -153,7 +163,9 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setChargeGifAccountIncome(chargeGifAccountIncome);
         brandIncomeDto.setBrandName(getBrandName());
         brandIncomeDto.setWaitNumberIncome(waitNumberIncome);
-        brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome);
+        brandIncomeDto.setOtherPayment(otherPayment);
+        brandIncomeDto.setAliPayment(aliPayment);
+        brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome,otherPayment,aliPayment);
         brandIncomeDtos.add(brandIncomeDto);
         Map<String, Object> map = new HashMap<>();
         map.put("shopIncome", shopIncomeDtos);

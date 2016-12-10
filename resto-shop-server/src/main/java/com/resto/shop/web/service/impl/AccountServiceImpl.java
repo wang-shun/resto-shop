@@ -74,9 +74,14 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	public void addAccount(BigDecimal value, String accountId, String remark,Integer source) {
 		Account account = selectById(accountId);
 		account.setRemain(account.getRemain().add(value));
-		addLog(value, account, remark, AccountLogType.INCOME,source);
+		if(value.doubleValue() > 0){
+			addLog(value, account, remark, AccountLogType.INCOME,source);
+		}else{
+			addLog(new BigDecimal(-1).multiply(value), account, remark, AccountLogType.PAY,source);
+		}
+
 		update(account);
-	} 
+	}
 
 	private void addLog(BigDecimal money,Account account,String remark,int type,int source){
 		AccountLog acclog = new AccountLog();
