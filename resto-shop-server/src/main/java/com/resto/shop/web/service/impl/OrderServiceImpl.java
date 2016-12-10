@@ -2502,7 +2502,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         rewardPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
         rewardPay.put("PAYMENT_MODE", "充值赠送支付");
         discountItems.add(rewardPay);
-
+        Map<String, Object> waitMoney = new HashMap<>();
+        waitMoney.put("SUBTOTAL", orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId()));
+        waitMoney.put("PAYMENT_MODE", "等位红包支付");
+        discountItems.add(waitMoney);
         data.put("INCOME_ITEMS", incomeItems);
         data.put("PAYMENT_ITEMS", items);
         data.put("ORDER_AMOUNT", order.getOrderCount());
