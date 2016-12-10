@@ -441,9 +441,6 @@
             <if test="elemeName != null">
                 eleme_name = #{elemeName},
             </if>
-            <if test="photoSquare != null">
-                photo_square = #{photoSquare},
-            </if>
             <if test="mealFeeNumber != null">
                 meal_fee_number = #{mealFeeNumber},
             </if>
@@ -488,7 +485,6 @@
       current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
       recommend_id = #{recommendId,jdbcType=VARCHAR},
       is_hidden = #{isHidden,isRemind,jdbcType=BIT},
-      photo_square = #{photoSquare},
       meal_fee_number = #{mealFeeNumber}
     where id = #{id,jdbcType=VARCHAR}
   </update>
