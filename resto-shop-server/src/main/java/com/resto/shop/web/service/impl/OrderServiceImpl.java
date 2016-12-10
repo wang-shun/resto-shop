@@ -2389,8 +2389,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (printer == null) {
             return null;
         }
+        Order order = null;
+        if(shopDetail.getShopMode() == ShopMode.HOUFU_ORDER){
+            order = orderMapper.getOrderAccountHoufu(shopDetail.getId());
+        }else{
+            order = orderMapper.getOrderAccount(shopDetail.getId());
+        }
 
-        Order order = orderMapper.getOrderAccount(shopDetail.getId());
+
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
