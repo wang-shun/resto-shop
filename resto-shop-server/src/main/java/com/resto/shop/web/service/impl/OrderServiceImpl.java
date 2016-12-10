@@ -738,7 +738,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
                     if(item.getPayValue().doubleValue() < 0){
-                        accountService.addAccount(new BigDecimal(-1).multiply(item.getPayValue()),customer.getAccountId(),"取消订单扣除",-1);
+                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
                         break;
                     }
 
