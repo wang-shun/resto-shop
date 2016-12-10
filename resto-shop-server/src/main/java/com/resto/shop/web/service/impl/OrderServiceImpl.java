@@ -1159,7 +1159,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
-                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+                if(order.getOrderState() == OrderState.SUBMIT){
+                    order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+                }
+
             }
             orderItems.addAll(child);
         }
@@ -1196,7 +1199,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getServicePrice());
-            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
+            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
                 item.put("ARTICLE_NAME", "就餐人数");
             }else{
                 item.put("ARTICLE_NAME", brandSetting.getServiceName());
@@ -2463,7 +2466,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("TOTAL_AMOUNT", order.getOrderTotal());
 
         data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId())
-                .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())));
+                .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()))
+                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())));
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
         wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId()));
@@ -2482,7 +2486,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         incomeItems.add(otherPayment);
         incomeItems.add(chargeItem);
         BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
+                .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId())));
         data.put("DISCOUNT_AMOUNT", discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         data.put("DISCOUNT_ITEMS", discountItems);
@@ -2531,7 +2535,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
-            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
+            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
                 item.put("FAMILY_NAME", "就餐人数");
             }else{
                 item.put("FAMILY_NAME", brandSetting.getServiceName());
