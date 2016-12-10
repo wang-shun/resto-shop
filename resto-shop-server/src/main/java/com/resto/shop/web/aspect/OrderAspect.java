@@ -183,10 +183,7 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
-        if(order != null  && order.getOrderState() == OrderState.PAYMENT
-                && order.getTableNumber() != null && order.getOrderMode() == ShopMode.HOUFU_ORDER){
-            MQMessageProducer.sendPlaceOrderMessage(order);
-        }
+
 
 
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
@@ -197,6 +194,7 @@ public class OrderAspect {
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+//            MQMessageProducer.sendPlaceOrderMessage(order);
             orderService.payOrderWXModeFive(order.getId());
         }
     }

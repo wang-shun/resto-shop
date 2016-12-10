@@ -753,6 +753,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if (historyItem == null) {
             orderPaymentItemService.insert(item);
+            if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+                order.setPaymentAmount(item.getPayValue());
+                update(order);
+            }
             payOrderSuccess(order);
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
@@ -2878,8 +2882,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void useRedPrice(BigDecimal factMoney, String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        order.setPaymentAmount(order.getPaymentAmount());
-        update(order);
         Customer customer = customerService.selectById(order.getCustomerId());
         accountService.payOrder(order, factMoney, customer);
     }
