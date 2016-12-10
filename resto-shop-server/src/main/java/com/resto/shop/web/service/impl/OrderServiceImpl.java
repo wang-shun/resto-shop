@@ -2871,7 +2871,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void useRedPrice(BigDecimal factMoney, String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-
+        order.setPaymentAmount(order.getPaymentAmount());
+        update(order);
         Customer customer = customerService.selectById(order.getCustomerId());
         accountService.payOrder(order, factMoney, customer);
     }
@@ -3392,10 +3393,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                         StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                             }
 
-
+                            BigDecimal realBack = maxWxRefund.doubleValue() > order.getRefundMoney().doubleValue() ? order.getRefundMoney() : maxWxRefund;
                             item.setResultData(new JSONObject(result).toString());
                             item.setId(newPayItemId);
-                            item.setPayValue(order.getRefundMoney().multiply(new BigDecimal(-1)));
+                            item.setPayValue(realBack.multiply(new BigDecimal(-1)));
                             orderPaymentItemService.insert(item);
                             if(maxWxPay < refundMoney){ //如果要退款的金额 比实际微信支付要大
                                 int charge = refundMoney - maxWxPay ;
