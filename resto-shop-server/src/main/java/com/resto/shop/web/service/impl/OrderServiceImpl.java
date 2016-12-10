@@ -2436,6 +2436,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.put("SUBTOTAL", od.getPayValue());
                 item.put("PAYMENT_MODE", "充值赠送支付");
                 items.add(item);
+            }else if(PayMode.ALI_PAY == od.getPaymentModeId().intValue()){
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "支付宝支付");
+                items.add(item);
+            }else if (PayMode.MONEY_PAY == od.getPaymentModeId().intValue()){
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "其他方式支付");
+                items.add(item);
+            }else if(PayMode.WAIT_MONEY == od.getPaymentModeId().intValue()){
+                item.put("SUBTOTAL", od.getPayValue());
+                item.put("PAYMENT_MODE", "等位红包支付");
+                items.add(item);
             }
         }
 
