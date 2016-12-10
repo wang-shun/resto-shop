@@ -3513,10 +3513,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void updateArticle(Order order) {
         BigDecimal total = new BigDecimal(0);
         Order o = getOrderInfo(order.getId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         int base = 0;
         int sum = 0 ;
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
+            if(shopDetail.getIsMealFee() == Common.YES){
+                BigDecimal mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
+                total = total.add(mealPrice);
+            }
             if(item.getRefundCount() > 0){
                 sum += item.getRefundCount();
 
