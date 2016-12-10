@@ -2436,14 +2436,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.put("SUBTOTAL", od.getPayValue());
                 item.put("PAYMENT_MODE", "充值赠送支付");
                 items.add(item);
-            }else if(PayMode.ALI_PAY == od.getPaymentModeId().intValue()){
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "支付宝支付");
-                items.add(item);
-            }else if (PayMode.MONEY_PAY == od.getPaymentModeId().intValue()){
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "其他方式支付");
-                items.add(item);
             }else if(PayMode.WAIT_MONEY == od.getPaymentModeId().intValue()){
                 item.put("SUBTOTAL", od.getPayValue());
                 item.put("PAYMENT_MODE", "等位红包支付");
@@ -2479,7 +2471,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> chargeItem = new HashMap<>();
         chargeItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId()));
         chargeItem.put("PAYMENT_MODE", "充值支付");
+        Map<String, Object> aliPayment = new HashMap<>();
+        aliPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()));
+        aliPayment.put("PAYMENT_MODE", "支付宝支付");
+        Map<String, Object> otherPayment = new HashMap<>();
+        otherPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId()));
+        otherPayment.put("PAYMENT_MODE", "其他方式支付");
         incomeItems.add(wxItem);
+        incomeItems.add(aliPayment);
+        incomeItems.add(otherPayment);
         incomeItems.add(chargeItem);
         BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
                 .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
