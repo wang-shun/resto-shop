@@ -1196,7 +1196,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getServicePrice());
-            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
+            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
                 item.put("ARTICLE_NAME", "就餐人数");
             }else{
                 item.put("ARTICLE_NAME", brandSetting.getServiceName());
@@ -2531,7 +2531,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (brandSetting.getIsUseServicePrice() == 1) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
-            if("31946c940e194311b117e3fff5327215".equals(brand.getId())){
+            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
                 item.put("FAMILY_NAME", "就餐人数");
             }else{
                 item.put("FAMILY_NAME", brandSetting.getServiceName());
