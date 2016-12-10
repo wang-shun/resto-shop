@@ -3439,7 +3439,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 back.setOrderId(order.getId());
                                 back.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
                                 back.setPayTime(new Date());
-                                back.setPayValue(backMoney);
+                                back.setPayValue(new BigDecimal(-1).multiply(backMoney));
                                 back.setRemark("退菜返回余额:" + backMoney);
 
                                 back.setResultData("总退款金额"+order.getRefundMoney()+",微信支付返回"+wxBack+",余额返回"+backMoney);
