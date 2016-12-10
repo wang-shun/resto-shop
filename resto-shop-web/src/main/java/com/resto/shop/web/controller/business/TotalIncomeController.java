@@ -163,6 +163,7 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setChargeGifAccountIncome(chargeGifAccountIncome);
         brandIncomeDto.setBrandName(getBrandName());
         brandIncomeDto.setWaitNumberIncome(waitNumberIncome);
+        brandIncomeDto.setOtherPayment(aliPayment);
         brandIncomeDto.setAliPayment(aliPayment);
         brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome,otherPayment,aliPayment);
         brandIncomeDtos.add(brandIncomeDto);

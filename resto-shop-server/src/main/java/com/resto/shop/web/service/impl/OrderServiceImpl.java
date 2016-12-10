@@ -2135,7 +2135,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order getOrderAccount(String shopId) {
-        Order order = orderMapper.getOrderAccount(shopId);
+        Order order = null;
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        if(shopDetail.getShopMode() == ShopMode.HOUFU_ORDER){
+            order  = orderMapper.getOrderAccountHoufu(shopId);
+        }else{
+            order  = orderMapper.getOrderAccount(shopId);
+        }
+
         return order;
     }
 

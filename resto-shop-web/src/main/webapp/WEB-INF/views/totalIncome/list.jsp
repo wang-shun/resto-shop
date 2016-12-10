@@ -120,6 +120,10 @@ var tb1 = $("#brandReportTable").DataTable({
 		{
 			title : "支付宝支付(元)",
 			data : "aliPayment"
+		},
+		{
+			title : "其他方式支付(元)",
+			data : "otherPayment",
 		}
     ]
 	
@@ -170,6 +174,10 @@ var tb2 = $("#shopReportTable").DataTable({
 		{
 			title : "支付宝支付(元)",
 			data : "aliPayment",
+		},
+		{
+			title : "其他方式支付(元)",
+			data : "otherPayment",
 		}
 	]
 	
