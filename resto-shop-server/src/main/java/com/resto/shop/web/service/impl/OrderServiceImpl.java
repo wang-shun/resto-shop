@@ -737,8 +737,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
-                    accountService.addAccount(new BigDecimal(-1).multiply(item.getPayValue()),customer.getAccountId(),"取消订单扣除",-1);
-                    break;
+                    if(item.getPayValue().doubleValue() < 0){
+                        accountService.addAccount(new BigDecimal(-1).multiply(item.getPayValue()),customer.getAccountId(),"取消订单扣除",-1);
+                        break;
+                    }
+
+
             }
             item.setId(newPayItemId);
             item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
@@ -3461,7 +3465,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             back.setOrderId(order.getId());
             back.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
             back.setPayTime(new Date());
-            back.setPayValue(order.getRefundMoney());
+            back.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
             back.setRemark("退菜返回余额:" + order.getRefundMoney());
 
             back.setResultData("总退款金额"+order.getRefundMoney()+"余额返回"+order.getRefundMoney());
