@@ -1159,7 +1159,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
-                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+                if(order.getOrderState() == OrderState.SUBMIT){
+                    order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+                }
+
             }
             orderItems.addAll(child);
         }
