@@ -28,7 +28,7 @@
 							<label class="col-sm-3 control-label">店铺图片：</label>
 							<div class="col-sm-5">
 								<div class="input-group">
-									<input type="hidden" name="shopImg" v-model="m.shopImg">
+									<input type="hidden" name="photo" v-model="m.photo">
 									<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
 								</div>
 							</div>
@@ -353,7 +353,7 @@
 
 				},
 				uploadSuccess:function(url){
-					$("[name='shopImg']").val(url).trigger("change");
+					$("[name='photo']").val(url).trigger("change");
 					toastr.success("上传成功！");
 				},
 				uploadError:function(msg){
