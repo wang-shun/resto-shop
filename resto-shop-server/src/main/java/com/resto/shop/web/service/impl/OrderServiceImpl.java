@@ -3514,11 +3514,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal total = new BigDecimal(0);
         Order o = getOrderInfo(order.getId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
         int base = 0;
         int sum = 0 ;
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
-            if(shopDetail.getIsMealFee() == Common.YES){
+            if(brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
                 BigDecimal mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
                 total = total.add(mealPrice);
             }
