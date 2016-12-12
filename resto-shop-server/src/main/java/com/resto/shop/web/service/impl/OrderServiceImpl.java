@@ -676,6 +676,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrder(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             int  refundTotal = 0;
@@ -716,9 +717,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
                     JSONObject obj = new JSONObject(item.getResultData());
                     int refund = obj.getInt("total_fee") - refundTotal;
-                    Map<String, String> result = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                            obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
-                            config.getMchkey(), config.getPayCertPath());
+                    Map<String, String> result = null;
+                    if(shopDetail.getWxServerId() == null){
+                        result  = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                                obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
+                                config.getMchkey(), config.getPayCertPath());
+                    }else{
+                        WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+
+                        result = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
+                                obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+                    }
+
+
+
                     item.setResultData(new JSONObject(result).toString());
                     break;
                 case PayMode.WAIT_MONEY:
