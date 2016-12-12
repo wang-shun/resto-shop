@@ -305,7 +305,7 @@ public class OrderAspect {
                         if(order.getPrintTimes() == 0){
                             order.setPrintTimes(order.getPrintTimes()+1);
                             orderService.update(order);
-                            MQMessageProducer.sendPlaceOrderMessageAgain(order,5000);
+                            MQMessageProducer.sendPlaceOrderMessageAgain(order,6000);
                         }
 
                     }

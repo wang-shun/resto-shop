@@ -2886,7 +2886,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             accountService.payOrder(order, factMoney, customer);
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
-            order.setPaymentAmount(order.getPaymentAmount().subtract(factMoney));
+            order.setPaymentAmount(new BigDecimal(0));
             order.setAllowContinueOrder(false);
             update(order);
             List<Order> orders = orderMapper.selectByParentId(order.getId());

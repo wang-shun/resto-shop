@@ -159,8 +159,8 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
 
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        order.setPaymentAmount(order.getPaymentAmount().subtract(coupon.getValue()));
-        orderService.update(order);
+//        order.setPaymentAmount(order.getPaymentAmount().subtract(coupon.getValue()));
+//        orderService.update(order);
 
 		OrderPaymentItem item = new OrderPaymentItem();
 		item.setId(ApplicationUtils.randomUUID());
