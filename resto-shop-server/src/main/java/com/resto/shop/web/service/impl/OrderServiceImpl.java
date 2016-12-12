@@ -826,8 +826,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
-        if (order.getPrintOrderTime() == null || order.getProductionStatus().equals(ProductionStatus.NOT_PRINT)
-                || order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) {
             if (StringUtils.isEmpty(order.getParentOrderId())) {
                 log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
                 if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
@@ -846,8 +844,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            Customer customer = customerService.selectById(order.getCustomerId());
 //            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
             return order;
-        }
-        throw new AppException(AppException.ORDER_IS_PRINTED);
     }
 
     @Override
