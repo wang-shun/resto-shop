@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 
 <div id="control" class="row">
-	<div class="col-md-offset-3 col-md-6">
+	<div class="col-md-offset-3 col-md-6" >
 		<div class="portlet light bordered">
 			<div class="portlet-title">
 				<div class="caption">
@@ -11,16 +11,14 @@
 				</div>
 			</div>
 			<div class="portlet-body">
-				<form role="form" class="form-horizontal"
+				<form role="form" class="form-horizontal" 
 					action="{{'shopDetailManage/modify'}}" @submit.prevent="save">
 					<div class="form-body">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">店铺名称：</label>
 							<div class="col-sm-9">
-								<div class="input-group">
-									<input type="text" class="form-control" name="name"
+								<input type="text" class="form-control" name="name"
 										:value="m.name" placeholder="必填" required="required">
-								</div>
 							</div>
 						</div>
 						
@@ -240,24 +238,20 @@
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
 							<div class="col-sm-9">
-								<div class="input-group">
-									<input type="text" class="form-control"
-										name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费"
-										required="required"> <input type="text"
-										class="form-control" name="mealFeeName" v-if="m.mealFeeName"
-										v-model="m.mealFeeName" required="required">
-								</div>
+								<input type="text" class="form-control"
+									name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费"
+									required="required"> <input type="text"
+									class="form-control" name="mealFeeName" v-if="m.mealFeeName"
+									v-model="m.mealFeeName" required="required">
 							</div>
 						</div>
 
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">餐盒费/盒：</label>
 							<div class="col-sm-9">
-								<div class="input-group">
-									<input type="number" class="form-control"
+								<input type="number" class="form-control"
 									name="mealFeePrice" placeholder="(建议输入整数)"
 									v-model="m.mealFeePrice" required="required" min="0">
-								</div>
 							</div>
 						</div>
 						
@@ -287,9 +281,27 @@
 								<%--</div>--%>
 							<%--</div>--%>
 						<%--</div>--%>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">店铺标语：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control"
+									name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
+									v-model="m.slogan">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">等位提示：</label>
+							<div class="col-sm-9">
+								<textarea rows="3" class="form-control"
+									name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
+									v-model="m.queueNotice"></textarea>
+							</div>
+						</div>
 					</div>
-					<input class="btn green" type="submit" value="保存" /> <a
-						class="btn default" @click="cancel">取消</a>
+					<div class="text-center">
+						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
+						<a class="btn default" @click="cancel">取消</a>
+					</div>
 				</form>
 			</div>
 		</div>

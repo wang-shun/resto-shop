@@ -180,6 +180,14 @@
 					<label>服务费/每人</label>
 					<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required">
 				</div>
+				<div class="form-group">
+				    <label>品牌标语</label>
+				    <input type="text" class="form-control" name="slogan" required="required" v-model="m.slogan">
+				</div>
+				<div class="form-group">
+				    <label>等位提示</label>
+				    <input type="text" class="form-control" name="queueNotice" required="required" v-model="m.queueNotice">
+				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
