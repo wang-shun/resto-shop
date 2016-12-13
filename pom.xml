@@ -9,7 +9,7 @@
 	<distributionManagement>
 		<repository>
 			<id>releases</id>
-			<url>http://102.27.228.98:8081/nexus/content/repositories/releases/</url>
+			<url>http://106.14.44.167:8081/nexus/content/repositories/releases/</url>
 		</repository>
 	</distributionManagement>
 	<parent> 
