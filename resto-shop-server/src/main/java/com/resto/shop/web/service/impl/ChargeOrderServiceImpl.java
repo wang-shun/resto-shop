@@ -155,9 +155,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		BigDecimal useReward = rewardPay.multiply(scalc).setScale(6, BigDecimal.ROUND_HALF_UP);
 		BigDecimal rewardBalance = order.getRewardBalance();
 		if(rewardBalance.compareTo(useReward)<0){  //如果剩余赠送金额不够支付，则返回剩余赠送金额
-			return useReward;
+			return rewardBalance;
 		}
-		return rewardPay; //否则返回需要支付的金额
+		return useReward; //否则返回需要支付的金额
 	}
 
 	@Override
