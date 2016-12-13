@@ -3533,7 +3533,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int sum = 0 ;
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
-            if(brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
+            if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
                 BigDecimal mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
                 total = total.add(mealPrice);
             }
