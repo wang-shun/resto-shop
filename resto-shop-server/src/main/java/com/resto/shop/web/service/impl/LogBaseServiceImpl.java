@@ -65,6 +65,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             printKitchenLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.REFUSE_ORDER){
             refuseOrderLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.WX_PAY){
+            wxPayLog(shopDetail, customer, desc);
         }
     }
 
@@ -309,11 +311,20 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //
+    //商家拒绝订单时记录log
     public void refuseOrderLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单被商家拒绝了");
+        logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //订单有WX支付时记录log
+    public void wxPayLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"的订单微信支付完成");
         logBase.setDesc(desc);
         insert(logBase);
     }
