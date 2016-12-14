@@ -76,4 +76,9 @@ public class TableCodeServiceImpl extends GenericServiceImpl<TableCode, String> 
     public List<TableCode> getTableList(String shopId) {
         return tablecodeMapper.getTableList(shopId);
     }
+
+	@Override
+	public List<TableCode> selectTableAndGetNumbers(String shopId) {
+		return tablecodeMapper.selectTableAndGetNumbers(shopId);
+	}
 }
