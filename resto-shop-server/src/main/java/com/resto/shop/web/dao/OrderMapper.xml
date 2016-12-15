@@ -2082,6 +2082,7 @@ GROUP BY r.table_number
         and ((order_mode = 5 and order_state = 1) or (order_mode != 5) )
         and #{time} > now() - create_time
         and table_number is not null
+        and allow_continue_order = 1
         order by create_time desc limit 1
 
     </select>
