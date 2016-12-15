@@ -77,6 +77,10 @@ var shopTable = $("#shopTable").DataTable({
 			data : "articleName",
 		},
         {
+            title : "菜品类别",
+            data : "typeName",
+        },
+        {
             title: "编号",
             data : "numberCode",
 			defaultContent:""

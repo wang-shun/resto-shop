@@ -28,5 +28,5 @@ public class LogBaseState {
     public static final int WX_RECHANGE = 22; //微信充值
     public static final int REFUSE_ORDER = 23;  //拒绝订单
     public static final int PRINT_KITCHEN = 24;  //打印厨房
-
+    public static final int WX_PAY = 25;   //微信支付
 }

@@ -425,4 +425,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 	public void updateArticleImg(Article article) {
 		articleMapper.updateByPrimaryKeySelective(article);
 	}
+
+    @Override
+    public void addArticleLikes(String articleId) {
+        articleMapper.addArticleLikes(articleId);
+    }
 }

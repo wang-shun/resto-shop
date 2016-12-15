@@ -197,8 +197,8 @@ var tb2 = $("#articleSellTable").DataTable({
 					$(td).html(lab);
 				}
 			}
-		},  
-		{
+		},
+        {
 			title : "菜名",
 			data : "articleName",
 			createdCell:function(td,tdData,rowData){
@@ -230,8 +230,6 @@ var tb2 = $("#articleSellTable").DataTable({
 		appendSelect(tbApi);
 	}
 } );
-
-
 
 
 //搜索

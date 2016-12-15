@@ -1542,6 +1542,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         for (ArticleSellDto articleSellDto : list) {
+
+            if(articleSellDto.getType()==3){
+                articleSellDto.setTypeName("套餐");
+            }else {
+                articleSellDto.setTypeName("单品");
+            }
+
             //销售额占比
             BigDecimal d = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             articleSellDto.setSalesRatio(d + "%");
@@ -1842,6 +1849,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         for (ArticleSellDto articleSellDto : list) {
+            //判断菜品的类型
+
+            if(articleSellDto.getType()==3){
+                articleSellDto.setTypeName("套餐");
+            }else {
+                articleSellDto.setTypeName("单品");
+            }
+
             //销售额占比
             BigDecimal d = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             articleSellDto.setSalesRatio(d + "%");
@@ -3533,7 +3548,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int sum = 0 ;
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
-            if(brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
+            if(o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
                 BigDecimal mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
                 total = total.add(mealPrice);
             }
