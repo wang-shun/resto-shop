@@ -1542,6 +1542,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         for (ArticleSellDto articleSellDto : list) {
+
+            if(articleSellDto.getType()==3){
+                articleSellDto.setTypeName("套餐");
+            }else {
+                articleSellDto.setTypeName("单品");
+            }
+
             //销售额占比
             BigDecimal d = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             articleSellDto.setSalesRatio(d + "%");
@@ -1842,6 +1849,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         for (ArticleSellDto articleSellDto : list) {
+            //判断菜品的类型
+
+            if(articleSellDto.getType()==3){
+                articleSellDto.setTypeName("套餐");
+            }else {
+                articleSellDto.setTypeName("单品");
+            }
+
             //销售额占比
             BigDecimal d = articleSellDto.getSalles().divide(temp, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             articleSellDto.setSalesRatio(d + "%");
