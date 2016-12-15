@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.model.Order;
@@ -21,7 +23,6 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 
 	void chargeorderWxPaySuccess(ChargePayment cp);
-
 
 	BigDecimal selectTotalBalance(String customerId);
 

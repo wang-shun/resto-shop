@@ -51,4 +51,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
      * @return
      */
     List<Customer> selectListByBrandIdHasRegister(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+    Customer selectCustomerAccount(@Param("telephone") String telephone);
 }

@@ -126,6 +126,11 @@ public class SpringContextConfig {
     public ChargeSettingService chargeSettingService() {
         return getProxy(ChargeSettingService.class);
     }
+    
+    @Bean
+    public ChargeLogService chargeLogService() {
+        return getProxy(ChargeLogService.class);
+    }
 
     @Bean
     public CouponService couponService() {
