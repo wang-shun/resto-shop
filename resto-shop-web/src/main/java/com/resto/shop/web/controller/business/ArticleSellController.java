@@ -267,7 +267,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","brandSellNum","numRatio","salles","salesRatio"};
+		String[]columns={"articleFamilyName","articleName","typeName","brandSellNum","numRatio","salles","salesRatio"};
 		//定义数据
 		List<ArticleSellDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -301,7 +301,7 @@ public class ArticleSellController extends GenericController{
 //		}
 		//暂时查全部
 		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		String[][] headers = {{"分类","25"},{"菜名","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"}};
+		String[][] headers = {{"分类","25"},{"菜名","25"},{"菜品类型","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"}};
 
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -387,7 +387,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"articleFamilyName","articleName","shopSellNum","numRatio","salles","salesRatio"};
+		String[]columns={"articleFamilyName","articleName","typeName","shopSellNum","numRatio","salles","salesRatio"};
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<>();
 		Brand brand = brandServie.selectById(getCurrentBrandId());
@@ -420,7 +420,7 @@ public class ArticleSellController extends GenericController{
 		
 		
 		//String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-		String[][] headers = {{"分类","22"},{"菜名","20"},{"销量(份)","20"},{"销量占比","20"},{"销售额","20"},{"销售额占比","20"}};
+		String[][] headers = {{"分类","22"},{"菜名","20"},{"菜品类型","20"},{"销量(份)","20"},{"销量占比","20"},{"销售额","20"},{"销售额占比","20"}};
 		
 		
 		//定义excel工具类对象

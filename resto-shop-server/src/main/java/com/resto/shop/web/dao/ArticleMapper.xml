@@ -753,4 +753,10 @@ GROUP BY article_id
     set photo_square = #{photoSquare}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+
+    <update id="addArticleLikes">
+        update tb_article
+        set likes = likes + 1
+        where id = #{articleId}
+    </update>
 </mapper>
