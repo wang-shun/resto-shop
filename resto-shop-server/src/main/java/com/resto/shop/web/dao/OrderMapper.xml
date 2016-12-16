@@ -2199,7 +2199,7 @@ AND o.production_status IN (2, 3)
     <select id="selectWXOrderItems" parameterType="String" resultMap="BaseResultMap">
 		select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
 		print_order_time,call_number_time,order_money,topi.id orderPaymentId,topi.pay_value,topi.payment_mode_id,
-		toi.article_name,toi.count
+		toi.article_name,(toi.orgin_count - toi.refund_count) count
 		from tb_order tod 
 		inner join tb_order_payment_item topi on tod.id = topi.order_id
 		inner join tb_order_item toi on tod.id = toi.order_id
