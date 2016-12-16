@@ -1934,7 +1934,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                     //品牌实际支付
-                    if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
+                    if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6|| oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
@@ -1991,7 +1991,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (!os.getOrderPaymentItems().isEmpty()) {
                         for (OrderPaymentItem oi : os.getOrderPaymentItems()) {
                             //店铺实际支付
-                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
+                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                                 ds2 = ds2.add(oi.getPayValue());
                             }
                             //店铺虚拟支付
