@@ -71,8 +71,13 @@
         <result column="meal_fee_price" property="mealFeePrice"/>
         <result column="meal_all_number" property="mealAllNumber"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+        	<result column="orderPaymentId" property="id"/>
         	<result column="pay_value" property="payValue"/>
 			<result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+        <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
+        	<result column="article_name" property="articleName"/>
+			<result column="count" property="count"/>
         </collection>
     </resultMap>
 
@@ -2193,8 +2198,11 @@ AND o.production_status IN (2, 3)
     </select>
     <select id="selectWXOrderItems" parameterType="String" resultMap="BaseResultMap">
 		select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
-		print_order_time,call_number_time,topi.pay_value,topi.payment_mode_id
-		from tb_order tod inner join tb_order_payment_item topi on tod.id = topi.order_id
+		print_order_time,call_number_time,order_money,topi.id orderPaymentId,topi.pay_value,topi.payment_mode_id,
+		toi.article_name,toi.count
+		from tb_order tod 
+		inner join tb_order_payment_item topi on tod.id = topi.order_id
+		inner join tb_order_item toi on tod.id = toi.order_id
 		where tod.serial_number =  #{serialNumber} 
 	</select>
 </mapper>
