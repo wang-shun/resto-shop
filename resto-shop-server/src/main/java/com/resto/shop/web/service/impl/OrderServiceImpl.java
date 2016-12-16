@@ -1998,15 +1998,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                 ds3 = ds3.add(oi.getPayValue());
                             }
+                            ds1.add(oi.getPayValue());
                         }
                     }
 
                     //计算店铺订单总额
-                    if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                        ds1=ds1.add(os.getAmountWithChildren());
-                    }else {
-                        ds1 = ds1.add(os.getOrderMoney());
-                    }
+//                    if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+//                        ds1=ds1.add(os.getAmountWithChildren());
+//                    }else {
+//                        ds1 = ds1.add(os.getOrderMoney());
+//                    }
 
                     //计算店铺的订单数目
                     sids.add(os.getId());
