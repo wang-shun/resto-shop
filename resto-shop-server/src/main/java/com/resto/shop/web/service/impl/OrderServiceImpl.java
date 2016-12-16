@@ -1998,7 +1998,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                 ds3 = ds3.add(oi.getPayValue());
                             }
-                            ds1.add(oi.getPayValue());
+                           ds1= ds1.add(oi.getPayValue());
                         }
                     }
 
