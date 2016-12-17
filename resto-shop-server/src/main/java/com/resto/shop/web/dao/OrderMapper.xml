@@ -1026,7 +1026,7 @@ SELECT
 
     <select id="selectParentAmount" resultType="java.lang.Double">
         SELECT
-        SUM(order_money) FROM tb_order WHERE id=#{orderId} OR parent_order_id=#{0}
+        SUM(order_money) FROM tb_order WHERE id=#{orderId} OR parent_order_id=#{orderId}
         <if test="shopMode != 5">
             and order_state not in (1,9)
         </if>
