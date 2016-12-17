@@ -10,6 +10,8 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
@@ -108,8 +110,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		if(chargeOrder!=null){
 			BigDecimal useReward = useReward(chargeOrder,remindPay);  //使用返利支付
 			BigDecimal useCharge = useCharge(chargeOrder,remindPay.subtract(useReward).setScale(2, BigDecimal.ROUND_HALF_UP));  //使用充值支付
-			result[0] = result[0].add(useCharge);
-			result[1] = result[1].add(useReward);
+			result[0] = useCharge;
+			result[1] = useReward;
 			chargeorderMapper.updateBalance(chargeOrder.getId(),useCharge,useReward);
 			BigDecimal totalPay = result[0].add(result[1]);
 			if(useCharge.compareTo(BigDecimal.ZERO)>0){
@@ -152,9 +154,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	private BigDecimal useReward(ChargeOrder order, BigDecimal rewardPay) {
 		BigDecimal totalCharge = order.getChargeMoney().add(order.getRewardMoney());
 		BigDecimal scalc = order.getRewardMoney().divide(totalCharge,2,BigDecimal.ROUND_HALF_UP); //支付比例
-		BigDecimal useReward = rewardPay.multiply(scalc).setScale(6, BigDecimal.ROUND_HALF_UP);
+		BigDecimal useReward = rewardPay.multiply(scalc).setScale(2, BigDecimal.ROUND_HALF_UP);
 		BigDecimal rewardBalance = order.getRewardBalance();
-		if(rewardBalance.compareTo(useReward)<0){  //如果剩余赠送金额不够支付，则返回剩余赠送金额
+		if(rewardBalance.compareTo(useReward)<0 || useReward.doubleValue() < 0.01){  //如果剩余赠送金额不够支付，则返回剩余赠送金额
 			return rewardBalance;
 		}
 		return useReward; //否则返回需要支付的金额
@@ -197,5 +199,4 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
         return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
     }
-
 }

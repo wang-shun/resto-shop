@@ -315,6 +315,10 @@ var tb2 = $("#articleSellTable").DataTable({
 			data : "articleName",
 		},
         {
+            title : "菜品类型",
+            data : "typeName",
+        },
+        {
           title : "编号",
            data : "numberCode",
            defaultContent:"",

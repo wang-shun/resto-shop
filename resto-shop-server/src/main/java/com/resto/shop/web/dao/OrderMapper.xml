@@ -71,8 +71,13 @@
         <result column="meal_fee_price" property="mealFeePrice"/>
         <result column="meal_all_number" property="mealAllNumber"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+        	<result column="orderPaymentId" property="id"/>
         	<result column="pay_value" property="payValue"/>
 			<result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+        <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
+        	<result column="article_name" property="articleName"/>
+			<result column="count" property="count"/>
         </collection>
     </resultMap>
 
@@ -1225,7 +1230,7 @@ AND o.production_status IN (2, 3)
         t2.order_state IN (2, 10, 11, 12)
         AND t2.production_status IN (2, 3) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id =#{shopId}
-        GROUP BY t.article_name
+        GROUP BY t.article_name,t4.article_type
     </select>
 
     <!-- 品牌菜品销售中 店铺菜品按菜品分类的数据   品牌端显示 -->
@@ -1475,7 +1480,7 @@ AND o.production_status IN (2, 3)
         t2.order_state IN (2, 10, 11, 12)
         AND t2.production_status IN (2, 3) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.brand_id =#{brandId}
-        GROUP BY t.article_name
+        GROUP BY t.article_name,t4.article_type
         ORDER BY ${sort}
     </select>
 
@@ -2080,8 +2085,9 @@ GROUP BY r.table_number
         select * from tb_order where customer_id = #{customerId}
         and shop_detail_id = #{shopId}
         and ((order_mode = 5 and order_state = 1) or (order_mode != 5) )
-        and now() - create_time > #{time}
+        and #{time} > now() - create_time
         and table_number is not null
+        and allow_continue_order = 1
         order by create_time desc limit 1
 
     </select>
@@ -2192,8 +2198,11 @@ AND o.production_status IN (2, 3)
     </select>
     <select id="selectWXOrderItems" parameterType="String" resultMap="BaseResultMap">
 		select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
-		print_order_time,call_number_time,topi.pay_value,topi.payment_mode_id
-		from tb_order tod inner join tb_order_payment_item topi on tod.id = topi.order_id
+		print_order_time,call_number_time,order_money,topi.id orderPaymentId,topi.pay_value,topi.payment_mode_id,
+		toi.article_name,(toi.orgin_count - toi.refund_count) count
+		from tb_order tod 
+		inner join tb_order_payment_item topi on tod.id = topi.order_id
+		inner join tb_order_item toi on tod.id = toi.order_id
 		where tod.serial_number =  #{serialNumber} 
 	</select>
 </mapper>

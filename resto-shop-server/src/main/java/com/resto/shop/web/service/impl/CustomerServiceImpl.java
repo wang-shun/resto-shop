@@ -173,4 +173,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
         Date end = DateUtil.getformatEndDate(endDate);
         return  customerMapper.selectListByBrandIdHasRegister(begin,end,brandId);
     }
+    
+    @Override
+    public Customer selectCustomerAccount(String telephone) {
+    	return customerMapper.selectCustomerAccount(telephone);
+    }
 }
