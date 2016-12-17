@@ -361,6 +361,24 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+	this.createBtn = function(model,url,urlData){
+		var button = $("<button class='btn btn-xs btn-primary' @click='abc'>编辑</button>");
+		button.click(function(){
+			if(_C.vue){
+				_C.vue.platform(model);
+			}else{
+				_C.loadForm({
+					url:url,
+					data:{id:model},
+					formaction:urlData,
+					aftersuccess:function(){
+						tb.ajax.reload();
+					}
+				});
+			}
+		});
+		return button;
+	}
 
 	this.createEditBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");

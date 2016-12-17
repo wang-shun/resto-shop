@@ -110,8 +110,6 @@ public class SpringContextConfig {
         return getProxy(ArticleUnitService.class);
     }
 
-
-
     @Bean
     public ChargeOrderService chargeOrderService() {
         return getProxy(ChargeOrderService.class);
@@ -345,6 +343,11 @@ public class SpringContextConfig {
     @Bean
     public OrderExceptionService orderExceptionService() {
         return proxy.create(OrderExceptionService.class);
+    }
+
+    @Bean
+    public TableQrcodeService tableQrcodeService() {
+        return proxy.create(TableQrcodeService.class);
     }
 
     public <T> T getProxy(Class<T> clazz) {
