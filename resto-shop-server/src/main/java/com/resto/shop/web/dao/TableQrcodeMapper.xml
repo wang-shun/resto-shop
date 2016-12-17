@@ -68,4 +68,8 @@
     </update>
 
     <select id="selectList" resultType="TableQrcode">select * from tb_table_qrcode </select>
+
+    <select id="selectByShopId" resultType="TableQrcode">
+        select * from tb_table_qrcode where shop_detail_id = #{shopId}
+    </select>
 </mapper>

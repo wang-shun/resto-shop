@@ -36,10 +36,9 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-offset-3 col-sm-3">
-                                    <input class="btn green"  type="submit"  value="保存"/>
+                                    <input class="btn green"  type="submit" value="保存"/>
                                     <a class="btn default" @click="cancel" >取消</a>
                                 </div>
-                                <div class="col-sm-3" id="downQRFile"></div>
                             </div>
                         </div>
                     </form>
@@ -57,7 +56,7 @@
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <form role="form" action="{{m.id?'tablecode/modify':'tablecode/create'}}" @submit.prevent="save">
+                    <form role="form" action="tableQrcode/modify" @submit.prevent="save">
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">最小人数</label>
@@ -93,6 +92,10 @@
 
     <div class="table-div">
         <div class="table-operator">
+            <span id="downQRFile"></span>
+            <s:hasPermission name="tableQrcode/download">
+                <button class="btn green" style="margin-right: 20px;" @click="download">下载</button>
+            </s:hasPermission>
             <s:hasPermission name="tableQrcode/add">
                 <button class="btn green pull-right" @click="create">新建</button>
             </s:hasPermission>
@@ -108,6 +111,7 @@
 <script>
     (function(){
         var cid="#control";
+        var tableNumber = [];
         var $table = $(".table-body>table");
         var tb = $table.DataTable({
             ajax : {
@@ -116,12 +120,20 @@
             },
             columns : [
                 {
+                    title: "全选 <input type='checkbox' id='checkAll' />",
+                    data:"id",
+                    width:'5%',
+                    createdCell: function (td, tdData) {
+                        $(td).html("<input type='checkbox' style='width:30px;height:30px' value=\""+tdData+"\" name= 'tableNumberCheck' />");
+                    },
+                },
+                {
                     title : "品牌名称",
-                    data : "brandId",
+                    data : "brandName",
                 },
                 {
                     title : "店铺名称",
-                    data : "shopDetailId",
+                    data : "shopName",
                 },
                 {
                     title : "桌号",
@@ -151,7 +163,6 @@
                     title : "操作",
                     data : "id",
                     createdCell:function(td,tdData,rowData,row){
-                        alert(JSON.stringify(rowData));
                         var operator = [];
                         <s:hasPermission name="tableQrcode/modify">
                         operator.push(C.createBtn(rowData).html("编辑"));
@@ -159,6 +170,24 @@
                         $(td).html(operator);
                     }
                 }],
+
+            initComplete: function () {
+                var api = this.api();
+                api.search('');
+                var data = api.data();
+                for (var i = 0; i < data.length; i++) {
+                    tableNumber.push(data[i]);
+                }
+
+                $("#checkAll").change(function() {
+                    if($("#checkAll").prop("checked")){
+                        $("input[name='tableNumberCheck']").prop("checked", true);
+
+                    }else{
+                        $("input[name='tableNumberCheck']").prop("checked", false);
+                    }
+                });
+            }
         });
 
         var C = new Controller(null,tb);
@@ -167,7 +196,8 @@
             mixins:[C.formVueMix],
             data: {
                 showPlatform: false,
-                showform: false
+                showform: false,
+                m:null
             },
             methods :{
                 cancel: function () {
@@ -175,9 +205,33 @@
                     this.showform = false;
                 },
                 platform: function (model) {
+                    this.m = model;
                     var that = this;
                     that.showPlatform = true;
                 },
+                download: function(){
+                    var that = this;
+                    var tableNumbers = null;
+                    var temp =$(":checkbox[name='tableNumberCheck']");
+                    for(var i = 0;i < temp.length;i++){
+                        if($(temp[i]).prop("checked")){
+                            if(tableNumbers == null){
+                                tableNumbers = parseInt($(temp[i]).prop("value"));
+                            }else{
+                                tableNumbers = tableNumbers + "," + parseInt($(temp[i]).prop("value"));
+                            }
+                        }
+                    }
+                    $.post("tableQrcode/download",{ids:JSON.stringify(tableNumbers)},function(data) {
+                        if (data.success) {
+                            var href = "<a class='btn blue' style='margin-right: 20px;' href='tableQrcode/downloadFile?fileName=" + data.message + "'>点我下载</a>";
+                            $("#downQRFile").html(href);
+                        } else {
+                            $("#validataMsg").html("网络好像出了点问题，再试一次吧！");
+                        }
+                        $("#btn_shop_run").removeAttr("disabled");
+                    })
+                }
             }
         });
         C.vue=vueObj;

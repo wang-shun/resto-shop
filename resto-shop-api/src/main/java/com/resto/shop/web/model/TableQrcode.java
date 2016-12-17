@@ -21,6 +21,26 @@ public class TableQrcode {
 
     private Date updateTime;
 
+    private String brandName;
+
+    private String shopName;
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
     public Long getId() {
         return id;
     }

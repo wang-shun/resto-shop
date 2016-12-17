@@ -8,6 +8,7 @@ import com.resto.shop.web.model.TableQrcode;
 import com.resto.shop.web.service.TableQrcodeService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by carl on 2016/12/16.
@@ -21,5 +22,10 @@ public class TableQrcodeServiceImpl extends GenericServiceImpl<TableQrcode, Long
     @Override
     public GenericDao<TableQrcode, Long> getDao() {
         return tableQrcodeMapper;
+    }
+
+    @Override
+    public List<TableQrcode> selectByShopId(String shopId) {
+        return tableQrcodeMapper.selectByShopId(shopId);
     }
 }
