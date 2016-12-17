@@ -1934,7 +1934,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                     //品牌实际支付
-                    if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
+                    if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6|| oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
@@ -1991,22 +1991,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (!os.getOrderPaymentItems().isEmpty()) {
                         for (OrderPaymentItem oi : os.getOrderPaymentItems()) {
                             //店铺实际支付
-                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6) {
+                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                                 ds2 = ds2.add(oi.getPayValue());
                             }
                             //店铺虚拟支付
                             if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                 ds3 = ds3.add(oi.getPayValue());
                             }
+                           ds1= ds1.add(oi.getPayValue());
                         }
                     }
 
                     //计算店铺订单总额
-                    if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                        ds1=ds1.add(os.getAmountWithChildren());
-                    }else {
-                        ds1 = ds1.add(os.getOrderMoney());
-                    }
+//                    if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+//                        ds1=ds1.add(os.getAmountWithChildren());
+//                    }else {
+//                        ds1 = ds1.add(os.getOrderMoney());
+//                    }
 
                     //计算店铺的订单数目
                     sids.add(os.getId());
