@@ -1046,7 +1046,7 @@ SELECT
     </update>
     <select id="selectArticleCountById" resultType="Integer">
         select
-        sum(article_count) from tb_order WHERE id=#{0} OR
+        sum(article_count) from tb_order WHERE id=#{id} OR
         parent_order_id=#{id}
         <if test="shopMode != 5">
             and order_state not in (1,9)
