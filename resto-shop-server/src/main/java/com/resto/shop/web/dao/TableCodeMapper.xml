@@ -15,6 +15,7 @@
     <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
 	<collection property="getNumbers" ofType="com.resto.shop.web.model.GetNumber">
 		<id column="gn_id" property="id"/>
+		<result column="code_value" property="codeValue"/>
 		<result column="customer_id" property="customerId"/>
 	</collection>
   </resultMap>
@@ -147,8 +148,8 @@ WHERE
     </select>
     
     <select id="selectTableAndGetNumbers" parameterType="String" resultMap="BaseResultMap">
-    	SELECT tc.id,tc.name,tc.code_number,min_number,max_number,gn.id gn_id,customer_id from tb_table_code tc LEFT JOIN
+    	SELECT tc.id,tc.name,tc.code_number,min_number,max_number,gn.id gn_id,gn.code_value,customer_id from tb_table_code tc LEFT JOIN
     	 tb_get_number gn on tc.code_number = gn.table_type and DATE_FORMAT(gn.create_time,'%Y-%m-%d') =  DATE_FORMAT(NOW(),'%Y-%m-%d')
-    	  and gn.state = 0 where tc.shop_detail_id = #{shopId} and is_used = TRUE ORDER BY tc.min_number ASC;
+    	  and gn.state = 0 where tc.shop_detail_id = #{shopId} and is_used = TRUE ORDER BY tc.min_number ASC , gn.create_time ASC;
     </select>
 </mapper>

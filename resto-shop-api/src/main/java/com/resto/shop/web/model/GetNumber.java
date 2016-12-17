@@ -47,6 +47,9 @@ public class GetNumber {
     private BigDecimal finalMoney;
 
     private BigDecimal highMoney;
+    
+    //当前取的号码
+    private String codeValue;
 
     public BigDecimal getHighMoney() {
         return highMoney;
@@ -207,4 +210,12 @@ public class GetNumber {
     public void setFlowMoney(BigDecimal flowMoney) {
         this.flowMoney = flowMoney;
     }
+
+	public String getCodeValue() {
+		return codeValue;
+	}
+
+	public void setCodeValue(String codeValue) {
+		this.codeValue = codeValue;
+	}
 }
