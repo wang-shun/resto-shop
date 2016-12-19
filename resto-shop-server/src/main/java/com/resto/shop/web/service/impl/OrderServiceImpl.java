@@ -458,11 +458,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
-                int articleCountWithChildren = selectArticleCountById(parent.getId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId(),order.getOrderMode());
                 if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
                     parent.setLastOrderTime(order.getCreateTime());
                 }
-                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
@@ -477,11 +477,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void updateOrderChild(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         Order parent = selectById(order.getParentOrderId());
-        int articleCountWithChildren = selectArticleCountById(parent.getId());
+        int articleCountWithChildren = selectArticleCountById(parent.getId(),parent.getOrderMode());
         if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
             parent.setLastOrderTime(order.getCreateTime());
         }
-        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
         parent.setCountWithChild(articleCountWithChildren);
         parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
         update(parent);
@@ -510,11 +510,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
-            int articleCountWithChildren = selectArticleCountById(parent.getId());
+            int articleCountWithChildren = selectArticleCountById(parent.getId(),parent.getOrderMode());
             if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
                 parent.setLastOrderTime(order.getCreateTime());
             }
-            Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+            Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
             parent.setCountWithChild(articleCountWithChildren);
             parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
             update(parent);
@@ -531,8 +531,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return order;
     }
 
-    private int selectArticleCountById(String id) {
-        return orderMapper.selectArticleCountById(id);
+    private int selectArticleCountById(String id,Integer shopMode) {
+        return orderMapper.selectArticleCountById(id,shopMode);
     }
 
     @Override
@@ -3361,11 +3361,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
-                int articleCountWithChildren = selectArticleCountById(parent.getId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId(),order.getOrderMode());
                 if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
                     parent.setLastOrderTime(order.getCreateTime());
                 }
-                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId());
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
