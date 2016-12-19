@@ -49,7 +49,7 @@ dt,dd{
 <!-- 店铺订单列表  -->
 <div class="panel panel-info">
 	<div class="panel-heading text-center" style="font-size: 22px;">
-		<strong>店铺订单列表</strong>
+		<strong>会员订单列表</strong>
 	</div>
 	<div class="panel-body">
 		<table class="table table-striped table-bordered table-hover"
@@ -130,11 +130,15 @@ dt,dd{
 		</div>
 	</div>
 </div>
-<script src="assets/customer/date.js" type="text/javascript"></script>
+<script src="/shop/assets/customer/date.js" type="text/javascript"></script>
+
+
 <script>
 	//时间插件
+	
+	
 
-	$('.form_datetime2').datetimepicker({
+ 	$(".form_datetime2").datetimepicker({
 		endDate : new Date(),
 		minView : "month",
 		maxView : "month",
@@ -144,9 +148,9 @@ dt,dd{
 		format : "yyyy-mm-dd",
 		startView : "month",
 		language : "zh-CN"
-	});
+	}); 
 
-	var shopId = "${shopId}"
+	 var shopId = "${shopId}"
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
 
@@ -170,7 +174,7 @@ dt,dd{
 		              ],
 		"lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
 		ajax : {
-			url : "orderReport/AllOrder",
+			url : "member/orderReport",
 			dataSrc : "",
 			data : function(d) {
 				d.beginDate = $("#beginDate2").val();
@@ -319,7 +323,7 @@ dt,dd{
 
 	function showDetails(orderId) {
 		$.ajax({
-			url : 'orderReport/detailInfo',
+			url : 'member/orderReport',
 			method : 'post',
 			data : {
 				"orderId" : orderId
@@ -543,7 +547,7 @@ dt,dd{
 	})
 
 	//下载报表
-	$("#shopreportExcel").click(
+/* 	$("#shopreportExcel").click(
 			function() {
 				var beginDate = $("#beginDate2").val();
 				var endDate = $("#endDate2").val();
@@ -553,8 +557,8 @@ dt,dd{
 					return;
 				}
 
-				location.href = "orderReport/shop_excel?beginDate=" + beginDate
+				location.href = "/orderReport/shop_excel?beginDate=" + beginDate
 						+ "&&endDate=" + endDate + "&&shopId=" + shopId;
 
-			})
+			})  */
 </script>

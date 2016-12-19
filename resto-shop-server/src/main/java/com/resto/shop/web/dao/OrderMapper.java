@@ -508,4 +508,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectListByParentId(@Param("orderId") String orderId);
 	
 	public List<Order> selectWXOrderItems(String serialNumber);
+	/**
+	 * 会员模块
+	 * 用户订单管理
+	 * @param orderId
+	 * @return
+	 */
+   List<Order> getCustomerOrderList(@Param("customerId") String customerId);
 }

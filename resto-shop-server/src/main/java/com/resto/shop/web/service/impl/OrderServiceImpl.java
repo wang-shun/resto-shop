@@ -3625,4 +3625,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectWXOrderItems(String serialNumber) {
     	return orderMapper.selectWXOrderItems(serialNumber);
     }
+  /**
+   * 会员管理
+   * 1订单管理
+   */
+	@Override
+	public List<Order> getCustomerOrderList(String customerId) {
+		return orderMapper.getCustomerOrderList(customerId);
+	}
 }

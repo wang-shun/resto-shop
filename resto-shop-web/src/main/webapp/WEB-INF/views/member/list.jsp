@@ -265,4 +265,3 @@ $("#brandreportExcel").click(function(){
 
 
 </script>
-
