@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.core.util.ExcelUtil2;
 import com.resto.brand.core.util.JdbcUtils;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.OrderPayDto;
@@ -135,7 +136,7 @@ public class MemberController extends GenericController{
 		
 		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
 		//定义excel工具类对象
-		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
+		ExcelUtil2<OrderPayDto> excelUtil=new ExcelUtil2<OrderPayDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);

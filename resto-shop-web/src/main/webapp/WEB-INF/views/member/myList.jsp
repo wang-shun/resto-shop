@@ -315,20 +315,20 @@ function searchInfo(beginDate,endDate){
 }
 
 
-//导出品牌数据
+//导出会员信息数据
 $("#brandreportExcel").click(function(){
 	 beginDate = $("#beginDate").val();
 	 endDate = $("#endDate").val();
-	location.href="member/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+	location.href="member/member_excel?beginDate="+beginDate+"&&endDate="+endDate;
 	
 })
 
 //导出店铺数据
-
+/* 
 $("#shopreportExcel").click(function(){
 	beginDate=$("#beginDate").val();
 	endDate = $("#endDate").val();
 	location.href="totalIncome/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
-})
+}) */
 
 </script>
