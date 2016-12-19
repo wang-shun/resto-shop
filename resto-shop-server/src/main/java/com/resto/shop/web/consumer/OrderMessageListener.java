@@ -90,6 +90,8 @@ public class OrderMessageListener implements MessageListener {
             return executeNoticeShareCustomer(message);
         } else if (tag.equals(MQSetting.SEND_CALL_MESSAGE)){
             return executeSendCallMessage(message);
+        }else if (tag.equals(MQSetting.TAG_REMIND_MSG)){
+        	return executeRemindMsg(message);
         }
         return Action.CommitMessage;
     }
@@ -102,6 +104,19 @@ public class OrderMessageListener implements MessageListener {
         noticeShareCustomer(customer);
         return Action.CommitMessage;
     }
+    
+    private Action executeRemindMsg(Message message) throws UnsupportedEncodingException {
+    	//就餐提醒的消息队列
+        String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+        Order order = JSONObject.parseObject(msg, Order.class);
+        DataSourceContextHolder.setDataSourceName(order.getBrandId());
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+        WeChatUtils.sendCustomerMsgASync(shop.getPushContext(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        return Action.CommitMessage;
+    }
+    
 
     private void noticeShareCustomer(Customer customer) {
         Customer shareCustomer = customerService.selectById(customer.getShareCustomer());

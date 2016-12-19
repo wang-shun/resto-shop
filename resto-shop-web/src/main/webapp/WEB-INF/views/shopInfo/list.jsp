@@ -255,6 +255,39 @@
 							</div>
 						</div>
 						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">开启就餐提醒：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="isPush"
+										v-model="m.isPush" value="1"> 是
+									</label> <label> <input type="radio" name="isPush"
+										v-model="m.isPush" value="0"> 否
+									</label>
+								</div>
+							</div>
+						</div>
+						
+						<div class="form-group" v-if="m.isPush==1">
+							<label class="col-sm-3 control-label">消息内容：</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control"
+									name="pushContext" v-if="!m.pushContext" placeholder="消息文案"
+									required="required"> <input type="text"
+									class="form-control" name="pushContext" v-if="m.pushContext"
+									v-model="m.pushContext" required="required">
+							</div>
+						</div>
+
+						<div class="form-group" v-if="m.isPush==1">
+							<label class="col-sm-3 control-label">推送时间：</label>
+							<div class="col-sm-9">
+								<input type="number" class="form-control"
+									name="pushTime" placeholder="(建议输入整数,以秒为单位)"
+									v-model="m.pushTime" required="required" min="0">
+							</div>
+						</div>
+						
 						<%--<div class="form-group">--%>
 							<%--<label class="col-sm-3 control-label">支付宝支付：</label>--%>
 							<%--<div class="col-sm-9">--%>
