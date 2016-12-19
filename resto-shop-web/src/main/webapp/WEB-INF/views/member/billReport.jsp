@@ -24,7 +24,7 @@ dt,dd{
 			<div class="form-group" style="margin-right: 50px;">
 				<label for="endDate2">结束时间：</label> <input type="text"
 					class="form-control form_datetime2" id="endDate2"
-					readonly="readonly">
+		"src/main/webapp/WEB-INF/views/member/billReport.jsp"			readonly="readonly">
 			</div>
 
 			<button type="button" class="btn btn-primary" id="today">今日</button>

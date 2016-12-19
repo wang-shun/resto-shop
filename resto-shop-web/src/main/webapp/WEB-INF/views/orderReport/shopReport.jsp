@@ -281,12 +281,8 @@ dt,dd{
 			title : "操作",
 			data : "orderId",
 			createdCell : function(td, tdData,rowData) {
-				var button = $("<button class='btn green'>详情</button>");
+				var button = $("<button class='btn green' @click='showShopReport(shop.shopName,shop.shopDetailId)'>查看详情</button>");
 				button.click(function() {
-//					if(rowData.telephone=="" || rowData.telephone==null){
-//						toastr.error("此订单没有填写手机号！");
-//						return;
-//					}
 					showDetails(tdData);
 				})
 				$(td).html(button);
