@@ -1382,11 +1382,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printOrderAll(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        if((order.getPrintOrderTime() != null || order.getProductionStatus() >= 2 ) && order.getOrderMode() != ShopMode.HOUFU_ORDER ){
+            return printTask;
+        }
+
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
 
 
-        List<Map<String, Object>> printTask = new ArrayList<>();
+
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (setting.getAutoPrintTotal().intValue() == 0 &&
