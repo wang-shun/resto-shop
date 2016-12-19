@@ -45,13 +45,13 @@ public class TableQrcodeController extends GenericController {
     @RequestMapping("/list_all")
     @ResponseBody
     public List<TableQrcode> listData(){
-        Brand brand = brandService.selectById(getCurrentBrandId());
-        List<TableQrcode> tableQrcodes = tableQrcodeService.selectList();
-        for(int i = 0; i < tableQrcodes.size(); i++){
-            tableQrcodes.get(i).setShopName(shopDetailService.selectById(getCurrentShopId()).getName());
-            tableQrcodes.get(i).setBrandName(brand.getBrandName());
-        }
-        return tableQrcodes;
+        return tableQrcodeService.selectList();
+    }
+
+    @RequestMapping("/shopList")
+    @ResponseBody
+    public List<ShopDetail> shopList(){
+        return shopDetailService.selectByBrandId(getCurrentBrandId());
     }
 
     @RequestMapping("list_one")

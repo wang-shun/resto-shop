@@ -11,7 +11,7 @@
                     </div>
                 </div>
                 <div class="tab-pane active">
-                    <form role="form" action="tableQrcode/create" @submit.prevent="save">
+                    <form role="form" id="tForm" action="tableQrcode/create" @submit.prevent="save">
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">开始桌号：</label>
@@ -36,8 +36,8 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-offset-3 col-sm-3">
-                                    <input class="btn green"  type="submit" value="保存"/>
-                                    <a class="btn default" @click="cancel" >取消</a>
+                                    <input class="btn green"  type="button" @click="createTableNumber" value="生成"/>
+                                    <a class="btn default" @click="cancel" >关闭</a>
                                 </div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                     <form role="form" action="tableQrcode/modify" @submit.prevent="save">
                         <div class="form-horizontal">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">最小人数</label>
+                                <label class="col-sm-3 control-label">桌号：</label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control" name="tableNumber" v-model="m.tableNumber">
                                 </div>
@@ -92,7 +92,7 @@
 
     <div class="table-div">
         <div class="table-operator">
-            <span id="downQRFile"></span>
+            <span id="validataMsg" class="text-danger"></span>
             <s:hasPermission name="tableQrcode/download">
                 <button class="btn green" style="margin-right: 20px;" @click="download">下载</button>
             </s:hasPermission>
@@ -112,12 +112,21 @@
     (function(){
         var cid="#control";
         var tableNumber = [];
+        var shopMap = new HashMap();
+        $.post("tableQrcode/shopList",null,function(data) {
+            for(var i = 0; i < data.length; i++){
+                shopMap.put(data[i].id,data[i]);
+            }
+        });
         var $table = $(".table-body>table");
         var tb = $table.DataTable({
+            "lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
             ajax : {
                 url : "tableQrcode/list_all",
                 dataSrc : ""
             },
+            deferRender: true,
+            ordering: false,
             columns : [
                 {
                     title: "全选 <input type='checkbox' id='checkAll' />",
@@ -128,12 +137,15 @@
                     },
                 },
                 {
-                    title : "品牌名称",
-                    data : "brandName",
-                },
-                {
                     title : "店铺名称",
-                    data : "shopName",
+                    data : "shopDetailId",
+                    createdCell:function(td,tdData){
+                        $(td).html(shopMap.get(tdData).name);
+                    },
+                    s_filter: true,
+                    s_render: function (d) {
+                        return shopMap.get(d).name;
+                    },
                 },
                 {
                     title : "桌号",
@@ -142,10 +154,19 @@
                 {
                     title : "创建时间",
                     data : "createTime",
+                    createdCell:function(td,tdData){
+                        $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                    }
                 },
                 {
                     title : "修改时间",
                     data : "updateTime",
+                    createdCell:function(td,tdData){
+                        if(tdData != null){
+                            $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                        }
+
+                    }
                 },
                 {
                     title : "是否开启",
@@ -187,6 +208,26 @@
                         $("input[name='tableNumberCheck']").prop("checked", false);
                     }
                 });
+
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var title = this.title;
+                        var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                        var that = this;
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                        });
+
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
             }
         });
 
@@ -197,7 +238,7 @@
             data: {
                 showPlatform: false,
                 showform: false,
-                m:null
+                m:null,
             },
             methods :{
                 cancel: function () {
@@ -210,7 +251,6 @@
                     that.showPlatform = true;
                 },
                 download: function(){
-                    var that = this;
                     var tableNumbers = null;
                     var temp =$(":checkbox[name='tableNumberCheck']");
                     for(var i = 0;i < temp.length;i++){
@@ -224,12 +264,16 @@
                     }
                     $.post("tableQrcode/download",{ids:JSON.stringify(tableNumbers)},function(data) {
                         if (data.success) {
-                            var href = "<a class='btn blue' style='margin-right: 20px;' href='tableQrcode/downloadFile?fileName=" + data.message + "'>点我下载</a>";
-                            $("#downQRFile").html(href);
+                            window.location.href = "tableQrcode/downloadFile?fileName=" + data.message;
                         } else {
                             $("#validataMsg").html("网络好像出了点问题，再试一次吧！");
                         }
-                        $("#btn_shop_run").removeAttr("disabled");
+                    })
+                },
+                createTableNumber: function(){
+                    var data = $("#tForm").serialize();
+                    $.post("tableQrcode/create",data,function(data) {
+
                     })
                 }
             }
