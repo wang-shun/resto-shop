@@ -226,7 +226,8 @@ var tb1 = $("#shopReportTable").DataTable({
 			createdCell : function(td, tdData,rowData) {
 				var button = $("<button class='btn green'>查看详情</button>");
 				button.click(function() {
-					showDetails(tdData);
+					$("#reportModal").modal('show');
+					this.openModal("member/show/billReport", shopName,shopId);
 				})
 				$(td).html(button);
 			}
