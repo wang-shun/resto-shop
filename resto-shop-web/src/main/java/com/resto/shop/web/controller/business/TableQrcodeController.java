@@ -21,8 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by carl on 2016/12/16.
@@ -30,6 +33,8 @@ import java.util.List;
 @Controller
 @RequestMapping("tableQrcode")
 public class TableQrcodeController extends GenericController {
+
+    private static SimpleDateFormat myDate=new SimpleDateFormat("yyyy-MM-dd");
 
     @Resource
     private TableQrcodeService tableQrcodeService;
@@ -63,19 +68,26 @@ public class TableQrcodeController extends GenericController {
 
     @RequestMapping("create")
     @ResponseBody
-    public Result create( Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ){
-        List<TableQrcode> tableQrcodes = tableQrcodeService.selectByShopId(getCurrentShopId());
+    public Result create(String shopId, Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ){
+        List<TableQrcode> tableQrcodes = tableQrcodeService.selectList();
+        int a = 0;
         for (int i = beginTableNumber; i <= endTableNumber; i++) {//循环生成二维码
-            if (ignoreNumber(i,ignoreNumber) && isTableNumber(i,tableQrcodes)){
+            if (ignoreNumber(i,ignoreNumber) && isTableNumber(i,tableQrcodes,shopId)){
                 TableQrcode tableQrcode = new TableQrcode();
                 tableQrcode.setBrandId(getCurrentBrandId());
-                tableQrcode.setShopDetailId(getCurrentShopId());
+                tableQrcode.setShopDetailId(shopId);
                 tableQrcode.setTableNumber(i);
                 tableQrcode.setCreateTime(new Date());
                 tableQrcodeService.insert(tableQrcode);
+                a++;
             }
         }
-        return Result.getSuccess();
+        if(a != 0){
+            return Result.getSuccess();
+        }else{
+            Result result = new Result(false);
+            return result;
+        }
     }
 
     @RequestMapping("modify")
@@ -84,6 +96,33 @@ public class TableQrcodeController extends GenericController {
         tableQrcode.setUpdateTime(new Date());
         tableQrcodeService.update(tableQrcode);
         return Result.getSuccess();
+    }
+
+    @RequestMapping("/run")
+    @ResponseBody
+    public Result run(String shopId, Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ,HttpServletRequest request)
+            throws IOException, InterruptedException, WriterException {
+        ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+        Brand brand = brandService.selectById(getCurrentBrandId());
+        String brandSign = brand.getBrandSign();
+        String fileSavePath = getFilePath(request,null);
+        deleteFile(new File(fileSavePath));//删除历史生成的文件
+        String filepath = getFilePath(request,shopDetail.getName());
+        for (int i = beginTableNumber; i <= endTableNumber; i++) {//循环生成二维码
+            if (ignoreNumber(i,ignoreNumber)) {
+                String fileName = shopDetail.getName() + "-" + i + ".jpg" ;
+                String contents = getShopUrlRun(brandSign, i);
+                QRCodeUtil.createQRCode(contents, filepath, fileName);
+            }
+        }
+        Date data = new Date();
+        String now = myDate.format(data);
+        //打包
+        FileToZip.fileToZip(filepath, fileSavePath, (brand.getBrandName() + "桌号二维码" + now));
+        Result result = new Result(true);
+        result.setMessage(brand.getBrandName() + "桌号二维码" + now +".zip");
+        System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
+        return result;
     }
 
     @RequestMapping("/download")
@@ -97,18 +136,20 @@ public class TableQrcodeController extends GenericController {
         deleteFile(new File(fileSavePath));//删除历史生成的文件
         String filepath = getFilePath(request,shopDetail.getName());
 
-        String[] idArr = ids.substring(1,ids.length()-1).split(",");
+        String[] idArr = ids.split(",");
 
         for (int i = 0; i < idArr.length; i++) {//循环生成二维码
             TableQrcode tableQrcode = tableQrcodeService.selectById(Long.parseLong(idArr[i]));
-            String fileName = tableQrcode.getTableNumber() + ".jpg" ;
+            String fileName = shopDetail.getName() + "-" + tableQrcode.getTableNumber() + ".jpg" ;
             String contents = getShopUrl(brandSign, Long.parseLong(idArr[i]));
             QRCodeUtil.createQRCode(contents, filepath, fileName);
         }
+        Date data = new Date();
+        String now = myDate.format(data);
         //打包
-        FileToZip.fileToZip(filepath, fileSavePath, shopDetail.getName());
+        FileToZip.fileToZip(filepath, fileSavePath, (brand.getBrandName() + "桌号二维码" + now));
         Result result = new Result(true);
-        result.setMessage(shopDetail.getName()+".zip");
+        result.setMessage(brand.getBrandName() + "桌号二维码" + now +".zip");
         System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
         return result;
     }
@@ -172,11 +213,11 @@ public class TableQrcodeController extends GenericController {
      * @param tableQrcodes
      * @return
      */
-    public boolean isTableNumber(int index, List<TableQrcode> tableQrcodes){
+    public boolean isTableNumber(int index, List<TableQrcode> tableQrcodes, String shopId){
         boolean flag = true;
         if(tableQrcodes != null){
             for(int j = 0; j < tableQrcodes.size(); j++){
-                if( index == tableQrcodes.get(j).getTableNumber() ){
+                if(index == tableQrcodes.get(j).getTableNumber() && tableQrcodes.get(j).getShopDetailId().equals(shopId)){
                     flag = false;
                     break;
                 }
@@ -194,7 +235,13 @@ public class TableQrcodeController extends GenericController {
      */
     public String getShopUrl(String brandSign, Long id) throws UnsupportedEncodingException{
         String v = Encrypter.encrypt(id.toString());
-        String url = "http://"+brandSign+".restoplus.cn/wechat/index?v=" + v;
+        String url = "http://"+brandSign+".restoplus.cn/wechat/index?vv=" + v;
+        return url;
+    }
+
+    public String getShopUrlRun(String brandSign, int tableNumber) throws UnsupportedEncodingException{
+        String v = Encrypter.encrypt(tableNumber+"");
+        String url = "http://"+brandSign+".restoplus.cn/wechat/index?vv=" + v;
         return url;
     }
 
