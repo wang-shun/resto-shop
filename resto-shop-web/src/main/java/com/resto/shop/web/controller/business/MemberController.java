@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.core.util.ExcelUtil2;
 import com.resto.brand.core.util.JdbcUtils;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.service.BrandService;
