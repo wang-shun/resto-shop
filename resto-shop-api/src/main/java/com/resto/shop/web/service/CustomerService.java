@@ -52,4 +52,6 @@ public interface CustomerService extends GenericService<Customer, String> {
      * @return
      */
     List<Customer> selectListByBrandIdHasRegister(String beginDate, String endDate,String brandId);
+    
+    Customer selectCustomerAccount(String telephone);
 }

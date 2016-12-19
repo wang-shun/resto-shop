@@ -65,6 +65,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             printKitchenLog(shopDetail, customer, desc);
         }else if(type == LogBaseState.REFUSE_ORDER){
             refuseOrderLog(shopDetail, customer, desc);
+        }else if(type == LogBaseState.WX_PAY){
+            wxPayLog(shopDetail, customer, desc);
         }
     }
 
@@ -161,7 +163,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void buyLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"未扫码下单了未付款");
+        logBase.setRemark(customer.getNickname()+"未扫码下单了未付款(1,0)");
         logBase.setDesc(order.getId());
         insert(logBase);
     }
@@ -170,7 +172,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void buyPayLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"未扫码下单了已付款");
+        logBase.setRemark(customer.getNickname()+"未扫码下单了已付款(2,0)");
         logBase.setDesc(order.getId());
         insert(logBase);
     }
@@ -179,7 +181,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void buyScanLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了未付款");
+        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了未付款(1,1)");
         logBase.setDesc(order.getId());
         insert(logBase);
     }
@@ -188,7 +190,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void buyScanPayLog(ShopDetail shopDetail, Customer customer, Order order){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了已付款");
+        logBase.setRemark(customer.getNickname()+"先扫码进入后下单了已付款(2,1)");
         logBase.setDesc(order.getId());
         insert(logBase);
     }
@@ -223,7 +225,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void payLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"支付了一份订单");
+        logBase.setRemark(customer.getNickname()+"支付了一份订单(o:2)");
         logBase.setDesc("OrderId为："+desc+" 的订单被支付了");
         insert(logBase);
     }
@@ -232,7 +234,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void scanLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"扫码了一份订单");
+        logBase.setRemark(customer.getNickname()+"推送了一份订单(p:1)");
         logBase.setDesc("OrderId为："+desc+" 的订单被扫码了");
         insert(logBase);
     }
@@ -309,11 +311,20 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         insert(logBase);
     }
 
-    //
+    //商家拒绝订单时记录log
     public void refuseOrderLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单被商家拒绝了");
+        logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //订单有WX支付时记录log
+    public void wxPayLog(ShopDetail shopDetail, Customer customer, String desc){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"的订单微信支付完成");
         logBase.setDesc(desc);
         insert(logBase);
     }

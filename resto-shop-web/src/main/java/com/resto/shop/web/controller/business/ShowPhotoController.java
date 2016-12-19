@@ -49,7 +49,6 @@ public class ShowPhotoController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid ShowPhoto brand){
-		brand.setPhotoSquare(null);
 		showphotoService.update(brand);
 		return Result.getSuccess();
 	}

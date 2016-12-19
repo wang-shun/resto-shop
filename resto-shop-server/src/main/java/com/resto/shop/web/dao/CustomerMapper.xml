@@ -304,5 +304,10 @@
     <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
     </select>
 
-
+	<select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">
+		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain from tb_customer tc 
+		left join tb_account ta
+		on tc.account_id = ta.id
+		where tc.telephone = #{telephone}
+	</select>
 </mapper>

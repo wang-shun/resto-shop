@@ -2,7 +2,10 @@ package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
@@ -31,6 +34,14 @@ public interface AccountService extends GenericService<Account, String> {
 
 	BigDecimal houFuPayOrder(Order order, BigDecimal payMoney, Customer customer);
 
+	/**
+	 * pos端账户充值时,修改用户额度 新增充值记录
+	 * @param operationPhone
+	 * @param customerPhone
+	 * @param chargeMoney
+	 * @return
+	 */
+	void updateCustomerAccount(String operationPhone,String customerPhone,String chargeMoney,String customerId,String accountId,Brand brand,ShopDetail shopDetail);
 
 
 }
