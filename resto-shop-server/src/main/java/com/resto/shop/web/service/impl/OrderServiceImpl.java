@@ -704,15 +704,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (item.getPaymentModeId()) {
                 case PayMode.COUPON_PAY:
                     couponService.refundCoupon(item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.CHARGE_PAY:
                     chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REWARD_PAY:
                     chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.WEIXIN_PAY:
                     WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
@@ -732,11 +736,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
 
 
-
+                    item.setPayValue(new BigDecimal(refund).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
                     break;
                 case PayMode.WAIT_MONEY:
                     getNumberService.refundWaitMoney(order);
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ALI_PAY: //如果是支付宝支付
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -748,6 +753,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("refund_amount", order.getPaymentAmount());
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
@@ -755,11 +761,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
                         break;
                     }
-
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 
             }
             item.setId(newPayItemId);
-            item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+
             orderPaymentItemService.insert(item);
         }
     }
