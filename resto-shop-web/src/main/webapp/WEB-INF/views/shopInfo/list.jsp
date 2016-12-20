@@ -267,6 +267,19 @@
 								</div>
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">是否开启二维码加密：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="isNewQrcode"
+												   v-model="m.isNewQrcode" value="1"> 是
+									</label> <label> <input type="radio" name="isNewQrcode"
+															v-model="m.isNewQrcode" value="0"> 否
+								</label>
+								</div>
+							</div>
+						</div>
 						
 						<div class="form-group" v-if="m.isPush==1">
 							<label class="col-sm-3 control-label">消息内容：</label>
