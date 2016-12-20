@@ -111,7 +111,8 @@ public class TableQrcodeController extends GenericController {
         for (int i = beginTableNumber; i <= endTableNumber; i++) {//循环生成二维码
             if (ignoreNumber(i,ignoreNumber)) {
                 String fileName = shopDetail.getName() + "-" + i + ".jpg" ;
-                String contents = getShopUrlRun(brandSign, i);
+                TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(shopDetail.getId(), i);
+                String contents = getShopUrlRun(brandSign, tableQrcode.getId());
                 QRCodeUtil.createQRCode(contents, filepath, fileName);
             }
         }
@@ -251,8 +252,8 @@ public class TableQrcodeController extends GenericController {
         return url;
     }
 
-    public String getShopUrlRun(String brandSign, int tableNumber) throws UnsupportedEncodingException{
-        String v = Encrypter.encrypt(tableNumber+"");
+    public String getShopUrlRun(String brandSign, Long id) throws UnsupportedEncodingException{
+        String v = Encrypter.encrypt(id.toString());
         String url = "http://"+brandSign+".restoplus.cn/wechat/index?vv=" + v;
         return url;
     }

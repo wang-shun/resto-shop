@@ -28,4 +28,9 @@ public class TableQrcodeServiceImpl extends GenericServiceImpl<TableQrcode, Long
     public List<TableQrcode> selectByShopId(String shopId) {
         return tableQrcodeMapper.selectByShopId(shopId);
     }
+
+    @Override
+    public TableQrcode selectByTableNumberShopId(String shopId, Integer tableNumber) {
+        return tableQrcodeMapper.selectByTableNumberShopId(shopId, tableNumber);
+    }
 }
