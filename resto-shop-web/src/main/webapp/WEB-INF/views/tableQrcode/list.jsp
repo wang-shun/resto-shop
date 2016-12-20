@@ -312,8 +312,8 @@
                     }
                 }
             });
+            C.vue = vueObj;
         });
-        C.vue = vueObj;
     }());
 
     function downloadNow(){

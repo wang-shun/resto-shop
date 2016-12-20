@@ -112,7 +112,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	void clearPushOrder(String id, int notOrder);
 
-	void setOrderNumber(String orderId, String tableNumber);
+	void setOrderNumber(@Param("orderId")String orderId,@Param("tableNumber") String tableNumber);
 	
 	/**
 	 * 根据取餐码查询已支付的订单

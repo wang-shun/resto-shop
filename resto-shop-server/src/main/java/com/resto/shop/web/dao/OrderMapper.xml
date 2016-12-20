@@ -977,7 +977,7 @@ SELECT
         id=#{0}
     </update>
     <update id="setOrderNumber">
-        update tb_order set table_number=#{1} where id=#{0}
+        update tb_order set table_number=#{tableNumber} where id=#{orderId}
     </update>
 
 
@@ -2184,6 +2184,7 @@ AND o.production_status IN (2, 3)
     <select id="getServicePrice" resultType="java.math.BigDecimal">
         select sum(customer_count) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and parent_order_id is null
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
     <update id="refundServicePrice">
