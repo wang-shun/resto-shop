@@ -102,7 +102,7 @@ public class TableQrcodeController extends GenericController {
     @ResponseBody
     public Result run(String shopId, Integer beginTableNumber, Integer endTableNumber, String ignoreNumber ,HttpServletRequest request)
             throws IOException, InterruptedException, WriterException {
-        ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(getCurrentBrandId());
         String brandSign = brand.getBrandSign();
         String fileSavePath = getFilePath(request,null);
