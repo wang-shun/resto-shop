@@ -198,7 +198,7 @@
                                 <thead>
                                 <tr>
                                     <th>
-                                        <select v-model="choiceArticleShow.currentFamily">
+                                        <select v-model="searchNameLike">
                                             <option value="">餐品分类(全部)</option>
                                             <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
                                         </select>
