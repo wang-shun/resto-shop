@@ -254,9 +254,14 @@ public class OrderAspect {
         WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId()); //根据订单找到对应的店铺
+        if(shopDetail.getIsPush() == Common.YES){ //开启就餐提醒
+        	MQMessageProducer.sendRemindMsg(order,shopDetail.getPushTime() * 1000);	
+        }
+        
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
+    @AfterReturning(value = "pushOrder()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {

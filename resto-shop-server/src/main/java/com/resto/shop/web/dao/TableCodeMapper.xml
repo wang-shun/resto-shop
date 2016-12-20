@@ -11,9 +11,13 @@
     <result column="max_number" property="maxNumber" jdbcType="INTEGER"/>
     <result column="min_number" property="minNumber" jdbcType="INTEGER"/>
     <result column="is_used" property="isUsed" jdbcType="TINYINT"/>
-      <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-      <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
-
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+	<collection property="getNumbers" ofType="com.resto.shop.web.model.GetNumber">
+		<id column="gn_id" property="id"/>
+		<result column="code_value" property="codeValue"/>
+		<result column="customer_id" property="customerId"/>
+	</collection>
   </resultMap>
   <sql id="Base_Column_List">id, name, code_number, create_time, end_time, max_number, min_number, is_used,shop_detail_id,brand_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
@@ -141,5 +145,11 @@ WHERE
         where t.is_used = 1
         and t.shop_detail_id = #{shopId}
  order by t.max_number asc
+    </select>
+    
+    <select id="selectTableAndGetNumbers" parameterType="String" resultMap="BaseResultMap">
+    	SELECT tc.id,tc.name,tc.code_number,min_number,max_number,gn.id gn_id,gn.code_value,customer_id from tb_table_code tc LEFT JOIN
+    	 tb_get_number gn on tc.code_number = gn.table_type and DATE_FORMAT(gn.create_time,'%Y-%m-%d') =  DATE_FORMAT(NOW(),'%Y-%m-%d')
+    	  and gn.state = 0 where tc.shop_detail_id = #{shopId} and is_used = TRUE ORDER BY tc.min_number ASC , gn.create_time ASC;
     </select>
 </mapper>

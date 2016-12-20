@@ -20,9 +20,9 @@
         <result column="customer_id" property="customerId" />
         <result column="final_money" property="finalMoney" />
         <result column="high_money" property="highMoney" />
-
+        <result column="code_value" property="codeValue" />
     </resultMap>
-    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money</sql>
+    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money,code_value</sql>
 
     <insert id="insert" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number (id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money)
       values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney},#{callNumberTime},#{customerId},#{finalMoney},#{highMoney})
@@ -47,6 +47,7 @@
             <if test="customerId != null">customer_id,</if>
             <if test="finalMoney != null">final_money,</if>
             <if test="highMoney != null">high_money,</if>
+            <if test="codeValue != null">code_value,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -66,6 +67,7 @@
             <if test="customerId != null">#{customerId},</if>
             <if test="finalMoney != null">#{finalMoney},</if>
             <if test="highMoney != null">#{highMoney},</if>
+            <if test="codeValue != null">#{codeValue},</if>
         </trim>
     </insert>
 

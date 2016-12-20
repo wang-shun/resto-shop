@@ -4,31 +4,31 @@
 
 <div class="panel panel-success">
 	<div class="panel-heading">
-		<strong>管理员密码</strong>
+		<strong>退菜口令</strong>
 	</div>
 	<div class="panel-body">
 		<form class="form-horizontal" onsubmit="return check()">
 
 			<div class="form-group">
-				<label class="col-md-3 control-label">原密码：</label>
+				<label class="col-md-3 control-label">原口令：</label>
 				<div class="col-md-5">
 					<input id="oldpwd" type="password" required class="form-control"
-						   placeholder="请输入原密码！" />
+						   placeholder="请输入原口令！" />
 				</div>
 			</div>
 
 			<div class="form-group">
-				<label class="col-md-3 control-label" >新密码：</label>
+				<label class="col-md-3 control-label" >新口令：</label>
 				<div class="col-md-5">
 					<input id="password" type="password" required class="form-control"
-						placeholder="请输入新密码！" />
+						placeholder="请输入新口令！" />
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-md-3  control-label">再次输入新密码:</label>
+				<label class="col-md-3  control-label">再次输入新口令:</label>
 				<div class="col-md-5">
 					<input id="passwordAgain" type="password" required
-						class="form-control" placeholder="再次输入新密码！" />
+						class="form-control" placeholder="再次输入新口令！" />
 				</div>
 			</div>
 			<div class="col-md-11">
@@ -60,10 +60,10 @@
 						}
 					})
 				}else{
-					$("#validataMsg").html("<strong>两次输入的密码不一致！</strong>");
+					$("#validataMsg").html("<strong>两次输入的口令不一致！</strong>");
 				}
 			}else{
-				toastr.error("原始密码错误！");
+				toastr.error("原始口令错误！");
 			}
 		})
 		return false;
