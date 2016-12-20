@@ -736,7 +736,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
 
 
-                    item.setPayValue(new BigDecimal(refund).multiply(new BigDecimal(-1)));
+                    item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100),2).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
                     break;
                 case PayMode.WAIT_MONEY:
