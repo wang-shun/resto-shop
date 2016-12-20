@@ -21,14 +21,21 @@
                             <label>桌位编号</label>
                             <input type="text" class="form-control" name="codeNumber" v-model="m.codeNumber" @blur="checkCodeNumber(m.codeNumber)">
                         </div>
+
+                            <div class="form-group">
+                                <label>排序</label>
+                                <input type="text" class="form-control" name="sort" v-model="m.sort" >
+                            </div>
+
+                            <div class="form-group">
+                                <label>最小人数</label>
+                                <input type="number" class="form-control" name="minNumber" v-model="m.minNumber" @blur="checkNumber(m)">
+                            </div>
                         <div class="form-group">
                             <label>最大人数</label>
                             <input type="number" class="form-control" name="maxNumber" v-model="m.maxNumber" @blur="checkNumber(m)">
                         </div>
-                        <div class="form-group">
-                            <label>最小人数</label>
-                            <input type="number" class="form-control" name="minNumber" v-model="m.minNumber" @blur="checkNumber(m)">
-                        </div>
+
                         <%--<div class="form-group">--%>
                             <%--<label>是否开启</label>--%>
                             <%--<input type="text" class="form-control" name="isUsed" v-model="m.isUsed">--%>
@@ -76,6 +83,7 @@
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
+            "order": [[ 2, "asc" ]],
 			ajax : {
 				url : "tablecode/list_all",
 				dataSrc : ""
@@ -89,18 +97,19 @@
                     title : "桌位编号",
                     data : "codeNumber",
                 },
-//                {
-//                    title : "endTime",
-//                    data : "endTime",
-//                },
                 {
-                    title : "最大人数",
-                    data : "maxNumber",
+                    title : "排序",
+                    data : "sort",
                 },
                 {
                     title : "最小人数",
                     data : "minNumber",
                 },
+                {
+                    title : "最大人数",
+                    data : "maxNumber",
+                },
+
                 {
                     title : "是否开启",
                     data : "isUsed",
@@ -118,7 +127,7 @@
 					data : "id",
 					createdCell:function(td,tdData,rowData,row){
 						var operator=[
-							<s:hasPermission name="tablecode/delete">
+							<s:hasPermission name="tabcode/delete">
 							C.createDelBtn(tdData,"tablecode/delete"),
 							</s:hasPermission>
 							<s:hasPermission name="tablecode/modify">

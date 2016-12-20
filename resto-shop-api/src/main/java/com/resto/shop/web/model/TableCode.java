@@ -37,6 +37,18 @@ public class TableCode {
     //该桌号类型，取号的集合
     private List<GetNumber> getNumbers;
 
+    //排序
+
+    private  Integer sort;
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
     final public Integer getWaitNumber() {
         return waitNumber;
     }
