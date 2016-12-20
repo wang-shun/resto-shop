@@ -136,11 +136,23 @@ public class TableQrcodeController extends GenericController {
         deleteFile(new File(fileSavePath));//删除历史生成的文件
         String filepath = getFilePath(request,shopDetail.getName());
 
-        String[] idArr = ids.split(",");
+        int count=0;
+        for(int i=0;i<ids.length();i++){
+            if(ids.charAt(i)==','){
+                count++;
+            }
+        }
+        String[] idArr = null;
+        if(count > 0){
+            idArr = ids.substring(1,ids.length()-1).split(",");
+        }else{
+            idArr = ids.split(",");
+        }
 
         for (int i = 0; i < idArr.length; i++) {//循环生成二维码
             TableQrcode tableQrcode = tableQrcodeService.selectById(Long.parseLong(idArr[i]));
-            String fileName = shopDetail.getName() + "-" + tableQrcode.getTableNumber() + ".jpg" ;
+            ShopDetail shop = shopDetailService.selectById(tableQrcode.getShopDetailId());
+            String fileName = shop.getName() + "-" + tableQrcode.getTableNumber() + ".jpg" ;
             String contents = getShopUrl(brandSign, Long.parseLong(idArr[i]));
             QRCodeUtil.createQRCode(contents, filepath, fileName);
         }
