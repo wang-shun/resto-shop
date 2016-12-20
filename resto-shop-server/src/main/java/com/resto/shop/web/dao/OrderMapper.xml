@@ -19,6 +19,7 @@
         <result column="payment_amount" property="paymentAmount"
                 jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column= "ali_pay_discount_money" property="aliPayDiscountMoney"/>
         <result column="article_count" property="articleCount"
                 jdbcType="INTEGER"/>
         <result column="serial_number" property="serialNumber"
@@ -243,7 +244,7 @@
         order_state,
         production_status,
         original_amount, reduction_amount,
-        payment_amount, order_money, article_count,
+        payment_amount, order_money, ali_pay_discount_money, article_count,
         serial_number,
         confirm_time, print_times, allow_cancel, allow_appraise, closed,
         remark,
@@ -616,6 +617,9 @@
             </if>
             <if test="orderMoney != null">
                 order_money = #{orderMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="aliPayDiscountMoney != null">
+                ali_pay_discount_money = #{aliPayDiscountMoney,jdbcType=DECIMAL},
             </if>
             <if test="articleCount != null">
                 article_count = #{articleCount,jdbcType=INTEGER},
