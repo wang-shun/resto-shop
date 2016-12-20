@@ -26,19 +26,19 @@
 							</div>
 						</div>
 						
-						<div class="form-group" v-if="m.aliPay==1">
-							<label class="col-sm-3 control-label">支付折扣：</label>
-							<div class="col-sm-3">
-								<div class="input-group">
-									<input type="number" class="form-control" placeholder="请输入数字"
-										placeholder="支付折扣" name="aliPayDiscount" min="1" max="100"
-										v-model="m.aliPayDiscount">
-									<div class="input-group-addon">
-										<b>%</b>
-									</div>
-								</div>
-							</div>
-						</div>
+						<%--<div class="form-group" v-if="m.aliPay==1">--%>
+							<%--<label class="col-sm-3 control-label">支付折扣：</label>--%>
+							<%--<div class="col-sm-3">--%>
+								<%--<div class="input-group">--%>
+									<%--<input type="number" class="form-control" placeholder="请输入数字"--%>
+										<%--placeholder="支付折扣" name="aliPayDiscount" min="1" max="100"--%>
+										<%--v-model="m.aliPayDiscount">--%>
+									<%--<div class="input-group-addon">--%>
+										<%--<b>%</b>--%>
+									<%--</div>--%>
+								<%--</div>--%>
+							<%--</div>--%>
+						<%--</div>--%>
 					</div>
 					<input class="btn green" type="submit" value="保存" /> <a
 						class="btn default" @click="cancel">取消</a>
