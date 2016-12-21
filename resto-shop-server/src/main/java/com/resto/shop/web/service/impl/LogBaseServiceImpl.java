@@ -103,7 +103,11 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void intoLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"进入了店铺");
+        if("scan".equals(desc)){
+            logBase.setRemark(customer.getNickname()+"扫码进入了店铺");
+        }else{
+            logBase.setRemark(customer.getNickname()+"进入了店铺");
+        }
         logBase.setDesc("当前店铺为"+shopDetail.getName());
         insert(logBase);
     }
