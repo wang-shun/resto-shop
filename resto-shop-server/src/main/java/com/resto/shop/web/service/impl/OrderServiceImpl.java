@@ -3442,9 +3442,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getPaymentModeId() == PayMode.WEIXIN_PAY) {
                 maxWxRefund = maxWxRefund.add(item.getPayValue());
             }
+            if(item.getPaymentModeId() == PayMode.ALI_PAY){
+                maxWxRefund = maxWxRefund.add(item.getPayValue());
+            }
         }
 
-        if(maxWxRefund.doubleValue() > 0){ //如果微信支付还有钱可以退
+        if(maxWxRefund.doubleValue() > 0){ //如果微信支付或者支付宝还有钱可以退
             for (OrderPaymentItem item : payItemsList) {
                 String newPayItemId = ApplicationUtils.randomUUID();
                 switch (item.getPaymentModeId()) {
@@ -3491,8 +3494,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 orderPaymentItemService.insert(back);
                                 accountService.addAccount(backMoney,customer.getAccountId(),"退菜红包",PayMode.ACCOUNT_PAY);
                             }
-                            break;
+
                         }
+                        break;
+                    case PayMode.ALI_PAY:
+                        if(item.getPayValue().doubleValue() > 0){
+                            BigDecimal refundTotal = maxWxRefund.doubleValue() > order.getRefundMoney().doubleValue() ?
+                                    order.getRefundMoney() : maxWxRefund;
+
+                            BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+                            AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
+                                    StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                                    StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                            Map map = new HashMap();
+                            map.put("out_trade_no", o.getId());
+                            map.put("refund_amount", refundTotal);
+                            String resultJson = AliPayUtils.refundPay(map);
+                            item.setResultData(new JSONObject(resultJson).toString());
+                            item.setPayValue(refundTotal.multiply(new BigDecimal(-1)));
+                            if(maxWxRefund.doubleValue() < order.getRefundMoney().doubleValue()){ //如果最大退款金额 比实际要退的小
+                                BigDecimal backMoney = order.getRefundMoney().subtract(maxWxRefund);
+                                OrderPaymentItem back = new OrderPaymentItem();
+                                back.setId(ApplicationUtils.randomUUID());
+                                back.setOrderId(order.getId());
+                                back.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
+                                back.setPayTime(new Date());
+                                back.setPayValue(new BigDecimal(-1).multiply(backMoney));
+                                back.setRemark("退菜红包:" + backMoney);
+
+                                back.setResultData("总退款金额"+order.getRefundMoney()+",支付宝支付返回"+refundTotal+",余额返回"+backMoney);
+                                orderPaymentItemService.insert(back);
+                                accountService.addAccount(backMoney,customer.getAccountId(),"退菜红包",PayMode.ACCOUNT_PAY);
+                            }
+
+                        }
+                        break;
 
                 }
 
