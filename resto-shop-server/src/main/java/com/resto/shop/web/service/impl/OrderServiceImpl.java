@@ -1400,8 +1400,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if (setting.getAutoPrintTotal().intValue() == 0 &&
+        if (setting.getAutoPrintTotal().intValue() == 0 && shopDetail.getAutoPrintTotal() == 0 &&
                 (order.getOrderMode() != ShopMode.HOUFU_ORDER || (order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER))) {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
@@ -1413,7 +1414,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if (order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
-                && setting.getIsPrintPayAfter().equals(Common.YES)) {
+                && setting.getIsPrintPayAfter().equals(Common.YES) && shopDetail.getIsPrintPayAfter().equals(Common.YES)) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));

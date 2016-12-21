@@ -116,21 +116,21 @@
 							<%--</div>--%>
 						<%--</div>--%>
 
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">打印总单：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="0">--%>
-										<%--是--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="1">--%>
-										<%--否--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">打印总单：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="0">
+										是
+									</label>
+									<label>
+										<input type="radio" name="autoPrintTotal" v-model="m.autoPrintTotal" value="1">
+										否
+									</label>
+								</div>
+							</div>
+						</div>
 						<%----%>
 						<%--<div class="form-group">--%>
 							<%--<label class="col-sm-3 control-label">启用推荐餐包：</label>--%>
@@ -164,22 +164,22 @@
 							<%--</div>--%>
 						<%--</div>--%>
 
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="isPrintPayAfter" v-model="m.isPrintPayAfter" value="1">--%>
-										<%--开--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="isPrintPayAfter"--%>
-											   <%--v-model="m.isPrintPayAfter" value="0">--%>
-										<%--关--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label>
+										<input type="radio" name="isPrintPayAfter" v-model="m.isPrintPayAfter" value="1">
+										开
+									</label>
+									<label>
+										<input type="radio" name="isPrintPayAfter"
+											   v-model="m.isPrintPayAfter" value="0">
+										关
+									</label>
+								</div>
+							</div>
+						</div>
 
 						<%--<div class="form-group">--%>
 							<%--<label class="col-sm-3 control-label">启用服务费：</label>--%>
