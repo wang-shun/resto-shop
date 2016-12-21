@@ -124,7 +124,7 @@ public class OrderController extends GenericController{
 		}
 	}
 	
-	
+	//
 	@RequestMapping("/show/shopReport")
 	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
@@ -136,6 +136,7 @@ public class OrderController extends GenericController{
 		}
 		return "orderReport/shopReport";
 	}
+	
 	
 	@RequestMapping("AllOrder")
 	@ResponseBody
@@ -266,6 +267,9 @@ public class OrderController extends GenericController{
 				}
 				return listDto;
 	}
+	
+	
+	
 	
 	
 	

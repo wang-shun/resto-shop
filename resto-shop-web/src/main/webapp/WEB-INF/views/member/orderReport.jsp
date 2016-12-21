@@ -10,7 +10,7 @@ dt,dd{
 }
 </style>
 <h2 class="text-center">
-	<strong>订单列表</strong>
+	<strong>订单记录</strong>
 </h2>
 <br />
 <div class="row">
@@ -22,16 +22,14 @@ dt,dd{
 					readonly="readonly">
 			</div>
 			<div class="form-group" style="margin-right: 50px;">
-				<label for="endDate2">结束时间：</label> <input type="text"
+				<label for="endDate2">结束时间：</label> 
+				<input type="text"
 					class="form-control form_datetime2" id="endDate2"
 					readonly="readonly">
 			</div>
-
 			<button type="button" class="btn btn-primary" id="today">今日</button>
 
 			<button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
-
-			<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
 
 			<button type="button" class="btn btn-primary" id="week">本周</button>
 			<button type="button" class="btn btn-primary" id="month">本月</button>
@@ -49,7 +47,7 @@ dt,dd{
 <!-- 店铺订单列表  -->
 <div class="panel panel-info">
 	<div class="panel-heading text-center" style="font-size: 22px;">
-		<strong>店铺订单列表</strong>
+		<strong>会员订单列表</strong>
 	</div>
 	<div class="panel-body">
 		<table class="table table-striped table-bordered table-hover"
@@ -57,13 +55,12 @@ dt,dd{
 		</table>
 	</div>
 </div>
-
+<!-- 订单详细 -->
 <div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					id="closeModal2" aria-label="Close">
+				<button type="button" class="close" data-dismiss="modal"	id="closeModal2" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 				<h4 class="modal-title text-center">
@@ -76,9 +73,6 @@ dt,dd{
 					<dd id="shopName"></dd>
                     <dt>订单编号：</dt>
                     <dd id="orderId"></dd>
-
-                    <div id="addOrderDiv"></div>
-
                     <dt>微信支付单号：</dt>
                     <dd id="orderPaymentItem_id"></dd>
 					<dt>订单时间：</dt>
@@ -107,6 +101,7 @@ dt,dd{
 				<table class="table table-condensed table-hover">
 					<thead>
 						<tr>
+							                           <th>餐品类型</th>
 							<th>餐品类别</th>
 							<th>餐品名称</th>
 							<th>餐品单价</th>
@@ -127,11 +122,12 @@ dt,dd{
 		</div>
 	</div>
 </div>
-<script src="assets/customer/date.js" type="text/javascript"></script>
+<script src="/shop/assets/customer/date.js" type="text/javascript"></script>
+
+
 <script>
 	//时间插件
-
-	$('.form_datetime2').datetimepicker({
+ 	$(".form_datetime2").datetimepicker({
 		endDate : new Date(),
 		minView : "month",
 		maxView : "month",
@@ -141,17 +137,17 @@ dt,dd{
 		format : "yyyy-mm-dd",
 		startView : "month",
 		language : "zh-CN"
-	});
-
-	var shopId = "${shopId}"
+	}); 
+     
+	//订单
+	var customerId = "${customerId}"//用户id
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
-
 	var tb1 = $("#shopOrder").DataTable({
 		"scrollY": "340px",
 		"autoWidth": false,
 		 "columnDefs": [
-		                { "width": "8%", "targets":0  },
+		                { "width": "15%", "targets":0  },
 		                { "width": "8%", "targets":1  },
 		                { "width": "8%", "targets":2  },
 		                { "width": "6%", "targets":3  },
@@ -160,19 +156,19 @@ dt,dd{
 		                { "width": "6%", "targets":6  },
 		                { "width": "8%", "targets":7  },
 		                { "width": "8%", "targets":8  },
-		                { "width": "6%", "targets":9  },
+		                { "width": "8%", "targets":9  },
 		                { "width": "6%", "targets":10  },
 		                { "width": "6%", "targets":11  },
-		                { "width": "3%", "targets":12  },
+		                { "width": "10%", "targets":12  },
 		              ],
 		"lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
 		ajax : {
-			url : "orderReport/AllOrder",
+			url : "member/orderReport",
 			dataSrc : "",
 			data : function(d) {
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
-				d.shopId = shopId;
+				d.customerId = customerId;
 				return d;
 			}
 		},
@@ -278,7 +274,7 @@ dt,dd{
 			title : "操作",
 			data : "orderId",
 			createdCell : function(td, tdData,rowData) {
-				var button = $("<button class='btn green' @click='showShopReport(shop.shopName,shop.shopDetailId)'>查看详情</button>");
+				var button = $("<button class='btn green'>详情</button>");
 				button.click(function() {
 					showDetails(tdData);
 				})
@@ -286,39 +282,42 @@ dt,dd{
 			}
 		} ]
 	});
-
+ 
+	//查询报表
 	$("#searchInfo2").click(function() {
 		var beginDate = $("#beginDate2").val();
 		var endDate = $("#endDate2").val();
-		search(beginDate, endDate);
+		search(beginDate, endDate);//查询掉下面方法
 	})
-
+ 
+	//查询
 	function search(beginDate, endDate) {
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,
-			"shopId" : shopId
+			"customerId" : customerId
 		};
 		tb1.ajax.reload();
 		toastr.success("查询成功");
 	}
-
-	$("#closeModal").click(function(e) {
+    //关闭
+	 $("#closeModal").click(function(e) {
 		e.stopPropagation();
 		var modal = $("#orderDetail");
-		//modal.find(".modal-body").html("");
 		modal.modal("hide");
 	})
-
-	function showDetails(orderId) {
+ 
+	
+	 /**订单详细**/
+	 
+	 function showDetails(orderId) {
 		$.ajax({
-			url : 'orderReport/detailInfo',
+			url : 'member/detailInfo',
 			method : 'post',
 			data : {
 				"orderId" : orderId
 			},
 			success : function(result) {
-				console.log(orderId+"_______________");
 				if (result) {
 					var data = result.data;
 					console.log(data);
@@ -351,14 +350,12 @@ dt,dd{
                     $("#orderPaymentItem_id").html(orderPaymentItem_id);
                     $("#telephone").html(telephone);
 					$("#orderMoney").html(data.orderMoney + "元");
-// 					if (data.appraise) {
 						$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
 						$("#content").html(data.appraise!=null ? data.appraise.content:null);
-// 					}
 					$("#orderState").html(getState(data.orderState,data.productionStatus));
 					$('#articleList').text("");
 
-					var articleTotalPrice = 0;
+ 					var articleTotalPrice = 0;
 
 					for (var i = 0; i < data.orderItems.length; i++) {
 						var obj = data.orderItems[i];
@@ -373,23 +370,7 @@ dt,dd{
 					$("#articleTotalPrice").html(articleTotalPrice+"元");
 					$("#servicePrice").html(data.servicePrice+"元");
 					$("#mealFreePrice").html(data.mealFreePrice+"元");
-					//-----------------------------------------------------------------------
-
-					// 					 var oLogin = $("#orderDetail").html();
-					// 					 console.log(oLogin);
-
-					// 					 $('body').append( oLogin );
-
-					// 					oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-					// 					oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 );
-
-					// 					$(window).on('scroll',function(){
-
-					// 						oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-					// 						oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 + $(window).scrollTop() );
-
-					// 					});
-					//----------------------------------------------------------------					 					
+				
 					$("#orderDetail").modal();
 				}else{
                     $("#orderState").html("<h1>没有数据</h1>");
@@ -421,7 +402,7 @@ dt,dd{
 
 		}
 		return levelName;
-	}
+	} 
 
 	function getState(state,productionStatus) {
 		var orderState = '';
@@ -457,9 +438,9 @@ dt,dd{
 			break;
 		}
 		return orderState;
-	}
+} 	
 
-	function getDistriubtioMode(mode) {
+	 function getDistriubtioMode(mode) {
 		var distributionMode = ''
 		switch (mode) {
 		case 1:
@@ -474,14 +455,18 @@ dt,dd{
 
 		}
 		return distributionMode;
-	}
+	} 
+	 
+	 
+	 
+	 
 
-	$("#closeModal2").click(function(e) {
+	 $("#closeModal2").click(function(e) {//关闭
 		e.stopPropagation();
 		var modal = $("#orderDetail");
 		modal.find(".modal-body").html("");
 		modal.modal("hide");
-	})
+	}) 
 
 	//查询今日
 
@@ -536,8 +521,8 @@ dt,dd{
 
 	})
 
-	//下载报表
-	$("#shopreportExcel").click(
+	//下载用户订单报表
+ 	$("#shopreportExcel").click(
 			function() {
 				var beginDate = $("#beginDate2").val();
 				var endDate = $("#endDate2").val();
@@ -547,8 +532,8 @@ dt,dd{
 					return;
 				}
 
-				location.href = "orderReport/shop_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&shopId=" + shopId;
+				location.href = "member/usershop_excel?beginDate=" + beginDate
+						+ "&&endDate=" + endDate + "&&customerId=" + customerId;
 
-			})
+    }) 
 </script>
