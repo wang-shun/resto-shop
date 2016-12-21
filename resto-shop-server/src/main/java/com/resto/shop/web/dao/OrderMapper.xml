@@ -1149,7 +1149,10 @@ SELECT
 
     <!--查询品牌下每个店铺的菜品数目卖的和 2016-11-3 -->
     <select id="selectShopArticleSum" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-        SELECT SUM(oi.count)totalNum,o.shop_detail_id shop_id from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
+        SELECT
+        SUM(oi.count)totalNum,
+        o.shop_detail_id shop_id
+	     from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         AND oi.type!=3
@@ -1159,7 +1162,13 @@ SELECT
 
     <!--查询品牌下每个店铺所有菜品卖的钱的和-->
     <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-        SELECT SUM(oi.final_price)sellIncome,o.shop_detail_id shop_id from tb_order_item oi INNER JOIN tb_order o
+        SELECT
+        SUM(oi.final_price)sellIncome,
+        o.shop_detail_id shop_id,
+        IFNULL(sum(oi.refund_count),0)refundCount,
+       IFNULL(sum(oi.refund_count)*oi.unit_price,0.00)refundTotal
+
+        from tb_order_item oi INNER JOIN tb_order o
         on o.id=oi.order_id WHERE
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
         AND
@@ -1168,17 +1177,19 @@ SELECT
     </select>
 
 
-    <select id="selectConfirmMoney" resultType="BigDecimal">
-        SELECT
-	ifnull(sum(oi.final_price),0.00) totalMoney
+    <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
+         SELECT
+	ifnull(sum(oi.final_price),0.00) sellIncome,
+	IFNULL(sum(oi.refund_count),0)refundCount,
+	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal
 FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 WHERE
 	o.order_state IN (10, 2, 11, 12)
 AND o.production_status IN (2, 3)
-        and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-        and o.brand_id=#{brandId}
+AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
     </select>
 
     <!-- 品牌菜品销售 -->
@@ -1237,6 +1248,8 @@ AND o.production_status IN (2, 3)
         t.order_id,
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) shopSellNum,
+        SUM(t.refund_count)refundCount,
+		SUM(t.refund_count*t.unit_price)refundTotal,
         t.article_name,
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
@@ -1485,6 +1498,8 @@ AND o.production_status IN (2, 3)
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
         t.order_id,
+        t.refund_count,
+		t.unit_price*t.refund_count as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) brandSellNum,
         t.article_name,

@@ -59,6 +59,8 @@
 						<th>品牌名称</th>
 						<th>菜品总销量(份)</th>
 						<th>菜品销售总额(元)</th>
+                        <th>退菜总数</th>
+                        <th>退菜总额(元)</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -66,6 +68,8 @@
 						<td><strong>{{brandReport.brandName}}</strong></td>
 						<td>{{brandReport.totalNum}}</td>
 						<td>{{brandReport.sellIncome}}</td>
+                        <td>{{brandReport.refundCount}}</td>
+                        <td>{{brandReport.refundTotal}}</td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -121,6 +125,8 @@
 						<th>菜品销量(份)</th>
 						<th>菜品销售额</th>
 						<th>品牌销售占比</th>
+                        <th>退菜总数</th>
+                        <th>退菜总额</th>
 						<th>销售详情</th>
 					</tr>
 				</thead>
@@ -130,6 +136,8 @@
 						<td>{{shop.totalNum}}</td>	
 						<td>{{shop.sellIncome}}</td>
 						<td>{{shop.occupy}}</td>
+                        <td>{{shop.refundCount}}</td>
+                        <td>{{shop.refundTotal}}</td>
 						<td><button class="btn btn-sm btn-success"
 								@click="showShopReport(shop.shopName,shop.shopId)">查看详情</button></td>
 					</tr>
@@ -205,55 +213,64 @@ var tb2 = $("#articleSellTable").DataTable({
 			title : "销售额占比",
 			data : "salesRatio",
 		},
+        {
+          title:"退菜数量" ,
+           data:"refundCount"
+        },
+        {
+            title:"退菜金额" ,
+            data:"refundTotal"
+        }
+
 	],
-	initComplete: function () {
-		var api = this.api();
-		api.search('');
-		var data = api.data();
-		var columnsSetting = api.settings()[0].oInit.columns;
-		$(columnsSetting).each(function (i) {
-			if (this.s_filter) {
-				var column = api.column(i);
-				var title = this.title;
-				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-				var that = this;
-				column.data().unique().each(function (d) {
-					select.append('<option value="' + d + '">' + d + '</option>')
-				});
-
-				select.appendTo($(column.header()).empty()).on('change', function () {
-					var val = $.fn.dataTable.util.escapeRegex(
-							$(this).val()
-					);
-					column.search(val ? '^' + val + '$' : '', true, false).draw();
-				});
-			}
-		});
-	},
-	infoCallback: function() {
-		var api = this.api();
-		api.search('');
-		var data = api.data();
-		var columnsSetting = api.settings()[0].oInit.columns;
-		$(columnsSetting).each(function (i) {
-			if (this.s_filter) {
-				var column = api.column(i);
-				var title = this.title;
-				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-				var that = this;
-				column.data().unique().each(function (d) {
-					select.append('<option value="' + d + '">' + d + '</option>')
-				});
-
-				select.appendTo($(column.header()).empty()).on('change', function () {
-					var val = $.fn.dataTable.util.escapeRegex(
-							$(this).val()
-					);
-					column.search(val ? '^' + val + '$' : '', true, false).draw();
-				});
-			}
-		});
-    }
+//	initComplete: function () {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//	},
+//	infoCallback: function() {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//    }
 });
 
 //时间插件
@@ -276,6 +293,8 @@ var vueObj = new Vue({
 				brandName : "",
 				totalNum : 0,
 				sellIncome:0,
+                refundTotal:0,
+                refundCount:0,
 			},
 			shopReportList : [],
 			searchDate : {
@@ -306,9 +325,12 @@ var vueObj = new Vue({
 				{
 				case 1:
 					$.post("articleSell/list_brand", this.getDate(null), function(result) {
+					    debugger;
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
 	 					that.brandReport.sellIncome=result.sellIncome;
+                        that.brandReport.refundCount=result.refundCount;
+                        that.brandReport.refundTotal=result.refundTotal;
 	 					tb2.bDestroy = true;
 	 					tb2.ajax.reload();
 	 					toastr.success("查询成功");
