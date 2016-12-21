@@ -3678,7 +3678,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectWXOrderItems(Map<String, Object> map) {
     	return orderMapper.selectWXOrderItems(map);
     }
-  /**
+
+
+
+    /**
    * 会员管理
    * 1订单管理
    */
