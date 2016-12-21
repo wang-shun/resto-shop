@@ -680,25 +680,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             int  refundTotal = 0;
+            BigDecimal aliRefund = new BigDecimal(0);
             if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
-                BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId());
+                BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.WEIXIN_PAY);
                 if(sum != null){
                     refundTotal = sum.multiply(new BigDecimal(100)).intValue();
                 }
 
+            }else if (item.getPaymentModeId() == PayMode.ALI_PAY){
+                BigDecimal sum  = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.ALI_PAY);
+                if(sum != null){
+                    aliRefund = sum;
+                }
             }
 
             if(item.getPaymentModeId() == PayMode.WEIXIN_PAY && item.getPayValue().doubleValue() < 0){
                 continue;
             }
-
-
-
-            if(refundTotal != 0 &&  refundTotal == order.getPaymentAmount().multiply(new BigDecimal(-100)).intValue() ){ //如果退款金额 等于订单应付金额
+            if(item.getPaymentModeId() == PayMode.ALI_PAY && item.getPayValue().doubleValue() < 0){
                 continue;
             }
 
 
+            if(refundTotal != 0 &&  refundTotal == order.getPaymentAmount().multiply(new BigDecimal(-100)).intValue() ){ //如果已经全部退款完毕
+                continue;
+            }
+
+            if(aliRefund.doubleValue() > 0 &&  aliRefund.doubleValue() == order.getPaymentAmount().multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
+                continue;
+            }
 
 
             switch (item.getPaymentModeId()) {
@@ -750,7 +760,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             brandSetting.getAliPublicKey());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
-                    map.put("refund_amount", order.getPaymentAmount());
+                    map.put("refund_amount", order.getPaymentAmount().add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
