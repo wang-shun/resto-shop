@@ -1,41 +1,42 @@
  package com.resto.shop.web.controller.business;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
+ import com.resto.brand.core.entity.Result;
+ import com.resto.brand.core.util.ExcelUtil;
+ import com.resto.brand.core.util.JdbcUtils;
+ import com.resto.brand.core.util.UserOrderExcelUtil;
+ import com.resto.brand.web.dto.MemberUserDto;
+ import com.resto.brand.web.dto.OrderDetailDto;
+ import com.resto.brand.web.model.DatabaseConfig;
+ import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.service.BrandService;
+ import com.resto.brand.web.service.DatabaseConfigService;
+ import com.resto.brand.web.service.OrderExceptionService;
+ import com.resto.brand.web.service.ShopDetailService;
+ import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.model.Coupon;
+ import com.resto.shop.web.model.CouponDto;
+ import com.resto.shop.web.model.Order;
+ import com.resto.shop.web.model.OrderPaymentItem;
+ import com.resto.shop.web.service.CouponService;
+ import com.resto.shop.web.service.CustomerService;
+ import com.resto.shop.web.service.OrderService;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.brand.web.service.OrderExceptionService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.core.util.JdbcUtils;
-import com.resto.brand.core.util.UserOrderExcelUtil;
-import com.resto.brand.web.dto.MemberUserDto;
-import com.resto.brand.web.dto.OrderDetailDto;
-import com.resto.brand.web.model.DatabaseConfig;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.DatabaseConfigService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderService;
+ import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ import javax.swing.*;
+ import java.io.FileOutputStream;
+ import java.io.OutputStream;
+ import java.math.BigDecimal;
+ import java.sql.SQLException;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
 
 @Controller
 @RequestMapping("member")
@@ -57,6 +58,10 @@ public class MemberController extends GenericController{
 	
 	@Resource
     private DatabaseConfigService databaseConfigService;
+
+	@Autowired
+	private CouponService couponService;
+
 	
 	@RequestMapping("/myList")
 	public void list(){
@@ -70,18 +75,13 @@ public class MemberController extends GenericController{
 		brandId=getCurrentBrandId();
 		System.out.println(brandId);
 //		将得到的时间格式化
-		Date beDate=DateUtil.fomatDate(beginDate);
-		Date eDate=DateUtil.fomatDate(endDate);
 //		因为格式化的时间是当天的00.00.00点，所以加上一天时间86400000毫秒
-		eDate = new Date(eDate.getTime()+ 86400000);
 		DatabaseConfig databaseConfig = databaseConfigService.selectByBrandId(brandId);
 		JdbcUtils jdbcUtils = new JdbcUtils(databaseConfig.getUsername(), databaseConfig.getPassword(), databaseConfig.getDriverClassName(), databaseConfig.getUrl());
 		jdbcUtils.getConnection();
-		String sql = "SELECT c.id AS customerId,a.id AS accountId,c.nickname,c.telephone,c.head_photo,c.province,c.city,c.sex,a.remain,AVG(b.order_money) as money,COUNT(b.brand_id) as amount,SUM(b.order_money) as sumMoney FROM	tb_customer c LEFT JOIN tb_account a ON c.account_id = a.id LEFT JOIN tb_order b ON c.id = b.customer_id WHERE c.brand_id = ? and  c.regiest_time >= ? and  c.regiest_time <= ? GROUP BY c.id ";
+		String sql = "SELECT c.id AS customerId,a.id AS accountId,c.nickname,c.telephone,c.is_bind_phone as isBindPhone,c.head_photo,c.province,c.city,c.sex,a.remain,AVG(b.order_money) as money,COUNT(b.brand_id) as amount,SUM(b.order_money) as sumMoney FROM	tb_customer c LEFT JOIN tb_account a ON c.account_id = a.id LEFT JOIN tb_order b ON c.id = b.customer_id WHERE c.brand_id = ?  GROUP BY c.id ";
 		List<Object> params = new ArrayList<Object>(); 
 		params.add(brandId);
-		params.add(beDate);
-		params.add(eDate);
 		List<Map<String, Object>> resultList = null;
 		try {
 			resultList = jdbcUtils.findModeResult(sql, params);
@@ -111,24 +111,30 @@ public class MemberController extends GenericController{
 	@RequestMapping("/list_all_shopId")
     @ResponseBody
 	public Result list_all_shopId(String customerId){
-		String brandId=getCurrentBrandId();
-		System.out.println("customerId"+customerId);
-		DatabaseConfig databaseConfig=databaseConfigService.selectByBrandId(brandId);
-		JdbcUtils jdbcUtils=new JdbcUtils(databaseConfig.getUsername(),databaseConfig.getPassword(), databaseConfig.getDriverClassName(),databaseConfig.getUrl());
-		jdbcUtils.getConnection();
-		String sql="select c.is_used,c.brand_id,c.shop_detail_id,c.coupon_type,s.name as shopname,cc.coupon_name,cc.name as myname,cc.coupon_validay,cc.use_with_account,c.begin_date,c.end_date,cc.coupon_value,c.begin_time,c.end_time from resto_brand.shop_detail s, shop_manager.tb_coupon c INNER JOIN shop_manager.tb_new_custom_coupon cc where c.brand_id=cc.brand_id and c.customer_id=?";
-		List<Object> params=new ArrayList<Object>();
-		params.add(customerId);
-		List<Map<String,Object>> resultlist=null;
-		try {
-			resultlist = jdbcUtils.findModeResult(sql, params);
-			JdbcUtils.close();
-			return getSuccessResult(resultlist);
-		} catch (Exception e) {
-			e.printStackTrace();
-			JdbcUtils.close();
-			return new Result("获取失败，后台报错了！",false);	
-		}
+		List<Coupon> list =  couponService.getListByCustomerId(customerId);
+		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+		CouponDto couponDto = new CouponDto();
+		couponDto.setCoupons(list);
+		couponDto.setShopDetails(shopDetails);
+		return getSuccessResult(couponDto);
+//		String brandId=getCurrentBrandId();
+//		System.out.println("customerId"+customerId);
+//		DatabaseConfig databaseConfig=databaseConfigService.selectByBrandId(brandId);
+//		JdbcUtils jdbcUtils=new JdbcUtils(databaseConfig.getUsername(),databaseConfig.getPassword(), databaseConfig.getDriverClassName(),databaseConfig.getUrl());
+//		jdbcUtils.getConnection();
+//		String sql="select c.is_used,c.brand_id,c.shop_detail_id,c.coupon_type,s.name as shopname,cc.coupon_name,cc.name as myname,cc.coupon_validay,cc.use_with_account,c.begin_date,c.end_date,cc.coupon_value,c.begin_time,c.end_time from resto_brand.shop_detail s, shop_manager.tb_coupon c INNER JOIN shop_manager.tb_new_custom_coupon cc where c.brand_id=cc.brand_id and c.customer_id=?";
+//		List<Object> params=new ArrayList<Object>();
+//		params.add(customerId);
+//		List<Map<String,Object>> resultlist=null;
+//		try {
+//			resultlist = jdbcUtils.findModeResult(sql, params);
+//			JdbcUtils.close();
+//			return getSuccessResult(resultlist);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			JdbcUtils.close();
+//			return new Result("获取失败，后台报错了！",false);
+//		}
 	}
 
 

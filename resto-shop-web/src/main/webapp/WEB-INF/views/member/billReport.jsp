@@ -15,6 +15,7 @@
     </div>
  <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
+	var shopList = new HashMap();
 var dataSource;
 var customerId = "${customerId}"
 $.ajax( {  
@@ -25,8 +26,14 @@ $.ajax( {
     },  
     success:function(data) { 
     	if(data != null ){
-    		dataSource=data;
+			debugger;
+    		dataSource=data.data.coupons;
+			for(var i = 0;i < data.data.shopDetails.length;i++){
+				shopList.put(data.data.shopDetails[i].id,data.data.shopDetails[i].name);
+			}
     	}
+
+
     	
      },  
      error : function() { 
@@ -34,13 +41,15 @@ $.ajax( {
      }   
 });
 
+
+
 var tb1 = $("#shopBill").DataTable({
-	data:dataSource.data,
+	data:dataSource,
 	bSort:false,
 	columns : [
 		{
 			title : "优惠券状态",
-			data : "is_used",
+			data : "isUsed",
 			defaultContent:"",
 			createdCell:function(td,tdData){
 				if(tdData==true){
@@ -53,7 +62,7 @@ var tb1 = $("#shopBill").DataTable({
 
 		{
 			title : "优惠券所属",
-			data : "brand_id",
+			data : "brandId",
 			createdCell:function(td,tdData){
 				if(tdData!=null || tdData!=""){
 					$(td).html("店铺");
@@ -63,7 +72,7 @@ var tb1 = $("#shopBill").DataTable({
 			}
 		}, {
 			title : "优惠券类型",
-			data : "coupon_type",
+			data : "couponType",
 			createdCell:function(td,tdData){
 				if(tdData==true){
 					$(td).html("邀请注册");
@@ -73,24 +82,28 @@ var tb1 = $("#shopBill").DataTable({
 			}
 		}, {
 			title : "所属门店",
-			data : "shopname",
+			data : "shopDetailId",
 			createdCell:function (td,tdData) {
 	           if(tdData==null||tdData==""){
 	                $(td).html("--")
-	            }
+	            }else{
+				   $(td).html(shopList.get(tdData));
+			   }
 	        }
-		}, {
-			title : "活动名称",
-			data : "coupon_name",
-			createdCell:function (td,tdData) {
-                if(tdData==null||tdData==""){
-                    $(td).html("--")
-                }
-            }
-
-		}, {
+		},
+//		{
+//			title : "活动名称",
+//			data : "coupon_name",
+//			createdCell:function (td,tdData) {
+//                if(tdData==null||tdData==""){
+//                    $(td).html("--")
+//                }
+//            }
+//
+//		},
+		{
 			title : "优惠券名称",
-			data : "myname",
+			data : "name",
 			createdCell:function (td,tdData) {
                 if(tdData==null||tdData==""){
                     $(td).html("--")
@@ -98,7 +111,7 @@ var tb1 = $("#shopBill").DataTable({
             }
 		}, {
 			title : "优惠券金额",
-			data : "coupon_validay",
+			data : "value",
 			createdCell:function (td,tdData) {
                 if(tdData==null||tdData==""){
                     $(td).html("--")
@@ -106,7 +119,7 @@ var tb1 = $("#shopBill").DataTable({
             }
 		}, {
 			title : "是否和余额叠加",
-			data : "use_with_account",
+			data : "useWithAccount",
 			createdCell:function(td,tdData){
 				if(tdData==true){
 					$(td).html("可以");
@@ -116,25 +129,27 @@ var tb1 = $("#shopBill").DataTable({
 			}
 		}, {
 			title : "优惠券生效时间",
-			data : "begin_date",
+			data : "beginDate",
             createdCell:function (td,tdData) {
-                if(tdData==null||tdData==""){
-                    $(td).html("--")
-                }
-            }
+				if (tdData != null) {
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+				}
+
+			}
 		},
 		{
 			title : "优惠券有效期至",
-			data : "end_date",
+			data : "endDate",
 			createdCell:function (td,tdData) {
-                if(tdData==null||tdData==""){
-                    $(td).html("--")
-                }
-            }
+				if (tdData != null) {
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+				}
+
+			}
 		},
 		{
                 title : "最低消费额",
-                data : "coupon_value",
+                data : "minAmount",
                 createdCell:function (td,tdData) {
                     if(tdData==null||tdData==""){
                         $(td).html("--")
@@ -143,23 +158,31 @@ var tb1 = $("#shopBill").DataTable({
             },
             {
 			title : "开始时间",
-			data : 'begin_time',
+			data : 'beginTime',
 			createdCell:function (td,tdData) {
-                if(tdData==null||tdData==""){
-                    $(td).html("--")
-                }
-            }
+				if (tdData != null) {
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+				}
+
+			}
 		}, {
 			title : "结束时间",
-			data : "end_time",
+			data : "endTime",
 			createdCell:function (td,tdData) {
-                if(tdData==null||tdData==""){
-                    $(td).html("--")
-                }
+				if (tdData != null) {
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+				}
+
+			}
             }
-            }
-	]
-	
+	],
+	initComplete: function () {
+
+//		for (var i = 0; i < data.length; i++) {
+//			allArticles.push(data[i]);
+//		}
+	}
+
 });
 
 </script>

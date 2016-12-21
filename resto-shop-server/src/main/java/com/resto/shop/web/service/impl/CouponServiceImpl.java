@@ -172,4 +172,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		item.setResultData(coupon.getId());
 		orderPaymentItemService.insert(item);
 	}
+
+    @Override
+    public List<Coupon> getListByCustomerId(String customerId) {
+        return couponMapper.getListByCustomerId(customerId);
+    }
 }
