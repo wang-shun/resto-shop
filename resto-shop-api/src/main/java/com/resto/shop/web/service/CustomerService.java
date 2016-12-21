@@ -2,9 +2,12 @@ package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.brand.web.model.ShareSetting;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
@@ -52,6 +55,24 @@ public interface CustomerService extends GenericService<Customer, String> {
      * @return
      */
     List<Customer> selectListByBrandIdHasRegister(String beginDate, String endDate,String brandId);
+    
+    
+    /**
+     * 得到某个时间段店铺的会员信息和订单情况
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
+    List<MemberUserDto> selectListMemberUser(String beginDate, String endDate,String brandId);
+    /**
+     * 查询某个时间段的店铺会员信息
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
+	Map<String,Object> selectListMember(String beginDate, String endDate,String brandId);
     
     Customer selectCustomerAccount(String telephone);
 }

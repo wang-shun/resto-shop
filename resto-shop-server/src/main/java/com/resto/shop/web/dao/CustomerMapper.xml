@@ -297,11 +297,52 @@
   </select>
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
-        select id, wechat_id, nickname, telephone, head_photo, is_bind_phone,
-    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
-    city, country, last_order_shop WHERE  is_bind_phone = 1
+    SELECT 
+	    id, 
+	    wechat_id, 
+	    nickname, 
+	    telephone, 
+	    head_photo, 
+	    is_bind_phone,
+	    regiest_time, 
+	    first_order_time, 
+	    last_login_time, 
+	    account_id, 
+	    brand_id, 
+	    sex, 
+	    province,
+	    city, 
+	    country, 
+	    last_order_shop 
+    FROM  tb_customer
+    WHERE is_bind_phone = 1
     AND
     <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
+    </select>
+    
+    
+    <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
+    SELECT
+		c.id AS customerId,
+		a.id AS accountId,
+		c.nickname,
+		c.telephone,
+		c.head_photo,
+		c.province,
+		c.city,
+		c.sex,
+		a.remain,
+		AVG(b.order_money) AS money,
+		COUNT(b.brand_id) AS amount,
+		SUM(b.order_money) AS sumMoney
+	FROM
+		tb_customer c
+		LEFT JOIN tb_account a ON c.account_id = a.id
+		LEFT JOIN tb_order b ON c.id = b.customer_id
+	where
+    <![CDATA[ c.regiest_time >= #{beginDate} and  c.regiest_time <= #{endDate}]]> AND  c.brand_id=#{brandId}
+    GROUP BY
+		c.id
     </select>
 
 	<select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">

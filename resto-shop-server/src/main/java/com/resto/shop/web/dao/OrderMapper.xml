@@ -2,6 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderMapper">
+     <!-- 一个用户多有很多订单 -->
+      <resultMap id="CustomerOrderListmap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="shop_detail_id" property="shopDetailId"  jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus"  jdbcType="INTEGER"/>
+        <!-- 顾客 -->
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customer_id" property="id"/>
+            <result column="telephone" property="telephone"/>
+       </association>
+       <!-- 评论 -->
+         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+            <result column="content" property="content"/>
+        </association>
+       <!-- 支付方式的id -->
+          <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+        	<result column="pay_value" property="payValue"/>
+			<result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+    
+   <!-- 结束 -->
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
@@ -2230,6 +2257,32 @@ AND o.production_status IN (2, 3)
 		inner join tb_order_item toi on tod.id = toi.order_id
 		where tod.serial_number =  #{serialNumber} 
 	</select>
+	
+	<!-- 一个用户有很多订单 -->
+	<select id="getCustomerOrderList" resultMap="CustomerOrderListmap">
+<!-- 	  SELECT -->
+<!-- 		      o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id ,c.telephone, a.id  appraise_id, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id   , oi.pay_value -->
+<!-- 			FROM -->
+<!-- 				tb_customer c -->
+<!-- 			LEFT  JOIN tb_order o ON c.id = o.customer_id -->
+<!-- 			LEFT   JOIN tb_appraise a on a.order_id = o.id -->
+<!-- 			LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id  -->
+<!-- 			WHERE c.id = 'f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12" -->
+	
+		   SELECT
+		      o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id ,c.telephone, a.id  appraise_id, a.level, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id   , oi.pay_value
+			FROM
+				tb_customer c
+			LEFT  JOIN tb_order o ON c.id = o.customer_id
+			LEFT   JOIN tb_appraise a on a.order_id = o.id
+			LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id 
+			 WHERE c.id =#{customerId}   AND  <![CDATA[ o.create_time >= #{ beginDate }  and o.create_time <= #{ endDate } ]]>
+
+	      
+	</select>
+	
+	
+	
 </mapper>
 
 
