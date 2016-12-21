@@ -2273,7 +2273,7 @@ AND o.production_status IN (2, 3)
         ,c.telephone, a.id appraise_id, a.level, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id , oi.pay_value
         FROM
         tb_customer c
-        LEFT JOIN tb_order o ON c.id = o.customer_id
+        INNER JOIN tb_order o ON c.id = o.customer_id
         LEFT JOIN tb_appraise a on a.order_id = o.id
         LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE c.id =#{customerId}
