@@ -3514,6 +3514,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             String resultJson = AliPayUtils.refundPay(map);
                             item.setResultData(new JSONObject(resultJson).toString());
                             item.setPayValue(refundTotal.multiply(new BigDecimal(-1)));
+                            orderPaymentItemService.insert(item);
                             if(maxWxRefund.doubleValue() < order.getRefundMoney().doubleValue()){ //如果最大退款金额 比实际要退的小
                                 BigDecimal backMoney = order.getRefundMoney().subtract(maxWxRefund);
                                 OrderPaymentItem back = new OrderPaymentItem();
