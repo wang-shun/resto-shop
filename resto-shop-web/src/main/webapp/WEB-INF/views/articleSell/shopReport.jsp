@@ -71,7 +71,6 @@ var shopTable = $("#shopTable").DataTable({
 		{
 			title : "菜品类别",
 			data : "articleFamilyName",
-			s_filter : true
 		},  
 		{
 			title : "菜名",
@@ -80,7 +79,6 @@ var shopTable = $("#shopTable").DataTable({
         {
             title : "菜品类型",
             data : "typeName",
-            s_filter : true
         },
         {
             title: "编号",
@@ -105,54 +103,6 @@ var shopTable = $("#shopTable").DataTable({
 			data : "salesRatio",
 		},
 	],
-	initComplete: function () {
-		var api = this.api();
-		api.search('');
-		var data = api.data();
-		var columnsSetting = api.settings()[0].oInit.columns;
-		$(columnsSetting).each(function (i) {
-			if (this.s_filter) {
-				var column = api.column(i);
-				var title = this.title;
-				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-				var that = this;
-				column.data().unique().each(function (d) {
-					select.append('<option value="' + d + '">' + d + '</option>')
-				});
-
-				select.appendTo($(column.header()).empty()).on('change', function () {
-					var val = $.fn.dataTable.util.escapeRegex(
-							$(this).val()
-					);
-					column.search(val ? '^' + val + '$' : '', true, false).draw();
-				});
-			}
-		});
-	},
-	infoCallback: function () {
-		var api = this.api();
-		api.search('');
-		var data = api.data();
-		var columnsSetting = api.settings()[0].oInit.columns;
-		$(columnsSetting).each(function (i) {
-			if (this.s_filter) {
-				var column = api.column(i);
-				var title = this.title;
-				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-				var that = this;
-				column.data().unique().each(function (d) {
-					select.append('<option value="' + d + '">' + d + '</option>')
-				});
-
-				select.appendTo($(column.header()).empty()).on('change', function () {
-					var val = $.fn.dataTable.util.escapeRegex(
-							$(this).val()
-					);
-					column.search(val ? '^' + val + '$' : '', true, false).draw();
-				});
-			}
-		});
-	}
 } );
 
 //搜索
