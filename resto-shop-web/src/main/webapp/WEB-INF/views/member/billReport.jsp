@@ -2,43 +2,46 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div>
-    	<div id="report-editor">
-	    	<div class="panel panel-success">
-			  <div class="panel-heading text-center">
-			  	<strong style="margin-right:100px;font-size:22px">会员优惠券详情</strong>
-			  </div>
-			  <div class="panel-body">
-			  	<table id="brandReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
-			  	<br/>
-			  	<table id="shopReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
-			  </div>
-			</div>
-    	</div>
+    	<div class="panel panel-info">
+	<div class="panel-heading text-center" style="font-size: 22px;">
+		<strong>会员优惠券列表</strong>
+	</div>
+	<div class="panel-body">
+		<table class="table table-striped table-bordered table-hover"
+			id="shopBill">
+		</table>
+	</div>
+</div>
     </div>
  <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 var dataSource;
+var customerId = "${customerId}"
 $.ajax( {  
     url:'member/list_all_shopId',
     async:false,
     data:{  
-    	
+    	'customerId':customerId
     },  
     success:function(data) { 
-    	dataSource=data;
+    	if(data != null ){
+    		dataSource=data;
+    	}
+    	
      },  
      error : function() { 
     	 toastr.error("系统异常请重新刷新");
      }   
 });
 
-var tb1 = $("#shopReportTable").DataTable({
+var tb1 = $("#shopBill").DataTable({
 	data:dataSource.data,
 	bSort:false,
 	columns : [
 		{
 			title : "优惠券状态",
 			data : "is_used",
+			defaultContent:"",
 			createdCell:function(td,tdData){
 				if(tdData==true){
 					$(td).html("已使用");

@@ -131,7 +131,9 @@ $('.form_datetime').datetimepicker({
 		language:"zh-CN"
 	});
 
-
+//文本框默认值
+var beginDate = $("#beginDate").val();
+var endDate = $("#endDate").val();
 //创建vue对象
 var vueObj =  new Vue({
 	el:"#control",
@@ -140,8 +142,8 @@ var vueObj =  new Vue({
 		shopOrderList : [],
 		brandOrder:{},
 		searchDate : {
-			beginDate : "",
-			endDate : "",
+			beginDate : "beginDate",
+			endDate : "endDate",
 		},
 		modalInfo:{
 			title:"",
@@ -156,12 +158,17 @@ var vueObj =  new Vue({
 			toastr.error("开始时间不能大于结束时间")
 			return ;
 		}
-			/* $.post("member/userList", this.getDate(null), function(result) {
-					that.shopOrderList = result.shopId;
+		/* 	$.post("member/userList", this.getDate(null), function(data) {
+					/* that.shopOrderList = result.shopId;
 					that.brandOrder = result.brandId;
+					that.shopOrderList = data;
 					toastr.success("查询成功");
-					console.log(result.brandId);
-				}); */
+					console.log(data);
+					console.log(that.shopOrderList);
+					console.log(data.customerId);
+					
+					
+			}); */
 			this.basePost("member/userList", $("#formInfo").serialize(), function(data) {
 				/* if (!data.customerId) {
 					that.errorMsg("该手机号码没有注册！");
@@ -175,7 +182,6 @@ var vueObj =  new Vue({
 			var data = {
 				beginDate : this.searchDate.beginDate,
 				endDate : this.searchDate.endDate,
-				shopId : shopId
 			};
 			return data;
 		},

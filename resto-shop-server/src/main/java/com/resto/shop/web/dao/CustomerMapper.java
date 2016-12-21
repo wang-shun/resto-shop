@@ -2,10 +2,12 @@ package com.resto.shop.web.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.shop.web.model.Customer;
 
 public interface CustomerMapper extends GenericDao<Customer, String>{
@@ -53,4 +55,9 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
     List<Customer> selectListByBrandIdHasRegister(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
 
     Customer selectCustomerAccount(@Param("telephone") String telephone);
+
+    List<MemberUserDto> selectListMemberUser(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+    Map<String,Object> selectListMember(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+	
 }

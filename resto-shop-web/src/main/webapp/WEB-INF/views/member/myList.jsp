@@ -1,8 +1,9 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
+<div id="control">
 <h2 class="text-center"><strong>会员信息列表</strong></h2>
-<div class="row" id="searchTools">
+<!-- <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
@@ -15,28 +16,56 @@
 		  <br></div>
 		  	 <button type="button" class="btn btn-primary" id="today"> 今日</button>
              <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
-<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
+             <button type="button" class="btn yellow" id="benxun">本询</button> 
              <button type="button" class="btn btn-primary" id="week">本周</button>
              <button type="button" class="btn btn-primary" id="month">本月</button>
 		  
 		  <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
 		  <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
-		  <form>
-			<input type="hidden" id="brandDataTable">
-			<input type="hidden" id="shopDataTable">
-		</form>&nbsp;&nbsp;&nbsp;
+		
 		</form>
+	</div>
+</div> -->
+<div class="row" id="searchTools">
+	<div class="col-md-12">
+		<form class="form-inline">
+		  <div class="form-group" style="margin-right: 50px;">
+		    <label for="beginDate">开始时间：</label>
+		    <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
+		  </div>
+		  <div class="form-group" style="margin-right: 50px;">
+		    <label for="endDate">结束时间：</label>
+		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
+		  </div>
+		  	
+		   	 <button type="button" class="btn btn-primary" id="today"> 今日</button>
+                 
+             <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
+          
+<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
+             
+             <button type="button" class="btn btn-primary" id="week">本周</button>
+             <button type="button" class="btn btn-primary" id="month">本月</button>
+             
+             <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
+		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+		</form>
+		
 	</div>
 </div>
 <br/>
-<div>
+<br/>
+
+<br/>
   	<!-- 每日报表 -->
-    	<div id="report-editor">
-	    	<div class="panel panel-success">
-			  <div class="panel-heading text-center">
-			  	<strong style="margin-right:100px;font-size:22px">会员信息管理</strong>
-			  </div>
-			  <div class="panel-body">
+    <div role="tabpanel" class="tab-pane" id="orderReport">
+    	<div class="panel panel-primary" style="border-color:write;">
+		  	<!-- 品牌订单 -->
+    	<div class="panel panel-info">
+		  <div class="panel-heading text-center">
+		  	<strong style="margin-right:100px;font-size:22px">品牌订单列表</strong>
+		  </div>
+		  		<div class="panel-body">
 			  	<table id="brandReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
 			  	<br/>
 			  	<table id="shopReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
@@ -44,13 +73,13 @@
 			</div>
     	</div>
     </div>
-    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" data-backdrop="static">
+	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" data-backdrop="static">
            <div class="modal-dialog modal-full">
                <div class="modal-content">
                    <div class="modal-header">
                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                    </div>
-                   <div class="modal-body"> </div>
+                   <div class="modal-body" id="reportModal1"> </div>
                    <div class="modal-footer">
 <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
 						<button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
@@ -82,6 +111,7 @@ $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
 var beginDate = $("#beginDate").val();
 var endDate = $("#endDate").val();
 var dataSource;
+var customerId;
 $.ajax( {  
     url:'member/userList',
     async:false,
@@ -143,7 +173,7 @@ var tb1 = $("#shopReportTable").DataTable({
                 }
             }
 		},       
- 		{                 
+ 		/* {                 
 			title : "生日",
 			data : "birthday",
 			createdCell:function (td,tdData) {
@@ -151,9 +181,9 @@ var tb1 = $("#shopReportTable").DataTable({
                     $(td).html("--")
                 }
             }
-		},       
+		},       */ 
 		
-		{                 
+		/* {                 
 			title : "星座",
 			data : "constellation",
 			createdCell:function (td,tdData) {
@@ -161,7 +191,7 @@ var tb1 = $("#shopReportTable").DataTable({
                     $(td).html("--")
                 }
             }
-		}, 
+		},  */
         {
             title : "省/市",
             data : "province",
@@ -187,12 +217,13 @@ var tb1 = $("#shopReportTable").DataTable({
 		},
 		{
 			title : "优惠券",
-			data : "orderId",
+			data : "customerId",
 			createdCell : function(td, tdData,rowData) {
+				customerId=tdData;
 				var button = $("<button class='btn green'>查看详情</button>");
 				button.click(function() {
-					$("#reportModal").modal('show');
-					this.openModal("member/show/billReport", shopName,shopId);
+					/* $("#reportModal").modal('show'); */
+					openModal1(customerId);
 				})
 				$(td).html(button);
 			}
@@ -222,12 +253,14 @@ var tb1 = $("#shopReportTable").DataTable({
 		},
 		{
 			title : "支付信息管理",
-			data : "orderId",
+			data : "customerId",
 			createdCell : function(td, tdData,rowData) {
+				customerId=tdData;
 				var button = $("<button class='btn green'>查看详情</button>");
 				button.click(function() {
 					$("#reportModal").modal('show');
-					this.openModal("member/show/billReport", shopName,shopId);
+					/* this.openModal("member/show/orderReport", customerId); */
+					openModal(beginDate,endDate, customerId);
 				})
 				$(td).html(button);
 			}
@@ -235,6 +268,7 @@ var tb1 = $("#shopReportTable").DataTable({
 	]
 	
 });
+
 
 //查询
 $("#searchReport").click(function(){
@@ -274,13 +308,13 @@ $("#week").click(function(){
 });
 
 
-//本旬
-$("#benxun").click(function(){
-	
-	
-	
+//关闭页面	
+$("#closeModal").click(function(e){
+	e.stopPropagation();
+	var modal = $("#reportModal");
+	modal.find(".modal-body").html("");
+    modal.modal({show:false});
 });
-
 
 //本月
 $("#month").click(function(){
@@ -310,8 +344,49 @@ function searchInfo(beginDate,endDate){
 		     },  
 		     error : function() { 
 		    	 toastr.error("系统异常请重新刷新");
-		     }  
+		     }
 		});
+}
+
+function openModal(beginDate,endDate,customerId){
+	//更新数据源
+	$.ajax( {  
+	    url:'member/show/orderReport',
+	    data:{  
+	    	'beginDate':beginDate,
+	    	'endDate':endDate,
+	    	'customerId':customerId
+	    },  
+	    success:function(result) {
+	    	var modal = $("#reportModal");
+			modal.find(".modal-body").html(result);
+/* 			modal.find(".modal-title > strong").html(modalTitle);*/
+			modal.modal()
+	     },  
+	     error : function() { 
+	    	 toastr.error("系统异常请重新刷新");
+	     }
+	});
+}
+
+function openModal1(customerId){
+	//更新数据源
+	$.ajax( {  
+	    url:'member/show/billReport',
+	    data:{  
+	    	'customerId':customerId
+	    },  
+	    success:function(result) {
+	    	console.log(result);
+	    	var modal = $("#reportModal");
+			modal.find(".modal-body").html(result);
+			/* modal.find(".modal-title > strong").html(modalTitle); */
+			modal.modal()
+	     },  
+	     error : function() { 
+	    	 toastr.error("系统异常请重新刷新");
+	     }
+	});
 }
 
 
