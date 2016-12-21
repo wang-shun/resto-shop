@@ -526,7 +526,7 @@ public interface OrderService extends GenericService<Order, String> {
      * @param customerId
      * @return
      */
-	public List<Order> getCustomerOrderList(String customerId);
+	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate);
     
     
     

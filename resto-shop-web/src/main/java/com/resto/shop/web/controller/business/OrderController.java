@@ -58,7 +58,7 @@ public class OrderController extends GenericController{
 	
 	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
-	@RequestMapping("brand_data")
+	@RequestMapping("brand_data")///////
 	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
 		
 		return this.getResult(beginDate, endDate);
@@ -70,7 +70,7 @@ public class OrderController extends GenericController{
 	}
 	
 	
-	//下载品牌订单报表
+	//下载品牌订单报表////////////
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping("brand_excel")
@@ -124,7 +124,7 @@ public class OrderController extends GenericController{
 		}
 	}
 	
-	
+	//
 	@RequestMapping("/show/shopReport")
 	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
@@ -136,6 +136,7 @@ public class OrderController extends GenericController{
 		}
 		return "orderReport/shopReport";
 	}
+	
 	
 	@RequestMapping("AllOrder")
 	@ResponseBody
@@ -266,6 +267,9 @@ public class OrderController extends GenericController{
 				}
 				return listDto;
 	}
+	
+	
+	
 	
 	
 	

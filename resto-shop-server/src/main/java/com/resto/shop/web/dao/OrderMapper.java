@@ -514,5 +514,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @param orderId
 	 * @return
 	 */
-   List<Order> getCustomerOrderList(@Param("customerId") String customerId);
+   List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }

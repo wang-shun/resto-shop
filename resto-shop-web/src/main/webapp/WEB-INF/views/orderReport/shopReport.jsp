@@ -101,15 +101,12 @@ dt,dd{
                     <dd id="articleTotalPrice"></dd>
                     <dt>服&nbsp;务&nbsp;费：</dt>
                     <dd id="servicePrice"></dd>
-                    <%--<dt>餐盒费：</dt>--%>
-                    <%--<dd id="mealFreePrice"></dd>--%>
 				</dl>
 			</div>
 			<div class="table-scrollable">
 				<table class="table table-condensed table-hover">
 					<thead>
 						<tr>
-							<!--                            <th>餐品类型</th> -->
 							<th>餐品类别</th>
 							<th>餐品名称</th>
 							<th>餐品单价</th>
@@ -321,6 +318,7 @@ dt,dd{
 				"orderId" : orderId
 			},
 			success : function(result) {
+				console.log(orderId+"_______________");
 				if (result) {
 					var data = result.data;
 					console.log(data);

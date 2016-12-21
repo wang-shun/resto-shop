@@ -1,30 +1,39 @@
  package com.resto.shop.web.controller.business;
 
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.JOptionPane;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.JdbcUtils;
+import com.resto.brand.core.util.UserOrderExcelUtil;
 import com.resto.brand.web.dto.OrderDetailDto;
+import com.resto.brand.web.model.DatabaseConfig;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DatabaseConfigService;
+import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.NewCustomCouponService;
 import com.resto.shop.web.service.OrderService;
 
 @Controller
@@ -47,8 +56,9 @@ public class MemberController extends GenericController{
     private DatabaseConfigService databaseConfigService;
 	
 	@RequestMapping("/myList")
-    public void list(){
-		
+    public String list(HttpServletRequest request){
+		request.setAttribute("beginDate",DateUtil.formatDate(new Date(), "yyyy-MM-dd") );
+		request.setAttribute("endDate", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
 		return "member/orderReport";
 	}
 	
@@ -56,16 +66,41 @@ public class MemberController extends GenericController{
 	 * yjuany 一个用户有多个订单
 	 */
 	@RequestMapping("orderReport")
-	public @ResponseBody List<Map<String,Object>> showUserOrder(String customerId){
-		//订单状态
-	  List<OrderDetailDto> listDto = new ArrayList<>();//订单状态掉用卷神大哥的方法
+	@ResponseBody
+	public  List<OrderDetailDto> showUserOrder(String beginDate,String endDate,String customerId,HttpServletRequest request){
+		 customerId="f81d4fe246614796be302fa7593bef1b";
 		
-	  
-       List<Map<String,Object>> listMap = new ArrayList<>();
-	   List<Order> orderList = orderService.getCustomerOrderList(customerId);
+		if(customerId!=null){
+			request.setAttribute("customerId", customerId);
+			
+		}
+		//#
+		//订单状态
+	   List<OrderDetailDto> listDto = new ArrayList<>(); 
+	   
+	   //从session中获取该品牌的信息（这里只需要店铺名称）
+       List<ShopDetail> shopDetailList = getCurrentShopDetails();//放到session中的
+       if(shopDetailList==null){
+    	   shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+       }
+       
+     
+      // 用户id='f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12"
+	   List<Order> orderList = orderService.getCustomerOrderList(customerId,beginDate,endDate);
+	    if(orderList.size()>0){
 		 for (Order order : orderList) {
 			 OrderDetailDto ot = new OrderDetailDto(order.getId(), order.getShopName(), order.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "","","");
-			if(order.getCustomer()!=null){//判断是否有这个用户
+		    //查询店铺名称
+			 
+	               for (ShopDetail shopDetail : shopDetailList) {///////看下session有
+	  				 if(order.getShopDetailId().equals(shopDetail.getId())){
+	  					 ot.setShopDetailId(order.getShopDetailId());
+	  					 ot.setShopName(shopDetail.getName());
+	  				 }
+	  			  }
+			  
+			  
+			 if(order.getCustomer()!=null){//判断是否有这个用户
 				//手机号
 				if(order.getCustomer().getTelephone()!=null&&order.getCustomer().getTelephone()!=""){
 					ot.setTelephone(order.getCustomer().getTelephone());
@@ -127,6 +162,7 @@ public class MemberController extends GenericController{
 					ot.setLevel("五星");
 					break;
 				default:
+					ot.setLevel("——");
 					break;
 				}
 			}
@@ -170,31 +206,99 @@ public class MemberController extends GenericController{
 			ot.setIncomePrize(incomPrize);
 			//订单金额
 			ot.setOrderMoney(order.getOrderMoney());
-			listDto.add(ot);
-			
-			  Map<String,Object> map = new HashMap<>();
-			   map.put("shopName", order.getShopName());
-			   map.put("beginTime", ot.getBeginTime() );
-			   map.put("telephone", ot.getTelephone());
-			   map.put("orderMoney", ot.getOrderMoney());//订单金额
-			   map.put("weChatPay", ot.getWeChatPay());//微信支付
-			   map.put("accountPay", ot.getAccountPay());//红包支付
-			   map.put("couponPay", ot.getCouponPay());
-			   map.put("chargePay", ot.getChargePay());//充值金额支付
-			   map.put("rewardPay", ot.getRewardPay());///充值赠送支付
-			   map.put("incomePrize", 1);//营销撬动率
-			   map.put("level", ot.getLevel());//评价
-			   map.put("orderState", ot.getOrderState());//订单状态
-			   listMap.add(map);
-			
+			//店铺名字
+			 listDto.add(ot);
+		
 			
 		 }
 		
-	  
+	    }
 		
     
-		return listMap;
+		return listDto;
     }
+	
+	 /**
+	  * 下载用户订单列表
+	  * @param beginDate
+	  * @param endDate
+	  * @param customerId 用户id
+	  * @param request
+	  * @param response
+	  */
+	
+		@RequestMapping("usershop_excel")
+		@ResponseBody
+		public void reportUserOrder(String beginDate,String endDate,String customerId,HttpServletRequest request, HttpServletResponse response){
+			//导出文件名
+			String fileName = "用户订单列表"+beginDate+"至"+endDate+".xls";
+			//定义读取文件的路径
+			String path = request.getSession().getServletContext().getRealPath(fileName);
+			//定义列（导出的行数）
+			String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","incomePrize","level","orderState"};
+			//定义数据
+			List<OrderDetailDto>  UserOrderResult = this.showUserOrder(beginDate, endDate, customerId, request);
+			//获取店铺名称
+			//ShopDetail s = shopDetailService.selectById(shopId);
+			//excel最顶不的内容
+			Map<String,String> map = new HashMap<>();
+			map.put("beginDate", beginDate);
+			map.put("reportType", "用户订单报表");//表的头，第一行内容
+			map.put("endDate", endDate);
+			map.put("num", "11");//显示的位置
+			map.put("reportTitle", "用户订单");//表的名字
+			map.put("timeType", "yyyy-MM-dd");
+			
+			String[][] headers = {{"店铺名","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
+			
+			
+			//定义excel工具类对象
+			UserOrderExcelUtil<OrderDetailDto> excelUtil=new UserOrderExcelUtil<OrderDetailDto>();//OrderDetailDto订单扩展类（showUserOrder）
+			try{
+				OutputStream out = new FileOutputStream(path);//导出 （ 输出流  ）路径path:E:\resto-shop\resto-shop-web\src\main\webapp\用户订单列表2016-1-1至2016-12-20.xls
+				excelUtil.ExportExcel(headers, columns, UserOrderResult, out, map);
+				out.close();
+				excelUtil.download(path, response);
+				JOptionPane.showMessageDialog(null, "导出成功！");
+				log.info("excel导出成功");
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	
+	
+
+       /**
+        * 
+        * 订单详情
+        * @param orderId
+        * @return
+        */
+		@RequestMapping("detailInfo")
+		@ResponseBody
+		public Result showDetail(String orderId){
+			Order o = orderService.selectOrderDetails(orderId);
+			List<Order> childList = orderService.selectListByParentId(orderId);//是否为套餐
+			if(!childList.isEmpty()){
+	                o.setChildList(childList);
+	        }
+           
+		
+			return getSuccessResult(o);
+		}
+		
+		
+		
+		
+		
+		
+		
+	
+	
+	
+	
+	
+	
 	
 	//查询当前店铺的所有用户
 	@RequestMapping("/userList")
@@ -222,16 +326,11 @@ public class MemberController extends GenericController{
 		}
 	}
 	
-	private Map<String,Object> getResult(String beginDate,String endDate){
-		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
-	}
-//	
-//	
-//	//下载品牌订单报表
-//	
-	@SuppressWarnings("unchecked")
+	
 	@RequestMapping("member_excel")
 	@ResponseBody
 	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+		
+	}
 
 }
