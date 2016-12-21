@@ -3675,7 +3675,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectWXOrderItems(String serialNumber) {
-    	return orderMapper.selectWXOrderItems(serialNumber);
+    public List<Order> selectWXOrderItems(Map<String, Object> map) {
+    	return orderMapper.selectWXOrderItems(map);
     }
 }

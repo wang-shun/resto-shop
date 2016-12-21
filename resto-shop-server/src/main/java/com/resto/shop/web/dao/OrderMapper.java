@@ -507,5 +507,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectListByParentId(@Param("orderId") String orderId);
 	
-	public List<Order> selectWXOrderItems(String serialNumber);
+	public List<Order> selectWXOrderItems(Map<String, Object> map);
 }

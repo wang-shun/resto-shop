@@ -518,5 +518,5 @@ public interface OrderService extends GenericService<Order, String> {
      * @param serialNumber
      * @return
      */
-    public List<Order> selectWXOrderItems(String serialNumber);
+    public List<Order> selectWXOrderItems(Map<String, Object> map);
 }
