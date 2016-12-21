@@ -3514,6 +3514,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("refund_amount", refundTotal);
                             map.put("out_request_no",newPayItemId);
                             String resultJson = AliPayUtils.refundPay(map);
+                            item.setId(newPayItemId);
                             item.setResultData(new JSONObject(resultJson).toString());
                             item.setPayValue(refundTotal.multiply(new BigDecimal(-1)));
                             orderPaymentItemService.insert(item);
