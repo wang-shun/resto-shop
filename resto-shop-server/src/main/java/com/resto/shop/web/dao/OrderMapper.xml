@@ -19,6 +19,7 @@
         <result column="payment_amount" property="paymentAmount"
                 jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column= "ali_pay_discount_money" property="aliPayDiscountMoney"/>
         <result column="article_count" property="articleCount"
                 jdbcType="INTEGER"/>
         <result column="serial_number" property="serialNumber"
@@ -243,7 +244,7 @@
         order_state,
         production_status,
         original_amount, reduction_amount,
-        payment_amount, order_money, article_count,
+        payment_amount, order_money, ali_pay_discount_money, article_count,
         serial_number,
         confirm_time, print_times, allow_cancel, allow_appraise, closed,
         remark,
@@ -617,6 +618,9 @@
             <if test="orderMoney != null">
                 order_money = #{orderMoney,jdbcType=DECIMAL},
             </if>
+            <if test="aliPayDiscountMoney != null">
+                ali_pay_discount_money = #{aliPayDiscountMoney,jdbcType=DECIMAL},
+            </if>
             <if test="articleCount != null">
                 article_count = #{articleCount,jdbcType=INTEGER},
             </if>
@@ -936,7 +940,13 @@ SELECT
         AND
         <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
         and( (production_status = 5 and order_state != 9 and print_times = 0) or
-         (production_status = 1 and order_state != 9 and print_times = 0 and now() - push_order_time > 90  ) )
+         (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 90  )
+         or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
+         )
+
+
+
+
 
         order by push_order_time DESC;
     </select>
@@ -977,7 +987,7 @@ SELECT
         id=#{0}
     </update>
     <update id="setOrderNumber">
-        update tb_order set table_number=#{1} where id=#{0}
+        update tb_order set table_number=#{tableNumber} where id=#{orderId}
     </update>
 
 
@@ -2184,6 +2194,7 @@ AND o.production_status IN (2, 3)
     <select id="getServicePrice" resultType="java.math.BigDecimal">
         select sum(customer_count) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and parent_order_id is null
         and order_state in (2,10,11,12) and production_status in (2,3)
     </select>
     <update id="refundServicePrice">

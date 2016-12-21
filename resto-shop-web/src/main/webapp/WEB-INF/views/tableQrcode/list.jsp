@@ -69,21 +69,36 @@
                     <form role="form" action="tableQrcode/modify" @submit.prevent="save">
                         <div class="form-horizontal">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">桌号：</label>
+                                <label class="col-sm-3 control-label"><strong>桌号：</strong></label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control" name="tableNumber"
                                            v-model="m.tableNumber">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">是否启用：</label>
-                                <div class="col-sm-5 radio-list">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="state" v-model="m.state" value="1"> 启用
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="state" v-model="m.state" value="0"> 不启用
-                                    </label>
+                                <label class="col-sm-3 control-label"><strong>是否开启：</strong></label>
+                                <div class="col-sm-8">
+                                    <div class="md-radio-inline">
+                                        <div class="md-radio">
+                                            <!-- 判断是否 绑定的对象是否有值，如果没有则不绑定 -->
+                                            <input type="radio" class="md-radiobtn" id="isAddRatio_yes" name="state" value="1" v-model="m.state" v-if="m.id">
+                                            <input type="radio" class="md-radiobtn" id="isAddRatio_yes" name="state" value="1"  v-if="!m.id" checked="checked">
+                                            <label for="isAddRatio_yes">
+                                                <span></span>
+                                                <span class="check"></span>
+                                                <span class="box"></span>开启
+                                            </label>
+                                        </div>
+                                        <div class="md-radio">
+                                            <input type="radio" class="md-radiobtn" id="isAddRatio_no" name="state" value="0" v-model="m.state" v-if="m.id">
+                                            <input type="radio" class="md-radiobtn" id="isAddRatio_no" name="state" value="0" v-if="!m.id">
+                                            <label for="isAddRatio_no">
+                                                <span></span>
+                                                <span class="check"></span>
+                                                <span class="box"></span>关闭
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -312,8 +327,8 @@
                     }
                 }
             });
+            C.vue = vueObj;
         });
-        C.vue = vueObj;
     }());
 
     function downloadNow(){

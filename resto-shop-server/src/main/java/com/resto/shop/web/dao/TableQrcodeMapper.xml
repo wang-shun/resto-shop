@@ -72,4 +72,8 @@
     <select id="selectByShopId" resultType="TableQrcode">
         select * from tb_table_qrcode where shop_detail_id = #{shopId}
     </select>
+
+    <select id="selectByTableNumberShopId" resultType="TableQrcode">
+        select * from tb_table_qrcode where shop_detail_id = #{shopId} and table_number = #{tableNumber} limit 1
+    </select>
 </mapper>

@@ -7,11 +7,11 @@
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" v-model="searchDate.beginDate" readonly="readonly">
+		    <input type="text" id="beginDate" class="form-control form_datetime" :value="searchDate.beginDate" v-model="searchDate.beginDate" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" v-model="searchDate.endDate" readonly="readonly">
+		    <input type="text" id="endDate" class="form-control form_datetime" :value="searchDate.endDate" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
 		  
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
@@ -144,6 +144,117 @@
   
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
+var sort = "desc";	
+var tb2 = $("#articleSellTable").DataTable({
+	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+	ajax : {
+		url : "articleSell/brand_id_data",
+		dataSrc : "data",
+		data:function(d){
+			var date = new Date().format("yyyy-MM-dd");
+			var beginDate = $("#beginDate").val().trim();
+			var endDate = $("#endDate").val().trim();
+			if(beginDate == null || beginDate == ""){
+				d.beginDate = date;
+			}else{
+				d.beginDate = beginDate;
+			}
+			if(endDate == null || endDate == ""){
+				d.endDate = date;
+			}else{
+				d.endDate = endDate;
+			}
+			d.sort = sort;//默认按销量排序
+			return d;
+		}
+	},
+	ordering:false,
+	columns : [
+		{
+			title : "菜品类别",
+			data : "articleFamilyName",
+			s_filter : true
+		},  
+		{
+			title : "菜名",
+			data : "articleName",
+		},
+        {
+            title : "菜品类型",
+            data : "typeName",
+            s_filter : true
+        },
+        {
+          title : "编号",
+           data : "numberCode",
+           defaultContent:"",
+        },
+		{
+			title : "销量(份)",
+			data : "brandSellNum",
+		},
+		{
+			title : "销量占比",
+			data : "numRatio",
+		},
+		{
+			title : "销售额(元)",
+			data : "salles",
+		},
+		{
+			title : "销售额占比",
+			data : "salesRatio",
+		},
+	],
+	initComplete: function () {
+		var api = this.api();
+		api.search('');
+		var data = api.data();
+		var columnsSetting = api.settings()[0].oInit.columns;
+		$(columnsSetting).each(function (i) {
+			if (this.s_filter) {
+				var column = api.column(i);
+				var title = this.title;
+				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+				var that = this;
+				column.data().unique().each(function (d) {
+					select.append('<option value="' + d + '">' + d + '</option>')
+				});
+
+				select.appendTo($(column.header()).empty()).on('change', function () {
+					var val = $.fn.dataTable.util.escapeRegex(
+							$(this).val()
+					);
+					column.search(val ? '^' + val + '$' : '', true, false).draw();
+				});
+			}
+		});
+	},
+	infoCallback: function() {
+		var api = this.api();
+		api.search('');
+		var data = api.data();
+		var columnsSetting = api.settings()[0].oInit.columns;
+		$(columnsSetting).each(function (i) {
+			if (this.s_filter) {
+				var column = api.column(i);
+				var title = this.title;
+				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+				var that = this;
+				column.data().unique().each(function (d) {
+					select.append('<option value="' + d + '">' + d + '</option>')
+				});
+
+				select.appendTo($(column.header()).empty()).on('change', function () {
+					var val = $.fn.dataTable.util.escapeRegex(
+							$(this).val()
+					);
+					column.search(val ? '^' + val + '$' : '', true, false).draw();
+				});
+			}
+		});
+    }
+});
 
 //时间插件
 $('.form_datetime').datetimepicker({
@@ -157,7 +268,7 @@ $('.form_datetime').datetimepicker({
 		startView:"month",
 		language:"zh-CN"
 	});
-	
+
 var vueObj = new Vue({
 		el : "#control",
 		data : {
@@ -198,6 +309,7 @@ var vueObj = new Vue({
 	 					that.brandReport.brandName = result.brandName;
 	 					that.brandReport.totalNum = result.totalNum;
 	 					that.brandReport.sellIncome=result.sellIncome;
+	 					tb2.bDestroy = true;
 	 					tb2.ajax.reload();
 	 					toastr.success("查询成功");
 	 				});
@@ -289,60 +401,7 @@ var vueObj = new Vue({
 			this.searchDate.endDate = date;
 			this.searchInfo();
 		}
-	})
-	
-var sort = "desc";	
-var tb2 = $("#articleSellTable").DataTable({
-	"lengthMenu": [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
-	ajax : {
-		url : "articleSell/brand_id_data",
-		dataSrc : "data",
-		data:function(d){
-			d.beginDate = vueObj.searchDate.beginDate;
-			d.endDate = vueObj.searchDate.endDate ;
-			d.sort = sort;//默认按销量排序
-			return d;
-		}
-	},
-	ordering:false,
-	columns : [
-		{
-			title : "分类",
-			data : "articleFamilyName",
-		},  
-		{
-			title : "菜名",
-			data : "articleName",
-		},
-        {
-            title : "菜品类型",
-            data : "typeName",
-        },
-        {
-          title : "编号",
-           data : "numberCode",
-           defaultContent:"",
-        },
-		{
-			title : "销量(份)",
-			data : "brandSellNum",
-		},
-		{
-			title : "销量占比",
-			data : "numRatio",
-		},
-		{
-			title : "销售额(元)",
-			data : "salles",
-		},
-		{
-			title : "销售额占比",
-			data : "salesRatio",
-		},
-	],
-	
-})
-	
+	});
 
 $('#ulTab a').click(function (e) {
 	var beginDate = vueObj.searchDate.beginDate;
