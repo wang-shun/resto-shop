@@ -147,22 +147,22 @@
 								<%--</div>--%>
 							<%--</div>--%>
 						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">套餐出单方式：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="printType" v-model="m.printType" value="0">--%>
-										<%--整单出单--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="printType" v-model="m.printType" value="1">--%>
-										<%--分单出单--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
+						
+						<div class="form-group">
+							<label class="col-sm-3 control-label">套餐出单方式：</label>
+							<div class="col-sm-9">
+								<div>
+									<label >
+										<input type="radio" name="printType" v-model="m.printType" value="0">
+										整单出单
+									</label>
+									<label>
+										<input type="radio" name="printType" v-model="m.printType" value="1">
+										分单出单
+									</label>
+								</div>
+							</div>
+						</div>
 
 						<div class="form-group">
 							<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>

@@ -898,6 +898,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         Map<String, List<String>> recommendMap = new HashMap<>();
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
@@ -914,7 +915,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             } else if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
 //                continue;
-                if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                if (setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
                     Kitchen kitchen = kitchenService.getItemKitchenId(item);
@@ -931,7 +932,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
-                if (setting.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                if (setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     Kitchen kitchen = kitchenService.selectMealKitchen(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();
