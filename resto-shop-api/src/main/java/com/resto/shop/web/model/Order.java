@@ -33,6 +33,8 @@ public class Order implements Serializable{
     private BigDecimal paymentAmount;
 
     private BigDecimal orderMoney;
+    
+    private BigDecimal aliPayDiscountMoney;
 
     private Integer articleCount;
 
@@ -716,6 +718,14 @@ public class Order implements Serializable{
     public void setUseAccount(boolean useAccount) {
         this.useAccount = useAccount;
     }
+
+	public BigDecimal getAliPayDiscountMoney() {
+		return aliPayDiscountMoney;
+	}
+
+	public void setAliPayDiscountMoney(BigDecimal aliPayDiscountMoney) {
+		this.aliPayDiscountMoney = aliPayDiscountMoney;
+	}
 
 
 }
