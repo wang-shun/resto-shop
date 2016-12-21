@@ -267,12 +267,12 @@
                 title: "订单记录",
                 data: "customerId",
                 createdCell: function (td, tdData, rowData) {
-                    customerId = tdData;
+                     ;
                     var button = $("<button class='btn green'>查看详情</button>");
                     button.click(function () {
                         $("#reportModal").modal('show');
                         /* this.openModal("member/show/orderReport", customerId); */
-                        openModal(beginDate, endDate, customerId);
+                        openModal(beginDate, endDate, tdData);
                     })
                     $(td).html(button);
                 }

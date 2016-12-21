@@ -187,8 +187,8 @@ public class MemberController extends GenericController{
 
 	@RequestMapping("/show/orderReport")
 	public String showModal1(String endDate,String beginDate,String customerId,HttpServletRequest request){
-		request.setAttribute("beginDate",beginDate );
-		request.setAttribute("endDate", endDate);
+//		request.setAttribute("beginDate",beginDate );
+//		request.setAttribute("endDate", endDate);
 		request.setAttribute("customerId", customerId);
 		return "member/orderReport";
 	}

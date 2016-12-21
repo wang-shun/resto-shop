@@ -141,8 +141,8 @@ dt,dd{
      
 	//订单
 	var customerId = "${customerId}"//用户id
-	$("#beginDate2").val("${beginDate}");
-	$("#endDate2").val("${endDate}");
+	$("#beginDate2").val("");
+	$("#endDate2").val("");
 	var tb1 = $("#shopOrder").DataTable({
 		"scrollY": "340px",
 		"autoWidth": false,
