@@ -69,14 +69,14 @@
                     <form role="form" action="tableQrcode/modify" @submit.prevent="save">
                         <div class="form-horizontal">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">桌号：</label>
+                                <label class="col-sm-3 control-label"><strong>桌号：</strong></label>
                                 <div class="col-sm-5">
                                     <input type="number" class="form-control" name="tableNumber"
                                            v-model="m.tableNumber">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label"><strong>是否可以叠加：</strong></label>
+                                <label class="col-sm-3 control-label"><strong>是否开启：</strong></label>
                                 <div class="col-sm-8">
                                     <div class="md-radio-inline">
                                         <div class="md-radio">
@@ -86,7 +86,7 @@
                                             <label for="isAddRatio_yes">
                                                 <span></span>
                                                 <span class="check"></span>
-                                                <span class="box"></span>是
+                                                <span class="box"></span>开启
                                             </label>
                                         </div>
                                         <div class="md-radio">
@@ -95,7 +95,7 @@
                                             <label for="isAddRatio_no">
                                                 <span></span>
                                                 <span class="check"></span>
-                                                <span class="box"></span>否
+                                                <span class="box"></span>关闭
                                             </label>
                                         </div>
                                     </div>
