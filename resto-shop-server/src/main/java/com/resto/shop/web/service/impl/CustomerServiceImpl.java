@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -10,6 +11,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.brand.web.model.ShareSetting;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
@@ -178,4 +180,20 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     public Customer selectCustomerAccount(String telephone) {
     	return customerMapper.selectCustomerAccount(telephone);
     }
+
+	@Override
+	public Map<String, Object> selectListMember(String beginDate, String endDate, String brandId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+		return customerMapper.selectListMember(begin,end,brandId);
+	}
+
+	@Override
+	public List<MemberUserDto> selectListMemberUser(String beginDate, String endDate, String brandId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+		return customerMapper.selectListMemberUser(begin,end,brandId);
+	}
 }

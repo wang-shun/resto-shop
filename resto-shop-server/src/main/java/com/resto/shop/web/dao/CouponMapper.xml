@@ -160,4 +160,9 @@
     order by VALUE DESC
 </select >
 
+  <select id="getListByCustomerId" resultType="Coupon">
+    select * from tb_coupon
+    where customer_id = #{customerId}
+  </select>
+
 </mapper>

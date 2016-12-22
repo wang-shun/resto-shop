@@ -497,12 +497,20 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Integer getMealALLNumber(String shopId);
 
-	BigDecimal getRefundSumByOrderId(String orderId);
+	BigDecimal getRefundSumByOrderId(@Param("orderId")String orderId,@Param("type")int type);
 
 	Integer getCustomerPerson(String shopId);
     List<Order> selectOrderListItemByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     List<Order> selectListByParentId(@Param("orderId") String orderId);
 	
+	public List<Order> selectWXOrderItems(Map<String, Object> map);
 	public List<Order> selectWXOrderItems(String serialNumber);
+	/**
+	 * 会员模块
+	 * 用户订单管理
+	 * @param orderId
+	 * @return
+	 */
+   List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }

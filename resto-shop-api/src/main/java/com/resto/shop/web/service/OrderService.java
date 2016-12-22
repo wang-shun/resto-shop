@@ -518,5 +518,16 @@ public interface OrderService extends GenericService<Order, String> {
      * @param serialNumber
      * @return
      */
-    public List<Order> selectWXOrderItems(String serialNumber);
+    public List<Order> selectWXOrderItems(Map<String, Object> map);
+
+    /**
+     * 会员管理
+     * yjuany 一个用户有多个订单
+     * @param customerId
+     * @return
+     */
+	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate);
+    
+    
+    
 }

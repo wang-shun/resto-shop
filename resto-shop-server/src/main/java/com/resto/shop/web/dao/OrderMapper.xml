@@ -2,6 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.resto.shop.web.dao.OrderMapper">
+    <!-- 一个用户多有很多订单 -->
+    <resultMap id="CustomerOrderListmap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
+        <!-- 顾客 -->
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customer_id" property="id"/>
+            <result column="telephone" property="telephone"/>
+        </association>
+        <!-- 评论 -->
+        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+            <result column="content" property="content"/>
+        </association>
+        <!-- 支付方式的id -->
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+
+    <!-- 结束 -->
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
@@ -19,7 +46,7 @@
         <result column="payment_amount" property="paymentAmount"
                 jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-        <result column= "ali_pay_discount_money" property="aliPayDiscountMoney"/>
+        <result column="ali_pay_discount_money" property="aliPayDiscountMoney"/>
         <result column="article_count" property="articleCount"
                 jdbcType="INTEGER"/>
         <result column="serial_number" property="serialNumber"
@@ -72,13 +99,13 @@
         <result column="meal_fee_price" property="mealFeePrice"/>
         <result column="meal_all_number" property="mealAllNumber"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
-        	<result column="orderPaymentId" property="id"/>
-        	<result column="pay_value" property="payValue"/>
-			<result column="payment_mode_id" property="paymentModeId"/>
+            <result column="orderPaymentId" property="id"/>
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
         <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
-        	<result column="article_name" property="articleName"/>
-			<result column="count" property="count"/>
+            <result column="article_name" property="articleName"/>
+            <result column="count" property="count"/>
         </collection>
     </resultMap>
 
@@ -91,10 +118,10 @@
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-        <result column="production_status" property="productionStatus" />
-        <result column="service_price" property="servicePrice" />
-        <result column="parent_order_id" property="parentOrderId" />
-        <result column="order_mode" property="orderMode" />
+        <result column="production_status" property="productionStatus"/>
+        <result column="service_price" property="servicePrice"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="order_mode" property="orderMode"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -126,14 +153,14 @@
     </resultMap>
 
     <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
-        <id column="id"  property="id"/>
+        <id column="id" property="id"/>
         <result column="order_money" property="orderMoney"/>
         <result column="order_mode" property="orderMode"/>
         <result column="amount_with_children" property="amountWithChildren"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItemId" property="id"/>
-           <result column="payment_mode_id" property="paymentModeId"/>
-          <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="pay_value" property="payValue"/>
         </collection>
     </resultMap>
 
@@ -170,7 +197,6 @@
     </resultMap>
 
 
-
     <resultMap id="orderPaymentlist" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
@@ -185,8 +211,6 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
     </resultMap>
-
-
 
 
     <resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
@@ -236,9 +260,6 @@
     </resultMap>
 
 
-
-
-
     <sql id="Base_Column_List">
         id, table_number, customer_count, accounting_time,
         order_state,
@@ -263,7 +284,8 @@
             parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
-        ,(select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount
+        ,(select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        totalCount
         from tb_order
         where id = #{id,jdbcType=VARCHAR}
     </select>
@@ -794,7 +816,8 @@
     <select id="orderList" resultType="Order">
         SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
-        and  ( (order_state != 1  and  parent_order_id is null and order_mode != 5) or (order_state = 1 and order_mode != 5 )
+        and ( (order_state != 1 and parent_order_id is null and order_mode != 5) or (order_state = 1 and order_mode != 5
+        )
         or (order_mode = 5 and parent_order_id is null))
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
@@ -862,10 +885,10 @@
         <![CDATA[ create_time>#{dateBegin} AND create_time<#{dateEnd}]]>
         and closed=0 and order_state in (2,10,11,12)
         <if test="shopMode != null and shopMode == 2">
-             and production_status in (3,4)
+            and production_status in (3,4)
         </if>
         <if test="shopMode != null and shopMode != 2">
-             and production_status in (2,3,4)
+            and production_status in (2,3,4)
         </if>
         order by create_time DESC;
     </select>
@@ -1119,9 +1142,9 @@ SELECT
     <!--o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND-->
     <!--<![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}-->
     <!--)-->
-<!--</select>-->
+    <!--</select>-->
 
-<!--查询品牌菜品的总数 -->
+    <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="integer">
        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
         WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and oi.type!=3
@@ -1144,7 +1167,6 @@ SELECT
        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
         ) as t
     </select>
-
 
 
     <!--查询品牌下每个店铺的菜品数目卖的和 2016-11-3 -->
@@ -1762,7 +1784,6 @@ AND
     </select>
 
 
-
     <update id="updateArticleStock">
         update tb_article
         <set>
@@ -1770,12 +1791,12 @@ AND
                 current_working_stock = current_working_stock - #{count}
             </if>
             <if test="type == 'add'">
-                current_working_stock = current_working_stock +  #{count}
+                current_working_stock = current_working_stock + #{count}
             </if>
         </set>
         where id = #{articleId}
         <if test="type=='minus'">
-            and current_working_stock -  #{count} >= 0
+            and current_working_stock - #{count} >= 0
         </if>
     </update>
 
@@ -1783,15 +1804,15 @@ AND
         update tb_article_price
         <set>
             <if test="type =='minus'">
-                current_working_stock = current_working_stock -  #{count}
+                current_working_stock = current_working_stock - #{count}
             </if>
             <if test="type =='add'">
-                current_working_stock = current_working_stock +  #{count}
+                current_working_stock = current_working_stock + #{count}
             </if>
         </set>
         where id = #{articleId}
         <if test="type=='minus'">
-            and current_working_stock -  #{count} >= 0
+            and current_working_stock - #{count} >= 0
         </if>
     </update>
 
@@ -1841,7 +1862,6 @@ where t.id = b.id
     </update>
 
 
-
     <select id="getPayment" resultType="java.math.BigDecimal">
        select ifnull(sum(t2.pay_value),0) from tb_order t
 INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
@@ -1883,7 +1903,6 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
     </select>
 
 
-
     <select id="selectOrderArticle" resultType="com.resto.brand.web.dto.OrderArticleDto">
         SELECT
         o.id orderId,
@@ -1906,7 +1925,7 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
     </select>
 
 
-    <select id="selectBrandArticleSellList"  resultType="java.util.HashMap">
+    <select id="selectBrandArticleSellList" resultType="java.util.HashMap">
         select r.type, r.shop_id, r.article_id, r.article_name,sum(r.count) as salles,r.article_family_name,r.sort,r.order_id,sum(r.final_price) as sell from (	SELECT
         DISTINCT(t.order_id),
         LEFT (t.article_id, 32) AS article_id,
@@ -1956,7 +1975,6 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
     </select>
 
 
-
     <select id="selectShopArticleSellList" resultType="java.util.HashMap">
         select r.articleId as article_id,r.type, r.article_name,sum(r.count) as salles,r.articleFamilyName as article_family_name,r.order_id,sum(r.final_price) as sell,r.shopId as shop_id from (	SELECT
         DISTINCT(t.order_id),
@@ -1985,7 +2003,7 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
     </select>
 
 
-    <select id="getTableNumberAll"  resultType="Order">
+    <select id="getTableNumberAll" resultType="Order">
          select r.* from (select tb_order.id,table_number,article_count,create_time,person_count
  from tb_order
 left join tb_order_payment_item on tb_order_payment_item.order_id = tb_order.id
@@ -1997,24 +2015,22 @@ GROUP BY r.table_number
 
 
     </select>
-    <select id="selectOrderPaymentItems" resultType="OrderPaymentItem"  >
+    <select id="selectOrderPaymentItems" resultType="OrderPaymentItem">
         select op.id as orderPaymentItem_id,payment_mode_id from tb_order_payment_item op
         LEFT JOIN tb_order o on o.id = op.order_id
         where op.order_id = #{orderId}
     </select>
 
-    <select id="selectOrderItems" resultType="OrderItem" >
+    <select id="selectOrderItems" resultType="OrderItem">
         select oi.id as orderItem_id,article_name,article_id from tb_order_item oi
         LEFT JOIN tb_order o on o.id = oi.order_id
         where oi.order_id = #{orderId}
     </select>
 
 
-
     <select id="getOrderDetail" resultMap="selectOrderTableNumberMap">
         select id,distribution_mode_id,order_money,payment_amount from tb_order where id = #{orderId}
     </select>
-
 
 
     <resultMap id="getOrderItemList" type="Order">
@@ -2025,10 +2041,10 @@ GROUP BY r.table_number
         <result column="payment_amount" property="paymentAmount"/>
         <result column="amount_with_children" property="amountWithChildren"/>
         <result column="parent_order_id" property="parentOrderId"/>
-        <result column="service_price" property="servicePrice" />
+        <result column="service_price" property="servicePrice"/>
         <collection property="orderItems" javaType="List" ofType="orderItem">
             <id column="orderItemId" property="id"/>
-            <result column="final_price" property="finalPrice" />
+            <result column="final_price" property="finalPrice"/>
         </collection>
     </resultMap>
 
@@ -2041,10 +2057,10 @@ GROUP BY r.table_number
         <result column="payment_amount" property="paymentAmount"/>
         <result column="order_money" property="orderMoney"/>
         <result column="person_count" property="personCount"/>
-        <result column="pay_mode" property="paymentModeId" />
-        <result column="customer_count" property="customerCount" />
-        <result column="order_money" property="orderMoney" />
-        <result column="original_amount" property="originalAmount" />
+        <result column="pay_mode" property="paymentModeId"/>
+        <result column="customer_count" property="customerCount"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="original_amount" property="originalAmount"/>
 
         <collection property="orderItems" javaType="List" ofType="orderItem">
             <id column="orderItem_id" property="id"/>
@@ -2087,7 +2103,8 @@ GROUP BY r.table_number
     <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
         SELECT tb_order.*,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount
+        (select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        totalCount
         from tb_order where shop_detail_id = #{shopId}
         <if test="orderStates != null and orderStates != '' ">
             and ORDER_STATE in
@@ -2165,7 +2182,8 @@ GROUP BY r.table_number
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
-        and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
+        ]]>
     </select>
 
     <select id="selectNeedCacelOrderList" resultType="Order">
@@ -2174,7 +2192,8 @@ GROUP BY r.table_number
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state =1 AND o.production_status=0
-        and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}]]>
+        and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}
+        ]]>
     </select>
 
     <select id="getLastOrderByTableNumber" resultType="Order">
@@ -2233,18 +2252,57 @@ AND o.production_status IN (2, 3)
 
     <select id="getRefundSumByOrderId" resultType="java.math.BigDecimal">
         select sum(pay_value) from tb_order_payment_item
-        where order_id = #{orderId} and payment_mode_id = 1
+        where order_id = #{orderId} and payment_mode_id = #{type}
         and 0 > pay_value
     </select>
-    <select id="selectWXOrderItems" parameterType="String" resultMap="BaseResultMap">
-		select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
-		print_order_time,call_number_time,order_money,topi.id orderPaymentId,topi.pay_value,topi.payment_mode_id,
-		toi.article_name,(toi.orgin_count - toi.refund_count) count
-		from tb_order tod 
-		inner join tb_order_payment_item topi on tod.id = topi.order_id
-		inner join tb_order_item toi on tod.id = toi.order_id
-		where tod.serial_number =  #{serialNumber} 
-	</select>
+    <select id="selectWXOrderItems" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select tod.serial_number,tod.order_state,tod.production_status,push_order_time,
+        print_order_time,call_number_time,order_money,topi.id orderPaymentId,topi.pay_value,topi.payment_mode_id,
+        toi.article_name,(toi.orgin_count - toi.refund_count) count
+        from tb_order tod
+        inner join tb_order_payment_item topi on tod.id = topi.order_id
+        inner join tb_order_item toi on tod.id = toi.order_id
+        <where>
+            <if test="serialNumber != null">
+                tod.serial_number = #{serialNumber}
+            </if>
+            <if test="orderId != null">
+                tod.id = #{orderId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 一个用户有很多订单 -->
+    <select id="getCustomerOrderList" resultMap="CustomerOrderListmap">
+        <!-- 	  SELECT -->
+        <!-- 		      o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id ,c.telephone, a.id  appraise_id, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id   , oi.pay_value -->
+        <!-- 			FROM -->
+        <!-- 				tb_customer c -->
+        <!-- 			LEFT  JOIN tb_order o ON c.id = o.customer_id -->
+        <!-- 			LEFT   JOIN tb_appraise a on a.order_id = o.id -->
+        <!-- 			LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id  -->
+        <!-- 			WHERE c.id = 'f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12" -->
+
+        SELECT
+        o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id
+        ,c.telephone, a.id appraise_id, a.level, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id , oi.pay_value
+        FROM
+        tb_customer c
+        INNER JOIN tb_order o ON c.id = o.customer_id
+        LEFT JOIN tb_appraise a on a.order_id = o.id
+        LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE c.id =#{customerId}
+        <if test="beginDate != null and beginDate != ''">
+            AND  <![CDATA[ o.create_time >= #{ beginDate }
+        </if>
+         <if test="endDate != null and endDate != ''">
+          and o.create_time <= #{ endDate } ]]>
+        </if>
+
+
+    </select>
+
+
 </mapper>
 
 
