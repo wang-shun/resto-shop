@@ -95,6 +95,27 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
+
+
+    <div class="modal fade" id="orderModel" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                            @click="closeOrderModal"></button>
+                </div>
+                <div class="modal-body" id="orderModelDetail"></div>
+                <div class="modal-footer">
+                    <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
+                            @click="closeOrderModal">关闭
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
@@ -267,10 +288,10 @@
                 title: "订单记录",
                 data: "customerId",
                 createdCell: function (td, tdData, rowData) {
-                     ;
+
                     var button = $("<button class='btn green'>查看详情</button>");
                     button.click(function () {
-                        $("#reportModal").modal('show');
+//                        $("#reportModal").modal('show');
                         /* this.openModal("member/show/orderReport", customerId); */
                         openModal(beginDate, endDate, tdData);
                     })
@@ -328,6 +349,15 @@
         modal.modal({show: false});
     });
 
+    //关闭页面
+    $("#closeOrderModal").click(function (e) {
+        e.stopPropagation();
+        var modal = $("#orderModel");
+        modal.find(".modal-body").html("");
+        modal.modal({show: false});
+    });
+
+
     //本月
     $("#month").click(function () {
         beginDate = getMonthStartDate();
@@ -369,7 +399,7 @@
                 'customerId': customerId
             },
             success: function (result) {
-                var modal = $("#reportModal");
+                var modal = $("#orderModel");
                 modal.find(".modal-body").html(result);
                 /* 			modal.find(".modal-title > strong").html(modalTitle);*/
                 modal.modal()
