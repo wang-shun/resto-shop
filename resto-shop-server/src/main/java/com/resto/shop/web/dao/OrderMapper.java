@@ -499,6 +499,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	BigDecimal getRefundSumByOrderId(@Param("orderId")String orderId,@Param("type")int type);
 
+	BigDecimal getAliPayment(@Param("orderId")String orderId);
+
 	Integer getCustomerPerson(String shopId);
     List<Order> selectOrderListItemByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 

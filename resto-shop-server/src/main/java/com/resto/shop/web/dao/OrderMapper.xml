@@ -2301,6 +2301,10 @@ AND o.production_status IN (2, 3)
 
     </select>
 
+    <select id="getAliPayment" resultType="java.math.BigDecimal">
+        select pay_value from tb_order_payment_item where order_id = #{orderId}
+        and pay_value > 0 and payment_mode_id = 10
+    </select>
 
 </mapper>
 
