@@ -225,6 +225,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
+
 	
 	/**
 	 * 获取店铺菜品的销售数据

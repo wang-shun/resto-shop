@@ -52,6 +52,7 @@ public class ReportExceptionTask {
   // @Scheduled(cron = "00  17 14 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
+
         //查询所有的品牌
         List<Brand> brandList = brandService.selectList();
         for (Brand brand : brandList) {

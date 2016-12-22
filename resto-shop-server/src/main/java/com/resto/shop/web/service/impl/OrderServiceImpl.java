@@ -1740,11 +1740,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer totalNum = 0;
         //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        brandArticleReportDto bo = new brandArticleReportDto();
+        /**
+         * 菜品总数单独算是因为 要出去套餐的数量
+         */
         totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
-        BigDecimal totalMoney = BigDecimal.ZERO;
-        totalMoney = orderMapper.selectConfirmMoney(begin, end, brandId);
-        bo.setSellIncome(totalMoney);
+        //查询菜品总额，退菜总数，退菜金额
+        brandArticleReportDto bo = orderMapper.selectConfirmMoney(begin, end, brandId);
         bo.setTotalNum(totalNum);
         bo.setBrandName(brandName);
         return bo;
@@ -1776,26 +1777,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
-        // List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin, end, brandId);
-
-        // List<ShopArticleReportDto> pFood = orderMapper.selectShopArticleCom(begin, end, brandId);
-
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
         for (ShopDetail shop : shopDetails) {
-            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
+            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%",0,BigDecimal.ZERO);
             listArticles.add(st);
         }
 
         //计算所有店铺的菜品销售的和
         BigDecimal sum = new BigDecimal(0);
-        //计算所有店铺的菜品销量的和
-        int num = 0;
-
+        //计算所有店铺的菜品销售的和
         if (!list.isEmpty()) {
             for (ShopArticleReportDto shopArticleReportDto2 : list) {
-                sum = sum.add(shopArticleReportDto2.getSellIncome());
+                //计算减去退菜销售额
+                sum = sum.add(shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal()));
             }
 
             for (ShopArticleReportDto shopArticleReportDto : listArticles) {
@@ -1803,7 +1798,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())) {
                         shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
                         shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
-                        BigDecimal current = shopArticleReportDto2.getSellIncome();
+                        shopArticleReportDto.setRefundCount(shopArticleReportDto2.getRefundCount());
+                        shopArticleReportDto.setRefundTotal(shopArticleReportDto2.getRefundTotal());
+                        //当前店铺的销售总额 同样减去退菜的总数
+                        BigDecimal current = shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal());
+
                         String occupy = current == null ? "0" : current.divide(sum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP)
                                 .toString();
                         shopArticleReportDto.setOccupy(occupy + "%");
@@ -1867,10 +1866,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (ArticleSellDto articleSellDto : list) {
             //计算总销量 不能加上套餐的数量
             if (articleSellDto.getType() != 3) {
-                num += articleSellDto.getBrandSellNum().doubleValue();
+                //新增减去退菜的数量
+                num += (articleSellDto.getBrandSellNum().doubleValue()-articleSellDto.getRefundCount());
+
             }
             //计算总销售额
-            temp = add(temp, articleSellDto.getSalles());
+            //新增减去退菜金额
+            temp = add(temp, (articleSellDto.getSalles().subtract(articleSellDto.getRefundTotal())));
         }
 
         for (ArticleSellDto articleSellDto : list) {
@@ -1949,8 +1951,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                d=d.add(o.getAmountWithChildren());
+            //判断是否是后付款模式
+            if(o.getOrderMode()==5){
+                if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                    d=d.add(o.getAmountWithChildren());
+                }else {
+                    d = d.add(o.getOrderMoney());
+                }
             }else {
                 d = d.add(o.getOrderMoney());
             }
