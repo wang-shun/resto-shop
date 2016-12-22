@@ -681,6 +681,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String newPayItemId = ApplicationUtils.randomUUID();
             int  refundTotal = 0;
             BigDecimal aliRefund = new BigDecimal(0);
+            BigDecimal aliPay = new BigDecimal(0);
             if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
                 BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.WEIXIN_PAY);
                 if(sum != null){
@@ -689,6 +690,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }else if (item.getPaymentModeId() == PayMode.ALI_PAY){
                 BigDecimal sum  = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.ALI_PAY);
+                aliPay = orderMapper.getAliPayment(order.getId());
                 if(sum != null){
                     aliRefund = sum;
                 }
@@ -706,7 +708,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 continue;
             }
 
-            if(aliRefund.doubleValue() > 0 &&  aliRefund.doubleValue() == order.getPaymentAmount().multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
+            if(aliRefund.doubleValue() < 0 &&  aliRefund.doubleValue() == aliPay.multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
                 continue;
             }
 
@@ -755,16 +757,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.ALI_PAY: //如果是支付宝支付
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                    AliPayUtils.connection(brandSetting.getAliAppId(),
-                            brandSetting.getAliPrivateKey(),
-                            brandSetting.getAliPublicKey());
+                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
+                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
-                    map.put("refund_amount", order.getPaymentAmount().add(aliRefund));
+                    map.put("refund_amount", aliPay.add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
