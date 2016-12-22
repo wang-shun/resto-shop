@@ -82,8 +82,7 @@
                         <td>{{shop.number}}</td>
                         <td>{{shop.average}}</td>
 						<td>{{shop.marketPrize}}</td>
-						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>
+						<td><button class="btn btn-sm btn-success" @click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -110,7 +109,7 @@
        </div>
        
     </div>
-  </div>
+
  <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
@@ -169,8 +168,9 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
+		    alert("---");
 			$("#reportModal").modal('show');
-			this.openModal("orderReport/show/shopReport", shopName,shopId);
+            vueObj.openModal("orderReport/show/shopReport", shopName,shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
 			$.post(url, this.getDate(shopId),function(result) {

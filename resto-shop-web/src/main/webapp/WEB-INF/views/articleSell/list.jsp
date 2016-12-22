@@ -89,23 +89,23 @@
 		</div>
     </div>
     
-    <%--<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">--%>
-           <%--<div class="modal-dialog modal-full">--%>
-               <%--<div class="modal-content">--%>
-                   <%--<div class="modal-header">--%>
-                       <%--<button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>--%>
-                   <%--</div>--%>
-                   <%--<div class="modal-body"> </div>--%>
-                   <%--<br/>--%>
-                   <%--<div class="modal-footer">--%>
-<%--<!--                        <button type="button" class="btn btn-info btn-block"  @click="closeModal">关闭</button> -->--%>
-                        <%--<button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>--%>
-                   <%--</div>--%>
-               <%--</div>--%>
-               <%--<!-- /.modal-content -->--%>
-           <%--</div>--%>
-           <%--<!-- /.modal-dialog -->--%>
-       <%--</div>--%>
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
+           <div class="modal-dialog modal-full">
+               <div class="modal-content">
+                   <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+                   </div>
+                   <div class="modal-body"> </div>
+                   <br/>
+                   <div class="modal-footer">
+<!--                        <button type="button" class="btn btn-info btn-block"  @click="closeModal">关闭</button> -->
+                        <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
+                   </div>
+               </div>
+               <!-- /.modal-content -->
+           </div>
+           <!-- /.modal-dialog -->
+       </div>
 
 
     <!-- 店铺菜品销售表 -->
@@ -271,7 +271,8 @@ var vueObj = new Vue({
 //            this.openModal("articleSell/show/brandReport", brandName, null);
 //        },
         showShopReport : function(shopName,shopId) {
-            this.openModal("articleSell/show/shopReport", shopName,shopId);
+            var that = this;
+            that.openModal("articleSell/show/shopReport", shopName,shopId);
         },
         searchInfo : function(isInit) {
             var that = this;
