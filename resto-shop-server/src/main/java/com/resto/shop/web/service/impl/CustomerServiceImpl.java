@@ -190,10 +190,54 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public List<MemberUserDto> selectListMemberUser(String beginDate, String endDate, String brandId) {
+	public List<MemberUserDto> selectListMemberUser(String beginDate,String endDate,String brandId) {
 		// TODO Auto-generated method stub
 		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
 		return customerMapper.selectListMemberUser(begin,end,brandId);
 	}
+	
+//  得到品牌所有用户总数
+	@Override
+	public Integer selectAllUser(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectAllUser(brandId);
+	}
+//  得到品牌所有注册用户总数
+	@Override
+	public Integer selectUserYe(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectUserYe(brandId);
+	}
+//  得到品牌所有未注册用户总数
+	@Override
+	public Integer selectUserNot(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectUserNot(brandId);
+	}
+//  得到品牌所有男用户总数
+	@Override
+	public Integer selectUserBoy(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectUserBoy(brandId);
+	}
+//  得到品牌所有女用户总数
+	@Override
+	public Integer selectUserGir(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectUserGir(brandId);
+	}
+//  得到品牌所有未知性别用户总数
+	@Override
+	public Integer selectNotUser(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectNotUser(brandId);
+	}
+//  得到品牌所有用户复购率
+	@Override
+	public Integer selectPulShopping(String brandId) {
+		// TODO Auto-generated method stub
+		return customerMapper.selectPulShopping(brandId);
+	}
+	
 }

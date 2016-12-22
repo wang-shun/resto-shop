@@ -63,7 +63,7 @@ public interface CustomerService extends GenericService<Customer, String> {
      * @param brandId
      * @return
      */
-    List<MemberUserDto> selectListMemberUser(String beginDate, String endDate,String brandId);
+    List<MemberUserDto> selectListMemberUser(String beginDate,String endDate,String brandId);
     /**
      * 查询某个时间段的店铺会员信息
      * @param beginDate
@@ -74,4 +74,20 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Map<String,Object> selectListMember(String beginDate, String endDate,String brandId);
     
     Customer selectCustomerAccount(String telephone);
+    
+//  得到品牌所有用户总数
+    Integer selectAllUser(String brandId);
+//  得到品牌所有注册用户数量
+    Integer selectUserYe(String brandId);
+//  得到品牌所有未注册用户数量
+    Integer selectUserNot(String brandId);
+//  得到品牌所有男顾客
+    Integer selectUserBoy(String brandId);
+//  得到品牌所有女顾客
+    Integer selectUserGir(String brandId);
+//  得到品牌所有未知性别顾客
+    Integer selectNotUser(String brandId);
+//  得到品牌所有复购率
+    Integer selectPulShopping(String brandId);
+    
 }

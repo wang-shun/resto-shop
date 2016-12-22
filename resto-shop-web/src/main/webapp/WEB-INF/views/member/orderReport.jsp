@@ -60,14 +60,11 @@ dt,dd{
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"	id="closeModal2" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
 				<h4 class="modal-title text-center">
 					<strong>订单详情</strong>
 				</h4>
 			</div>
-			<div class="modal-body">
+			<div class="modal-bodyw">
 				<dl class="dl-horizontal">
 					<dt>店铺名称：</dt>
 					<dd id="shopName"></dd>
@@ -114,17 +111,10 @@ dt,dd{
 				</table>
 			</div>
 
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-block btn-primary" data-dismiss="modal"
-					id="closeModal">关闭</button>
-			</div>
 		</div>
 	</div>
 </div>
 <script src="/shop/assets/customer/date.js" type="text/javascript"></script>
-
-
 <script>
 	//时间插件
  	$(".form_datetime2").datetimepicker({
@@ -138,29 +128,12 @@ dt,dd{
 		startView : "month",
 		language : "zh-CN"
 	}); 
-     
 	//订单
 	var customerId = "${customerId}"//用户id
 	$("#beginDate2").val("");
 	$("#endDate2").val("");
+	
 	var tb1 = $("#shopOrder").DataTable({
-		"scrollY": "340px",
-		"autoWidth": false,
-		 "columnDefs": [
-		                { "width": "15%", "targets":0  },
-		                { "width": "8%", "targets":1  },
-		                { "width": "8%", "targets":2  },
-		                { "width": "6%", "targets":3  },
-		                { "width": "6%", "targets":4  },
-		                { "width": "6%", "targets":5  },
-		                { "width": "6%", "targets":6  },
-		                { "width": "8%", "targets":7  },
-		                { "width": "8%", "targets":8  },
-		                { "width": "8%", "targets":9  },
-		                { "width": "6%", "targets":10  },
-		                { "width": "6%", "targets":11  },
-		                { "width": "10%", "targets":12  },
-		              ],
 		"lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
 		ajax : {
 			url : "member/orderReport",
@@ -301,11 +274,11 @@ dt,dd{
 		toastr.success("查询成功");
 	}
     //关闭
-	 $("#closeModal").click(function(e) {
-		e.stopPropagation();
-		var modal = $("#orderDetail");
-		modal.modal("hide");
-	})
+// 	 $("#closeModal").click(function(e) {
+// 		e.stopPropagation();
+// 		var modal = $("#orderDetail");
+// 		modal.modal("hide");
+// 	})
  
 	
 	 /**订单详细**/
@@ -461,12 +434,12 @@ dt,dd{
 	 
 	 
 
-	 $("#closeModal2").click(function(e) {//关闭
-		e.stopPropagation();
-		var modal = $("#orderDetail");
-		modal.find(".modal-body").html("");
-		modal.modal("hide");
-	}) 
+// 	 $("#closeModal2").click(function(e) {//关闭
+// 		e.stopPropagation();
+// 		var modal = $("#orderDetail");
+// 		modal.find(".modal-body").html("");
+// 		modal.modal("hide");
+// 	}) 
 
 	//查询今日
 

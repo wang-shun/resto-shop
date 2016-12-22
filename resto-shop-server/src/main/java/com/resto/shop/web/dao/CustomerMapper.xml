@@ -305,6 +305,37 @@
     select count(1) from tb_customer where id = #{0} and telephone is null
   </select>
 
+
+<!-- 得到品牌用户总数 -->
+  <select id="selectAllUser" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId}
+  </select>
+<!-- 得到品牌注册用户总数 -->
+	<select id="selectUserYe" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=1
+  </select>
+  <!-- 得到品牌未注册用户总数 -->
+  <select id="selectUserNot" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=0
+  </select>
+  <!-- 得到品牌男性用户总数 -->
+  <select id="selectUserBoy" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=1
+  </select>
+  <!-- 得到品牌女性用户总数 -->
+  <select id="selectUserGir" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=2
+  </select>
+  <!-- 得到品牌未知性别用户总数 -->
+  <select id="selectNotUser" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=0
+  </select>
+  <!-- 得到品牌用户购买率 -->
+  <select id="selectPulShopping" resultType="java.lang.Integer">
+    select count(1) from tb_customer where id in (select customer_id from tb_order GROUP BY customer_id having count(id) > 2) and brand_id=#{brandId}
+  </select>
+
+
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
     SELECT 
 	    id, 
@@ -336,7 +367,8 @@
 		a.id AS accountId,
 		c.nickname,
 		c.telephone,
-		c.head_photo,
+		c.head_photo as photo,
+		c.is_bind_phone as isBindPhone,
 		c.province,
 		c.city,
 		c.sex,
@@ -349,7 +381,7 @@
 		LEFT JOIN tb_account a ON c.account_id = a.id
 		LEFT JOIN tb_order b ON c.id = b.customer_id
 	where
-    <![CDATA[ c.regiest_time >= #{beginDate} and  c.regiest_time <= #{endDate}]]> AND  c.brand_id=#{brandId}
+  	    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND	c.brand_id=#{brandId}
     GROUP BY
 		c.id
     </select>
