@@ -20,7 +20,6 @@
                  
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
           
-<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
              
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
@@ -218,11 +217,6 @@ var vueObj =  new Vue({
 		var date = new Date().format("yyyy-MM-dd");
 		this.searchDate.beginDate = date;
 		this.searchDate.endDate = date;
-		
-// 		getAppraiseCount(function(appraiseCount,countList){
-// 			that.appraiseCount = appraiseCount;
-// 			that.countList = countList;
-// 		});
 		this.searchInfo();
 	}
 	
