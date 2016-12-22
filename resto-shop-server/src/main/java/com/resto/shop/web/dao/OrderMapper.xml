@@ -204,6 +204,7 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
+        <result column="order_mode" property="orderMode"/>
 
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItem_id" property="id"/>
@@ -1520,8 +1521,8 @@ AND
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
         t.order_id,
-        t.refund_count,
-		t.unit_price*t.refund_count as refundTotal,
+        sum(t.refund_count)refundCount,
+		SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) brandSellNum,
         t.article_name,
@@ -1582,6 +1583,7 @@ AND
         o.shop_detail_id,
         o.amount_with_children,
         o.order_money,
+        o.order_mode,
         o.id,
         oi.payment_mode_id,
         oi.pay_value

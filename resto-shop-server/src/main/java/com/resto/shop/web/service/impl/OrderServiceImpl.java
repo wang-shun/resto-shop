@@ -1951,8 +1951,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                d=d.add(o.getAmountWithChildren());
+            //判断是否是后付款模式
+            if(o.getOrderMode()==5){
+                if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                    d=d.add(o.getAmountWithChildren());
+                }else {
+                    d = d.add(o.getOrderMoney());
+                }
             }else {
                 d = d.add(o.getOrderMoney());
             }
