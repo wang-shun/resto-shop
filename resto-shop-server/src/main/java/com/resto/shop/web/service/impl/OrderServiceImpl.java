@@ -2522,7 +2522,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId())
                 .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())));
+                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId())));
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
         wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId()));
@@ -2536,10 +2536,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> otherPayment = new HashMap<>();
         otherPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId()));
         otherPayment.put("PAYMENT_MODE", "其他方式支付");
+        Map<String, Object> articleBackPay = new HashMap<>();
+        articleBackPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId()));
+        articleBackPay.put("PAYMENT_MODE", "退菜红包");
         incomeItems.add(wxItem);
         incomeItems.add(aliPayment);
         incomeItems.add(otherPayment);
         incomeItems.add(chargeItem);
+        incomeItems.add(articleBackPay);
         BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
                 .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId())));
         data.put("DISCOUNT_AMOUNT", discountAmount);
