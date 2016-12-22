@@ -762,11 +762,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
-                    map.put("refund_amount", order.getPaymentAmount().add(aliRefund));
+                    map.put("refund_amount", aliPay.add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
-                    item.setPayValue(order.getPaymentAmount().add(aliRefund).multiply(new BigDecimal(-1)));
+                    item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
