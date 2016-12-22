@@ -706,7 +706,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 continue;
             }
 
-            if(aliRefund.doubleValue() > 0 &&  aliRefund.doubleValue() == order.getPaymentAmount().multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
+            if(aliRefund.doubleValue() < 0 &&  aliRefund.doubleValue() == order.getPaymentAmount().multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
                 continue;
             }
 
@@ -755,16 +755,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.ALI_PAY: //如果是支付宝支付
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                    AliPayUtils.connection(brandSetting.getAliAppId(),
-                            brandSetting.getAliPrivateKey(),
-                            brandSetting.getAliPublicKey());
+                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
+                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
                     map.put("refund_amount", order.getPaymentAmount().add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setPayValue(order.getPaymentAmount().add(aliRefund).multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
