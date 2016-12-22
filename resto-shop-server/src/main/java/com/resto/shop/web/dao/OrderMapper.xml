@@ -1330,36 +1330,33 @@ AND
     </select>
 
 
-    <!-- 店铺菜品销售记录 店铺端-->
+    <!-- 店铺菜品销售记录 pos端-->
     <select id="selectShopArticleByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        SELECT sum(r.count) as shopSellNum,r.article_name,r.articleFamilyName FROM(
         SELECT
-        DISTINCT(t.order_id),
+        t.order_id,
+        sum(t.refund_count)refundCount,
+		SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
-        t.count,
+        SUM(t.count) shopSellNum,
         t.article_name,
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
         t5.peference,
-        t4.sort
-
+        t4.sort,
+        t.type,
+        t4.peference AS numberCode,
+        SUM(t.final_price) AS salles
         FROM
         tb_order_item t
         INNER JOIN tb_order t2 ON t2.id = t.order_id
-        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
         INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
-        t2.production_status in (2,3)
-        and
-        <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
-
-
-        ) as r
-        GROUP BY r.article_name
-
+        t2.order_state IN (2, 10, 11, 12)
+        AND t2.production_status IN (2, 3) AND
+        <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id =#{shopId}
+        GROUP BY t.article_name,t4.article_type
         ORDER BY ${sort}
-
     </select>
 
     <!-- 店铺菜品销售按菜品分类的数据  -->
