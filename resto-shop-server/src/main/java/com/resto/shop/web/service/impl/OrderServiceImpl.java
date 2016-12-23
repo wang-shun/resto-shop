@@ -1081,7 +1081,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 StringBuilder gao = new StringBuilder();
                 int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
-                if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+                if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
                     gao.append(" 高");
                 }
                 data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
@@ -1292,7 +1292,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         StringBuilder gao = new StringBuilder();
         int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
-        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
             gao.append(" 高");
         }
         String modeText = getModeText(order);
