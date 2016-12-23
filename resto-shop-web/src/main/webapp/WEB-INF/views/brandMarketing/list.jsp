@@ -42,7 +42,7 @@
 				
 				<div class="panel panel-success">
 				  <div class="panel-heading text-center">
-				  	<strong style="margin-right:100px;font-size:22px">品牌营销表
+				  	<strong style="margin-right:100px;font-size:22px">品牌营销报表
 				  	</strong>
 				  </div>
 				  <div class="panel-body">
