@@ -1077,12 +1077,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 StringBuilder chong = new StringBuilder();
                 int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
                 if(chongCount > 0){
-                    chong.append(" V+ ");
+                    chong.append(" V+");
                 }
                 StringBuilder gao = new StringBuilder();
                 int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
                 if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
-                    gao.append(" 高 ");
+                    gao.append(" 高");
                 }
                 data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
@@ -1288,12 +1288,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder chong = new StringBuilder();
         int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
         if(chongCount > 0){
-            chong.append(" V+ ");
+            chong.append(" V+");
         }
         StringBuilder gao = new StringBuilder();
         int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
         if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
-            gao.append(" 高 ");
+            gao.append(" 高");
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
