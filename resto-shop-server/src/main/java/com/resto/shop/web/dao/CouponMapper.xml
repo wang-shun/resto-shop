@@ -19,6 +19,7 @@
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
     <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
       <result column="shop_det" property="customerId" jdbcType="VARCHAR"/>
+    <result column="coupon_type" property="couponType"/>
   </resultMap>
   <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
@@ -165,4 +166,10 @@
     where customer_id = #{customerId}
   </select>
 
+  <select id="selectCoupon" resultMap="BaseResultMap">
+  	select SUM(`value`) `value`, coupon_type 
+	from tb_coupon
+	where coupon_type in (0,1)
+	group by coupon_type
+  </select>
 </mapper>

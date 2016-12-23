@@ -198,5 +198,10 @@
       result_data = '{}'
     </select>
 
-
+	<select id="selectOrderPayMentItem" resultMap="BaseResultMap">
+		select ABS(SUM(pay_value)) pay_value, payment_mode_id
+		from tb_order_payment_item
+		where payment_mode_id in (8,11)
+		group by payment_mode_id
+	</select>
 </mapper>

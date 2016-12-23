@@ -102,4 +102,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      * @return
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
+    
+    List<OrderPaymentItem> selectOrderPayMentItem();
 }

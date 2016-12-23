@@ -26,4 +26,6 @@ public interface AccountLogMapper  extends GenericDao<AccountLog,String> {
 	 * @return
 	 */
     List<AccountLog> selectLogsByAccountId(@Param("accountId") String accountId);
+    
+    List<AccountLog> selectAccountLog();
 }

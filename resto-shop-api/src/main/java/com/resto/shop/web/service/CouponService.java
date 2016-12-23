@@ -29,4 +29,5 @@ public interface CouponService extends GenericService<Coupon, String> {
 
 	List<Coupon> getListByCustomerId(String customerId);
 
+	List<Coupon> selectCoupon();
 }

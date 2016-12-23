@@ -12,4 +12,6 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	 * @return
 	 */
     List<AccountLog> selectLogsByAccountId(String accountId);
+    
+    List<AccountLog> selectAccountLog();
 }

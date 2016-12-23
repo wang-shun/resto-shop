@@ -53,4 +53,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
+    
+    List<OrderPaymentItem> selectOrderPayMentItem();
 }
