@@ -5,13 +5,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderArticleDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -464,7 +461,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
-    BigDecimal  selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -501,6 +498,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Integer getMealALLNumber(String shopId);
 
 	BigDecimal getRefundSumByOrderId(@Param("orderId")String orderId,@Param("type")int type);
+
+	BigDecimal getAliPayment(@Param("orderId")String orderId);
 
 	Integer getCustomerPerson(String shopId);
     List<Order> selectOrderListItemByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);

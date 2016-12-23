@@ -4,9 +4,11 @@
  import com.resto.brand.core.util.ExcelUtil;
  import com.resto.brand.core.util.JdbcUtils;
  import com.resto.brand.core.util.UserOrderExcelUtil;
- import com.resto.brand.web.dto.MemberUserDto;
+import com.resto.brand.web.dto.CountUserDto;
+import com.resto.brand.web.dto.MemberUserDto;
  import com.resto.brand.web.dto.OrderDetailDto;
- import com.resto.brand.web.model.DatabaseConfig;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.DatabaseConfig;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.DatabaseConfigService;
@@ -20,7 +22,9 @@
  import com.resto.shop.web.service.CouponService;
  import com.resto.shop.web.service.CustomerService;
  import com.resto.shop.web.service.OrderService;
- import org.springframework.beans.factory.annotation.Autowired;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,7 +38,8 @@
  import java.math.BigDecimal;
  import java.sql.SQLException;
  import java.util.ArrayList;
- import java.util.HashMap;
+import java.util.Date;
+import java.util.HashMap;
  import java.util.List;
  import java.util.Map;
 
@@ -68,30 +73,50 @@ public class MemberController extends GenericController{
 	}
 	
 	//查询当前店铺的所有用户
-	@RequestMapping("/userList")
+	@RequestMapping("/myConList")
 	@ResponseBody
-	public Result queryUserData(String brandId,String beginDate,String endDate){
+	public Map<String, Object> selectAllMath(String beginDate,String endDate){
+//		得到品牌所有用户
+		Integer countUser=customerService.selectAllUser(getCurrentBrandId());
+//		得到品牌所有注册用户
+		Integer countYeUser=customerService.selectUserYe(getCurrentBrandId());
+//		得到品牌所有未注册用户
+		Integer countNotUser=customerService.selectUserNot(getCurrentBrandId());
+//		得到品牌所有男用户
+		Integer countBoyUser=customerService.selectUserBoy(getCurrentBrandId());
+//		得到品牌所有女用户
+		Integer countGirUser=customerService.selectUserGir(getCurrentBrandId());
+//		得到品牌所有未知性别用户
+		Integer countNotAllUser=customerService.selectNotUser(getCurrentBrandId());
+//		得到品牌所有复购人数
+		Integer countPulShopping=customerService.selectPulShopping(getCurrentBrandId());
+//		进行计算，得到复购率
+		double a=countUser;
+		double b=countPulShopping;
+		double c=(b/a)*100;
+		BigDecimal d=new BigDecimal(c);
+//		得到小数点后两位小数
+		double f1 = d.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+//		得到百分号
+		String pulShopping=f1+"%";
+		List<CountUserDto> countUserDtos=new ArrayList<>();//定义统计CountUserDto一个对象集合
+		List<MemberUserDto>  memberUserDtos = customerService.selectListMemberUser(beginDate,endDate,getCurrentBrandId());//得到会员表的数据
+		Brand brand=brandService.selectById(getCurrentBrandId());//得到品牌
+		CountUserDto countUserDto=new CountUserDto();
+		countUserDto.setUserBrandName(brand.getBrandName());
+		countUserDto.setUserAll(countUser);
+		countUserDto.setUserYe(countYeUser);
+		countUserDto.setUserNot(countNotUser);
+		countUserDto.setUserBoy(countBoyUser);
+		countUserDto.setUserGir(countGirUser);
+		countUserDto.setNotUser(countNotAllUser);
+		countUserDto.setpShoping(pulShopping);
+		countUserDtos.add(countUserDto);
 		
-		brandId=getCurrentBrandId();
-		System.out.println(brandId);
-//		将得到的时间格式化
-//		因为格式化的时间是当天的00.00.00点，所以加上一天时间86400000毫秒
-		DatabaseConfig databaseConfig = databaseConfigService.selectByBrandId(brandId);
-		JdbcUtils jdbcUtils = new JdbcUtils(databaseConfig.getUsername(), databaseConfig.getPassword(), databaseConfig.getDriverClassName(), databaseConfig.getUrl());
-		jdbcUtils.getConnection();
-		String sql = "SELECT c.id AS customerId,a.id AS accountId,c.nickname,c.telephone,c.is_bind_phone as isBindPhone,c.head_photo,c.province,c.city,c.sex,a.remain,AVG(b.order_money) as money,COUNT(b.brand_id) as amount,SUM(b.order_money) as sumMoney FROM	tb_customer c LEFT JOIN tb_account a ON c.account_id = a.id LEFT JOIN tb_order b ON c.id = b.customer_id WHERE c.brand_id = ?  GROUP BY c.id ";
-		List<Object> params = new ArrayList<Object>(); 
-		params.add(brandId);
-		List<Map<String, Object>> resultList = null;
-		try {
-			resultList = jdbcUtils.findModeResult(sql, params);
-			JdbcUtils.close();
-			return getSuccessResult(resultList);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			JdbcUtils.close();
-			return new Result("查询失败，后台报错了！",false);
-		}
+		Map<String, Object> map=new HashMap<>();
+		map.put("countUserDtos", countUserDtos);
+		map.put("memberUserDtos", memberUserDtos);
+		return map;
 	}
 	
 	 /**
@@ -103,7 +128,6 @@ public class MemberController extends GenericController{
 	@RequestMapping("/show/billReport")
 	public String showModal(String customerId,HttpServletRequest request){
 		request.setAttribute("customerId", customerId);
-		System.out.println(customerId);
 		return "member/billReport";
 	}
 	
@@ -117,24 +141,6 @@ public class MemberController extends GenericController{
 		couponDto.setCoupons(list);
 		couponDto.setShopDetails(shopDetails);
 		return getSuccessResult(couponDto);
-//		String brandId=getCurrentBrandId();
-//		System.out.println("customerId"+customerId);
-//		DatabaseConfig databaseConfig=databaseConfigService.selectByBrandId(brandId);
-//		JdbcUtils jdbcUtils=new JdbcUtils(databaseConfig.getUsername(),databaseConfig.getPassword(), databaseConfig.getDriverClassName(),databaseConfig.getUrl());
-//		jdbcUtils.getConnection();
-//		String sql="select c.is_used,c.brand_id,c.shop_detail_id,c.coupon_type,s.name as shopname,cc.coupon_name,cc.name as myname,cc.coupon_validay,cc.use_with_account,c.begin_date,c.end_date,cc.coupon_value,c.begin_time,c.end_time from resto_brand.shop_detail s, shop_manager.tb_coupon c INNER JOIN shop_manager.tb_new_custom_coupon cc where c.brand_id=cc.brand_id and c.customer_id=?";
-//		List<Object> params=new ArrayList<Object>();
-//		params.add(customerId);
-//		List<Map<String,Object>> resultlist=null;
-//		try {
-//			resultlist = jdbcUtils.findModeResult(sql, params);
-//			JdbcUtils.close();
-//			return getSuccessResult(resultlist);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			JdbcUtils.close();
-//			return new Result("获取失败，后台报错了！",false);
-//		}
 	}
 
 
@@ -154,7 +160,9 @@ public class MemberController extends GenericController{
 		//定义列
 		String[]columns={"customerId","nickname","telephone","province","city","sex","remain","sumMoney","amount","money"};
 		//定义数据
-		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate, endDate, getCurrentBrandId());
+		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate,endDate,getCurrentBrandId());
+		
+//		Map< String, Object> listMap=this.selectAllMath();
 		
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {

@@ -59,5 +59,20 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
     List<MemberUserDto> selectListMemberUser(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
 
     Map<String,Object> selectListMember(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
-	
+
+//  得到品牌所有用户总数
+    Integer selectAllUser(@Param("brandId") String brandId);
+//  得到品牌所有注册用户数量
+    Integer selectUserYe(@Param("brandId") String brandId);
+//  得到品牌所有未注册用户数量
+    Integer selectUserNot(@Param("brandId") String brandId);
+//  得到品牌所有男顾客
+    Integer selectUserBoy(@Param("brandId") String brandId);
+//  得到品牌所有女顾客
+    Integer selectUserGir(@Param("brandId") String brandId);
+//  得到品牌所有未知性别顾客
+    Integer selectNotUser(@Param("brandId") String brandId);
+//  得到品牌所有复购率
+    Integer selectPulShopping(@Param("brandId") String brandId);
+    
 }

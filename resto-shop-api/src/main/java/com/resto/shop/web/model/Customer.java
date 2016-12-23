@@ -56,7 +56,17 @@ public class Customer implements Serializable{
      * 附加属性用来接收账户的余额
      */
     private BigDecimal remain;
-    
+
+    private Integer isShare;
+
+    public Integer getIsShare() {
+        return isShare;
+    }
+
+    public void setIsShare(Integer isShare) {
+        this.isShare = isShare;
+    }
+
     public BigDecimal getRemain() {
 		return remain;
 	}

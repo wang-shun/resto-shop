@@ -5,11 +5,11 @@
 	<div class="col-md-12">
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="beginDate">开始时间：</label>
+		    <label for="beginDates">开始时间：</label>
 		    <input type="text" class="form-control form_datetime" id="beginDates" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="endDate">结束时间：</label>
+		    <label for="endDates">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDates" readonly="readonly">
 		  </div>
 		  
@@ -71,6 +71,7 @@ var shopTable = $("#shopTable").DataTable({
 		{
 			title : "菜品类别",
 			data : "articleFamilyName",
+			s_filter : true
 		},  
 		{
 			title : "菜名",
@@ -79,6 +80,7 @@ var shopTable = $("#shopTable").DataTable({
         {
             title : "菜品类型",
             data : "typeName",
+            s_filter : true
         },
         {
             title: "编号",
@@ -102,7 +104,65 @@ var shopTable = $("#shopTable").DataTable({
 			title : "销售额占比",
 			data : "salesRatio",
 		},
+        {
+            title : "退菜数",
+            data : "refundCount",
+
+        },
+        {
+            title : "退菜金额",
+            data : "refundTotal",
+
+        }
 	],
+//	initComplete: function () {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//	},
+//	infoCallback: function () {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//	}
 } );
 
 //搜索
@@ -124,32 +184,32 @@ function isEmpty(str){
 }
 
 //添加分类下拉框
-var select;
-function appendSelect(api){
-	api.columns().indexes().flatten().each(function (i) {
-        if (i == 0) {
-            var column = api.column(i);
-            $(column.header()).html("菜品分类");
-            var $span = $('<span class="addselect">▾</span>').appendTo($(column.header()))
-            select = $('<select><option value="">全部</option></select>')
-                    .appendTo($(column.header()))
-                    .on('click', function (evt) {
-                        evt.stopPropagation();
-                        var val = $.fn.dataTable.util.escapeRegex(
-                                $(this).val()
-                        );
-                        column.search(val ? '^' + val + '$' : '', true, false).draw();
-                    });
-            	column.data().unique().sort().each(function (d, j) {
-            	if(d!=null && d!=""){
-            		select.append('<option value="' + d + '">' + d + '</option>')
-                    $span.append(select)
-            	}
-            });
-
-        }
-    });
-}
+//var select;
+//function appendSelect(api){
+//	api.columns().indexes().flatten().each(function (i) {
+//        if (i == 0) {
+//            var column = api.column(i);
+//            $(column.header()).html("菜品分类");
+//            var $span = $('<span class="addselect">▾</span>').appendTo($(column.header()))
+//            select = $('<select><option value="">全部</option></select>')
+//                    .appendTo($(column.header()))
+//                    .on('click', function (evt) {
+//                        evt.stopPropagation();
+//                        var val = $.fn.dataTable.util.escapeRegex(
+//                                $(this).val()
+//                        );
+//                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+//                    });
+//            	column.data().unique().sort().each(function (d, j) {
+//            	if(d!=null && d!=""){
+//            		select.append('<option value="' + d + '">' + d + '</option>')
+//                    $span.append(select)
+//            	}
+//            });
+//
+//        }
+//    });
+//}
 
 $("#ExcelReport").click(function(){
 	var beginDate = $("#beginDates").val();

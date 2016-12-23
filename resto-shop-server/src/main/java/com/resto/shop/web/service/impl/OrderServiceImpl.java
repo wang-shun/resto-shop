@@ -681,6 +681,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String newPayItemId = ApplicationUtils.randomUUID();
             int  refundTotal = 0;
             BigDecimal aliRefund = new BigDecimal(0);
+            BigDecimal aliPay = new BigDecimal(0);
             if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
                 BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.WEIXIN_PAY);
                 if(sum != null){
@@ -689,6 +690,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }else if (item.getPaymentModeId() == PayMode.ALI_PAY){
                 BigDecimal sum  = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.ALI_PAY);
+                aliPay = orderMapper.getAliPayment(order.getId());
                 if(sum != null){
                     aliRefund = sum;
                 }
@@ -706,7 +708,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 continue;
             }
 
-            if(aliRefund.doubleValue() > 0 &&  aliRefund.doubleValue() == order.getPaymentAmount().multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
+            if(aliRefund.doubleValue() < 0 &&  aliRefund.doubleValue() == aliPay.multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
                 continue;
             }
 
@@ -755,23 +757,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.ALI_PAY: //如果是支付宝支付
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                    AliPayUtils.connection(brandSetting.getAliAppId(),
-                            brandSetting.getAliPrivateKey(),
-                            brandSetting.getAliPublicKey());
+                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
+                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
-                    map.put("refund_amount", order.getPaymentAmount().add(aliRefund));
+                    map.put("refund_amount", aliPay.add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ARTICLE_BACK_PAY:
                     Customer customer = customerService.selectById(order.getCustomerId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+
                     if(item.getPayValue().doubleValue() < 0){
                         accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
                     }
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
 
 
@@ -1740,11 +1743,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer totalNum = 0;
         //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        brandArticleReportDto bo = new brandArticleReportDto();
+        /**
+         * 菜品总数单独算是因为 要出去套餐的数量
+         */
         totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
-        BigDecimal totalMoney = BigDecimal.ZERO;
-        totalMoney = orderMapper.selectConfirmMoney(begin, end, brandId);
-        bo.setSellIncome(totalMoney);
+        //查询菜品总额，退菜总数，退菜金额
+        brandArticleReportDto bo = orderMapper.selectConfirmMoney(begin, end, brandId);
         bo.setTotalNum(totalNum);
         bo.setBrandName(brandName);
         return bo;
@@ -1776,26 +1780,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
-        // List<ShopArticleReportDto> list = orderMapper.selectShopArticleDetails(begin, end, brandId);
-
-        // List<ShopArticleReportDto> pFood = orderMapper.selectShopArticleCom(begin, end, brandId);
-
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
         for (ShopDetail shop : shopDetails) {
-            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%");
+            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%",0,BigDecimal.ZERO);
             listArticles.add(st);
         }
 
         //计算所有店铺的菜品销售的和
         BigDecimal sum = new BigDecimal(0);
-        //计算所有店铺的菜品销量的和
-        int num = 0;
-
+        //计算所有店铺的菜品销售的和
         if (!list.isEmpty()) {
             for (ShopArticleReportDto shopArticleReportDto2 : list) {
-                sum = sum.add(shopArticleReportDto2.getSellIncome());
+                //计算减去退菜销售额
+                sum = sum.add(shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal()));
             }
 
             for (ShopArticleReportDto shopArticleReportDto : listArticles) {
@@ -1803,7 +1801,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())) {
                         shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
                         shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
-                        BigDecimal current = shopArticleReportDto2.getSellIncome();
+                        shopArticleReportDto.setRefundCount(shopArticleReportDto2.getRefundCount());
+                        shopArticleReportDto.setRefundTotal(shopArticleReportDto2.getRefundTotal());
+                        //当前店铺的销售总额 同样减去退菜的总数
+                        BigDecimal current = shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal());
+
                         String occupy = current == null ? "0" : current.divide(sum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP)
                                 .toString();
                         shopArticleReportDto.setOccupy(occupy + "%");
@@ -1867,10 +1869,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (ArticleSellDto articleSellDto : list) {
             //计算总销量 不能加上套餐的数量
             if (articleSellDto.getType() != 3) {
-                num += articleSellDto.getBrandSellNum().doubleValue();
+                //新增减去退菜的数量
+                num += (articleSellDto.getBrandSellNum().doubleValue()-articleSellDto.getRefundCount());
+
             }
             //计算总销售额
-            temp = add(temp, articleSellDto.getSalles());
+            //新增减去退菜金额
+            temp = add(temp, (articleSellDto.getSalles().subtract(articleSellDto.getRefundTotal())));
         }
 
         for (ArticleSellDto articleSellDto : list) {
@@ -1949,8 +1954,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                d=d.add(o.getAmountWithChildren());
+            //判断是否是后付款模式
+            if(o.getOrderMode()==5){
+                if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                    d=d.add(o.getAmountWithChildren());
+                }else {
+                    d = d.add(o.getOrderMoney());
+                }
             }else {
                 d = d.add(o.getOrderMoney());
             }
@@ -2522,7 +2532,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId())
                 .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())));
+                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId())));
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
         wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId()));
@@ -2536,10 +2546,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> otherPayment = new HashMap<>();
         otherPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId()));
         otherPayment.put("PAYMENT_MODE", "其他方式支付");
+        Map<String, Object> articleBackPay = new HashMap<>();
+        articleBackPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId()));
+        articleBackPay.put("PAYMENT_MODE", "退菜红包");
         incomeItems.add(wxItem);
         incomeItems.add(aliPayment);
         incomeItems.add(otherPayment);
         incomeItems.add(chargeItem);
+        incomeItems.add(articleBackPay);
         BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
                 .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId())));
         data.put("DISCOUNT_AMOUNT", discountAmount);
