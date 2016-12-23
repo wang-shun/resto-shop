@@ -166,10 +166,10 @@
     where customer_id = #{customerId}
   </select>
 
-  <select id="selectCoupon" resultMap="BaseResultMap">
+  <select id="selectCoupon" parameterType="java.util.Map" resultMap="BaseResultMap">
   	select SUM(`value`) `value`, coupon_type 
 	from tb_coupon
-	where coupon_type in (0,1)
+	where coupon_type in (0,1) and add_time between #{beginDate} and date_add(#{endDate},interval 1 day)
 	group by coupon_type
   </select>
 </mapper>

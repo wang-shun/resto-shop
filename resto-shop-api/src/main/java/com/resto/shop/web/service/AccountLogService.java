@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.AccountLog;
@@ -13,5 +14,5 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	 */
     List<AccountLog> selectLogsByAccountId(String accountId);
     
-    List<AccountLog> selectAccountLog();
+    List<AccountLog> selectAccountLog(Map<String, String> map);
 }

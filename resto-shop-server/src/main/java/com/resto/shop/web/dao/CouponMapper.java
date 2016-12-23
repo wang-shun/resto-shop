@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -65,5 +66,5 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      */
     List<Coupon> getListByCustomerId(String customerId);
 
-    List<Coupon> selectCoupon();
+    List<Coupon> selectCoupon(Map<String, String> map);
 }

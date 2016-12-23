@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.Oneway;
@@ -124,7 +125,7 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
     
     @Override
-    public List<OrderPaymentItem> selectOrderPayMentItem() {
-    	return orderpaymentitemMapper.selectOrderPayMentItem();
+    public List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map) {
+    	return orderpaymentitemMapper.selectOrderPayMentItem(map);
     }
 }

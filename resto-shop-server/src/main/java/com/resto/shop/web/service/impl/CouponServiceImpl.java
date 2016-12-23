@@ -179,7 +179,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     }
     
     @Override
-    public List<Coupon> selectCoupon() {
-    	return couponMapper.selectCoupon();
+    public List<Coupon> selectCoupon(Map<String, String> map) {
+    	return couponMapper.selectCoupon(map);
     }
 }

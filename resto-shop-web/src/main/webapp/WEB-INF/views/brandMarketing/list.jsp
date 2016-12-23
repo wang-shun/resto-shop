@@ -7,11 +7,11 @@
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate" readonly="readonly">
+		    <input type="text" class="form-control form_datetime" :value="searchDate.beginDate" v-model="searchDate.beginDate" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate" readonly="readonly">
+		    <input type="text" class="form-control form_datetime" :value="searchDate.endDate" v-model="searchDate.endDate" readonly="readonly">
 		  </div>
 		  
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
@@ -46,93 +46,140 @@
 				  	</strong>
 				  </div>
 				  <div class="panel-body">
-				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" width="100%"></table>
+				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" style="width: 100%">
+				  		<thead> 
+							<tr>
+								<th>品牌名称</th>
+								<th>红包总额(元)</th>
+								<th>评论红包(元)</th>
+		                        <th>充值赠送红包(元)</th>
+		                        <th>分享返利红包(元)</th>
+		                        <th>等位红包(元)</th>
+								<th>退菜红包(元)</th>
+								<th>优惠券总额(元)</th>
+		                        <th>注册优惠券(元)</th>
+		                        <th>邀请优惠券(元)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-if="brandInfo.brandName != null">
+								<td><strong>{{brandInfo.brandName}}</strong></td>
+								<td>{{brandInfo.redMoneyAll}}</td>
+								<td>{{brandInfo.plRedMoney}}</td>
+		                        <td>{{brandInfo.czRedMoney}}</td>
+		                        <td>{{brandInfo.fxRedMoney}}</td>
+		                        <td>{{brandInfo.dwRedMoney}}</td>
+								<td>{{brandInfo.tcRedMoney}}</td>
+								<td>{{brandInfo.couponAllMoney}}</td>
+		                        <td>{{brandInfo.zcCouponMoney}}</td>
+		                        <td>{{brandInfo.yqCouponMoney}}</td>
+							</tr>
+							<tr v-else>
+								<td align="center" colspan="10"><strong>加载中...</strong></td>
+							</tr>
+						</tbody>
+				  	</table>
 				  </div>
 				</div>
 				
 		    </div>
 		</div>
 	</div>
-
+</div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
-<script type="text/javascript">
-	//时间插件
-	$('.form_datetime').datetimepicker({
-	 		endDate:new Date(),
-			minView:"month",
-			maxView:"month",
-			autoclose:true,//选择后自动关闭时间选择器
-			todayBtn:true,//在底部显示 当天日期
-			todayHighlight:true,//高亮当前日期
-			format:"yyyy-mm-dd",
-			startView:"month",
-			language:"zh-CN"
-		});
-	var date = new Date().format("yyyy-MM-dd");
-	$("#beginDate").val(date);
-	$("#endDate").val(date);
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
-	
-	var table = $("#brandMarketing").DataTable({
-		ajax : {
-			url : "brandMarketing/selectAll",
-			dataSrc : "data"
-		},
-		ordering:false,
-		paging:false,
-		info:false,
-		searching:false,
-		columns : [
-			{
-				title : "品牌",
-				data : "brandName",
-			},  
-			{
-				title : "红包总额(元)",
-				data : "redMoneyAll",
-				defaultContent:"0"
-			},
-	        {
-	            title : "评论红包(元)",
-	            data : "plRedMoney",
-	            defaultContent:"0"
-	        },
-	        {
-	          title : "充值赠送红包(元)",
-	           data : "czRedMoney",
-	           defaultContent:"0"
-	        },
-			{
-				title : "分享返利红包(元)",
-				data : "fxRedMoney",
-				defaultContent:"0"
-			},
-			{
-				title : "等位红包(元)",
-				data : "dwRedMoney",
-				defaultContent:"0"
-			},
-			{
-				title : "退菜红包(元)",
-				data : "tcRedMoney",
-				defaultContent:"0"
-			},
-			{
-				title : "优惠券总额(元)",
-				data : "couponAllMoney",
-				defaultContent:"0"
-			},
-			{
-				title : "注册优惠券(元)",
-				data : "zcCouponMoney",
-				defaultContent:"0"
-			},
-			{
-				title : "邀请优惠券(元)",
-				data : "yqCouponMoney",
-				defaultContent:"0"
-			}
-		]
-	});
+<script>
+ //时间插件
+ $('.form_datetime').datetimepicker({
+     endDate:new Date(),
+     minView:"month",
+     maxView:"month",
+     autoclose:true,//选择后自动关闭时间选择器
+     todayBtn:true,//在底部显示 当天日期
+     todayHighlight:true,//高亮当前日期
+     format:"yyyy-mm-dd",
+     startView:"month",
+     language:"zh-CN"
+ });
+
+var vueObj = new Vue({
+    el : "#control",
+    data : {
+        searchDate : {
+            beginDate : "",
+            endDate : ""
+        },
+        brandInfo : {}
+    },
+    created : function() {
+        var date = new Date().format("yyyy-MM-dd");
+        this.searchDate.beginDate = date;
+        this.searchDate.endDate = date;
+        this.loading();
+    },
+    methods : {
+        searchInfo : function(isInit) {
+            var that = this;
+            //判断 时间范围是否合法
+            if (this.searchDate.beginDate > this.searchDate.endDate) {
+                toastr.error("开始时间不能大于结束时间");
+                toastr.clear();
+                return false;
+            }
+            this.loading();
+        },
+        getDate : function(){
+            var data = {
+                beginDate : this.searchDate.beginDate,
+                endDate : this.searchDate.endDate
+            };
+            return data;
+        },
+        brandreportExcel : function(){
+        	location.href = "brandMarketing/downloadBrandExcel?brandJson="+JSON.stringify(this.brandInfo)+"&beginDate="+this.searchDate.beginDate+"&endDate="+this.searchDate.endDate;
+        },
+        today : function(){
+            date = new Date().format("yyyy-MM-dd");
+            this.searchDate.beginDate = date;
+            this.searchDate.endDate = date;
+            this.searchInfo();
+        },
+        yesterDay : function(){
+            this.searchDate.beginDate = GetDateStr(-1);
+            this.searchDate.endDate  = GetDateStr(-1);
+            this.searchInfo();
+        },
+
+        week : function(){
+            this.searchDate.beginDate  = getWeekStartDate();
+            this.searchDate.endDate  = new Date().format("yyyy-MM-dd");
+            this.searchInfo();
+        },
+        month : function(){
+            this.searchDate.beginDate  = getMonthStartDate();
+            this.searchDate.endDate  = new Date().format("yyyy-MM-dd");
+            this.searchInfo();
+        },
+		loading : function(){
+			var that = this;
+			$.ajax({
+				url:"brandMarketing/selectAll",
+				type:"post",
+				data:this.getDate(),
+				dataType:"json",
+				success:function(result){
+					if(result.success){
+						that.brandInfo = result.data;
+					}else{
+						toastr.error("查询品牌营销报表出错!");
+		                toastr.clear();
+					}
+				},
+				error:function(){
+					toastr.error("查询品牌营销报表出错!");
+	                toastr.clear();
+				}
+			});
+		}
+    }
+});
 </script>

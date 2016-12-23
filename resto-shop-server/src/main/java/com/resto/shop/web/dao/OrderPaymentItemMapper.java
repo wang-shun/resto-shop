@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.shop.web.model.Order;
 import org.apache.ibatis.annotations.Param;
@@ -103,5 +104,5 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
     
-    List<OrderPaymentItem> selectOrderPayMentItem();
+    List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map);
 }

@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.exception.AppException;
@@ -29,5 +30,5 @@ public interface CouponService extends GenericService<Coupon, String> {
 
 	List<Coupon> getListByCustomerId(String customerId);
 
-	List<Coupon> selectCoupon();
+	List<Coupon> selectCoupon(Map<String, String> map);
 }
