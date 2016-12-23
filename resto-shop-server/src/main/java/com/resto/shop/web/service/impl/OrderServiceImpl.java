@@ -1077,7 +1077,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 StringBuilder chong = new StringBuilder();
                 int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
                 if(chongCount > 0){
-                    chong.append(" V+");
+                    chong.append(" VIP");
                 }
                 StringBuilder gao = new StringBuilder();
                 int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
@@ -1288,7 +1288,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder chong = new StringBuilder();
         int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
         if(chongCount > 0){
-            chong.append(" V+");
+            chong.append(" VIP");
         }
         StringBuilder gao = new StringBuilder();
         int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
