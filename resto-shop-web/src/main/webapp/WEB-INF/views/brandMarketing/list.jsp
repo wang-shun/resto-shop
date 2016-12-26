@@ -118,6 +118,7 @@ var vueObj = new Vue({
     },
     methods : {
         searchInfo : function(isInit) {
+        	this.brandInfo = null;
             var that = this;
             //判断 时间范围是否合法
             if (this.searchDate.beginDate > this.searchDate.endDate) {
