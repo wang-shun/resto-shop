@@ -174,10 +174,10 @@
     var tb2 = $("#shopReportTable").DataTable({
     	"lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
     	data: dataSource.memberUserDtos,
-    	"order": [[ 9, 'desc' ]],
     	"aoColumnDefs": [
     	      { "bSortable": false, "aTargets": [ 0 ,1,2,3,4,5,6,8,12] }
     	    ],	
+    	"order": [[ 9, 'desc' ]],
         columns: [
             {
                 title: "用户类型",
@@ -514,7 +514,6 @@
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
         location.href = "member/member_excel?beginDate="+beginDate+"&&endDate="+endDate;
-
     })
 
     //导出店铺数据
