@@ -411,8 +411,6 @@ public class MemberController extends GenericController{
 			if(!childList.isEmpty()){
 	                o.setChildList(childList);
 	        }
-           
-		
 			return getSuccessResult(o);
 		}
 
