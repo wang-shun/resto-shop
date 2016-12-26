@@ -33,6 +33,8 @@ public class ChargeSetting {
     private String brandId;
     
     private String shopDetailId;
+
+    private Integer numberDay;
     
     public String getShopDetailId() {
 		return shopDetailId;
@@ -112,5 +114,13 @@ public class ChargeSetting {
 
     public void setBrandId(String brandId) {
         this.brandId = brandId == null ? null : brandId.trim();
+    }
+
+    public Integer getNumberDay() {
+        return numberDay;
+    }
+
+    public void setNumberDay(Integer numberDay) {
+        this.numberDay = numberDay;
     }
 }

@@ -65,6 +65,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setChargeBalance(BigDecimal.ZERO);
 		chargeOrder.setRewardBalance(BigDecimal.ZERO);
 		chargeOrder.setTotalBalance(BigDecimal.ZERO);
+		chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
+		chargeOrder.setArrivalAmount(chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay())));
 		chargeorderMapper.insert(chargeOrder);
 		return chargeOrder;
 	} 
