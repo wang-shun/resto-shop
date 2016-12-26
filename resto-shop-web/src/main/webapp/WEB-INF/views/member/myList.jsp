@@ -332,7 +332,7 @@
 	            if (this.s_filter) {
 	                var column = api.column(i);
 	                var title = this.title;
-	                var select = $('<select id=""><option value="select">' + this.title + '(全部)</option></select>');
+	                var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
 	                console.log(select.html());
 	                var that = this;
 	                column.data().unique().each(function (d) {
