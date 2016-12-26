@@ -15,4 +15,11 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
     List<AccountLog> selectLogsByAccountId(String accountId);
     
     List<AccountLog> selectAccountLog(Map<String, String> map);
+
+	/**
+	 * 根据 账户ID 查询 账户充值的次数
+	 * @param id
+	 * @return
+     */
+	int selectByCustomerIdNumber(String id);
 }

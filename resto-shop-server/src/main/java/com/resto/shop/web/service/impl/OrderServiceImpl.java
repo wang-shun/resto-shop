@@ -138,6 +138,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     WxServerConfigService wxServerConfigService;
 
+    @Autowired
+    AccountLogService accountLogService;
+
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
         String[] states = null;
@@ -1071,7 +1074,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         star.append("★");
                     }
                 }
-                data.put("TABLE_NUMBER", tableNumber + star.toString());
+                StringBuilder chong = new StringBuilder();
+                int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
+                if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
+                    chong.append(" VIP");
+                }
+                StringBuilder gao = new StringBuilder();
+                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
+                if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+                    gao.append(" 高");
+                }
+                data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -1272,13 +1285,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
+        StringBuilder chong = new StringBuilder();
+        int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
+        if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
+            chong.append(" VIP");
+        }
+        StringBuilder gao = new StringBuilder();
+        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+            gao.append(" 高");
+        }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber() + star.toString());
+        data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -3703,4 +3726,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate) {
 		return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
 	}
+
+    @Override
+    public Integer selectByCustomerCount(String customerId) {
+        return orderMapper.selectByCustomerCount(customerId);
+    }
 }
