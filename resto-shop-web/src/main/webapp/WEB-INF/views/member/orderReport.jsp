@@ -27,12 +27,12 @@ dt,dd{
 					class="form-control form_datetime2" id="endDate2"
 					readonly="readonly">
 			</div>
-			<button type="button" class="btn btn-primary" id="today">今日</button>
+			<button type="button" class="btn btn-primary" id="todayOrder">今日</button>
 
-			<button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
+			<button type="button" class="btn btn-primary" id="yesterDayOrder">昨日</button>
 
-			<button type="button" class="btn btn-primary" id="week">本周</button>
-			<button type="button" class="btn btn-primary" id="month">本月</button>
+			<button type="button" class="btn btn-primary" id="weekOrder">本周</button>
+			<button type="button" class="btn btn-primary" id="monthOrder">本月</button>
 
 			<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
 			&nbsp;
@@ -129,9 +129,11 @@ dt,dd{
 		language : "zh-CN"
 	}); 
 	//订单
-	var customerId = "${customerId}"//用户id
-	$("#beginDate2").val("");
-	$("#endDate2").val("");
+	var customerId = "${customerId}";//用户id
+	var beginDate = "${beginDate}";
+	var endDate = "${endDate}";
+	$("#beginDate2").val(beginDate);
+	$("#endDate2").val(endDate);
 	
 	var tb1 = $("#shopOrder").DataTable({
 		"lengthMenu" : [ [10,50, 75, 100, -1 ], [10, 50, 75, 100, "All" ] ],
@@ -426,7 +428,7 @@ dt,dd{
 
 	//查询今日
 
-	$("#today").click(function() {
+	$("#todayOrder").click(function() {
 		var date = new Date().format("yyyy-MM-dd");
 		//赋值插件上的时间
 		$("#beginDate2").val(date);
@@ -438,9 +440,9 @@ dt,dd{
 	})
 
 	//查询昨日
-	$("#yesterDay").click(function() {
-		var beginDate = GetDateStr(-1);
-		var endDate = GetDateStr(-1);
+	$("#yesterDayOrder").click(function() {
+		beginDate = GetDateStr(-1);
+		endDate = GetDateStr(-1);
 
 		//赋值插件上时间
 		$("#beginDate2").val(beginDate);
@@ -451,10 +453,9 @@ dt,dd{
 	})
 
 	//查询本周
-	$("#week").click(function() {
-		var beginDate = getWeekStartDate();
-		;
-		var endDate = new Date().format("yyyy-MM-dd");
+	$("#weekOrder").click(function() {
+		beginDate = getWeekStartDate();
+		endDate = new Date().format("yyyy-MM-dd");
 
 		//赋值插件上时间
 		$("#beginDate2").val(beginDate);
@@ -465,9 +466,9 @@ dt,dd{
 	})
 
 	//查询本月
-	$("#month").click(function() {
-		var beginDate = getMonthStartDate();
-		var endDate = new Date().format("yyyy-MM-dd");
+	$("#monthOrder").click(function() {
+		beginDate = getMonthStartDate();
+		endDate = new Date().format("yyyy-MM-dd");
 
 		//赋值插件上时间
 		$("#beginDate2").val(beginDate);

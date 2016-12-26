@@ -56,14 +56,11 @@
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
                     <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"   id="closeModal">关闭
                     </button>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
     <div class="modal fade" id="endModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-full">
@@ -74,15 +71,12 @@
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
                     <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
                            id="closeModal">关闭
                     </button>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
     </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
@@ -113,6 +107,8 @@
     	1: "会员",
         0: "非会员"
     }
+    
+    var flg = true;
     
     $.ajax({
     	url: 'member/myConList',
@@ -224,7 +220,15 @@
                 },
 	            s_filter: true,
 	            s_render: function (d) {
-	            	return d ? 2 : 2;
+	            	var result = "";
+	            	if (d == null || d == "") {
+	            		result = "未知";
+                    } else if (d == 1) {
+                    	result = "男";
+                    } else if (d == 2) {
+                    	result = "女";
+                    }
+	            	return result;
 	            }
             },
             {
@@ -236,25 +240,6 @@
                     }
                 }
             },
-            /* {
-             title : "生日",
-             data : "birthday",
-             createdCell:function (td,tdData) {
-             if(tdData==null || tdData==""){
-             $(td).html("--")
-             }
-             }
-             },       */
-
-            /* {
-             title : "星座",
-             data : "constellation",
-             createdCell:function (td,tdData) {
-             if(tdData==null || tdData==""){
-             $(td).html("--")
-             }
-             }
-             },  */
             {
                 title: "省/市",
                 data: "province",
@@ -284,7 +269,6 @@
                 createdCell: function (td, tdData, rowData) {
                     var button = $("<button class='btn green'>查看详情</button>");
                     button.click(function () {
-                        /* $("#reportModal").modal('show'); */
                         openModal1(tdData);
                     })
                     $(td).html(button);
@@ -321,7 +305,6 @@
                     var button = $("<button class='btn green'>查看详情</button>");
                     button.click(function () {
                         $("#reportModal").modal('show');
-                        /* this.openModal("member/show/orderReport", customerId); */
                         openModal(beginDate, endDate, tdData);
                     })
                     $(td).html(button);
@@ -330,63 +313,42 @@
         ],
         initComplete: function () {
         	tb2API = this.api();
-//             var api = this.api();
-//             api.search('');
-//             var data = api.data();
-//             /* for (var i = 0; i < data.length; i++) {
-//                 allArticles.push(data[i]);
-//             } */
-//             var columnsSetting = api.settings()[0].oInit.columns;
-//             $(columnsSetting).each(function (i) {
-//                 if (this.s_filter) {
-//                     var column = api.column(i);
-//                     var title = this.title;
-//                     var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-//                     var that = this;
-//                     column.data().unique().each(function (d) {
-//                         select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
-//                     });
-
-//                     select.appendTo($(column.header()).empty()).on('change', function () {
-//                         var val = $.fn.dataTable.util.escapeRegex(
-//                                 $(this).val()
-//                         );
-//                         column.search(val ? '^' + val + '$' : '', true, false).draw();
-//                     });
-//                 }
-//             });
+        	customerTable();
         }
     });
     
     $("#shopReportTable").on( 'draw.dt', function () {
-    	var api = tb2API;
-        api.search('');
-        var data = api.data();
-        /* for (var i = 0; i < data.length; i++) {
-            allArticles.push(data[i]);
-        } */
-        var columnsSetting = api.settings()[0].oInit.columns;
-        
-        $(columnsSetting).each(function (i) {
-            if (this.s_filter) {
-                var column = api.column(i);
-                var title = this.title;
-                var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-                console.log(select.html());
-                var that = this;
-                column.data().unique().each(function (d) {
-                    select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
-                });
-                select.appendTo($(column.header()).empty()).on('change', function () {
-                    var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                    );
-                    column.search(val ? '^' + val + '$' : '', true, false).draw();
-                });
-            }
-        });
+    	customerTable();
     } );
-
+    
+    function customerTable(){
+    	if(flg){
+	    	var api = tb2API;
+	        api.search('');
+	        var data = api.data();
+	        var columnsSetting = api.settings()[0].oInit.columns;
+	      
+	        $(columnsSetting).each(function (i) {
+	            if (this.s_filter) {
+	                var column = api.column(i);
+	                var title = this.title;
+	                var select = $('<select id=""><option value="select">' + this.title + '(全部)</option></select>');
+	                console.log(select.html());
+	                var that = this;
+	                column.data().unique().each(function (d) {
+	                    select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+	                });
+	                select.appendTo($(column.header()).empty()).on('change', function () {
+	                    var val = $.fn.dataTable.util.escapeRegex(
+	                            $(this).val()
+	                    );
+	                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+	                });
+	            }
+	        });
+	        flg = false;
+    	}
+    }
 
     //查询
     $("#searchReport").click(function () {
@@ -396,7 +358,6 @@
     })
 
     //今日
-
     $("#today").click(function () {
         date = new Date().format("yyyy-MM-dd");
         beginDate = date;
@@ -414,7 +375,6 @@
 
     });
 
-
     //本周
     $("#week").click(function () {
         beginDate = getWeekStartDate();
@@ -424,7 +384,6 @@
         searchInfo(beginDate, endDate);
 
     });
-
 
     //关闭页面
     $("#closeModal").click(function (e) {
@@ -441,11 +400,15 @@
         $("#beginDate").val(beginDate);
         $("#endDate").val(endDate);
         searchInfo(beginDate, endDate);
-
     });
 
-
     function searchInfo(beginDate, endDate) {
+    	var api = tb2API;
+    	api.search('');
+    	var column0 = api.column(0);
+    	var column3 = api.column(3);
+    	column0.search('', true, false);
+    	column3.search('', true, false);
         //更新数据源
         $.ajax({
             url: 'member/myConList',
@@ -457,8 +420,10 @@
 		    	dataSource=result;
 		    	tb1.clear().draw();
 		    	tb2.clear().draw();
+		    	flg = true;
 		    	tb1.rows.add(result.countUserDtos).draw();
 		    	tb2.rows.add(result.memberUserDtos).draw();
+		    	flg = true;
 		    	toastr.success('查询成功');
 		     },
             error: function () {
@@ -479,7 +444,6 @@
             success: function (result) {
                 var modal = $("#beginModal");
                 modal.find(".modal-body").html(result);
-                /* 			modal.find(".modal-title > strong").html(modalTitle);*/
                 modal.modal()
             },
             error: function () {
@@ -496,10 +460,8 @@
                 'customerId': customerId
             },
             success: function (result) {
-//                console.log(result);
                 var modal = $("#endModal");
                 modal.find(".modal-body").html(result);
-                /* modal.find(".modal-title > strong").html(modalTitle); */
                 modal.modal()
             },
             error: function () {
@@ -508,20 +470,10 @@
         });
     }
 
-
     //导出会员信息数据
     $("#brandreportExcel").click(function () {
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
         location.href = "member/member_excel?beginDate="+beginDate+"&&endDate="+endDate;
     })
-
-    //导出店铺数据
-    /*
-     $("#shopreportExcel").click(function(){
-     beginDate=$("#beginDate").val();
-     endDate = $("#endDate").val();
-     location.href="totalIncome/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
-     }) */
-
 </script>
