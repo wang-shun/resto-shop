@@ -134,7 +134,7 @@ dt,dd{
 	$("#endDate2").val("");
 	
 	var tb1 = $("#shopOrder").DataTable({
-		"lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
+		"lengthMenu" : [ [10,50, 75, 100, -1 ], [10, 50, 75, 100, "All" ] ],
 		ajax : {
 			url : "member/orderReport",
 			dataSrc : "",
@@ -150,7 +150,6 @@ dt,dd{
 			title : "店铺",
 			data : "shopName",
 		},
-
 		{
 			title : "下单时间",
 			data : "beginTime",
@@ -273,14 +272,6 @@ dt,dd{
 		tb1.ajax.reload();
 		toastr.success("查询成功");
 	}
-    //关闭
-// 	 $("#closeModal").click(function(e) {
-// 		e.stopPropagation();
-// 		var modal = $("#orderDetail");
-// 		modal.modal("hide");
-// 	})
- 
-	
 	 /**订单详细**/
 	 
 	 function showDetails(orderId) {
@@ -432,14 +423,6 @@ dt,dd{
 	 
 	 
 	 
-	 
-
-// 	 $("#closeModal2").click(function(e) {//关闭
-// 		e.stopPropagation();
-// 		var modal = $("#orderDetail");
-// 		modal.find(".modal-body").html("");
-// 		modal.modal("hide");
-// 	}) 
 
 	//查询今日
 

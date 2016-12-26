@@ -65,9 +65,9 @@ var tb1 = $("#shopBill").DataTable({
 			data : "brandId",
 			createdCell:function(td,tdData){
 				if(tdData!=null || tdData!=""){
-					$(td).html("店铺");
-				}else if(tdData==null || tdData==""){
 					$(td).html("品牌");
+				}else if(tdData==null || tdData==""){
+					$(td).html("店铺");
 				}
 			}
 		}, {

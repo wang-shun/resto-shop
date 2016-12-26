@@ -8,11 +8,11 @@
             <form class="form-inline">
                 <div class="form-group" style="margin-right: 50px;">
                 <label for="beginDate">开始时间：</label>
-                <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
+                <input type="text" class="form-control form_datetime" id="beginDate" id="searchDate.beginDate"   readonly="readonly">
                 </div>
                 <div class="form-group" style="margin-right: 50px;">
                 <label for="endDate">结束时间：</label>
-                <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
+                <input type="text" class="form-control form_datetime" id="endDate" id="searchDate.endDate"   readonly="readonly">
                 </div>
                 <button type="button" class="btn btn-primary" id="today"> 今日</button>
                 <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
@@ -20,11 +20,9 @@
                 <button type="button" class="btn btn-primary" id="month">本月</button>
                 <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button>
-                <form>
 					<input type="hidden" id="brandDataTable">
 					<input type="hidden" id="shopDataTable">
-				</form>&nbsp;&nbsp;&nbsp;
-            </form>
+				</form>
 
         </div>
     </div>
@@ -42,10 +40,10 @@
                 </div>
                 <div class="panel-body">
                     <table id="brandReportTable" class="table table-striped table-bordered table-hover" 
-                    	   width="100%"></table>
+                    	 ></table>
                     <br/>
                     <table id="shopReportTable" class="table table-striped table-bordered table-hover"
-                           width="100%"></table>
+                    	></table>
                 </div>
             </div>
         </div>
@@ -54,14 +52,12 @@
         <div class="modal-dialog modal-full">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                            @click="closeModal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"   id="closeModal"></button>
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
                     <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
-                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
-                            @click="closeModal">关闭
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"   id="closeModal">关闭
                     </button>
                 </div>
             </div>
@@ -74,13 +70,13 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                            @click="closeModal"></button>
+                          id="closeModal"></button>
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
                     <!--                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button> -->
                     <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
-                            @click="closeModal">关闭
+                           id="closeModal">关闭
                     </button>
                 </div>
             </div>
@@ -113,8 +109,9 @@
     var customerId;
     var allArticles = [];
     var articleType = {
-        1: "会员",
-        2: "非会员"
+        2:"女",
+    	1: "会员",
+        0: "非会员"
     }
     
     $.ajax({
@@ -173,10 +170,14 @@
         ]
     	
     });
+    var tb2API = null;
     var tb2 = $("#shopReportTable").DataTable({
     	"lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
     	data: dataSource.memberUserDtos,
-    	ordering: false,
+    	"aoColumnDefs": [
+    	      { "bSortable": false, "aTargets": [ 0 ,1,2,3,4,5,6,8,12] }
+    	    ],	
+    	"order": [[ 9, 'desc' ]],
         columns: [
             {
                 title: "用户类型",
@@ -184,7 +185,7 @@
                 createdCell: function (td, tdData) {
                     if (tdData == 1) {
                         $(td).html("会员")
-                    }else{
+                    }else if(tdData == 0){
                         $(td).html("非会员")
                     }
                 },
@@ -203,9 +204,9 @@
                 defaultContent: "",
                 createdCell: function (td, tdData) {
                     if (tdData != null && tdData.substring(0, 4) == "http") {
-                        $(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+                        $(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:60px;width:60px;\"/>");
                     } else {
-                        $(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+                        $(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:60px;width:60px;\"/>");
                     }
                 }
             },
@@ -214,7 +215,7 @@
                 data: "sex",
                 createdCell: function (td, tdData) {
                     if (tdData == null || tdData == "") {
-                        $(td).html("--")
+                        $(td).html("未知")
                     } else if (tdData == 1) {
                         $(td).html("男")
                     } else if (tdData == 2) {
@@ -222,6 +223,9 @@
                     }
                 },
 	            s_filter: true,
+	            s_render: function (d) {
+	            	return d ? 2 : 2;
+	            }
             },
             {
                 title: "手机号码",
@@ -323,9 +327,65 @@
                     $(td).html(button);
                 }
             },
-        ]
+        ],
+        initComplete: function () {
+        	tb2API = this.api();
+//             var api = this.api();
+//             api.search('');
+//             var data = api.data();
+//             /* for (var i = 0; i < data.length; i++) {
+//                 allArticles.push(data[i]);
+//             } */
+//             var columnsSetting = api.settings()[0].oInit.columns;
+//             $(columnsSetting).each(function (i) {
+//                 if (this.s_filter) {
+//                     var column = api.column(i);
+//                     var title = this.title;
+//                     var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//                     var that = this;
+//                     column.data().unique().each(function (d) {
+//                         select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+//                     });
 
+//                     select.appendTo($(column.header()).empty()).on('change', function () {
+//                         var val = $.fn.dataTable.util.escapeRegex(
+//                                 $(this).val()
+//                         );
+//                         column.search(val ? '^' + val + '$' : '', true, false).draw();
+//                     });
+//                 }
+//             });
+        }
     });
+    
+    $("#shopReportTable").on( 'draw.dt', function () {
+    	var api = tb2API;
+        api.search('');
+        var data = api.data();
+        /* for (var i = 0; i < data.length; i++) {
+            allArticles.push(data[i]);
+        } */
+        var columnsSetting = api.settings()[0].oInit.columns;
+        
+        $(columnsSetting).each(function (i) {
+            if (this.s_filter) {
+                var column = api.column(i);
+                var title = this.title;
+                var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                console.log(select.html());
+                var that = this;
+                column.data().unique().each(function (d) {
+                    select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                });
+                select.appendTo($(column.header()).empty()).on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                    );
+                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+            }
+        });
+    } );
 
 
     //查询
@@ -454,7 +514,6 @@
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
         location.href = "member/member_excel?beginDate="+beginDate+"&&endDate="+endDate;
-
     })
 
     //导出店铺数据
