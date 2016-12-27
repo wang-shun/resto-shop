@@ -30,7 +30,7 @@ public class ChargeSettingController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ChargeSetting> listData(){
-		return chargesettingService.selectListByShopId(getCurrentShopId());
+		return chargesettingService.selectListByShopIdAll();
 	}
 	
 	@RequestMapping("list_one")
