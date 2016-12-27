@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -26,6 +27,8 @@ public interface AccountLogMapper  extends GenericDao<AccountLog,String> {
 	 * @return
 	 */
     List<AccountLog> selectLogsByAccountId(@Param("accountId") String accountId);
+    
+    List<AccountLog> selectAccountLog(Map<String, String> map);
 
     List<AccountLog> selectByCustomerIdNumber(String id);
 }
