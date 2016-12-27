@@ -7,6 +7,7 @@ import com.resto.shop.web.model.ChargeSetting;
 
 public interface ChargeSettingService extends GenericService<ChargeSetting, String> {
 
-    List<ChargeSetting> selectListByShopId(String currentBrandId);
-    
+    List<ChargeSetting> selectListByShopId();
+
+    List<ChargeSetting> selectListByShopIdAll();
 }

@@ -68,4 +68,9 @@
 	  select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id,number_day from tb_charge_setting
 	  where state = 1 ORDER BY sort ASC
   </select>
+
+  <select id="selectListByShopIdAll" resultType="ChargeSetting">
+    select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id,number_day from tb_charge_setting
+    ORDER BY sort ASC
+  </select>
 </mapper>
