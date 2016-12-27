@@ -86,7 +86,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
 			chargeOrder.setChargeBalance(chargeMoney);
-			chargeOrder.setRewardBalance(reward);
+			chargeOrder.setRewardBalance(chargeOrder.getArrivalAmount());
 			chargeOrder.setTotalBalance(chargeMoney.add(reward));
 			chargePaymentService.insert(cp);
 			update(chargeOrder);// 只能更新状态和结束时间
