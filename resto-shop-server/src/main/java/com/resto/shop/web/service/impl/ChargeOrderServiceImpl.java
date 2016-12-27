@@ -81,7 +81,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			BigDecimal reward = chargeOrder.getRewardMoney();
 			// 开始充值余额
 			accountService.addAccount(chargeMoney, customer.getAccountId(), "自助充值",AccountLog.SOURCE_CHARGE);
-			accountService.addAccount(reward, customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+			accountService.addAccount(chargeOrder.getArrivalAmount(), customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
 			// 添加充值记录
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
