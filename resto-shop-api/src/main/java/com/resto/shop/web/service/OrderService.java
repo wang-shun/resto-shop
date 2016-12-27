@@ -528,7 +528,11 @@ public interface OrderService extends GenericService<Order, String> {
      * @return
      */
 	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate);
-    
-    
-    
+
+	/**
+	 * 用户已消费记录总数
+	 * @param customerId
+	 * @return
+     */
+	Integer selectByCustomerCount(String customerId);
 }

@@ -12,8 +12,10 @@
     <result column="state" property="state" jdbcType="TINYINT"/>
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="number_day" property="numberDay" jdbcType="INTEGER"/>
   </resultMap>
-  <sql id="Base_Column_List">id, charge_money, reward_money, show_in, label_text, sort, state, create_time, brand_id</sql>
+  <sql id="Base_Column_List">id, charge_money, reward_money, show_in, label_text, sort, state, create_time, brand_id, shop_detail_id, number_day</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_charge_setting where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -30,8 +32,9 @@
       <if test="state != null">state,</if>  
       <if test="createTime != null">create_time,</if>  
       <if test="brandId != null">brand_id,</if>  
-      <if test="shopDetailId != null">shop_detail_id,</if> 
-    </trim>  
+      <if test="shopDetailId != null">shop_detail_id,</if>
+      <if test="numberDay != null">number_day,</if>
+    </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
       <if test="chargeMoney != null">#{chargeMoney,jdbcType=DECIMAL},</if>  
@@ -42,7 +45,8 @@
       <if test="state != null">#{state,jdbcType=TINYINT},</if>  
       <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>  
       <if test="brandId != null">#{brandId},</if>  
-      <if test="shopDetailId != null">#{shopDetailId},</if> 
+      <if test="shopDetailId != null">#{shopDetailId},</if>
+      <if test="numberDay != null">#{numberDay},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ChargeSetting">update tb_charge_setting 
@@ -54,13 +58,19 @@
       <if test="sort != null">sort = #{sort,jdbcType=INTEGER},</if>  
       <if test="state != null">state = #{state,jdbcType=TINYINT},</if>  
       <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>  
-      <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if> 
+      <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if>
+      <if test="numberDay != null">number_day = #{numberDay,jdbcType=INTEGER},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeSetting">update tb_charge_setting set charge_money = #{chargeMoney,jdbcType=DECIMAL}, reward_money = #{rewardMoney,jdbcType=DECIMAL}, show_in = #{showIn,jdbcType=TINYINT}, label_text = #{labelText,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, state = #{state,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, brand_id = #{brandId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeSetting">update tb_charge_setting set charge_money = #{chargeMoney,jdbcType=DECIMAL}, reward_money = #{rewardMoney,jdbcType=DECIMAL}, show_in = #{showIn,jdbcType=TINYINT}, label_text = #{labelText,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, state = #{state,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, brand_id = #{brandId,jdbcType=VARCHAR}, number_day = #{numberDay,jdbcType=INTEGER} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ChargeSetting">select * from tb_charge_setting</select>
   <select id="selectListByShopId" resultType="ChargeSetting">
-	  select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id from tb_charge_setting
-	  where shop_detail_id=#{shopId} ORDER BY sort ASC
+	  select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id,number_day from tb_charge_setting
+	  where state = 1 ORDER BY sort ASC
+  </select>
+
+  <select id="selectListByShopIdAll" resultType="ChargeSetting">
+    select id,charge_money,reward_money,show_in,label_text,sort,state,create_time,brand_id ,shop_detail_id,number_day from tb_charge_setting
+    ORDER BY sort ASC
   </select>
 </mapper>

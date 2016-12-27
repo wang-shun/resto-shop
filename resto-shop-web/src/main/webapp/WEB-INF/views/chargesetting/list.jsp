@@ -52,6 +52,10 @@
 							    <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state"> 
 							    <label for="showIn">否</label>
 						</div>
+							<div class="form-group">
+								<label>赠送金额到账天数</label>
+								<input type="number" class="form-control" name="numberDay" v-model="m.numberDay">
+							</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -131,7 +135,11 @@
 					return data;
 				}
 				
-			},                 
+			},
+			{
+				title : "赠送金额到账天数",
+				data : "numberDay",
+			},
 
 				{
 					title : "操作",
