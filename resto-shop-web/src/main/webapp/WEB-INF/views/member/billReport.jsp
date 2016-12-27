@@ -26,7 +26,6 @@ $.ajax( {
     },  
     success:function(data) { 
     	if(data != null ){
-			debugger;
     		dataSource=data.data.coupons;
 			for(var i = 0;i < data.data.shopDetails.length;i++){
 				shopList.put(data.data.shopDetails[i].id,data.data.shopDetails[i].name);
