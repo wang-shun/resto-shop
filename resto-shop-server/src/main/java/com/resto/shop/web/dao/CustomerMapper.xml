@@ -360,7 +360,7 @@
     <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
     </select>
     
-    
+    <!-- 得到品牌下的所有用户信息，得到用户已消费的订单 -->
     <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
     SELECT
 		c.id AS customerId,
@@ -373,9 +373,9 @@
 		c.city,
 		c.sex,
 		a.remain,
-		AVG(b.order_money) AS money,
-		COUNT(b.brand_id) AS amount,
-		SUM(b.order_money) AS sumMoney
+		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11)) as amount,
+		(SELECT SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11)) as sumMoney,
+		(SELECT ROUND(AVG(order_money),2) from tb_order where customer_id = c.id and order_state in (2,10,11)) as money
 	FROM
 		tb_customer c
 		LEFT JOIN tb_account a ON c.account_id = a.id

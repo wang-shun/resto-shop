@@ -195,8 +195,8 @@ public class MemberController extends GenericController{
 
 	@RequestMapping("/show/orderReport")
 	public String showModal1(String endDate,String beginDate,String customerId,HttpServletRequest request){
-//		request.setAttribute("beginDate",beginDate );
-//		request.setAttribute("endDate", endDate);
+		request.setAttribute("beginDate",beginDate);
+		request.setAttribute("endDate", endDate);
 		request.setAttribute("customerId", customerId);
 		return "member/orderReport";
 	}
@@ -341,13 +341,9 @@ public class MemberController extends GenericController{
 			ot.setOrderMoney(order.getOrderMoney());
 			//店铺名字
 			 listDto.add(ot);
-		
-			
 		 }
 		
 	    }
-		
-    
 		return listDto;
     }
 	
@@ -375,13 +371,13 @@ public class MemberController extends GenericController{
 			//ShopDetail s = shopDetailService.selectById(shopId);
 			//excel最顶不的内容
 			Map<String,String> map = new HashMap<>();
+			map.put("brandName", getBrandName());
 			map.put("beginDate", beginDate);
 			map.put("reportType", "用户订单报表");//表的头，第一行内容
 			map.put("endDate", endDate);
-			map.put("num", "11");//显示的位置
+			map.put("num", "9");//显示的位置
 			map.put("reportTitle", "用户订单");//表的名字
 			map.put("timeType", "yyyy-MM-dd");
-			
 			String[][] headers = {{"店铺名","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
 			
 			
@@ -415,8 +411,6 @@ public class MemberController extends GenericController{
 			if(!childList.isEmpty()){
 	                o.setChildList(childList);
 	        }
-           
-		
 			return getSuccessResult(o);
 		}
 
