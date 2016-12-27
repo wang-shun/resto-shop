@@ -27,6 +27,10 @@ public class ChargeOrder {
     private BigDecimal rewardBalance;
 
     private BigDecimal totalBalance;
+
+    private Integer numberDayNow;
+
+    private BigDecimal arrivalAmount;
     
 	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
 			String customerId, String shopDetailId, String brandId) {
@@ -156,4 +160,20 @@ public class ChargeOrder {
 	public void setTotalBalance(BigDecimal totalBalance) {
 		this.totalBalance = totalBalance;
 	}
+
+    public Integer getNumberDayNow() {
+        return numberDayNow;
+    }
+
+    public void setNumberDayNow(Integer numberDayNow) {
+        this.numberDayNow = numberDayNow;
+    }
+
+    public BigDecimal getArrivalAmount() {
+        return arrivalAmount;
+    }
+
+    public void setArrivalAmount(BigDecimal arrivalAmount) {
+        this.arrivalAmount = arrivalAmount;
+    }
 }

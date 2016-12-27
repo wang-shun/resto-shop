@@ -12,4 +12,11 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	 * @return
 	 */
     List<AccountLog> selectLogsByAccountId(String accountId);
+
+	/**
+	 * 根据 账户ID 查询 账户充值的次数
+	 * @param id
+	 * @return
+     */
+	int selectByCustomerIdNumber(String id);
 }
