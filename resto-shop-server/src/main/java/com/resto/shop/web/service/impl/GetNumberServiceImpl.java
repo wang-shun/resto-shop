@@ -4,6 +4,8 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.WaitModerState;
 import com.resto.shop.web.dao.GetNumberMapper;
@@ -12,6 +14,7 @@ import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.GetNumberService;
 import com.resto.shop.web.service.OrderPaymentItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -26,6 +29,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Resource
     private GetNumberMapper getNumberMapper;
+
+    @Autowired
+    private ShopDetailService shopDetailService;
 
 
     @Resource
@@ -104,12 +110,15 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Override
     public GetNumber getWaitInfoByCustomerId(String customerId,String shopId) {
-        return getNumberMapper.getWaitInfoByCustomerId(customerId,shopId);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+
+        return getNumberMapper.getWaitInfoByCustomerId(customerId,shopId,shopDetail.getTimeOut());
     }
 
     @Override
     public void refundWaitMoney(Order order) {
-        GetNumber getNumber = getNumberMapper.getWaitInfoByCustomerId(order.getCustomerId(),order.getShopDetailId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        GetNumber getNumber = getNumberMapper.getWaitInfoByCustomerId(order.getCustomerId(),order.getShopDetailId(),shopDetail.getTimeOut());
         getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_ONE);
         update(getNumber);
 

@@ -117,7 +117,7 @@
 
     <select id="getWaitInfoByCustomerId" resultType="GetNumber">
         select * from tb_get_number where shop_detail_id = #{shopId}
-        and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+        and  #{timeOut}         > TIMESTAMPDIFF(HOUR,create_time,now())
         and customer_id = #{customerId} order by create_time desc limit 1
     </select>
 
