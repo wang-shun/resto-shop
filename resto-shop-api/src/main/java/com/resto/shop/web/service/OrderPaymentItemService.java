@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.IncomeReportDto;
@@ -53,4 +54,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
+    
+    List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map);
 }

@@ -177,4 +177,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public List<Coupon> getListByCustomerId(String customerId) {
         return couponMapper.getListByCustomerId(customerId);
     }
+    
+    @Override
+    public List<Coupon> selectCoupon(Map<String, String> map) {
+    	return couponMapper.selectCoupon(map);
+    }
 }

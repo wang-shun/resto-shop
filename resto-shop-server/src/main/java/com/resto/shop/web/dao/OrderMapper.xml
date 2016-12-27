@@ -2273,14 +2273,6 @@ AND o.production_status IN (2, 3)
 
     <!-- 一个用户有很多订单 -->
     <select id="getCustomerOrderList" resultMap="CustomerOrderListmap">
-        <!-- 	  SELECT -->
-        <!-- 		      o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id ,c.telephone, a.id  appraise_id, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id   , oi.pay_value -->
-        <!-- 			FROM -->
-        <!-- 				tb_customer c -->
-        <!-- 			LEFT  JOIN tb_order o ON c.id = o.customer_id -->
-        <!-- 			LEFT   JOIN tb_appraise a on a.order_id = o.id -->
-        <!-- 			LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id  -->
-        <!-- 			WHERE c.id = 'f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12" -->
 
         SELECT
         o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id
@@ -2292,10 +2284,10 @@ AND o.production_status IN (2, 3)
         LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE c.id =#{customerId}
         <if test="beginDate != null and beginDate != ''">
-            AND  <![CDATA[ o.create_time >= #{ beginDate }
+            and <![CDATA[ o.create_time >= #{ beginDate } ]]>
         </if>
-         <if test="endDate != null and endDate != ''">
-          and o.create_time <= #{ endDate } ]]>
+        <if test="endDate != null and endDate != ''">
+            and <![CDATA[ o.create_time <= #{ endDate } ]]>
         </if>
 
 
@@ -2306,8 +2298,9 @@ AND o.production_status IN (2, 3)
         and pay_value > 0 and payment_mode_id = 10
     </select>
 
+    <select id="selectByCustomerCount" resultType="java.lang.Integer">
+        select count(1) from tb_order where customer_id = #{customerId}
+        and parent_order_id is null
+        and order_state in (2,10,11) and production_status in (2,3)
+    </select>
 </mapper>
-
-
-
-

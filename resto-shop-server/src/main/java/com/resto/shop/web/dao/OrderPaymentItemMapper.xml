@@ -198,5 +198,10 @@
       result_data = '{}'
     </select>
 
-
+	<select id="selectOrderPayMentItem" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select ABS(SUM(pay_value)) pay_value, payment_mode_id
+		from tb_order_payment_item
+		where payment_mode_id in (8,11) and pay_time between #{beginDate} and date_add(#{endDate},interval 1 day)
+		group by payment_mode_id
+	</select>
 </mapper>

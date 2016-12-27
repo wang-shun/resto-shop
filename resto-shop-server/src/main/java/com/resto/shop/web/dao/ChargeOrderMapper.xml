@@ -15,10 +15,12 @@
     <result column="charge_balance" property="chargeBalance" jdbcType="DECIMAL" />
     <result column="reward_balance" property="rewardBalance" jdbcType="DECIMAL" />
     <result column="total_balance" property="totalBalance" jdbcType="DECIMAL" />
+    <result column="number_day_now" property="numberDayNow"/>
+    <result column="arrival_amount" property="arrivalAmount"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, 
-    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance
+    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -31,15 +33,14 @@
     where id = #{id,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder" >
-    insert into tb_charge_order (id, charge_money, reward_money, 
-      order_state, create_time, finish_time, 
-      customer_id, brand_id, shop_detail_id, 
-      charge_balance, reward_balance, total_balance
-      )
+    insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, brand_id, shop_detail_id,
+    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount
+    )
     values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL}, 
       #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, 
       #{customerId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, 
-      #{chargeBalance,jdbcType=DECIMAL}, #{rewardBalance,jdbcType=DECIMAL}, #{totalBalance,jdbcType=DECIMAL}
+      #{chargeBalance,jdbcType=DECIMAL}, #{rewardBalance,jdbcType=DECIMAL}, #{totalBalance,jdbcType=DECIMAL},
+      #{numberDayNow}, #{arrivalAmount}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.ChargeOrder" >
@@ -81,6 +82,12 @@
       <if test="totalBalance != null" >
         total_balance,
       </if>
+      <if test="numberDayNow != null" >
+        number_day_now,
+      </if>
+      <if test="arrivalAmount != null" >
+        arrival_amount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -118,6 +125,12 @@
       </if>
       <if test="totalBalance != null" >
         #{totalBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="numberDayNow != null" >
+        #{numberDayNow},
+      </if>
+      <if test="arrivalAmount != null" >
+        #{arrivalAmount},
       </if>
     </trim>
   </insert>
@@ -157,6 +170,12 @@
       <if test="totalBalance != null" >
         total_balance = #{totalBalance,jdbcType=DECIMAL},
       </if>
+      <if test="numberDayNow != null" >
+        number_day_now = #{numberDayNow},
+      </if>
+      <if test="arrivalAmount != null" >
+        arrival_amount = #{arrivalAmount},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -172,7 +191,9 @@
       shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
       charge_balance = #{chargeBalance,jdbcType=DECIMAL},
       reward_balance = #{rewardBalance,jdbcType=DECIMAL},
-      total_balance = #{totalBalance,jdbcType=DECIMAL}
+      total_balance = #{totalBalance,jdbcType=DECIMAL},
+      number_day_now = #{numberDayNow},
+      arrival_amount = #{arrivalAmount}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="ChargeOrder">select * from tb_charge_order</select>
@@ -227,8 +248,6 @@
         ]]>
         AND order_state = 1
     </select>
-
-
 
     <select id="selectByDateAndBrandId" resultType="com.resto.shop.web.model.ChargeOrder">
         SELECT
