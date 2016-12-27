@@ -121,9 +121,9 @@ var tb1 = $("#shopBill").DataTable({
 			data : "useWithAccount",
 			createdCell:function(td,tdData){
 				if(tdData==true){
-					$(td).html("可以");
+					$(td).html("是");
 				}else{
-					$(td).html("不可以");
+					$(td).html("否");
 				}
 			}
 		}, {
@@ -160,7 +160,7 @@ var tb1 = $("#shopBill").DataTable({
 			data : 'beginTime',
 			createdCell:function (td,tdData) {
 				if (tdData != null) {
-					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+					$(td).html(new Date(tdData).format("hh:mm"));
 				}
 
 			}
@@ -169,7 +169,7 @@ var tb1 = $("#shopBill").DataTable({
 			data : "endTime",
 			createdCell:function (td,tdData) {
 				if (tdData != null) {
-					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+					$(td).html(new Date(tdData).format("hh:mm"));
 				}
 
 			}
