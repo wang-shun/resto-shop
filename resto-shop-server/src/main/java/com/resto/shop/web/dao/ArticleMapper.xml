@@ -759,4 +759,14 @@ GROUP BY article_id
         set likes = likes + 1
         where id = #{articleId}
     </update>
+    
+    <select id="selectsingleItem" parameterType="java.lang.String" resultMap="BaseResultMap">
+    	select ar.*,arf.name 
+		as articleFamilyName from tb_article ar
+		left join tb_article_family arf  
+		on ar.article_family_id=arf.id
+		where ar.state=1 and ar.article_type = 1
+		and ar.id not in (select article_id from tb_article_price group by article_id)
+		and ar.shop_detail_id = #{shopId}
+    </select>
 </mapper>

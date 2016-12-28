@@ -551,8 +551,7 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th>
-                                        <select v-model="choiceArticleShow.currentFamily">
+                                    <th><select v-model="choiceArticleShow.currentFamily">
                                             <option value="">餐品分类(全部)</option>
                                             <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
                                         </select>
@@ -562,7 +561,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleCanChoice">
+                                <tr v-for="art in singleItem | filterBy choiceArticleShow.currentFamily">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -798,7 +797,8 @@
                         choiceTemp: "",
                         lastChoiceTemp: "",
                         allArticles: allArticles,
-                        choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
+                        choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""},
+                        singleItem:[]
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
@@ -891,6 +891,20 @@
 
                         },
                         addMealItem: function (meal) {
+                        	var that = this;
+                            $.ajax({
+                            	url:"article/selectsingleItem",
+                            	type: "post",
+                            	dataType:"json",
+                            	success:function(result){
+                            		if(result.success){
+                            			that.singleItem = result.data;
+                            		}
+                            	},
+                            	error:function(){
+                            		C.errorMsg("获取单品失败!");
+                            	}
+                            });
                             this.choiceArticleShow.show = true;
                             this.choiceArticleShow.mealAttr = meal;
                             this.choiceArticleShow.items = $.extend(true, {}, meal).mealItems || [];
@@ -1156,25 +1170,6 @@
                         }
                     },
                     computed: {
-                        choiceArticleCanChoice: function () {
-                            var arts = [];
-                            for (var i in this.allArticles) {
-                                var art = this.allArticles[i];
-                                var has = false;
-                                for (var n in this.choiceArticleShow.items) {
-                                    var mealItem = this.choiceArticleShow.items[n];
-                                    if (mealItem.articleId == art.id) {
-                                        has = true;
-                                        break;
-                                    }
-                                }
-                                if (!has && art.articleType == 1 && art.state == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
-                                    arts.push(art);
-                                }
-                            }
-                            return arts;
-                        }
-                        ,
                         maxMealAttrSort: function () {
                             var sort = 0;
                             for (var i in this.m.mealAttrs) {

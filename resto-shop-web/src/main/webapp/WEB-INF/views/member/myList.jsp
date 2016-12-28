@@ -144,7 +144,7 @@
     			data : "userYe",
     		},  
     		{                 
-    			title : "未知注册用户数",
+    			title : "未注册用户数",
     			data : "userNot",
     		},       
     		{                 
