@@ -224,9 +224,12 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
 	    	chargeOrder.setChargeBalance(chargeSetting.getChargeMoney());
 	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
-	    	chargeOrder.setArrivalAmount(chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),BigDecimal.ROUND_HALF_UP));
-	    	chargeOrder.setRewardBalance(chargeOrder.getArrivalAmount());
-	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(chargeOrder.getRewardBalance()));
+	    	BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),0,BigDecimal.ROUND_HALF_UP);
+	    	chargeOrder.setArrivalAmount(amount);
+	    	chargeOrder.setRewardBalance(amount);
+	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(amount));
+	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
+			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
 	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
 	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
@@ -256,9 +259,4 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
 	}
 	
-	public static void main(String[] args) {
-		BigDecimal a = new BigDecimal(75);
-		BigDecimal b = new BigDecimal(8);
-		System.out.println(a.divide(b,BigDecimal.ROUND_HALF_UP));
-	}
 }
