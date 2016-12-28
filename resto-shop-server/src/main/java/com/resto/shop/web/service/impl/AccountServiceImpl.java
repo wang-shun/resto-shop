@@ -236,14 +236,14 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	//微信推送
 			wxPush(chargeOrder);
     	}catch (Exception e) {
-    		log.debug("插入ChargeOrder或AccountLog失败!");
+    		log.error("插入ChargeOrder或AccountLog失败!");
     		throw e;
 		}
 	}
 	
 	public void wxPush(ChargeOrder chargeOrder){
-		log.debug("----------品牌Id为:"+chargeOrder.getBrandId()+"");
-		log.debug("----------用户Id为:"+chargeOrder.getCustomerId()+"");
+		log.info("----------品牌Id为:"+chargeOrder.getBrandId()+"");
+		log.info("----------用户Id为:"+chargeOrder.getCustomerId()+"");
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
 		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 		//如果不是立即到账 优先推送一条提醒
