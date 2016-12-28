@@ -10,8 +10,10 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.constant.AccountLogType;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.AccountMapper;
@@ -19,6 +21,7 @@ import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.ChargeOrder;
+import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -26,6 +29,7 @@ import com.resto.shop.web.service.AccountLogService;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.ChargeLogService;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.ChargeSettingService;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 
@@ -58,6 +62,11 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     @Resource
     ChargeLogService chargeLogService;
     
+    @Resource
+    ChargeSettingService chargeSettingService;
+    
+    @Resource
+    BrandService brandService;
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -215,16 +224,37 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	chargeOrder.setBrandId(brand.getId());
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
 	    	chargeOrder.setChargeBalance(new BigDecimal(charges[0]));
-	    	chargeOrder.setRewardBalance(new BigDecimal(charges[1]));
-	    	chargeOrder.setTotalBalance(new BigDecimal(charges[0]).add(new BigDecimal(charges[1])));
+	    	ChargeSetting chargeSetting = chargeSettingService.selectById(charges[2]);
+	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
+	    	chargeOrder.setArrivalAmount(chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay())));
+	    	chargeOrder.setRewardBalance(chargeOrder.getArrivalAmount());
+	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(chargeOrder.getRewardBalance()));
 	    	chargeOrderMapper.insert(chargeOrder);
-	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, new BigDecimal(charges[0]).add(new BigDecimal(charges[1])), shopDetail);
-	    	addAccount(new BigDecimal(charges[0]), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
-	    	addAccount(new BigDecimal(charges[1]), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
+	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
+	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+	    	//微信推送
+			wxPush(chargeOrder);
     	}catch (Exception e) {
-    		log.debug("插入ChargeOrder或AccountLog失败!");
+    		log.error("插入ChargeOrder或AccountLog失败!");
     		throw e;
 		}
+	}
 	
+	public void wxPush(ChargeOrder chargeOrder){
+		log.info("----------品牌Id为:"+chargeOrder.getBrandId()+"");
+		log.info("----------用户Id为:"+chargeOrder.getCustomerId()+"");
+		Brand brand = brandService.selectById(chargeOrder.getBrandId());
+		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
+		//如果不是立即到账 优先推送一条提醒
+		if(chargeOrder.getNumberDayNow() > 0){
+			String msgFrist = "充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～";
+			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+		}
+		StringBuffer msg = new StringBuffer();
+		msg.append("今日充值赠送红包已到账，快去看看吧~");
+		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
+		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
 	}
 }
