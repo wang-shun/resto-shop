@@ -210,25 +210,26 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	}
 	
 	@Override
-	public void updateCustomerAccount(String operationPhone,String customerPhone,String chargeMoney,String customerId,String accountId,Brand brand,ShopDetail shopDetail) {
+	public void updateCustomerAccount(String operationPhone,String customerPhone,ChargeSetting chargeSetting,String customerId,String accountId,Brand brand,ShopDetail shopDetail) {
 		try{
 	    	ChargeOrder chargeOrder = new ChargeOrder();
-	    	String[] charges = chargeMoney.split(","); 
 	    	chargeOrder.setId(ApplicationUtils.randomUUID());
-	    	chargeOrder.setChargeMoney(new BigDecimal(charges[0]));
-	    	chargeOrder.setRewardMoney(new BigDecimal(charges[1]));
+	    	chargeOrder.setChargeMoney(chargeSetting.getChargeMoney());
+	    	chargeOrder.setRewardMoney(chargeSetting.getRewardMoney());
 	    	chargeOrder.setOrderState((byte)1);
 	    	chargeOrder.setCreateTime(new Date());
 	    	chargeOrder.setFinishTime(new Date());
 	    	chargeOrder.setCustomerId(customerId);
 	    	chargeOrder.setBrandId(brand.getId());
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
-	    	chargeOrder.setChargeBalance(new BigDecimal(charges[0]));
-	    	ChargeSetting chargeSetting = chargeSettingService.selectById(charges[2]);
+	    	chargeOrder.setChargeBalance(chargeSetting.getChargeMoney());
 	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
-	    	chargeOrder.setArrivalAmount(chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay())));
-	    	chargeOrder.setRewardBalance(chargeOrder.getArrivalAmount());
-	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(chargeOrder.getRewardBalance()));
+	    	BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),0,BigDecimal.ROUND_HALF_UP);
+	    	chargeOrder.setArrivalAmount(amount);
+	    	chargeOrder.setRewardBalance(amount);
+	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(amount));
+	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
+			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
 	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
 	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
@@ -257,4 +258,5 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
 	}
+	
 }

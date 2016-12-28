@@ -7,6 +7,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Account;
+import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 
@@ -41,7 +42,7 @@ public interface AccountService extends GenericService<Account, String> {
 	 * @param chargeMoney
 	 * @return
 	 */
-	void updateCustomerAccount(String operationPhone,String customerPhone,String chargeMoney,String customerId,String accountId,Brand brand,ShopDetail shopDetail);
+	void updateCustomerAccount(String operationPhone,String customerPhone,ChargeSetting chargeSetting,String customerId,String accountId,Brand brand,ShopDetail shopDetail);
 
 
 }
