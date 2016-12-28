@@ -551,7 +551,8 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th><select v-model="choiceArticleShow.currentFamily">
+                                    <th>
+                                        <select v-model="choiceArticleShow.currentFamily">
                                             <option value="">餐品分类(全部)</option>
                                             <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
                                         </select>
@@ -561,7 +562,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in singleItem | filterBy choiceArticleShow.currentFamily">
+                                <tr v-for="art in choiceArticleCanChoice">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -1170,6 +1171,25 @@
                         }
                     },
                     computed: {
+                        choiceArticleCanChoice: function () {
+                            var arts = [];
+                            for (var i in this.singleItem) {
+                                var art = this.singleItem[i];
+                                var has = false;
+                                for (var n in this.choiceArticleShow.items) {
+                                    var mealItem = this.choiceArticleShow.items[n];
+                                    if (mealItem.articleId == art.id) {
+                                        has = true;
+                                        break;
+                                    }
+                                }
+                                if (!has && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
+                                    arts.push(art);
+                                }
+                            }
+                            return arts;
+                        }
+                        ,
                         maxMealAttrSort: function () {
                             var sort = 0;
                             for (var i in this.m.mealAttrs) {
