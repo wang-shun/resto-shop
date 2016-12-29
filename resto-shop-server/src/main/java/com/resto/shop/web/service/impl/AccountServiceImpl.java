@@ -224,11 +224,11 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
 	    	chargeOrder.setChargeBalance(chargeSetting.getChargeMoney());
 	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
-	    	BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),2,BigDecimal.ROUND_HALF_UP);
-	    	chargeOrder.setArrivalAmount(new BigDecimal(Math.floor(amount.doubleValue())));
-	    	chargeOrder.setRewardBalance(new BigDecimal(Math.floor(amount.doubleValue())));
-	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(new BigDecimal(Math.floor(amount.doubleValue()))));
-	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(new BigDecimal(Math.floor(amount.doubleValue())).multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
+	    	BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),2,BigDecimal.ROUND_FLOOR);
+	    	chargeOrder.setArrivalAmount(amount);
+	    	chargeOrder.setRewardBalance(amount);
+	    	chargeOrder.setTotalBalance(chargeOrder.getChargeBalance().add(amount));
+	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
 			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
 	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
