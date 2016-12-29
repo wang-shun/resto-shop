@@ -34,10 +34,10 @@
 							    
 						</div>
 						
-						<div class="form-group">
-						    <label>显示的文本</label>
-						    <input type="text" class="form-control" name="labelText" v-model="m.labelText">
-						</div>
+						<%--<div class="form-group">--%>
+						    <%--<label>显示的文本</label>--%>
+						    <%--<input type="text" class="form-control" name="labelText" v-model="m.labelText">--%>
+						<%--</div>--%>
 						<div class="form-group">
 						    <label>排序</label>
 						    <input type="text" class="form-control" name="sort" v-model="m.sort">

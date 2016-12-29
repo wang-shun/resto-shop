@@ -45,6 +45,7 @@ public class ChargeSettingController extends GenericController{
 	public Result create(@Valid ChargeSetting brand){
 		   brand.setShopDetailId(getCurrentShopId());
 		   brand.setBrandId(getCurrentBrandId());
+		   brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 	       brand.setCreateTime(new Date());
 	       brand.setId(UUID.randomUUID().toString());
 		chargesettingService.insert(brand);
