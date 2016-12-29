@@ -430,4 +430,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public void addArticleLikes(String articleId) {
         articleMapper.addArticleLikes(articleId);
     }
+    
+    @Override
+    public List<Article> selectsingleItem(String shopId) {
+    	return articleMapper.selectsingleItem(shopId);
+    }
 }

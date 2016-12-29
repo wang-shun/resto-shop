@@ -2298,9 +2298,13 @@ AND o.production_status IN (2, 3)
         and pay_value > 0 and payment_mode_id = 10
     </select>
 
-    <select id="selectByCustomerCount" resultType="java.lang.Integer">
+    <select id="selectByCustomerCount" >
         select count(1) from tb_order where customer_id = #{customerId}
         and parent_order_id is null
         and order_state in (2,10,11) and production_status in (2,3)
+        and  TIMESTAMPDIFF(day,create_time,now()) >#{consumeConfineTime}
     </select>
+
+
+
 </mapper>

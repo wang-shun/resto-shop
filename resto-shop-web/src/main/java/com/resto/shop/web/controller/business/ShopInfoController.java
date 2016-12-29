@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServlet;
 import java.util.List;
 
 /**
@@ -33,13 +34,33 @@ public class ShopInfoController extends GenericController{
         return getSuccessResult(shopDetail);
     }
 
+
+    /**
+     * name:yjuany
+     * @param shopDetail
+     * @return
+     */
     @RequestMapping("modify")
     @ResponseBody
     public Result modify(ShopDetail shopDetail){
         shopDetail.setId(getCurrentShopId());
+        switch (shopDetail.getConsumeConfineUnit()){
+            case 1 :
+                shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime());
+                break;
+            case 2 ://月
+                shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime()*30);
+                break;
+            case 3 :
+                shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
+                break;
+        }
         shopDetailService.update(shopDetail);
         return Result.getSuccess();
     }
+
+
+
 
     @RequestMapping("list_all")
     @ResponseBody
