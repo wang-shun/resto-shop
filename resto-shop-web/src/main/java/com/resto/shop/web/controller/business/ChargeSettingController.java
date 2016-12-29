@@ -55,6 +55,7 @@ public class ChargeSettingController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid ChargeSetting brand){
+		brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 		chargesettingService.update(brand);
 		return Result.getSuccess();
 	}
