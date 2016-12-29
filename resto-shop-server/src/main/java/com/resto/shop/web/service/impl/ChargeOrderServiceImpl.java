@@ -74,7 +74,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
 		BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),2,BigDecimal.ROUND_HALF_UP);
 		chargeOrder.setArrivalAmount(new BigDecimal(Math.floor(amount.doubleValue())));
-		BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
+		BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(new BigDecimal(Math.floor(amount.doubleValue())).multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
 		chargeOrder.setEndAmount(endAmount);
 		chargeorderMapper.insert(chargeOrder);
 		return chargeOrder;
