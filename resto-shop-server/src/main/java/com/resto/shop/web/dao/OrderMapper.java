@@ -511,10 +511,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	/**
 	 * 会员模块
 	 * 用户订单管理
-	 * @param orderId
-	 * @return
 	 */
    List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
 	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineUnit")int consumeConfineUnit,@Param("consumeConfineTime") int consumeConfineTime);
+
+
 }
