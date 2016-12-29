@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -71,8 +72,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setRewardBalance(BigDecimal.ZERO);
 		chargeOrder.setTotalBalance(BigDecimal.ZERO);
 		chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
-		BigDecimal amount = (chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),0,BigDecimal.ROUND_HALF_UP));
-		chargeOrder.setArrivalAmount(amount);
+		BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),2,BigDecimal.ROUND_HALF_UP);
+		chargeOrder.setArrivalAmount(new BigDecimal(Math.floor(amount.doubleValue())));
 		BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
 		chargeOrder.setEndAmount(endAmount);
 		chargeorderMapper.insert(chargeOrder);
