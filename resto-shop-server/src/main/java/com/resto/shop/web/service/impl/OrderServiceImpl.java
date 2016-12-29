@@ -1305,7 +1305,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());//////////
 
 
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
             gao.append(" VIP");
         }
         //无限制的时候
