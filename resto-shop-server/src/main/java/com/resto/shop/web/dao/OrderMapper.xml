@@ -1582,6 +1582,7 @@ AND
         o.order_money,
         o.order_mode,
         o.id,
+        o.parent_order_id,
         oi.payment_mode_id,
         oi.pay_value
         FROM
