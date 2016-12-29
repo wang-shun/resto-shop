@@ -54,6 +54,11 @@
         <!-- END THEME LAYOUT STYLES -->
 		<link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
         <link href="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+
+
+        <%--    bootstrap-wysiwyg 富文本编辑器--%>
+        <link href="<%=resourcePath%>/assets/global/plugins/bootstrap-wysiwyg/css/font-awesome.css" rel="stylesheet">
+
         
     <!-- END HEAD -->
 
@@ -159,11 +164,10 @@
 
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.js" type="text/javascript"></script>
 
+        <%--    bootstrap-wysiwyg 富文本编辑器--%>
+        <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-wysiwyg/js/jquery.hotkeys.js"></script>
+        <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-wysiwyg/bootstrap-wysiwyg.js"></script>
 
-		<!-- 百度编辑器 -->
-	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.config.js"></script><!-- 配置文件 -->
-	    <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.all.min.js"></script><!-- 编辑器源码文件 -->
-	    
         <!-- END THEME LAYOUT SCRIPTS -->
     </body>
 	
