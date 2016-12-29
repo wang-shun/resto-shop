@@ -34,6 +34,8 @@ public class ChargeSetting {
     
     private String shopDetailId;
 
+    @NotNull(message="赠送金额到账天数不能为空")
+    @Min(message="赠送金额到账天数最小值为1",value=1)
     private Integer numberDay;
     
     public String getShopDetailId() {
