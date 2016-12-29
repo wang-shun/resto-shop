@@ -362,6 +362,8 @@
         date = new Date().format("yyyy-MM-dd");
         beginDate = date;
         endDate = date;
+        $("#beginDate").val(beginDate);
+        $("#endDate").val(endDate);
         searchInfo(beginDate, endDate);
     });
 
