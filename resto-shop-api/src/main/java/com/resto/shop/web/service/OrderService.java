@@ -516,7 +516,7 @@ public interface OrderService extends GenericService<Order, String> {
     List<Order> selectHoufuOrderList(String beginDate, String endDate, String currentBrandId);
 	/**
      * 微信端查询:以流水号查询订单详情
-     * @param serialNumber
+     * @param
      * @return
      */
     public List<Order> selectWXOrderItems(Map<String, Object> map);
@@ -534,5 +534,5 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param customerId
 	 * @return
      */
-	Integer selectByCustomerCount(String customerId);
+	Integer selectByCustomerCount(String customerId,int consumeConfineUnit,int consumeConfineTime);
 }

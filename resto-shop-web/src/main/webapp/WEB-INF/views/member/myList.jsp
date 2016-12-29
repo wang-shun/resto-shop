@@ -144,7 +144,7 @@
     			data : "userYe",
     		},  
     		{                 
-    			title : "未知注册用户数",
+    			title : "未注册用户数",
     			data : "userNot",
     		},       
     		{                 
@@ -362,6 +362,8 @@
         date = new Date().format("yyyy-MM-dd");
         beginDate = date;
         endDate = date;
+        $("#beginDate").val(beginDate);
+        $("#endDate").val(endDate);
         searchInfo(beginDate, endDate);
     });
 

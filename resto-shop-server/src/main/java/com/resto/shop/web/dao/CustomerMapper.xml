@@ -22,11 +22,12 @@
     <result column="new_notice_time" property="newNoticeTime" jdbcType="TIMESTAMP" />
     <result column="share_customer" property="shareCustomer" jdbcType="VARCHAR" />
     <result column="is_now_register" property="isNowRegister" />
+    <result column="customer_detail_id" property="customerDetailId" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, wechat_id, nickname, telephone, head_photo, default_delivery_point, is_bind_phone, 
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, 
-    city, country, last_order_shop, new_notice_time, share_customer, is_now_register
+    city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -45,14 +46,14 @@
       last_login_time, account_id, brand_id, 
       sex, province, city, 
       country, last_order_shop, new_notice_time, 
-      share_customer,is_now_register)
+      share_customer,is_now_register, customer_detail_id)
     values (#{id,jdbcType=VARCHAR}, #{wechatId,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
       #{telephone,jdbcType=VARCHAR}, #{headPhoto,jdbcType=VARCHAR}, #{defaultDeliveryPoint,jdbcType=INTEGER}, 
       #{isBindPhone,jdbcType=BIT}, #{regiestTime,jdbcType=TIMESTAMP}, #{firstOrderTime,jdbcType=TIMESTAMP}, 
       #{lastLoginTime,jdbcType=TIMESTAMP}, #{accountId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, 
       #{sex,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{lastOrderShop,jdbcType=VARCHAR}, #{newNoticeTime,jdbcType=TIMESTAMP}, 
-      #{shareCustomer,jdbcType=VARCHAR},#{isNowRegister})
+      #{shareCustomer,jdbcType=VARCHAR},#{isNowRegister},#{customerDetailId})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Customer" >
     insert into tb_customer
@@ -120,6 +121,9 @@
       <if test="isShare != null">
         is_share,
       </if>
+        <if test="customerDetailId != null">
+            customer_detail_id,
+        </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -185,6 +189,9 @@
       <if test="isShare != null">
         #{isShare},
       </if>
+        <if test="customerDetailId != null">
+            #{customerDetailId},
+        </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Customer" >
@@ -248,8 +255,11 @@
         is_now_register = #{isNowRegister,jdbcType=VARCHAR},
       </if>
       <if test="isShare != null">
-        is_share = #{isShare}
+        is_share = #{isShare},
       </if>
+        <if test="customerDetailId != null">
+            customer_detail_id = #{customerDetailId},
+        </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -273,7 +283,8 @@
       last_order_shop = #{lastOrderShop,jdbcType=VARCHAR},
       new_notice_time = #{newNoticeTime,jdbcType=TIMESTAMP},
       share_customer = #{shareCustomer,jdbcType=VARCHAR},
-      is_now_register = #{isNowRegister}
+      is_now_register = #{isNowRegister},
+      customer_detail_id = #{customerDetailId}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   

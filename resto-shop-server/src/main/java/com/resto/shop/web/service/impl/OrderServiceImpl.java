@@ -1077,13 +1077,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 StringBuilder chong = new StringBuilder();
                 int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
+                //
                 if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
                     chong.append(" VIP");
                 }
                 StringBuilder gao = new StringBuilder();
-                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
-                if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
-                    gao.append(" 高");
+
+                int unit=shopDetail.getConsumeConfineUnit();//1 2 3（日月 无限制）
+
+                //店铺设置的次数；
+                int  brandNumber=  shopDetail.getConsumeNumber();
+                //用户订单的次数
+                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());////
+                 //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
+                if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber){
+                   // gao.append(" 高");
+                    // gao.append(" vip");
                 }
                 data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
@@ -1289,12 +1298,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder chong = new StringBuilder();
         int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
         if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
-            chong.append(" VIP");
+            chong.append("充");
         }
         StringBuilder gao = new StringBuilder();
-        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId());
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
-            gao.append(" 高");
+        //shopDetail.getIsUserIdentity() == 1
+        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());//////////
+
+
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+            gao.append(" VIP");
+        }
+        //无限制的时候
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeConfineUnit()==3){
+            gao.append(" VIP");
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
@@ -3728,8 +3744,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
 	}
 
+
+
     @Override
-    public Integer selectByCustomerCount(String customerId) {
-        return orderMapper.selectByCustomerCount(customerId);
+    public Integer selectByCustomerCount(String customerId ,int consumeConfineUnit ,int consumeConfineTime ) {
+        return orderMapper.selectByCustomerCount(customerId ,consumeConfineUnit,consumeConfineTime);
     }
 }

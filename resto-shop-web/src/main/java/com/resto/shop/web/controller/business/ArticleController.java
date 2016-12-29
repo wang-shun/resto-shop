@@ -183,4 +183,17 @@ public class ArticleController extends GenericController {
         List<Article> result = articleService.getSingoArticle(getCurrentShopId());
         return result;
     }
+    
+    @RequestMapping("/selectsingleItem")
+    @ResponseBody
+    public Result selectsingleItem(){
+    	List<Article> list = null;
+    	try{
+    		list = articleService.selectsingleItem(getCurrentShopId());
+    		return getSuccessResult(list);
+    	}catch (Exception ex) {
+			log.error(ex.getMessage());
+			return new Result(false);
+		}
+    }
 }

@@ -167,13 +167,22 @@
 							</div>
 						</div>
 
-						<div class="form-group" v-if="m.isUserIdentity==1">
-							<label class="col-sm-3 control-label">消费次数：</label>
-							<div class="col-sm-9">
+
+						<div  class="form-group" v-if="m.isUserIdentity==1">
+							<label class="col-sm-3 control-label">消费 次数：</label>
+							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px" >
+							<select class="form-control" style="width:12%;position: relative;left: 15px;" id="consumeConfineUnit"  name="consumeConfineUnit" @click="selectWaitUnit" v-model="m.consumeConfineUnit">
+								<option  value="1" selected="selected">日</option>
+								<option  value="2">月</option>
+								<option  value="3">无限制</option>
+							</select>
+							<div class="col-sm-3" style="width: 12%; float:right;margin-top: -35px;margin-right:30%;">
 								<input type="number" class="form-control"
-									   name="consumeNumber" v-model="m.consumeNumber" required="required" min="0">
+									   name="consumeNumber" v-model="m.consumeNumber" required="required" min="0" >
+								<span style="position: relative;left:70px;bottom: 25px;">次</span>
 							</div>
 						</div>
+
 					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
@@ -186,80 +195,87 @@
 </div>
 
 <script>
-	$(document).ready(function() {
-		initContent();
-		toastr.options = {
-			"closeButton" : true,
-			"debug" : false,
-			"positionClass" : "toast-top-right",
-			"onclick" : null,
-			"showDuration" : "500",
-			"hideDuration" : "500",
-			"timeOut" : "3000",
-			"extendedTimeOut" : "500",
-			"showEasing" : "swing",
-			"hideEasing" : "linear",
-			"showMethod" : "fadeIn",
-			"hideMethod" : "fadeOut"
-		}
-		var temp;
-		var vueObj = new Vue({
-			el : "#control",
-			data : {
-				m : {},
-			},
-			methods : {
-				initTime : function() {
-					$(".timepicker-no-seconds").timepicker({
-						autoclose : true,
-						showMeridian : false,
-						minuteStep : 5
-					});
-				},
-				save : function(e) {
-					var formDom = e.target;
-					$.ajax({
-						url : "shopInfo/modify",
-						data : $(formDom).serialize(),
-						success : function(result) {
-							if (result.success) {
-								toastr.clear();
-								toastr.success("保存成功！");
-							} else {
-								toastr.clear();
-								toastr.error("保存失败");
+	$.ajax({
+		url:"shopInfo/list_one",
+		success:function(result){
+			$(document).ready(function() {
+				toastr.options = {
+					"closeButton" : true,
+					"debug" : false,
+					"positionClass" : "toast-top-right",
+					"onclick" : null,
+					"showDuration" : "500",
+					"hideDuration" : "500",
+					"timeOut" : "3000",
+					"extendedTimeOut" : "500",
+					"showEasing" : "swing",
+					"hideEasing" : "linear",
+					"showMethod" : "fadeIn",
+					"hideMethod" : "fadeOut"
+				}
+				var temp;
+				var vueObj = new Vue({
+					el : "#control",
+					data : {
+						m : result.data,
+						showa:true
+					},
+					watch: {
+						'm.consumeConfineUnit': 'hideShowa'
+					},
+					methods : {
+						hideShowa : function(){
+							if(this.m.consumeConfineUnit == 3){
+								this.showa = false;
+							}else{
+								this.showa = true;
 							}
 						},
-						error : function() {
-							toastr.clear();
-							toastr.error("保存失败");
+						initTime : function() {
+							$(".timepicker-no-seconds").timepicker({
+								autoclose : true,
+								showMeridian : false,
+								minuteStep : 5
+							});
+						},
+						save : function(e) {
+							var formDom = e.target;
+							$.ajax({
+								url : "shopInfo/modify",
+								data : $(formDom).serialize(),
+								success : function(result) {
+									if (result.success) {
+										toastr.clear();
+										toastr.success("保存成功！");
+									} else {
+										toastr.clear();
+										toastr.error("保存失败");
+									}
+								},
+								error : function() {
+									toastr.clear();
+									toastr.error("保存失败");
+								}
+							})
+
+						},
+						cancel : function() {
+							initContent();
+
+						},
+						uploadSuccess:function(url){
+							$("[name='photo']").val(url).trigger("change");
+							toastr.success("上传成功！");
+						},
+						uploadError:function(msg){
+							toastr.error("上传失败");
 						}
-					})
+					}
+				});
 
-				},
-				cancel : function() {
-					initContent();
-
-				},
-				uploadSuccess:function(url){
-					$("[name='photo']").val(url).trigger("change");
-					toastr.success("上传成功！");
-				},
-				uploadError:function(msg){
-					toastr.error("上传失败");
-				}
-			}
-		});
-
-		function initContent() {
-			$.ajax({
-				url : "shopInfo/list_one",
-				success : function(result) {
-					console.log(result.data);
-					vueObj.m = result.data;
-				}
-			})
+			}());
 		}
 
-	}());
+	})
+
 </script>

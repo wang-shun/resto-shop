@@ -85,4 +85,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	void updateArticleImg(Article article);
 
 	void addArticleLikes(String articleId);
+	
+	List<Article> selectsingleItem(String shopId);
 }
