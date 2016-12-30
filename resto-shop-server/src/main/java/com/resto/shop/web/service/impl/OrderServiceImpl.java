@@ -1984,6 +1984,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //查询后台数据
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
+
         //封装品牌的数据
         OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
         //品牌订单总额初始值
@@ -2012,12 +2013,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }else {
                 d = d.add(o.getOrderMoney());
             }
-            //品牌订单数目
-            ids.add(o.getId());
+            //品牌订单数目 加菜订单和父订单算一个订单
+
+            if(o.getParentOrderId()==null){
+                ids.add(o.getId());
+            }
+
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-                    //品牌实际支付
-                    if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6|| oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
+                    //品牌实际支付  微信支付+
+                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6|| oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
@@ -2081,7 +2086,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                 ds3 = ds3.add(oi.getPayValue());
                             }
-                           ds1= ds1.add(oi.getPayValue());
                         }
                     }
 
@@ -2092,8 +2096,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        ds1 = ds1.add(os.getOrderMoney());
 //                    }
 
+                    //判断是否是后付款模式
+                    if(os.getOrderMode()==5){
+                        if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            ds1=ds1.add(os.getAmountWithChildren());
+                        }else {
+                            ds1 = ds1.add(os.getOrderMoney());
+                        }
+                    }else {
+                        ds1 = ds1.add(os.getOrderMoney());
+                    }
+
                     //计算店铺的订单数目
-                    sids.add(os.getId());
+                    if(os.getParentOrderId()==null){
+                        sids.add(os.getId());
+                    }
                     if (sids.size() > 0) {
                         snumber = sids.size();
                     }
@@ -3039,7 +3056,98 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 sendWxRefundMsg(order);
             }
         }
+
+        //增加结店微信推送每日营业相关的数据
+
+        //WeChatUtils.getXmlText(toUserName, String fromUserName, String content)
+
+
     }
+
+    public static void main(String[] args){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        StringBuilder content = new StringBuilder();
+        content
+                .append("门店:简厨凌空SHOH").append("\n")
+                .append("日报:2016.11.20").append("\n")
+                .append("堂吃支付金额:10000元").append("\n")
+                .append("商户录取").append("\n")
+                 .append("堂吃消费笔数:64").append("\n")
+                .append("商户录入").append("\n")
+                .append("用户支付消费:62/9500").append("\n")
+                .append("----------------").append("\n")
+                .append("新增用户消费:12/2600").append("\n")
+                .append("其中：").append("\n")
+                .append("自然用户消费:9/1700").append("\n")
+                .append("分享用户消费:3/900").append("\n")
+                .append("-----------------").append("\n")
+                .append("回头用户消费:50/6900").append("\n")
+                .append("其中:").append("\n")
+                .append("二次回头用户:20/3000").append("\n")
+                .append("多次回头用户:30/3900").append("\n")
+                .append("-----------------").append("\n")
+                .append("用户消费占比:96.85%").append("\n")
+                .append("(用户交易笔数/堂吃交易笔数)").append("\n")
+                .append("新增用户比率:85.76%").append("\n")
+                .append("新增消费用户/(堂吃交易笔数-回头用户交易笔数)").append("\n")
+                .append("在线支付比例:95%").append("\n")
+                .append("在线支付金额/堂吃支付金额").append("\n")
+                .append("--------------------").append("\n")
+                .append("本日满意度:99.15分").append("\n")
+                .append("------上旬合计------").append("\n")
+                .append("上旬满意度:97.5").append("\n")
+                .append("用户消费占比:96.56%").append("\n")
+                .append("新增用户占比:80.03%").append("\n")
+                .append("在线支付占比:93%").append("\n")
+                .append("总支付金额:2000000").append("\n")
+                .append("用户支付金额:111111").append("\n")
+                .append("新增用户消费:121/18500").append("\n")
+                .append("新增自然用户").append("\n")
+                .append("新增分享用户").append("\n")
+                .append("回头用户消费").append("\n")
+                .append("新增回头用户").append("\n")
+                .append("多次回头用户").append("\n")
+                .append("------中旬合计------").append("\n")
+                .append("中旬满意度:97.5").append("\n")
+                .append("用户消费占比:96.56%").append("\n")
+                .append("新增用户占比:80.03%").append("\n")
+                .append("在线支付占比:93%").append("\n")
+                .append("总支付金额:2000000").append("\n")
+                .append("用户支付金额:111111").append("\n")
+                .append("新增用户消费:121/18500").append("\n")
+                .append("新增自然用户").append("\n")
+                .append("新增分享用户").append("\n")
+                .append("回头用户消费").append("\n")
+                .append("新增回头用户").append("\n")
+                .append("多次回头用户").append("\n")
+                .append("------下旬合计------").append("\n")
+                .append("下旬满意度:97.5").append("\n")
+                .append("用户消费占比:96.56%").append("\n")
+                .append("新增用户占比:80.03%").append("\n")
+                .append("在线支付占比:93%").append("\n")
+                .append("总支付金额:2000000").append("\n")
+                .append("用户支付金额:111111").append("\n")
+                .append("新增用户消费:121/18500").append("\n")
+                .append("新增自然用户").append("\n")
+                .append("新增分享用户").append("\n")
+                .append("回头用户消费").append("\n")
+                .append("新增回头用户").append("\n")
+                .append("多次回头用户").append("\n")
+                .append("------本月合计------").append("\n")
+                .append("本月满意度:97.5").append("\n")
+                .append("用户消费占比:96.56%").append("\n")
+                .append("新增用户占比:80.03%").append("\n")
+                .append("在线支付占比:93%").append("\n")
+                .append("总支付金额:2000000").append("\n")
+                .append("用户支付金额:111111").append("\n")
+                .append("新增用户消费:121/18500").append("\n");
+        /**
+         发送客服消息
+         */
+        WeChatUtils.sendCustomerMsgASync(content.toString(), "oBHT9squwPUyTM-zwoWcWyey4PCM", "wx36bd5b9b7d264a8c", "807530431fe6e19e3f2c4a7d1a149465");
+
+    }
+
 
 
     public void sendWxRefundMsg(Order order) {

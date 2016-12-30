@@ -205,6 +205,8 @@
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
         <result column="order_mode" property="orderMode"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+
 
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItem_id" property="id"/>
@@ -1582,6 +1584,7 @@ AND
         o.order_money,
         o.order_mode,
         o.id,
+        o.parent_order_id,
         oi.payment_mode_id,
         oi.pay_value
         FROM
