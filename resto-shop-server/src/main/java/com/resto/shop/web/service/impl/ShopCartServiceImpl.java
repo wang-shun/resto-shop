@@ -47,16 +47,34 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             return shopCart.getId();
         } else if (shopCart.getShopType().equals(ShopCarType.DANPIN)) {
             shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
+        } else if (shopCart.getShopType().equals(ShopCarType.CAOBAO)){
+            if(shopCartItem == null){
+                insertShopCart(shopCart);
+                return shopCart.getId();
+            }else{
+                shopCartItem.setNumber(shopCart.getNumber());
+                shopcartMapper.updateShopCartItem(shopCartItem);
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+                return shopCartItem.getId();
+            }
+        } else if (shopCart.getShopType().equals(ShopCarType.CAOBAODANPIN)){
+            insertShopCart(shopCart);
+        } else if (shopCart.getShopType().equals(ShopCarType.XINGUIGE)){
+            insertShopCart(shopCart);
+            return shopCart.getId();
+        } else if (shopCart.getShopType().equals(ShopCarType.XINGUIGECAOBAODANPIN)){
+            insertShopCart(shopCart);
         }
         if(shopCart.getShopType().equals(ShopCarType.DANPIN)){
             if (shopCartItem == null && number > 0) {
+                log.info(shopCart.getRecommendArticleId());
                 insertShopCart(shopCart);
                 return number;
             } else if (shopCartItem != null && number > 0) {
                 shopCartItem.setNumber(number);
                 shopcartMapper.updateShopCartItem(shopCartItem);
                 return number - oldNumber;
-            }else if(shopCart != null){
+            } else if (shopCart != null){
                 if(number <= 0 &&  shopCart.getId() != null){
                     shopcartMapper.delMealArticle(shopCart.getId().toString());
                 }else if(number <= 0 &&  shopCart.getId() == null && shopCartItem.getId() != null){
@@ -106,4 +124,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public void delMealItem(String articleId) {
         shopcartMapper.delMealItem(articleId);
     }
+
+    @Override
+    public ShopCart selectByUuId(String uuid) {
+        return shopcartMapper.selectByUuId(uuid);
+    }
+
 }

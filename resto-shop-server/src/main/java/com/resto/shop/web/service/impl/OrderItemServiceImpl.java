@@ -14,10 +14,13 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.dao.ArticleFamilyMapper;
 import com.resto.shop.web.dao.OrderItemMapper;
+import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.OrderItemService;
 
 import cn.restoplus.rpc.server.RpcService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -29,6 +32,8 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     private OrderItemMapper orderitemMapper;
 
 
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public GenericDao<OrderItem, String> getDao() {
@@ -39,7 +44,17 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public List<OrderItem> listByOrderId(String orderId) {
         List<OrderItem> orderItems = orderitemMapper.listByOrderId(orderId);
 
+        List<OrderItem> other = orderitemMapper.listTotalByOrderId(orderId);
+
+        orderItems.addAll(other);
+
         return getOrderItemsWithChild(orderItems);
+    }
+
+
+    @Override
+    public List<OrderItem> listByParentId(String orderId) {
+        return orderitemMapper.listByParentId(orderId);
     }
 
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {

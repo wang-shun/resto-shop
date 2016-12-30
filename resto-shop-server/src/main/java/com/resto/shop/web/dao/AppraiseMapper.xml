@@ -75,7 +75,7 @@
   <select id="selectList" resultType="Appraise">select * from tb_appraise</select>
   
   <select id="listAppraise" resultType="Appraise">
-  	 SELECT a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo
+  	 SELECT a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo,c.sex
   	  from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id   	  
   	  where shop_detail_id=#{currentShopId} and LEVEL &gt;= #{minLevel}
   	  	and LEVEL &lt;= #{maxLevel} ORDER BY create_time DESC LIMIT #{currentPage},#{showCount}
@@ -96,7 +96,7 @@
 	SELECT COUNT(1) AS COUNT,AVG(LEVEL)*20 AVG_SCORE,
 	CASE WHEN DAY(create_time) BETWEEN 1 AND 10 THEN DATE_FORMAT(create_time,'%Y.%m.01~10')
 	WHEN DAY(create_time) BETWEEN 11 AND 20 THEN DATE_FORMAT(create_time,'%Y.%m.11~20')
-	ELSE CONCAT(DATE_FORMAT(create_time,'%Y.%m.21~'),DAY(LAST_DAY(CURDATE())))
+	ELSE CONCAT(DATE_FORMAT(create_time,'%Y.%m.21~'),DAY(LAST_DAY(create_time)))
 	END AS YEARMONTH FROM tb_appraise 
 	where shop_detail_id=#{0}
 	GROUP BY YEARMONTH
@@ -106,5 +106,25 @@
 
   <select id="selectDeatilByOrderId" resultType="Appraise">select
       <include refid="Base_Column_List"/>from tb_appraise where order_id=#{orderId}
+  </select>
+
+  <select id="selectAppraiseByCustomerId" resultType="Appraise">
+      select * from tb_appraise where customer_id = #{customerId} and shop_detail_id = #{shopId}
+      and status = 1 order by create_time desc limit 1
+  </select>
+
+  <select id="selectCustomerAllAppraise" resultType="Appraise">
+    select a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo
+    from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id
+    where a.customer_id = #{customerId} and a.status = 1 order by a.create_time desc
+    LIMIT #{currentPage},#{showCount}
+  </select>
+
+  <select id="selectByCustomerCount" resultType="java.lang.Integer">
+    select count(*) from tb_appraise where customer_id = #{customerId} and status = 1
+  </select>
+
+  <select id="selectByGoodAppraise" resultType="Appraise">
+    select <include refid="Base_Column_List"/> from tb_appraise where level = 5 and picture_url is not null order by create_time desc limit 500
   </select>
 </mapper>

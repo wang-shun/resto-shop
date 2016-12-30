@@ -7,7 +7,7 @@ import com.resto.shop.web.model.SmsLog;
 
 public interface SmsLogService extends GenericService<SmsLog, Long> {
 
-	String sendCode(String phone, String code, String brandId, String shopId);
+	String sendCode(String phone, String code, String brandId, String shopId, int smsLogType);
     /**
      * 根据店铺ID查询短信记录
      * @param shopId

@@ -117,6 +117,9 @@
       <if test="isNowRegister != null" >
         is_now_register,
       </if>
+      <if test="isShare != null">
+        is_share,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -178,6 +181,9 @@
       </if>
       <if test="isNowRegister != null" >
         #{isNowRegister},
+      </if>
+      <if test="isShare != null">
+        #{isShare},
       </if>
     </trim>
   </insert>
@@ -241,6 +247,9 @@
       <if test="isNowRegister != null" >
         is_now_register = #{isNowRegister,jdbcType=VARCHAR},
       </if>
+      <if test="isShare != null">
+        is_share = #{isShare}
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -296,13 +305,91 @@
     select count(1) from tb_customer where id = #{0} and telephone is null
   </select>
 
+
+<!-- 得到品牌用户总数 -->
+  <select id="selectAllUser" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId}
+  </select>
+<!-- 得到品牌注册用户总数 -->
+	<select id="selectUserYe" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=1
+  </select>
+  <!-- 得到品牌未注册用户总数 -->
+  <select id="selectUserNot" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=0
+  </select>
+  <!-- 得到品牌男性用户总数 -->
+  <select id="selectUserBoy" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=1
+  </select>
+  <!-- 得到品牌女性用户总数 -->
+  <select id="selectUserGir" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=2
+  </select>
+  <!-- 得到品牌未知性别用户总数 -->
+  <select id="selectNotUser" resultType="java.lang.Integer">
+    select count(id) from tb_customer where brand_id=#{brandId} and sex=0
+  </select>
+  <!-- 得到品牌用户购买率 -->
+  <select id="selectPulShopping" resultType="java.lang.Integer">
+    select count(1) from tb_customer where id in (select customer_id from tb_order GROUP BY customer_id having count(id) > 2) and brand_id=#{brandId}
+  </select>
+
+
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
-        select id, wechat_id, nickname, telephone, head_photo, is_bind_phone,
-    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
-    city, country, last_order_shop WHERE  is_bind_phone = 1
+    SELECT 
+	    id, 
+	    wechat_id, 
+	    nickname, 
+	    telephone, 
+	    head_photo, 
+	    is_bind_phone,
+	    regiest_time, 
+	    first_order_time, 
+	    last_login_time, 
+	    account_id, 
+	    brand_id, 
+	    sex, 
+	    province,
+	    city, 
+	    country, 
+	    last_order_shop 
+    FROM  tb_customer
+    WHERE is_bind_phone = 1
     AND
     <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
     </select>
+    
+    
+    <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
+    SELECT
+		c.id AS customerId,
+		a.id AS accountId,
+		c.nickname,
+		c.telephone,
+		c.head_photo as photo,
+		c.is_bind_phone as isBindPhone,
+		c.province,
+		c.city,
+		c.sex,
+		a.remain,
+		AVG(b.order_money) AS money,
+		COUNT(b.brand_id) AS amount,
+		SUM(b.order_money) AS sumMoney
+	FROM
+		tb_customer c
+		LEFT JOIN tb_account a ON c.account_id = a.id
+		LEFT JOIN tb_order b ON c.id = b.customer_id
+	where
+  	    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND	c.brand_id=#{brandId}
+    GROUP BY
+		c.id
+    </select>
 
-
+	<select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">
+		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain from tb_customer tc 
+		left join tb_account ta
+		on tc.account_id = ta.id
+		where tc.telephone = #{telephone}
+	</select>
 </mapper>

@@ -11,6 +11,6 @@
     <title>Title</title>
 </head>
 <body>
-<h1>尚未开启此功能，请联系管理员开通此功能!</h1>
+<h1 align="center">尚未开启此功能，请联系管理员开通此功能!</h1>
 </body>
 </html>

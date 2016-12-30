@@ -5,13 +5,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.OrderArticleDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -74,7 +71,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
 	Order getOrderAccount(String shopId);
 
-
+	Order getOrderAccountHoufu(String shopId);
 	/**
 	 * 查询某天的历史订单
 	 * 根据店铺模式查询不同状态的历史订单。（2016-10-11，已取消此功能，改为所有模式的店铺的历史订单都不为取消状态和未支付状态）
@@ -85,6 +82,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
 	 */
 	List<Order> selectHistoryOrderList(@Param("shopId") String currentShopId, @Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd, @Param("shopMode") Integer shopMode);
+
+	List<Order>listHoufuFinishedOrder(String shopId);
+
+	List<Order>listHoufuUnFinishedOrder(String shopId);
 
 	/**
 	 * 查询某天的异常订单
@@ -108,7 +109,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	void clearPushOrder(String id, int notOrder);
 
-	void setOrderNumber(String orderId, String tableNumber);
+	void setOrderNumber(@Param("orderId")String orderId,@Param("tableNumber") String tableNumber);
 	
 	/**
 	 * 根据取餐码查询已支付的订单
@@ -140,11 +141,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	void updateParentAmount(String orderId, Double money);
 
-	Double selectParentAmount(String orderId);
+	Double selectParentAmount(@Param("orderId")String orderId,@Param("shopMode") Integer shopMode);
 
 	void changeAllowContinue(String id, boolean b);
 
-	Integer selectArticleCountById(String id);
+	Integer selectArticleCountById(@Param("id")String id,@Param("shopMode")Integer shopMode);
 
 	List<Order> selectByParentId(String parentOrderId);
 
@@ -458,9 +459,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
 
-    int  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
-    BigDecimal  selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -486,9 +487,32 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> getOrderByEmployee(@Param("shopId") String shopId,@Param("employeeId") String employeeId);
 
 
-	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId);
+	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
 	Order getLastOrderByTableNumber(String tableNumber);
 
-    List<Order> selectHasPayListHouFuOrderByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+	BigDecimal getServicePrice(String shopId);
+
+	void refundServicePrice(@Param("id") String id,@Param("servicePrice") BigDecimal servicePrice,@Param("customerCount") Integer customerCount);
+
+	Integer getMealALLNumber(String shopId);
+
+	BigDecimal getRefundSumByOrderId(@Param("orderId")String orderId,@Param("type")int type);
+
+	BigDecimal getAliPayment(@Param("orderId")String orderId);
+
+	Integer getCustomerPerson(String shopId);
+    List<Order> selectOrderListItemByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+    List<Order> selectListByParentId(@Param("orderId") String orderId);
+	
+	public List<Order> selectWXOrderItems(Map<String, Object> map);
+	public List<Order> selectWXOrderItems(String serialNumber);
+	/**
+	 * 会员模块
+	 * 用户订单管理
+	 * @param orderId
+	 * @return
+	 */
+   List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }

@@ -16,6 +16,7 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Order;
 
 
@@ -137,10 +138,46 @@ public class MQMessageProducer {
 		obj.put("originalAmount", order.getOriginalAmount());
 		obj.put("orderMoney", order.getOrderMoney());
 		obj.put("serialNumber",order.getSerialNumber());
+		obj.put("printTimes",order.getPrintTimes());
+		obj.put("amountWithChildren",order.getAmountWithChildren());
+		obj.put("printOrderTime",order.getPrintOrderTime());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
 
+	public static void sendPlaceOrderMessageAgain(Order order,final long delayTime) {
+		JSONObject obj  = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		obj.put("tableNumber", order.getTableNumber());
+		obj.put("shopDetailId", order.getShopDetailId());
+		obj.put("articleCount", order.getArticleCount());
+		obj.put("orderMode",order.getOrderMode());
+		obj.put("productionStatus", order.getProductionStatus());
+		obj.put("verCode", order.getVerCode());
+		obj.put("parentOrderId", order.getParentOrderId());
+		obj.put("originalAmount", order.getOriginalAmount());
+		obj.put("orderMoney", order.getOrderMoney());
+		obj.put("serialNumber",order.getSerialNumber());
+		obj.put("printTimes",order.getPrintTimes());
+		obj.put("amountWithChildren",order.getAmountWithChildren());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+
+	public static void sendRemindMsg(Order order,final long delayTime) {
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("customerId", order.getCustomerId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		obj.put("brandId", order.getBrandId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_REMIND_MSG,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
+	
+	
 	public static void checkPlaceOrderMessage(Order order,Long delayTime,Long limitTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());

@@ -34,7 +34,7 @@
 							<input type="text" class="form-control" name="latitude" :value="m.latitude">
 						</div>
 						<div class="form-group">
-                                      <labe>营业时间</label>
+                                      <label>营业时间</label>
                                          <div class="input-group">
                                        <input type="text" class="form-control timepicker timepicker-no-seconds" name="openTime" @focus="initTime" :value="m.openTime" readonly="readonly">
                                        <span class="input-group-btn">

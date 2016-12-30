@@ -175,5 +175,13 @@
 				App.initAjax();
 			})
 		})
+
+        $("#updateManagerPwd").click(function(){
+            $.post("branduser/updatemanagerpwd",function(result){
+                var contentBody = $(".page-content .page-content-body");
+                contentBody.html(result);
+                App.initAjax();
+            })
+        })
 	</script>
 </html>

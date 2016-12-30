@@ -5,6 +5,7 @@ import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.PermissionService;
+import com.resto.shop.web.service.TableQrcodeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -110,8 +111,6 @@ public class SpringContextConfig {
         return getProxy(ArticleUnitService.class);
     }
 
-
-
     @Bean
     public ChargeOrderService chargeOrderService() {
         return getProxy(ChargeOrderService.class);
@@ -125,6 +124,11 @@ public class SpringContextConfig {
     @Bean
     public ChargeSettingService chargeSettingService() {
         return getProxy(ChargeSettingService.class);
+    }
+    
+    @Bean
+    public ChargeLogService chargeLogService() {
+        return getProxy(ChargeLogService.class);
     }
 
     @Bean
@@ -342,6 +346,10 @@ public class SpringContextConfig {
         return proxy.create(OrderExceptionService.class);
     }
 
+    @Bean
+    public TableQrcodeService tableQrcodeService() {
+        return proxy.create(TableQrcodeService.class);
+    }
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

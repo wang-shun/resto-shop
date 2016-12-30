@@ -112,8 +112,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public Appraise saveAppraise(Appraise appraise) throws AppException {
 		Order order= orderService.selectById(appraise.getOrderId());
 		if(order.getAllowAppraise()){
-			String pic = getPicture(appraise);
-			appraise.setPictureUrl(pic);
+//			String pic = getPicture(appraise);
+//			appraise.setPictureUrl(pic);
 			appraise.setId(ApplicationUtils.randomUUID());
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
@@ -192,5 +192,25 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		}else{
 			return null;
 		}
+	}
+
+	@Override
+	public Appraise selectAppraiseByCustomerId(String customerId,String shopId) {
+		return appraiseMapper.selectAppraiseByCustomerId(customerId,shopId);
+	}
+
+	@Override
+	public List<Appraise> selectCustomerAllAppraise(String customerId, Integer currentPage, Integer showCount) {
+		return appraiseMapper.selectCustomerAllAppraise(customerId, currentPage, showCount);
+	}
+
+	@Override
+	public int selectByCustomerCount(String customerId) {
+		return appraiseMapper.selectByCustomerCount(customerId);
+	}
+
+	@Override
+	public List<Appraise> selectByGoodAppraise() {
+		return appraiseMapper.selectByGoodAppraise();
 	}
 }

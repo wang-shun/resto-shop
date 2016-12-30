@@ -19,10 +19,13 @@
     <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
      <result column="meal_item_id" property="mealItemId"/>
+     <result column="recommend_id" property="recommendId"/>
+     <result column="orgin_count" property="orginCount"/>
+     <result column="refund_count" property="refundCount"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, article_name, article_designation, count, original_price, unit_price, final_price, 
-    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id
+    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -39,13 +42,13 @@
       count, original_price, unit_price, 
       final_price, remark, sort, 
       status, order_id, article_id, 
-      type, parent_id, create_time
+      type, parent_id, create_time,orgin_count
       )
     values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{articleDesignation,jdbcType=VARCHAR}, 
       #{count,jdbcType=INTEGER}, #{originalPrice,jdbcType=DECIMAL}, #{unitPrice,jdbcType=DECIMAL}, 
       #{finalPrice,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, 
-      #{type,jdbcType=INTEGER}, #{parentId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      #{type,jdbcType=INTEGER}, #{parentId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},#{count,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderItem">
@@ -96,6 +99,9 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="count != null">
+        orgin_count,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -142,6 +148,9 @@
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -190,6 +199,9 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="refundCount != null">
+        refund_count = #{refundCount} + refund_count,
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -216,7 +228,19 @@
   
   <!-- 根据订单ID查询订单项 -->
   <select id="listByOrderId" resultType="OrderItem">
-  	SELECT * from tb_order_item where order_id = #{orderId} ORDER BY create_time
+  	SELECT sum(count) as count,sum(original_price) as original_price,sum(unit_price) as unit_price,
+  	 sum(final_price) as final_price,tb_order_item.*
+  	 from tb_order_item where order_id = #{orderId}
+  	 and type not in (3,4)
+  	GROUP BY article_id,article_name
+
+  	ORDER BY create_time
+  </select>
+
+  <select id="listTotalByOrderId" resultType="OrderItem">
+    SELECT * from tb_order_item where order_id = #{orderId}
+    and type in (3,4)
+    ORDER BY create_time
   </select>
   <select id="listByOrderIds" resultType="OrderItem">
   	SELECT * from tb_order_item where 
@@ -228,11 +252,11 @@
   </select>
   <insert id="insertBatch">
   	insert into tb_order_item 
-  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id,meal_item_id)
+  	(id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status, order_id, article_id,type,parent_id,meal_item_id,recommend_id,orgin_count,meal_fee_number)
   	values
   	<foreach collection="list" item="t" separator="," >
   		(#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId})
+  		#{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber})
   	</foreach>
   </insert>
   
@@ -273,5 +297,23 @@ order by t.print_sort asc
 		where <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.order_state IN (2, 10, 11, 12)
         AND o.production_status IN (2, 3) 
   </select>
-  
+
+  <select id="listByParentId" resultType="OrderItem">
+    select * from tb_order_item
+    where order_id in (select id from tb_order where parent_order_id = #{orderId})
+  </select>
+
+  <select id="getOrderItemByRecommendId" resultType="OrderItem">
+    select sum(count) as count,article_name,sum(final_price) as final_price  from tb_order_item
+    where order_id = #{orderId} and recommend_id = #{recommendId}
+    GROUP BY article_id
+  </select>
+
+  <update id="refundArticle">
+     update tb_order_item
+     set `count` = `count` - #{count},
+     refund_count = refund_count + #{count},
+     final_price = unit_price * `count`
+     where id = #{id}
+  </update>
 </mapper>

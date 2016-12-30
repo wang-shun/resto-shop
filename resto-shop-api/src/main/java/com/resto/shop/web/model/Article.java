@@ -128,6 +128,26 @@ public class Article {
 
     private List<Platform> platforms;
 
+    private String photoSquare;
+
+    private Integer mealFeeNumber;
+
+    public Integer getMealFeeNumber() {
+        return mealFeeNumber;
+    }
+
+    public void setMealFeeNumber(Integer mealFeeNumber) {
+        this.mealFeeNumber = mealFeeNumber;
+    }
+
+    public String getPhotoSquare() {
+        return photoSquare;
+    }
+
+    public void setPhotoSquare(String photoSquare) {
+        this.photoSquare = photoSquare;
+    }
+
     final public List<Platform> getPlatforms() {
         return platforms;
     }

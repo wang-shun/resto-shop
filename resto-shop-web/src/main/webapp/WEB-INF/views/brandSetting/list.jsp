@@ -29,11 +29,13 @@
 				    <label>微信欢迎图片</label>
 				    <input type="hidden" name="wechatWelcomeImg" v-model="m.wechatWelcomeImg">
 					<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+					<img v-if="m.wechatWelcomeImg" :src="m.wechatWelcomeImg" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 				</div>
 				<div class="form-group">
 				    <label>红包Logo</label>
 				    <input type="hidden" name="redPackageLogo" v-model="m.redPackageLogo">
 					<img-file-upload  class="form-control" @success="setRedPackage" @error="uploadError"></img-file-upload>
+					<img v-if="m.redPackageLogo" :src="m.redPackageLogo" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 				</div>
 				
 				<div class="form-group">
@@ -146,7 +148,18 @@
 						分单出单
 					</label>
 				</div>
-
+				<div class="form-group">
+					<div class="control-label">买单后出总单（后付款模式）</div>
+					<label>
+						<input type="radio" name="isPrintPayAfter" v-model="m.isPrintPayAfter" value="1">
+						开启
+					</label>
+					<label>
+						<input type="radio" name="isPrintPayAfter"
+							   v-model="m.isPrintPayAfter" value="0">
+						未开启
+					</label>
+				</div>
 				<div class="form-group">
 					<div class="control-label">是否启用服务费</div>
 					<label >
@@ -166,6 +179,14 @@
 				<div class="form-group" id="serviceDivTwo" style="display: none">
 					<label>服务费/每人</label>
 					<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required">
+				</div>
+				<div class="form-group">
+				    <label>品牌标语</label>
+				    <input type="text" class="form-control" name="slogan" required="required" v-model="m.slogan">
+				</div>
+				<div class="form-group">
+				    <label>等位提示</label>
+				    <input type="text" class="form-control" name="queueNotice" required="required" v-model="m.queueNotice">
 				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />

@@ -39,6 +39,8 @@ public class OrderItem {
     private Integer type;
     
     private Integer[] mealItems;
+
+    private Integer[] recommendList;
     
     private String parentId;
 
@@ -62,6 +64,57 @@ public class OrderItem {
     private BigDecimal price;
 
     private Integer mealItemId;
+
+    private String recommendId;
+
+    //退菜数量
+    private Integer refundCount;
+
+    //原始购买的菜品数量
+    private Integer orginCount;
+
+    //餐盒数量
+    private Integer mealFeeNumber;
+
+    public Integer getMealFeeNumber() {
+        return mealFeeNumber;
+    }
+
+    public void setMealFeeNumber(Integer mealFeeNumber) {
+        this.mealFeeNumber = mealFeeNumber;
+    }
+
+    public Integer getRefundCount() {
+        return refundCount;
+    }
+
+    public void setRefundCount(Integer refundCount) {
+        this.refundCount = refundCount;
+    }
+
+    public Integer getOrginCount() {
+        return orginCount;
+    }
+
+    public void setOrginCount(Integer orginCount) {
+        this.orginCount = orginCount;
+    }
+
+    public String getRecommendId() {
+        return recommendId;
+    }
+
+    public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
+    public Integer[] getRecommendList() {
+        return recommendList;
+    }
+
+    public void setRecommendList(Integer[] recommendList) {
+        this.recommendList = recommendList;
+    }
 
     final public Integer getMealItemId() {
         return mealItemId;

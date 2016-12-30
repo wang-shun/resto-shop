@@ -28,4 +28,13 @@ public interface TableCodeMapper  extends GenericDao<TableCode,String> {
     TableCode selectByPersonNumber(@Param("personNumber") Integer personNumber,@Param("shopId") String shopId);
 
     List<TableCode> getTableList(String shopId);
+    
+    /**
+     * 获取店铺的桌位信息和取号集合
+     * @author lmx
+     * @version 创建时间：2016年12月13日 下午6:58:31
+     * @param shopId
+     * @return
+     */
+    List<TableCode> selectTableAndGetNumbers(String shopId);
 }

@@ -6,19 +6,25 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.AccountLogType;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.AccountMapper;
+import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.AccountLog;
+import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.AccountLogService;
 import com.resto.shop.web.service.AccountService;
+import com.resto.shop.web.service.ChargeLogService;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
@@ -45,6 +51,13 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     
     @Resource
     ChargeOrderService chargeOrderService;
+    
+    @Resource
+    ChargeOrderMapper chargeOrderMapper;
+        
+    @Resource
+    ChargeLogService chargeLogService;
+    
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -74,9 +87,14 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	public void addAccount(BigDecimal value, String accountId, String remark,Integer source) {
 		Account account = selectById(accountId);
 		account.setRemain(account.getRemain().add(value));
-		addLog(value, account, remark, AccountLogType.INCOME,source);
+		if(value.doubleValue() > 0){
+			addLog(value, account, remark, AccountLogType.INCOME,source);
+		}else{
+			addLog(new BigDecimal(-1).multiply(value), account, remark, AccountLogType.PAY,source);
+		}
+
 		update(account);
-	} 
+	}
 
 	private void addLog(BigDecimal money,Account account,String remark,int type,int source){
 		AccountLog acclog = new AccountLog();
@@ -180,5 +198,33 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			orderPaymentItemService.insert(item);
 		}
 		return realPay;
+	}
+	
+	@Override
+	public void updateCustomerAccount(String operationPhone,String customerPhone,String chargeMoney,String customerId,String accountId,Brand brand,ShopDetail shopDetail) {
+		try{
+	    	ChargeOrder chargeOrder = new ChargeOrder();
+	    	String[] charges = chargeMoney.split(","); 
+	    	chargeOrder.setId(ApplicationUtils.randomUUID());
+	    	chargeOrder.setChargeMoney(new BigDecimal(charges[0]));
+	    	chargeOrder.setRewardMoney(new BigDecimal(charges[1]));
+	    	chargeOrder.setOrderState((byte)1);
+	    	chargeOrder.setCreateTime(new Date());
+	    	chargeOrder.setFinishTime(new Date());
+	    	chargeOrder.setCustomerId(customerId);
+	    	chargeOrder.setBrandId(brand.getId());
+	    	chargeOrder.setShopDetailId(shopDetail.getId());
+	    	chargeOrder.setChargeBalance(new BigDecimal(charges[0]));
+	    	chargeOrder.setRewardBalance(new BigDecimal(charges[1]));
+	    	chargeOrder.setTotalBalance(new BigDecimal(charges[0]).add(new BigDecimal(charges[1])));
+	    	chargeOrderMapper.insert(chargeOrder);
+	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, new BigDecimal(charges[0]).add(new BigDecimal(charges[1])), shopDetail);
+	    	addAccount(new BigDecimal(charges[0]), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
+	    	addAccount(new BigDecimal(charges[1]), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+    	}catch (Exception e) {
+    		log.debug("插入ChargeOrder或AccountLog失败!");
+    		throw e;
+		}
+	
 	}
 }

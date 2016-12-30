@@ -35,9 +35,9 @@
 			           		<div class="form-group">
 			           			<label class="col-sm-3 control-label">显示图片：</label>
 							    <div class="col-sm-8">
-							    	<img src="" id="noticeImage"/>
 								    <input type="hidden" name="noticeImage" v-model="m.noticeImage">
 								    <img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError" cut="false"></img-file-upload>
+								    <img v-if="m.noticeImage" :src="m.noticeImage" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 							    </div>
 							</div>
 			           		<div class="form-group">
@@ -115,7 +115,7 @@
 				data : "noticeImage",
 				defaultContent:'',
 				createdCell:function(td,tdData){
-					$(td).html("<image src='/"+tdData+"' style='height:40px;width:80px;'/>")
+					$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
 				}
 				},                 
 				{                 
@@ -193,7 +193,6 @@
 				uploadSuccess:function(url){
 					$("[name='noticeImage']").val(url).trigger("change");
 					C.simpleMsg("上传成功");
-					$("#noticeImage").attr("src","/"+url);
 				},
 				uploadError:function(msg){
 					C.errorMsg(msg);

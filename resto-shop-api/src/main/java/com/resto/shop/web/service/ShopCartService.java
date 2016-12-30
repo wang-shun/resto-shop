@@ -22,4 +22,6 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     void delMealArticle(String id);
 
     void delMealItem(String articleId);
+
+    ShopCart selectByUuId(String uuid);
 }

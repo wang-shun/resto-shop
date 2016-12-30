@@ -109,7 +109,7 @@
                                                         <div class="flex-2">餐品价格</div>
                                                         <div class="flex-1">排序</div>
                                                         <div class="flex-1">最大购买数量</div>
-                                                        <div class="flex-1" v-if="printType == 0">指定厨房出单</div>
+                                                        <%--<div class="flex-1" v-if="printType == 0">指定厨房出单</div>--%>
                                                         <div class="flex-1">移除</div>
                                                     </div>
                                                     <div class="flex-row">
@@ -133,15 +133,15 @@
                                                                    v-model="attr.maxCount" name="maxCount"
                                                                    required="required" lazy/>
                                                         </div>
-                                                        <div class="flex-1 radio-list" v-if="printType == 0">
-                                                            <select class="form-control" name="kitchenId"
-                                                                    v-model="attr.kitchenId">
-                                                                <option value="-1">(选择厨房)</option>
-                                                                <option :value="k.id" v-for="k in kitchenList">
-                                                                    {{k.name}}
-                                                                </option>
-                                                            </select>
-                                                        </div>
+                                                        <%--<div class="flex-1 radio-list" v-if="printType == 0">--%>
+                                                            <%--<select class="form-control" name="kitchenId"--%>
+                                                                    <%--v-model="attr.kitchenId">--%>
+                                                                <%--<option value="-1">(选择厨房)</option>--%>
+                                                                <%--<option :value="k.id" v-for="k in kitchenList">--%>
+                                                                    <%--{{k.name}}--%>
+                                                                <%--</option>--%>
+                                                            <%--</select>--%>
+                                                        <%--</div>--%>
                                                         <div class="flex-1">
                                                             <button class="btn red" type="button"
                                                                     @click="removeMealItem(attr)">移除
@@ -198,7 +198,7 @@
                                 <thead>
                                 <tr>
                                     <th>
-                                        <select v-model="choiceArticleShow.currentFamily">
+                                        <select v-model="searchNameLike">
                                             <option value="">餐品分类(全部)</option>
                                             <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
                                         </select>
@@ -208,7 +208,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleShow.itemsLess  | filterBy searchNameLike ">
+                                <tr v-for="art in  choiceArticleShow.itemsLess  | filterBy searchNameLike ">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -628,14 +628,14 @@
                                 kitchenId:$('#totalKitchen').val()
                             };
                             data.articles = this.articles;
-                            if($('#printType').val() == 0){
-                                for(var i = 0;i <  data.articles.length;i++){
-                                    if( data.articles[i].kitchenId == null ||  data.articles[i].kitchenId ==  "-1"){
-                                        C.errorMsg( "未选择出餐厨房!");
-                                        return;
-                                    }
-                                }
-                            }
+//                            if($('#printType').val() == 0){
+//                                for(var i = 0;i <  data.articles.length;i++){
+//                                    if( data.articles[i].kitchenId == null ||  data.articles[i].kitchenId ==  "-1"){
+//                                        C.errorMsg( "未选择出餐厨房!");
+//                                        return;
+//                                    }
+//                                }
+//                            }
 
 //                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);

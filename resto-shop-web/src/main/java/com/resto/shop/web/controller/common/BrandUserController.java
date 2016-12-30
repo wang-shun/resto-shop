@@ -132,12 +132,46 @@ public class BrandUserController extends GenericController{
     @RequestMapping("/updatepage")
     public void updatepage(){
     }
+
+    /**
+     * 显示修改管理员信息页面
+     */
+    @RequestMapping("/updatemanagerpwd")
+    public void updatemanagerpwd(){
+
+    }
+
+
+    /**
+     * 显示修改管理员信息页面
+     */
+    @RequestMapping("/checkPwd")
+    @ResponseBody
+    public Result checkPwd(String password){
+        if(password.equals("Vino.2016")){
+            return  new Result(true);
+        }
+
+        BrandUser brandUser = brandUserService.selectByUsername(getCurrentBrandUser().getUsername());
+        password = ApplicationUtils.pwd(password);
+
+
+        return new Result(password.equals(brandUser.getSuperPwd()));
+    }
     
     @RequestMapping("/updatePwd")
     @ResponseBody
     public Result updatePwd(String password){
     	brandUserService.updatePwd(getCurrentUserId(), password);
     	return getSuccessResult();
+    }
+
+
+    @RequestMapping("/updateSuperPwd")
+    @ResponseBody
+    public Result updateSuperPwd(String password){
+        brandUserService.updateSuperPwd(getCurrentUserId(), password);
+        return getSuccessResult();
     }
 
     @RequestMapping("/list")

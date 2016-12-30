@@ -15,6 +15,8 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 */
 	public List<OrderItem> listByOrderId(String orderId);
 
+	public List<OrderItem> listByParentId(String orderId);
+
 	public void insertItems(List<OrderItem> orderItems);
 
 	/**

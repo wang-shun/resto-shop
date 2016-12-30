@@ -55,12 +55,12 @@ public class ReportDataTask{
     ShopDetailService shopDetailService;
 
     static Logger log = Logger.getLogger(ReportDataTask.class);
-    
+
     //链接前缀
     static String urlBase = "http://localhost:8081";//http://op.restoplus.cn
     //登入的url
     String loginUrl = urlBase + "/shop/branduser/login";
-    
+
     //获取数据的URL
     static Map<String, String> urlMap = new HashMap<>();
 
@@ -69,39 +69,39 @@ public class ReportDataTask{
     String driver = "com.mysql.jdbc.Driver";
     String username = "root";
     String password = "root";
-    
+
     Connection conn = null;
 	Statement state = null;
-    
+
     static {
-		//注册驱动类 
-		try { 
-		     Class.forName("com.mysql.jdbc.Driver"); 
-		} catch (ClassNotFoundException e) { 
-		     log.error("#ERROR# :加载数据库驱动异常，请检查！", e); 
-		} 
-		
+		//注册驱动类
+		try {
+		     Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+		     log.error("#ERROR# :加载数据库驱动异常，请检查！", e);
+		}
+
 		urlMap.put("brand_income", urlBase + "/shop/syncData/syncBrandIncome");//品牌 总收入
 		urlMap.put("shop_income", urlBase + "/shop/syncData/syncShopIncome");//店铺 总收入
 		urlMap.put("brand_article", urlBase + "/shop/syncData/syncBrandOrderArticle");//品牌 菜品 销售
 		urlMap.put("shop_article", urlBase + "/shop/syncData/syncShopOrderArticle");//店铺 菜品 销售
 		urlMap.put("order_detail", urlBase + "/shop/syncData/syncOrderDetail");//订单 详情 信息
 		urlMap.put("order_article", urlBase + "/shop/syncData/syncOrderArticle");//订单 菜品 信息
-    } 
-    
-    
+    }
+
+
 //    @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次
     //				   ss mm HH
-    @Scheduled(cron = "00 29 13 * * ?")   //每天12点执行
+  // @Scheduled(cron = "00 29 13 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
-    	
+
     	//简厨 974b0b1e31dc4b3fb0c3d9a0970d22e4
     	//书香茶香 1386c0c0f35f466097fc770bec7d6400
     	String brandId = "974b0b1e31dc4b3fb0c3d9a0970d22e4";
         //获取品牌用户
         BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brandId, 8);
         List<ShopDetail> list_shopDetail = shopDetailService.selectByBrandId(brandId);
-        
+
         //创建 Client 对象
         CloseableHttpClient client = HttpClients.createDefault();
         //设置登录参数
@@ -111,24 +111,24 @@ public class ReportDataTask{
         parameterMap.put("isMD5", "true");
         //登录
         HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
-        
+
         //得到httpResponse的状态响应码
         int statusCode = loginResponse.getStatusLine().getStatusCode();
-        
+
         if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {//登录成功后会 进行 重定向  页面跳转，返回的  statusCode 为 302，正常访问 密码错误时，返回的是 200.【HttpStatus.SC_OK=200】
         	log.info("--------------HttpClient 登录成功！");
     		conn = getConnection();
         	try {
-				conn.setAutoCommit(false);//关闭自动提交事物 
+				conn.setAutoCommit(false);//关闭自动提交事物
 				state = conn.createStatement();
 			} catch (SQLException e2) {
 				e2.printStackTrace();
 			}
-        	
+
         	Map<String,String> requestMap = new HashMap<>();
         	requestMap.put("beginDate",DateUtil.getYesterDay());
         	requestMap.put("endDate",DateUtil.getYesterDay());
-            
+
         	//循环执行 URLMap 中的链接
         	for (String key : urlMap.keySet()) {
         		HttpResponse httpResponse = doPost(client, urlMap.get(key), requestMap);
@@ -136,7 +136,7 @@ public class ReportDataTask{
                     try {
     	        		List<String> sqlList = createSQL(httpResponse, key);
     	        		executeBatchSQL(state, sqlList);
-    	        		conn.commit(); 
+    	        		conn.commit();
     				} catch (SQLException e) {
     					log.error("【"+key+"】表  -------------- 数据  插入失败！   ");
     					e.printStackTrace();
@@ -144,7 +144,7 @@ public class ReportDataTask{
     						conn.rollback();
     					} catch (SQLException e1) {
     						e1.printStackTrace();
-    					} 
+    					}
     				}
                     log.info("【"+key+"】表 --------------导入完成");
             	}else{
@@ -158,8 +158,8 @@ public class ReportDataTask{
         	log.info("--------------HttpClient 登录失败！");
         }
     }
-    
-    
+
+
     /**
      * HttpClient Post 请求
      * @param client
@@ -190,8 +190,8 @@ public class ReportDataTask{
 		}
         return httpResponse;
     }
-    
-    
+
+
     /**
      * 获取response里的数据
      * @param httpResponse
@@ -232,7 +232,7 @@ public class ReportDataTask{
 			JSONObject ob = (JSONObject) it_data.next();
 			Iterator it_map = ob.keys();
 			while (it_map.hasNext()) {
-				String key = (String) it_map.next();  
+				String key = (String) it_map.next();
 				sql_parameters.append(key+",");
 				sql_values.append("'"+ob.get(key)+"',");
 			}
@@ -244,6 +244,9 @@ public class ReportDataTask{
         }
         return sqlList;
     }
+
+
+
     
     
     /**

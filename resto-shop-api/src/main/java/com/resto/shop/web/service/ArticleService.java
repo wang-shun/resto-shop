@@ -6,6 +6,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleStock;
+import org.apache.ibatis.annotations.Param;
 
 public interface ArticleService extends GenericService<Article, String> {
 
@@ -78,4 +79,10 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @return
      */
 	List<Article> delCheckArticle(String id);
+
+	void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare);
+	
+	void updateArticleImg(Article article);
+
+	void addArticleLikes(String articleId);
 }

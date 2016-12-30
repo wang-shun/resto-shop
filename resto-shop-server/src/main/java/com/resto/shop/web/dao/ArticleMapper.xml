@@ -42,13 +42,16 @@
         <result column="is_hidden" property="isHidden"/>
         <result column="recommendCount" property="recommendCount"/>
         <result column="eleme_name" property="elemeName"/>
+        <result column="photo_square" property="photoSquare"/>
+        <result column="meal_fee_number" property="mealFeeNumber"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
     is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,recommend_id,is_hidden,eleme_name
+    is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
+    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -71,7 +74,8 @@
       price, fans_price, has_mult_price, 
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,recommend_id,is_hidden,pId,eleme_name)
+      is_remind,article_type,stock_working_day,stock_weekend,
+      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -83,7 +87,8 @@
       #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
-      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR})
+      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
+      #{photoSquare},#{mealFeeNumber})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -199,6 +204,12 @@
             <if test="elemeName != null">
                 eleme_name,
             </if>
+            <if test="photoSquare != null">
+                photo_square,
+            </if>
+            <if test="mealFeeNumber != null">
+                meal_fee_number,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -312,6 +323,12 @@
             <if test="elemeName != null">
                 #{elemeName},
             </if>
+            <if test="photoSquare != null">
+                #{photoSquare},
+            </if>
+            <if test="mealFeeNumber != null">
+                #{mealFeeNumber},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -422,8 +439,12 @@
                 is_hidden = #{isHidden},
             </if>
             <if test="elemeName != null">
-                eleme_name = #{elemeName}
+                eleme_name = #{elemeName},
             </if>
+            <if test="mealFeeNumber != null">
+                meal_fee_number = #{mealFeeNumber},
+            </if>
+            photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -464,8 +485,9 @@
       stock_weekend = #{stockWeekend,jdbcType=INTEGER},
       current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
       recommend_id = #{recommendId,jdbcType=VARCHAR},
-      is_hidden = #{isHidden,isRemind,jdbcType=BIT}
-
+      is_hidden = #{isHidden,isRemind,jdbcType=BIT},
+      meal_fee_number = #{mealFeeNumber},
+      photo_square = null
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
@@ -486,11 +508,11 @@
     </select>
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
-  	a.show_big,	a.description,a.photo_small,a.is_empty,
+  	a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
   	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,
   	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
   	(select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
-  	if(a.recommend_id is not null,1,0) as recommendCount
+  	if(a.recommend_id is not null,1,0) as recommendCount,recommend_id
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
 	AND a.shop_detail_id=#{0}
@@ -674,7 +696,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
         from tb_article
         left join tb_article_family on tb_article.article_family_id = tb_article_family.id
-        where state =1 and activated =1
+        where state =1
         and article_type =1
         and tb_article.id not in (select article_id from tb_article_price GROUP BY article_id)
         and tb_article.shop_detail_id = #{shopId}
@@ -725,4 +747,16 @@ GROUP BY article_id
         where t2.article_id = #{id}
         and t4.state = 1 and t4.article_type = 2
     </select>
+
+    <update id="updatePhotoSquare" parameterType="com.resto.shop.web.model.Article">
+    update tb_article
+    set photo_square = #{photoSquare}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+    <update id="addArticleLikes">
+        update tb_article
+        set likes = likes + 1
+        where id = #{articleId}
+    </update>
 </mapper>

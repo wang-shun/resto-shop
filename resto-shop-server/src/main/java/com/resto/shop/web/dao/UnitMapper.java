@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.Unit;
+import com.resto.shop.web.model.UnitArticle;
 import com.resto.shop.web.model.UnitDetail;
 import org.apache.ibatis.annotations.Param;
 
@@ -46,4 +47,6 @@ public interface UnitMapper extends GenericDao<Unit, String> {
     void deleteUnitNew(@Param("id") String id);
 
     Integer getUnitByRelation(@Param("detailId") String detailId,@Param("relationId") String relationId);
+
+    List<UnitArticle> selectUnitDetail(String id);
 }

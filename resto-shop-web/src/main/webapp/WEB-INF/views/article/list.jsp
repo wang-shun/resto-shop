@@ -21,11 +21,12 @@
     }
 </style>
 <div id="control">
+
     <div class="modal fade" id="article-dialog" v-if="showform" @click="cleanRemark">
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title text-center"><strong>{{formTitle}}</strong></h4>
+                    <h4 class="modal-title">表单</h4>
                 </div>
                 <form class="form-horizontal" role="form " action="article/save" @submit.prevent="save">
                     <div class="modal-body auto-height">
@@ -53,7 +54,7 @@
                                 <label class="col-md-5 control-label">饿了么名称</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="elemeName" v-model="m.elemeName"
-                                           >
+                                            >
                                 </div>
                             </div>
 
@@ -106,13 +107,12 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">显示</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
-                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false" v-model="m.showBig" @click="checkShowBig()">大图
-                                        <%--<input type="checkbox"   v-model="m.showBig" @click="checkShowBig()">大图--%>
+                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
+                                               v-model="m.showBig">大图
                                     </label>
                                     <label class="radio-inline">
                                         <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
@@ -145,7 +145,12 @@
                                     <span class="btn btn-default" @click="changeColor('#fff')">白</span>
                                 </div>
                             </div>
-
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">餐盒数量</label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" name="mealFeeNumber" v-model="m.mealFeeNumber">
+                                </div>
+                            </div>
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">餐品编号</label>
                                 <div class="col-md-7">
@@ -159,9 +164,9 @@
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
                                                      @error="uploadError"></img-file-upload>
+                                    <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
                                 </div>
                             </div>
-
                             <div class="form-group col-md-5">
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">
@@ -303,7 +308,7 @@
                                         <div class="flex-1">
                                             <input type="text" class="form-control" name="sort"
                                                    v-model="detail.sort" id="sort{{detail.id}}" required="required"
-                                            />
+                                                    />
                                         </div>
                                         <div class="flex-1">
                                             <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
@@ -431,8 +436,8 @@
                                                     <div class="col-md-4">
                                                         <select class="form-control" style="width:150px"
                                                                 name="choiceType" v-model="attr.choiceType"
-                                                                v-on:change="choiceTypeChange(attr)" >
-                                                            <option value="0" selected="selected">必选</option>
+                                                                v-on:change="choiceTypeChange(attr)">
+                                                            <option value="0">必选</option>
                                                             <option value="1">任选</option>
                                                         </select>
 
@@ -489,7 +494,7 @@
                                                         <div class="flex-1 radio-list">
                                                             <select class="form-control" name="kitchenId"
                                                                     v-model="item.kitchenId">
-                                                                <option value="-1" selected="selected">(选择厨房)</option>
+                                                                <option value="-1">(选择厨房)</option>
                                                                 <option :value="k.id" v-for="k in kitchenList">
                                                                     {{k.name}}
                                                                 </option>
@@ -538,11 +543,7 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项
-                        <span style="float: right">
-                            搜索：<input type="search" class="form-control input-sm input-small input-inline" v-model="searchNameLike" />
-                        </span>
-                    </h4>
+                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
                 </div>
                 <div class="modal-body auto-height">
                     <div class="row">
@@ -561,7 +562,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleCanChoice | filterBy searchNameLike ">
+                                <tr v-for="art in choiceArticleCanChoice">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -601,8 +602,8 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="article/add">
-                <button class="btn blue" @click="create(2,'新建套餐')">新建套餐</button>
-                <button class="btn green" @click="create(1,'新建餐品')">新建餐品</button>
+                <button class="btn blue" @click="create(2)">新建套餐</button>
+                <button class="btn green" @click="create(1)">新建餐品</button>
             </s:hasPermission>
             <div class="clearfix"></div>
         </div>
@@ -692,7 +693,11 @@
                     data: "photoSmall",
                     defaultContent: "",
                     createdCell: function (td, tdData) {
-                        $(td).html("<img src='/" + tdData + "' style='height:40px;width:80px;'/>")
+                    	if(tdData !=null && tdData.substring(0,4)=="http"){
+                			$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+                		}else{
+                			$(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+                		}
                     }
                 },
                 {
@@ -793,8 +798,6 @@
                         choiceTemp: "",
                         lastChoiceTemp: "",
                         allArticles: allArticles,
-                        searchNameLike : "",
-                        formTitle : "",
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""}
                     },
                     methods: {
@@ -958,7 +961,7 @@
                             }
                         }
                         ,
-                        create: function (article_type,title) {
+                        create: function (article_type) {
                             var that = this;
                             action = "create";
                             this.m = {
@@ -978,18 +981,19 @@
                                 units: [],
                                 articleType: article_type,
                             };
+
                             this.showform = true;
-                            this.formTitle = title;
                             this.selectedUnit = [];
+
+
                             var list = {
                                 unitList: []
                             }
-
                             this.selectedUnit = list;
-                            that.checkedUnit=[];//新建的时候把餐品规格都设置为非选中状态
                             $.post("unit/list_all", null, function (data) {
                                 that.unitList = data;
                             });
+
                         }
                         ,
                         uploadSuccess: function (url) {
@@ -1005,6 +1009,8 @@
                         ,
                         edit: function (model) {
                             this.selectedUnit = [];
+
+
                             var list = {
                                 unitList: []
                             }
@@ -1012,7 +1018,7 @@
 
                             var that = this;
 
-                            that.formTitle="编辑菜品";
+
                             action = "edit";
 
                             $.post("article/list_one_full", {id: model.id}, function (result) {
@@ -1056,9 +1062,6 @@
                                 return;
                             }
                             tb.search(val).draw();
-                        },
-                        checkShowBig : function () {
-                            console.log("11");
                         }
                         ,
                         changeColor: function (val) {
@@ -1069,7 +1072,7 @@
                             $("#supportTimeRemark").html("");
                         },
                         checkNull: function () {
-                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
+                        	if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
                                 $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
                                 return true;
                             }
@@ -1077,7 +1080,7 @@
                                 $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
                                 return true;
                             }
-                          	//if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
+                            //if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
                             //    $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
                             //    return true;
                             //}
@@ -1085,26 +1088,7 @@
                                 //$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
                                 //return true;
                                 if(!confirm("是否不选择出餐厨房！")){
-                                	return true;
-                                }
-                            }
-                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
-                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
-                                return true;
-                            }
-                            if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
-                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
-                                return true;
-                            }
-                          	//if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
-                            //    $("#kitchenRemark").html("<font color='red'>请先创建至少一个出餐厨房！</span>");
-                            //    return true;
-                            //}
-                            if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
-                                //$("#kitchenRemark").html("<font color='red'>请选择出餐厨房！</span>");
-                                //return true;
-                                if(!confirm("是否不选择出餐厨房！")){
-                                	return true;
+                                    return true;
                                 }
                             }
                             return false;
@@ -1202,7 +1186,7 @@
                             return parseInt(sort);
                         }
                         ,
-                        allUnitPrice: function (data) {
+                        allUnitPrice: function () {
                             var result = [];
                             console.log(this.checkedUnit);
                             for (var i = 0; i < this.articleattrs.length; i++) {

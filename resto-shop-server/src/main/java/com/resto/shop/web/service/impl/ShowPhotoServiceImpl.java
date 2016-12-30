@@ -29,6 +29,11 @@ public class ShowPhotoServiceImpl extends GenericServiceImpl<ShowPhoto, Integer>
 	@Override
 	public List<ShowPhoto> selectListByShopId(String currentShopId) {
 		return showphotoMapper.selectListByShopId(currentShopId);
-	} 
+	}
+
+    @Override
+    public void updatePhotoSquare(Integer id, String photoSquare) {
+        showphotoMapper.updatePhotoSquare(id, photoSquare);
+    }
 
 }

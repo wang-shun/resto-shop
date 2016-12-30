@@ -2,6 +2,8 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.Unit;
+import com.resto.shop.web.model.UnitArticle;
+import com.resto.shop.web.model.UnitDetail;
 
 import java.util.List;
 
@@ -30,5 +32,5 @@ public interface UnitService extends GenericService<Unit, String> {
 
    void modifyUnit(Unit unit);
 
-
+   List<UnitArticle> selectUnitDetail(String id);
 }

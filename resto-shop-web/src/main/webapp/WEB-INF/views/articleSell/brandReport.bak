@@ -197,8 +197,8 @@ var tb2 = $("#articleSellTable").DataTable({
 					$(td).html(lab);
 				}
 			}
-		},  
-		{
+		},
+        {
 			title : "菜名",
 			data : "articleName",
 			createdCell:function(td,tdData,rowData){
@@ -232,14 +232,11 @@ var tb2 = $("#articleSellTable").DataTable({
 } );
 
 
-
-
 //搜索
 $("#searchReport").click(function(){
 	var beginDate = $("#beginDate").val();
 	var endDate = $("#endDate").val();
 	sort = "desc";
-	debugger;
 	var num = getNumActive()
 	 switch(num){
 	  case 1:

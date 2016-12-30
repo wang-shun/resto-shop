@@ -1,7 +1,10 @@
 package com.resto.shop.web.controller.business;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -383,7 +386,7 @@ public class SyncDataController extends GenericController {
                 OrderException orderException = new OrderException();
                 orderException.setOrderId(oi.getOrderId());
                 orderException.setOrderMoney(order.getOrderMoney());
-                orderException.setWhy("累计退款金额大于支付金额");
+                orderException.setWhy("订单退款有问题");
                 orderException.setShopName(shopDetail.getName());
                 orderException.setCreateTime(order.getCreateTime());
                 orderException.setBrandName(brandName);
@@ -392,17 +395,21 @@ public class SyncDataController extends GenericController {
         }
 
         //查询订单项丢失
-
-        if(!brandName.equals("花千锅")){
-            List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
-            if(!orderExceptionList.isEmpty()){
-                for(Order order : orderExceptionList){
+        List<Order> orderExceptionList  = orderService.selectHasPayOrderPayMentItemListBybrandId(beginDate,endDate,getCurrentBrandId());
+        if(!orderExceptionList.isEmpty()){
+            for(Order order : orderExceptionList){
                     BigDecimal temp = BigDecimal.ZERO;
                     if(!order.getOrderPaymentItems().isEmpty()){
                         for(OrderPaymentItem oi : order.getOrderPaymentItems()){
                             temp=temp.add(oi.getPayValue());
                         }
-                        if(order.getOrderMoney().compareTo(temp)!=0){
+                        BigDecimal  orderMoney = order.getOrderMoney();
+                        //如果当前的店铺的模式为后付款模式 并且该订单的amountWithChildren不为0则orderMoney选择
+                        if(order.getOrderMode()==5&&order.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            orderMoney = order.getAmountWithChildren();
+                        }
+
+                        if(orderMoney.compareTo(temp)!=0){
                             Order order2 = orderService.selectById(order.getId());
                             //插入数据
                             //查询店铺的名字
@@ -412,57 +419,19 @@ public class SyncDataController extends GenericController {
                             OrderException orderException = new OrderException();
                             orderException.setOrderId(order2.getId());
                             orderException.setOrderMoney(order2.getOrderMoney());
-                            orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,order.getOrderMoney()));
+                            orderException.setWhy("订单项里的金额比订单的金额少："+sub(temp,orderMoney));
                             orderException.setShopName(shopDetail.getName());
                             orderException.setCreateTime(order2.getCreateTime());
                             orderException.setBrandName(brandName);
                             orderExceptionService.insert(orderException);
                         }
                     }
-                }
-
             }
 
-        }else {
-            //查询所有的已支付的订单(2,10,11,12) (2.3) 27f56b31669f4d43805226709874b530
-            //通过品牌名字查询品牌
-            String brandId = "27f56b31669f4d43805226709874b530";
-            List<Order> orderList = orderService.selectHasPayListHouFuOrderByBrandId(beginDate,endDate,brandId);
-
-            //查询所有的父订单
-            Set<String> orderSet = new HashSet<>();
-            for(Order order:orderList){
-                if(order.getParentOrderId()!=null){
-                    orderSet.add(order.getParentOrderId());
-                }
-            }
-
-            List<String> stringList = new ArrayList<>(orderSet);
-            //所有的父订单的id
-            for(String s: stringList){
-                //父订单
-                Order o = orderService.selectOrderDetails(s);
-                //子订单
-                List<Order>  childList = orderService.selectByParentId(s);
-                BigDecimal  temp = BigDecimal.ZERO;
-                for(Order ochild : childList){
-                    temp = temp.add(ochild.getOrderMoney());
-                }
-                BigDecimal total = temp.add(o.getOrderMoney());
-                //判断各个订单的总额 是否和 主订单的
-                if(o.getAmountWithChildren().compareTo(total)>0){
-                    OrderException orderException = new OrderException();
-                    orderException.setOrderId(o.getId());
-                    orderException.setOrderMoney(o.getOrderMoney());
-                    orderException.setWhy("后付款模式 总订单价格和子订单和价格有差"+sub(total,o.getAmountWithChildren()));
-                    orderException.setBrandName(brandName);
-                    orderExceptionService.insert(orderException);
-                }
-            }
         }
-
         return  getSuccessResult();
     }
+
 
     //设置 BigDecimal 默认值为 0
     public BigDecimal getBigDecimal(BigDecimal data){

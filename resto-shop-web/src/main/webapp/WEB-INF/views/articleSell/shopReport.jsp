@@ -5,12 +5,12 @@
 	<div class="col-md-12">
 		<form class="form-inline">
 		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" id="beginDate" readonly="readonly">
+		    <label for="beginDates">开始时间：</label>
+		    <input type="text" class="form-control form_datetime" id="beginDates" readonly="readonly">
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" id="endDate" readonly="readonly">
+		    <label for="endDates">结束时间：</label>
+		    <input type="text" class="form-control form_datetime" id="endDates" readonly="readonly">
 		  </div>
 		  
 		   <button type="button" class="btn btn-primary" id="today"> 今日</button>
@@ -45,8 +45,8 @@ $('.form_datetime').datetimepicker({
 	});
 
 //文本框默认值  --同步为首页选择的时间
-$("#beginDate").val("${beginDate}");
-$("#endDate").val("${endDate}");
+$("#beginDates").val("${beginDate}");
+$("#endDates").val("${endDate}");
 
 var tbApi = null;
 var isFirst = true;
@@ -55,8 +55,8 @@ var shopTable = $("#shopTable").DataTable({
 		url : "articleSell/shop_data",
 		dataSrc : "data",
 		data:function(d){
-			d.beginDate = $("#beginDate").val();
-			d.endDate = $("#endDate").val();
+			d.beginDate = $("#beginDates").val();
+			d.endDate = $("#endDates").val();
 			d.shopId = "${shopId}";
 			return d;
 		}
@@ -69,13 +69,19 @@ var shopTable = $("#shopTable").DataTable({
              }],
 	columns : [
 		{
-			title : "分类",
+			title : "菜品类别",
 			data : "articleFamilyName",
+			s_filter : true
 		},  
 		{
 			title : "菜名",
 			data : "articleName",
 		},
+        {
+            title : "菜品类型",
+            data : "typeName",
+            s_filter : true
+        },
         {
             title: "编号",
             data : "numberCode",
@@ -98,7 +104,65 @@ var shopTable = $("#shopTable").DataTable({
 			title : "销售额占比",
 			data : "salesRatio",
 		},
+        {
+            title : "退菜数",
+            data : "refundCount",
+
+        },
+        {
+            title : "退菜金额",
+            data : "refundTotal",
+
+        }
 	],
+//	initComplete: function () {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//	},
+//	infoCallback: function () {
+//		var api = this.api();
+//		api.search('');
+//		var data = api.data();
+//		var columnsSetting = api.settings()[0].oInit.columns;
+//		$(columnsSetting).each(function (i) {
+//			if (this.s_filter) {
+//				var column = api.column(i);
+//				var title = this.title;
+//				var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+//				var that = this;
+//				column.data().unique().each(function (d) {
+//					select.append('<option value="' + d + '">' + d + '</option>')
+//				});
+//
+//				select.appendTo($(column.header()).empty()).on('change', function () {
+//					var val = $.fn.dataTable.util.escapeRegex(
+//							$(this).val()
+//					);
+//					column.search(val ? '^' + val + '$' : '', true, false).draw();
+//				});
+//			}
+//		});
+//	}
 } );
 
 //搜索
@@ -120,36 +184,36 @@ function isEmpty(str){
 }
 
 //添加分类下拉框
-var select;
-function appendSelect(api){
-	api.columns().indexes().flatten().each(function (i) {
-        if (i == 0) {
-            var column = api.column(i);
-            $(column.header()).html("菜品分类");
-            var $span = $('<span class="addselect">▾</span>').appendTo($(column.header()))
-            select = $('<select><option value="">全部</option></select>')
-                    .appendTo($(column.header()))
-                    .on('click', function (evt) {
-                        evt.stopPropagation();
-                        var val = $.fn.dataTable.util.escapeRegex(
-                                $(this).val()
-                        );
-                        column.search(val ? '^' + val + '$' : '', true, false).draw();
-                    });
-            	column.data().unique().sort().each(function (d, j) {
-            	if(d!=null && d!=""){
-            		select.append('<option value="' + d + '">' + d + '</option>')
-                    $span.append(select)
-            	}
-            });
-
-        }
-    });
-}
+//var select;
+//function appendSelect(api){
+//	api.columns().indexes().flatten().each(function (i) {
+//        if (i == 0) {
+//            var column = api.column(i);
+//            $(column.header()).html("菜品分类");
+//            var $span = $('<span class="addselect">▾</span>').appendTo($(column.header()))
+//            select = $('<select><option value="">全部</option></select>')
+//                    .appendTo($(column.header()))
+//                    .on('click', function (evt) {
+//                        evt.stopPropagation();
+//                        var val = $.fn.dataTable.util.escapeRegex(
+//                                $(this).val()
+//                        );
+//                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+//                    });
+//            	column.data().unique().sort().each(function (d, j) {
+//            	if(d!=null && d!=""){
+//            		select.append('<option value="' + d + '">' + d + '</option>')
+//                    $span.append(select)
+//            	}
+//            });
+//
+//        }
+//    });
+//}
 
 $("#ExcelReport").click(function(){
-	var beginDate = $("#beginDate").val();
-	var endDate = $("#endDate").val();
+	var beginDate = $("#beginDates").val();
+	var endDate = $("#endDates").val();
 	var shopId = "${shopId}"
 	location.href="articleSell/shop_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort+"&&shopId="+shopId;
 })
@@ -158,8 +222,8 @@ $("#ExcelReport").click(function(){
 $("#today").click(function(){
 	date = new Date().format("yyyy-MM-dd");
 	//给时间插件赋值
-	$("#beginDate").val(date);
-	$("#endDate").val(date);
+	$("#beginDates").val(date);
+	$("#endDates").val(date);
 	
 	//查询
 	searchInfo()
@@ -169,8 +233,8 @@ $("#today").click(function(){
 //昨日
 $("#yesterDay").click(function(){
 	//给时间插件赋值
-	$("#beginDate").val(GetDateStr(-1));
-	$("#endDate").val(GetDateStr(-1));
+	$("#beginDates").val(GetDateStr(-1));
+	$("#endDates").val(GetDateStr(-1));
 	
 	//查询
 	searchInfo()
@@ -180,8 +244,8 @@ $("#yesterDay").click(function(){
 //本周
 $("#week").click(function(){
 	//给时间插件赋值
-	$("#beginDate").val(getWeekStartDate());
-	$("#endDate").val(new Date().format("yyyy-MM-dd"));
+	$("#beginDates").val(getWeekStartDate());
+	$("#endDates").val(new Date().format("yyyy-MM-dd"));
 	
 	//查询
 	searchInfo()
@@ -191,8 +255,8 @@ $("#week").click(function(){
 //本月
 $("#month").click(function(){
 	//给时间插件赋值
-	$("#beginDate").val(getMonthStartDate);
-	$("#endDate").val(new Date().format("yyyy-MM-dd"));
+	$("#beginDates").val(getMonthStartDate);
+	$("#endDates").val(new Date().format("yyyy-MM-dd"));
 	
 	//查询
 	searchInfo()

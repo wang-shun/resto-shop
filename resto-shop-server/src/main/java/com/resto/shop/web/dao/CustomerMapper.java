@@ -2,10 +2,12 @@ package com.resto.shop.web.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.shop.web.model.Customer;
 
 public interface CustomerMapper extends GenericDao<Customer, String>{
@@ -51,4 +53,26 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
      * @return
      */
     List<Customer> selectListByBrandIdHasRegister(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+    Customer selectCustomerAccount(@Param("telephone") String telephone);
+
+    List<MemberUserDto> selectListMemberUser(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+    Map<String,Object> selectListMember(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+//  得到品牌所有用户总数
+    Integer selectAllUser(@Param("brandId") String brandId);
+//  得到品牌所有注册用户数量
+    Integer selectUserYe(@Param("brandId") String brandId);
+//  得到品牌所有未注册用户数量
+    Integer selectUserNot(@Param("brandId") String brandId);
+//  得到品牌所有男顾客
+    Integer selectUserBoy(@Param("brandId") String brandId);
+//  得到品牌所有女顾客
+    Integer selectUserGir(@Param("brandId") String brandId);
+//  得到品牌所有未知性别顾客
+    Integer selectNotUser(@Param("brandId") String brandId);
+//  得到品牌所有复购率
+    Integer selectPulShopping(@Param("brandId") String brandId);
+    
 }

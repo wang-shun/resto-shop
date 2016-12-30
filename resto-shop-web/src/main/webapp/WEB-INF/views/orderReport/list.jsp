@@ -20,7 +20,6 @@
                  
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
           
-<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
              
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
@@ -83,8 +82,7 @@
                         <td>{{shop.number}}</td>
                         <td>{{shop.average}}</td>
 						<td>{{shop.marketPrize}}</td>
-						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>
+						<td><button class="btn btn-sm btn-success" @click="showShopReport(shop.shopName,shop.shopDetailId)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -111,7 +109,7 @@
        </div>
        
     </div>
-  </div>
+
  <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
@@ -170,8 +168,9 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
+		    alert("---");
 			$("#reportModal").modal('show');
-			this.openModal("orderReport/show/shopReport", shopName,shopId);
+            vueObj.openModal("orderReport/show/shopReport", shopName,shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
 			$.post(url, this.getDate(shopId),function(result) {
@@ -218,11 +217,6 @@ var vueObj =  new Vue({
 		var date = new Date().format("yyyy-MM-dd");
 		this.searchDate.beginDate = date;
 		this.searchDate.endDate = date;
-		
-// 		getAppraiseCount(function(appraiseCount,countList){
-// 			that.appraiseCount = appraiseCount;
-// 			that.countList = countList;
-// 		});
 		this.searchInfo();
 	}
 	

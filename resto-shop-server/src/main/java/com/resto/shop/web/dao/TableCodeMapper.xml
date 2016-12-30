@@ -13,9 +13,16 @@
     <result column="is_used" property="isUsed" jdbcType="TINYINT"/>
       <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
       <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
-
+      <result column="sort" property="sort" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+	<collection property="getNumbers" ofType="com.resto.shop.web.model.GetNumber">
+		<id column="gn_id" property="id"/>
+		<result column="code_value" property="codeValue"/>
+		<result column="customer_id" property="customerId"/>
+	</collection>
   </resultMap>
-  <sql id="Base_Column_List">id, name, code_number, create_time, end_time, max_number, min_number, is_used,shop_detail_id,brand_id</sql>
+  <sql id="Base_Column_List">id, name, code_number, create_time, end_time, max_number, min_number, is_used,shop_detail_id,brand_id,sort</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_table_code where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -33,7 +40,8 @@
       <if test="isUsed != null">is_used,</if>
         <if test="shopDetailId != null">shop_detail_id,</if>
         <if test="brandId != null">brand_id,</if>
-    </trim>  
+        <if test="sort != null">sort,</if>
+    </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
       <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
@@ -45,6 +53,7 @@
       <if test="isUsed != null">#{isUsed,jdbcType=TINYINT},</if>
         <if test="shopDetailId != null">#{shopDetailId},</if>
         <if test="brandId != null">#{brandId},</if>
+        <if test="sort != null">#{sort},</if>
 
     </trim> 
   </insert>
@@ -59,9 +68,10 @@
       <if test="isUsed != null">is_used = #{isUsed,jdbcType=TINYINT},</if>
         <if test="shopDetailId != null">shop_detail_id = #{shopDetailId},</if>
         <if test="brandId != null">brand_id = #{brandId},</if>
+        <if test="sort != null">sort = #{sort},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.TableCode">update tb_table_code set name = #{name,jdbcType=VARCHAR}, code_number = #{codeNumber,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, end_time = #{endTime,jdbcType=TIMESTAMP}, max_number = #{maxNumber,jdbcType=INTEGER}, min_number = #{minNumber,jdbcType=INTEGER}, is_used = #{isUsed,jdbcType=TINYINT},shop_detail_id = #{shopDetailId},brand_id=#{brandId} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.TableCode">update tb_table_code set name = #{name,jdbcType=VARCHAR}, code_number = #{codeNumber,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, end_time = #{endTime,jdbcType=TIMESTAMP}, max_number = #{maxNumber,jdbcType=INTEGER}, min_number = #{minNumber,jdbcType=INTEGER}, is_used = #{isUsed,jdbcType=TINYINT},shop_detail_id = #{shopDetailId},brand_id=#{brandId} ,sort=#{sort}where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="TableCode">select * from tb_table_code </select>
 
     <select id="selectByName" resultType="TableCode">
@@ -73,7 +83,8 @@
 	min_number,
 	is_used,
 	shop_detail_id,
-	brand_id
+	brand_id,
+	sort
 FROM
 	tb_table_code
 WHERE
@@ -89,7 +100,8 @@ WHERE
         min_number,
         is_used,
         shop_detail_id,
-        brand_id
+        brand_id,
+        sort
         FROM
         tb_table_code
         WHERE
@@ -107,7 +119,8 @@ WHERE
         min_number,
         is_used,
         shop_detail_id,
-        brand_id
+        brand_id,
+        sort
         FROM
         tb_table_code
         WHERE
@@ -123,7 +136,7 @@ WHERE
         min_number,
         is_used,
         shop_detail_id,
-        brand_id from tb_table_code
+        brand_id,sort from tb_table_code
         where
          <![CDATA[  min_number <= #{personNumber} and max_number >= #{personNumber}]]>
           and is_used = 1
@@ -141,5 +154,11 @@ WHERE
         where t.is_used = 1
         and t.shop_detail_id = #{shopId}
  order by t.max_number asc
+    </select>
+
+    <select id="selectTableAndGetNumbers" parameterType="String" resultMap="BaseResultMap">
+    	SELECT tc.id,tc.name,tc.code_number,min_number,max_number,gn.id gn_id,gn.code_value,customer_id from tb_table_code tc LEFT JOIN
+    	 tb_get_number gn on tc.code_number = gn.table_type and DATE_FORMAT(gn.create_time,'%Y-%m-%d') =  DATE_FORMAT(NOW(),'%Y-%m-%d')
+    	  and gn.state = 0 where tc.shop_detail_id = #{shopId} and is_used = TRUE ORDER BY tc.min_number ASC , gn.create_time ASC;
     </select>
 </mapper>

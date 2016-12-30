@@ -11,6 +11,16 @@ public class ShowPhoto {
 
     private String shopDetailId;
 
+    private String photoSquare;
+
+    public String getPhotoSquare() {
+        return photoSquare;
+    }
+
+    public void setPhotoSquare(String photoSquare) {
+        this.photoSquare = photoSquare;
+    }
+
     public Integer getId() {
         return id;
     }

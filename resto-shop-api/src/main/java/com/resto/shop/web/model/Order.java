@@ -3,7 +3,9 @@ package com.resto.shop.web.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -31,6 +33,8 @@ public class Order implements Serializable{
     private BigDecimal paymentAmount;
 
     private BigDecimal orderMoney;
+    
+    private BigDecimal aliPayDiscountMoney;
 
     private Integer articleCount;
 
@@ -138,8 +142,105 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    private  List<Order> childList; //子订单
+
+    public List<Order> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<Order> childList) {
+        this.childList = childList;
+    }
+
+
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
+
+    //菜品总数量（包含加菜）
+    private int totalCount;
+
+    //加菜次数
+    private int childCount;
+
+    //订单原始金额（退菜前）
+    private BigDecimal baseMoney;
+
+
+
+    //子订单的菜品项 ，key为子订单id
+    private Map<String,List<OrderItem>> childItems;
+
+    private BigDecimal refundMoney;
+
+    //订单原始人数（退菜前）
+    private Integer baseCustomerCount;
+
+    public Integer getBaseCustomerCount() {
+        return baseCustomerCount;
+    }
+
+    public void setBaseCustomerCount(Integer baseCustomerCount) {
+        this.baseCustomerCount = baseCustomerCount;
+    }
+
+    public BigDecimal getBaseMoney() {
+        return baseMoney;
+    }
+
+    public void setBaseMoney(BigDecimal baseMoney) {
+        this.baseMoney = baseMoney;
+    }
+
+    public BigDecimal getRefundMoney() {
+        return refundMoney;
+    }
+
+    public void setRefundMoney(BigDecimal refundMoney) {
+        this.refundMoney = refundMoney;
+    }
+    private BigDecimal mealFeePrice;
+
+    private Integer mealAllNumber;
+
+    public Integer getMealAllNumber() {
+        return mealAllNumber;
+    }
+
+    public void setMealAllNumber(Integer mealAllNumber) {
+        this.mealAllNumber = mealAllNumber;
+    }
+
+    public BigDecimal getMealFeePrice() {
+        return mealFeePrice;
+    }
+
+    public void setMealFeePrice(BigDecimal mealFeePrice) {
+        this.mealFeePrice = mealFeePrice;
+    }
+
+    public Map<String, List<OrderItem>> getChildItems() {
+        return childItems;
+    }
+
+    public void setChildItems(Map<String, List<OrderItem>> childItems) {
+        this.childItems = childItems;
+    }
+
+    public int getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(int childCount) {
+        this.childCount = childCount;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
 
     public OrderPaymentItem getOrderPaymentItem() {
         return orderPaymentItem;
@@ -617,6 +718,14 @@ public class Order implements Serializable{
     public void setUseAccount(boolean useAccount) {
         this.useAccount = useAccount;
     }
+
+	public BigDecimal getAliPayDiscountMoney() {
+		return aliPayDiscountMoney;
+	}
+
+	public void setAliPayDiscountMoney(BigDecimal aliPayDiscountMoney) {
+		this.aliPayDiscountMoney = aliPayDiscountMoney;
+	}
 
 
 }

@@ -225,6 +225,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
+
 	
 	/**
 	 * 获取店铺菜品的销售数据
@@ -478,12 +479,56 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	Order getLastOrderByTableNumber(String tableNumber);
 
+	/**
+	 * 返回子订单的菜品项
+	 * @param orderId
+	 * @return
+	 */
+	List<Order> getChildItem(String orderId);
+
+	Result updateOrderItem(String orderId,Integer count,String orderItemId,Integer type);
+
+	void refundArticle(Order order);
+
+	boolean checkOrder(Order order);
+
+	void refundArticleMsg(Order order);
+
+	void updateArticle(Order order);
+
+
     /**
-     * 查询后付款的所有的已支付订单
+     * 查询已完成订单  ---级对应的订单的菜品-
      * @param beginDate
      * @param endDate
-     * @param brandId
+     * @param currentBrandId
      * @return
      */
-    List<Order> selectHasPayListHouFuOrderByBrandId(String beginDate, String endDate, String brandId);
+    List<Order> selectOrderListItemByBrandId(String beginDate, String endDate, String currentBrandId);
+
+    /**
+     * 查询该订单所有的子订单（包含已取消的）
+     * @param orderId
+     * @return
+     */
+    List<Order> selectListByParentId(String orderId);
+
+    List<Order> selectHoufuOrderList(String beginDate, String endDate, String currentBrandId);
+	/**
+     * 微信端查询:以流水号查询订单详情
+     * @param serialNumber
+     * @return
+     */
+    public List<Order> selectWXOrderItems(Map<String, Object> map);
+
+    /**
+     * 会员管理
+     * yjuany 一个用户有多个订单
+     * @param customerId
+     * @return
+     */
+	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate);
+    
+    
+    
 }

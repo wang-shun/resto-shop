@@ -25,6 +25,56 @@ public class ShopCart {
 
     private Integer attrId;
 
+    private String recommendId;
+
+    private String recommendArticleId;
+
+    private String unitNewId;
+
+    private List<ShopCart> unitList;
+
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public List<ShopCart> getUnitList() {
+        return unitList;
+    }
+
+    public void setUnitList(List<ShopCart> unitList) {
+        this.unitList = unitList;
+    }
+
+    public String getUnitNewId() {
+        return unitNewId;
+    }
+
+    public void setUnitNewId(String unitNewId) {
+        this.unitNewId = unitNewId;
+    }
+
+    public String getRecommendArticleId() {
+        return recommendArticleId;
+    }
+
+    public void setRecommendArticleId(String recommendArticleId) {
+        this.recommendArticleId = recommendArticleId;
+    }
+
+    public String getRecommendId() {
+        return recommendId;
+    }
+
+    public void setRecommendId(String recommendId) {
+        this.recommendId = recommendId;
+    }
+
     public Integer getAttrId() {
         return attrId;
     }

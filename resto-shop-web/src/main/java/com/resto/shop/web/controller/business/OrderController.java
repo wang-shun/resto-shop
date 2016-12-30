@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.resto.brand.web.model.OrderException;
+import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.model.OrderItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -44,6 +47,10 @@ public class OrderController extends GenericController{
 	private BrandService brandService;
 	@Resource
 	private ShopDetailService shopDetailService;
+
+
+	@Resource
+    private OrderExceptionService orderExceptionService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -59,6 +66,7 @@ public class OrderController extends GenericController{
 	
 	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
+
 	}
 	
 	
@@ -116,7 +124,7 @@ public class OrderController extends GenericController{
 		}
 	}
 	
-	
+	//
 	@RequestMapping("/show/shopReport")
 	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
@@ -128,6 +136,7 @@ public class OrderController extends GenericController{
 		}
 		return "orderReport/shopReport";
 	}
+	
 	
 	@RequestMapping("AllOrder")
 	@ResponseBody
@@ -143,7 +152,7 @@ public class OrderController extends GenericController{
 				List<OrderDetailDto> listDto = new ArrayList<>();
 				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 				for (Order o : list) {
-					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "");
+					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
 					if(o.getCustomer()!=null){
 						//手机号
 						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
@@ -239,6 +248,11 @@ public class OrderController extends GenericController{
 							}
 						}
 					}
+					if(null!=o.getParentOrderId()){
+					    //该订单是子订单
+                        ot.setChildOrder(true);
+                    }
+                    ot.setOrderMode(o.getOrderMode());
 					//设置营销撬动率  实际/虚拟
 					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
 					BigDecimal temp = o.getOrderMoney().subtract(real);
@@ -256,10 +270,18 @@ public class OrderController extends GenericController{
 	
 	
 	
+	
+	
+	
 	@RequestMapping("detailInfo")
 	@ResponseBody
 	public Result showDetail(String orderId){
 		Order o = orderService.selectOrderDetails(orderId);
+		List<Order> childList = orderService.selectListByParentId(orderId);
+		if(!childList.isEmpty()){
+                o.setChildList(childList);
+        }
+
 		return getSuccessResult(o);
 	}
 	
@@ -307,4 +329,66 @@ public class OrderController extends GenericController{
 	public void refund(String orderId){
 		orderService.cancelOrder(orderId);
 	}
+
+	@RequestMapping("houFuChekc")
+    @ResponseBody
+    public  Result checkHoufu(String beginDate,String endDate){
+        List<Order> orderList = orderService.selectOrderListItemByBrandId(beginDate,endDate,getCurrentBrandId());
+        if(!orderList.isEmpty()){
+            for(Order o :orderList){
+                BigDecimal temp = BigDecimal.ZERO;
+                for(OrderItem oi:o.getOrderItems()){
+                    temp=temp.add(oi.getFinalPrice());//查询所有的菜品的总价
+                }
+                //判断当前的订单的总额orderMoney 是否=菜品价格+服务费
+                if(o.getOrderMoney().compareTo(temp.add(o.getServicePrice()))!=0){
+                    OrderException orderException = new OrderException();
+                    orderException.setOrderId(o.getId());
+                    orderException.setOrderMoney(o.getOrderMoney());
+                    orderException.setWhy("服务费+菜品费不等于订单价格");
+                    orderException.setShopName("花千锅");
+                    orderException.setCreateTime(o.getCreateTime());
+                    orderException.setBrandName(getBrandName());
+                    orderExceptionService.insert(orderException);
+
+                }
+            }
+        }
+
+
+        List<Order> orderPayList = orderService.selectHoufuOrderList(beginDate, endDate, getCurrentBrandId());
+        if(!orderPayList.isEmpty()){
+            for(Order od : orderPayList ){
+                   BigDecimal temp = BigDecimal.ZERO;
+                   if(od.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                       temp = od.getAmountWithChildren();
+                   }else {
+                       temp= od.getOrderMoney();
+                   }
+
+                   BigDecimal tempoi = BigDecimal.ZERO;
+                   for( OrderPaymentItem oi :od.getOrderPaymentItems()){
+                       tempoi=tempoi.add(oi.getPayValue());
+                   }
+                   if(temp.compareTo(tempoi)!=0){
+                       OrderException orderException2 = new OrderException();
+                       orderException2.setOrderId(od.getId());
+                       orderException2.setOrderMoney(od.getOrderMoney());
+                       orderException2.setWhy("支付项比支付金额");
+                       orderException2.setShopName("花千锅");
+                       orderException2.setCreateTime(od.getCreateTime());
+                       orderException2.setBrandName(getBrandName());
+                       orderExceptionService.insert(orderException2);
+
+                   }
+
+
+            }
+        }
+
+	    return  getSuccessResult();
+
+    }
+
+
 }

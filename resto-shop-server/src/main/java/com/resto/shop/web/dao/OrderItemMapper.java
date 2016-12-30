@@ -25,6 +25,12 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     //根据订单ID查询订单项
     List<OrderItem> listByOrderId(@Param("orderId") String orderId);
 
+    //套餐
+    List<OrderItem> listTotalByOrderId(@Param("orderId") String orderId);
+
+
+    List<OrderItem> listByParentId(String orderId);
+
 	void insertBatch(List<OrderItem> orderItems);
 
 	
@@ -49,4 +55,10 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
      * @return
      */
     List<Map<String, Object>> selectOrderItems(@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
+
+    List<OrderItem> getOrderItemByRecommendId(@Param("recommendId")String recommendId,@Param("orderId")String orderId);
+
+    void refundArticle(@Param("id") String id,@Param("count") Integer count);
+
+
 }

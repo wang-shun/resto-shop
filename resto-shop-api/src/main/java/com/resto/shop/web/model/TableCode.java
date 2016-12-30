@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TableCode {
     private String id;
@@ -32,6 +33,21 @@ public class TableCode {
 
     //等待位数
     private Integer waitNumber;
+    
+    //该桌号类型，取号的集合
+    private List<GetNumber> getNumbers;
+
+    //排序
+
+    private  Integer sort;
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
 
     final public Integer getWaitNumber() {
         return waitNumber;
@@ -120,4 +136,12 @@ public class TableCode {
     public void setIsUsed(Byte isUsed) {
         this.isUsed = isUsed;
     }
+
+	public List<GetNumber> getGetNumbers() {
+		return getNumbers;
+	}
+
+	public void setGetNumbers(List<GetNumber> getNumbers) {
+		this.getNumbers = getNumbers;
+	}
 }

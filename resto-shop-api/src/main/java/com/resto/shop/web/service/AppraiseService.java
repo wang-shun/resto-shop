@@ -39,4 +39,16 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	Appraise selectDetailedById(String appraiseId);
 
 	Appraise selectDeatilByOrderId(String orderId);
+
+	Appraise selectAppraiseByCustomerId(String customerId,String shopId);
+
+	List<Appraise> selectCustomerAllAppraise(String customerId, Integer currentPage, Integer showCount);
+
+	int selectByCustomerCount(String customerId);
+
+	/**
+	 * 查询每个品牌前500条好评
+	 * @return
+     */
+	List<Appraise> selectByGoodAppraise();
 }

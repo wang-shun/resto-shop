@@ -63,6 +63,12 @@ public class ServerConfig {
 	}
 
 
+    @Bean
+    public WxServerConfigService wxServerConfigService(){
+        return proxy.create(WxServerConfigService.class);
+    }
+
+
 	@Bean
 	public UserService userService(){ return proxy.create(UserService.class) ;}
 
@@ -92,4 +98,5 @@ public class ServerConfig {
 
     @Bean
     public LogBaseService logBaseService(){ return  proxy.create(LogBaseService.class); }
+
 }
