@@ -767,6 +767,7 @@ GROUP BY article_id
 		on ar.article_family_id=arf.id
 		where ar.state=1 and ar.article_type = 1
 		and ar.id not in (select article_id from tb_article_price group by article_id)
+		and ar.unit_id is null
 		and ar.shop_detail_id = #{shopId}
     </select>
 </mapper>
