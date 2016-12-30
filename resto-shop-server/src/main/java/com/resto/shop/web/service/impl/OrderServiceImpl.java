@@ -1079,7 +1079,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
                 //
                 if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
-                    chong.append(" VIP");
+                    chong.append("充");
                 }
                 StringBuilder gao = new StringBuilder();
 
@@ -1087,12 +1087,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 //店铺设置的次数；
                 int  brandNumber=  shopDetail.getConsumeNumber();
+
                 //用户订单的次数
                 int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());////
                  //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
-                if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber){
-                   // gao.append(" 高");
-                    // gao.append(" vip");
+                if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber&&shopDetail.getConsumeConfineUnit()!=3){
+                     gao.append(" vip");
+                }
+                //3无限制
+                int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+
+                if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCountlong > brandNumber && shopDetail.getConsumeConfineUnit()==3){
+                    gao.append(" vip");
                 }
                 data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
@@ -1302,14 +1308,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         StringBuilder gao = new StringBuilder();
         //shopDetail.getIsUserIdentity() == 1
-        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());//////////
+        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
 
+        //3无限制
+        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
 
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()){
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
             gao.append(" VIP");
         }
         //无限制的时候
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeConfineUnit()==3){
+        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
             gao.append(" VIP");
         }
         String modeText = getModeText(order);
