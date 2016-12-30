@@ -178,17 +178,7 @@
             {
                 title: "用户类型",
                 data: "isBindPhone",
-                createdCell: function (td, tdData) {
-                    if (tdData == 1) {
-                        $(td).html("会员")
-                    }else if(tdData == 0){
-                        $(td).html("非会员")
-                    }
-                },
-                s_filter: true,
-                s_render: function (d) {
-                    return articleType[d];
-                }
+                s_filter: true
             },
             {
                 title: "昵称",
@@ -209,27 +199,7 @@
             {
                 title: "性别",
                 data: "sex",
-                createdCell: function (td, tdData) {
-                    if (tdData == null || tdData == "") {
-                        $(td).html("未知")
-                    } else if (tdData == 1) {
-                        $(td).html("男")
-                    } else if (tdData == 2) {
-                        $(td).html("女")
-                    }
-                },
-	            s_filter: true,
-	            s_render: function (d) {
-	            	var result = "";
-	            	if (d == null || d == "") {
-	            		result = "未知";
-                    } else if (d == 1) {
-                    	result = "男";
-                    } else if (d == 2) {
-                    	result = "女";
-                    }
-	            	return result;
-	            }
+	            s_filter: true
             },
             {
                 title: "手机号码",
@@ -360,7 +330,7 @@
 	                console.log(select.html());
 	                var that = this;
 	                column.data().unique().each(function (d) {
-	                    select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+	                    select.append('<option value="' + d + '">' + d + '</option>')
 	                });
 	                select.appendTo($(column.header()).empty()).on('change', function () {
 	                    var val = $.fn.dataTable.util.escapeRegex(

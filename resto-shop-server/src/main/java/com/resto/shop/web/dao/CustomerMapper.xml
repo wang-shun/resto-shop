@@ -357,10 +357,14 @@
 		c.telephone,
 		c.head_photo photo,
 		(if(ISNULL(c.birthday),'',DATE_FORMAT(c.birthday,'%Y-%m-%d'))) birthday,
-		c.is_bind_phone isBindPhone,
+		if(c.is_bind_phone=1,'会员','非会员') isBindPhone,
 		c.province,
 		c.city,
-		c.sex,
+		case 
+			when c.sex = 1 then '男'
+			when c.sex = 2 then '女'
+			else '未知'
+		end sex,
 		a.remain,
 		((select IFNULL(SUM(tal1.money),0) from tb_account_log tal1 where tal1.account_id = a.id and tal1.source = 2)
 		-(select IFNULL(SUM(topi1.pay_value),0) from tb_order_payment_item topi1 
