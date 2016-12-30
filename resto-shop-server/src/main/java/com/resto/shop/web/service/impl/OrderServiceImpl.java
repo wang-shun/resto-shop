@@ -1959,6 +1959,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //查询后台数据
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
+
         //封装品牌的数据
         OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
         //品牌订单总额初始值
