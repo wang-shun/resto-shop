@@ -7,6 +7,7 @@
     <result column="nickname" property="nickname" jdbcType="VARCHAR" />
     <result column="telephone" property="telephone" jdbcType="VARCHAR" />
     <result column="head_photo" property="headPhoto" jdbcType="VARCHAR" />
+    <result column="birthday" property="birthday"/>
     <result column="default_delivery_point" property="defaultDeliveryPoint" jdbcType="INTEGER" />
     <result column="is_bind_phone" property="isBindPhone" jdbcType="BIT" />
     <result column="regiest_time" property="regiestTime" jdbcType="TIMESTAMP" />
@@ -25,7 +26,7 @@
     <result column="customer_detail_id" property="customerDetailId" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, wechat_id, nickname, telephone, head_photo, default_delivery_point, is_bind_phone, 
+    id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone, 
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, 
     city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id
   </sql>
@@ -316,36 +317,12 @@
     select count(1) from tb_customer where id = #{0} and telephone is null
   </select>
 
-
-<!-- 得到品牌用户总数 -->
-  <select id="selectAllUser" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId}
+  <select id="selectBrandUser" resultType="java.lang.String">
+    select CONCAT_WS(',',(select count(1) from tb_customer),(select count(1) from tb_customer where is_bind_phone=1)
+	,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
+	,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
+	,(select count(1) from tb_customer where id in (select customer_id from tb_order GROUP BY customer_id having count(id) > 2))) count
   </select>
-<!-- 得到品牌注册用户总数 -->
-	<select id="selectUserYe" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=1
-  </select>
-  <!-- 得到品牌未注册用户总数 -->
-  <select id="selectUserNot" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId} and is_bind_phone=0
-  </select>
-  <!-- 得到品牌男性用户总数 -->
-  <select id="selectUserBoy" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId} and sex=1
-  </select>
-  <!-- 得到品牌女性用户总数 -->
-  <select id="selectUserGir" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId} and sex=2
-  </select>
-  <!-- 得到品牌未知性别用户总数 -->
-  <select id="selectNotUser" resultType="java.lang.Integer">
-    select count(id) from tb_customer where brand_id=#{brandId} and sex=0
-  </select>
-  <!-- 得到品牌用户购买率 -->
-  <select id="selectPulShopping" resultType="java.lang.Integer">
-    select count(1) from tb_customer where id in (select customer_id from tb_order GROUP BY customer_id having count(id) > 2) and brand_id=#{brandId}
-  </select>
-
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
     SELECT 
@@ -373,28 +350,40 @@
     
     <!-- 得到品牌下的所有用户信息，得到用户已消费的订单 -->
     <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
-    SELECT
-		c.id AS customerId,
-		a.id AS accountId,
+	    select
+		c.id customerId,
+		a.id accountId,
 		c.nickname,
 		c.telephone,
-		c.head_photo as photo,
-		c.is_bind_phone as isBindPhone,
+		c.head_photo photo,
+		(if(ISNULL(c.birthday),'',DATE_FORMAT(c.birthday,'%Y-%m-%d'))) birthday,
+		c.is_bind_phone isBindPhone,
 		c.province,
 		c.city,
 		c.sex,
 		a.remain,
-		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11)) as amount,
-		(SELECT SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11)) as sumMoney,
-		(SELECT ROUND(AVG(order_money),2) from tb_order where customer_id = c.id and order_state in (2,10,11)) as money
-	FROM
+		((select IFNULL(SUM(tal1.money),0) from tb_account_log tal1 where tal1.account_id = a.id and tal1.source = 2)
+		-(select IFNULL(SUM(topi1.pay_value),0) from tb_order_payment_item topi1 
+						 inner join tb_order td1 on topi1.order_id = td1.id and topi1.payment_mode_id = 6 where td1.customer_id = c.id)) chargeRemain,
+		((select IFNULL(SUM(tal1.money),0) from tb_account_log tal1 where tal1.account_id = a.id and tal1.source = 3)
+		-(select IFNULL(SUM(topi2.pay_value),0) from tb_order_payment_item topi2 
+						 inner join tb_order td2 on topi2.order_id = td2.id and topi2.payment_mode_id = 7 where td2.customer_id = c.id)) presentRemain,
+		(a.remain - ((select IFNULL(SUM(tal3.money),0) from tb_account_log tal3 where tal3.account_id = a.id and tal3.source = 2)
+		-(select IFNULL(SUM(topi3.pay_value),0) from tb_order_payment_item topi3 
+			inner join tb_order td3 on topi3.order_id = td3.id and topi3.payment_mode_id = 6 where td3.customer_id = c.id))
+		- ((select IFNULL(SUM(tal4.money),0) from tb_account_log tal4 where tal4.account_id = a.id and tal4.source = 3)
+		-(select IFNULL(SUM(topi4.pay_value),0) from tb_order_payment_item topi4 
+			inner join tb_order td4 on topi4.order_id = td4.id and topi4.payment_mode_id = 7 where td4.customer_id = c.id))
+		) redRemain,
+		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11)) amount,
+		(select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11)) sumMoney,
+		(select ROUND(AVG(order_money),2) from tb_order where customer_id = c.id and order_state in (2,10,11)) money
+	from
 		tb_customer c
-		LEFT JOIN tb_account a ON c.account_id = a.id
-		LEFT JOIN tb_order b ON c.id = b.customer_id
-	where
-  	    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND	c.brand_id=#{brandId}
-    GROUP BY
-		c.id
+		left join tb_account a on c.account_id = a.id
+		where
+	  	    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]>
+	    group by c.id
     </select>
 
 	<select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">

@@ -1,6 +1,7 @@
  package com.resto.shop.web.controller.business;
 
- import com.resto.brand.core.entity.Result;
+import com.alibaba.fastjson.JSON;
+import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.ExcelUtil;
  import com.resto.brand.core.util.JdbcUtils;
  import com.resto.brand.core.util.UserOrderExcelUtil;
@@ -24,6 +25,7 @@ import com.resto.brand.web.model.DatabaseConfig;
  import com.resto.shop.web.service.OrderService;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,43 +78,49 @@ public class MemberController extends GenericController{
 	@RequestMapping("/myConList")
 	@ResponseBody
 	public Map<String, Object> selectAllMath(String beginDate,String endDate){
-//		得到品牌所有用户
-		Integer countUser=customerService.selectAllUser(getCurrentBrandId());
-//		得到品牌所有注册用户
-		Integer countYeUser=customerService.selectUserYe(getCurrentBrandId());
-//		得到品牌所有未注册用户
-		Integer countNotUser=customerService.selectUserNot(getCurrentBrandId());
-//		得到品牌所有男用户
-		Integer countBoyUser=customerService.selectUserBoy(getCurrentBrandId());
-//		得到品牌所有女用户
-		Integer countGirUser=customerService.selectUserGir(getCurrentBrandId());
-//		得到品牌所有未知性别用户
-		Integer countNotAllUser=customerService.selectNotUser(getCurrentBrandId());
-//		得到品牌所有复购人数
-		Integer countPulShopping=customerService.selectPulShopping(getCurrentBrandId());
-//		进行计算，得到复购率
-		double a=countUser;
-		double b=countPulShopping;
-		double c=(b/a)*100;
-		BigDecimal d=new BigDecimal(c);
-//		得到小数点后两位小数
-		double f1 = d.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-//		得到百分号
-		String pulShopping=f1+"%";
-		List<CountUserDto> countUserDtos=new ArrayList<>();//定义统计CountUserDto一个对象集合
-		List<MemberUserDto>  memberUserDtos = customerService.selectListMemberUser(beginDate,endDate,getCurrentBrandId());//得到会员表的数据
-		Brand brand=brandService.selectById(getCurrentBrandId());//得到品牌
+		//得到品牌用户信息
+		String count = customerService.selectBrandUser();
+		String[] counts = count.split(",");
+		List<CountUserDto> countUserDtos=new ArrayList<>();
 		CountUserDto countUserDto=new CountUserDto();
-		countUserDto.setUserBrandName(brand.getBrandName());
-		countUserDto.setUserAll(countUser);
-		countUserDto.setUserYe(countYeUser);
-		countUserDto.setUserNot(countNotUser);
-		countUserDto.setUserBoy(countBoyUser);
-		countUserDto.setUserGir(countGirUser);
-		countUserDto.setNotUser(countNotAllUser);
-		countUserDto.setpShoping(pulShopping);
+		countUserDto.setUserBrandName(getBrandName());
+		Integer i = 0;
+		for(String str : counts){
+			switch (i) {
+			case 0:
+				countUserDto.setUserAll(Integer.valueOf(str));
+				break;
+			case 1:
+				countUserDto.setUserYe(Integer.valueOf(str));
+				break;
+			case 2:
+				countUserDto.setUserNot(Integer.valueOf(str));
+				break;
+			case 3:
+				countUserDto.setUserBoy(Integer.valueOf(str));
+				break;
+			case 4:
+				countUserDto.setUserGir(Integer.valueOf(str));
+				break;
+			case 5:
+				countUserDto.setNotUser(Integer.valueOf(str));
+				break;
+			case 6:
+				double a=countUserDto.getUserAll();
+				double b=Double.valueOf(str);
+				double c=(b/a)*100;
+				BigDecimal d=new BigDecimal(c);
+				double f1 = d.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+				String pulShopping=f1+"%";
+				countUserDto.setpShoping(pulShopping);
+				break;
+			default:
+				break;
+			}
+			i++;
+		}
 		countUserDtos.add(countUserDto);
-		
+		List<MemberUserDto>  memberUserDtos = customerService.selectListMemberUser(beginDate,endDate);
 		Map<String, Object> map=new HashMap<>();
 		map.put("countUserDtos", countUserDtos);
 		map.put("memberUserDtos", memberUserDtos);
@@ -147,8 +155,7 @@ public class MemberController extends GenericController{
 	//下载会员信息报表
 	@RequestMapping("member_excel")
 	@ResponseBody
-	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
-
+	public void reportIncome(String userJson,String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
@@ -158,12 +165,9 @@ public class MemberController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"customerId","nickname","telephone","province","city","sex","remain","sumMoney","amount","money"};
+		String[]columns={"customerId","nickname","telephone","birthday","province","city","sex","remain","chargeRemain","presentRemain","redRemain","sumMoney","amount","money"};
 		//定义数据
-		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate,endDate,getCurrentBrandId());
-		
-//		Map< String, Object> listMap=this.selectAllMath();
-		
+		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate, endDate);
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
 			shopName += shopDetail.getName()+",";
@@ -174,11 +178,11 @@ public class MemberController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "会员信息报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "9");//显示的位置
+		map.put("num", "12");//显示的位置
 		map.put("reportTitle", "会员信息");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
+		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"生日","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"充值金额","25"},{"充值赠送金额","25"},{"红包金额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
 		//定义excel工具类对象
 		ExcelUtil<MemberUserDto> excelUtil=new ExcelUtil<MemberUserDto>();
 		try{
@@ -413,5 +417,6 @@ public class MemberController extends GenericController{
 	        }
 			return getSuccessResult(o);
 		}
+		
 
 }
