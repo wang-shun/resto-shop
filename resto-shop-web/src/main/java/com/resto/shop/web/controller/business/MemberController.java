@@ -178,7 +178,7 @@ public class MemberController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "会员信息报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "12");//显示的位置
+		map.put("num", "13");//显示的位置
 		map.put("reportTitle", "会员信息");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
