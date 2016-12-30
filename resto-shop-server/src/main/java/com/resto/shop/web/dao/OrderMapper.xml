@@ -2303,7 +2303,7 @@ AND o.production_status IN (2, 3)
         and parent_order_id is null
         and order_state in (2,10,11) and production_status in (2,3)
         <if test="consumeConfineTime != null and consumeConfineTime !=0">
-            and  TIMESTAMPDIFF(day,create_time,now()) >#{consumeConfineTime}
+            and  #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
         </if>
 
     </select>
