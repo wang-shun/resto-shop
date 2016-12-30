@@ -19,6 +19,8 @@ public class Customer implements Serializable{
     private String telephone;
 
     private String headPhoto;
+    
+    private Date birthday;
 
     private Integer defaultDeliveryPoint;
 
@@ -85,7 +87,15 @@ public class Customer implements Serializable{
         this.isNowRegister = isNowRegister;
     }
 
-    public Integer getIsNowRegister() {
+    public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public Integer getIsNowRegister() {
         return isNowRegister;
     }
 

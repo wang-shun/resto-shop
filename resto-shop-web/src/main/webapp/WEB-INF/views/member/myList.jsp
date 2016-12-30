@@ -241,6 +241,15 @@
                 }
             },
             {
+                title: "生日",
+                data: "birthday",
+                createdCell: function (td, tdData) {
+                    if (tdData == null || tdData == "") {
+                        $(td).html("--")
+                    }
+                }
+            },
+            {
                 title: "省/市",
                 data: "province",
                 createdCell: function (td, tdData) {
@@ -261,6 +270,21 @@
             {
                 title: "账户余额",
                 data: "remain",
+                defaultContent: '0'
+            },
+            {
+                title: "充值金额",
+                data: "chargeRemain",
+                defaultContent: '0'
+            },
+            {
+                title: "充值赠送金额",
+                data: "presentRemain",
+                defaultContent: '0'
+            },
+            {
+                title: "红包金额",
+                data: "redRemain",
                 defaultContent: '0'
             },
             {
@@ -476,6 +500,6 @@
     $("#brandreportExcel").click(function () {
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
-        location.href = "member/member_excel?beginDate="+beginDate+"&&endDate="+endDate;
+        location.href = "member/member_excel?beginDate="+beginDate+"&endDate="+endDate;
     })
 </script>
