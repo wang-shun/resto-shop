@@ -19,7 +19,7 @@ public interface TableCodeMapper  extends GenericDao<TableCode,String> {
 
     int updateByPrimaryKey(TableCode record);
 
-    TableCode selectByName(String name);
+    TableCode selectByName(@Param("name") String name,@Param("shopId") String shopId);
 
     TableCode selectByCodeNumber(@Param("codeNumber")String codeNumber,@Param("shopId")String shopId);
 
