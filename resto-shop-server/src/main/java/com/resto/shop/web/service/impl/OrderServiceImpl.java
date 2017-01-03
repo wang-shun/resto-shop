@@ -1328,7 +1328,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
 
         //加菜不算
-        if(order.getParentOrderId().equals(null)) {
+        if(!order.getParentOrderId().equals(null)) {
             data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString());
         }else{
             data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
