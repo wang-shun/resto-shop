@@ -65,7 +65,7 @@
          select t.id ,t.name,t.sort,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort
            from tb_unit t
          left join tb_unit_detail t2 on t2.unit_id = t.id
-         where t.id = #{id}
+         where t.id = #{id} order by t.sort
     </select>
 
     <update id="updateByPrimaryKeySelective">
