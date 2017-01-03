@@ -32,15 +32,14 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
 		return accountlogMapper.selectLogsByAccountId(accountId);
 	}
 	
-	@Override
-	public List<AccountLog> selectAccountLog(Map<String, String> map) {
-		return accountlogMapper.selectAccountLog(map);
-	}
-
     @Override
     public int selectByCustomerIdNumber(String id) {
         List<AccountLog> list = accountlogMapper.selectByCustomerIdNumber(id);
         return list.size();
     }
 
+    @Override
+	public List<String> selectBrandMarketing(Map<String, String> selectMap) {
+		return accountlogMapper.selectBrandMarketing(selectMap);
+	}
 }
