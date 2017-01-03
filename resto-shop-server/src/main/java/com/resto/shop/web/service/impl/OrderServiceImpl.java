@@ -1100,7 +1100,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCountlong > brandNumber && shopDetail.getConsumeConfineUnit()==3){
                     gao.append(" vip");
                 }
-                data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
+
+                //加菜不算
+                if(null!=order.getParentOrderId()) {
+                    data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() );
+                }else{
+                    data.put("TABLE_NUMBER", tableNumber + star.toString() + chong.toString() + gao.toString());
+                }
                 data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
                 data.put("RESTAURANT_NAME", shop.getName());
                 data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
@@ -1326,7 +1332,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
+
+        //加菜不算
+        if(order.getParentOrderId() != null) {
+            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString());
+        }else{
+            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
+        }
+
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
