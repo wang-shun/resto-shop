@@ -65,6 +65,4 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      * @return
      */
     List<Coupon> getListByCustomerId(String customerId);
-
-    List<Coupon> selectCoupon(Map<String, String> map);
 }
