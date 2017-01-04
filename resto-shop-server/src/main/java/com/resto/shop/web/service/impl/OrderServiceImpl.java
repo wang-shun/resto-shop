@@ -3075,87 +3075,258 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        //-----------开始发送结店数据-----------------
         StringBuilder content = new StringBuilder();
-        content
-                .append("门店:简厨凌空SHOH").append("\n")
-                .append("日报:2016.11.20").append("\n")
-                .append("堂吃支付金额:10000元").append("\n")
-                .append("商户录取").append("\n")
-                 .append("堂吃消费笔数:64").append("\n")
-                .append("商户录入").append("\n")
-                .append("用户支付消费:62/9500").append("\n")
-                .append("----------------").append("\n")
-                .append("新增用户消费:12/2600").append("\n")
-                .append("其中：").append("\n")
-                .append("自然用户消费:9/1700").append("\n")
-                .append("分享用户消费:3/900").append("\n")
-                .append("-----------------").append("\n")
-                .append("回头用户消费:50/6900").append("\n")
-                .append("其中:").append("\n")
-                .append("二次回头用户:20/3000").append("\n")
-                .append("多次回头用户:30/3900").append("\n")
-                .append("-----------------").append("\n")
-                .append("用户消费占比:96.85%").append("\n")
-                .append("(用户交易笔数/堂吃交易笔数)").append("\n")
-                .append("新增用户比率:85.76%").append("\n")
-                .append("新增消费用户/(堂吃交易笔数-回头用户交易笔数)").append("\n")
-                .append("在线支付比例:95%").append("\n")
-                .append("在线支付金额/堂吃支付金额").append("\n")
-                .append("--------------------").append("\n")
-                .append("本日满意度:99.15分").append("\n")
-                .append("------上旬合计------").append("\n")
-                .append("上旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------中旬合计------").append("\n")
-                .append("中旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------下旬合计------").append("\n")
-                .append("下旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------本月合计------").append("\n")
-                .append("本月满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n");
-        /**
-         发送客服消息
-         */
-        WeChatUtils.sendCustomerMsgASync(content.toString(), "oBHT9squwPUyTM-zwoWcWyey4PCM", "wx36bd5b9b7d264a8c", "807530431fe6e19e3f2c4a7d1a149465");
+        //1.店铺名称
+        String shopName = "测试专用品牌(坐下点餐)";
+        //2.日报
+        String dateTime = DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
+        //3.营业总额
+        BigDecimal totalMoney = new BigDecimal(1000);
+        //4消费笔数
+        Integer orderCount = 20;
+        //5用户支付消费
+        BigDecimal paymentAmount= new BigDecimal(20);
+        BigDecimal paymentTotal= new BigDecimal(10);
+
+        //----6新增用户消费start---
+        BigDecimal newCustomerPay= new BigDecimal(10);
+        BigDecimal newCustomerPayTotal= new BigDecimal(10);
+        //1.自然用户消费
+        BigDecimal orginCustomerPay= new BigDecimal(10);
+        BigDecimal orginCustomerPayTotal= new BigDecimal(10);
+        //2.分享用户消费
+        BigDecimal shareCustomerPay= new BigDecimal(10);
+        BigDecimal shareCustomerPayTotal= new BigDecimal(10);
+        //----6新增用户消费end---
+
+        //----7回头用户消费start---
+        BigDecimal backCustomerPay= new BigDecimal(10);
+        BigDecimal backCustomerPayTotal= new BigDecimal(10);
+        //1.二次回头用户
+        BigDecimal secondBackCustomerAmount= new BigDecimal(10);
+        BigDecimal secondBackCustomerTotal= new BigDecimal(10);
+        //2.多次回头用户
+        BigDecimal backCustomersAmount= new BigDecimal(10);
+        BigDecimal backCustomersTotal= new BigDecimal(10);
+
+        //用户消费占比
+        String customerPayPercent = "80";
+        //新增用户比例
+        String newCustomerPercent = "70";
+        //在线支付占比
+        String payOnlinePercent = "60";
+        //本日满意度
+        String satisfied = "70";
+
+        content.append("{")
+                .append("shopName:").append("'").append(shopName).append("'").append(",")
+                .append("dateTime:").append("'").append(dateTime).append("'").append(",")
+                .append("totalMoney:").append("'").append(totalMoney).append("'").append(",")
+                .append("paymentAmount:").append("'").append(paymentAmount).append("'").append(",")
+                .append("orderCount:").append("'").append(orderCount).append("'").append(",")
+                .append("paymentTotal:").append("'").append(paymentTotal).append("'").append(",")
+                .append("newCustomerPay:").append("'").append(newCustomerPay).append("'").append(",")
+                .append("newCustomerPayTotal:").append("'").append(newCustomerPayTotal).append("'").append(",")
+                .append("orginCustomerPay:").append("'").append(orginCustomerPay).append("'").append(",")
+                .append("orginCustomerPayTotal:").append("'").append(orginCustomerPayTotal).append("'").append(",")
+                .append("shareCustomerPay:").append("'").append(shareCustomerPay).append("'").append(",")
+                .append("shareCustomerPayTotal:").append("'").append(shareCustomerPayTotal).append("'").append(",")
+                .append("backCustomerPay:").append("'").append(backCustomerPay).append("'").append(",")
+                .append("backCustomerPayTotal:").append("'").append(backCustomerPayTotal).append("'").append(",")
+                .append("secondBackCustomerAmount:").append("'").append(secondBackCustomerAmount).append("'").append(",")
+                .append("secondBackCustomerTotal:").append("'").append(secondBackCustomerTotal).append("'").append(",")
+                .append("backCustomersAmount:").append("'").append(backCustomersAmount).append("'").append(",")
+                .append("backCustomersTotal:").append("'").append(backCustomersTotal).append("'").append(",")
+                .append("customerPayPercent:").append("'").append(customerPayPercent).append("'").append(",")
+                .append("newCustomerPercent:").append("'").append(newCustomerPercent).append("'").append(",")
+                .append("payOnlinePercent:").append("'").append(payOnlinePercent).append("'").append(",")
+                .append("satisfied:").append("'").append(satisfied).append("'")
+                .append("}");
+        SMSUtils.sendMessage("13317182430",content.toString(),"餐加","SMS_37160073");
+
+        //------------------------------上旬数据开始----------------------------------------------
+        StringBuilder lastcontent = new StringBuilder();
+        //1.满意度
+        String lastSatisfied = "97.85";
+        //2.用户消费占比
+        String lastCustomerPayPercent = "10";
+        //3新增用户占比
+        String lastNewCustomerCount = "50";
+        //4在线支付占比
+        String lastOnlinePercent = "50";
+        //5总支付金额
+        BigDecimal lasterTotalPayment = new BigDecimal(50);
+        //6用户支付金额
+        BigDecimal lastCustomerPayment = new BigDecimal(50);
+        //7新增用户消费占比
+        BigDecimal lastNewCustomerPay = new BigDecimal(50);
+        BigDecimal lastNewCustomerPayTotal = new BigDecimal(50);
+        //8新增自然用户
+        Integer lastOrginCustomerCount =10;
+        //9新增分享用户
+        Integer lastShareCustomerCount =10;
+        //10回头用户消费
+        BigDecimal lastBackPayment = new BigDecimal(50);
+        //11新增回头用户
+        Integer lastNewBackCustomerCount =10;
+        //12多次新增回头用户
+        Integer lastBackCustomersCount =10;
+        lastcontent.append("{")
+                .append("lastSatisfied:").append("'").append(lastSatisfied).append("'").append(",")
+                .append("lastCustomerPayPercent:").append("'").append(lastCustomerPayPercent).append("'").append(",")
+                .append("lastNewCustomerCount:").append("'").append(lastNewCustomerCount).append("'").append(",")
+                .append("lastOnlinePercent:").append("'").append(lastOnlinePercent).append("'").append(",")
+                .append("lasterTotalPayment:").append("'").append(lasterTotalPayment).append("'").append(",")
+                .append("lastCustomerPayment:").append("'").append(lastCustomerPayment).append("'").append(",")
+                .append("lastNewCustomerPay:").append("'").append(lastNewCustomerPay).append("'").append(",")
+                .append("lastNewCustomerPayTotal:").append("'").append(lastNewCustomerPayTotal).append("'").append(",")
+                .append("lastOrginCustomerCount:").append("'").append(lastOrginCustomerCount).append("'").append(",")
+                .append("lastShareCustomerCount:").append("'").append(lastShareCustomerCount).append("'").append(",")
+                .append("lastBackPayment:").append("'").append(lastBackPayment).append("'").append(",")
+                .append("lastNewBackCustomerCount:").append("'").append(lastNewBackCustomerCount).append("'").append(",")
+                .append("lastBackCustomersCount:").append("'").append(lastBackCustomersCount).append("'")
+                .append("}");
+        SMSUtils.sendMessage("13317182430",lastcontent.toString(),"餐加","SMS_37030070");
+        //-----------------------------上旬数据结束----------------------------------------------
+
+        //------------------------------中旬数据开始----------------------------------------------
+        StringBuilder middlecontent = new StringBuilder();
+        //1.满意度
+        String middleSatisfied = "97.85";
+        //2.用户消费占比
+        String middleCustomerPayPercent = "10";
+        //3新增用户占比
+        String middleNewCustomerCount = "50";
+        //4在线支付占比
+        String middleOnlinePercent = "50";
+        //5总支付金额
+        BigDecimal middleerTotalPayment = new BigDecimal(50);
+        //6用户支付金额
+        BigDecimal middleCustomerPayment = new BigDecimal(50);
+        //7新增用户消费占比
+        BigDecimal middleNewCustomerPay = new BigDecimal(50);
+        BigDecimal middleNewCustomerPayTotal = new BigDecimal(50);
+        //8新增自然用户
+        Integer middleOrginCustomerCount =10;
+        //9新增分享用户
+        Integer middleShareCustomerCount =10;
+        //10回头用户消费
+        BigDecimal middleBackPayment = new BigDecimal(50);
+        //11新增回头用户
+        Integer middleNewBackCustomerCount =10;
+        //12多次新增回头用户
+        Integer middleBackCustomersCount =10;
+        middlecontent.append("{")
+                .append("middleSatisfied:").append("'").append(middleSatisfied).append("'").append(",")
+                .append("middleCustomerPayPercent:").append("'").append(middleCustomerPayPercent).append("'").append(",")
+                .append("middleNewCustomerCount:").append("'").append(middleNewCustomerCount).append("'").append(",")
+                .append("middleOnlinePercent:").append("'").append(middleOnlinePercent).append("'").append(",")
+                .append("middleerTotalPayment:").append("'").append(middleerTotalPayment).append("'").append(",")
+                .append("middleCustomerPayment:").append("'").append(middleCustomerPayment).append("'").append(",")
+                .append("middleNewCustomerPay:").append("'").append(middleNewCustomerPay).append("'").append(",")
+                .append("middleNewCustomerPayTotal:").append("'").append(middleNewCustomerPayTotal).append("'").append(",")
+                .append("middleOrginCustomerCount:").append("'").append(middleOrginCustomerCount).append("'").append(",")
+                .append("middleShareCustomerCount:").append("'").append(middleShareCustomerCount).append("'").append(",")
+                .append("middleBackPayment:").append("'").append(middleBackPayment).append("'").append(",")
+                .append("middleNewBackCustomerCount:").append("'").append(middleNewBackCustomerCount).append("'").append(",")
+                .append("middleBackCustomersCount:").append("'").append(middleBackCustomersCount).append("'")
+                .append("}");
+        SMSUtils.sendMessage("13317182430",middlecontent.toString(),"餐加","SMS_37065121");
+        //------------------------------中旬数据结束----------------------------------------------
+
+        //------------------------------下旬数据开始----------------------------------------------
+        StringBuilder endcontent = new StringBuilder();
+        //1.满意度
+        String endSatisfied = "97.85";
+        //2.用户消费占比
+        String endCustomerPayPercent = "10";
+        //3新增用户占比
+        String endNewCustomerCount = "50";
+        //4在线支付占比
+        String endOnlinePercent = "50";
+        //5总支付金额
+        BigDecimal enderTotalPayment = new BigDecimal(50);
+        //6用户支付金额
+        BigDecimal endCustomerPayment = new BigDecimal(50);
+        //7新增用户消费占比
+        BigDecimal endNewCustomerPay = new BigDecimal(50);
+        BigDecimal endNewCustomerPayTotal = new BigDecimal(50);
+        //8新增自然用户
+        Integer endOrginCustomerCount =10;
+        //9新增分享用户
+        Integer endShareCustomerCount =10;
+        //10回头用户消费
+        BigDecimal endBackPayment = new BigDecimal(50);
+        //11新增回头用户
+        Integer endNewBackCustomerCount =10;
+        //12多次新增回头用户
+        Integer endBackCustomersCount =10;
+        endcontent.append("{")
+                .append("endSatisfied:").append("'").append(endSatisfied).append("'").append(",")
+                .append("endCustomerPayPercent:").append("'").append(endCustomerPayPercent).append("'").append(",")
+                .append("endNewCustomerCount:").append("'").append(endNewCustomerCount).append("'").append(",")
+                .append("endOnlinePercent:").append("'").append(endOnlinePercent).append("'").append(",")
+                .append("enderTotalPayment:").append("'").append(enderTotalPayment).append("'").append(",")
+                .append("endCustomerPayment:").append("'").append(endCustomerPayment).append("'").append(",")
+                .append("endNewCustomerPay:").append("'").append(endNewCustomerPay).append("'").append(",")
+                .append("endNewCustomerPayTotal:").append("'").append(endNewCustomerPayTotal).append("'").append(",")
+                .append("endOrginCustomerCount:").append("'").append(endOrginCustomerCount).append("'").append(",")
+                .append("endShareCustomerCount:").append("'").append(endShareCustomerCount).append("'").append(",")
+                .append("endBackPayment:").append("'").append(endBackPayment).append("'").append(",")
+                .append("endNewBackCustomerCount:").append("'").append(endNewBackCustomerCount).append("'").append(",")
+                .append("endBackCustomersCount:").append("'").append(endBackCustomersCount).append("'")
+                .append("}");
+        SMSUtils.sendMessage("13317182430",endcontent.toString(),"餐加","SMS_36965049");
+        //------------------------------下旬数据结束----------------------------------------------
+
+        //------------------------------本月数据开始----------------------------------------------
+        StringBuilder nowcontent = new StringBuilder();
+        //1.满意度
+        String nowSatisfied = "97.85";
+        //2.用户消费占比
+        String nowCustomerPayPercent = "10";
+        //3新增用户占比
+        String nowNewCustomerCount = "50";
+        //4在线支付占比
+        String nowOnlinePercent = "50";
+        //5总支付金额
+        BigDecimal nowerTotalPayment = new BigDecimal(50);
+        //6用户支付金额
+        BigDecimal nowCustomerPayment = new BigDecimal(50);
+        //7新增用户消费占比
+        BigDecimal nowNewCustomerPay = new BigDecimal(50);
+        BigDecimal nowNewCustomerPayTotal = new BigDecimal(50);
+        //8新增自然用户
+        Integer nowOrginCustomerCount =10;
+        //9新增分享用户
+        Integer nowShareCustomerCount =10;
+        //10回头用户消费
+        BigDecimal nowBackPayment = new BigDecimal(50);
+        //11新增回头用户
+        Integer nowNewBackCustomerCount =10;
+        //12多次新增回头用户
+        Integer nowBackCustomersCount =10;
+        nowcontent.append("{")
+                .append("nowSatisfied:").append("'").append(nowSatisfied).append("'").append(",")
+                .append("nowCustomerPayPercent:").append("'").append(nowCustomerPayPercent).append("'").append(",")
+                .append("nowNewCustomerCount:").append("'").append(nowNewCustomerCount).append("'").append(",")
+                .append("nowOnlinePercent:").append("'").append(nowOnlinePercent).append("'").append(",")
+                .append("nowerTotalPayment:").append("'").append(nowerTotalPayment).append("'").append(",")
+                .append("nowCustomerPayment:").append("'").append(nowCustomerPayment).append("'").append(",")
+                .append("nowNewCustomerPay:").append("'").append(nowNewCustomerPay).append("'").append(",")
+                .append("nowNewCustomerPayTotal:").append("'").append(nowNewCustomerPayTotal).append("'").append(",")
+                .append("nowOrginCustomerCount:").append("'").append(nowOrginCustomerCount).append("'").append(",")
+                .append("nowShareCustomerCount:").append("'").append(nowShareCustomerCount).append("'").append(",")
+                .append("nowBackPayment:").append("'").append(nowBackPayment).append("'").append(",")
+                .append("nowNewBackCustomerCount:").append("'").append(nowNewBackCustomerCount).append("'").append(",")
+                .append("nowBackCustomersCount:").append("'").append(nowBackCustomersCount).append("'")
+                .append("}");
+        SMSUtils.sendMessage("13317182430",nowcontent.toString(),"餐加","SMS_37685377");
+        //------------------------------本月数据结束----------------------------------------------
 
     }
 
