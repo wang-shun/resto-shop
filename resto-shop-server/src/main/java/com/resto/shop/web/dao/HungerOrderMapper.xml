@@ -107,4 +107,9 @@
         where t.restaurant_id = #{restaurantId}
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.created_at,'%d %b %y')
     </select>
+
+    <select id="getExtra" resultType="HungerOrderExtra">
+        select * from tb_hunger_order_extra
+        where order_id = #{orderId}
+    </select>
 </mapper>
