@@ -197,6 +197,4 @@
        order_id = #{orderId} AND
       result_data = '{}'
     </select>
-
-
 </mapper>

@@ -27,6 +27,12 @@ public class ChargeOrder {
     private BigDecimal rewardBalance;
 
     private BigDecimal totalBalance;
+
+    private Integer numberDayNow;
+
+    private BigDecimal arrivalAmount;
+
+    private BigDecimal endAmount;
     
 	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
 			String customerId, String shopDetailId, String brandId) {
@@ -121,39 +127,51 @@ public class ChargeOrder {
 		this.brandId = brandId;
 	}
 
-
-
 	public BigDecimal getChargeBalance() {
 		return chargeBalance;
 	}
-
-
 
 	public BigDecimal getRewardBalance() {
 		return rewardBalance;
 	}
 
-
-
 	public BigDecimal getTotalBalance() {
 		return totalBalance;
 	}
-
-
 
 	public void setChargeBalance(BigDecimal chargeBalance) {
 		this.chargeBalance = chargeBalance;
 	}
 
-
-
 	public void setRewardBalance(BigDecimal rewardBalance) {
 		this.rewardBalance = rewardBalance;
 	}
 
-
-
 	public void setTotalBalance(BigDecimal totalBalance) {
 		this.totalBalance = totalBalance;
 	}
+
+    public Integer getNumberDayNow() {
+        return numberDayNow;
+    }
+
+    public void setNumberDayNow(Integer numberDayNow) {
+        this.numberDayNow = numberDayNow;
+    }
+
+    public BigDecimal getArrivalAmount() {
+        return arrivalAmount;
+    }
+
+    public void setArrivalAmount(BigDecimal arrivalAmount) {
+        this.arrivalAmount = arrivalAmount;
+    }
+
+    public BigDecimal getEndAmount() {
+        return endAmount;
+    }
+
+    public void setEndAmount(BigDecimal endAmount) {
+        this.endAmount = endAmount;
+    }
 }

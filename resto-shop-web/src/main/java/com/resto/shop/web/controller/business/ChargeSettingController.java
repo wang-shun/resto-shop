@@ -30,7 +30,7 @@ public class ChargeSettingController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ChargeSetting> listData(){
-		return chargesettingService.selectListByShopId(getCurrentShopId());
+		return chargesettingService.selectListByShopIdAll();
 	}
 	
 	@RequestMapping("list_one")
@@ -43,17 +43,19 @@ public class ChargeSettingController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid ChargeSetting brand){
-		   brand.setShopDetailId(getCurrentShopId());
-		   brand.setBrandId(getCurrentBrandId());
-	       brand.setCreateTime(new Date());
-	       brand.setId(UUID.randomUUID().toString());
-		chargesettingService.insert(brand);
+	    brand.setShopDetailId(getCurrentShopId());
+	    brand.setBrandId(getCurrentBrandId());
+	    brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
+	    brand.setCreateTime(new Date());
+	    brand.setId(UUID.randomUUID().toString());
+	    chargesettingService.insert(brand);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid ChargeSetting brand){
+		brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 		chargesettingService.update(brand);
 		return Result.getSuccess();
 	}

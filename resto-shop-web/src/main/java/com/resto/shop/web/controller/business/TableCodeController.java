@@ -65,7 +65,7 @@ public class TableCodeController extends GenericController{
     public  Result checkedName(String name){
         Result result = new Result();
         result.setSuccess(true);
-        TableCode tableCode = tablecodeService.selectByName(name);
+        TableCode tableCode = tablecodeService.selectByName(name,getCurrentShopId());
         if(tableCode!=null){
             result.setSuccess(false);
             result.setMessage("名字重复了请重新填写");

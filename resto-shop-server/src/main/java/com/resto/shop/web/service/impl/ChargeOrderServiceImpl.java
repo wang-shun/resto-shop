@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -10,8 +11,10 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
@@ -51,6 +54,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	CustomerService customerService;
 	@Resource
     OrderPaymentItemService orderPaymentItemService;
+	@Resource
+	BrandService brandService;
+
 	@Override
 	public GenericDao<ChargeOrder, String> getDao() {
 		return chargeorderMapper;
@@ -65,6 +71,11 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setChargeBalance(BigDecimal.ZERO);
 		chargeOrder.setRewardBalance(BigDecimal.ZERO);
 		chargeOrder.setTotalBalance(BigDecimal.ZERO);
+		chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
+		BigDecimal amount = chargeSetting.getRewardMoney().divide(new BigDecimal(chargeSetting.getNumberDay()),2,BigDecimal.ROUND_FLOOR);
+		chargeOrder.setArrivalAmount(amount);
+		BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
+		chargeOrder.setEndAmount(endAmount);
 		chargeorderMapper.insert(chargeOrder);
 		return chargeOrder;
 	} 
@@ -79,15 +90,17 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			BigDecimal reward = chargeOrder.getRewardMoney();
 			// 开始充值余额
 			accountService.addAccount(chargeMoney, customer.getAccountId(), "自助充值",AccountLog.SOURCE_CHARGE);
-			accountService.addAccount(reward, customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+			accountService.addAccount(chargeOrder.getArrivalAmount(), customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
 			// 添加充值记录
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
 			chargeOrder.setChargeBalance(chargeMoney);
-			chargeOrder.setRewardBalance(reward);
-			chargeOrder.setTotalBalance(chargeMoney.add(reward));
+			chargeOrder.setRewardBalance(chargeOrder.getArrivalAmount());
+			chargeOrder.setTotalBalance(chargeMoney.add(chargeOrder.getArrivalAmount()));
 			chargePaymentService.insert(cp);
 			update(chargeOrder);// 只能更新状态和结束时间
+			//微信推送
+			wxPush(chargeOrder);
 		}
 
 
@@ -157,6 +170,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		BigDecimal useReward = rewardPay.multiply(scalc).setScale(2, BigDecimal.ROUND_HALF_UP);
 		BigDecimal rewardBalance = order.getRewardBalance();
 		if(rewardBalance.compareTo(useReward)<0 || useReward.doubleValue() < 0.01){  //如果剩余赠送金额不够支付，则返回剩余赠送金额
+			if(rewardPay.compareTo(rewardBalance) < 0){
+				return rewardPay;
+			}
 			return rewardBalance;
 		}
 		return useReward; //否则返回需要支付的金额
@@ -199,4 +215,19 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
         return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
     }
+
+	public void wxPush(ChargeOrder chargeOrder){
+		Brand brand = brandService.selectById(chargeOrder.getBrandId());
+		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
+		//如果不是立即到账 优先推送一条提醒
+		if(chargeOrder.getNumberDayNow() > 0){
+			String msgFrist = "充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～";
+			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+		}
+		StringBuffer msg = new StringBuffer();
+		msg.append("今日充值赠送红包已到账，快去看看吧~");
+		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
+		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+	}
 }

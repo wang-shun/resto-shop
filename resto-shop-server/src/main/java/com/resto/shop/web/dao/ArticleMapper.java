@@ -104,4 +104,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void updatePhotoSquare(@Param("id") String id, @Param("photoSquare") String photoSquare);
 
 	void addArticleLikes(String articleId);
+	
+	List<Article> selectsingleItem(@Param("shopId") String shopId);
 }

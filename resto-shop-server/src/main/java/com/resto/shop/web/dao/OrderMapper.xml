@@ -205,6 +205,8 @@
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
         <result column="order_mode" property="orderMode"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+
 
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItem_id" property="id"/>
@@ -1582,6 +1584,7 @@ AND
         o.order_money,
         o.order_mode,
         o.id,
+        o.parent_order_id,
         oi.payment_mode_id,
         oi.pay_value
         FROM
@@ -1717,7 +1720,8 @@ AND
 
 
     <select id="getOrderAccountHoufu" resultMap="BaseResultMap">
-        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  if(t.amount_with_children = 0,t.original_amount,t.amount_with_children) as orderTotal from tb_order t
+        select  (count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal  from ( select t.parent_order_id,
+         if(t.amount_with_children = 0,t.original_amount,t.amount_with_children) as orderTotal from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
@@ -1728,7 +1732,8 @@ AND
     </select>
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
-        select count(1) as orderCount,sum(orderTotal) as orderTotal  from ( select  t.original_amount as orderTotal from tb_order t
+        select (count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal  from ( select t.parent_order_id,
+          t.original_amount as orderTotal from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
@@ -2273,14 +2278,6 @@ AND o.production_status IN (2, 3)
 
     <!-- 一个用户有很多订单 -->
     <select id="getCustomerOrderList" resultMap="CustomerOrderListmap">
-        <!-- 	  SELECT -->
-        <!-- 		      o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id ,c.telephone, a.id  appraise_id, a.content,oi.id orderPaymentItem_id , oi.payment_mode_id   , oi.pay_value -->
-        <!-- 			FROM -->
-        <!-- 				tb_customer c -->
-        <!-- 			LEFT  JOIN tb_order o ON c.id = o.customer_id -->
-        <!-- 			LEFT   JOIN tb_appraise a on a.order_id = o.id -->
-        <!-- 			LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id  -->
-        <!-- 			WHERE c.id = 'f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12" -->
 
         SELECT
         o.id,o.shop_detail_id,o.create_time,o.order_state,o.order_money,o.production_status,c.id customer_id
@@ -2292,10 +2289,10 @@ AND o.production_status IN (2, 3)
         LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE c.id =#{customerId}
         <if test="beginDate != null and beginDate != ''">
-            AND  <![CDATA[ o.create_time >= #{ beginDate }
+            and <![CDATA[ o.create_time >= #{ beginDate } ]]>
         </if>
-         <if test="endDate != null and endDate != ''">
-          and o.create_time <= #{ endDate } ]]>
+        <if test="endDate != null and endDate != ''">
+            and <![CDATA[ o.create_time <= #{ endDate } ]]>
         </if>
 
 
@@ -2306,18 +2303,16 @@ AND o.production_status IN (2, 3)
         and pay_value > 0 and payment_mode_id = 10
     </select>
 
+    <select id="selectByCustomerCount" resultType="java.lang.Integer" >
+        select count(1) from tb_order where customer_id = #{customerId}
+        and parent_order_id is null
+        and order_state in (2,10,11) and production_status in (2,3)
+        <if test="consumeConfineTime != null and consumeConfineTime !=0">
+            and  #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
+        </if>
 
-
-<!-- 查询所有的后付款已支付的订单-->
-    <select id="selectHasPayListHouFuOrderByBrandId" resultType="Order">
-        SELECT
-        o.id , o.order_money ,o.order_state,o.production_status,o.payment_amount, o.amount_with_children,o.service_price,o.parent_order_id from tb_order o
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND  o.production_status in (2,3)
-        and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
     </select>
 
+
+
 </mapper>
-
-
-
-

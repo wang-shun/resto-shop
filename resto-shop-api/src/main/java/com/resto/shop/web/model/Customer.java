@@ -19,6 +19,8 @@ public class Customer implements Serializable{
     private String telephone;
 
     private String headPhoto;
+    
+    private Date birthday;
 
     private Integer defaultDeliveryPoint;
 
@@ -59,6 +61,12 @@ public class Customer implements Serializable{
 
     private Integer isShare;
 
+    /**
+     * 个人信息详细
+     */
+    private CustomerDetail customerDetail;
+    private String customerDetailId;
+
     public Integer getIsShare() {
         return isShare;
     }
@@ -79,7 +87,15 @@ public class Customer implements Serializable{
         this.isNowRegister = isNowRegister;
     }
 
-    public Integer getIsNowRegister() {
+    public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public Integer getIsNowRegister() {
         return isNowRegister;
     }
 
@@ -243,6 +259,21 @@ public class Customer implements Serializable{
 		this.shareCustomer = shareCustomer;
 	}
 
+    public CustomerDetail getCustomerDetail() {
+        return customerDetail;
+    }
+
+    public void setCustomerDetail(CustomerDetail customerDetail) {
+        this.customerDetail = customerDetail;
+    }
+
+    public String getCustomerDetailId() {
+        return customerDetailId;
+    }
+
+    public void setCustomerDetailId(String customerDetailId) {
+        this.customerDetailId = customerDetailId;
+    }
 
     @Override
     public String toString() {

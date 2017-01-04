@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -29,6 +30,16 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
 	@Override
 	public List<AccountLog> selectLogsByAccountId(String accountId) {
 		return accountlogMapper.selectLogsByAccountId(accountId);
-	} 
+	}
+	
+    @Override
+    public int selectByCustomerIdNumber(String id) {
+        List<AccountLog> list = accountlogMapper.selectByCustomerIdNumber(id);
+        return list.size();
+    }
 
+    @Override
+	public List<String> selectBrandMarketing(Map<String, String> selectMap) {
+		return accountlogMapper.selectBrandMarketing(selectMap);
+	}
 }

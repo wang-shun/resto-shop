@@ -33,6 +33,10 @@ public class ChargeSetting {
     private String brandId;
     
     private String shopDetailId;
+
+    @NotNull(message="赠送金额到账天数不能为空")
+    @Min(message="赠送金额到账天数最小值为1",value=1)
+    private Integer numberDay;
     
     public String getShopDetailId() {
 		return shopDetailId;
@@ -112,5 +116,13 @@ public class ChargeSetting {
 
     public void setBrandId(String brandId) {
         this.brandId = brandId == null ? null : brandId.trim();
+    }
+
+    public Integer getNumberDay() {
+        return numberDay;
+    }
+
+    public void setNumberDay(Integer numberDay) {
+        this.numberDay = numberDay;
     }
 }

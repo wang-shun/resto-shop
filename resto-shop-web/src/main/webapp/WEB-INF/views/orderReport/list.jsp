@@ -168,7 +168,6 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopName,shopId) {
-		    alert("---");
 			$("#reportModal").modal('show');
             vueObj.openModal("orderReport/show/shopReport", shopName,shopId);
 		},

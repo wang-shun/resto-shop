@@ -21,100 +21,6 @@
 										:value="m.name" placeholder="必填" required="required">
 							</div>
 						</div>
-						
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">店铺图片：</label>--%>
-							<%--<div class="col-sm-5">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="hidden" name="photo" v-model="m.photo">--%>
-									<%--<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">评论最小金额：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="text" class="form-control" name="appraiseMinMoney"--%>
-                                       <%--v-model="m.appraiseMinMoney">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">红包提醒倒计时(秒)：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" class="form-control" name="autoConfirmTime" --%>
-									<%--v-model="m.autoConfirmTime" required="required" placeholder="(建议输入整数)"--%>
-									<%--min="0">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">最迟加菜时间(秒)：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" class="form-control" name="closeContinueTime" --%>
-									<%--v-model="m.closeContinueTime" required="required" placeholder="(建议输入整数)"--%>
-									<%--min="0">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">选择配送模式：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="1">--%>
-										<%--是--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0"> --%>
-										<%--否--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">红包弹窗：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="1">--%>
-										<%--是--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="autoAlertAppraise" v-model="m.autoAlertAppraise" value="0"> --%>
-										<%--否--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">好评最少字数：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" class="form-control" name="goodAppraiseLength" --%>
-									<%--v-model="m.goodAppraiseLength" placeholder="(建议输入整数)" min= "0">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">差评最少字数：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" class="form-control" name="badAppraiseLength" --%>
-									<%--v-model="m.badAppraiseLength" placeholder="(建议输入整数)" min = "0">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
 
 						<div class="form-group">
 							<label class="col-sm-3 control-label">打印总单：</label>
@@ -131,23 +37,7 @@
 								</div>
 							</div>
 						</div>
-						<%----%>
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">启用推荐餐包：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="1">--%>
-										<%--是--%>
-									<%--</label>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="isUseRecommend" v-model="m.isUseRecommend" value="0">--%>
-										<%--否--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">套餐出单方式：</label>
 							<div class="col-sm-9">
@@ -180,47 +70,6 @@
 								</div>
 							</div>
 						</div>
-
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">启用服务费：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label>--%>
-										<%--<input type="radio" name="isUseServicePrice" --%>
-										<%--v-model="m.isUseServicePrice" value="1">--%>
-										<%--是--%>
-									<%--</label>--%>
-									<%--<label >--%>
-										<%--<input type="radio" name="isUseServicePrice"  --%>
-										<%--v-model="m.isUseServicePrice" value="0"">--%>
-										<%--否--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group" v-if="m.isUseServicePrice==1">--%>
-							<%--<label class="col-sm-3 control-label">名称：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="text" class="form-control"--%>
-										<%--name="serviceName" v-if="!m.serviceName" value="服务费" required="required"> --%>
-								   <%--<input type="text"--%>
-										<%--class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" --%>
-										<%--required="required">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-
-						<%--<div class="form-group" v-if="m.isUseServicePrice==1">--%>
-							<%--<label class="col-sm-3 control-label">服务费/每人：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" placeholder="(建议输入整数)" class="form-control" name="servicePrice" --%>
-									<%--v-model="m.servicePrice" required="required" min="0">--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
 
 						<div class="form-group">
 							<label class="col-sm-3 control-label">启用餐盒费：</label>
@@ -288,45 +137,6 @@
 							</div>
 						</div>
 
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">是否开启二维码加密：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label> <input type="radio" name="isNewQrcode"--%>
-												   <%--v-model="m.isNewQrcode" value="1"> 是--%>
-									<%--</label> <label> <input type="radio" name="isNewQrcode"--%>
-															<%--v-model="m.isNewQrcode" value="0"> 否--%>
-								<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						
-						<%--<div class="form-group">--%>
-							<%--<label class="col-sm-3 control-label">支付宝支付：</label>--%>
-							<%--<div class="col-sm-9">--%>
-								<%--<div>--%>
-									<%--<label> <input type="radio" name="aliPay"--%>
-										<%--v-model="m.aliPay" value="1"> 开--%>
-									<%--</label> <label> <input type="radio" name="aliPay"--%>
-										<%--v-model="m.aliPay" value="0"> 关--%>
-									<%--</label>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
-						<%----%>
-						<%--<div class="form-group" v-if="m.aliPay==1">--%>
-							<%--<label class="col-sm-3 control-label">支付折扣：</label>--%>
-							<%--<div class="col-sm-4">--%>
-								<%--<div class="input-group">--%>
-									<%--<input type="number" class="form-control" placeholder="(建议输入整数)"--%>
-										<%--placeholder="支付折扣" name="aliPayDiscount" min="1" max="100"--%>
-										<%--v-model="m.aliPayDiscount">--%>
-									<%--<div class="input-group-addon">--%>
-										<%--<b>%</b>--%>
-									<%--</div>--%>
-								<%--</div>--%>
-							<%--</div>--%>
-						<%--</div>--%>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">店铺标语：</label>
 							<div class="col-sm-9">
@@ -343,6 +153,36 @@
 									v-model="m.queueNotice"></textarea>
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">开启显示用户标识功能：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="isUserIdentity"
+												   v-model="m.isUserIdentity" value="1"> 是
+									</label> <label> <input type="radio" name="isUserIdentity"
+															v-model="m.isUserIdentity" value="0"> 否
+								</label>
+								</div>
+							</div>
+						</div>
+
+
+						<div  class="form-group" v-if="m.isUserIdentity==1">
+							<label class="col-sm-3 control-label">消费 次数：</label>
+							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px" >
+							<select class="form-control" style="width:12%;position: relative;left: 15px;" id="consumeConfineUnit"  name="consumeConfineUnit" @click="selectWaitUnit" v-model="m.consumeConfineUnit">
+								<option  value="1" selected="selected">日</option>
+								<option  value="2">月</option>
+								<option  value="3">无限制</option>
+							</select>
+							<div class="col-sm-3" style="width: 12%; float:right;margin-top: -35px;margin-right:30%;">
+								<input type="number" class="form-control"
+									   name="consumeNumber" v-model="m.consumeNumber" required="required" min="0" >
+								<span style="position: relative;left:70px;bottom: 25px;">次</span>
+							</div>
+						</div>
+
 					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
@@ -355,80 +195,87 @@
 </div>
 
 <script>
-	$(document).ready(function() {
-		initContent();
-		toastr.options = {
-			"closeButton" : true,
-			"debug" : false,
-			"positionClass" : "toast-top-right",
-			"onclick" : null,
-			"showDuration" : "500",
-			"hideDuration" : "500",
-			"timeOut" : "3000",
-			"extendedTimeOut" : "500",
-			"showEasing" : "swing",
-			"hideEasing" : "linear",
-			"showMethod" : "fadeIn",
-			"hideMethod" : "fadeOut"
-		}
-		var temp;
-		var vueObj = new Vue({
-			el : "#control",
-			data : {
-				m : {},
-			},
-			methods : {
-				initTime : function() {
-					$(".timepicker-no-seconds").timepicker({
-						autoclose : true,
-						showMeridian : false,
-						minuteStep : 5
-					});
-				},
-				save : function(e) {
-					var formDom = e.target;
-					$.ajax({
-						url : "shopInfo/modify",
-						data : $(formDom).serialize(),
-						success : function(result) {
-							if (result.success) {
-								toastr.clear();
-								toastr.success("保存成功！");
-							} else {
-								toastr.clear();
-								toastr.error("保存失败");
+	$.ajax({
+		url:"shopInfo/list_one",
+		success:function(result){
+			$(document).ready(function() {
+				toastr.options = {
+					"closeButton" : true,
+					"debug" : false,
+					"positionClass" : "toast-top-right",
+					"onclick" : null,
+					"showDuration" : "500",
+					"hideDuration" : "500",
+					"timeOut" : "3000",
+					"extendedTimeOut" : "500",
+					"showEasing" : "swing",
+					"hideEasing" : "linear",
+					"showMethod" : "fadeIn",
+					"hideMethod" : "fadeOut"
+				}
+				var temp;
+				var vueObj = new Vue({
+					el : "#control",
+					data : {
+						m : result.data,
+						showa:true
+					},
+					watch: {
+						'm.consumeConfineUnit': 'hideShowa'
+					},
+					methods : {
+						hideShowa : function(){
+							if(this.m.consumeConfineUnit == 3){
+								this.showa = false;
+							}else{
+								this.showa = true;
 							}
 						},
-						error : function() {
-							toastr.clear();
-							toastr.error("保存失败");
+						initTime : function() {
+							$(".timepicker-no-seconds").timepicker({
+								autoclose : true,
+								showMeridian : false,
+								minuteStep : 5
+							});
+						},
+						save : function(e) {
+							var formDom = e.target;
+							$.ajax({
+								url : "shopInfo/modify",
+								data : $(formDom).serialize(),
+								success : function(result) {
+									if (result.success) {
+										toastr.clear();
+										toastr.success("保存成功！");
+									} else {
+										toastr.clear();
+										toastr.error("保存失败");
+									}
+								},
+								error : function() {
+									toastr.clear();
+									toastr.error("保存失败");
+								}
+							})
+
+						},
+						cancel : function() {
+							initContent();
+
+						},
+						uploadSuccess:function(url){
+							$("[name='photo']").val(url).trigger("change");
+							toastr.success("上传成功！");
+						},
+						uploadError:function(msg){
+							toastr.error("上传失败");
 						}
-					})
+					}
+				});
 
-				},
-				cancel : function() {
-					initContent();
-
-				},
-				uploadSuccess:function(url){
-					$("[name='photo']").val(url).trigger("change");
-					toastr.success("上传成功！");
-				},
-				uploadError:function(msg){
-					toastr.error("上传失败");
-				}
-			}
-		});
-
-		function initContent() {
-			$.ajax({
-				url : "shopInfo/list_one",
-				success : function(result) {
-					console.log(result.data);
-					vueObj.m = result.data;
-				}
-			})
+			}());
 		}
 
-	}());
+	})
+
 </script>

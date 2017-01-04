@@ -15,11 +15,11 @@
 						<div class="form-body">
 							<div class="form-group">
 						    <label>充值金额</label>
-						    <input type="text" placeholder="请输入数字" required min="0" class="form-control" name="chargeMoney" v-model="m.chargeMoney">
+						    <input type="text" placeholder="请输入数字" required min="0" required class="form-control" name="chargeMoney" v-model="m.chargeMoney">
 						</div>
 						<div class="form-group">
 						    <label>赠送金额</label>
-						    <input type="text" class="form-control" name="rewardMoney" v-model="m.rewardMoney" placeholder="请输入数字" min="0">
+						    <input type="text" class="form-control" name="rewardMoney" required v-model="m.rewardMoney" placeholder="请输入数字" min="0">
 						</div>
 						
 						<div class="form-group">
@@ -34,13 +34,13 @@
 							    
 						</div>
 						
-						<div class="form-group">
-						    <label>显示的文本</label>
-						    <input type="text" class="form-control" name="labelText" v-model="m.labelText">
-						</div>
+						<%--<div class="form-group">--%>
+						    <%--<label>显示的文本</label>--%>
+						    <%--<input type="text" class="form-control" name="labelText" v-model="m.labelText">--%>
+						<%--</div>--%>
 						<div class="form-group">
 						    <label>排序</label>
-						    <input type="text" class="form-control" name="sort" v-model="m.sort">
+						    <input type="text" class="form-control" name="sort" required v-model="m.sort">
 						</div>
 						
 						<div class="form-group">
@@ -52,6 +52,10 @@
 							    <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state"> 
 							    <label for="showIn">否</label>
 						</div>
+							<div class="form-group">
+								<label>赠送金额到账天数</label>
+								<input type="number" class="form-control" required name="numberDay" v-model="m.numberDay">
+							</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -131,7 +135,11 @@
 					return data;
 				}
 				
-			},                 
+			},
+			{
+				title : "赠送金额到账天数",
+				data : "numberDay",
+			},
 
 				{
 					title : "操作",
