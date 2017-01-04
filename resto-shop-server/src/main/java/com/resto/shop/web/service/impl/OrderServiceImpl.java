@@ -189,8 +189,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
+            }else{
+                Order p = getOrderInfo(order.getParentOrderId());
+                order.setVerCode(p.getVerCode());
             }
         }
+
+
+
         order.setId(orderId);
         order.setCreateTime(new Date());
         BigDecimal totalMoney = BigDecimal.ZERO;
@@ -450,7 +456,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
         }
-
+        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF){
+            order.setTableNumber(order.getVerCode());
+        }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -484,7 +492,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
             parent.setLastOrderTime(order.getCreateTime());
         }
-        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
+        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
         parent.setCountWithChild(articleCountWithChildren);
         parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
         update(parent);
@@ -535,7 +543,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private int selectArticleCountById(String id,Integer shopMode) {
-        return orderMapper.selectArticleCountById(id,shopMode);
+        return orderMapper.selectArticleCountById(id, shopMode);
     }
 
     @Override
@@ -3873,6 +3881,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Integer selectByCustomerCount(String customerId,int consumeConfineTime ) {
-        return orderMapper.selectByCustomerCount(customerId ,consumeConfineTime);
+        return orderMapper.selectByCustomerCount(customerId, consumeConfineTime);
     }
 }
