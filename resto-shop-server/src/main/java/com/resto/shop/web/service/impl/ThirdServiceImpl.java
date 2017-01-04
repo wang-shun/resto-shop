@@ -11,6 +11,7 @@ import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.ArticleMapper;
+import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.dao.HungerOrderMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
@@ -69,6 +70,9 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Autowired
     private KitchenService kitchenService;
+    
+    @Autowired
+    private CustomerMapper customerMapper;
 
 
     @Override
@@ -114,7 +118,6 @@ public class ThirdServiceImpl implements ThirdService {
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        int sum = 0;
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
             Article article = articleMapper.selectByName(item.getName(), shopDetail.getId());
@@ -122,7 +125,6 @@ public class ThirdServiceImpl implements ThirdService {
                 continue;
             }
             String articleId = article.getId();
-            sum += item.getQuantity();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
             for (Kitchen kitchen : kitchenList) {
                 String kitchenId = kitchen.getId().toString();
@@ -149,69 +151,38 @@ public class ThirdServiceImpl implements ThirdService {
             if (printer == null) {
                 continue;
             }
-
-
             //生成厨房小票
             for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
-                //保存 菜品的名称和数量
-                String articleName = article.getName();
-                if (article.getSpecs() != null) {
-                    JSONArray jsonArray = new JSONArray(article.getSpecs());
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        articleName += ("(" + jsonArray.get(i) + ")");
-                    }
-                }
-                List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-                Map<String, Object> item = new HashMap<String, Object>();
-                item.put("SUBTOTAL", article.getQuantity() * article.getPrice().doubleValue());
-                item.put("ARTICLE_NAME", articleName);
-                item.put("ARTICLE_COUNT", article.getQuantity());
-                items.add(item);
-
-                //保存基本信息
-
-
-                Map<String, Object> print = new HashMap<String, Object>();
-//                print.put("TABLE_NO", "");
-
-                print.put("KITCHEN_NAME", kitchen.getName());
+            	Map<String, Object> print = new HashMap<String, Object>();
                 print.put("PORT", printer.getPort());
-                print.put("ORDER_ID", order.getOrderId());
                 print.put("IP", printer.getIp());
                 String print_id = ApplicationUtils.randomUUID();
                 print.put("PRINT_TASK_ID", print_id);
-                print.put("ADD_TIME", new Date());
-
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("ORDER_ID", order.getOrderId());
+                data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                data.put("DISTRIBUTION_MODE", "外卖");
+                data.put("TABLE_NUMBER", "饿了么");
+                data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+                Map<String, Object> items = new HashMap<String, Object>();
+                items.put("ARTICLE_COUNT", article.getQuantity());
+                items.put("ARTICLE_NAME", article.getName());
                 data.put("ITEMS", items);
-                data.put("DISTRIBUTION_MODE", "饿了么订单");
-                data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
-                data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
-                data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
-                data.put("RESTAURANT_TEL", shopDetail.getPhone());
-                data.put("TABLE_NUMBER", "");
-                data.put("PAYMENT_AMOUNT", order.getTotalPrice());
-                data.put("RESTAURANT_NAME", shopDetail.getName());
-
-
-                data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
-                data.put("ARTICLE_COUNT", sum);
+//                Customer customer = customerMapper.selectByPrimaryKey(order.getUserId().toString());
+//                if(customer != null){
+//                }
+//                data.put("CUSTOMER_SATISFACTION", "★★★★☆");
+//                data.put("CUSTOMER_SATISFACTION_DEGREE", "8");
+//                data.put("CUSTOMER_PROPERTY", "余额：188.00 【高频】 ★生日★");
+                data.put("CUSTOMER_SATISFACTION", "暂无信息");
+                data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                data.put("CUSTOMER_PROPERTY", "");
                 print.put("DATA", data);
-
-                print.put("STATUS", 0);
-
+                print.put("STATUS", "0");
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
-
-
-//
-                //添加当天打印订单的序号
-                data.put("ORDER_NUMBER", "");
-
                 printTask.add(print);
             }
         }
-
         return printTask;
     }
 
