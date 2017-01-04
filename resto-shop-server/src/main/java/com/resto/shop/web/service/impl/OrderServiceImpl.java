@@ -1083,8 +1083,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 StringBuilder gao = new StringBuilder();
 
-                int unit=shopDetail.getConsumeConfineUnit();//1 2 3（日月 无限制）
-
                 //店铺设置的次数；
                 int  brandNumber=  shopDetail.getConsumeNumber();
 
