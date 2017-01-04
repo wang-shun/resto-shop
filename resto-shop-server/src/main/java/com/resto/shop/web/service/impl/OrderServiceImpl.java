@@ -189,6 +189,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
+            }else{
+                Order p = getOrderInfo(order.getParentOrderId());
+                order.setVerCode(p.getVerCode());
             }
         }
 
