@@ -75,7 +75,7 @@
         t2.sort,t2.kitchen_id  as  article_kitchen_id
         from tb_recommend t
         left join tb_recommend_article t2 on t2.recommend_id = t.id
-        where t.id = #{id}
+        where t.id = #{id} order by t2.sort
 
     </select>
 
