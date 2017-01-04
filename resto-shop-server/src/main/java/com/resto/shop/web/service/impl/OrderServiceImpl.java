@@ -192,9 +192,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF){
-            order.setTableNumber(order.getVerCode());
-        }
+
 
         order.setId(orderId);
         order.setCreateTime(new Date());
@@ -455,7 +453,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
         }
-
+        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF){
+            order.setTableNumber(order.getVerCode());
+        }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
