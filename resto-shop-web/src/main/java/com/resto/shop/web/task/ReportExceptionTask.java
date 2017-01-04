@@ -49,7 +49,7 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-  // @Scheduled(cron = "00  17 14 * * ?")   //每天12点执行
+   //@Scheduled(cron = "00  39 11 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
 
@@ -77,8 +77,8 @@ public class ReportExceptionTask {
                     if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
                         log.info("--------------HttpClient 登录成功！");
                         Map<String, String> requestMap = new HashMap<>();
-                        requestMap.put("beginDate", "2016-12-01");
-                        requestMap.put("endDate", "2016-12-20");
+                        requestMap.put("beginDate", "2017-01-02");
+                        requestMap.put("endDate", "2017-01-03");
                         requestMap.put("brandName",brand.getBrandName());
                         //循环执行 URLMap 中的链接
                         HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
