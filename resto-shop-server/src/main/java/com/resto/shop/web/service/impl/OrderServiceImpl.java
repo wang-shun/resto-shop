@@ -1083,19 +1083,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 StringBuilder gao = new StringBuilder();
 
-                int unit=shopDetail.getConsumeConfineUnit();//1 2 3（日月 无限制）
-
                 //店铺设置的次数；
                 int  brandNumber=  shopDetail.getConsumeNumber();
 
                 //用户订单的次数
-                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());////
+                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineTime());////
                  //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber&&shopDetail.getConsumeConfineUnit()!=3){
                      gao.append(" vip");
                 }
                 //3无限制
-                int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+                int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),0);
 
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCountlong > brandNumber && shopDetail.getConsumeConfineUnit()==3){
                     gao.append(" vip");
@@ -1314,10 +1312,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         StringBuilder gao = new StringBuilder();
         //shopDetail.getIsUserIdentity() == 1
-        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineTime());
 
         //3无限制
-        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),0);
 
         if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
             gao.append(" VIP");
@@ -3873,10 +3871,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
 	}
 
-
-
     @Override
-    public Integer selectByCustomerCount(String customerId ,int consumeConfineUnit ,int consumeConfineTime ) {
-        return orderMapper.selectByCustomerCount(customerId ,consumeConfineUnit,consumeConfineTime);
+    public Integer selectByCustomerCount(String customerId,int consumeConfineTime ) {
+        return orderMapper.selectByCustomerCount(customerId ,consumeConfineTime);
     }
 }
