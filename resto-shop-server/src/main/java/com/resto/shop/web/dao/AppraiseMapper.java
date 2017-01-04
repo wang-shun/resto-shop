@@ -33,6 +33,8 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
 
     Appraise selectAppraiseByCustomerId(@Param("customerId")String customerId,@Param("shopId") String shopId);
 
+    Appraise selectAppraiseByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId);
+    
     List<Appraise> selectCustomerAllAppraise(@Param(value = "customerId") String customerId, @Param(value = "currentPage") Integer currentPage, @Param(value = "showCount") Integer showCount);
 
     int selectByCustomerCount(String customerId);

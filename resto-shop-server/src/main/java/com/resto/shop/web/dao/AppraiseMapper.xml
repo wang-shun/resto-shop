@@ -112,6 +112,11 @@
       select * from tb_appraise where customer_id = #{customerId} and shop_detail_id = #{shopId}
       and status = 1 order by create_time desc limit 1
   </select>
+  
+  <select id="selectAppraiseByCustomer" resultType="Appraise">
+      select * from tb_appraise where customer_id = #{customerId} and shop_detail_id = #{shopId}
+      and status = 1 order by create_time desc,level asc limit 1
+  </select>
 
   <select id="selectCustomerAllAppraise" resultType="Appraise">
     select a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo

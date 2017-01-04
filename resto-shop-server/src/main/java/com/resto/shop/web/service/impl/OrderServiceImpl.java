@@ -126,6 +126,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private GetNumberService getNumberService;
+    
+    @Autowired
+    private CustomerDetailMapper customerDetailMapper;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -1114,8 +1117,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 print.put("DATA", data);
                 print.put("STATUS", 0);
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
-                //添加当天打印订单的序号
-                data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                 //保存打印配置信息
 //                print.put("ORDER_ID", serialNumber);
 //                print.put("KITCHEN_NAME", kitchen.getName());
@@ -1298,34 +1299,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
+        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ITEMS", items);
-        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        Appraise appraise = appraiseService.selectAppraiseByCustomer(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
         if (appraise != null && appraise.getLevel() < 5) {
             for (int i = 0; i < appraise.getLevel(); i++) {
                 star.append("★");
             }
-
+            for (int i = 0; i < 5 - appraise.getLevel(); i++){
+            	star.append("☆");
+            }
+        }else if(appraise != null && appraise.getLevel() == 5){
+        	star.append("★★★★★");
         }
         StringBuilder chong = new StringBuilder();
-        int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
-        if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
-            chong.append("充");
-        }
+//        int chongCount = accountLogService.selectByCustomerIdNumber(order.getCustomerId());
+//        if(shopDetail.getIsUserIdentity() == 1 && chongCount > 0){
+//            chong.append("充");
+//        }
         StringBuilder gao = new StringBuilder();
         //shopDetail.getIsUserIdentity() == 1
-        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+//        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
 
         //3无限制
-        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+//        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
 
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
-            gao.append(" VIP");
-        }
+//        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+//            gao.append(" VIP");
+//        }
         //无限制的时候
-        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
-            gao.append(" VIP");
-        }
+//        if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+//            gao.append(" VIP");
+//        }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
@@ -1334,29 +1340,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
 
         //加菜不算
-        if(order.getParentOrderId() != null) {
-            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString());
-        }else{
-            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
-        }
-
+//        if(order.getParentOrderId() != null) {
+//            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString());
+//        }else{
+//            data.put("TABLE_NUMBER", order.getTableNumber() + star.toString() + chong.toString() + gao.toString());
+//        }
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("CUSTOMER_COUNT", order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", order.getArticleCount());
+        List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        if(orderPaymentItems != null && orderPaymentItems.size() > 0){
+        	for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+        		Map<String, Object> patMentItem = new HashMap<String, Object>();
+        		patMentItem.put("SUBTOTAL", orderPaymentItem.getPayValue());
+        		patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()));
+        		patMentItems.add(patMentItem);
+        	}
+        }else{
+        	Map<String, Object> patMentItem = new HashMap<String, Object>();
+    		patMentItem.put("SUBTOTAL", 0);
+    		patMentItem.put("PAYMENT_MODE", "");
+    		patMentItems.add(patMentItem);
+        }
+        data.put("PAYMENT_ITEMS", patMentItems);
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", appraise.getLevel());
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        customerStr.append("余额："+account.getRemain()+" ");
+        customerStr.append("【高频】 ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+        if(customerDetail != null){
+        	customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", 0);
-
         print.put("TICKET_TYPE", TicketType.RECEIPT);
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-//
-//        //添加当天小票的打印的序号
-//        data.put("NUMBER", nextNumber(shopDetail.getId(), order.getId()));
-//
-//        // 根据shopDetailId查询出打印机类型为2的打印机(前台打印机)
-//        print.put("TABLE_NO", order.getTableNumber());
-//
-//        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order.getId(), LogBaseState.PRINT_TICKET);
         return print;
     }
 
