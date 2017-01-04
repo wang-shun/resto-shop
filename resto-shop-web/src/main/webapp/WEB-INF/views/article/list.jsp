@@ -543,10 +543,11 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
-                    <span style="float: right">
-                            搜索：<input type="text" class="form-control input-sm input-small input-inline" v-model="searchNameLike" />
-                    </span>
+                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项
+                        <span style="float: right">
+                                搜索：<input type="search" class="form-control input-sm input-small input-inline" v-model="searchNameLike" />
+                        </span>
+                    </h4>
                 </div>
                 <div class="modal-body auto-height">
                     <div class="row">
