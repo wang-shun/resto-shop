@@ -27,7 +27,7 @@
         left join tb_recommend_article t2 on t2.recommend_id = t.id
          where t.shop_detail_id = #{shopId}
         and t.is_used = 0
-        order by t.create_time desc
+        order by t.create_time desc,t2.sort
     </select>
 
     <insert id="insertSelective" parameterType="ArticleRecommend" >
