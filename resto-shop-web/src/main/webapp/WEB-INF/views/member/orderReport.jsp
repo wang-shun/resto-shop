@@ -139,7 +139,7 @@ dt,dd{
 	$("#endDate2").val(endDate);
 	
 	var tb1 = $("#shopOrder").DataTable({
-		"lengthMenu" : [ [10,50, 75, 100, -1 ], [10, 50, 75, 100, "All" ] ],
+		"lengthMenu" : [ [5,10,50, 75, 100, -1 ], [5,10, 50, 75, 100, "All" ] ],
 		ajax : {
 			url : "member/orderReport",
 			dataSrc : "",
