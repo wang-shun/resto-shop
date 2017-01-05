@@ -101,7 +101,6 @@ dt,dd{
 				<table class="table table-condensed table-hover">
 					<thead>
 						<tr>
-							                           <th>餐品类型</th>
 							<th>餐品类别</th>
 							<th>餐品名称</th>
 							<th>餐品单价</th>
@@ -424,10 +423,10 @@ dt,dd{
 
 		}
 		return distributionMode;
-	} 
-	 
-	 
-	 
+	}
+
+
+
 
 	//查询今日
 
