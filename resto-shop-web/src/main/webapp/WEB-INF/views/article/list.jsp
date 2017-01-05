@@ -543,7 +543,11 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项</h4>
+                    <h4 class="modal-title">添加 {{choiceArticleShow.mealAttr.name}} 菜品项
+                        <span style="float: right">
+                                搜索：<input type="search" class="form-control input-sm input-small input-inline" v-model="searchNameLike" />
+                        </span>
+                    </h4>
                 </div>
                 <div class="modal-body auto-height">
                     <div class="row">
@@ -552,7 +556,7 @@
                                 <thead>
                                 <tr>
                                     <th>
-                                        <select v-model="choiceArticleShow.currentFamily">
+                                        <select v-model="searchNameLike">
                                             <option value="">餐品分类(全部)</option>
                                             <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
                                         </select>
@@ -562,7 +566,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="art in choiceArticleCanChoice">
+                                <tr v-for="art in choiceArticleCanChoice | filterBy searchNameLike">
                                     <td>{{art.articleFamilyName}}</td>
                                     <td>{{art.name}}</td>
                                     <td>
@@ -599,6 +603,12 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="article/add">
@@ -799,7 +809,8 @@
                         lastChoiceTemp: "",
                         allArticles: allArticles,
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""},
-                        singleItem:[]
+                        singleItem:[],
+                        searchNameLike : ""
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {

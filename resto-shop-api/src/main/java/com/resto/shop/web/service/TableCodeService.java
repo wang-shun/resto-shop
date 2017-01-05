@@ -11,7 +11,7 @@ public interface TableCodeService extends GenericService<TableCode, String> {
 
     void updateTableCode(TableCode tablecode);
 
-    TableCode selectByName(String name);
+    TableCode selectByName(String name,String shopId);
 
     TableCode selectByCodeNumber(String codeNumber,String shopId);
 
