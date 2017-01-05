@@ -7,64 +7,76 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki"> 菜品供应时间</span>
 	                </div>
 	            </div>
 	            
 	            <div class="portlet-body">
-		            <form role="form" action="{{m.id?'supporttime/modify':'supporttime/create'}}" @submit.prevent="save">
+		            <form role="form" class="form-horizontal" action="{{m.id?'supporttime/modify':'supporttime/create'}}" @submit.prevent="save">
+						<input type="hidden" name="id" v-model="m.id" />
 						<div class="form-body">
+								<div class="form-group">
+									<label  class="col-sm-2 control-label">名称</label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control" name="name" required v-model="m.name">
+									</div>
+								</div>
+								<div class="form-group">
+									<label  class="col-sm-2 control-label">开始时间</label>
+									<div class="col-sm-8">
+										<div class="input-group">
+											<input type="text" class="form-control timepicker timepicker-no-seconds" required name="beginTime" @focus="initTime" v-model="m.beginTime">
+											<span class="input-group-btn">
+											<button class="btn default" type="button">
+												<i class="fa fa-clock-o"></i>
+											</button>
+										</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label  class="col-sm-2 control-label">结束时间</label>
+									<div class="col-sm-8">
+										<div class="input-group">
+											<input type="text" class="form-control timepicker timepicker-no-seconds" required name="endTime" @focus="initTime" v-model="m.endTime">
+											<span class="input-group-btn">
+											<button class="btn default" type="button">
+												<i class="fa fa-clock-o"></i>
+											</button>
+										</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label  class="col-sm-2 control-label">供应时间</label>
+									<div class="col-sm-8">
+										<label v-for="day in supportDay">
+											<input type="checkbox" name="activated" :value="day[1]"  v-model="checkedValues"> {{day[0]}} &nbsp;&nbsp;
+										</label>
+										<input type="hidden" class="form-control" name="supportWeekBin" id="supportWeekBin" :value="getSum">
+									</div>
+								</div>
 							<div class="form-group">
-							    <label>名称</label>
-							    <input type="text" class="form-control" name="name" v-model="m.name">
+								<label  class="col-sm-2 control-label">折扣</label>
+								<div class="col-sm-8">
+									<div class="input-group">
+										<input class="form-control" type="number" name="discount" min="1" max="100" v-model="m.discount" required placeholder="折扣金额">
+										<div class="input-group-addon">%</div>
+									</div>
+									<span class="help-block">请输入1-100整数值</span>
+								</div>
 							</div>
-							
-							<!-- <div class="form-group">
-							    <label>开始时间</label>
-							    <input type="text" class="form-control" name="beginTime" v-model="m.beginTime">
-							</div> -->
 							<div class="form-group">
-							    <label>开始时间</label>
-							    <div class="input-group">
-							    	<input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" @focus="initTime" v-model="m.beginTime">
-							    	<span class="input-group-btn">
-										<button class="btn default" type="button">
-											<i class="fa fa-clock-o"></i>
-										</button>
-									</span>
-							    </div>
-							</div>
-							
-							<div class="form-group">
-							    <label>结束时间</label>
-							    <div class="input-group">
-							    	<input type="text" class="form-control timepicker timepicker-no-seconds" name="endTime" @focus="initTime" v-model="m.endTime">
-							    	<span class="input-group-btn">
-										<button class="btn default" type="button">
-											<i class="fa fa-clock-o"></i>
-										</button>
-									</span>
-							    </div>
-							</div>
-							
-							
-							<div class="form-group">
-								<label>供应时间</label>
-								<br/>
-								<label v-for="day in supportDay">
-							    	<input type="checkbox" name="activated" :value="day[1]"  v-model="checkedValues"> {{day[0]}} &nbsp;&nbsp;
-							    </label>
-								<input type="hidden" class="form-control" name="supportWeekBin" id="supportWeekBin" :value="getSum">
-							</div>
-								
-							<div class="form-group">
-							    <label>描述</label>
-							    <input type="text" class="form-control" name="remark" v-model="m.remark">
+								<label  class="col-sm-2 control-label">描述</label>
+								<div class="col-sm-8">
+									<input type="text" class="form-control" name="remark" v-model="m.remark">
+								</div>
 							</div>
 					</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
+						<div class="form-group text-center">
+							<input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
+							<a class="btn default" @click="cancel" >取消</a>
+						</div>
 					</form>
 	            </div>
 	        </div>
@@ -119,10 +131,17 @@
 				dataSrc : ""
 			},
 			columns : [
-				{                 
+				{
 					title : "名称",
 					data : "name",
-				},                 
+				},
+				{
+					title : "折扣",
+					data : "discount",
+					createdCell : function(td,tdData){
+						$(td).html(tdData+"%");
+					}
+				},
 				{                 
 					title : "开始时间",
 					data : "beginTime",
@@ -137,7 +156,6 @@
 					createdCell:function(td,tdData){
 						var dayArr = getWeekDayArr(tdData);
 						$(td).html("");
-						console.log(dayArr);
 						for(var i=0;i<dayArr.length;i++){
 							$(td).append(dayArr[i][0]);
 						}
@@ -198,6 +216,9 @@
 				},
 				create:function(){
 					this.m={};
+					this.m.beginTime = '10:00';
+					this.m.endTime = '22:00';
+					this.m.discount = '100';
 					this.checkedValues=[];
 					this.openForm();
 					

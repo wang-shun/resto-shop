@@ -125,21 +125,25 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
         Map<String, Article> articleMap = selectAllSupportArticle(currentShopId);
         for (Article a : articleList) {
-            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {
+            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
                     a.setArticlePrices(prices);
                 }
-            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {
+            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {//套餐
                 List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
                 a.setMealAttrs(mealAttrs);
             }
+            //设置菜品的折扣百分比
+            a.setDiscount(articleMap.get(a.getId()).getDiscount());
             if (!articleMap.containsKey(a.getId())) {
                 a.setIsEmpty(true);
             }
         }
         return articleList;
     }
+
+
 
     @Override
     public int delete(String id) {
