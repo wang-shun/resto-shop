@@ -165,7 +165,7 @@ public class MemberController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"customerId","nickname","telephone","birthday","province","city","sex","remain","chargeRemain","presentRemain","redRemain","sumMoney","amount","money"};
+		String[]columns={"customerId","nickname","telephone","birthday","province","city","sex","remain","isCharge","chargeRemain","presentRemain","redRemain","sumMoney","amount","money"};
 		//定义数据
 		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate, endDate);
 		String shopName="";
@@ -178,11 +178,11 @@ public class MemberController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "会员信息报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "13");//显示的位置
+		map.put("num", "14");//显示的位置
 		map.put("reportTitle", "会员信息");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"生日","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"充值金额","25"},{"充值赠送金额","25"},{"红包金额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
+		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"生日","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"储值","25"},{"充值金额","25"},{"充值赠送金额","25"},{"红包金额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
 		//定义excel工具类对象
 		ExcelUtil<MemberUserDto> excelUtil=new ExcelUtil<MemberUserDto>();
 		try{
@@ -211,6 +211,9 @@ public class MemberController extends GenericController{
 	@RequestMapping("orderReport")
 	@ResponseBody
 	public  List<OrderDetailDto> showUserOrder(String beginDate,String endDate,String customerId,HttpServletRequest request){
+		
+		beginDate += " 00:00:00";
+		endDate += "23:59:59";
 		//#
 		//订单状态
 	   List<OrderDetailDto> listDto = new ArrayList<>(); 
