@@ -33,6 +33,8 @@ public class ChargeOrder {
     private BigDecimal arrivalAmount;
 
     private BigDecimal endAmount;
+
+    private Integer type;
     
 	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
 			String customerId, String shopDetailId, String brandId) {
@@ -173,5 +175,13 @@ public class ChargeOrder {
 
     public void setEndAmount(BigDecimal endAmount) {
         this.endAmount = endAmount;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

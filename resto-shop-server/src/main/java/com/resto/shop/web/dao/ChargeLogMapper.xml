@@ -28,7 +28,8 @@
 	    shop_detail_id,
 	    shop_name,
 	    charge_money,
-	    create_time
+	    create_time,
+	    charge_order_id
 	) 
 	values
 	(
@@ -38,7 +39,8 @@
 		#{shopDetailId},
 		#{shopName},
 		#{chargeMoney},
-		#{createTime}
+		#{createTime},
+		#{chargeOrderId}
 	)
   </insert>
   
