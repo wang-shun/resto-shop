@@ -27,7 +27,7 @@ public class ChargeLogServiceImpl extends GenericServiceImpl<ChargeLog, String> 
 	}
 
 	@Override
-	public void insertChargeLogService(String operationPhone, String customerPhone, BigDecimal chargeMoney, ShopDetail shopDetail) {
+	public void insertChargeLogService(String operationPhone, String customerPhone, BigDecimal chargeMoney, ShopDetail shopDetail, String chargeOrderId) {
 		ChargeLog chargeLog = new ChargeLog();
 		chargeLog.setId(ApplicationUtils.randomUUID());
 		chargeLog.setOperationPhone(operationPhone);
@@ -36,6 +36,7 @@ public class ChargeLogServiceImpl extends GenericServiceImpl<ChargeLog, String> 
 		chargeLog.setShopDetailId(shopDetail.getId());
 		chargeLog.setShopName(shopDetail.getName());
 		chargeLog.setCreateTime(new Date());
+		chargeLog.setChargeOrderId(chargeOrderId);
 		chargeLogMapper.insertChargeLogService(chargeLog);
 	}
 }
