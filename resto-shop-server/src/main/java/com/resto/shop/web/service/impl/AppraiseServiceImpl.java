@@ -200,11 +200,6 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	}
 
 	@Override
-	public Appraise selectAppraiseByCustomer(String customerId, String shopId) {
-		return appraiseMapper.selectAppraiseByCustomer(customerId,shopId);
-	}
-	
-	@Override
 	public List<Appraise> selectCustomerAllAppraise(String customerId, Integer currentPage, Integer showCount) {
 		return appraiseMapper.selectCustomerAllAppraise(customerId, currentPage, showCount);
 	}
@@ -217,5 +212,10 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	@Override
 	public List<Appraise> selectByGoodAppraise() {
 		return appraiseMapper.selectByGoodAppraise();
+	}
+	
+	@Override
+	public Map<String, Object> selectCustomerAppraiseAvg(String customerId) {
+		return appraiseMapper.selectCustomerAppraiseAvg(customerId);
 	}
 }

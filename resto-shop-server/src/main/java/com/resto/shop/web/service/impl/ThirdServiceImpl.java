@@ -168,12 +168,6 @@ public class ThirdServiceImpl implements ThirdService {
                 items.put("ARTICLE_COUNT", article.getQuantity());
                 items.put("ARTICLE_NAME", article.getName());
                 data.put("ITEMS", items);
-//                Customer customer = customerMapper.selectByPrimaryKey(order.getUserId().toString());
-//                if(customer != null){
-//                }
-//                data.put("CUSTOMER_SATISFACTION", "★★★★☆");
-//                data.put("CUSTOMER_SATISFACTION_DEGREE", "8");
-//                data.put("CUSTOMER_PROPERTY", "余额：188.00 【高频】 ★生日★");
                 data.put("CUSTOMER_SATISFACTION", "暂无信息");
                 data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
                 data.put("CUSTOMER_PROPERTY", "");

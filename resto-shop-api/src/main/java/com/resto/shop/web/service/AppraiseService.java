@@ -42,8 +42,6 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 
 	Appraise selectAppraiseByCustomerId(String customerId,String shopId);
 	
-	Appraise selectAppraiseByCustomer(String customerId,String shopId);
-
 	List<Appraise> selectCustomerAllAppraise(String customerId, Integer currentPage, Integer showCount);
 
 	int selectByCustomerCount(String customerId);
@@ -53,4 +51,10 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 * @return
      */
 	List<Appraise> selectByGoodAppraise();
+	
+	/**
+	 * 查询用户综合评分
+	 * @return
+	 */
+	Map<String, Object> selectCustomerAppraiseAvg(String customerId);
 }
