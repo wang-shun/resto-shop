@@ -504,7 +504,7 @@
         where state=1
         <if test="shopId!=null and shopId!=''">
             and ar.shop_detail_id = #{shopId}
-        </if>
+        </if> order by ar.sort
     </select>
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
@@ -592,15 +592,15 @@ where t.id = t2.article_id
         ifnull(t2.current_working_stock,t.current_working_stock) as currentStock ,
         ifnull(t2.stock_weekend,t.stock_weekend) as stockWeekend ,
         ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay,
-		t.article_type articleType,
-		ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
-		t.activated
+        t.article_type articleType,
+        ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
+        t.activated
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
         where  t.state = 1
         <if test="activated != null">
-         and t.activated = #{activated}
+            and t.activated = #{activated}
         </if>
         <if test="familyId != null and familyId != ''">
             and t.article_family_id = #{familyId}
@@ -613,7 +613,7 @@ where t.id = t2.article_id
             </if>
 
         </where>
-		order by articleType DESC
+        order by articleType DESC
     </select>
 
     <update id="clearStock">
@@ -636,16 +636,16 @@ where t.id = t2.article_id
     </update>
 
     <update id="editStock">
-    update tb_article
-    <set>
-        current_working_stock = #{count} , empty_remark = #{emptyRemark}
-        <if test="count == 0 ">
-            ,is_empty = 1
-        </if>
-    </set>
+        update tb_article
+        <set>
+            current_working_stock = #{count} , empty_remark = #{emptyRemark}
+            <if test="count == 0 ">
+                ,is_empty = 1
+            </if>
+        </set>
 
-      where id = #{articleId}
-  </update>
+        where id = #{articleId}
+    </update>
 
     <update id="editPriceStock">
     update tb_article_price
@@ -686,7 +686,7 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
     set is_empty = 0 , empty_remark = NULL where current_working_stock > 0
   </update>
 
-	<update id="setActivate">
+    <update id="setActivate">
 		UPDATE tb_article set activated = #{activated} where id  = #{articleId}
 	</update>
 
@@ -759,7 +759,7 @@ GROUP BY article_id
         set likes = likes + 1
         where id = #{articleId}
     </update>
-    
+
     <select id="selectsingleItem" parameterType="java.lang.String" resultMap="BaseResultMap">
     	select ar.*,arf.name 
 		as articleFamilyName from tb_article ar
