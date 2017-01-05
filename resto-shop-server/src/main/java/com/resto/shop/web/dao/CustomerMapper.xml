@@ -321,7 +321,7 @@
     select CONCAT_WS(',',(select count(1) from tb_customer),(select count(1) from tb_customer where is_bind_phone=1)
 	,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
 	,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
-	,(select count(1) from tb_customer where id in (select customer_id from tb_order GROUP BY customer_id having count(id) > 2))) count
+	,(select count(1) from tb_customer where id in (select customer_id from tb_order where parent_order_id is null GROUP BY customer_id having count(id) > 2))) count
   </select>
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
