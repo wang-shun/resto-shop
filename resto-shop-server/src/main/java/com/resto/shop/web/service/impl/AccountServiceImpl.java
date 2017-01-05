@@ -221,6 +221,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	chargeOrder.setFinishTime(new Date());
 	    	chargeOrder.setCustomerId(customerId);
 	    	chargeOrder.setBrandId(brand.getId());
+			chargeOrder.setType(0);
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
 	    	chargeOrder.setChargeBalance(chargeSetting.getChargeMoney());
 	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
@@ -231,7 +232,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
 			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
-	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
+	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail,chargeOrder.getId());
 	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
 	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
 	    	//微信推送
