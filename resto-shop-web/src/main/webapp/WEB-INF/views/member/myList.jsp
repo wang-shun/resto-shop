@@ -181,6 +181,11 @@
                 s_filter: true
             },
             {
+            	title: "储值",
+                data: "isCharge",
+                s_filter: true
+            },
+            {
                 title: "昵称",
                 data: "nickname",
             },
@@ -402,9 +407,11 @@
     	var api = tb2API;
     	api.search('');
     	var column0 = api.column(0);
-    	var column3 = api.column(3);
+    	var column1 = api.column(1);
+    	var column4 = api.column(4);
     	column0.search('', true, false);
-    	column3.search('', true, false);
+    	column1.search('', true, false);
+    	column4.search('', true, false);
         //更新数据源
         $.ajax({
             url: 'member/myConList',
