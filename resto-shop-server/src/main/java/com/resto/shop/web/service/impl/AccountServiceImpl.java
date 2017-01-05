@@ -253,7 +253,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
 		}
 		StringBuffer msg = new StringBuffer();
-		msg.append("今日充值赠送红包已到账，快去看看吧~");
+		msg.append("今日充值余额已到账，快去看看吧~");
 		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
