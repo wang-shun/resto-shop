@@ -504,7 +504,7 @@
         where state=1
         <if test="shopId!=null and shopId!=''">
             and ar.shop_detail_id = #{shopId}
-        </if>
+        </if> order by ar.sort
     </select>
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
