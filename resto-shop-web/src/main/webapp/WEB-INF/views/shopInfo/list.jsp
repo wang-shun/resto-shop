@@ -169,13 +169,14 @@
 
 
 						<div  class="form-group" v-if="m.isUserIdentity==1">
-							<label class="col-sm-3 control-label">消费 次数：</label>
+							<label class="col-sm-3 control-label">高频条件：<span v-if="showlate" >近</span></label>
 							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px" >
 							<select class="form-control" style="width:12%;position: relative;left: 15px;" id="consumeConfineUnit"  name="consumeConfineUnit" @click="selectWaitUnit" v-model="m.consumeConfineUnit">
 								<option  value="1" selected="selected">日</option>
 								<option  value="2">月</option>
 								<option  value="3">无限制</option>
 							</select>
+							<span style="float: right;margin-top: -25px; margin-right: 42%;">消费</span>
 							<div class="col-sm-3" style="width: 12%; float:right;margin-top: -35px;margin-right:30%;">
 								<input type="number" class="form-control"
 									   name="consumeNumber" v-model="m.consumeNumber" required="required" min="0" >
@@ -218,7 +219,8 @@
 					el : "#control",
 					data : {
 						m : result.data,
-						showa:true
+						showa:true,
+						showlate:true
 					},
 					watch: {
 						'm.consumeConfineUnit': 'hideShowa'
@@ -227,8 +229,10 @@
 						hideShowa : function(){
 							if(this.m.consumeConfineUnit == 3){
 								this.showa = false;
+								this.showlate=false;
 							}else{
 								this.showa = true;
+								this.showlate=true;
 							}
 						},
 						initTime : function() {
