@@ -44,20 +44,29 @@ public class ShopInfoController extends GenericController{
     @ResponseBody
     public Result modify(ShopDetail shopDetail){
         shopDetail.setId(getCurrentShopId());
-        switch (shopDetail.getConsumeConfineUnit()){
-            case 1 :
-                shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime());
-                break;
-            case 2 ://月
-                shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime()*30);
-                break;
-            case 3 :
-                shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
-                break;
+        if(shopDetail.getIsUserIdentity()==0){
+            shopDetailService.update(shopDetail);
+             return Result.getSuccess();
+
+        }else {
+            switch (shopDetail.getConsumeConfineUnit()){
+                case 1 :
+                    shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime());
+                    break;
+                case 2 ://月
+                    shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime()*30);
+                    break;
+                case 3 :
+                    shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
+                    break;
+            }
+            shopDetailService.update(shopDetail);
+            return Result.getSuccess();
+
         }
-        shopDetailService.update(shopDetail);
-        return Result.getSuccess();
+
     }
+
 
 
 

@@ -170,7 +170,7 @@
 
 						<div  class="form-group" v-if="m.isUserIdentity==1">
 							<label class="col-sm-3 control-label">高频条件：<span v-if="showlate" >近</span></label>
-							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px" >
+							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px;margin-left: 19px;" >
 							<select class="form-control" style="width:12%;position: relative;left: 15px;" id="consumeConfineUnit"  name="consumeConfineUnit" @click="selectWaitUnit" v-model="m.consumeConfineUnit">
 								<option  value="1" selected="selected">日</option>
 								<option  value="2">月</option>
