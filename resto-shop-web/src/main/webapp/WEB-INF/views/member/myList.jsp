@@ -51,29 +51,29 @@
     <div class="modal fade" id="beginModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-full">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"   id="closeModal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                 </div>
+
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"   id="closeModal">关闭
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="endModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-full">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                          id="closeModal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
-                           id="closeModal">关闭
-                    </button>
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
                 </div>
             </div>
         </div>
@@ -178,6 +178,11 @@
             {
                 title: "用户类型",
                 data: "isBindPhone",
+                s_filter: true
+            },
+            {
+            	title: "储值",
+                data: "isCharge",
                 s_filter: true
             },
             {
@@ -402,9 +407,11 @@
     	var api = tb2API;
     	api.search('');
     	var column0 = api.column(0);
-    	var column3 = api.column(3);
+    	var column1 = api.column(1);
+    	var column4 = api.column(4);
     	column0.search('', true, false);
-    	column3.search('', true, false);
+    	column1.search('', true, false);
+    	column4.search('', true, false);
         //更新数据源
         $.ajax({
             url: 'member/myConList',

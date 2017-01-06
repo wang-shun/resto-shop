@@ -46,7 +46,7 @@ public class ShopInfoController extends GenericController{
         shopDetail.setId(getCurrentShopId());
         if(shopDetail.getIsUserIdentity()==0){
             shopDetailService.update(shopDetail);
-             return Result.getSuccess();
+            return Result.getSuccess();
 
         }else {
             switch (shopDetail.getConsumeConfineUnit()){
@@ -66,9 +66,6 @@ public class ShopInfoController extends GenericController{
         }
 
     }
-
-
-
 
 
     @RequestMapping("list_all")

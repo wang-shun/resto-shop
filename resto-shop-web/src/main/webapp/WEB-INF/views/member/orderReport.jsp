@@ -60,9 +60,11 @@ dt,dd{
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" id="close">
-					&times;
+				<button type="button" class="close" data-dismiss="modal"
+						id="closeModaltop" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
+
 				<h4 class="modal-title text-center">
 					<strong>订单详情</strong>
 				</h4>
@@ -101,7 +103,6 @@ dt,dd{
 				<table class="table table-condensed table-hover">
 					<thead>
 						<tr>
-							                           <th>餐品类型</th>
 							<th>餐品类别</th>
 							<th>餐品名称</th>
 							<th>餐品单价</th>
@@ -114,6 +115,10 @@ dt,dd{
 				</table>
 			</div>
 
+		 <div class="modal-footer">
+			<button type="button" class="btn btn-block btn-primary" data-dismiss="modal"
+					id="closeModalbotton">关闭</button>
+		</div>
 		</div>
 	</div>
 </div>
@@ -424,10 +429,10 @@ dt,dd{
 
 		}
 		return distributionMode;
-	} 
-	 
-	 
-	 
+	}
+
+
+
 
 	//查询今日
 
@@ -496,8 +501,20 @@ dt,dd{
 						+ "&&endDate=" + endDate + "&&customerId=" + customerId;
 
     }) 
-    
-    $("#close").click(function(){
-    	$("#orderDetail").modal("hide");
-    });
+
+	$("#closeModaltop").click(function(e) {
+		e.stopPropagation();
+		var modal = $("#orderDetail");
+		//modal.find(".modal-body").html("");
+		modal.modal("hide");
+	});
+
+	$("#closeModalbotton").click(function(e) {
+		e.stopPropagation();
+		var modal = $("#orderDetail");
+		modal.find(".modal-body").html("");
+		modal.modal("hide");
+	})
+
+
 </script>
