@@ -516,6 +516,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order payOrderSuccess(Order order) {
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
+            order.setIsPay(OrderPayState.PAYED);
             update(order);
         }
 
@@ -3045,6 +3046,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
+            order.setIsPay(OrderPayState.PAYED);
             order.setAllowContinueOrder(false);
             update(order);
         }
@@ -3053,6 +3055,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
+                child.setIsPay(OrderPayState.PAYED);
                 child.setAllowCancel(false);
                 child.setAllowContinueOrder(false);
                 update(child);
