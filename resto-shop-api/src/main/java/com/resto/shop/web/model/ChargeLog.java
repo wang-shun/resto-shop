@@ -19,6 +19,7 @@ public class ChargeLog {
     
     private Date createTime;
 
+	private String chargeOrderId;
 
 	public String getId() {
 		return id;
@@ -74,6 +75,14 @@ public class ChargeLog {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getChargeOrderId() {
+		return chargeOrderId;
+	}
+
+	public void setChargeOrderId(String chargeOrderId) {
+		this.chargeOrderId = chargeOrderId;
 	}
 
 	public ChargeLog() {

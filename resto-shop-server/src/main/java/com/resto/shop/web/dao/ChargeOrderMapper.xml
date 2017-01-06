@@ -18,10 +18,11 @@
     <result column="number_day_now" property="numberDayNow"/>
     <result column="arrival_amount" property="arrivalAmount"/>
     <result column="end_amount" property="endAmount"/>
+    <result column="type" property="type"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, 
-    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount
+    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -35,13 +36,13 @@
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder" >
     insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, brand_id, shop_detail_id,
-    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount
+    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type
     )
     values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL}, 
       #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, 
       #{customerId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, 
       #{chargeBalance,jdbcType=DECIMAL}, #{rewardBalance,jdbcType=DECIMAL}, #{totalBalance,jdbcType=DECIMAL},
-      #{numberDayNow}, #{arrivalAmount}, #{endAmount}
+      #{numberDayNow}, #{arrivalAmount}, #{endAmount}, #{type}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.ChargeOrder" >
@@ -92,6 +93,9 @@
       <if test="endAmount != null" >
         end_amount,
       </if>
+      <if test="type != null" >
+        `type`,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -138,6 +142,9 @@
       </if>
       <if test="endAmount != null" >
         #{endAmount},
+      </if>
+      <if test="type != null" >
+        #{type},
       </if>
     </trim>
   </insert>
@@ -186,6 +193,9 @@
       <if test="endAmount != null" >
         end_amount = #{endAmount},
       </if>
+      <if test="type != null" >
+        `type` = #{type},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -204,7 +214,7 @@
       total_balance = #{totalBalance,jdbcType=DECIMAL},
       number_day_now = #{numberDayNow},
       arrival_amount = #{arrivalAmount},
-      end_amount = #{endAmount}
+      end_amount = #{endAmount},`type` = #{type}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="ChargeOrder">select * from tb_charge_order</select>

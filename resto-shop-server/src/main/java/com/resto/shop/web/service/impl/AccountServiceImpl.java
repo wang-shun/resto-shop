@@ -221,6 +221,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	chargeOrder.setFinishTime(new Date());
 	    	chargeOrder.setCustomerId(customerId);
 	    	chargeOrder.setBrandId(brand.getId());
+			chargeOrder.setType(0);
 	    	chargeOrder.setShopDetailId(shopDetail.getId());
 	    	chargeOrder.setChargeBalance(chargeSetting.getChargeMoney());
 	    	chargeOrder.setNumberDayNow(chargeSetting.getNumberDay() - 1);
@@ -231,7 +232,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	BigDecimal endAmount = chargeSetting.getRewardMoney().subtract(amount.multiply(new BigDecimal(chargeSetting.getNumberDay() - 1)));
 			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
-	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail);
+	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail,chargeOrder.getId());
 	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
 	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
 	    	//微信推送
@@ -253,7 +254,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
 		}
 		StringBuffer msg = new StringBuffer();
-		msg.append("今日充值赠送红包已到账，快去看看吧~");
+		msg.append("今日充值余额已到账，快去看看吧~");
 		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
