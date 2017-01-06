@@ -175,7 +175,7 @@ var vueObj =  new Vue({
 				/* if (!data.customerId) {
 					that.errorMsg("该手机号码没有注册！");
 				} */
-				$("#searchStart").html("正在查询...");
+				$("#searchStart").html("查询成功");
 				setTimeout(function(){
 					$("#searchStart").html();
 				},2000);
