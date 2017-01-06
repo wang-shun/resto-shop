@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("recharge")
 public class RechargeLogController {
-	
+
 	@RequestMapping("/list")
-	public void list(){
-		
+	public String shopChargeRecorde(){
+
+       return "/recharge/shopchargerecord";
 	}
-	
+
+
+
+
 }
