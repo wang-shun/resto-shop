@@ -76,6 +76,11 @@ public class OrderItem {
     //餐盒数量
     private Integer mealFeeNumber;
 
+    /**
+     * 此订单项，在前端传入的折扣百分比，用于在后台创建订单时做折扣值对比，判断订单是否可创建。
+     */
+    private Integer discount;
+
     public Integer getMealFeeNumber() {
         return mealFeeNumber;
     }
@@ -307,5 +312,12 @@ public class OrderItem {
 	public void setTelephone(String telephone) {
 		this.telephone = telephone;
 	}
-	
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
+    }
 }

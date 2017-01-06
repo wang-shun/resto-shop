@@ -164,6 +164,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return sb.toString();
     }
 
+    /**
+     * 计算菜品折扣
+     * @param price               价格
+     * @param discount         当前菜品的折扣
+     * @param wxdiscount    微信前端传入的折扣
+     * @return
+     */
+    private  BigDecimal discount(BigDecimal price,int discount,int wxdiscount) throws AppException {
+        if (price != null){
+            if(discount != wxdiscount){
+                //折扣不匹配
+                throw new AppException(AppException.DISCOUNT_TIMEOUT);
+            }
+            return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+        }else{
+            return price;
+        }
+    }
+
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -202,8 +221,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
+            String remark = null;
             switch (item.getType()) {
-                case OrderItemType.ARTICLE:
+                case OrderItemType.ARTICLE://无规格单品
+                    // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(a.getName());
+                    org_price = a.getPrice();
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount());
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount());
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    remark = a.getDiscount()+ " ";//设置菜品当前折扣
+                    break;
+                case OrderItemType.RECOMMEND://推荐餐品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
@@ -212,25 +242,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = a.getFansPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.RECOMMEND:
-                    // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
-                    a = articleMap.get(item.getArticleId());
-                    item.setArticleName(a.getName());
-                    org_price = a.getPrice();
-                    price = a.getPrice();
-                    fans_price = a.getFansPrice();
-                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
-                    break;
-                case OrderItemType.UNITPRICE:
+                case OrderItemType.UNITPRICE://老规格
                     ArticlePrice p = articlePriceMap.get(item.getArticleId());
                     a = articleMap.get(p.getArticleId());
                     item.setArticleName(a.getName() + p.getName());
                     org_price = p.getPrice();
-                    price = p.getPrice();
-                    fans_price = p.getFansPrice();
+                    price = discount(p.getPrice(),a.getDiscount(),item.getDiscount());
+                    fans_price = discount(p.getFansPrice(),a.getDiscount(),item.getDiscount());
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.UNIT_NEW:
+                case OrderItemType.UNIT_NEW://新规格
+                    //判断折扣是否匹配，如果不匹配则不允许买单
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
                     org_price = item.getPrice();
@@ -238,12 +260,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.SETMEALS:
+                case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
-                    price = a.getPrice();
-                    fans_price = a.getFansPrice();
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount()) ;
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount()) ;
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
                     item.setChildren(new ArrayList<OrderItem>());
@@ -279,6 +301,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setOriginalPrice(org_price);
             item.setStatus(1);
             item.setSort(0);
+            item.setRemark(remark);
             if (fans_price != null) {
                 item.setUnitPrice(fans_price);
             } else {

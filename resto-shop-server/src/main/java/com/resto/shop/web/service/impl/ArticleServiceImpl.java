@@ -74,6 +74,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<Article> selectList(String currentShopId) {
+        Map<String, Article> discountMap = selectAllSupportArticle(currentShopId);
+        List<Article> articleList =  articleMapper.selectList(currentShopId);
+        for (Article article : articleList ) {
+            if(discountMap.containsKey(article.getId())){
+                article.setDiscount(discountMap.get(article.getId()).getDiscount());
+            }
+        }
         return articleMapper.selectList(currentShopId);
     }
 
