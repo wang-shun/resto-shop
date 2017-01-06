@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.shop.web.model.ChargePayment;
 
 public interface ChargePaymentMapper  extends GenericDao<ChargePayment,String> {
@@ -24,4 +25,7 @@ public interface ChargePaymentMapper  extends GenericDao<ChargePayment,String> {
     int updateByPrimaryKey(ChargePayment record);
 
 	List<ChargePayment> selectPayList(@Param("begin")Date begin,@Param("end")Date end);
+	
+	RechargeLogDto selectRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("brandId") String BrandId);
+
 }
