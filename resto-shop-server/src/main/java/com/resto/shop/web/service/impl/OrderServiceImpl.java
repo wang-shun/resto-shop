@@ -165,17 +165,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     /**
+     *
      * 计算菜品折扣
      * @param price               价格
      * @param discount         当前菜品的折扣
      * @param wxdiscount    微信前端传入的折扣
+     * @param articleName   菜品名称
      * @return
+     * @throws AppException
      */
-    private  BigDecimal discount(BigDecimal price,int discount,int wxdiscount) throws AppException {
+    private  BigDecimal discount(BigDecimal price,int discount,int wxdiscount,String articleName) throws AppException {
         if (price != null){
             if(discount != wxdiscount){
                 //折扣不匹配
-                throw new AppException(AppException.DISCOUNT_TIMEOUT);
+                throw new AppException(AppException.DISCOUNT_TIMEOUT,articleName+"折扣活动已结束，请重新选购餐品~");
             }
             return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
         }else{
@@ -228,10 +231,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
-                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount());
-                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount());
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount(),a.getName());                      //计算折扣
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount(),a.getName());       //计算折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
-                    remark = a.getDiscount()+ " ";//设置菜品当前折扣
+                    remark = a.getDiscount()+ "%";          //设置菜品当前折扣
                     break;
                 case OrderItemType.RECOMMEND://推荐餐品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -247,8 +250,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     a = articleMap.get(p.getArticleId());
                     item.setArticleName(a.getName() + p.getName());
                     org_price = p.getPrice();
-                    price = discount(p.getPrice(),a.getDiscount(),item.getDiscount());
-                    fans_price = discount(p.getFansPrice(),a.getDiscount(),item.getDiscount());
+                    price = discount(p.getPrice(),a.getDiscount(),item.getDiscount(),p.getName());                      //计算折扣
+                    fans_price = discount(p.getFansPrice(),a.getDiscount(),item.getDiscount(),p.getName());       //计算折扣
+                    remark = a.getDiscount()+ "%";          //设置菜品当前折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
                 case OrderItemType.UNIT_NEW://新规格
@@ -264,8 +268,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
-                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount()) ;
-                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount()) ;
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount(),a.getName()) ;
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount(),a.getName()) ;
+                    remark = a.getDiscount()+ "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
                     item.setChildren(new ArrayList<OrderItem>());
