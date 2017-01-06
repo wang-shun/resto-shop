@@ -19,6 +19,7 @@ public class ChargeLog {
     
     private Date createTime;
 
+
 	public String getId() {
 		return id;
 	}
