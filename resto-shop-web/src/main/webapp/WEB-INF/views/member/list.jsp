@@ -27,6 +27,7 @@
              
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
+			 <div class="text-danger" id="searchStart" style="float: right"></div>
 		</form>
 		
 	</div>
@@ -169,10 +170,15 @@ var vueObj =  new Vue({
 					
 					
 			}); */
+			$("#searchStart").html("正在查询...");
 			this.basePost("member/userList", $("#formInfo").serialize(), function(data) {
 				/* if (!data.customerId) {
 					that.errorMsg("该手机号码没有注册！");
 				} */
+				$("#searchStart").html("正在查询...");
+				setTimeout(function(){
+					$("#searchStart").html();
+				},2000);
 				that.shopOrderList = data;
 				console.log(that.shopOrderList);
 			});
