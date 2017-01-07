@@ -480,6 +480,9 @@
             <if test="mealAllNumber != null">
                 meal_all_number,
             </if>
+            <if test="needScan != null">
+                need_scan,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -610,6 +613,9 @@
             </if>
             <if test="mealAllNumber != null">
                 #{mealAllNumber},
+            </if>
+            <if test="needScan != null">
+                #{needScan},
             </if>
         </trim>
     </insert>

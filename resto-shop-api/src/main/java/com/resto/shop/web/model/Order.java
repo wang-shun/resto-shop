@@ -175,6 +175,18 @@ public class Order implements Serializable{
     //订单原始人数（退菜前）
     private Integer baseCustomerCount;
 
+    //是否需要扫码 0不需要 1需要
+
+    private Integer needScan;
+
+    public Integer getNeedScan() {
+        return needScan;
+    }
+
+    public void setNeedScan(Integer needScan) {
+        this.needScan = needScan;
+    }
+
     public Integer getBaseCustomerCount() {
         return baseCustomerCount;
     }
