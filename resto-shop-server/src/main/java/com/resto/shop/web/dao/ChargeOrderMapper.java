@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -35,4 +36,6 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
     List<ChargeOrder> selectByDateAndShopId(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("shopId") String shopId);
 
     List<ChargeOrder> selectByDateAndBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+
+    List<Map<String, Object>> selectByShopToDay(@Param("shopId") String shopId);
 }

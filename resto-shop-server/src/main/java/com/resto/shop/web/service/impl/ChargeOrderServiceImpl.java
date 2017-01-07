@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -229,5 +230,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+	}
+	
+	@Override
+	public List<Map<String, Object>> selectByShopToDay(String shopId) {
+		return chargeorderMapper.selectByShopToDay(shopId);
 	}
 }

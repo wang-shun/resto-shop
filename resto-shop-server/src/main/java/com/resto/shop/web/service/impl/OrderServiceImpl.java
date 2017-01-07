@@ -2609,60 +2609,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else{
             order = orderMapper.getOrderAccount(shopDetail.getId());
         }
-
-
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-
-        Calendar calendar2 = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<OrderPaymentItem> olist = orderPaymentItemService
-                .selectpaymentByPaymentMode(shopDetail.getId(), sdf.format(calendar.getTime()), sdf.format(calendar2.getTime()));
-        List<Map<String, Object>> items = new ArrayList<>();
-
-        for (OrderPaymentItem od : olist) {
-            Map<String, Object> item = new HashMap<>();
-            if (PayMode.WEIXIN_PAY == od.getPaymentModeId().intValue()) {
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "微信支付");
-                items.add(item);
-            } else if (PayMode.CHARGE_PAY == od.getPaymentModeId().intValue()) {
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "充值支付");
-                items.add(item);
-            } else if (PayMode.ACCOUNT_PAY == od.getPaymentModeId().intValue()) {
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "红包支付");
-                items.add(item);
-            } else if (PayMode.COUPON_PAY == od.getPaymentModeId().intValue()) {
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "优惠券支付");
-                items.add(item);
-            } else if (PayMode.REWARD_PAY == od.getPaymentModeId().intValue()) {
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "充值赠送支付");
-                items.add(item);
-            }else if(PayMode.WAIT_MONEY == od.getPaymentModeId().intValue()){
-                item.put("SUBTOTAL", od.getPayValue());
-                item.put("PAYMENT_MODE", "等位红包支付");
-                items.add(item);
-            }
-        }
-
-
-        List<ArticleSellDto> productCount = selectShopArticleByDate(shopDetail.getId(), sdf.format(calendar.getTime()), sdf.format(calendar2.getTime()), "desc");
-        int sum = 0;
-        for (ArticleSellDto product : productCount) {
-            sum += product.getShopSellNum();
-        }
         Map<String, Object> print = new HashMap<>();
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
@@ -2672,102 +2618,153 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ADD_TIME", new Date());
         Map<String, Object> data = new HashMap<>();
         data.put("RESTAURANT_NAME", shopDetail.getName());
-
         data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-        data.put("TOTAL_AMOUNT", order.getOrderTotal());
-
-        data.put("INCOME_AMOUNT", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId())
-                .add(orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId())).add(orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId())));
+        BigDecimal totalAmount = new BigDecimal(0);
+        if(order.getOrderTotal() != null){
+        	totalAmount = totalAmount.add(order.getOrderTotal());
+        }
+        data.put("TOTAL_AMOUNT", totalAmount);
+        BigDecimal orderAmount = new BigDecimal(0);
+        if(new BigDecimal(order.getOrderCount()) != null){
+        	orderAmount = orderAmount.add(new BigDecimal(order.getOrderCount()));
+        }
+        data.put("ORDER_AMOUNT", orderAmount);
+	    DecimalFormat df = new DecimalFormat("######0.00");
+        double average = orderAmount.equals(BigDecimal.ZERO) ? 0 :
+        	totalAmount.doubleValue() / orderAmount.doubleValue();
+	    data.put("ORDER_AVERAGE", df.format(average));
+	    BigDecimal customerAmount = new BigDecimal(0);
+	    if(order.getCustomerCount() != null){
+	    	customerAmount = customerAmount.add(new BigDecimal(order.getCustomerCount()));
+	    }
+        data.put("CUSTOMER_AMOUNT", customerAmount);
+    	double customerAverage = customerAmount.equals(BigDecimal.ZERO) ? 0 :
+    		totalAmount.doubleValue() / customerAmount.doubleValue();
+    	data.put("CUSTOMER_AVERAGE", df.format(customerAverage));
+        BigDecimal wxPay =  orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId());
+        BigDecimal chargePay = orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId());
+        BigDecimal aliPay= orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId());
+        BigDecimal otherPay = orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId());
+        BigDecimal articlePay = orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId());
+        BigDecimal incomeAmount = wxPay.add(chargePay).add(aliPay).add(otherPay).add(articlePay);
+        data.put("INCOME_AMOUNT", incomeAmount == null ? 0 : incomeAmount);
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
-        wxItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId()));
+        wxItem.put("SUBTOTAL", wxPay == null ? 0 : wxPay);
         wxItem.put("PAYMENT_MODE", "微信支付");
         Map<String, Object> chargeItem = new HashMap<>();
-        chargeItem.put("SUBTOTAL", orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId()));
+        chargeItem.put("SUBTOTAL", chargePay == null ? 0 : chargePay);
         chargeItem.put("PAYMENT_MODE", "充值支付");
         Map<String, Object> aliPayment = new HashMap<>();
-        aliPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId()));
+        aliPayment.put("SUBTOTAL", aliPay == null ? 0 : aliPay);
         aliPayment.put("PAYMENT_MODE", "支付宝支付");
         Map<String, Object> otherPayment = new HashMap<>();
-        otherPayment.put("SUBTOTAL", orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId()));
+        otherPayment.put("SUBTOTAL", otherPay == null ? 0 :otherPay);
         otherPayment.put("PAYMENT_MODE", "其他方式支付");
         Map<String, Object> articleBackPay = new HashMap<>();
-        articleBackPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId()));
+        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay);
         articleBackPay.put("PAYMENT_MODE", "退菜红包");
         incomeItems.add(wxItem);
         incomeItems.add(aliPayment);
         incomeItems.add(otherPayment);
         incomeItems.add(chargeItem);
         incomeItems.add(articleBackPay);
-        BigDecimal discountAmount = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()))
-                .add(orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()).add(orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId())));
-        data.put("DISCOUNT_AMOUNT", discountAmount);
-        List<Map<String, Object>> discountItems = new ArrayList<>();
-        data.put("DISCOUNT_ITEMS", discountItems);
-        Map<String, Object> accountPay = new HashMap<>();
-        accountPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId()));
-        accountPay.put("PAYMENT_MODE", "红包支付");
-        discountItems.add(accountPay);
-        Map<String, Object> couponPay = new HashMap<>();
-        couponPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId()));
-        couponPay.put("PAYMENT_MODE", "优惠券支付");
-        discountItems.add(couponPay);
-        Map<String, Object> rewardPay = new HashMap<>();
-        rewardPay.put("SUBTOTAL", orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId()));
-        rewardPay.put("PAYMENT_MODE", "充值赠送支付");
-        discountItems.add(rewardPay);
-        Map<String, Object> waitMoney = new HashMap<>();
-        waitMoney.put("SUBTOTAL", orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId()));
-        waitMoney.put("PAYMENT_MODE", "等位红包支付");
-        discountItems.add(waitMoney);
         data.put("INCOME_ITEMS", incomeItems);
-        data.put("PAYMENT_ITEMS", items);
-        data.put("ORDER_AMOUNT", order.getOrderCount());
-        double average = order.getOrderCount() == 0 ? 0 :
-                order.getOrderTotal().doubleValue() / order.getOrderCount();
-        DecimalFormat df = new DecimalFormat("######0.00");
-        data.put("ORDER_AVERAGE", df.format(average));
-        data.put("PRODUCT_AMOUNT", sum);
+        BigDecimal accountPay = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId());
+        BigDecimal couponPay = orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId());
+        BigDecimal rewardPay = orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId());
+        BigDecimal waitMoney = orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId());
+        BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney);
+        data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
+        List<Map<String, Object>> discountItems = new ArrayList<>();
+        Map<String, Object> accountPayItem = new HashMap<>();
+        accountPayItem.put("SUBTOTAL", accountPay == null ? 0 : accountPay);
+        accountPayItem.put("PAYMENT_MODE", "红包支付");
+        discountItems.add(accountPayItem);
+        Map<String, Object> couponPayItem = new HashMap<>();
+        couponPayItem.put("SUBTOTAL", couponPay == null ? 0 : couponPay);
+        couponPayItem.put("PAYMENT_MODE", "优惠券支付");
+        discountItems.add(couponPayItem);
+        Map<String, Object> rewardPayItem = new HashMap<>();
+        rewardPayItem.put("SUBTOTAL", rewardPay == null ? 0 : rewardPay);
+        rewardPayItem.put("PAYMENT_MODE", "充值赠送支付");
+        discountItems.add(rewardPayItem);
+        Map<String, Object> waitMoneyItem = new HashMap<>();
+        waitMoneyItem.put("SUBTOTAL", waitMoney == null ? 0 : waitMoney);
+        waitMoneyItem.put("PAYMENT_MODE", "等位红包支付");
+        discountItems.add(waitMoneyItem);
+        data.put("DISCOUNT_ITEMS", discountItems);
+        List<Map<String, Object>> chargeOrders = chargeOrderService.selectByShopToDay(shopDetail.getId());
+        data.put("STORED_VALUE_COUNT", chargeOrders.size());
+        BigDecimal chargeAmount = new BigDecimal(0);
+        List<Map<String, Object>> storedValueItems = new ArrayList<Map<String, Object>>();
+        if(chargeOrders.size() > 0){
+        	for(Map<String, Object> chargeOrder : chargeOrders){
+        		Map<String, Object> chargeMap = new HashMap<String, Object>();
+        		chargeMap.put("SUBTOTAL", chargeOrder.get("chargeMoney"));
+        		chargeMap.put("TEL", chargeOrder.get("telephone"));
+        		chargeAmount = chargeAmount.add(new BigDecimal(chargeOrder.get("chargeMoney").toString()));
+        		storedValueItems.add(chargeMap);
+        	}
+        }
+        data.put("STORED_VALUE_AMOUNT", chargeAmount);
+        data.put("STORED_VALUE_ITEMS", storedValueItems);
+        BigDecimal saledProductAmount = new BigDecimal(0);
+        BigDecimal canceledProductCount = new BigDecimal(0);
+        BigDecimal canceledProductAmount = new BigDecimal(0);
+        BigDecimal canceledOrderCount = new BigDecimal(0); 
+        Map<String, Object> canceledOrderMap = new HashMap<>();
+        List<Map<String, Object>> saledProducts = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> canceledProducts = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> canceledOrders = new ArrayList<Map<String, Object>>();
+        if(StringUtils.isNotBlank(order.getId())){
+            String[] orderIds = order.getId().split(",");
+            Map<String, Object> selectMap = new HashMap<String, Object>();
+            selectMap.put("orderIds", orderIds);
+            selectMap.put("count", "count != 0");
+            List<OrderItem> orderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
+            saledProductAmount = saledProductAmount.add(new BigDecimal(orderItems.size()));
+            for(OrderItem orderItem : orderItems){
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+            	itemMap.put("SUBTOTAL", orderItem.getCount());
+            	saledProducts.add(itemMap);
+            }
+            selectMap.clear();
+            selectMap.put("orderIds", orderIds);
+            selectMap.put("count", "count = 0");
+            orderItems.clear();
+            orderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
+            canceledProductCount = canceledProductCount.add(new BigDecimal(orderItems.size()));
+            for(OrderItem orderItem : orderItems){
+            	canceledOrderMap.put(orderItem.getOrderId(), orderItem.getOriginalPrice());
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+            	itemMap.put("SUBTOTAL", orderItem.getCount());
+            	canceledProducts.add(itemMap);
+            	canceledProductAmount = canceledProductAmount.add(orderItem.getOriginalPrice());
+            }
+            canceledOrderCount = canceledOrderCount.add(new BigDecimal(canceledOrderMap.size()));
+            for(Map.Entry<String, Object> map : canceledOrderMap.entrySet()){
+            	Map<String, Object> canceledMap = new HashMap<>();
+            	Order canceledOrder = orderMapper.selectOrderDetails(map.getKey());
+            	canceledMap.put("ORDER_NUMBER", map.getKey());
+            	canceledMap.put("TEL", canceledOrder.getCustomer().getTelephone());
+            	canceledMap.put("SUBTOTAL", map.getValue());
+            	canceledOrders.add(canceledMap);
+            }
+        }
+        data.put("SALED_PRODUCT_AMOUNT", saledProductAmount);
+        data.put("SALED_PRODUCTS", saledProducts);
+        data.put("CANCELED_PRODUCT_COUNT", canceledProductCount);
+        data.put("CANCELED_PRODUCTS", canceledProducts);
+        data.put("CANCELED_ORDER_AMOUNT", canceledProductAmount);
+        data.put("CANCELED_ORDER_COUNT", canceledOrderCount);
+        data.put("CANCELED_ORDERS", canceledOrders);
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.DAILYREPORT);
-        List<Map<String, Object>> productItems = new ArrayList<>();
-        data.put("PRODUCT_FAMILIES", productItems);
-
-        List<ArticleFamily> articleFamilies = articleFamilyMapper.selectListByDistributionModeId(shopDetail.getId(), 1);
-        for (ArticleFamily articleFamily : articleFamilies) {
-            Map<String, Object> productItem = new HashMap<>();
-            Integer subtotal = orderMapper.getArticleCount(shopDetail.getId(), articleFamily.getId());
-            productItem.put("SUBTOTAL", subtotal == null ? 0 : subtotal);
-            productItem.put("FAMILY_NAME", articleFamily.getName());
-            productItems.add(productItem);
-        }
-//        Map<String, Object> itemHeng = new HashMap<>();
-//        itemHeng.put("SUBTOTAL", 0);
-//        itemHeng.put("FAMILY_NAME", "-----------------------------------------------");
-//        productItems.add(itemHeng);
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
-
-        if (brandSetting.getIsUseServicePrice() == 1) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", orderMapper.getServicePrice(shopDetail.getId()));
-            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
-                item.put("FAMILY_NAME", "就餐人数");
-            }else{
-                item.put("FAMILY_NAME", brandSetting.getServiceName());
-            }
-            productItems.add(item);
-        }
-        if(brandSetting.getIsMealFee() == 1 && shopDetail.getIsMealFee() ==1){
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", orderMapper.getMealALLNumber(shopDetail.getId()));
-            item.put("FAMILY_NAME", shopDetail.getMealFeeName());
-            productItems.add(item);
-        }
         return print;
-
     }
 
     @Override
