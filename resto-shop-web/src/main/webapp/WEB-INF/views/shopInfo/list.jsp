@@ -169,7 +169,7 @@
 
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label">加菜是否需要扫码：</label>
+							<label class="col-sm-3 control-label">外带是否需要扫码：</label>
 							<div class="col-sm-9">
 								<div>
 									<label> <input type="radio" name="continueOrderScan"
