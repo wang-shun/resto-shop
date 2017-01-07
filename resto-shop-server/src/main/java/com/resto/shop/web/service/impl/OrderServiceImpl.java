@@ -463,8 +463,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-
-
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -879,24 +877,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order printSuccess(String orderId) throws AppException {
         Order order = selectById(orderId);
-            if (StringUtils.isEmpty(order.getParentOrderId())) {
-                log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
-                if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
-                    order.setAllowContinueOrder(true);
-                }
-            } else {
-                log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
-                order.setAllowContinueOrder(false);
-                order.setAllowAppraise(false);
+        if (StringUtils.isEmpty(order.getParentOrderId())) {
+            log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
+            if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
+                order.setAllowContinueOrder(true);
             }
-            order.setProductionStatus(ProductionStatus.PRINTED);
-            order.setPrintOrderTime(new Date());
-            order.setAllowCancel(false);
-            update(order);
+        } else {
+            log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
+            order.setAllowContinueOrder(false);
+            order.setAllowAppraise(false);
+        }
+        order.setProductionStatus(ProductionStatus.PRINTED);
+        order.setPrintOrderTime(new Date());
+        order.setAllowCancel(false);
+        update(order);
 //            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 //            Customer customer = customerService.selectById(order.getCustomerId());
 //            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
-            return order;
+        return order;
     }
 
     @Override
@@ -1102,9 +1100,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 //用户订单的次数
                 int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineTime());////
-                 //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
+                //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber&&shopDetail.getConsumeConfineUnit()!=3){
-                     gao.append(" vip");
+                    gao.append(" vip");
                 }
                 //3无限制
                 int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),0);
@@ -3097,7 +3095,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("日报:2016.11.20").append("\n")
                 .append("堂吃支付金额:10000元").append("\n")
                 .append("商户录取").append("\n")
-                 .append("堂吃消费笔数:64").append("\n")
+                .append("堂吃消费笔数:64").append("\n")
                 .append("商户录入").append("\n")
                 .append("用户支付消费:62/9500").append("\n")
                 .append("----------------").append("\n")
@@ -3635,7 +3633,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         return result;
     }
-    
+
     @Override
     public void refundArticle(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
@@ -3871,19 +3869,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> selectWXOrderItems(Map<String, Object> map) {
-    	return orderMapper.selectWXOrderItems(map);
+        return orderMapper.selectWXOrderItems(map);
     }
 
 
 
     /**
-   * 会员管理
-   * 1订单管理
-   */
-	@Override
-	public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate) {
-		return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
-	}
+     * 会员管理
+     * 1订单管理
+     */
+    @Override
+    public List<Order> getCustomerOrderList(String customerId,String beginDate,String endDate) {
+        return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
+    }
 
     @Override
     public Integer selectByCustomerCount(String customerId,int consumeConfineTime ) {
