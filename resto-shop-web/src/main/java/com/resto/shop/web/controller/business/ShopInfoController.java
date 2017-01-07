@@ -55,6 +55,12 @@ public class ShopInfoController extends GenericController{
                 shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
                 break;
         }
+        if(shopDetail.getPrintReceipt() == null){
+        	shopDetail.setPrintReceipt(0);
+        }
+        if(shopDetail.getPrintKitchen() == null){
+        	shopDetail.setPrintKitchen(0);
+        }
         shopDetailService.update(shopDetail);
         return Result.getSuccess();
     }
