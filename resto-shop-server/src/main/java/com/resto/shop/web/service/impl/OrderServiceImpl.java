@@ -456,10 +456,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
         }
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO){
+        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.NO){
             order.setTableNumber(order.getVerCode());
+        }
 
+        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.YES){
+            order.setNeedScan(Common.YES);
+        }else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.TABLE_MODE
+                && StringUtils.isEmpty(order.getTableNumber())){
+            order.setNeedScan(Common.YES);
+        }else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.HOUFU_ORDER
+                && StringUtils.isEmpty(order.getTableNumber())){
+            order.setNeedScan(Common.YES);
         }
 
 
