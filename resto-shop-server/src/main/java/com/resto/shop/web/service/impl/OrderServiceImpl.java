@@ -463,15 +463,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.YES){
-            order.setNeedScan(Common.YES);
-        }else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.TABLE_MODE
-                 && StringUtils.isEmpty(order.getTableNumber())){
-            order.setNeedScan(Common.YES);
-        }else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.HOUFU_ORDER
-                && StringUtils.isEmpty(order.getTableNumber())){
-            order.setNeedScan(Common.YES);
-        }
+
 
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
