@@ -155,18 +155,6 @@
 						</div>
 
 
-						<div class="form-group">
-							<label class="col-sm-3 control-label">加菜是否需要扫码：</label>
-							<div class="col-sm-9">
-								<div>
-									<label> <input type="radio" name="continueOrderScan"
-												   v-model="m.continueOrderScan" value="0"> 不需要
-									</label> <label> <input type="radio" name="continueOrderScan"
-															v-model="m.continueOrderScan" value="1"> 需要
-								</label>
-								</div>
-							</div>
-						</div>
 
 
 						<div class="form-group">
