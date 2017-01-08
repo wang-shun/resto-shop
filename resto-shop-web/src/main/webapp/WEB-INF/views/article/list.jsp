@@ -1358,29 +1358,7 @@
                             var that = this;
                             $("#supportTimeRemark").html("");   //清除错误提示
                             this.canSave = true;//还原为可以保存的状态
-
-//                            //判断所选的时间是否有覆盖区间
-//                            console.log("x的begin<y的end x的end>y的begin")
-//                            for (var i in that.m.supportTimes) {
-//                                var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
-//                                for (var y in that.m.supportTimes) {
-////                                    console.log("Y",itemY);
-////                                    console.log("【X】begin："+itemX.beginTime);
-////                                    console.log("【X】end："+itemY.endTime);
-//                                    var itemY = getSupportTimesInfo(that.m.supportTimes[y]);
-//                                    console.log("X的begin："+itemX.beginTime," > Y的end："+itemY.endTime,strFormat(itemX.beginTime)>strFormat(itemY.endTime));
-//                                    console.log("X的end："+itemX.endTime," < Y的begin："+itemY.beginTime,strFormat(itemX.endTime)<strFormat(itemY.beginTime));
-//                                    console.log(" ");console.log(" ");console.log(" ");
-////                                    if (strFormat(itemX.beginTime) > strFormat(itemY.endTime)  &&(strFormat(itemX.endTime) < strFormat(itemY.beginTime))) {
-////                                        $("#supportTimeRemark").html("时间冲突：【"+itemX.name+"】--【"+itemY.name+"】对应多种折扣");
-////                                        that.canSave = false;
-////                                    }
-//                                    if(strFormat(itemX.beginTime)<strFormat(itemY.beginTime)){
-//
-//                                    }
-//                                }
-//                            }
-
+                            //判断所选的时间是否有覆盖区间
                             for (var i in that.m.supportTimes) {
                                 var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
                                 for (var y in that.m.supportTimes) {
