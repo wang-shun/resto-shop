@@ -60,14 +60,14 @@
 								<label  class="col-sm-2 control-label">折扣</label>
 								<div class="col-sm-8">
 									<div class="input-group">
-										<input class="form-control" type="number" name="discount" min="1" max="100" v-model="m.discount" required placeholder="折扣金额">
+										<input class="form-control" type="number" name="discount" min="1"  max="100" v-model="m.discount" required placeholder="请输入1-100整数值">
 										<div class="input-group-addon">%</div>
 									</div>
 									<span class="help-block">请输入1-100整数值</span>
 								</div>
 							</div>
 							<div class="form-group">
-								<label  class="col-sm-2 control-label">描述</label>
+								<label  class="col-sm-2 control-label">备注</label>
 								<div class="col-sm-8">
 									<input type="text" class="form-control" name="remark" v-model="m.remark">
 								</div>
@@ -111,8 +111,8 @@
 			            ["周五",1<<4],
 			            ["周六",1<<5],
 			            ["周日",1<<6],
-			            ["工作日",1<<7],
-			            ["非工作日",1<<8],
+//			            ["工作日",1<<7],			不需要了
+//			            ["非工作日",1<<8],		不需要了
 			            ];
 		function getWeekDayArr(weekBin){
 			var arr = [];
@@ -139,7 +139,7 @@
 					title : "折扣",
 					data : "discount",
 					createdCell : function(td,tdData){
-						$(td).html(tdData+"%");
+						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
 					}
 				},
 				{                 
@@ -184,10 +184,11 @@
 		
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
+			mixins:[C.formVueMix],
 			el:"#control",
 			data:{
 				checkedValues: [],
-				supportDay:supportDay,
+				supportDay:supportDay
 			},
 			computed: {
 			 	getSum: function () {
@@ -199,9 +200,7 @@
 			      return s;
 			    },
 			},
-			mixins:[C.formVueMix],
-			methods:{ 
-				
+			methods:{
 				initTime :function(){
 					$(".timepicker-no-seconds").timepicker({
 						 autoclose: true,
@@ -215,13 +214,13 @@
 					this.checkedValues=[];
 				},
 				create:function(){
-					this.m={};
-					this.m.beginTime = '10:00';
-					this.m.endTime = '22:00';
-					this.m.discount = '100';
+					this.m={
+						beginTime : '10:00',
+						endTime : '22:00',
+						discount : 100
+					};
 					this.checkedValues=[];
 					this.openForm();
-					
 				},
 				edit:function(model){
 					var that = this;
@@ -233,6 +232,19 @@
 						this.checkedValues.push(dayArr[i][1]);
 					}
 				},
+				save:function(e){
+					if($("input:checked").length>0){
+						var that = this;
+						var formDom = e.target;
+						C.ajaxFormEx(formDom,function(){
+							that.cancel();
+							tb.ajax.reload();
+						});
+					}else {
+						toastr.error("请选择供应时间！");
+						return false;
+					}
+				}
 			}
 		});
 		C.vue=vueObj;

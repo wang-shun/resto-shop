@@ -183,7 +183,7 @@
                                                 <input type="checkbox" name="kitchenList" :value="kitchen.id"
                                                        v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
                                             </label>
-                                            <div id="kitchenRemark"></div>
+                                            <div id="kitchenRemark" style="color: red;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -193,32 +193,34 @@
                                         <div class="col-md-8">
                                             <label v-for="time in supportTimes">
                                                 <input type="checkbox" name="supportTimes" :value="time.id"
-                                                       v-model="m.supportTimes"> {{time.name}} &nbsp;&nbsp;
+                                                       v-model="m.supportTimes"> <span :class="{'text-danger':time.shopName}" >{{time.name}}({{time.discount+'%'}})</span> &nbsp;&nbsp;
                                             </label>
-                                            <label v-if="supportTimes.length>0">
-                                                <input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选
-                                            </label>
-                                            <div id="supportTimeRemark"></div>
+                                            <%--<label v-if="supportTimes.length>0">--%>
+                                                <%--<input type="checkbox" @change="selectAllTimes(m,$event)"/> 全选--%>
+                                            <%--</label>--%>
+                                            <div id="supportTimeRemark" style="color: red;"></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row" v-if="m.articleType!=2">
                                     <div class="form-group  col-md-12">
-                                        <label class="col-md-2 text-right" style="margin-top: 20px">库存</label>
+                                        <label class="col-sm-2 control-label ">库存</label>
                                         <div class="col-md-8">
-                                            <div>
-                                                <label>
+                                            <div class="form-group col-sm-4">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">工作日</div>
                                                     <input name="stockWorkingDay"
                                                            class="form-control" v-model="m.stockWorkingDay"
-                                                           id="stockWorkingDay"/> (工作日)
-                                                </label>
+                                                           id="stockWorkingDay"/>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label>
+                                            <div class="form-group col-sm-4 ">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">假期</div>
                                                     <input name="stockWeekend"
                                                            class="form-control" v-model="m.stockWeekend"
-                                                           id="stockWeekend"/> (假期)
-                                                </label>
+                                                           id="stockWeekend"/>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -532,7 +534,7 @@
                     <div class="modal-footer">
                         <input type="hidden" name="id" v-model="m.id"/>
                         <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="submit" class="btn btn-primary" :disabled="!canSave">保存</button>
                     </div>
                 </form>
             </div>
@@ -799,7 +801,8 @@
                         lastChoiceTemp: "",
                         allArticles: allArticles,
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""},
-                        singleItem:[]
+                        singleItem:[],
+                        canSave : true, //用于判断是否可以点击保存按钮
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
@@ -1084,15 +1087,17 @@
                         },
                         cleanRemark: function () {
                             $("#kitchenRemark").html("");
-                            $("#supportTimeRemark").html("");
+                            if($("#supportTimeRemark").html().indexOf("时间冲突") == -1){
+                                $("#supportTimeRemark").html("");
+                            }
                         },
                         checkNull: function () {
-                        	if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
-                                $("#supportTimeRemark").html("<font color='red'>请先创建至少一个菜品供应时间！</span>");
+                            if (this.supportTimes.length <= 0) {//判断当前店铺是否创建了供应时间
+                                $("#supportTimeRemark").html("请先创建至少一个菜品供应时间！");
                                 return true;
                             }
                             if (this.m.supportTimes.length <= 0) {//供应时间 非空验证
-                                $("#supportTimeRemark").html("<font color='red'>请选择餐品供应时间！</span>");
+                                $("#supportTimeRemark").html("请选择餐品供应时间！");
                                 return true;
                             }
                             //if (this.kitchenList.length <= 0) {//判断当前店铺是否创建了出餐厨房
@@ -1109,7 +1114,6 @@
                             return false;
                         },
                         save: function (e) {
-
                             var attrs = this.m.mealAttrs;
                             for (var i = 0; i < attrs.length; i++) {
                                 var attr = attrs[i];
@@ -1346,6 +1350,73 @@
                             that.articleunits = article_units;
                             that.articleattrs = data;
                         });
+                    },
+                    watch: {
+                        'm.supportTimes': function(newVal, oldVal) {
+                            var that = this;
+                            $("#supportTimeRemark").html("");   //清除错误提示
+                            this.canSave = true;//还原为可以保存的状态
+
+//                            //判断所选的时间是否有覆盖区间
+//                            console.log("x的begin<y的end x的end>y的begin")
+//                            for (var i in that.m.supportTimes) {
+//                                var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
+//                                for (var y in that.m.supportTimes) {
+////                                    console.log("Y",itemY);
+////                                    console.log("【X】begin："+itemX.beginTime);
+////                                    console.log("【X】end："+itemY.endTime);
+//                                    var itemY = getSupportTimesInfo(that.m.supportTimes[y]);
+//                                    console.log("X的begin："+itemX.beginTime," > Y的end："+itemY.endTime,strFormat(itemX.beginTime)>strFormat(itemY.endTime));
+//                                    console.log("X的end："+itemX.endTime," < Y的begin："+itemY.beginTime,strFormat(itemX.endTime)<strFormat(itemY.beginTime));
+//                                    console.log(" ");console.log(" ");console.log(" ");
+////                                    if (strFormat(itemX.beginTime) > strFormat(itemY.endTime)  &&(strFormat(itemX.endTime) < strFormat(itemY.beginTime))) {
+////                                        $("#supportTimeRemark").html("时间冲突：【"+itemX.name+"】--【"+itemY.name+"】对应多种折扣");
+////                                        that.canSave = false;
+////                                    }
+//                                    if(strFormat(itemX.beginTime)<strFormat(itemY.beginTime)){
+//
+//                                    }
+//                                }
+//                            }
+
+                            for (var i in that.m.supportTimes) {
+                                var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
+                                for (var y in that.m.supportTimes) {
+                                    var itemY = getSupportTimesInfo(that.m.supportTimes[y]);
+                                    if(i == y){
+                                        break;
+                                    }
+                                    if(strFormat(itemX.beginTime)>=strFormat(itemY.beginTime) && strFormat(itemX.beginTime)<=strFormat(itemY.endTime) ){      //X 开始时间    在       Y区间之间
+                                        $("#supportTimeRemark").html("时间冲突：【"+itemX.name+"("+itemX.discount+"%)】--【"+itemY.name+"("+itemY.discount+"%)】");
+                                        that.canSave = false;
+                                    }
+                                    if(strFormat(itemX.endTime)>=strFormat(itemY.beginTime) && strFormat(itemX.endTime)<=strFormat(itemY.endTime) ){            //X 结束时间     在      Y区间之间
+                                        $("#supportTimeRemark").html("时间冲突：【"+itemX.name+"("+itemX.discount+"%)】--【"+itemY.name+"("+itemY.discount+"%)】");
+                                        that.canSave = false;
+                                    }
+                                    if(strFormat(itemX.beginTime)>=strFormat(itemY.beginTime) && strFormat(itemX.endTime)>=strFormat(itemY.endTime) ){        // X开始时间>Y开始时间   并且   X结束时间>Y开始时间
+                                        $("#supportTimeRemark").html("时间冲突：【"+itemX.name+"("+itemX.discount+"%)】--【"+itemY.name+"("+itemY.discount+"%)】");
+                                        that.canSave = false;
+                                    }
+                                }
+                            }
+
+                            //根据ID获取供应时间的信息
+                            function getSupportTimesInfo (id){
+                                var supportItem = null;
+                                $(that.supportTimes).each(function(index,item){
+                                    if(item.id == id){
+                                        supportItem = item;
+                                        return false;
+                                    }
+                                })
+                                return supportItem;
+                            }
+
+                            function strFormat(str){
+                                return parseInt(str.replace(":",""));
+                            }
+                        }
                     }
                 })
                 ;
