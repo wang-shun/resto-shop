@@ -534,5 +534,12 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param customerId
 	 * @return
      */
-	Integer selectByCustomerCount(String customerId,int consumeConfineUnit,int consumeConfineTime);
+	Integer selectByCustomerCount(String customerId,int consumeConfineTime);
+
+
+	/**
+	 * 返回未支付的订单的支付项
+	 */
+	Result refundPaymentByUnfinishedOrder(String orderId);
+
 }

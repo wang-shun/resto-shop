@@ -11,14 +11,14 @@
 				</div>
 			</div>
 			<div class="portlet-body">
-				<form role="form" class="form-horizontal" 
-					action="{{'shopDetailManage/modify'}}" @submit.prevent="save">
+				<form role="form" class="form-horizontal"
+					  action="{{'shopDetailManage/modify'}}" @submit.prevent="save">
 					<div class="form-body">
 						<div class="form-group">
 							<label class="col-sm-3 control-label">店铺名称：</label>
 							<div class="col-sm-9">
 								<input type="text" class="form-control" name="name"
-										:value="m.name" placeholder="必填" required="required">
+									   :value="m.name" placeholder="必填" required="required">
 							</div>
 						</div>
 
@@ -76,22 +76,22 @@
 							<div class="col-sm-9">
 								<div>
 									<label> <input type="radio" name="isMealFee"
-										v-model="m.isMealFee" value="1"> 是
+												   v-model="m.isMealFee" value="1"> 是
 									</label> <label> <input type="radio" name="isMealFee"
-										v-model="m.isMealFee" value="0"> 否
-									</label>
+															v-model="m.isMealFee" value="0"> 否
+								</label>
 								</div>
 							</div>
 						</div>
-						
+
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
 							<div class="col-sm-9">
 								<input type="text" class="form-control"
-									name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费"
-									required="required"> <input type="text"
-									class="form-control" name="mealFeeName" v-if="m.mealFeeName"
-									v-model="m.mealFeeName" required="required">
+									   name="mealFeeName" v-if="!m.mealFeeName" value="餐盒费"
+									   required="required"> <input type="text"
+																   class="form-control" name="mealFeeName" v-if="m.mealFeeName"
+																   v-model="m.mealFeeName" required="required">
 							</div>
 						</div>
 
@@ -99,32 +99,32 @@
 							<label class="col-sm-3 control-label">餐盒费/盒：</label>
 							<div class="col-sm-9">
 								<input type="number" class="form-control"
-									name="mealFeePrice" placeholder="(建议输入整数)"
-									v-model="m.mealFeePrice" required="required" min="0">
+									   name="mealFeePrice" placeholder="(建议输入整数)"
+									   v-model="m.mealFeePrice" required="required" min="0">
 							</div>
 						</div>
-						
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">开启就餐提醒：</label>
 							<div class="col-sm-9">
 								<div>
 									<label> <input type="radio" name="isPush"
-										v-model="m.isPush" value="1"> 是
+												   v-model="m.isPush" value="1"> 是
 									</label> <label> <input type="radio" name="isPush"
-										v-model="m.isPush" value="0"> 否
-									</label>
+															v-model="m.isPush" value="0"> 否
+								</label>
 								</div>
 							</div>
 						</div>
-						
+
 						<div class="form-group" v-if="m.isPush==1">
 							<label class="col-sm-3 control-label">消息内容：</label>
 							<div class="col-sm-9">
 								<input type="text" class="form-control"
-									name="pushContext" v-if="!m.pushContext" placeholder="消息文案"
-									required="required"> <input type="text"
-									class="form-control" name="pushContext" v-if="m.pushContext"
-									v-model="m.pushContext" required="required">
+									   name="pushContext" v-if="!m.pushContext" placeholder="消息文案"
+									   required="required"> <input type="text"
+																   class="form-control" name="pushContext" v-if="m.pushContext"
+																   v-model="m.pushContext" required="required">
 							</div>
 						</div>
 
@@ -132,8 +132,8 @@
 							<label class="col-sm-3 control-label">推送时间：</label>
 							<div class="col-sm-9">
 								<input type="number" class="form-control"
-									name="pushTime" placeholder="(建议输入整数,以秒为单位)"
-									v-model="m.pushTime" required="required" min="0">
+									   name="pushTime" placeholder="(建议输入整数,以秒为单位)"
+									   v-model="m.pushTime" required="required" min="0">
 							</div>
 						</div>
 
@@ -141,16 +141,16 @@
 							<label class="col-sm-3 control-label">店铺标语：</label>
 							<div class="col-sm-9">
 								<input type="text" class="form-control"
-									name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
-									v-model="m.slogan">
+									   name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
+									   v-model="m.slogan">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">等位提示：</label>
 							<div class="col-sm-9">
 								<textarea rows="3" class="form-control"
-									name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
-									v-model="m.queueNotice"></textarea>
+										  name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
+										  v-model="m.queueNotice"></textarea>
 							</div>
 						</div>
 
@@ -169,13 +169,14 @@
 
 
 						<div  class="form-group" v-if="m.isUserIdentity==1">
-							<label class="col-sm-3 control-label">消费 次数：</label>
-							<input v-if="showa" type="number" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px" >
+							<label class="col-sm-3 control-label">高频条件：<span v-if="showlate" >近</span></label>
+							<input v-if="showa" type="number" min="1" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px;margin-left: 19px;" >
 							<select class="form-control" style="width:12%;position: relative;left: 15px;" id="consumeConfineUnit"  name="consumeConfineUnit" @click="selectWaitUnit" v-model="m.consumeConfineUnit">
 								<option  value="1" selected="selected">日</option>
 								<option  value="2">月</option>
 								<option  value="3">无限制</option>
 							</select>
+							<span style="float: right;margin-top: -25px; margin-right: 42%;">消费</span>
 							<div class="col-sm-3" style="width: 12%; float:right;margin-top: -35px;margin-right:30%;">
 								<input type="number" class="form-control"
 									   name="consumeNumber" v-model="m.consumeNumber" required="required" min="0" >
@@ -218,7 +219,8 @@
 					el : "#control",
 					data : {
 						m : result.data,
-						showa:true
+						showa:true,
+						showlate:true
 					},
 					watch: {
 						'm.consumeConfineUnit': 'hideShowa'
@@ -227,8 +229,10 @@
 						hideShowa : function(){
 							if(this.m.consumeConfineUnit == 3){
 								this.showa = false;
+								this.showlate=false;
 							}else{
 								this.showa = true;
+								this.showlate=true;
 							}
 						},
 						initTime : function() {

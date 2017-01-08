@@ -168,6 +168,10 @@
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-wysiwyg/js/jquery.hotkeys.js"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/bootstrap-wysiwyg/bootstrap-wysiwyg.js"></script>
 
+        <!-- 百度编辑器 -->
+        <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.config.js"></script><!-- 配置文件 -->
+        <script type="text/javascript" src="<%=resourcePath%>/assets/global/plugins/ueditor/ueditor.all.min.js"></script><!-- 编辑器源码文件 -->
+
         <!-- END THEME LAYOUT SCRIPTS -->
     </body>
 	

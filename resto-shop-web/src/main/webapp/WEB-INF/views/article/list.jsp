@@ -802,6 +802,7 @@
                         allArticles: allArticles,
                         choiceArticleShow: {show: false, mealAttr: null, items: [], currentFamily: ""},
                         singleItem:[],
+                        searchNameLike : "",
                         canSave : true, //用于判断是否可以点击保存按钮
                     },
                     methods: {
@@ -1114,6 +1115,7 @@
                             return false;
                         },
                         save: function (e) {
+
                             var attrs = this.m.mealAttrs;
                             for (var i = 0; i < attrs.length; i++) {
                                 var attr = attrs[i];

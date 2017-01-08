@@ -211,8 +211,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
+            }else{
+                Order p = getOrderInfo(order.getParentOrderId());
+                order.setVerCode(p.getVerCode());
             }
         }
+
+
+
         order.setId(orderId);
         order.setCreateTime(new Date());
         BigDecimal totalMoney = BigDecimal.ZERO;
@@ -478,7 +484,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
         }
-
+        if(order.getDistributionModeId() == DistributionType.TAKE_IT_SELF){
+            order.setTableNumber(order.getVerCode());
+        }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -512,7 +520,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
             parent.setLastOrderTime(order.getCreateTime());
         }
-        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
+        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
         parent.setCountWithChild(articleCountWithChildren);
         parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
         update(parent);
@@ -536,6 +544,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order payOrderSuccess(Order order) {
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
+            order.setIsPay(OrderPayState.PAYED);
             update(order);
         }
 
@@ -563,7 +572,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private int selectArticleCountById(String id,Integer shopMode) {
-        return orderMapper.selectArticleCountById(id,shopMode);
+        return orderMapper.selectArticleCountById(id, shopMode);
     }
 
     @Override
@@ -703,6 +712,84 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return false;
         }
 
+    }
+
+    @Override
+    public Result refundPaymentByUnfinishedOrder(String orderId) {
+        Result result = new Result();
+
+        //首先获得订单
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            //如果订单状态不是1 或者 是后付模式
+            result.setMessage("订单状态不符合退款条件");
+            result.setSuccess(false);
+            return result;
+        }
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(orderId);
+        for (OrderPaymentItem item : payItemsList) {
+            String newPayItemId = ApplicationUtils.randomUUID();
+            switch (item.getPaymentModeId()) {
+                case PayMode.COUPON_PAY:
+                    couponService.refundCoupon(item.getResultData());
+                    break;
+                case PayMode.ACCOUNT_PAY:
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    break;
+                case PayMode.CHARGE_PAY:
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.REWARD_PAY:
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.WEIXIN_PAY:
+                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                    JSONObject obj = new JSONObject(item.getResultData());
+                    int refund = obj.getInt("total_fee");
+                    Map<String, String> jsonObject = null;
+                    if(shopDetail.getWxServerId() == null){
+                        jsonObject  = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
+                                obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
+                                config.getMchkey(), config.getPayCertPath());
+                    }else{
+                        WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+
+                        jsonObject = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
+                                obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+                    }
+
+
+
+                    item.setResultData(new JSONObject(jsonObject).toString());
+                    break;
+                case PayMode.WAIT_MONEY:
+                    getNumberService.refundWaitMoney(order);
+                    break;
+                case PayMode.ALI_PAY: //如果是支付宝支付
+                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
+                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                    Map map = new HashMap();
+                    map.put("out_trade_no", order.getId());
+                    map.put("refund_amount", item.getPayValue());
+                    String resultJson = AliPayUtils.refundPay(map);
+                    item.setResultData(new JSONObject(resultJson).toString());
+                    break;
+
+
+
+            }
+            order.setPaymentAmount(order.getPaymentAmount().add(item.getPayValue()));
+            item.setId(newPayItemId);
+            item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+            orderPaymentItemService.insert(item);
+        }
+        update(order);
+        result.setSuccess(true);
+        return result;
     }
 
     private void refundOrder(Order order) {
@@ -1111,19 +1198,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 StringBuilder gao = new StringBuilder();
 
-                int unit=shopDetail.getConsumeConfineUnit();//1 2 3（日月 无限制）
-
                 //店铺设置的次数；
                 int  brandNumber=  shopDetail.getConsumeNumber();
 
                 //用户订单的次数
-                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());////
+                int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineTime());////
                  //店铺是否开启了这个高频功能，订单数大于店铺设置的次数
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCount > brandNumber&&shopDetail.getConsumeConfineUnit()!=3){
                      gao.append(" vip");
                 }
                 //3无限制
-                int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+                int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),0);
 
                 if(shopDetail.getIsUserIdentity() == 1 && brandNumber > 0 && gaoCountlong > brandNumber && shopDetail.getConsumeConfineUnit()==3){
                     gao.append(" vip");
@@ -1342,10 +1427,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         StringBuilder gao = new StringBuilder();
         //shopDetail.getIsUserIdentity() == 1
-        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineTime());
 
         //3无限制
-        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),0);
 
         if(shopDetail.getIsUserIdentity() == 1 && shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
             gao.append(" VIP");
@@ -2989,6 +3074,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderState() < OrderState.PAYMENT) {
             order.setOrderState(OrderState.PAYMENT);
             order.setAllowCancel(false);
+            order.setIsPay(OrderPayState.PAYED);
             order.setAllowContinueOrder(false);
             update(order);
         }
@@ -2997,6 +3083,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
+                child.setIsPay(OrderPayState.PAYED);
                 child.setAllowCancel(false);
                 child.setAllowContinueOrder(false);
                 update(child);
@@ -3901,10 +3988,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return orderMapper.getCustomerOrderList(customerId, beginDate, endDate);
 	}
 
-
-
     @Override
-    public Integer selectByCustomerCount(String customerId ,int consumeConfineUnit ,int consumeConfineTime ) {
-        return orderMapper.selectByCustomerCount(customerId ,consumeConfineUnit,consumeConfineTime);
+    public Integer selectByCustomerCount(String customerId,int consumeConfineTime ) {
+        return orderMapper.selectByCustomerCount(customerId, consumeConfineTime);
     }
 }

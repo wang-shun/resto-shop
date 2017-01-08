@@ -165,6 +165,9 @@ public class Order implements Serializable{
     //订单原始金额（退菜前）
     private BigDecimal baseMoney;
 
+    //支付状态（0 未支付 1支付中 2已支付）
+    private Integer isPay;
+
 
 
     //子订单的菜品项 ，key为子订单id
@@ -174,6 +177,14 @@ public class Order implements Serializable{
 
     //订单原始人数（退菜前）
     private Integer baseCustomerCount;
+
+    public Integer getIsPay() {
+        return isPay;
+    }
+
+    public void setIsPay(Integer isPay) {
+        this.isPay = isPay;
+    }
 
     public Integer getBaseCustomerCount() {
         return baseCustomerCount;

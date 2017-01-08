@@ -18,20 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.BrandMarketing;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.Coupon;
-import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.AccountLogService;
-import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.service.OrderPaymentItemService;
 
 @Controller
 @RequestMapping("/brandMarketing")
@@ -39,12 +32,6 @@ public class BrandMarketingController extends GenericController{
 
 	@Resource
 	private AccountLogService accountLogService;
-	
-	@Resource
-	private OrderPaymentItemService orderPaymentItemService;
-	
-	@Resource
-	private CouponService couponService;
 	
 	@RequestMapping("/list")
 	public void list(){}
@@ -57,9 +44,6 @@ public class BrandMarketingController extends GenericController{
 			Map<String, String> selectMap = new HashMap<String, String>();
 			selectMap.put("beginDate", beginDate);
 			selectMap.put("endDate", endDate);
-			List<AccountLog> accountLogs = accountLogService.selectAccountLog(selectMap);
-			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectOrderPayMentItem(selectMap);
-			List<Coupon> coupons = couponService.selectCoupon(selectMap);
 			JSONObject object = new JSONObject();
 			object.put("brandName", getBrandName());
 			object.put("plRedMoney", 0);
@@ -71,37 +55,33 @@ public class BrandMarketingController extends GenericController{
 			object.put("yqCouponMoney", 0);
 			BigDecimal redMoneyAll = new BigDecimal(0);
 			BigDecimal couponAllMoney = new BigDecimal(0);
-			for(AccountLog accountLog : accountLogs){
-				if(accountLog.getSource().equals(1)){
-					object.put("plRedMoney", accountLog.getMoney());
-					redMoneyAll = redMoneyAll.add(accountLog.getMoney());
-				}else if(accountLog.getSource().equals(3)){
-					object.put("czRedMoney", accountLog.getMoney());
-					redMoneyAll = redMoneyAll.add(accountLog.getMoney());
-				}else if(accountLog.getSource().equals(4)){
-					object.put("fxRedMoney", accountLog.getMoney());
-					redMoneyAll = redMoneyAll.add(accountLog.getMoney());
-				}
-			}
-			for(OrderPaymentItem paymentItem : orderPaymentItems){
-				if(paymentItem.getPaymentModeId().equals(8)){
-					object.put("dwRedMoney", paymentItem.getPayValue());
-					redMoneyAll = redMoneyAll.add(paymentItem.getPayValue());
-				}else if(paymentItem.getPaymentModeId().equals(11)){
-					object.put("tcRedMoney", paymentItem.getPayValue());
-					redMoneyAll = redMoneyAll.add(paymentItem.getPayValue());
+			List<String> brandMarketings = accountLogService.selectBrandMarketing(selectMap);
+			for(String brandMarketing : brandMarketings){
+				String[] results = brandMarketing.split(":");
+				if(results[0].equalsIgnoreCase("plRedMoney")){
+					object.put("plRedMoney", results[1]);
+					redMoneyAll = redMoneyAll.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("czRedMoney")){
+					object.put("czRedMoney", results[1]);
+					redMoneyAll = redMoneyAll.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("fxRedMoney")){
+					object.put("fxRedMoney", results[1]);
+					redMoneyAll = redMoneyAll.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("dwRedMoney")){
+					object.put("dwRedMoney", results[1]);
+					redMoneyAll = redMoneyAll.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("tcRedMoney")){
+					object.put("tcRedMoney", results[1]);
+					redMoneyAll = redMoneyAll.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("zcCouponMoney")){
+					object.put("zcCouponMoney", results[1]);
+					couponAllMoney = couponAllMoney.add(new BigDecimal(results[1]));
+				}else if(results[0].equalsIgnoreCase("yqCouponMoney")){
+					object.put("yqCouponMoney", results[1]);
+					couponAllMoney = couponAllMoney.add(new BigDecimal(results[1]));
 				}
 			}
 			object.put("redMoneyAll", redMoneyAll);
-			for(Coupon coupon : coupons){
-				if(coupon.getCouponType().equals(0)){
-					object.put("zcCouponMoney", coupon.getValue());
-					couponAllMoney = couponAllMoney.add(coupon.getValue());
-				}else if(coupon.getCouponType().equals(1)){
-					object.put("yqCouponMoney", coupon.getValue());
-					couponAllMoney = couponAllMoney.add(coupon.getValue());
-				}
-			}
 			object.put("couponAllMoney", couponAllMoney);
 			return getSuccessResult(object);
 		}catch (Exception ex) {

@@ -28,7 +28,7 @@
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
 		  	 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
 		</form>
-		
+
 	</div>
 </div>
 <br/>
