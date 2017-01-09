@@ -402,6 +402,6 @@
 	</select>
 
     <select id="selectByShareCustomer" resultType="java.lang.Integer">
-      select count(1) from tb_customer t where t.shareCustomer = #{id}
+      select count(1) from tb_customer t where t.share_customer = #{id}
     </select>
 </mapper>
