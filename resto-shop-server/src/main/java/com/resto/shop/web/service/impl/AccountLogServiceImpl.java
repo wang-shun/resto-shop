@@ -42,4 +42,9 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
 	public List<String> selectBrandMarketing(Map<String, String> selectMap) {
 		return accountlogMapper.selectBrandMarketing(selectMap);
 	}
+
+    @Override
+    public Integer selectByShareMoney(String accountId) {
+        return accountlogMapper.selectByShareMoney(accountId);
+    }
 }
