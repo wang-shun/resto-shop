@@ -1367,28 +1367,26 @@
                                         break;
                                     }
                                     if(strFormat(itemX.beginTime)>=strFormat(itemY.beginTime) && strFormat(itemX.beginTime)<=strFormat(itemY.endTime) ){      //X 开始时间    在       Y区间之间
-                                        showSupportTimeRemark(itemX,itemY);
-                                        break;
+                                        if(itemX.supportWeekBin&itemY.supportWeekBin){//如果两个供应时间，存在时间重叠，并且选中的星期也存在重叠，则不允许保存。
+                                            showSupportTimeRemark(itemX,itemY);
+                                            break;
+                                        }
                                     }
                                     if(strFormat(itemX.endTime)>=strFormat(itemY.beginTime) && strFormat(itemX.endTime)<=strFormat(itemY.endTime) ){            //X 结束时间     在      Y区间之间
-                                        showSupportTimeRemark(itemX,itemY);
-                                        break;
+                                        if(itemX.supportWeekBin&itemY.supportWeekBin){
+                                            showSupportTimeRemark(itemX,itemY);
+                                            break;
+                                        }
                                     }
                                     if(strFormat(itemX.beginTime)<=strFormat(itemY.beginTime) && strFormat(itemX.endTime)>=strFormat(itemY.endTime) ){        //  Y 在 X 区间内
-                                        showSupportTimeRemark(itemX,itemY);
-                                        break;
+                                        if(itemX.supportWeekBin&itemY.supportWeekBin){
+                                            showSupportTimeRemark(itemX,itemY);
+                                            break;
+                                        }
                                     }
                                 }
                             }
 
-                            //显示供应时间冲突错误
-                            function showSupportTimeRemark(x,y){
-                                var str = "时间冲突：<br/>";
-                                str += "【"+x.name+"】 ("+x.beginTime+"--"+x.endTime+")<br/>";
-                                str += "【"+y.name+"】 ("+y.beginTime+"--"+y.endTime+")<br/>";
-                                $("#supportTimeRemark").html(str);
-                                that.canSave = false;
-                            }
                             //根据ID获取供应时间的信息
                             function getSupportTimesInfo (id){
                                 var supportItem = null;
@@ -1399,6 +1397,15 @@
                                     }
                                 })
                                 return supportItem;
+                            }
+
+                            //显示供应时间冲突错误
+                            function showSupportTimeRemark(x,y){
+                                var str = "星期或时间冲突：<br/>";
+                                str += "【"+x.name+"】 ("+x.beginTime+"--"+x.endTime+")<br/>";
+                                str += "【"+y.name+"】 ("+y.beginTime+"--"+y.endTime+")<br/>";
+                                $("#supportTimeRemark").html(str);
+                                that.canSave = false;
                             }
 
                             function strFormat(str){
