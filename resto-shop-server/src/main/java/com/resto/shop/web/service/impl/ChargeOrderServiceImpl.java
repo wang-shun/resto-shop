@@ -2,8 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -12,6 +11,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -56,6 +56,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     OrderPaymentItemService orderPaymentItemService;
 	@Resource
 	BrandService brandService;
+
+	@Resource
+	ChargeOrderService chargeorderService;
+
 
 	@Override
 	public GenericDao<ChargeOrder, String> getDao() {
@@ -224,11 +228,40 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	 * @param beginDate
 	 * @param endDate
 	 * @return
+	 *
 	 */
 	@Override
 	public List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate) {
 		return chargeorderMapper.shopChargeCodes(shopdetailid,beginDate,endDate);
 	}
+
+	/**
+	 * 下载报表
+	 * @param shopdetailid
+	 * @param beginDate
+	 * @param endDate
+	 * @param shopname
+	 * @return
+	 */
+
+
+	@Override
+	public Map<String, Object> shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+
+		List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
+		for (ChargeOrder charge:chargeList) {
+			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,charge.getChargeMoney(),charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),charge.getChargelog().getOperationPhone(),charge.getChargelog().getCustomerPhone());
+			ShopDetailDtoList.add(ShopDetailDto);
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("shopId", ShopDetailDtoList);
+		return map;
+	}
+
 
 
 

@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.ChargeOrder;
@@ -65,4 +66,14 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 
 	List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate);
+
+
+	/**
+	 * 下载报表
+	 */
+
+	public Map<String,Object>  shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname);
+
+
+
 }

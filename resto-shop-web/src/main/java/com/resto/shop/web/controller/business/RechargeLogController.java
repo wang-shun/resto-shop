@@ -1,7 +1,22 @@
 package com.resto.shop.web.controller.business;
 
-import com.resto.brand.core.entity.Result;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.ShopDetailDto;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -11,18 +26,6 @@ import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.ChargePaymentService;
 import com.resto.shop.web.service.CustomerService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.*;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.*;
 
 
 @Controller
@@ -45,25 +48,34 @@ public class RechargeLogController extends GenericController{
 	@Resource
 	private CustomerService customerService;
 
+
+
+
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
 
-        for (ShopDetail fa:shopDetailList
+        /*for (ShopDetail fa:shopDetailList
              ) {
             System.out.println(fa.getName()+fa.getId()+"---------------");
-        }
+        }*/
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
 
         return chargeList ;
 	}
 
 
+
     /**
      * 店铺详细下载报表
      * @return
      */
+
+    public Map<String,Object> getResultSetDto(String shopdetailid,String beginDate,String endDate,String shopname){
+        chargeorderService.shopChargeCodesSetDto(shopdetailid,beginDate,endDate,shopname);
+        return  null;
+    }
     @RequestMapping("shop_excel")
     @ResponseBody
    public void reportOrder(String beginDate, String endDate, String
@@ -80,7 +92,7 @@ public class RechargeLogController extends GenericController{
                 {"shopname","typeString","customerPhone","chargeMoney","rewardMoney","finishTime","operationPhone    "};
                         //定义数据
 
-     List<ShopDetailDto>  result = new LinkedList<>();
+      List<ShopDetailDto>  result = new LinkedList<>();
 
     //获取店铺名称
         ShopDetail s = shopDetailService.selectById(shopId);
@@ -96,7 +108,7 @@ public class RechargeLogController extends GenericController{
 
         String[][] headers = {{"店铺","25"}};
         //定义excel工具类对象
-        ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
+       ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
         try{
             OutputStream out = new FileOutputStream(path);
             excelUtil.ExportExcel(headers, columns, result, out, map);
@@ -116,9 +128,9 @@ public class RechargeLogController extends GenericController{
 
 
 	@RequestMapping("/list")
-	public String list(){
+	public String  list(){
 
-        return "recharge/shopchargerecord";
+	    return "recharge/shopchargerecord";
 	}
 
 	@RequestMapping("/rechargeLog")
