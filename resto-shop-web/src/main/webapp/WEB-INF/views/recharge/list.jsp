@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
 <div id="control">
-<h2 class="text-center"><strong>评论报表</strong></h2><br/>
+<h2 class="text-center"><strong>充值报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -53,24 +53,24 @@
                         <th>微信端充值(元)</th>
                         <th>POS端充值(元)</th>
                         <th>充值消费总额(元)</th>
-                        <th>充值赠送消费(元)</th>
-                        <th>充值剩余总额(元)</th>
                         <th>充值赠送消费总额(元)</th>
+                        <th>充值剩余总额(元)</th>
+                        <th>充值赠送剩余总额(元)</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<!-- <td><strong>{{brandReport.brandName}}</strong></td> -->
-						<td>{{rechargeLogDto.brandName}}</td>
-						<td>{{rechargeLogDto.rechargeCount}}</td>
-						<td>{{rechargeLogDto.rechargeNum}}</td>
-                        <td>{{rechargeLogDto.rechargeGaNum}}</td>
-                        <td>{{rechargeLogDto.rechargeWeChat}}</td>
-                        <td>{{rechargeLogDto.rechargePos}}</td>
-						<td>{{rechargeLogDto.rechargeCsNum}}</td>
-						<td>{{rechargeLogDto.rechargeGaCsNum}}</td>
-                        <td>{{rechargeLogDto.rechargeSpNum}}</td>
-                        <td>{{rechargeLogDto.rechargeGaSpNum}}</td>
+						<td>{{brandInit.brandName}}</td>
+						<td>{{brandInit.rechargeCount}}</td>
+						<td>{{brandInit.rechargeNum}}</td>
+                        <td>{{brandInit.rechargeGaNum}}</td>
+                        <td>{{brandInit.rechargeWeChat}}</td>
+                        <td>{{brandInit.rechargePos}}</td>
+						<td>{{brandInit.rechargeCsNum}}</td>
+						<td>{{brandInit.rechargeGaCsNum}}</td>
+                        <td>{{brandInit.rechargeSpNum}}</td>
+                        <td>{{brandInit.rechargeGaSpNum}}</td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -103,18 +103,17 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<!-- <td><strong>{{brandReport.brandName}}</strong></td> -->
-						<td>--</td>
-						<td>--</td>
-						<td>--</td>
-                        <td>--</td>
-                        <td>--</td>
-                        <td>--</td>
-						<td>--</td>
-                        <td>--</td>
+					<tr v-for="shopRecharge in shopRrchargeLogs">
+						<td>{{shopRecharge.shopName}}</td>
+						<td>{{shopRecharge.shopCount}}</td>
+						<td>{{shopRecharge.shopNum}}</td>
+                        <td>{{shopRecharge.shopGaNum}}</td>
+                        <td>{{shopRecharge.shopWeChat}}</td>
+                        <td>{{shopRecharge.shopPos}}</td>
+						<td>{{shopRecharge.shopCsNum}}</td>
+                        <td>{{shopRecharge.shopGaCsNum}}</td>
 						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shopAppraise.shopName , shopAppraise.shopId)">查看详情</button></td>
+								@click="showShopReport(shopRecharge.shopId)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -165,8 +164,8 @@ $('.form_datetime').datetimepicker({
 var vueObj =  new Vue({
 	el:"#control",
 	data:{
-		rechargeLogDto:{},
-		shopAppraises:[],
+		brandInit:{},
+		shopRrchargeLogs:[],
 		searchDate : {
 			beginDate : "",
 			endDate : "",
@@ -185,10 +184,11 @@ var vueObj =  new Vue({
 			return ;
 		}
 			$.post("recharge/rechargeLog", this.getDate(null), function(result) {
-					that.rechargeLogDto = result.data.rechargeLogDto;
-// 					that.shopAppraises = result.data.shopAppraise;
-					toastr.success("查询成功");
-				});
+				that.brandInit = result.data.brandInit;
+				that.shopRrchargeLogs = result.data.shopRrchargeLogs;
+				console.log(that.shopRrchargeLogs);
+				toastr.success("查询成功");
+			});
 		},
 		getDate : function(shopId){
 			var data = {
@@ -198,9 +198,9 @@ var vueObj =  new Vue({
 			};
 			return data;
 		},
-		showShopReport : function(shopName,shopId) {
+		showShopReport : function(shopId) {
 			$("#reportModal").modal('show');
-			this.openModal("appraiseReport/shopReport",shopName,shopId);
+			this.openModal("recharge/rechargeLog",shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
 			$.post(url, this.getDate(shopId),function(result) {
@@ -243,7 +243,7 @@ var vueObj =  new Vue({
 		brandreportExcel : function (){
 			var beginDate = this.searchDate.beginDate;
 			var endDate = this.searchDate.endDate;
-			location.href="appraiseReport/brand_excel?beginDate="+beginDate+"&&endDate="+endDate;
+			location.href="recharge/brandOrShop_excel?beginDate="+beginDate+"&&endDate="+endDate;
 		}
 		
 	},
