@@ -199,4 +199,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public String selectBrandUser() {
 		return customerMapper.selectBrandUser();
 	}
+
+	@Override
+	public Integer selectByShareCustomer(String customerId) {
+		return customerMapper.selectByShareCustomer(customerId);
+	}
 }

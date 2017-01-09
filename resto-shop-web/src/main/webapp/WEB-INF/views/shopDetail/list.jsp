@@ -154,6 +154,9 @@
 							</div>
 						</div>
 
+
+
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">开启显示用户标识功能：</label>
 							<div class="col-sm-9">

@@ -108,7 +108,6 @@
             <result column="article_name" property="articleName"/>
             <result column="count" property="count"/>
         </collection>
-
     </resultMap>
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
@@ -283,7 +282,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number,
+        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number,need_scan,
         is_pay
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
@@ -483,6 +482,9 @@
             <if test="mealAllNumber != null">
                 meal_all_number,
             </if>
+            <if test="needScan != null">
+                need_scan,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -613,6 +615,9 @@
             </if>
             <if test="mealAllNumber != null">
                 #{mealAllNumber},
+            </if>
+            <if test="needScan != null">
+                #{needScan},
             </if>
         </trim>
     </insert>

@@ -62,4 +62,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 
    //得到品牌用户信息
    String selectBrandUser();
+
+	Integer selectByShareCustomer(String customerId);
 }

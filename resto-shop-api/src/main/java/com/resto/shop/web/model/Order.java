@@ -168,8 +168,6 @@ public class Order implements Serializable{
     //支付状态（0 未支付 1支付中 2已支付）
     private Integer isPay;
 
-
-
     //子订单的菜品项 ，key为子订单id
     private Map<String,List<OrderItem>> childItems;
 
@@ -178,12 +176,23 @@ public class Order implements Serializable{
     //订单原始人数（退菜前）
     private Integer baseCustomerCount;
 
+    //是否需要扫码 0不需要 1需要
+    private Integer needScan;
+
     public Integer getIsPay() {
         return isPay;
     }
 
     public void setIsPay(Integer isPay) {
         this.isPay = isPay;
+    }
+
+    public Integer getNeedScan() {
+        return needScan;
+    }
+
+    public void setNeedScan(Integer needScan) {
+        this.needScan = needScan;
     }
 
     public Integer getBaseCustomerCount() {

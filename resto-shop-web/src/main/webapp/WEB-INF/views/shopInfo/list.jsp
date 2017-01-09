@@ -168,6 +168,20 @@
 						</div>
 
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">外带是否需要扫码：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="continueOrderScan"
+												   v-model="m.continueOrderScan" value="0"> 不需要
+									</label> <label> <input type="radio" name="continueOrderScan"
+															v-model="m.continueOrderScan" value="1"> 需要
+								</label>
+								</div>
+							</div>
+						</div>
+
+
 						<div  class="form-group" v-if="m.isUserIdentity==1">
 							<label class="col-sm-3 control-label">高频条件：<span v-if="showlate" >近</span></label>
 							<input v-if="showa" type="number" min="1" name="consumeConfineTime" class="form-control"  v-model="m.consumeConfineTime" style="width:12%;float:left;margin-right: 5px;margin-left: 19px;" >

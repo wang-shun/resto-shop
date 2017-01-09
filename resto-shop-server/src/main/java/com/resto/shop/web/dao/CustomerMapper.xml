@@ -319,9 +319,12 @@
 
   <select id="selectBrandUser" resultType="java.lang.String">
     select CONCAT_WS(',',(select count(1) from tb_customer),(select count(1) from tb_customer where is_bind_phone=1)
-	,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
-	,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
-	,(select count(1) from tb_customer where id in (select customer_id from tb_order where parent_order_id is null GROUP BY customer_id having count(id) > 2))) count
+    ,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
+    ,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
+    ,(select count(1) from tb_customer where id in (select customer_id from tb_order where order_state in (2,10,11,12,13)
+    and production_status in (2,3) GROUP BY customer_id having count(id) > 2))
+    ,(select count(1) from tb_customer where id in (select customer_id from tb_order
+    where order_state in (2,10,11,12,13) and production_status in (2,3) group by customer_id))) count
   </select>
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
@@ -397,4 +400,8 @@
 		on tc.account_id = ta.id
 		where tc.telephone = #{telephone}
 	</select>
+
+    <select id="selectByShareCustomer" resultType="java.lang.Integer">
+      select count(1) from tb_customer t where t.share_customer = #{id}
+    </select>
 </mapper>
