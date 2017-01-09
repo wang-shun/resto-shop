@@ -36,6 +36,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public JSONResult createOrder(Order order)throws AppException;
 
+	public JSONResult repayOrder(Order order)throws AppException;
+
 	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
 
 	public boolean cancelOrder(String string);
