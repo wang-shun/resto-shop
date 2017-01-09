@@ -188,6 +188,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             old.setServicePrice(order.getServicePrice());
         }
         if(order.getMealFeePrice() == null){
+            old.setMealFeePrice(new BigDecimal(0));
+        }else{
             old.setMealFeePrice(order.getMealFeePrice());
         }
 
