@@ -400,4 +400,8 @@
 		on tc.account_id = ta.id
 		where tc.telephone = #{telephone}
 	</select>
+
+    <select id="selectByShareCustomer" resultType="java.lang.Integer">
+      select count(1) from tb_customer t where t.share_customer = #{id}
+    </select>
 </mapper>

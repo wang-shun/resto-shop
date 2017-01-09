@@ -170,4 +170,9 @@
 			where coupon_type in (0,1) and add_time between #{beginDate} and date_add(#{endDate},interval 1 day)
 			group by coupon_type)
   </select>
+
+  <!-- 根据 账户ID 查询 分享返利总额 -->
+  <select id="selectByShareMoney" resultType="java.lang.Integer">
+    SELECT sum(money) from tb_account_log where account_id = #{accountId} and source = 4
+  </select>
 </mapper>
