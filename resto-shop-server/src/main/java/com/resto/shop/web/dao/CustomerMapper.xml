@@ -22,6 +22,7 @@
     <result column="last_order_shop" property="lastOrderShop" jdbcType="VARCHAR" />
     <result column="new_notice_time" property="newNoticeTime" jdbcType="TIMESTAMP" />
     <result column="share_customer" property="shareCustomer" jdbcType="VARCHAR" />
+    <result column="register_shop_id" property="registerShopId" jdbcType="VARCHAR" />
     <result column="is_now_register" property="isNowRegister" />
     <result column="customer_detail_id" property="customerDetailId" />
   </resultMap>
