@@ -20,6 +20,25 @@
     <result column="end_amount" property="endAmount"/>
     <result column="type" property="type"/>
   </resultMap>
+
+  <!--店铺详细-->
+  <resultMap id="ShopchargecordMap" type="com.resto.shop.web.model.ChargeOrder">
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="charge_money" property="chargeMoney" jdbcType="DECIMAL" />
+    <result column="reward_money" property="rewardMoney" jdbcType="DECIMAL" />
+    <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+    <result column="type" property="type"/>
+    <!--充值详细-->
+    <association property="chargelog" javaType="com.resto.shop.web.model.ChargeLog">
+      <id column="cid" property="id" jdbcType="VARCHAR" />
+      <result column="operation_phone" property="operationPhone" jdbcType="VARCHAR" />
+      <result column="customer_phone" property="customer_phone" jdbcType="VARCHAR" />
+    </association>
+
+  </resultMap>
+
+
   <sql id="Base_Column_List" >
     id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, 
     brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type
@@ -287,5 +306,20 @@
         AND order_state = 1
     </select>
 
+
+  <!--店铺充值详细-->
+  <select id="shopChargeCord" resultType="ShopchargecordMap" >-->
+
+    SELECT  o.id ,o.charge_money ,o.reward_money, o.finish_time,o.shop_detail_id ,o.type,c.id cid ,c.operation_phone,c.customer_phone  from tb_charge_log c
+    INNER JOIN tb_charge_order o ON c.charge_order_id=o.id
+    WHERE o.shop_detail_id="31164cebcc4b422685e8d9a32db12ab8"
+    AND o.order_state = 1
+    <if test="begin != null">
+      AND  <![CDATA[  o.finish_time>=#{begin} ]]>
+    </if>
+    <if test="endDate != null and endDate != ''">
+      AND  <![CDATA[ o.finish_time <= #{ endDate } ]]>
+    <!--</if>-->
+  </select>
 
 </mapper>
