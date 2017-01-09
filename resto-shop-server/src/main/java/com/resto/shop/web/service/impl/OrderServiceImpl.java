@@ -170,6 +170,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         JSONResult jsonResult = new JSONResult();
         Order old = orderMapper.selectByPrimaryKey(order.getId());
 
+        if(old.getServicePrice() == null){
+            old.setServicePrice(new BigDecimal(0));
+        }
+
+        if(old.getMealFeePrice() == null){
+            old.setMealFeePrice(new BigDecimal(0));
+        }
+
         //先获取菜品金额
         BigDecimal articleTotalPirce = old.getPaymentAmount().subtract(old.getServicePrice()).subtract(old.getMealFeePrice());
 
