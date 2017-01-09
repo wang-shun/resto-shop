@@ -164,6 +164,111 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return sb.toString();
     }
 
+
+    @Override
+    public JSONResult repayOrder(Order order) throws AppException {
+        JSONResult jsonResult = new JSONResult();
+        Order old = orderMapper.selectByPrimaryKey(order.getId());
+
+        //先获取菜品金额
+        BigDecimal articleTotalPirce = old.getPaymentAmount().subtract(old.getServicePrice()).subtract(old.getMealFeePrice());
+
+        //重新计算这单子的现有价格
+        if (order.getServicePrice() == null) {
+            old.setServicePrice(new BigDecimal(0));
+        }else{
+            old.setServicePrice(order.getServicePrice());
+        }
+        if(order.getMealFeePrice() == null){
+            old.setMealFeePrice(order.getMealFeePrice());
+        }
+
+        //重新计算订单价格
+        BigDecimal orderMoney = articleTotalPirce.add(old.getMealFeePrice()).add(old.getServicePrice());
+
+        old.setOriginalAmount(orderMoney);
+        old.setOrderMoney(orderMoney);
+
+        //计算订单应付金额
+        BigDecimal payment = orderMoney;
+
+
+        // 等位红包
+        ShopDetail detail = shopDetailService.selectById(old.getShopDetailId());
+        if (order.getWaitMoney().doubleValue() > 0) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(order.getId());
+            item.setPaymentModeId(PayMode.WAIT_MONEY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(order.getWaitMoney());
+            item.setRemark("等位红包支付:" + order.getWaitMoney());
+            item.setResultData(order.getWaitId());
+            orderPaymentItemService.insert(item);
+
+            GetNumber getNumber = getNumberService.selectById(order.getWaitId());
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
+            getNumberService.update(getNumber);
+
+            payment.subtract(order.getWaitMoney());
+        }
+        Customer customer = customerService.selectById(old.getCustomerId());
+
+
+
+        if (detail.getShopMode() != 5) {
+            if (order.getUseCoupon() != null) {
+                Coupon coupon = couponService.useCoupon(orderMoney, old);
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(order.getId());
+                item.setPaymentModeId(PayMode.COUPON_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(coupon.getValue());
+                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setResultData(coupon.getId());
+                orderPaymentItemService.insert(item);
+                payment = payment.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+            // 使用余额
+            if (payment.doubleValue() > 0 && order.isUseAccount()) {
+                BigDecimal payValue = accountService.payOrder(old, payment, customer);
+//			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
+                if (payValue.doubleValue() > 0) {
+                    payment = payment.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
+
+                }
+            }
+        }
+
+        if (payment.doubleValue() < 0) {
+            payment = BigDecimal.ZERO;
+        }
+        old.setPaymentAmount(payment);
+
+        if (old.getPaymentAmount().doubleValue() == 0) {
+            payOrderSuccess(old);
+        }
+        update(old);
+        jsonResult.setSuccess(Boolean.TRUE);
+        jsonResult.setData(old);
+        if (old.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            if (old.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(old.getParentOrderId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId(),old.getOrderMode());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < old.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(old.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(),parent.getOrderMode());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
+
+            }
+        }
+        return jsonResult;
+    }
+
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
