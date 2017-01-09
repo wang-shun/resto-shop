@@ -35,9 +35,21 @@ public class ChargeOrder {
     private BigDecimal endAmount;
 
     private Integer type;
-    
-	public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
-			String customerId, String shopDetailId, String brandId) {
+     //充值详细
+    private ChargeLog chargelog;
+
+
+
+    public ChargeLog getChargelog() {
+        return chargelog;
+    }
+
+    public void setChargelog(ChargeLog chargelog) {
+        this.chargelog = chargelog;
+    }
+
+    public ChargeOrder(String id, BigDecimal chargeMoney, BigDecimal rewardMoney, Byte orderState, Date createTime,
+                       String customerId, String shopDetailId, String brandId) {
 		super();
 		this.id = id;
 		this.chargeMoney = chargeMoney;

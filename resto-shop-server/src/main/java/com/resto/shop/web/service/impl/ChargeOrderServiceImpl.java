@@ -217,6 +217,23 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
         return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
     }
 
+
+	/**
+	 *
+	 * @param shopdetailid
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	@Override
+	public List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate) {
+		return chargeorderMapper.shopChargeCodes(shopdetailid,beginDate,endDate);
+	}
+
+
+
+
+
 	public void wxPush(ChargeOrder chargeOrder){
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
 		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
