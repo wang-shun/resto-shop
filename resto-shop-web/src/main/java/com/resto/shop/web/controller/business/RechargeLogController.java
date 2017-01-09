@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.brand.web.dto.RechargeLogDto;
-import com.resto.brand.web.dto.ReportIncomeDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -68,34 +66,51 @@ public class RechargeLogController extends GenericController{
 		RechargeLogDto rechargeLogDto=chargepaymentService.selectRechargeLog(beginDate, endDate,getCurrentBrandId());
 		if(rechargeLogDto!=null){
 			brandInit.setBrandName(getBrandName());
+			//判断为空则为0
 			if(rechargeLogDto.getRechargeCount() == null){
 				brandInit.setRechargeCount(initZero);
-			}if(rechargeLogDto.getRechargeCsNum() == null){
+			}else{
+				brandInit.setRechargeCount(rechargeLogDto.getRechargeCount());
+			}
+			if(rechargeLogDto.getRechargeCsNum() == null){
 				brandInit.setRechargeCsNum(initZero);
-			}if(rechargeLogDto.getRechargeGaCsNum() == null){
+			}else{
+				brandInit.setRechargeCsNum(rechargeLogDto.getRechargeCsNum());
+			}
+			if(rechargeLogDto.getRechargeGaCsNum() == null){
 				brandInit.setRechargeGaCsNum(initZero);
-			}if(rechargeLogDto.getRechargeGaNum() == null){
+			}else{
+				brandInit.setRechargeGaCsNum(rechargeLogDto.getRechargeGaCsNum());
+			}
+			if(rechargeLogDto.getRechargeGaNum() == null){
 				brandInit.setRechargeGaNum(initZero);
-			}if(rechargeLogDto.getRechargeGaSpNum() == null){
+			}else{
+				brandInit.setRechargeGaNum(rechargeLogDto.getRechargeGaNum());
+			}
+			if(rechargeLogDto.getRechargeGaSpNum() == null){
 				brandInit.setRechargeGaSpNum(initZero);
-			}if(rechargeLogDto.getRechargeNum() == null){
+			}else{
+				brandInit.setRechargeGaSpNum(rechargeLogDto.getRechargeGaSpNum());
+			}
+			if(rechargeLogDto.getRechargeNum() == null){
 				brandInit.setRechargeNum(initZero);
-			}if(rechargeLogDto.getRechargePos() == null){
+			}else{
+				brandInit.setRechargeNum(rechargeLogDto.getRechargeNum());
+			}
+			if(rechargeLogDto.getRechargePos() == null){
 				brandInit.setRechargePos(initZero);
-			}if(rechargeLogDto.getRechargeSpNum() == null){
+			}else{
+				brandInit.setRechargePos(rechargeLogDto.getRechargePos());
+			}
+			if(rechargeLogDto.getRechargeSpNum() == null){
 				brandInit.setRechargeSpNum(initZero);
-			}if(rechargeLogDto.getRechargeWeChat() == null){
+			}else{
+				brandInit.setRechargeSpNum(rechargeLogDto.getRechargeSpNum());
+			}
+			if(rechargeLogDto.getRechargeWeChat() == null){
 				brandInit.setRechargeWeChat(initZero);
 			}else{
-			brandInit.setRechargeCount(rechargeLogDto.getRechargeCount());
-			brandInit.setRechargeCsNum(rechargeLogDto.getRechargeCsNum());
-			brandInit.setRechargeGaCsNum(rechargeLogDto.getRechargeGaCsNum());
-			brandInit.setRechargeGaNum(rechargeLogDto.getRechargeGaNum());
-			brandInit.setRechargeGaSpNum(rechargeLogDto.getRechargeGaSpNum());
-			brandInit.setRechargeNum(rechargeLogDto.getRechargeNum());
-			brandInit.setRechargePos(rechargeLogDto.getRechargePos());
-			brandInit.setRechargeSpNum(rechargeLogDto.getRechargeSpNum());
-			brandInit.setRechargeWeChat(rechargeLogDto.getRechargeWeChat());
+				brandInit.setRechargeWeChat(rechargeLogDto.getRechargeWeChat());
 			}
 		}
 		
@@ -111,28 +126,41 @@ public class RechargeLogController extends GenericController{
         	RechargeLogDto shopRechargeLogDto=chargepaymentService.selectShopRechargeLog(beginDate, endDate, shopDetail.getId());
         	shopInit.setShopId(shopDetail.getId());
         	shopInit.setShopName(shopDetail.getName());
+        	//判断为空则为0
         	if(shopRechargeLogDto.getShopCount()==null){
         		shopInit.setShopCount(initZero);
-        	}if(shopRechargeLogDto.getShopGaNum()==null){
+        	}else{
+            	shopInit.setShopCount(shopRechargeLogDto.getShopCount()); 		
+        	}
+        	if(shopRechargeLogDto.getShopGaNum()==null){
         		shopInit.setShopNum(initZero);
-        	}if(shopRechargeLogDto.getShopGaNum() == null){
+        	}else{
+            	shopInit.setShopNum(shopRechargeLogDto.getShopNum());
+        	}
+        	if(shopRechargeLogDto.getShopGaNum() == null){
         		shopInit.setShopGaNum(initZero);
-        	}if(shopRechargeLogDto.getShopWeChat() == null){
+        	}else{
+            	shopInit.setShopGaNum(shopRechargeLogDto.getShopGaNum());
+        	}
+        	if(shopRechargeLogDto.getShopWeChat() == null){
         		shopInit.setShopWeChat(initZero);
-        	}if(shopRechargeLogDto.getShopPos() == null){
+        	}else{
+            	shopInit.setShopWeChat(shopRechargeLogDto.getShopWeChat());
+        	}
+        	if(shopRechargeLogDto.getShopPos() == null){
         		shopInit.setShopPos(initZero);
-        	}if(shopRechargeLogDto.getShopCsNum() == null){
+        	}else{
+            	shopInit.setShopPos(shopRechargeLogDto.getShopPos());
+        	}
+        	if(shopRechargeLogDto.getShopCsNum() == null){
         		shopInit.setShopCsNum(initZero);
-        	}if(shopRechargeLogDto.getShopGaCsNum() == null){
+        	}else{
+            	shopInit.setShopCsNum(shopRechargeLogDto.getShopCsNum());
+        	}
+        	if(shopRechargeLogDto.getShopGaCsNum() == null){
         		shopInit.setShopGaCsNum(initZero);
 	    	}else{
-        	shopInit.setShopCount(shopRechargeLogDto.getShopCount()); 		
-        	shopInit.setShopNum(shopRechargeLogDto.getShopNum());
-        	shopInit.setShopGaNum(shopRechargeLogDto.getShopGaNum());
-        	shopInit.setShopWeChat(shopRechargeLogDto.getShopWeChat());
-        	shopInit.setShopPos(shopRechargeLogDto.getShopPos());
-        	shopInit.setShopCsNum(shopRechargeLogDto.getShopCsNum());
-        	shopInit.setShopGaCsNum(shopRechargeLogDto.getShopGaCsNum());
+	    		shopInit.setShopGaCsNum(shopRechargeLogDto.getShopGaCsNum());
         	}
         	shopRrchargeLogs.add(shopInit);
 		}
@@ -150,7 +178,6 @@ public class RechargeLogController extends GenericController{
 	@RequestMapping("brandOrShop_excel")
 	@ResponseBody
 	public void reportIncome(String userJson,String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
-		BigDecimal initZero=BigDecimal.ZERO;
     	List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
