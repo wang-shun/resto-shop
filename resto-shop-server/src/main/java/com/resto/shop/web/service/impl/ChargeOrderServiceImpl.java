@@ -25,12 +25,13 @@ import java.util.*;
 @RpcService
 public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, String> implements ChargeOrderService {
 
-  
+
     @Resource
     private ChargeSettingMapper chargeSettingMapper;
 
 	@Resource
 	private ChargeOrderMapper chargeorderMapper;
+
 	@Resource
 	private ChargePaymentService chargePaymentService;
 
@@ -44,7 +45,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	BrandService brandService;
 
 	@Resource
-	ChargeOrderService chargeorderService;
+	ChargeOrderMapper chargeOrderMapper;
 
 
 	@Override
@@ -69,7 +70,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setType(1);
 		chargeorderMapper.insert(chargeOrder);
 		return chargeOrder;
-	} 
+	}
 
 	@Override
 	public void chargeorderWxPaySuccess(ChargePayment cp) {
@@ -106,7 +107,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public void useChargePay(BigDecimal remainPay,String customerId,Order order) {
 		BigDecimal[] result = new BigDecimal[]{BigDecimal.ZERO,BigDecimal.ZERO};
 		useBalance(result,remainPay,customerId,order);
-		
+
 	}
 
 	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order) {
@@ -127,7 +128,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayValue(useCharge);
 				item.setRemark("充值余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
-				orderPaymentItemService.insert(item); 
+				orderPaymentItemService.insert(item);
 			}
 			if(useReward.compareTo(BigDecimal.ZERO)>0){
 				OrderPaymentItem item = new OrderPaymentItem();
@@ -138,7 +139,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayValue(useReward);
 				item.setRemark("赠送余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
-				orderPaymentItemService.insert(item); 
+				orderPaymentItemService.insert(item);
 			}
 			if(remindPay.compareTo(totalPay)>0){
 				remindPay = remindPay.subtract(totalPay).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -191,10 +192,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
     @Override
     public List<ChargeOrder> selectByDateAndShopId(String beginDate, String endDate, String shopId) {
-        
+
        Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
         Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
-        
+
         return chargeorderMapper.selectByDateAndShopId(begin,end,shopId);
     }
 
@@ -233,10 +234,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Override
 	public Map<String, Object> shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname) {
-		/*Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-           */
-		List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		for (ChargeOrder charge:chargeList) {
 			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,charge.getChargeMoney(),charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),charge.getChargelog().getOperationPhone(),charge.getChargelog().getCustomerPhone());
@@ -246,6 +244,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopdetailmap", ShopDetailDtoList);
 		return map;
+
 	}
 
 

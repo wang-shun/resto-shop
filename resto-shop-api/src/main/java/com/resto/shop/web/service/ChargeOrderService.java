@@ -9,9 +9,9 @@ import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.model.Order;
 
+
 public interface ChargeOrderService extends GenericService<ChargeOrder, String> {
 
-	
 	/**
 	 * 创建微信充值订单
 	 * @param settingId
@@ -27,10 +27,10 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 
 	/**
-	 * 
+	 *
 	 * @param remainPay
 	 * @param customerId
-	 * @param order 
+	 * @param order
 	 * @return  array[0]充值支付金额  array[1]赠送支付金额
 	 */
 	void useChargePay(BigDecimal remainPay, String customerId, Order order);
@@ -63,8 +63,6 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 *
 	 */
 
-
-
 	List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate);
 
 
@@ -73,6 +71,10 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 */
 
 	public Map<String,Object>  shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname);
+
+
+
+
 
 
 
