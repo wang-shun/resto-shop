@@ -319,10 +319,7 @@ order by t.print_sort asc
   
   <select id="selectOrderItemByOrderIds" parameterType="java.util.Map" resultMap="BaseResultMap">
   	select * from tb_order_item
-	where order_id in
-	<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
-		#{orderId}
-	</foreach>
+	where order_id = #{orderId}
 	and `status` = 1 and ${count}
   </select>
 </mapper>
