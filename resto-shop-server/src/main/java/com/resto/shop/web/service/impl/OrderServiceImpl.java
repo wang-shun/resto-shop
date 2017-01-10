@@ -858,9 +858,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                                 StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                     }
-
-
-
                     item.setResultData(new JSONObject(jsonObject).toString());
                     break;
                 case PayMode.WAIT_MONEY:
