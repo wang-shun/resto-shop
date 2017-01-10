@@ -2315,6 +2315,11 @@ AND o.production_status IN (2, 3)
 
     </select>
 
-
+	<select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
+		select * from tb_order where id in
+		<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+			#{orderId}
+		</foreach>
+	</select>
 
 </mapper>

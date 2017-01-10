@@ -535,4 +535,6 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
      */
 	Integer selectByCustomerCount(String customerId,int consumeConfineUnit,int consumeConfineTime);
+	
+	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
 }
