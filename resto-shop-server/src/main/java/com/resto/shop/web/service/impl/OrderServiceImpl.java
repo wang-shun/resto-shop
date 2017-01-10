@@ -3947,10 +3947,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
         int base = 0;
         int sum = 0 ;
+        BigDecimal mealPrice = BigDecimal.valueOf(0);
+        int mealCount = 0;
+        BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
         for (OrderItem item : o.getOrderItems()) {
             total = total.add(item.getFinalPrice());
             if(o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
-                BigDecimal mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
+                mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
+                mealTotalPrice = mealTotalPrice.add(mealPrice);
+                mealCount += item.getCount() * item.getMealFeeNumber();
                 total = total.add(mealPrice);
             }
             if(item.getRefundCount() > 0){
@@ -3963,7 +3968,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(o.getServicePrice() == null){
             o.setServicePrice(new BigDecimal(0));
         }
-
+        o.setMealFeePrice(mealTotalPrice);
+        o.setMealAllNumber(mealCount);
         o.setArticleCount(base - sum);
         o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(total.add(o.getServicePrice()));
