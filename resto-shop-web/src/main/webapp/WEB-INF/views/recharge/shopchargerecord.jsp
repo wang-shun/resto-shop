@@ -233,9 +233,8 @@ dt,dd{
 					toastr.error("开始时间不能大于结束时间");
 					return;
 				}
-
-				location.href = "recharge/shopDetail_excel" ;
-
+				location.href ="recharge/shopDetail_excel?shopDetailId=31164cebcc4b422685e8d9a32db12ab8"+"&&shopname=sss"+"&&beginDate="+beginDate
+						+ "&&endDate="+endDate;
 			});
 
 

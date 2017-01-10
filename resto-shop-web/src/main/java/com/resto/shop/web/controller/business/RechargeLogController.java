@@ -54,14 +54,9 @@ public class RechargeLogController extends GenericController{
 
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
-	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
-        List<ShopDetail> shopDetailList = getCurrentShopDetails();
-
-        for (ShopDetail fa:shopDetailList
-             ) {
-            System.out.println(fa.getName()+fa.getId()+"---------------");
-        }
-        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
+		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
 
         return chargeList ;
 	}
@@ -73,7 +68,13 @@ public class RechargeLogController extends GenericController{
 
     public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
            if(shopname==null) {
-           	shopname= getShopName(shopDetailId);
+			   List<ShopDetail> shopDetailList = getCurrentShopDetails();
+
+			   for (ShopDetail fa:shopDetailList
+					   ) {
+				   shopname= getShopName(fa.getName());
+			   }
+
            }
 		     shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
            Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
@@ -81,9 +82,9 @@ public class RechargeLogController extends GenericController{
         return  mapshopDetailDto;
     }
     @RequestMapping("shopDetail_excel")
-    @ResponseBody
-   public void reportShopDetail(String shopDetailId,String beginDate, String endDate,
-             HttpServletRequest request, HttpServletResponse response,String shopname){
+	@ResponseBody
+   public void reportShopDetail(String shopDetailId,String shopname,String beginDate, String endDate,
+             HttpServletRequest request, HttpServletResponse response){
         shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ShopDetailDto>  result = new LinkedList<>();
         Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,shopname);
@@ -91,26 +92,24 @@ public class RechargeLogController extends GenericController{
 
 
         //导出文件名
-        String fileName = "店铺订单列表"+beginDate+"至"+endDate
+        String fileName = "店铺充值记录"+beginDate+"至"+endDate
                 +".xls";
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
         String[]columns=
                          {"shopname","typeString","customerPhone","chargeMoney",
-						"rewardMoney","finishTime","operationPhone    "};
+						"rewardMoney","finishTime","operationPhone"};
                         //定义数据
 
 
       //获取店铺名称
         Map<String,String> map = new HashMap<>();
         map.put("shops",getShopName(shopDetailId));
-        map.put("beginDate", beginDate);
-        map.put("reportType", "店铺充值记录");//表的头，第一行内容
+      /*  map.put("beginDate", beginDate);
         map.put("endDate", endDate);
         map.put("num", "11");//显示的位置
-        map.put("reportTitle", "店铺充值记录");//表的名字
-        map.put("timeType", "yyyy-MM-dd");
+        map.put("timeType", "yyyy-MM-dd");*/
         String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
         ,{"充值赠送金额（元）","25"} ,{"充值时间（元）","25"} ,{"操作人手机","25"}};
         //定义excel工具类对象
@@ -135,12 +134,12 @@ public class RechargeLogController extends GenericController{
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
 
         }
-		for (ShopDetail shop: shopDetailList
+	/*	for (ShopDetail shop: shopDetailList
 				) {
-			/*shop.getId().equals(shopdetailid);*/
+			*//*shop.getId().equals(shopdetailid);*/
 			shopname="aa";
 
-		}
+		/*}*/
 
         return  shopname;
     }

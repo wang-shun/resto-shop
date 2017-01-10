@@ -233,14 +233,18 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Override
 	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
-		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
 
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
+		System.out.println(chargeList.size()+"_________________");
+
 		for (ChargeOrder charge:chargeList) {
-			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,charge.getChargeMoney(),charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),charge.getChargelog().getOperationPhone(),charge.getChargelog().getCustomerPhone());
+			//System.out.println(shopname +charge.getChargeMoney()+"___"+charge.getRewardMoney()+"+++"+charge.getFinishTime()+charge.getType()+"___"+charge.getChargelog().getOperationPhone()+"____"+charge.getChargelog().getCustomerPhone());
+			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,null==charge.getChargeMoney()?BigDecimal.ZERO:charge.getChargeMoney(),null==charge.getRewardMoney()?BigDecimal.ZERO:charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),null==charge.getChargelog().getOperationPhone()?"---":charge.getChargelog().getOperationPhone(),null==charge.getChargelog().getCustomerPhone()?"---":charge.getChargelog().getCustomerPhone());
+		//	ShopDetailDto ShopDetailDto=new ShopDetailDto("ss",new BigDecimal(10),new BigDecimal(10),new Date(),1,"122333344","222");
 			ShopDetailDtoList.add(ShopDetailDto);
 		}
-
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopDetailMap", ShopDetailDtoList);
 		return map;

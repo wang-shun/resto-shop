@@ -63,7 +63,7 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 *
 	 */
 
-	List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate);
+	List<ChargeOrder> shopChargeCodes(String shopDetailId, String beginDate, String endDate);
 
 
 	/**
@@ -71,6 +71,8 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 */
 
 	public Map<String,Object>  shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate,String shopname);
+
+
 
 
 
