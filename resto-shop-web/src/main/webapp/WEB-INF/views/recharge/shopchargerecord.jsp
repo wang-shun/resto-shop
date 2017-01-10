@@ -240,18 +240,18 @@ dt,dd{
 
 
 
-	$("#closeModal").click(function(e) {
-		e.stopPropagation();
-		var modal = $("#orderDetail");
-		//modal.find(".modal-body").html("");
-		modal.modal("hide");
-	})
+	/*$("#closeModal").click(function(e) {
+			e.stopPropagation();
+			var modal = $("#orderDetail");
+			//modal.find(".modal-body").html("");
+			modal.modal("hide");
+		})
 
 
-	$("#closeModal2").click(function(e) {
-		e.stopPropagation();
+		$("#closeModal2").click(function(e) {
+			e.stopPropagation();
 		var modal = $("#orderDetail");
 		modal.find(".modal-body").html("");
 		modal.modal("hide");
-	})
+	})*/
 </script>

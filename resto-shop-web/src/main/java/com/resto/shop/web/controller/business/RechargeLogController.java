@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.core.util.ExcelUtilShopDetail;
 import com.resto.brand.web.dto.ShopDetailDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,17 +50,17 @@ public class RechargeLogController extends GenericController{
 	@Resource
 	private CustomerService customerService;
 
-
-    @RequestMapping("/list")
+	@RequestMapping("/list")
 	public void  list(){
 	}
 
 
-    @RequestMapping("/shopRechargeLog")
-    public String shopchargerecord(){
+	@RequestMapping("/shopRechargeLog")
+	public String shopchargerecord(){
 
-    	return "recharge/shopchargerecord";
-    }
+		return "recharge/shopchargerecord";
+	}
+
 
 
 	@RequestMapping("/queryShopchargecord")
@@ -116,7 +117,7 @@ public class RechargeLogController extends GenericController{
         String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
         ,{"充值赠送金额（元）","25"} ,{"充值时间（元）","25"} ,{"操作人手机","25"}};
         //定义excel工具类对象
-       ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
+		ExcelUtilShopDetail<ShopDetailDto> excelUtil=new ExcelUtilShopDetail<ShopDetailDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
@@ -128,6 +129,7 @@ public class RechargeLogController extends GenericController{
 			e.printStackTrace();
 		}
 	}
+
 
     private String getShopName(String shopDetailId) {
         String shopname=null;
