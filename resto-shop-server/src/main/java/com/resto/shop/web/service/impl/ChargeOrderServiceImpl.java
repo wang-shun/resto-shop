@@ -239,12 +239,15 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
    if(chargeList!=null&&chargeList.size()>0){
 	   for (ChargeOrder charge:chargeList) {
-        if(charge.getChargelog().getOperationPhone()==null){
-			charge.getChargelog().setOperationPhone("--");
-
-		  }
+          if(charge.getChargelog().getOperationPhone()==null){
+			charge.getChargelog().setOperationPhone("没有填写");
+		   }
 		  if(charge.getChargelog().getCustomerPhone()==null){
 			  charge.getChargelog().setCustomerPhone("--");
+
+		   }
+		   if(charge.getType()==null){
+			   charge.setType(3);//以前老数据
 
 		   }
 		   ShopDetailDto ShopDetailDto=new ShopDetailDto(

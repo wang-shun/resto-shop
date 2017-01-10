@@ -69,8 +69,6 @@ public class RechargeLogController extends GenericController{
 		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
 
-
-
         return chargeList ;
 	}
 
