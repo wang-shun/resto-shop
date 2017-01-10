@@ -224,7 +224,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	/**
 	 * 下载报表
-	 * @param shopdetailid
+	 * @param shopDetailId
 	 * @param beginDate
 	 * @param endDate
 	 * @param shopname
@@ -233,8 +233,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 
 	@Override
-	public Map<String, Object> shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname) {
+	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
 		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		for (ChargeOrder charge:chargeList) {
 			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,charge.getChargeMoney(),charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),charge.getChargelog().getOperationPhone(),charge.getChargelog().getCustomerPhone());
@@ -242,7 +243,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		}
 
 		Map<String, Object> map = new HashMap<>();
-		map.put("shopdetailmap", ShopDetailDtoList);
+		map.put("shopDetailMap", ShopDetailDtoList);
 		return map;
 
 	}

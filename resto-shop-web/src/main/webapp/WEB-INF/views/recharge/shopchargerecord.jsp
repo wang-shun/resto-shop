@@ -38,7 +38,7 @@ dt,dd{
 
 			<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
 			&nbsp;
-			<button type="button" class="btn btn-primary" id="shopreportExcel">下载报表</button>
+			<button type="button" class="btn btn-primary" id="shopDetailexcel">下载报表</button>
 			<br />
 
 		</form>
@@ -224,7 +224,7 @@ dt,dd{
 	})
 
 	//下载报表
-	$("#shopreportExcel").click(
+	$("#shopDetailexcel").click(
 			function() {
 				var beginDate = $("#beginDate2").val();
 				var endDate = $("#endDate2").val();
@@ -234,8 +234,7 @@ dt,dd{
 					return;
 				}
 
-				location.href = "recharge/shopDetail_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&shopDetailId=31164cebcc4b422685e8d9a32db12ab8" ;
+				location.href = "recharge/shopDetail_excel" ;
 
 			});
 

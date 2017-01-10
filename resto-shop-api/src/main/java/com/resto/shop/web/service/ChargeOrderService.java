@@ -70,7 +70,7 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 * 下载报表
 	 */
 
-	public Map<String,Object>  shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname);
+	public Map<String,Object>  shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate,String shopname);
 
 
 

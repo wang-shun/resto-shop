@@ -57,36 +57,35 @@ public class RechargeLogController extends GenericController{
 	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
 
-        /*for (ShopDetail fa:shopDetailList
+        for (ShopDetail fa:shopDetailList
              ) {
             System.out.println(fa.getName()+fa.getId()+"---------------");
-        }*/
+        }
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
 
         return chargeList ;
 	}
-
-
 
     /**
      * 店铺详细下载报表
      * @return
      */
 
-    public Map<String,Object> getResultSetDto(String shopdetailid,String beginDate,String endDate,String shopname){
-           if(shopname==null) { shopname= getShopName(shopdetailid);}
-           Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopdetailid,beginDate,endDate,shopname);
+    public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
+           if(shopname==null) { shopname= getShopName(shopDetailId);}
+		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+           Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
 
         return  mapshopDetailDto;
     }
     @RequestMapping("shopDetail_excel")
     @ResponseBody
-   public void reportShopDetail(String shopdetailid,String beginDate, String endDate, String
-            shopId, HttpServletRequest request, HttpServletResponse response,String shopname){
-
+   public void reportShopDetail(String shopDetailId,String beginDate, String endDate,
+             HttpServletRequest request, HttpServletResponse response,String shopname){
+        shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ShopDetailDto>  result = new LinkedList<>();
-        Map<String,Object>  resultMap=this.getResultSetDto(shopdetailid,beginDate,endDate,shopname);
-        result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopdetailmap"));
+        Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,"che");
+        result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
 
 
         //导出文件名
@@ -102,42 +101,44 @@ public class RechargeLogController extends GenericController{
 
 
       //获取店铺名称
-       ShopDetail s = shopDetailService.selectById(shopId);
         Map<String,String> map = new HashMap<>();
-        map.put("shops",getShopName(shopdetailid));
+        map.put("shops",getShopName(shopDetailId));
         map.put("beginDate", beginDate);
         map.put("reportType", "店铺充值记录");//表的头，第一行内容
         map.put("endDate", endDate);
         map.put("num", "11");//显示的位置
         map.put("reportTitle", "店铺充值记录");//表的名字
         map.put("timeType", "yyyy-MM-dd");
-        String[][] headers = {{"名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
+        String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
+        ,{"充值赠送金额（元）","25"} ,{"充值时间（元）","25"} ,{"操作人手机","25"}};
         //定义excel工具类对象
        ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
-        try{
-            OutputStream out = new FileOutputStream(path);
-            excelUtil.ExportExcel(headers, columns, result, out, map);
-            out.close();
-            excelUtil.download(path, response);
-            JOptionPane.showMessageDialog(null, "导出成功！");
-            log.info("excel导出成功");
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+		try{
+			OutputStream out = new FileOutputStream(path);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
+			out.close();
+			excelUtil.download(path, response);
+			JOptionPane.showMessageDialog(null, "导出成功！");
+			log.info("excel导出成功");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
-    private String getShopName(String shopdetailid) {
+    private String getShopName(String shopDetailId) {
         String shopname=null;
 
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-            for (ShopDetail shop: shopDetailList
-                    ) {
-                shop.getId().equals(shopdetailid);
-                shopname=shop.getName();
-            }
+
         }
+		for (ShopDetail shop: shopDetailList
+				) {
+			/*shop.getId().equals(shopdetailid);*/
+			shopname="aa";
+
+		}
 
         return  shopname;
     }
