@@ -52,7 +52,11 @@
 				    <input type="text" class="form-control" name="wechatWelcomeContent" v-model="m.wechatWelcomeContent">
 				</div>
 				<div class="form-group">
-				    <label>微信首页名称</label>
+					<label>微信品牌名名称</label>
+					<input type="text" class="form-control" name="wechatBrandName" v-model="m.wechatBrandName">
+				</div>
+				<div class="form-group">
+				    <label>微信粉丝圈名称</label>
 				    <input type="text" class="form-control" name="wechatHomeName" v-model="m.wechatHomeName">
 				</div>
 				<div class="form-group">
