@@ -238,17 +238,27 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		System.out.println(chargeList.size()+"_________________");
+   if(chargeList!=null&&chargeList.size()>0){
+	   for (ChargeOrder charge:chargeList) {
 
-		for (ChargeOrder charge:chargeList) {
-			//System.out.println(shopname +charge.getChargeMoney()+"___"+charge.getRewardMoney()+"+++"+charge.getFinishTime()+charge.getType()+"___"+charge.getChargelog().getOperationPhone()+"____"+charge.getChargelog().getCustomerPhone());
-			ShopDetailDto ShopDetailDto=new ShopDetailDto(shopname,null==charge.getChargeMoney()?BigDecimal.ZERO:charge.getChargeMoney(),null==charge.getRewardMoney()?BigDecimal.ZERO:charge.getRewardMoney(),charge.getFinishTime(),charge.getType(),null==charge.getChargelog().getOperationPhone()?"---":charge.getChargelog().getOperationPhone(),null==charge.getChargelog().getCustomerPhone()?"---":charge.getChargelog().getCustomerPhone());
-		//	ShopDetailDto ShopDetailDto=new ShopDetailDto("ss",new BigDecimal(10),new BigDecimal(10),new Date(),1,"122333344","222");
-			ShopDetailDtoList.add(ShopDetailDto);
-		}
+		   ShopDetailDto ShopDetailDto=new ShopDetailDto(
+		   		   shopname
+				   ,null==charge.getChargeMoney()?BigDecimal.ZERO:charge.getChargeMoney()
+				   ,null==charge.getRewardMoney()?BigDecimal.ZERO:charge.getRewardMoney()
+				   ,null==charge.getFinishTime()?new Date():charge.getFinishTime()
+				   ,charge.getType()
+				   ,null==charge.getChargelog().getOperationPhone()?"---":charge.getChargelog().getOperationPhone()
+				   ,null==charge.getChargelog().getCustomerPhone()?"---":charge.getChargelog().getCustomerPhone()
+		           );
+		   //	ShopDetailDto ShopDetailDto=new ShopDetailDto("ss",new BigDecimal(10),new BigDecimal(10),new Date(),1,"122333344","222");
+		   ShopDetailDtoList.add(ShopDetailDto);
+	   }
+
+     }
+
 		Map<String, Object> map = new HashMap<>();
 		map.put("shopDetailMap", ShopDetailDtoList);
 		return map;
-
 	}
 
 

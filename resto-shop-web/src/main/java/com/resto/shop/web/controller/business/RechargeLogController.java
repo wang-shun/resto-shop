@@ -65,14 +65,16 @@ public class RechargeLogController extends GenericController{
 
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
-	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
-        List<ShopDetail> shopDetailList = getCurrentShopDetails();
+	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
+       // List<ShopDetail> shopDetailList = getCurrentShopDetails();
 
-        for (ShopDetail fa:shopDetailList
+       /* for (ShopDetail fa:shopDetailList
              ) {
             System.out.println(fa.getName()+fa.getId()+"---------------");
-        }
-        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
+
+        }*/
+		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
 
         return chargeList ;
 	}
@@ -83,8 +85,7 @@ public class RechargeLogController extends GenericController{
      */
 
     public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
-           if(shopname==null) { shopname= getShopName(shopDetailId);}
-		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+    	   shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
            Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
 
         return  mapshopDetailDto;
