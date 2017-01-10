@@ -886,6 +886,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
             orderPaymentItemService.insert(item);
         }
+        order.setIsPay(OrderPayState.NOT_PAY);
         update(order);
         result.setSuccess(true);
         return result;
