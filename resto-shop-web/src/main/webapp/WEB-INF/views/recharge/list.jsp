@@ -200,7 +200,7 @@ var vueObj =  new Vue({
 		},
 		showShopReport : function(shopId) {
 			$("#reportModal").modal('show');
-			this.openModal("recharge/rechargeLog",shopId);
+			this.openModal("recharge/shopRechargeLog",shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
 			$.post(url, this.getDate(shopId),function(result) {

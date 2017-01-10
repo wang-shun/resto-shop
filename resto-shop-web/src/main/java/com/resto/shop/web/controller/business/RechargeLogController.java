@@ -50,6 +50,18 @@ public class RechargeLogController extends GenericController{
 	private CustomerService customerService;
 
 
+    @RequestMapping("/list")
+	public void  list(){
+	}
+	
+	
+    @RequestMapping("/shopRechargeLog")
+    public String shopchargerecord(){
+    	
+    	return "recharge/shopchargerecord";
+    }
+
+    
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
@@ -141,10 +153,6 @@ public class RechargeLogController extends GenericController{
         return  shopname;
     }
 
-
-    @RequestMapping("/list")
-	public void  list(){
-	}
 
     
 	@RequestMapping("/rechargeLog")
