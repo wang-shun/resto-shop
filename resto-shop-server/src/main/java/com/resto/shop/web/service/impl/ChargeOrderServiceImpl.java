@@ -258,7 +258,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		}
 
 		Map<String, Object> map = new HashMap<>();
-		map.put("shopId", ShopDetailDtoList);
+		map.put("shopdetailmap", ShopDetailDtoList);
 		return map;
 	}
 
