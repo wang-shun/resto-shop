@@ -73,13 +73,21 @@ public class RechargeLogController extends GenericController{
      */
 
     public Map<String,Object> getResultSetDto(String shopdetailid,String beginDate,String endDate,String shopname){
-     Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopdetailid,beginDate,endDate,shopname);
+           if(shopname==null) { shopname= getShopName(shopdetailid);}
+           Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopdetailid,beginDate,endDate,shopname);
+
         return  mapshopDetailDto;
     }
-    @RequestMapping("shop_excel")
+    @RequestMapping("shopDetail_excel")
     @ResponseBody
-   public void reportOrder(String shopdetailid,String beginDate, String endDate, String
+   public void reportShopDetail(String shopdetailid,String beginDate, String endDate, String
             shopId, HttpServletRequest request, HttpServletResponse response,String shopname){
+
+        List<ShopDetailDto>  result = new LinkedList<>();
+        Map<String,Object>  resultMap=this.getResultSetDto(shopdetailid,beginDate,endDate,shopname);
+        result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopdetailmap"));
+
+
         //导出文件名
         String fileName = "店铺订单列表"+beginDate+"至"+endDate
                 +".xls";
@@ -91,24 +99,17 @@ public class RechargeLogController extends GenericController{
 						"rewardMoney","finishTime","operationPhone    "};
                         //定义数据
 
-      List<ShopDetailDto>  result = new LinkedList<>();
-        Map<String,Object>  resultMap=this.getResultSetDto(shopdetailid,beginDate,endDate,shopname);
-        result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopdetailmap"));
 
-
-
-    //获取店铺名称
-       /* ShopDetail s = shopDetailService.selectById(shopId);
+      //获取店铺名称
+       ShopDetail s = shopDetailService.selectById(shopId);
         Map<String,String> map = new HashMap<>();
-        map.put("brandName", getBrandName());
-        map.put("shops", s.getName());
+        map.put("shops",getShopName(shopdetailid));
         map.put("beginDate", beginDate);
-        map.put("reportType", "店铺订单报表");//表的头，第一行内容
+        map.put("reportType", "店铺充值记录");//表的头，第一行内容
         map.put("endDate", endDate);
         map.put("num", "11");//显示的位置
-        map.put("reportTitle", "品牌订单");//表的名字
+        map.put("reportTitle", "店铺充值记录");//表的名字
         map.put("timeType", "yyyy-MM-dd");
-*/
         String[][] headers = {{"名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
         //定义excel工具类对象
        ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
@@ -124,13 +125,24 @@ public class RechargeLogController extends GenericController{
         }
 	}
 
+    private String getShopName(String shopdetailid) {
+        String shopname=null;
+
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
+        if(shopDetailList==null){
+            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+            for (ShopDetail shop: shopDetailList
+                    ) {
+                shop.getId().equals(shopdetailid);
+                shopname=shop.getName();
+            }
+        }
+
+        return  shopname;
+    }
 
 
-
-
-
-
-	@RequestMapping("/list")
+    @RequestMapping("/list")
 	public String  list(){
 
 	    return "recharge/shopchargerecord";

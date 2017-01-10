@@ -234,8 +234,8 @@ dt,dd{
 					return;
 				}
 
-				location.href = "orderReport/shopDetail_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&shopDetailId=" + shopDetailId;
+				location.href = "recharge/shopDetail_excel?beginDate=" + beginDate
+						+ "&&endDate=" + endDate + "&&shopDetailId=31164cebcc4b422685e8d9a32db12ab8" ;
 
 			});
 

@@ -1,11 +1,6 @@
 package com.resto.shop.web.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-
-import javax.annotation.Resource;
-
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -13,25 +8,16 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.ChargeOrder;
-import com.resto.shop.web.model.ChargePayment;
-import com.resto.shop.web.model.ChargeSetting;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargePaymentService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.model.*;
+import com.resto.shop.web.service.*;
 
-import cn.restoplus.rpc.server.RpcService;
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  *
@@ -247,9 +233,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Override
 	public Map<String, Object> shopChargeCodesSetDto(String shopdetailid, String beginDate, String endDate,String shopname) {
-		Date begin = DateUtil.getformatBeginDate(beginDate);
+		/*Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-
+           */
 		List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes("31164cebcc4b422685e8d9a32db12ab8",beginDate,endDate);
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		for (ChargeOrder charge:chargeList) {
