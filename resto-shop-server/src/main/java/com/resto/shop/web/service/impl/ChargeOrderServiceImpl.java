@@ -237,18 +237,24 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
 
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
-		System.out.println(chargeList.size()+"_________________");
    if(chargeList!=null&&chargeList.size()>0){
 	   for (ChargeOrder charge:chargeList) {
+        if(charge.getChargelog().getOperationPhone()==null){
+			charge.getChargelog().setOperationPhone("--");
 
+		  }
+		  if(charge.getChargelog().getCustomerPhone()==null){
+			  charge.getChargelog().setCustomerPhone("--");
+
+		   }
 		   ShopDetailDto ShopDetailDto=new ShopDetailDto(
 		   		   shopname
 				   ,null==charge.getChargeMoney()?BigDecimal.ZERO:charge.getChargeMoney()
 				   ,null==charge.getRewardMoney()?BigDecimal.ZERO:charge.getRewardMoney()
 				   ,null==charge.getFinishTime()?new Date():charge.getFinishTime()
 				   ,charge.getType()
-				   ,null==charge.getChargelog().getOperationPhone()?"---":charge.getChargelog().getOperationPhone()
-				   ,null==charge.getChargelog().getCustomerPhone()?"---":charge.getChargelog().getCustomerPhone()
+				   ,charge.getChargelog().getOperationPhone()
+				   ,charge.getChargelog().getCustomerPhone()
 		           );
 		   //	ShopDetailDto ShopDetailDto=new ShopDetailDto("ss",new BigDecimal(10),new BigDecimal(10),new Date(),1,"122333344","222");
 		   ShopDetailDtoList.add(ShopDetailDto);

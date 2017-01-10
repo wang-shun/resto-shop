@@ -252,9 +252,10 @@
   </select>
   <!--店铺充值详细-->
   <select id="shopChargeCodes" resultMap="ShopchargecordMap" >
-    SELECT  o.id ,o.charge_money ,o.reward_money, o.finish_time,o.shop_detail_id ,o.type,c.id  cid,c.operation_phone,c.customer_phone  from tb_charge_order o
+    SELECT  o.id ,o.charge_money ,o.reward_money, o.finish_time,o.shop_detail_id ,o.type,c.id  cid,
+    if(c.operation_phone is null,'没有填写',c.operation_phone),if(c.customer_phone is null,'没有填写',c.customer_phone)  from tb_charge_order o
     LEFT  JOIN  tb_charge_log c ON c.charge_order_id=o.id
-    WHERE o.shop_detail_id=#{shopDetailId}
+    WHERE  o.shop_detail_id=#{shopDetailId}
     AND o.order_state = 1
     and o.finish_time is not null
     <if test="beginDate != null and beginDate != ''">

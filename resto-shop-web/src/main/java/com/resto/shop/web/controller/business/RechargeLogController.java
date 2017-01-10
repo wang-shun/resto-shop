@@ -66,15 +66,10 @@ public class RechargeLogController extends GenericController{
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
-       // List<ShopDetail> shopDetailList = getCurrentShopDetails();
-
-       /* for (ShopDetail fa:shopDetailList
-             ) {
-            System.out.println(fa.getName()+fa.getId()+"---------------");
-
-        }*/
 		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
+
+
 
         return chargeList ;
 	}
