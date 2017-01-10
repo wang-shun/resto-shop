@@ -874,9 +874,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     String resultJson = AliPayUtils.refundPay(map);
                     item.setResultData(new JSONObject(resultJson).toString());
                     break;
-
-
-
             }
             order.setPaymentAmount(order.getPaymentAmount().add(item.getPayValue()));
             item.setId(newPayItemId);
@@ -885,6 +882,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         order.setIsPay(OrderPayState.NOT_PAY);
         update(order);
+        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order, LogBaseState.NOT_PAYMENT_ORDER);
         result.setSuccess(true);
         return result;
     }
