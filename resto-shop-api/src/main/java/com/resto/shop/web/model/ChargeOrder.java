@@ -195,7 +195,7 @@ public class ChargeOrder {
 
     public void setType(Integer type) {
         if(type==null){
-            type=3;
+            type=1;
         }
         this.type = type;
     }
