@@ -72,8 +72,10 @@ public class RechargeLogController extends GenericController{
      */
 
     public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
-           if(shopname==null) { shopname= getShopName(shopDetailId);}
-		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+           if(shopname==null) {
+           	shopname= getShopName(shopDetailId);
+           }
+		     shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
            Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
 
         return  mapshopDetailDto;
@@ -84,7 +86,7 @@ public class RechargeLogController extends GenericController{
              HttpServletRequest request, HttpServletResponse response,String shopname){
         shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ShopDetailDto>  result = new LinkedList<>();
-        Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,"che");
+        Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,shopname);
         result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
 
 

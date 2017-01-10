@@ -211,15 +211,14 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	/**
 	 *
-	 * @param shopdetailid
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 *
 	 */
 	@Override
-	public List<ChargeOrder> shopChargeCodes(String shopdetailid, String beginDate, String endDate) {
-		return chargeorderMapper.shopChargeCodes(shopdetailid,beginDate,endDate);
+	public List<ChargeOrder> shopChargeCodes(String shopDetailId, String beginDate, String endDate) {
+		return chargeorderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
 	}
 
 	/**
