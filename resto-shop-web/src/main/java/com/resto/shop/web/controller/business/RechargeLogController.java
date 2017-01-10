@@ -50,8 +50,6 @@ public class RechargeLogController extends GenericController{
 	private CustomerService customerService;
 
 
-
-
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopdetailid, String beginDate, String endDate){
@@ -84,9 +82,9 @@ public class RechargeLogController extends GenericController{
              HttpServletRequest request, HttpServletResponse response,String shopname){
         shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ShopDetailDto>  result = new LinkedList<>();
+
         Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,"che");
         result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
-
 
         //导出文件名
         String fileName = "店铺订单列表"+beginDate+"至"+endDate
@@ -145,11 +143,10 @@ public class RechargeLogController extends GenericController{
 
 
     @RequestMapping("/list")
-	public String  list(){
-
-	    return "recharge/shopchargerecord";
+	public void  list(){
 	}
 
+    
 	@RequestMapping("/rechargeLog")
 	@ResponseBody
 	public Result selectBrandOrShopRecharge(String beginDate,String endDate){
@@ -159,22 +156,60 @@ public class RechargeLogController extends GenericController{
 	private Result getResult(String beginDate, String endDate) {
 		return getSuccessResult(this.RechargeList(beginDate, endDate));
 	}
-	
+		//初始化品牌充值记录
 	public Map<String, Object> RechargeList(String beginDate,String endDate){
+		BigDecimal initZero=BigDecimal.ZERO;
 		//初始化品牌充值记录
 		RechargeLogDto brandInit = new RechargeLogDto(getBrandName(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 		RechargeLogDto rechargeLogDto=chargepaymentService.selectRechargeLog(beginDate, endDate,getCurrentBrandId());
 		if(rechargeLogDto!=null){
 			brandInit.setBrandName(getBrandName());
-			brandInit.setRechargeCount(rechargeLogDto.getRechargeCount());
-			brandInit.setRechargeCsNum(rechargeLogDto.getRechargeCsNum());
-			brandInit.setRechargeGaCsNum(rechargeLogDto.getRechargeGaCsNum());
-			brandInit.setRechargeGaNum(rechargeLogDto.getRechargeGaNum());
-			brandInit.setRechargeGaSpNum(rechargeLogDto.getRechargeGaSpNum());
-			brandInit.setRechargeNum(rechargeLogDto.getRechargeNum());
-			brandInit.setRechargePos(rechargeLogDto.getRechargePos());
-			brandInit.setRechargeSpNum(rechargeLogDto.getRechargeSpNum());
-			brandInit.setRechargeWeChat(rechargeLogDto.getRechargeWeChat());
+			//判断为空则为0
+			if(rechargeLogDto.getRechargeCount() == null){
+				brandInit.setRechargeCount(initZero);
+			}else{
+				brandInit.setRechargeCount(rechargeLogDto.getRechargeCount());
+			}
+			if(rechargeLogDto.getRechargeCsNum() == null){
+				brandInit.setRechargeCsNum(initZero);
+			}else{
+				brandInit.setRechargeCsNum(rechargeLogDto.getRechargeCsNum());
+			}
+			if(rechargeLogDto.getRechargeGaCsNum() == null){
+				brandInit.setRechargeGaCsNum(initZero);
+			}else{
+				brandInit.setRechargeGaCsNum(rechargeLogDto.getRechargeGaCsNum());
+			}
+			if(rechargeLogDto.getRechargeGaNum() == null){
+				brandInit.setRechargeGaNum(initZero);
+			}else{
+				brandInit.setRechargeGaNum(rechargeLogDto.getRechargeGaNum());
+			}
+			if(rechargeLogDto.getRechargeGaSpNum() == null){
+				brandInit.setRechargeGaSpNum(initZero);
+			}else{
+				brandInit.setRechargeGaSpNum(rechargeLogDto.getRechargeGaSpNum());
+			}
+			if(rechargeLogDto.getRechargeNum() == null){
+				brandInit.setRechargeNum(initZero);
+			}else{
+				brandInit.setRechargeNum(rechargeLogDto.getRechargeNum());
+			}
+			if(rechargeLogDto.getRechargePos() == null){
+				brandInit.setRechargePos(initZero);
+			}else{
+				brandInit.setRechargePos(rechargeLogDto.getRechargePos());
+			}
+			if(rechargeLogDto.getRechargeSpNum() == null){
+				brandInit.setRechargeSpNum(initZero);
+			}else{
+				brandInit.setRechargeSpNum(rechargeLogDto.getRechargeSpNum());
+			}
+			if(rechargeLogDto.getRechargeWeChat() == null){
+				brandInit.setRechargeWeChat(initZero);
+			}else{
+				brandInit.setRechargeWeChat(rechargeLogDto.getRechargeWeChat());
+			}
 		}
 		
 		List<RechargeLogDto> shopRrchargeLogs=new ArrayList<>();
@@ -185,20 +220,50 @@ public class RechargeLogController extends GenericController{
         }
         for (ShopDetail shopDetail : shoplist) {
         	//初始化店铺充值记录
-        	RechargeLogDto shopInit=new RechargeLogDto(shopDetail.getId(),shopDetail.getName(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
-        	System.out.println(shopInit.getShopCsNum());
         	RechargeLogDto shopRechargeLogDto=chargepaymentService.selectShopRechargeLog(beginDate, endDate, shopDetail.getId());
-        	shopInit.setShopId(shopDetail.getId());
-        	shopInit.setShopName(shopDetail.getName());
-        	shopInit.setShopCount(shopRechargeLogDto.getShopCount());
-        	shopInit.setShopCsNum(shopRechargeLogDto.getShopCsNum());
-        	shopInit.setShopGaNum(shopRechargeLogDto.getShopGaNum());
-        	shopInit.setShopGaCsNum(shopRechargeLogDto.getShopGaCsNum());
-        	shopInit.setShopNum(shopRechargeLogDto.getShopNum());
-        	shopInit.setRechargePos(shopRechargeLogDto.getRechargePos());
-        	shopInit.setShopWeChat(shopRechargeLogDto.getShopWeChat());
-        	shopRrchargeLogs.add(shopInit);
-		}
+        	if(shopRechargeLogDto == null){
+        		shopRechargeLogDto=new RechargeLogDto(shopDetail.getId(),shopDetail.getName(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        	}
+        		shopRechargeLogDto.setShopId(shopDetail.getId());
+        		shopRechargeLogDto.setShopName(shopDetail.getName());
+	        	//判断为空则为0
+	        	if(shopRechargeLogDto.getShopCount()==null){
+	        		shopRechargeLogDto.setShopCount(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopCount(shopRechargeLogDto.getShopCount()); 		
+	        	}
+	        	if(shopRechargeLogDto.getShopGaNum()==null){
+	        		shopRechargeLogDto.setShopNum(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopNum(shopRechargeLogDto.getShopNum());
+	        	}
+	        	if(shopRechargeLogDto.getShopGaNum() == null){
+	        		shopRechargeLogDto.setShopGaNum(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopGaNum(shopRechargeLogDto.getShopGaNum());
+	        	}
+	        	if(shopRechargeLogDto.getShopWeChat() == null){
+	        		shopRechargeLogDto.setShopWeChat(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopWeChat(shopRechargeLogDto.getShopWeChat());
+	        	}
+	        	if(shopRechargeLogDto.getShopPos() == null){
+	        		shopRechargeLogDto.setShopPos(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopPos(shopRechargeLogDto.getShopPos());
+	        	}
+	        	if(shopRechargeLogDto.getShopCsNum() == null){
+	        		shopRechargeLogDto.setShopCsNum(initZero);
+	        	}else{
+	        		shopRechargeLogDto.setShopCsNum(shopRechargeLogDto.getShopCsNum());
+	        	}
+	        	if(shopRechargeLogDto.getShopGaCsNum() == null){
+	        		shopRechargeLogDto.setShopGaCsNum(initZero);
+		    	}else{
+		    		shopRechargeLogDto.setShopGaCsNum(shopRechargeLogDto.getShopGaCsNum());
+	        	}
+	        	shopRrchargeLogs.add(shopRechargeLogDto);
+        }
         
 		Map<String, Object> map=new HashMap<>();
 		map.put("brandInit", brandInit);
@@ -208,7 +273,64 @@ public class RechargeLogController extends GenericController{
 	}
 
 	
-	
+    	//下载充值报表
+        @SuppressWarnings("unchecked")
+    	@RequestMapping("brandOrShop_excel")
+    	@ResponseBody
+    	public void reportIncome(String userJson,String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+        	List<ShopDetail> shopDetailList = getCurrentShopDetails();
+            if(shopDetailList==null){
+                shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+            }
+            List<RechargeLogDto> result = new LinkedList<>();
+    		List<RechargeLogDto> shopRechargeLogDto=(List<RechargeLogDto>) RechargeList(beginDate,endDate).get("shopRrchargeLogs");
+            for (RechargeLogDto rechargeLogDto : shopRechargeLogDto) {
+            	RechargeLogDto shoprecharge=new RechargeLogDto();
+            	shoprecharge.setShopName(rechargeLogDto.getShopName());
+            	shoprecharge.setShopCount(rechargeLogDto.getShopCount()); 		
+            	shoprecharge.setShopNum(rechargeLogDto.getShopNum());
+            	shoprecharge.setShopGaNum(rechargeLogDto.getShopGaNum());
+            	shoprecharge.setShopWeChat(rechargeLogDto.getShopWeChat());
+            	shoprecharge.setShopPos(rechargeLogDto.getShopPos());
+            	shoprecharge.setShopCsNum(rechargeLogDto.getShopCsNum());
+            	shoprecharge.setShopGaCsNum(rechargeLogDto.getShopGaCsNum());
+            	result.add(shoprecharge);
+    		}
+    		//导出文件名
+    		String fileName = "充值报表"+beginDate+"至"+endDate+".xls";
+    		//定义读取文件的路径
+    		String path = request.getSession().getServletContext().getRealPath(fileName);
+    		//定义列
+    		String[]columns={"shopName","shopCount","shopNum","shopGaNum","shopWeChat","shopPos","shopCsNum","shopGaCsNum"};
+    		//定义数据
+    		String shopName="";
+    		for (ShopDetail shopDetail : shopDetailList) {
+    			shopName += shopDetail.getName()+",";
+    		}
+    		Map<String,String> map = new HashMap<>();
+    		map.put("brandName", getBrandName());
+    		map.put("shops", shopName);
+    		map.put("beginDate", beginDate);
+    		map.put("reportType", "充值报表");//表的头，第一行内容
+    		map.put("endDate", endDate);
+    		map.put("num", "8");//显示的位置
+    		map.put("reportTitle", "充值报表");//表的名字
+    		map.put("timeType", "yyyy-MM-dd");
+    		
+    		String[][] headers = {{"店铺名","25"},{"充值单数","25"},{"店铺充值总额","25"},{"店铺充值赠送总额","25"},{"店铺微信充值总额","25"},{"店铺POS端充值总额","25"},{"店铺充值消费","25"},{"店铺充值赠送消费","25"}};
+    		//定义excel工具类对象
+    		ExcelUtil<RechargeLogDto> excelUtil=new ExcelUtil<RechargeLogDto>();
+    		try{
+    			OutputStream out = new FileOutputStream(path);
+    			excelUtil.ExportExcel(headers, columns, result, out, map);
+    			out.close();
+    			excelUtil.download(path, response);
+    			JOptionPane.showMessageDialog(null, "导出成功！");
+    			log.info("excel导出成功");
+    		}catch(Exception e){
+    			e.printStackTrace();
+    		}
+    	}
 	
 
 
