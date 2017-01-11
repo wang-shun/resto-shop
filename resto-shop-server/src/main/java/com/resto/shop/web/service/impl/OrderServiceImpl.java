@@ -1305,7 +1305,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(article.getRefundCount() != 0){
             	Map<String, Object> refundItem = new HashMap<>();
             	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).intValue());
-            	refundItem.put("ARTICLE_NAME", article.getArticleName());
+            	refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
             	refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
             	refundItems.add(refundItem);
             }
@@ -1313,18 +1313,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-        if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getServicePrice());
-            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
-                item.put("ARTICLE_NAME", "就餐人数");
-            }else{
-                item.put("ARTICLE_NAME", brandSetting.getServiceName());
-            }
-            item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
-            items.add(item);
-        }
-        if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
+        if (order.getDistributionModeId() == 1) {
+        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+	            Map<String, Object> item = new HashMap<>();
+	            item.put("SUBTOTAL", brandSetting.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+	            item.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
+	            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+	                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
+	            }
+	            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+	            items.add(item);
+	            if(order.getBaseCustomerCount() != order.getCustomerCount()){
+	            	Map<String, Object> refundItem = new HashMap<>();
+	            	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).intValue());
+	            	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
+	            	if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+		                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
+		            }
+	            	refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount()-order.getCustomerCount()));
+	            	refundItems.add(refundItem);
+	            }
+        	}
+        }else if(order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2){
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", order.getMealFeePrice());
             item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
