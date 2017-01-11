@@ -177,9 +177,9 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
-
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
-                && (order.getTableNumber() != null || order.getDistributionModeId() == DistributionType.TAKE_IT_SELF) && order.getOrderMode() == ShopMode.TABLE_MODE){
+                && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO)) && order.getOrderMode() == ShopMode.TABLE_MODE){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
