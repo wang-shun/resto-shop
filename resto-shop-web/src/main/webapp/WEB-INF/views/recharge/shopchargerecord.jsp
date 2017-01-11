@@ -91,7 +91,7 @@ dt,dd{
 		                { "width": "6%", "targets":5  },
 		                { "width": "6%", "targets":6  },
 		              ],
-		"lengthMenu" : [ [ 15,50, 75, 100, -1 ], [15, 50, 75, 100, "All" ] ],
+		"lengthMenu" : [ [ 15,50, 75, 100, -1 ], [15, 50, 75,+ 100, "All" ] ],
 		ajax : {
 			url : "recharge/queryShopchargecord",
 			dataSrc : "",
@@ -163,6 +163,8 @@ dt,dd{
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,
+			shopDetailId:shopDetailId,
+
 		};
 		tb1.ajax.reload();
 		toastr.success("查询成功");
