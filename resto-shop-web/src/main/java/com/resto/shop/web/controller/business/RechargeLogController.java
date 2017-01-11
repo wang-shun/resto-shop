@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 
 import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.core.util.ExcelUtilShopDetail;
 import com.resto.brand.web.dto.ShopDetailDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,15 +53,38 @@ public class RechargeLogController extends GenericController{
 	public void  list(){
 	}
 
-
+	/**
+	 * name:yjuany
+	 * @param shopDetailId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
 	@RequestMapping("/shopRechargeLog")
-	public String shopchargerecord(String shopId ,String beginDate, String endDate ){
-		System.out.println(shopId+",,,,,,,,,,,,,,,,,,,,,"+shopId);
-		//getRequest().getSession().setAttribute("shopDetailId",shopId);
-		//getRequest().getSession().setAttribute("shopname",shopname);
-		//getRequest().getSession().setAttribute("endDate",beginDate);
-		//getRequest().getSession().setAttribute("beginDate",endDate);
+	public String shopchargerecord(String shopDetailId,String beginDate,String endDate ){
+		getRequest().setAttribute("shopDetailId",shopDetailId);
+		getRequest().setAttribute("beginDate",beginDate);
+		getRequest().setAttribute("endDate",endDate);
 		return "recharge/shopchargerecord";
+	}
+
+	/**
+	 * 得到所有店铺名字
+	 * @param
+	 * @return
+	 * name:yjuany
+	 */
+	public String  getShopList(String shopDetailId){
+		List<ShopDetail> shoplist = getCurrentShopDetails();
+		if(!shoplist.isEmpty()){
+			shoplist = shopDetailService.selectByBrandId(getCurrentBrandId());
+		}
+		for ( ShopDetail shopd:shoplist) {
+			  if(shopd.getId().equals(shopDetailId)){
+			  	return  shopd.getName();
+			  }
+		}
+		return  "----";
 	}
 
 
@@ -70,36 +92,34 @@ public class RechargeLogController extends GenericController{
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
-		//shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+		String shopname=getShopList(shopDetailId);
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
-
+		for (int i=0;i<chargeList.size();i++){
+			chargeList.get(i).getChargelog().setShopName(shopname);
+		}
         return chargeList ;
 	}
 
     /**
      * 店铺详细下载报表
      * @return
+	 *name: yjuany
      */
-
-    public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
-    	  // shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
-
+    public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate){
+		   String shopname=getShopList(shopDetailId);//店铺名字
            Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
 
         return  mapshopDetailDto;
     }
     @RequestMapping("shopDetail_excel")
 	@ResponseBody
-   public void reportShopDetail(String shopDetailId,String shopname,String beginDate, String endDate,
-             HttpServletRequest request, HttpServletResponse response){
-     //   shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+   public void reportShopDetail(String shopDetailId,String beginDate, String endDate, HttpServletRequest request, HttpServletResponse response){
+		String shopname=getShopList(shopDetailId);//店铺名字
         List<ShopDetailDto>  result = new LinkedList<>();
-
-        Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,shopname);
+        Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate);
         result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
-
         //导出文件名
-        String fileName = "店铺充值记录"+beginDate+"至"+endDate
+        String fileName = "店铺充值记录详细"+beginDate+"至"+endDate
                 +".xls";
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
@@ -110,14 +130,19 @@ public class RechargeLogController extends GenericController{
                         //定义数据
       //获取店铺名称
         Map<String,String> map = new HashMap<>();
-		if(shopname==null){
-			shopname=getShopName(shopDetailId);
-		}
-        map.put("shops",shopname);
-        String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
+		map.put("brandName", getBrandName());
+		map.put("shops",shopname);
+		map.put("beginDate", beginDate);
+		map.put("reportType", "充值报表");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "8");//显示的位置
+		map.put("reportTitle", "充值报表");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+
+		String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
         ,{"充值赠送金额（元）","25"} ,{"充值时间（元）","25"} ,{"操作人手机","25"}};
         //定义excel工具类对象
-		ExcelUtilShopDetail<ShopDetailDto> excelUtil=new ExcelUtilShopDetail<ShopDetailDto>();
+		ExcelUtil<ShopDetailDto> excelUtil=new ExcelUtil<ShopDetailDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
@@ -129,28 +154,6 @@ public class RechargeLogController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-
-
-    private String getShopName(String shopDetailId) {
-        String shopname=null;
-        List<ShopDetail> shopDetailList = getCurrentShopDetails();
-        if(shopDetailList==null){
-            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-        }
-		for (ShopDetail shop: shopDetailList
-				) {
-			if (shop.getId().equals(shopDetailId)){shopname=shop.getBrandName();
-			}else {
-
-				shopname="--";
-			}
-
-
-		}
-
-        return  shopname;
-    }
-
 
 
 	@RequestMapping("/rechargeLog")

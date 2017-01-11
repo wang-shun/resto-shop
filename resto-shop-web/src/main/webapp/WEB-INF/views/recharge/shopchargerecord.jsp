@@ -74,11 +74,11 @@ dt,dd{
 	});
 
 	var shopDetailId = "${shopDetailId}"
-
-	$("#beginDate2").val("${beginDate}");
+	console.log(shopDetailId);
+    $("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
-	console.log(shopDetailId+"----------------------------------------"+${shopname});
-	//console.log(shopDetailId);
+
+
 	var tb1 = $("#shopdetail").DataTable({
 		"scrollY": "340px",
 		"autoWidth": false,
@@ -98,7 +98,8 @@ dt,dd{
 			data : function(d) {
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
-				d.shopDetailId = shopDetailId;
+				d.shopDetailId =shopDetailId;
+          console.log(shopDetailId);
 				return d;
 			}
 		},
@@ -162,7 +163,6 @@ dt,dd{
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,
-			"shopDetailId" : shopDetailId
 		};
 		tb1.ajax.reload();
 		toastr.success("查询成功");
@@ -233,8 +233,9 @@ dt,dd{
 					toastr.error("开始时间不能大于结束时间");
 					return;
 				}
-				location.href ="recharge/shopDetail_excel?shopDetailId=31164cebcc4b422685e8d9a32db12ab8"+"&&shopname="+shopname+"&&beginDate="+beginDate
-						+ "&&endDate="+endDate;
+				console.log(shopDetailId);
+				location.href ="recharge/shopDetail_excel?shopDetailId="+ shopDetailId
+						  +"&&beginDate="+ beginDate+"&&endDate="+endDate;
 			});
 
 </script>

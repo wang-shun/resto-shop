@@ -15,20 +15,20 @@
 		    <label for="endDate">结束时间：</label>
 		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
 		  </div>
-		  	
+
 		   	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
-                 
+
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
-          
+
 <!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
-             
+
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-             
+
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/> 
+		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
 		</form>
-		
+
 	</div>
 </div>
 <br/>
@@ -78,7 +78,7 @@
 		</div>
 		  </div>
 		</div>
-		
+
 	<!-- 店铺订单列表 -->
     <div role="tabpanel" class="tab-pane" id="orderReport">
     	<div class="panel panel-primary" style="border-color:write;">
@@ -104,7 +104,6 @@
 				</thead>
 				<tbody>
 					<tr v-for="shopRecharge in shopRrchargeLogs">
-						<td>{{shopRecharge.shopId}}></td>
 						<td>{{shopRecharge.shopName}}</td>
 						<td>{{shopRecharge.shopCount}}</td>
 						<td>{{shopRecharge.shopNum}}</td>
@@ -114,15 +113,15 @@
 						<td>{{shopRecharge.shopCsNum}}</td>
                         <td>{{shopRecharge.shopGaCsNum}}</td>
 						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shopRecharge.shopId , shopRecharge.shopName)">查看详情</button></td>
+								@click="showShopReport(shopRecharge.shopId)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
 		  </div>
 		</div>
 		  </div>
-		</div>	
-		
+		</div>
+
 	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
            <div class="modal-dialog modal-full">
                <div class="modal-content">
@@ -132,7 +131,6 @@
                    </div>
                    <div class="modal-body"> </div>
                    <div class="modal-footer">
-<!--                        <button type="button" class="btn btn-info btn-block"  @click="closeModal">关闭</button> -->
                         <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
                    </div>
                </div>
@@ -140,10 +138,10 @@
            </div>
            <!-- /.modal-dialog -->
        </div>
-       
+
     </div>
   </div>
-  
+
  <script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
@@ -188,32 +186,27 @@ var vueObj =  new Vue({
 			$.post("recharge/rechargeLog", this.getDate(null), function(result) {
 				that.brandInit = result.data.brandInit;
 				that.shopRrchargeLogs = result.data.shopRrchargeLogs;
-				console.log(that.shopRrchargeLogs);
 				toastr.success("查询成功");
 			});
 		},
-		getDate : function(shopId){
+		getDate : function(shopDetailId){
 			var data = {
+				shopDetailId :shopDetailId,
 				beginDate : this.searchDate.beginDate,
-				endDate : this.searchDate.endDate,
-				shopId : shopId
+				endDate : this.searchDate.endDate
 			};
 			return data;
 		},
-		showShopReport : function(shopId) {
-	           $("#reportModal").modal('show');
-			 this.openModal("recharge/shopRechargeLog",shopId);
+		showShopReport : function(shopDetailId) {
+			$("#reportModal").modal('show');
+				$.post("recharge/shopRechargeLog",this.getDate(shopDetailId),function(result) {
+					var modal = $("#reportModal");
+					modal.find(".modal-body").html(result);
+					modal.find(".text-center > strong").html("店铺充值记录详细");
+					modal.modal()
+				});
 		},
-		openModal : function(url, modalTitle,shopId) {
 
-			$.post(url, this.getDate(shopId),function(result) {
-				var modal = $("#reportModal");
-				modal.find(".modal-body").html(result);
-				modal.find(".text-center > strong").html("店铺充值记录详细");
-				modal.modal()
-			})
-
-		},
 		closeModal : function(){
 			var modal = $("#reportModal");
 			modal.find(".modal-body").html("");
@@ -226,12 +219,12 @@ var vueObj =  new Vue({
 			this.searchInfo();
 		},
 		yesterDay : function(){
-			
+
 			this.searchDate.beginDate = GetDateStr(-1);
 			this.searchDate.endDate  = GetDateStr(-1);
 			this.searchInfo();
 		},
-		
+
 		week : function(){
 			this.searchDate.beginDate  = getWeekStartDate();
 			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
@@ -248,9 +241,9 @@ var vueObj =  new Vue({
 			var endDate = this.searchDate.endDate;
 			location.href="recharge/brandOrShop_excel?beginDate="+beginDate+"&&endDate="+endDate;
 		}
-		
+
 	},
-	
+
 	created : function() {
 		var that = this;
 		var date = new Date().format("yyyy-MM-dd");
@@ -258,7 +251,7 @@ var vueObj =  new Vue({
 		this.searchDate.endDate = date;
 		this.searchInfo();
 	}
-	
+
 })
 
 
