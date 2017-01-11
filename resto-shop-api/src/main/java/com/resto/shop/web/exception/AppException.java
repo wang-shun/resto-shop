@@ -24,6 +24,7 @@ public class AppException extends Exception{
 	public static final ErrorMsg ORDER_IS_PRINTED = new ErrorMsg(16, "该订单已经打印过了！");
 	public static final ErrorMsg ORDER_IS_NULL = new ErrorMsg(17, "该订单不存在或无商品信息！");
     public static final ErrorMsg COUPON_IS_SHOP = new ErrorMsg(18, "不是该店铺的优惠券！");
+	public static final ErrorMsg DISCOUNT_TIMEOUT = new ErrorMsg(19, "菜品供应时间变动，价格需重新计算！");
 	
 	
 	public AppException(ErrorMsg msg) {

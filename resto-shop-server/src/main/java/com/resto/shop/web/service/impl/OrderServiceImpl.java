@@ -282,6 +282,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return jsonResult;
     }
 
+    /**
+     *
+     * 计算菜品折扣
+     * @param price               价格
+     * @param discount         当前菜品的折扣
+     * @param wxdiscount    微信前端传入的折扣
+     * @param articleName   菜品名称
+     * @return
+     * @throws AppException
+     */
+    private  BigDecimal discount(BigDecimal price,int discount,int wxdiscount,String articleName) throws AppException {
+        if (price != null){
+            if(discount != wxdiscount){
+                //折扣不匹配
+                throw new AppException(AppException.DISCOUNT_TIMEOUT,articleName+"折扣活动已结束，请重新选购餐品~");
+            }
+            return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+        }else{
+            return price;
+        }
+    }
+
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -326,8 +348,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
+            String remark = null;
             switch (item.getType()) {
-                case OrderItemType.ARTICLE:
+                case OrderItemType.ARTICLE://无规格单品
+                    // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(a.getName());
+                    org_price = a.getPrice();
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount(),a.getName());                      //计算折扣
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount(),a.getName());       //计算折扣
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    remark = a.getDiscount()+ "%";          //设置菜品当前折扣
+                    break;
+                case OrderItemType.RECOMMEND://推荐餐品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
@@ -336,25 +369,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = a.getFansPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.RECOMMEND:
-                    // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
-                    a = articleMap.get(item.getArticleId());
-                    item.setArticleName(a.getName());
-                    org_price = a.getPrice();
-                    price = a.getPrice();
-                    fans_price = a.getFansPrice();
-                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
-                    break;
-                case OrderItemType.UNITPRICE:
+                case OrderItemType.UNITPRICE://老规格
                     ArticlePrice p = articlePriceMap.get(item.getArticleId());
                     a = articleMap.get(p.getArticleId());
                     item.setArticleName(a.getName() + p.getName());
                     org_price = p.getPrice();
-                    price = p.getPrice();
-                    fans_price = p.getFansPrice();
+                    price = discount(p.getPrice(),a.getDiscount(),item.getDiscount(),p.getName());                      //计算折扣
+                    fans_price = discount(p.getFansPrice(),a.getDiscount(),item.getDiscount(),p.getName());       //计算折扣
+                    remark = a.getDiscount()+ "%";          //设置菜品当前折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.UNIT_NEW:
+                case OrderItemType.UNIT_NEW://新规格
+                    //判断折扣是否匹配，如果不匹配则不允许买单
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
                     org_price = item.getPrice();
@@ -362,12 +388,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
-                case OrderItemType.SETMEALS:
+                case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
-                    price = a.getPrice();
-                    fans_price = a.getFansPrice();
+                    price = discount(a.getPrice(),a.getDiscount(),item.getDiscount(),a.getName()) ;
+                    fans_price = discount(a.getFansPrice(),a.getDiscount(),item.getDiscount(),a.getName()) ;
+                    remark = a.getDiscount()+ "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
                     item.setChildren(new ArrayList<OrderItem>());
@@ -403,6 +430,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setOriginalPrice(org_price);
             item.setStatus(1);
             item.setSort(0);
+            item.setRemark(remark);
             if (fans_price != null) {
                 item.setUnitPrice(fans_price);
             } else {
@@ -1450,7 +1478,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-
     private String getModeText(Order order) {
         if (order == null) {
             return "";
@@ -1554,38 +1581,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if(appraise != null){
-	        if (appraise != null && appraise.getLevel() < 5) {
-	            for (int i = 0; i < appraise.getLevel(); i++) {
-	                star.append("★");
-	            }
-	            for (int i = 0; i < 5 - appraise.getLevel(); i++){
-	            	star.append("☆");
-	            }
-	        }else if(appraise != null && appraise.getLevel() == 5){
-	        	star.append("★★★★★");
-	        }
-	        Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
-	        level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
-	        			.divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++){
+                    star.append("☆");
+                }
+            }else if(appraise != null && appraise.getLevel() == 5){
+                star.append("★★★★★");
+            }
+            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
         }else{
-        	star.append("☆☆☆☆☆");
+            star.append("☆☆☆☆☆");
         }
         StringBuilder gao = new StringBuilder();
         if(shopDetail.getIsUserIdentity().equals(1)){
-        	//得到有限制的情况下用户的订单数
-	        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
-	        //得到无限制情况下用户的订单数
-	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
-	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
-	            gao.append("【高频】");
-	        }
-	        //无限制的时候
-	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
-	            gao.append("【高频】");
-	        }
-	        else{
-	        	gao.append("【低频】");
-	        }
+            //得到有限制的情况下用户的订单数
+            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+            //得到无限制情况下用户的订单数
+            int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+            if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+                gao.append("【高频】");
+            }
+            //无限制的时候
+            else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+                gao.append("【高频】");
+            }
+            else{
+                gao.append("【低频】");
+            }
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
@@ -1602,17 +1629,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
         if(orderPaymentItems != null && orderPaymentItems.size() > 0){
-        	for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
-        		Map<String, Object> patMentItem = new HashMap<String, Object>();
-        		patMentItem.put("SUBTOTAL", orderPaymentItem.getPayValue());
-        		patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()));
-        		patMentItems.add(patMentItem);
-        	}
+            for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+                Map<String, Object> patMentItem = new HashMap<String, Object>();
+                patMentItem.put("SUBTOTAL", orderPaymentItem.getPayValue());
+                patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()));
+                patMentItems.add(patMentItem);
+            }
         }else{
-        	Map<String, Object> patMentItem = new HashMap<String, Object>();
-    		patMentItem.put("SUBTOTAL", 0);
-    		patMentItem.put("PAYMENT_MODE", "");
-    		patMentItems.add(patMentItem);
+            Map<String, Object> patMentItem = new HashMap<String, Object>();
+            patMentItem.put("SUBTOTAL", 0);
+            patMentItem.put("PAYMENT_MODE", "");
+            patMentItems.add(patMentItem);
         }
         data.put("PAYMENT_ITEMS", patMentItems);
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -1620,17 +1647,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
         StringBuffer customerStr = new StringBuffer();
         if(account != null){
-        	customerStr.append("余额："+account.getRemain()+" ");
+            customerStr.append("余额："+account.getRemain()+" ");
         }else{
-        	customerStr.append("余额：0 ");
+            customerStr.append("余额：0 ");
         }
         customerStr.append(""+gao.toString()+" ");
         Customer customer = customerService.selectById(order.getCustomerId());
         CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
         if(customerDetail != null){
-        	if(customerDetail.getBirthDate() != null){
-        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
-        	}
+            if(customerDetail.getBirthDate() != null){
+                customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+            }
         }
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);

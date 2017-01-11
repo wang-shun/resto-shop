@@ -8,10 +8,11 @@
     <result column="begin_time" property="beginTime" jdbcType="VARCHAR"/>
     <result column="end_time" property="endTime" jdbcType="VARCHAR"/>
     <result column="support_week_bin" property="supportWeekBin" jdbcType="INTEGER"/>
+    <result column="discount" property="discount" jdbcType="INTEGER"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, name, begin_time, end_time, support_week_bin, remark, shop_detail_id</sql>
+  <sql id="Base_Column_List">id, name, begin_time, end_time, support_week_bin, discount,remark, shop_detail_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_support_time where id = #{id,jdbcType=INTEGER}
   </select>
@@ -22,27 +23,30 @@
       <if test="id != null">id,</if>  
       <if test="name != null">name,</if>  
       <if test="beginTime != null">begin_time,</if>  
-      <if test="endTime != null">end_time,</if>  
-      <if test="supportWeekBin != null">support_week_bin,</if>  
-      <if test="remark != null">remark,</if>  
+      <if test="endTime != null">end_time,</if>
+      <if test="supportWeekBin != null">support_week_bin,</if>
+      <if test="discount != null">discount,</if>
+      <if test="remark != null">remark,</if>
       <if test="shopDetailId != null">shop_detail_id,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
       <if test="name != null">#{name,jdbcType=VARCHAR},</if>  
       <if test="beginTime != null">#{beginTime,jdbcType=VARCHAR},</if>  
-      <if test="endTime != null">#{endTime,jdbcType=VARCHAR},</if>  
-      <if test="supportWeekBin != null">#{supportWeekBin,jdbcType=INTEGER},</if>  
-      <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
+      <if test="endTime != null">#{endTime,jdbcType=VARCHAR},</if>
+      <if test="supportWeekBin != null">#{supportWeekBin,jdbcType=INTEGER},</if>
+      <if test="discount != null">#{discount,jdbcType=INTEGER},</if>
+      <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.SupportTime">update tb_support_time 
-    <set> 
+    <set>
       <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>  
       <if test="beginTime != null">begin_time = #{beginTime,jdbcType=VARCHAR},</if>  
-      <if test="endTime != null">end_time = #{endTime,jdbcType=VARCHAR},</if>  
-      <if test="supportWeekBin != null">support_week_bin = #{supportWeekBin,jdbcType=INTEGER},</if>  
+      <if test="endTime != null">end_time = #{endTime,jdbcType=VARCHAR},</if>
+      <if test="supportWeekBin != null">support_week_bin = #{supportWeekBin,jdbcType=INTEGER},</if>
+      <if test="discount != null">discount = #{discount,jdbcType=INTEGER},</if>
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
     </set> where id = #{id,jdbcType=INTEGER}

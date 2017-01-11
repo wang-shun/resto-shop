@@ -67,6 +67,11 @@ public class Article {
 
     private BigDecimal fansPrice;
 
+    /**
+     * 供应时间关联字段，用于储存 菜品的折扣百分比
+     */
+    private int discount;
+
     private Boolean hasMultPrice;
 
     private String hasUnit;
@@ -549,5 +554,11 @@ public class Article {
         this.likes = likes;
     }
 
+    public int getDiscount() {
+        return discount;
+    }
 
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
 }

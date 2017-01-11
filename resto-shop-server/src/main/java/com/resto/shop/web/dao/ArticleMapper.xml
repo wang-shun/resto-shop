@@ -519,15 +519,13 @@
 	ORDER BY sort
   </select>
     <select id="selectBySupportTimeId" resultType="Article">
-        select a.id,a.name,a.description from tb_article a
-        where a.id in (
-        select article_id from tb_article_support_time
-        where support_time_id in
+        select a.id,a.name,a.description,MAX(st.discount) discount from tb_article a
+        LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
         <foreach collection="times" separator="," item="id" open="(" close=")">
             #{id}
         </foreach>
-        ) and a.shop_detail_id=#{shopId}
-        and a.state=1
+        LEFT JOIN tb_support_time st on ast.support_time_id = st.id
+        where  a.shop_detail_id =#{shopId}and a.state=1 GROUP BY a.id;
     </select>
 
     <!-- 根据是否谷清查询菜品信息 -->

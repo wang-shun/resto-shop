@@ -74,6 +74,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<Article> selectList(String currentShopId) {
+        Map<String, Article> discountMap = selectAllSupportArticle(currentShopId);
+        List<Article> articleList =  articleMapper.selectList(currentShopId);
+        for (Article article : articleList ) {
+            if(discountMap.containsKey(article.getId())){
+                article.setDiscount(discountMap.get(article.getId()).getDiscount());
+            }
+        }
         return articleMapper.selectList(currentShopId);
     }
 
@@ -125,21 +132,25 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
         Map<String, Article> articleMap = selectAllSupportArticle(currentShopId);
         for (Article a : articleList) {
-            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {
+            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
                     a.setArticlePrices(prices);
                 }
-            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {
+            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {//套餐
                 List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
                 a.setMealAttrs(mealAttrs);
             }
+            //设置菜品的折扣百分比
+            a.setDiscount(articleMap.get(a.getId()).getDiscount());
             if (!articleMap.containsKey(a.getId())) {
                 a.setIsEmpty(true);
             }
         }
         return articleList;
     }
+
+
 
     @Override
     public int delete(String id) {
