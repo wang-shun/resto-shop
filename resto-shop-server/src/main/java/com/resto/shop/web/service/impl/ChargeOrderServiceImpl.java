@@ -208,8 +208,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
         return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
     }
 
-
-	/**
+    /**
 	 *
 	 * @param beginDate
 	 * @param endDate
@@ -217,7 +216,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	 *
 	 */
 	@Override
-	public List<ChargeOrder> shopChargeCodes(String shopDetailId, String beginDate, String endDate) {
+	public List<ChargeOrder> shopChargeCodes(String shopDetailId, Date beginDate, Date endDate) {
 		return chargeorderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
 	}
 
@@ -233,7 +232,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Override
 	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
-		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,begin,end);
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		if(chargeList!=null&&chargeList.size()>0){
 	    for (ChargeOrder charge:chargeList) {

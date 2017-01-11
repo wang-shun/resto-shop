@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ShopDetailDto;
 import org.springframework.stereotype.Controller;
@@ -88,12 +89,20 @@ public class RechargeLogController extends GenericController{
 	}
 
 
-
+	/**
+	 * 店铺详细
+	 * @param shopDetailId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
 		String shopname=getShopList(shopDetailId);
-        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,begin,end);
 		for (int i=0;i<chargeList.size();i++){
 			chargeList.get(i).getChargelog().setShopName(shopname);
 		}
