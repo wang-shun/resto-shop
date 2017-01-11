@@ -65,4 +65,55 @@
 		where 
 		 <![CDATA[ cp.create_time>#{begin} AND cp.create_time<#{end}]]>
 		  </select>
+		  
+	<!-- 所有充值记录 -->
+	<select id="selectRechargeLog" resultType="RechargeLogDto">
+		SELECT
+			COUNT(id) AS rechargeCount,
+			SUM(charge_money) AS rechargeNum,
+			SUM(reward_money) AS rechargeGaNum,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 1
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND brand_id = #{brandId}
+			) AS rechargeWeChat,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 0
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND brand_id = #{brandId}
+			) AS rechargePos,
+			SUM(charge_money) - SUM(charge_balance) AS rechargeCsNum,
+		
+			IF (
+				number_day_now > 0,
+				SUM(
+					reward_money - (number_day_now - 1) * arrival_amount + end_amount
+				),
+				SUM(
+					reward_money - reward_balance
+				)
+			) AS rechargeGaCsNum,
+			 SUM(charge_balance) AS rechargeSpNum,
+			 SUM(reward_balance) AS rechargeGaSpNum
+			 FROM
+				tb_charge_order
+			 WHERE
+				order_state = 1
+			 <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+			 GROUP BY
+				brand_id = #{brandId}
+	</select>
+		  
 </mapper>
