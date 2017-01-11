@@ -1295,12 +1295,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return null;
         }
         List<Map<String, Object>> items = new ArrayList<>();
+        List<Map<String, Object>> refundItems = new ArrayList<>();
         for (OrderItem article : orderItems) {
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getFinalPrice());
+            item.put("SUBTOTAL", article.getUnitPrice().multiply(new BigDecimal(article.getOrginCount())));
             item.put("ARTICLE_NAME", article.getArticleName());
-            item.put("ARTICLE_COUNT", article.getCount());
+            item.put("ARTICLE_COUNT", article.getOrginCount());
             items.add(item);
+            if(article.getRefundCount() != 0){
+            	Map<String, Object> refundItem = new HashMap<>();
+            	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).intValue());
+            	refundItem.put("ARTICLE_NAME", article.getArticleName());
+            	refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+            	refundItems.add(refundItem);
+            }
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
