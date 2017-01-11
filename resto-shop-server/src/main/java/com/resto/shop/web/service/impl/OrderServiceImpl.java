@@ -1317,9 +1317,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
 	            Map<String, Object> item = new HashMap<>();
 	            item.put("SUBTOTAL", brandSetting.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-	            item.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
+	            item.put("ARTICLE_NAME", brandSetting.getServiceName());
 	            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
-	                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
+	                item.put("ARTICLE_NAME", "就餐人数");
 	            }
 	            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
 	            items.add(item);
@@ -1335,11 +1335,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            }
         	}
         }else if(order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2){
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getMealFeePrice());
-            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-            item.put("ARTICLE_COUNT", order.getMealAllNumber());
-            items.add(item);
+        	if(order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0){
+	            Map<String, Object> item = new HashMap<>();
+	            item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount())));
+	            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+	            item.put("ARTICLE_COUNT", order.getBaseMealAllCount());
+	            items.add(item);
+	            if(order.getBaseCustomerCount() != order.getMealAllNumber()){
+	            	Map<String, Object> refundItem = new HashMap<>();
+	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getMealAllNumber()-order.getMealAllNumber())).intValue());
+	            	refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
+	            	refundItem.put("ARTICLE_COUNT", -(order.getMealAllNumber()-order.getMealAllNumber()));
+		            refundItems.add(item);
+	            }
+        	}
         }
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
@@ -1355,6 +1364,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        if(refundItems.size() != 0){
+        	Map<String, Object> map = new HashMap<String, Object>();
+        	for(int i = 0; i < refundItems.size(); i++){
+        		map = refundItems.get(i);
+        		items.add(map);
+        	}
+        }
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
