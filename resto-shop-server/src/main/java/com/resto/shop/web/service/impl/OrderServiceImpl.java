@@ -2763,11 +2763,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            	oldService = oldService.add(oldCustomerCount);
 	        		serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
 	        	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
-	            	if(orderAll.getMealAllNumber() != null && orderAll.getMealAllNumber() != 0){
-		        		BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
-		            	nowMeal = nowMeal.add(nowMealAllNumber);
-		            	mealMap.put(orderAll.getId(), orderAll.getMealAllNumber());
-	            	}
+	        		BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
+	        		BigDecimal oldMealAllNumber = new BigDecimal(orderAll.getBaseMealAllCount() == null ? 0 : orderAll.getBaseMealAllCount());
+	            	nowMeal = nowMeal.add(nowMealAllNumber);
+	            	oldMeal = oldMeal.add(oldMealAllNumber);
+	            	mealMap.put(orderAll.getId(), oldMealAllNumber.subtract(nowMealAllNumber));
 	        	}
 	        	Map<String, Object> selectMap = new HashMap<String, Object>();
 	        	selectMap.put("orderId", orderAll.getId());
@@ -2802,14 +2802,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			              		refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(brandSetting.getServicePrice()));
 			              	}
 		              	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
-		              		if(mealMap.get(orderItem.getOrderId()) != null && StringUtils.isNotBlank(mealMap.get(orderItem.getOrderId()).toString())){
-			              		BigDecimal oldMealAllNember = new BigDecimal(orderItem.getRefundCount() * (orderItem.getMealFeeNumber() == null ? 0 : orderItem.getMealFeeNumber()));
-			  	            	oldMeal = oldMeal.add(oldMealAllNember);
-			  	            	refundPrice = refundPrice.add(oldMealAllNember.multiply(shopDetail.getMealFeePrice()));
-		              		}else if(orderItem.getOrginCount().equals(orderItem.getRefundCount())){
-		              			BigDecimal oldMealAllNember = new BigDecimal(orderItem.getRefundCount() * (orderItem.getMealFeeNumber() == null ? 0 : orderItem.getMealFeeNumber()));
-			  	            	oldMeal = oldMeal.add(oldMealAllNember);
-			  	            	refundPrice = refundPrice.add(oldMealAllNember.multiply(shopDetail.getMealFeePrice()));
+		              		if(!orderId.equals(orderItem.getOrderId())){
+			  	            	refundPrice = refundPrice.add(new BigDecimal(mealMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getMealFeePrice()));
 		              		}
 		              	}
 		          		canceledOrderMap.put(orderItem.getOrderId(), refundPrice);
