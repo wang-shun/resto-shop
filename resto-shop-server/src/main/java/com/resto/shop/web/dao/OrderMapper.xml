@@ -480,6 +480,9 @@
             <if test="mealAllNumber != null">
                 meal_all_number,
             </if>
+            <if test="mealAllNumber != null">
+                base_meal_all_count,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -607,6 +610,9 @@
             </if>
             <if test="mealFeePrice != null">
                 #{mealFeePrice},
+            </if>
+            <if test="mealAllNumber != null">
+                #{mealAllNumber},
             </if>
             <if test="mealAllNumber != null">
                 #{mealAllNumber},

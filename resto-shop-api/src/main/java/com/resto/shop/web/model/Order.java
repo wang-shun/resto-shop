@@ -174,8 +174,19 @@ public class Order implements Serializable{
 
     //订单原始人数（退菜前）
     private Integer baseCustomerCount;
+    
+    //原始餐盒总数（退菜前）
+    private Integer baseMealAllCount;
 
-    public Integer getBaseCustomerCount() {
+    public Integer getBaseMealAllCount() {
+		return baseMealAllCount;
+	}
+
+	public void setBaseMealAllCount(Integer baseMealAllCount) {
+		this.baseMealAllCount = baseMealAllCount;
+	}
+
+	public Integer getBaseCustomerCount() {
         return baseCustomerCount;
     }
 
