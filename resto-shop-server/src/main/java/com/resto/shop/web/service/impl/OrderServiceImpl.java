@@ -2838,9 +2838,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(!oldMeal.subtract(nowMeal).equals(BigDecimal.ZERO)){
             	Map<String, Object> itemMap = new HashMap<String, Object>();
             	itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
-            	itemMap.put("SUBTOTAL", oldMeal);
+            	itemMap.put("SUBTOTAL", oldMeal.subtract(nowMeal));
             	canceledProducts.add(itemMap);
-            	canceledProductCount = canceledProductCount.add(oldMeal);
+            	canceledProductCount = canceledProductCount.add(oldMeal.subtract(nowMeal));
             }
             canceledOrderCount = canceledOrderCount.add(new BigDecimal(canceledOrderMap.size()));
             for(Map.Entry<String, Object> map : canceledOrderMap.entrySet()){
