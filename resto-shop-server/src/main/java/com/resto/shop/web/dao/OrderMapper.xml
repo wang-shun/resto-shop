@@ -28,7 +28,72 @@
         </collection>
     </resultMap>
 
+
+    <!-- 每日短信报表数据 -->
+    <resultMap id="everdayReport" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="parent_order_id" property="parentOrderId" />
+        <result column="count_with_child" property="countWithChild" />
+        <result column="order_mode" property="orderMode" />
+        <result column="create_time" property="createTime" />
+        <result column="amount_with_children" property="amountWithChildren" />
+        <result column="customer_id" property="customerId" />
+
+        <!-- 用户 -->
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customerId" property="id"/>
+            <result column="nickname" property="nickname"/>
+            <result column="regiest_time" property="regiestTime"/>
+            <result column="is_share" property="isShare"/>
+            <result column="share_customer" property="shareCustomer"/>
+        </association>
+        <!-- 评论 -->
+        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
+            <id column="appraise_id" property="id"/>
+            <result column="level" property="level"/>
+        </association>
+        <!-- 支付方式的id -->
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+            <result column="pay_value" property="payValue"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+    </resultMap>
+
     <!-- 结束 -->
+
+
+
+    <!-- 每日短信报表数据 用户数分析 -->
+    <resultMap id="selectOrderHistoryListMap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="parent_order_id" property="parentOrderId" />
+        <result column="count_with_child" property="countWithChild" />
+        <result column="order_mode" property="orderMode" />
+        <result column="create_time" property="createTime" />
+        <result column="customer_id" property="customerId" />
+        <!-- 用户 -->
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customerId" property="id"/>
+            <result column="nickname" property="nickname"/>
+            <result column="regiest_time" property="regiestTime"/>
+            <result column="is_share" property="isShare"/>
+            <result column="share_customer" property="shareCustomer"/>
+        </association>
+        <!-- 评论 -->
+
+    </resultMap>
+
+
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
@@ -108,6 +173,7 @@
             <result column="count" property="count"/>
         </collection>
     </resultMap>
+
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -2311,6 +2377,72 @@ AND o.production_status IN (2, 3)
             and  #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
         </if>
 
+    </select>
+
+<!-- 每日短信报表数据 -->
+<select id="selectListsmsByShopId" resultMap="everdayReport">
+    SELECT
+	o.id,
+	o.order_state,
+	o.production_status,
+	o.order_money,
+	o.shop_detail_id,
+	o.parent_order_id,
+	o.count_with_child,
+	o.amount_with_children,
+	o.order_mode,
+	o.create_time,
+	oi.id orderPaymentId,
+	oi.payment_mode_id,
+	oi.pay_value,
+	o.customer_id,
+	c.nickname,
+	c.regiest_time,
+	c.share_customer,
+	c.is_share,
+	a.id appraise,
+	a.level,
+	a.feedback
+FROM
+	tb_order o
+INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+LEFT JOIN tb_customer c ON c.id = o.customer_id
+LEFT JOIN tb_appraise a on o.id = a.order_id
+WHERE  o.shop_detail_id =#{shopId}
+and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+</select>
+
+
+
+    <!-- 每日短信报表数据 用户总数 -->
+    <select id="selectOrderHistoryList" resultMap="selectOrderHistoryListMap">
+        SELECT
+        o.id,
+        o.order_state,
+        o.production_status,
+        o.order_money,
+        o.shop_detail_id,
+        o.parent_order_id,
+        o.count_with_child,
+        o.order_mode,
+        o.customer_id,
+        o.create_time,
+        oi.id orderPaymentId,
+        oi.payment_mode_id,
+        oi.pay_value,
+        c.id customerId,
+        c.regiest_time,
+        c.is_share,
+        c.share_customer
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        LEFT JOIN tb_customer c ON c.id = o.customer_id
+        WHERE  o.shop_detail_id =#{shopId}
+        and  <![CDATA[ o.create_time <= #{endDate} ]]>
+        AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+        and o.parent_order_id is NULL
     </select>
 
 

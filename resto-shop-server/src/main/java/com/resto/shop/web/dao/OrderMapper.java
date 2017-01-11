@@ -516,5 +516,21 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineTime") int consumeConfineTime);
 
+    /**
+     * 报表数据查询用于短信推送
+     * 短信推送
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+    List<Order> selectListsmsByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("shopId") String shopId);
 
+    /**
+     * 查询该店铺历史的订单数据
+     * @param shopId
+     * @param dateEnd
+     * @return
+     */
+    List<Order> selectOrderHistoryList(@Param("shopId") String shopId, @Param("endDate") Date dateEnd);
 }

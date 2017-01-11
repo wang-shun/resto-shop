@@ -436,7 +436,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(String shopId);
+    void cleanShopOrder(String shopId,String shopName);
 
     public boolean cancelExceptionOrder(String orderId);
 
