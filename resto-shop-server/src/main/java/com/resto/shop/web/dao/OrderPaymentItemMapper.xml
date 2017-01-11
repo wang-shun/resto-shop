@@ -204,4 +204,9 @@
 		where payment_mode_id in (8,11) and pay_time between #{beginDate} and date_add(#{endDate},interval 1 day)
 		group by payment_mode_id
 	</select>
+	
+	<select id="selectPaymentSumByOrderId" parameterType="java.lang.String" resultType="com.resto.shop.web.model.OrderPaymentItem">
+		select payment_mode_id, SUM(pay_value) pay_value from tb_order_payment_item where order_id = #{orderId}
+		group by payment_mode_id
+	</select>
 </mapper>

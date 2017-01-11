@@ -128,4 +128,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map) {
     	return orderpaymentitemMapper.selectOrderPayMentItem(map);
     }
+    
+    @Override
+    public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId) {
+    	return orderpaymentitemMapper.selectPaymentCountByOrderId(orderId);
+    }
 }
