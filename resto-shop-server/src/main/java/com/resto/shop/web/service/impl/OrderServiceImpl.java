@@ -4249,8 +4249,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Integer selectByCustomerCount(String customerId,int consumeConfineTime ) {
-        return orderMapper.selectByCustomerCount(customerId, consumeConfineTime);
+    public Integer selectByCustomerCount(String customerId ,int consumeConfineUnit ,int consumeConfineTime ) {
+        return orderMapper.selectByCustomerCount(customerId ,consumeConfineUnit,consumeConfineTime);
     }
     
     @Override
