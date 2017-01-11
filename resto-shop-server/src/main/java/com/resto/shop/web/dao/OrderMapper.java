@@ -514,7 +514,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
    List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
-	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineTime") int consumeConfineTime);
+	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineUnit")int consumeConfineUnit,@Param("consumeConfineTime") int consumeConfineTime);
 
 	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
 }
