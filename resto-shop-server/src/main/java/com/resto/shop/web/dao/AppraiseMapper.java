@@ -38,4 +38,6 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     int selectByCustomerCount(String customerId);
 
     List<Appraise> selectByGoodAppraise();
+    
+    Map<String, Object> selectCustomerAppraiseAvg(@Param("customerId") String customerId);
 }

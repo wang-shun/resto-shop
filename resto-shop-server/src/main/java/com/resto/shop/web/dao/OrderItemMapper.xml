@@ -316,4 +316,10 @@ order by t.print_sort asc
      final_price = unit_price * `count`
      where id = #{id}
   </update>
+  
+  <select id="selectOrderItemByOrderIds" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select * from tb_order_item
+	where order_id = #{orderId}
+	and `status` = 1 and ${count}
+  </select>
 </mapper>

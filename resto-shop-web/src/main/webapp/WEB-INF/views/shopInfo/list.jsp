@@ -198,6 +198,19 @@
 							</div>
 						</div>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">退菜打印订单：</label>
+							<div class="col-sm-9">
+								<div>
+									<label class="checkbox-inline">
+										<input type="checkbox" name="printReceipt" v-model="m.printReceipt" value = "1"> 打印总单
+									</label>
+									<label class="checkbox-inline">
+										<input type="checkbox" name="printKitchen" v-model="m.printKitchen" value = "1"> 打印厨打
+									</label>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;

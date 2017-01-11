@@ -106,6 +106,7 @@
         left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
         where t.restaurant_id = #{restaurantId}
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.created_at,'%d %b %y')
+        group by t.id
     </select>
 
     <select id="getExtra" resultType="HungerOrderExtra">
