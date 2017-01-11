@@ -1091,13 +1091,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
         	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
         	            gao.append("【高频】");
-        	        }
-        	        //无限制的时候
+        	        }//无限制的时候
         	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
         	            gao.append("【高频】");
-        	        }
-        	        else{
-        	        	gao.append("【低频】");
         	        }
                 }
                 data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -1194,13 +1190,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
         	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
         	            gao.append("【高频】");
-        	        }
-        	        //无限制的时候
+        	        }//无限制的时候
         	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
         	            gao.append("【高频】");
-        	        }
-        	        else{
-        	        	gao.append("【低频】");
         	        }
                 }
                 data.put("CUSTOMER_SATISFACTION", star.toString());
