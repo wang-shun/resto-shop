@@ -1108,8 +1108,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-                if(customerDetail != null){
-                	if(customerDetail.getBirthDate() != null){
+                if(customerDetail.getBirthDate() != null){
+                	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
                 		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
                 	}
                 }
@@ -1207,8 +1208,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-                if(customerDetail != null){
-                	if(customerDetail.getBirthDate() != null){
+                if(customerDetail.getBirthDate() != null){
+                	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
                 		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
                 	}
                 }
@@ -1333,12 +1335,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
 	            item.put("ARTICLE_COUNT", order.getBaseMealAllCount());
 	            items.add(item);
-	            if(order.getBaseCustomerCount() != order.getMealAllNumber()){
+	            if(order.getBaseMealAllCount() != order.getMealAllNumber()){
 	            	Map<String, Object> refundItem = new HashMap<>();
-	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getMealAllNumber()-order.getMealAllNumber())).intValue());
+	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount()-order.getMealAllNumber())).intValue());
 	            	refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
-	            	refundItem.put("ARTICLE_COUNT", -(order.getMealAllNumber()-order.getMealAllNumber()));
-		            refundItems.add(item);
+	            	refundItem.put("ARTICLE_COUNT", -(order.getBaseMealAllCount()-order.getMealAllNumber()));
+		            refundItems.add(refundItem);
 	            }
         	}
         }
@@ -1437,8 +1439,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerStr.append(""+gao.toString()+" ");
         Customer customer = customerService.selectById(order.getCustomerId());
         CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if(customerDetail != null){
-        	if(customerDetail.getBirthDate() != null){
+        if(customerDetail.getBirthDate() != null){
+        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
         		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
         	}
         }
