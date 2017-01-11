@@ -99,6 +99,7 @@
         <result column="meal_fee_price" property="mealFeePrice"/>
         <result column="meal_all_number" property="mealAllNumber"/>
         <result column="is_pay" property="isPay"/>
+        <result column="base_meal_all_count" property="baseMealAllCount"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="orderPaymentId" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -282,8 +283,8 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number,need_scan,
-        is_pay
+        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
+        ,is_pay,need_scan, base_meal_all_count
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -485,6 +486,9 @@
             <if test="needScan != null">
                 need_scan,
             </if>
+            <if test="mealAllNumber != null">
+                base_meal_all_count,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -612,6 +616,9 @@
             </if>
             <if test="mealFeePrice != null">
                 #{mealFeePrice},
+            </if>
+            <if test="mealAllNumber != null">
+                #{mealAllNumber},
             </if>
             <if test="mealAllNumber != null">
                 #{mealAllNumber},

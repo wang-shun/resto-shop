@@ -1306,55 +1306,51 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 StringBuilder star = new StringBuilder();
                 BigDecimal level = new BigDecimal(0);
                 if(appraise != null){
-                    if (appraise != null && appraise.getLevel() < 5) {
-                        for (int i = 0; i < appraise.getLevel(); i++) {
-                            star.append("★");
-                        }
-                        for (int i = 0; i < 5 - appraise.getLevel(); i++){
-                            star.append("☆");
-                        }
-                    }else if(appraise != null && appraise.getLevel() == 5){
-                        star.append("★★★★★");
-                    }
-                    Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
-                    level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
-                            .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
+        	        if (appraise != null && appraise.getLevel() < 5) {
+        	            for (int i = 0; i < appraise.getLevel(); i++) {
+        	                star.append("★");
+        	            }
+        	            for (int i = 0; i < 5 - appraise.getLevel(); i++){
+        	            	star.append("☆");
+        	            }
+        	        }else if(appraise != null && appraise.getLevel() == 5){
+        	        	star.append("★★★★★");
+        	        }
+        	        Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+        	        level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+        	        			.divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
                 }else{
-                    star.append("☆☆☆☆☆");
+                	star.append("☆☆☆☆☆");
                 }
                 StringBuilder gao = new StringBuilder();
                 if(shopDetail.getIsUserIdentity().equals(1)){
-                    //得到有限制的情况下用户的订单数
-                    int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
-                    //得到无限制情况下用户的订单数
-                    int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
-                    if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
-                        gao.append("【高频】");
-                    }
-                    //无限制的时候
-                    else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
-                        gao.append("【高频】");
-                    }
-                    else{
-                        gao.append("【低频】");
-                    }
+                	//得到有限制的情况下用户的订单数
+        	        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+        	        //得到无限制情况下用户的订单数
+        	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+        	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+        	            gao.append("【高频】");
+        	        }//无限制的时候
+        	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+        	            gao.append("【高频】");
+        	        }
                 }
                 data.put("CUSTOMER_SATISFACTION", star.toString());
                 data.put("CUSTOMER_SATISFACTION_DEGREE", level);
                 Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
                 StringBuffer customerStr = new StringBuffer();
                 if(account != null){
-                    customerStr.append("余额："+account.getRemain()+" ");
+                	customerStr.append("余额："+account.getRemain()+" ");
                 }else{
-                    customerStr.append("余额：0 ");
+                	customerStr.append("余额：0 ");
                 }
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
                 if(customerDetail != null){
-                    if(customerDetail.getBirthDate() != null){
-                        customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
-                    }
+                	if(customerDetail.getBirthDate() != null){
+                		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+                	}
                 }
                 data.put("CUSTOMER_PROPERTY", customerStr.toString());
                 print.put("DATA", data);
@@ -1409,55 +1405,51 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 StringBuilder star = new StringBuilder();
                 BigDecimal level = new BigDecimal(0);
                 if(appraise != null){
-                    if (appraise != null && appraise.getLevel() < 5) {
-                        for (int i = 0; i < appraise.getLevel(); i++) {
-                            star.append("★");
-                        }
-                        for (int i = 0; i < 5 - appraise.getLevel(); i++){
-                            star.append("☆");
-                        }
-                    }else if(appraise != null && appraise.getLevel() == 5){
-                        star.append("★★★★★");
-                    }
-                    Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
-                    level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
-                            .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
+        	        if (appraise != null && appraise.getLevel() < 5) {
+        	            for (int i = 0; i < appraise.getLevel(); i++) {
+        	                star.append("★");
+        	            }
+        	            for (int i = 0; i < 5 - appraise.getLevel(); i++){
+        	            	star.append("☆");
+        	            }
+        	        }else if(appraise != null && appraise.getLevel() == 5){
+        	        	star.append("★★★★★");
+        	        }
+        	        Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+        	        level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+        	        			.divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
                 }else{
-                    star.append("☆☆☆☆☆");
+                	star.append("☆☆☆☆☆");
                 }
                 StringBuilder gao = new StringBuilder();
                 if(shopDetail.getIsUserIdentity().equals(1)){
-                    //得到有限制的情况下用户的订单数
-                    int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
-                    //得到无限制情况下用户的订单数
-                    int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
-                    if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
-                        gao.append("【高频】");
-                    }
-                    //无限制的时候
-                    else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
-                        gao.append("【高频】");
-                    }
-                    else{
-                        gao.append("【低频】");
-                    }
+                	//得到有限制的情况下用户的订单数
+        	        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+        	        //得到无限制情况下用户的订单数
+        	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+        	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+        	            gao.append("【高频】");
+        	        }//无限制的时候
+        	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+        	            gao.append("【高频】");
+        	        }
                 }
                 data.put("CUSTOMER_SATISFACTION", star.toString());
                 data.put("CUSTOMER_SATISFACTION_DEGREE", level);
                 Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
                 StringBuffer customerStr = new StringBuffer();
                 if(account != null){
-                    customerStr.append("余额："+account.getRemain()+" ");
+                	customerStr.append("余额："+account.getRemain()+" ");
                 }else{
-                    customerStr.append("余额：0 ");
+                	customerStr.append("余额：0 ");
                 }
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
                 if(customerDetail != null){
-                    if(customerDetail.getBirthDate() != null){
-                        customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
-                    }
+                	if(customerDetail.getBirthDate() != null){
+                		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+                	}
                 }
                 data.put("CUSTOMER_PROPERTY", customerStr.toString());
                 print.put("DATA", data);
@@ -1534,33 +1526,60 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return null;
         }
         List<Map<String, Object>> items = new ArrayList<>();
+        List<Map<String, Object>> refundItems = new ArrayList<>();
         for (OrderItem article : orderItems) {
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getFinalPrice());
+            item.put("SUBTOTAL", article.getUnitPrice().multiply(new BigDecimal(article.getOrginCount())));
             item.put("ARTICLE_NAME", article.getArticleName());
-            item.put("ARTICLE_COUNT", article.getCount());
+            item.put("ARTICLE_COUNT", article.getOrginCount());
             items.add(item);
+            if(article.getRefundCount() != 0){
+            	Map<String, Object> refundItem = new HashMap<>();
+            	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).intValue());
+            	refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
+            	refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+            	refundItems.add(refundItem);
+            }
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-        if (brandSetting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getServicePrice());
-            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
-                item.put("ARTICLE_NAME", "就餐人数");
-            }else{
-                item.put("ARTICLE_NAME", brandSetting.getServiceName());
-            }
-            item.put("ARTICLE_COUNT", order.getCustomerCount() == null ? 0 : order.getCustomerCount());
-            items.add(item);
-        }
-        if(brandSetting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", order.getMealFeePrice());
-            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-            item.put("ARTICLE_COUNT", order.getMealAllNumber());
-            items.add(item);
+        if (order.getDistributionModeId() == 1) {
+        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+	            Map<String, Object> item = new HashMap<>();
+	            item.put("SUBTOTAL", brandSetting.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+	            item.put("ARTICLE_NAME", brandSetting.getServiceName());
+	            if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+	                item.put("ARTICLE_NAME", "就餐人数");
+	            }
+	            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+	            items.add(item);
+	            if(order.getBaseCustomerCount() != order.getCustomerCount()){
+	            	Map<String, Object> refundItem = new HashMap<>();
+	            	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).intValue());
+	            	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
+	            	if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+		                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
+		            }
+	            	refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount()-order.getCustomerCount()));
+	            	refundItems.add(refundItem);
+	            }
+        	}
+        }else if(order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2){
+        	if(order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0){
+	            Map<String, Object> item = new HashMap<>();
+	            item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount())));
+	            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+	            item.put("ARTICLE_COUNT", order.getBaseMealAllCount());
+	            items.add(item);
+	            if(order.getBaseCustomerCount() != order.getMealAllNumber()){
+	            	Map<String, Object> refundItem = new HashMap<>();
+	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getMealAllNumber()-order.getMealAllNumber())).intValue());
+	            	refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
+	            	refundItem.put("ARTICLE_COUNT", -(order.getMealAllNumber()-order.getMealAllNumber()));
+		            refundItems.add(item);
+	            }
+        	}
         }
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
@@ -1576,43 +1595,46 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        if(refundItems.size() != 0){
+        	Map<String, Object> map = new HashMap<String, Object>();
+        	for(int i = 0; i < refundItems.size(); i++){
+        		map = refundItems.get(i);
+        		items.add(map);
+        	}
+        }
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if(appraise != null){
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++){
-                    star.append("☆");
-                }
-            }else if(appraise != null && appraise.getLevel() == 5){
-                star.append("★★★★★");
-            }
-            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
-            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
-                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
+	        if (appraise != null && appraise.getLevel() < 5) {
+	            for (int i = 0; i < appraise.getLevel(); i++) {
+	                star.append("★");
+	            }
+	            for (int i = 0; i < 5 - appraise.getLevel(); i++){
+	            	star.append("☆");
+	            }
+	        }else if(appraise != null && appraise.getLevel() == 5){
+	        	star.append("★★★★★");
+	        }
+	        Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+	        level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+	        			.divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
         }else{
-            star.append("☆☆☆☆☆");
+        	star.append("☆☆☆☆☆");
         }
         StringBuilder gao = new StringBuilder();
         if(shopDetail.getIsUserIdentity().equals(1)){
-            //得到有限制的情况下用户的订单数
-            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
-            //得到无限制情况下用户的订单数
-            int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
-            if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
-                gao.append("【高频】");
-            }
-            //无限制的时候
-            else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
-                gao.append("【高频】");
-            }
-            else{
-                gao.append("【低频】");
-            }
+        	//得到有限制的情况下用户的订单数
+	        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+	        //得到无限制情况下用户的订单数
+	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+	            gao.append("【高频】");
+	        }//无限制的时候
+	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+	            gao.append("【高频】");
+	        }
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
@@ -1627,19 +1649,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", order.getArticleCount());
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
-        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectPaymentCountByOrderId(order.getId());
         if(orderPaymentItems != null && orderPaymentItems.size() > 0){
-            for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
-                Map<String, Object> patMentItem = new HashMap<String, Object>();
-                patMentItem.put("SUBTOTAL", orderPaymentItem.getPayValue());
-                patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()));
-                patMentItems.add(patMentItem);
-            }
+        	for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+        		Map<String, Object> patMentItem = new HashMap<String, Object>();
+        		patMentItem.put("SUBTOTAL", orderPaymentItem.getPayValue());
+        		patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()));
+        		patMentItems.add(patMentItem);
+        	}
         }else{
-            Map<String, Object> patMentItem = new HashMap<String, Object>();
-            patMentItem.put("SUBTOTAL", 0);
-            patMentItem.put("PAYMENT_MODE", "");
-            patMentItems.add(patMentItem);
+        	Map<String, Object> patMentItem = new HashMap<String, Object>();
+    		patMentItem.put("SUBTOTAL", 0);
+    		patMentItem.put("PAYMENT_MODE", "");
+    		patMentItems.add(patMentItem);
         }
         data.put("PAYMENT_ITEMS", patMentItems);
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -1647,17 +1669,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
         StringBuffer customerStr = new StringBuffer();
         if(account != null){
-            customerStr.append("余额："+account.getRemain()+" ");
+        	customerStr.append("余额："+account.getRemain()+" ");
         }else{
-            customerStr.append("余额：0 ");
+        	customerStr.append("余额：0 ");
         }
         customerStr.append(""+gao.toString()+" ");
         Customer customer = customerService.selectById(order.getCustomerId());
         CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
         if(customerDetail != null){
-            if(customerDetail.getBirthDate() != null){
-                customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
-            }
+        	if(customerDetail.getBirthDate() != null){
+        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+        	}
         }
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
@@ -2859,26 +2881,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
         BigDecimal totalAmount = new BigDecimal(0);
         if(order.getOrderTotal() != null){
-            totalAmount = totalAmount.add(order.getOrderTotal());
+        	totalAmount = totalAmount.add(order.getOrderTotal());
         }
         data.put("TOTAL_AMOUNT", totalAmount);
         BigDecimal orderAmount = new BigDecimal(0);
         if(new BigDecimal(order.getOrderCount()) != null){
-            orderAmount = orderAmount.add(new BigDecimal(order.getOrderCount()));
+        	orderAmount = orderAmount.add(new BigDecimal(order.getOrderCount()));
         }
         data.put("ORDER_AMOUNT", orderAmount);
-        DecimalFormat df = new DecimalFormat("######0.00");
+	    DecimalFormat df = new DecimalFormat("######0.00");
         double average = orderAmount.equals(BigDecimal.ZERO) ? 0 :
-                totalAmount.doubleValue() / orderAmount.doubleValue();
-        data.put("ORDER_AVERAGE", df.format(average));
-        BigDecimal customerAmount = new BigDecimal(0);
-        if(order.getCustomerCount() != null){
-            customerAmount = customerAmount.add(new BigDecimal(order.getCustomerCount()));
-        }
+        	totalAmount.doubleValue() / orderAmount.doubleValue();
+	    data.put("ORDER_AVERAGE", df.format(average));
+	    BigDecimal customerAmount = new BigDecimal(0);
+	    if(order.getCustomerCount() != null){
+	    	customerAmount = customerAmount.add(new BigDecimal(order.getCustomerCount()));
+	    }
         data.put("CUSTOMER_AMOUNT", customerAmount);
-        double customerAverage = customerAmount.equals(BigDecimal.ZERO) ? 0 :
-                totalAmount.doubleValue() / customerAmount.doubleValue();
-        data.put("CUSTOMER_AVERAGE", df.format(customerAverage));
+    	double customerAverage = customerAmount.equals(BigDecimal.ZERO) ? 0 :
+    		totalAmount.doubleValue() / customerAmount.doubleValue();
+    	data.put("CUSTOMER_AVERAGE", df.format(customerAverage));
         BigDecimal wxPay =  orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId());
         BigDecimal chargePay = orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId());
         BigDecimal aliPay= orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId());
@@ -2943,26 +2965,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal chargeAmount = new BigDecimal(0);
         List<Map<String, Object>> storedValueItems = new ArrayList<Map<String, Object>>();
         if(chargeOrders.size() > 0){
-            for(Map<String, Object> chargeOrder : chargeOrders){
-                Map<String, Object> chargeMap = new HashMap<String, Object>();
-                chargeMap.put("SUBTOTAL", chargeOrder.get("chargeMoney"));
-                chargeMap.put("TEL", chargeOrder.get("telephone"));
-                chargeAmount = chargeAmount.add(new BigDecimal(chargeOrder.get("chargeMoney").toString()));
-                storedValueItems.add(chargeMap);
-            }
+        	for(Map<String, Object> chargeOrder : chargeOrders){
+        		Map<String, Object> chargeMap = new HashMap<String, Object>();
+        		chargeMap.put("SUBTOTAL", chargeOrder.get("chargeMoney"));
+        		chargeMap.put("TEL", chargeOrder.get("telephone"));
+        		chargeAmount = chargeAmount.add(new BigDecimal(chargeOrder.get("chargeMoney").toString()));
+        		storedValueItems.add(chargeMap);
+        	}
         }
         data.put("STORED_VALUE_AMOUNT", chargeAmount);
         data.put("STORED_VALUE_ITEMS", storedValueItems);
         BigDecimal saledProductAmount = new BigDecimal(0);
         BigDecimal canceledProductCount = new BigDecimal(0);
         BigDecimal canceledProductAmount = new BigDecimal(0);
-        BigDecimal canceledOrderCount = new BigDecimal(0);
+        BigDecimal canceledOrderCount = new BigDecimal(0); 
         Map<String, Object> canceledOrderMap = new HashMap<>();
         List<Map<String, Object>> saledProducts = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> canceledProducts = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> canceledOrders = new ArrayList<Map<String, Object>>();
         if(StringUtils.isNotBlank(order.getId())){
-            BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
+        	BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
             Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
             String[] orderIds = order.getId().split(",");
             Map<String, Object> selectOrderMap = new HashMap<String, Object>();
@@ -2981,107 +3003,101 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> mealMap = new HashMap<>();
             mealMap.put("mealName", shopDetail.getMealFeeName());
             for(Order orderAll : orders){
-                BigDecimal nowCustomerCount = new BigDecimal(orderAll.getCustomerCount() == null ? 0 : orderAll.getCustomerCount());
-                BigDecimal oldCustomerCount = new BigDecimal(orderAll.getBaseCustomerCount() == null ? 0 : orderAll.getBaseCustomerCount());
-                if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
-                    nowService = nowService.add(nowCustomerCount);
-                    oldService = oldService.add(oldCustomerCount);
-                    serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
-                }else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
-                    if(orderAll.getMealAllNumber() != null && orderAll.getMealAllNumber() != 0){
-                        BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
-                        nowMeal = nowMeal.add(nowMealAllNumber);
-                        mealMap.put(orderAll.getId(), orderAll.getMealAllNumber());
-                    }
-                }
-                Map<String, Object> selectMap = new HashMap<String, Object>();
-                selectMap.put("orderId", orderAll.getId());
-                selectMap.put("count", "count != 0");
-                List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
-                for(OrderItem orderItem : saledOrderItems){
-                    saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
-                    Map<String, Object> itemMap = new HashMap<String, Object>();
-                    itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                    itemMap.put("SUBTOTAL", orderItem.getCount());
-                    saledProducts.add(itemMap);
-                }
-                selectMap.clear();
-                selectMap.put("orderId", orderAll.getId());
-                selectMap.put("count", "refund_count != 0");
-                List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
-                BigDecimal refundPrice = new BigDecimal(0);
-                if(canceledOrderItems.size() != 0){
-                    String orderId = "";
-                    for(OrderItem orderItem : canceledOrderItems){
-                        canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
-                        if(!orderId.equals(orderItem.getOrderId())){
-                            refundPrice = BigDecimal.ZERO;
-                        }
-                        refundPrice = refundPrice.add(orderItem.getUnitPrice().multiply(new BigDecimal(orderItem.getRefundCount())));
-                        Map<String, Object> itemMap = new HashMap<String, Object>();
-                        itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                        itemMap.put("SUBTOTAL", orderItem.getRefundCount());
-                        canceledProducts.add(itemMap);
-                        if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
-                            if(!orderId.equals(orderItem.getOrderId())){
-                                refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(brandSetting.getServicePrice()));
-                            }
-                        }else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
-                            if(mealMap.get(orderItem.getOrderId()) != null && StringUtils.isNotBlank(mealMap.get(orderItem.getOrderId()).toString())){
-                                BigDecimal oldMealAllNember = new BigDecimal(orderItem.getRefundCount() * (orderItem.getMealFeeNumber() == null ? 0 : orderItem.getMealFeeNumber()));
-                                oldMeal = oldMeal.add(oldMealAllNember);
-                                refundPrice = refundPrice.add(oldMealAllNember.multiply(shopDetail.getMealFeePrice()));
-                            }else if(orderItem.getOrginCount().equals(orderItem.getRefundCount())){
-                                BigDecimal oldMealAllNember = new BigDecimal(orderItem.getRefundCount() * (orderItem.getMealFeeNumber() == null ? 0 : orderItem.getMealFeeNumber()));
-                                oldMeal = oldMeal.add(oldMealAllNember);
-                                refundPrice = refundPrice.add(oldMealAllNember.multiply(shopDetail.getMealFeePrice()));
-                            }
-                        }
-                        canceledOrderMap.put(orderItem.getOrderId(), refundPrice);
-                        orderId = orderItem.getOrderId();
-                    }
-                }else if (!oldCustomerCount.equals(nowCustomerCount)){
-                    refundPrice = refundPrice.add(oldCustomerCount.subtract(nowCustomerCount).multiply(brandSetting.getServicePrice()));
-                    canceledOrderMap.put(orderAll.getId(), refundPrice);
-                }
+            	BigDecimal nowCustomerCount = new BigDecimal(orderAll.getCustomerCount() == null ? 0 : orderAll.getCustomerCount());
+            	BigDecimal oldCustomerCount = new BigDecimal(orderAll.getBaseCustomerCount() == null ? 0 : orderAll.getBaseCustomerCount());
+            	if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
+	            	nowService = nowService.add(nowCustomerCount);
+	            	oldService = oldService.add(oldCustomerCount);
+	        		serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
+	        	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
+	        		BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
+	        		BigDecimal oldMealAllNumber = new BigDecimal(orderAll.getBaseMealAllCount() == null ? 0 : orderAll.getBaseMealAllCount());
+	            	nowMeal = nowMeal.add(nowMealAllNumber);
+	            	oldMeal = oldMeal.add(oldMealAllNumber);
+	            	mealMap.put(orderAll.getId(), oldMealAllNumber.subtract(nowMealAllNumber));
+	        	}
+	        	Map<String, Object> selectMap = new HashMap<String, Object>();
+	        	selectMap.put("orderId", orderAll.getId());
+	            selectMap.put("count", "count != 0");
+	            List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
+	        	for(OrderItem orderItem : saledOrderItems){
+	        		saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+	            	Map<String, Object> itemMap = new HashMap<String, Object>();
+	            	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+	            	itemMap.put("SUBTOTAL", orderItem.getCount());
+	            	saledProducts.add(itemMap);
+	            }
+	            selectMap.clear();
+	            selectMap.put("orderId", orderAll.getId());
+	            selectMap.put("count", "refund_count != 0");
+	            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
+	            BigDecimal refundPrice = new BigDecimal(0);
+	            if(canceledOrderItems.size() != 0){
+		        	String orderId = "";
+		            for(OrderItem orderItem : canceledOrderItems){
+		                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
+		              	if(!orderId.equals(orderItem.getOrderId())){
+		              		refundPrice = BigDecimal.ZERO;
+		              	}
+		          		refundPrice = refundPrice.add(orderItem.getUnitPrice().multiply(new BigDecimal(orderItem.getRefundCount())));
+		              	Map<String, Object> itemMap = new HashMap<String, Object>();
+		              	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+		              	itemMap.put("SUBTOTAL", orderItem.getRefundCount());
+		              	canceledProducts.add(itemMap);
+		              	if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
+			              	if(!orderId.equals(orderItem.getOrderId())){
+			              		refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(brandSetting.getServicePrice()));
+			              	}
+		              	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
+		              		if(!orderId.equals(orderItem.getOrderId())){
+			  	            	refundPrice = refundPrice.add(new BigDecimal(mealMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getMealFeePrice()));
+		              		}
+		              	}
+		          		canceledOrderMap.put(orderItem.getOrderId(), refundPrice);
+		          		orderId = orderItem.getOrderId();
+		            }
+	            }else if (!oldCustomerCount.equals(nowCustomerCount)){
+	            	refundPrice = refundPrice.add(oldCustomerCount.subtract(nowCustomerCount).multiply(brandSetting.getServicePrice()));
+	            	canceledOrderMap.put(orderAll.getId(), refundPrice);
+	            }
             }
             if(!nowService.equals(BigDecimal.ZERO)){
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
-                itemMap.put("SUBTOTAL", nowService);
-                saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowService);
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
+            	itemMap.put("SUBTOTAL", nowService);
+            	saledProducts.add(itemMap);
+            	saledProductAmount = saledProductAmount.add(nowService);
             }
             if(!nowMeal.equals(BigDecimal.ZERO)){
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
-                itemMap.put("SUBTOTAL", nowMeal);
-                saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowMeal);
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
+            	itemMap.put("SUBTOTAL", nowMeal);
+            	saledProducts.add(itemMap);
+            	saledProductAmount = saledProductAmount.add(nowMeal);
             }
             if(!oldService.subtract(nowService).equals(BigDecimal.ZERO)){
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
-                itemMap.put("SUBTOTAL", oldService.subtract(nowService));
-                canceledProducts.add(itemMap);
-                canceledProductCount = canceledProductCount.add(oldService.subtract(nowService));
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
+            	itemMap.put("SUBTOTAL", oldService.subtract(nowService));
+            	canceledProducts.add(itemMap);
+            	canceledProductCount = canceledProductCount.add(oldService.subtract(nowService));
             }
-            if(!oldMeal.equals(BigDecimal.ZERO)){
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
-                itemMap.put("SUBTOTAL", oldMeal);
-                canceledProducts.add(itemMap);
-                canceledProductCount = canceledProductCount.add(oldMeal);
+            if(!oldMeal.subtract(nowMeal).equals(BigDecimal.ZERO)){
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
+            	itemMap.put("SUBTOTAL", oldMeal.subtract(nowMeal));
+            	canceledProducts.add(itemMap);
+            	canceledProductCount = canceledProductCount.add(oldMeal.subtract(nowMeal));
             }
             canceledOrderCount = canceledOrderCount.add(new BigDecimal(canceledOrderMap.size()));
             for(Map.Entry<String, Object> map : canceledOrderMap.entrySet()){
-                Map<String, Object> canceledMap = new HashMap<>();
-                Order canceledOrder = orderMapper.selectOrderDetails(map.getKey());
-                canceledMap.put("ORDER_NUMBER", map.getKey());
-                canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
-                canceledMap.put("SUBTOTAL", map.getValue());
-                canceledOrders.add(canceledMap);
-                canceledProductAmount = canceledProductAmount.add(new BigDecimal(map.getValue().toString()));
+            	Map<String, Object> canceledMap = new HashMap<>();
+            	Order canceledOrder = orderMapper.selectOrderDetails(map.getKey());
+            	canceledMap.put("ORDER_NUMBER", map.getKey());
+            	canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
+            	canceledMap.put("SUBTOTAL", map.getValue());
+            	canceledOrders.add(canceledMap);
+              	canceledProductAmount = canceledProductAmount.add(new BigDecimal(map.getValue().toString()));
             }
         }
         data.put("SALED_PRODUCT_AMOUNT", saledProductAmount);
