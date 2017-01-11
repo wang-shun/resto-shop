@@ -1388,7 +1388,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", order.getArticleCount());
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
-        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectPaymentCountByOrderId(order.getId());
         if(orderPaymentItems != null && orderPaymentItems.size() > 0){
         	for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
         		Map<String, Object> patMentItem = new HashMap<String, Object>();
