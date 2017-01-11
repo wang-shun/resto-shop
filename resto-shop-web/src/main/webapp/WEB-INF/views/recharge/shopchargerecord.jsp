@@ -74,9 +74,11 @@ dt,dd{
 	});
 
 	var shopDetailId = "${shopDetailId}"
+
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
-
+	console.log(shopDetailId+"----------------------------------------"+${shopname});
+	//console.log(shopDetailId);
 	var tb1 = $("#shopdetail").DataTable({
 		"scrollY": "340px",
 		"autoWidth": false,
@@ -94,7 +96,6 @@ dt,dd{
 			url : "recharge/queryShopchargecord",
 			dataSrc : "",
 			data : function(d) {
-         console.log(d);
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
 				d.shopDetailId = shopDetailId;
@@ -104,7 +105,7 @@ dt,dd{
 		order: [[2,'desc'],[ 1, 'desc' ]],
 		columns : [ {
 			title : "店铺",
-			data : "shopDetailId",
+			data : "chargelog.shopName"
 		},
 
 		{
@@ -154,7 +155,6 @@ dt,dd{
 	$("#searchInfo2").click(function() {
 		var beginDate = $("#beginDate2").val();
 		var endDate = $("#endDate2").val();
-		//console.log(beginDate+endDate);
 		search(beginDate, endDate);
 	})
 
@@ -233,25 +233,8 @@ dt,dd{
 					toastr.error("开始时间不能大于结束时间");
 					return;
 				}
-				location.href ="recharge/shopDetail_excel?shopDetailId=31164cebcc4b422685e8d9a32db12ab8"+"&&shopname=sss"+"&&beginDate="+beginDate
+				location.href ="recharge/shopDetail_excel?shopDetailId=31164cebcc4b422685e8d9a32db12ab8"+"&&shopname="+shopname+"&&beginDate="+beginDate
 						+ "&&endDate="+endDate;
 			});
 
-
-
-
-	/*$("#closeModal").click(function(e) {
-			e.stopPropagation();
-			var modal = $("#orderDetail");
-			//modal.find(".modal-body").html("");
-			modal.modal("hide");
-		})
-
-
-		$("#closeModal2").click(function(e) {
-			e.stopPropagation();
-		var modal = $("#orderDetail");
-		modal.find(".modal-body").html("");
-		modal.modal("hide");
-	})*/
 </script>

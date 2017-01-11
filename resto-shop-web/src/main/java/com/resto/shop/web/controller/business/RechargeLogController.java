@@ -56,8 +56,12 @@ public class RechargeLogController extends GenericController{
 
 
 	@RequestMapping("/shopRechargeLog")
-	public String shopchargerecord(){
-
+	public String shopchargerecord(String shopId ,String beginDate, String endDate ){
+		System.out.println(shopId+",,,,,,,,,,,,,,,,,,,,,"+shopId);
+		//getRequest().getSession().setAttribute("shopDetailId",shopId);
+		//getRequest().getSession().setAttribute("shopname",shopname);
+		//getRequest().getSession().setAttribute("endDate",beginDate);
+		//getRequest().getSession().setAttribute("beginDate",endDate);
 		return "recharge/shopchargerecord";
 	}
 
@@ -66,7 +70,7 @@ public class RechargeLogController extends GenericController{
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
 	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
-		shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+		//shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,beginDate,endDate);
 
         return chargeList ;
@@ -78,7 +82,8 @@ public class RechargeLogController extends GenericController{
      */
 
     public Map<String,Object> getResultSetDto(String shopDetailId,String beginDate,String endDate,String shopname){
-    	   shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+    	  // shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+
            Map<String,Object>  mapshopDetailDto= chargeorderService.shopChargeCodesSetDto(shopDetailId,beginDate,endDate,shopname);
 
         return  mapshopDetailDto;
@@ -87,7 +92,7 @@ public class RechargeLogController extends GenericController{
 	@ResponseBody
    public void reportShopDetail(String shopDetailId,String shopname,String beginDate, String endDate,
              HttpServletRequest request, HttpServletResponse response){
-        shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
+     //   shopDetailId="31164cebcc4b422685e8d9a32db12ab8";
         List<ShopDetailDto>  result = new LinkedList<>();
 
         Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate,shopname);
@@ -103,11 +108,12 @@ public class RechargeLogController extends GenericController{
                          {"shopname","typeString","customerPhone","chargeMoney",
 						"rewardMoney","finishTime","operationPhone"};
                         //定义数据
-
-
       //获取店铺名称
         Map<String,String> map = new HashMap<>();
-        map.put("shops",getShopName(shopDetailId));
+		if(shopname==null){
+			shopname=getShopName(shopDetailId);
+		}
+        map.put("shops",shopname);
         String[][] headers = {{"店铺名字","25"},{"充值方式","25"},{"充值手机","25"},{"充值金额(元)","25"}
         ,{"充值赠送金额（元）","25"} ,{"充值时间（元）","25"} ,{"操作人手机","25"}};
         //定义excel工具类对象
@@ -127,18 +133,20 @@ public class RechargeLogController extends GenericController{
 
     private String getShopName(String shopDetailId) {
         String shopname=null;
-
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-
         }
-	/*	for (ShopDetail shop: shopDetailList
+		for (ShopDetail shop: shopDetailList
 				) {
-			/*shop.getId().equals(shopdetailid);*/
-			shopname="aa";
+			if (shop.getId().equals(shopDetailId)){shopname=shop.getBrandName();
+			}else {
 
-		/*}*/
+				shopname="--";
+			}
+
+
+		}
 
         return  shopname;
     }

@@ -104,6 +104,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="shopRecharge in shopRrchargeLogs">
+						<td>{{shopRecharge.shopId}}></td>
 						<td>{{shopRecharge.shopName}}</td>
 						<td>{{shopRecharge.shopCount}}</td>
 						<td>{{shopRecharge.shopNum}}</td>
@@ -113,7 +114,7 @@
 						<td>{{shopRecharge.shopCsNum}}</td>
                         <td>{{shopRecharge.shopGaCsNum}}</td>
 						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shopRecharge.shopId)">查看详情</button></td>
+								@click="showShopReport(shopRecharge.shopId , shopRecharge.shopName)">查看详情</button></td>
 					</tr>
 				</tbody>
 		  	</table>
@@ -126,6 +127,7 @@
            <div class="modal-dialog modal-full">
                <div class="modal-content">
                    <div class="modal-header">
+
                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                    </div>
                    <div class="modal-body"> </div>
@@ -168,7 +170,7 @@ var vueObj =  new Vue({
 		shopRrchargeLogs:[],
 		searchDate : {
 			beginDate : "",
-			endDate : "",
+			endDate : ""
 		},
 		modalInfo:{
 			title:"",
@@ -199,17 +201,18 @@ var vueObj =  new Vue({
 			return data;
 		},
 		showShopReport : function(shopId) {
-			$("#reportModal").modal('show');
-			this.openModal("recharge/shopRechargeLog",shopId);
+	           $("#reportModal").modal('show');
+			 this.openModal("recharge/shopRechargeLog",shopId);
 		},
 		openModal : function(url, modalTitle,shopId) {
+
 			$.post(url, this.getDate(shopId),function(result) {
 				var modal = $("#reportModal");
 				modal.find(".modal-body").html(result);
-				modal.find(".modal-title > strong").html(modalTitle);
+				modal.find(".text-center > strong").html("店铺充值记录详细");
 				modal.modal()
 			})
-		
+
 		},
 		closeModal : function(){
 			var modal = $("#reportModal");

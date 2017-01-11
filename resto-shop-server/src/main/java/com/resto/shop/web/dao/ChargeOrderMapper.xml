@@ -34,6 +34,7 @@
       <id column="cid" property="id" jdbcType="VARCHAR" />
       <result column="operation_phone" property="operationPhone" jdbcType="VARCHAR" />
       <result column="customer_phone"  property="customerPhone" jdbcType="VARCHAR" />
+      <result column="shop_name"  property="shopName" jdbcType="VARCHAR" />
     </association>
   </resultMap>
 
@@ -253,11 +254,11 @@
   <!--店铺充值详细-->
   <select id="shopChargeCodes" resultMap="ShopchargecordMap" >
     SELECT  o.id ,o.charge_money ,o.reward_money, o.finish_time,o.shop_detail_id ,IF(o.type  is null ,1,o.type) type,if(c.id   is null,'没有填写',c.id ) cid,
-    if(c.operation_phone is null,'没有填写',c.operation_phone) operation_phone,if(c.customer_phone is null,'没有填写',c.customer_phone) customer_phone from tb_charge_order o
+    if(c.operation_phone is null,'没有填写',c.operation_phone) operation_phone,if(c.customer_phone is null,'没有填写',c.customer_phone) customer_phone,if(c.shop_name is NULL,"---",c.shop_name) shop_name from tb_charge_order o
     LEFT  JOIN  tb_charge_log c ON c.charge_order_id=o.id
-     WHERE  o.shop_detail_id=#{shopDetailId}
-      AND o.order_state = 1
-        AND o.finish_time is not null
+      WHERE  o.shop_detail_id=#{shopDetailId}
+       AND o.order_state = 1
+         AND o.finish_time is not null
     <if test="beginDate != null and beginDate != ''">
       AND  <![CDATA[  o.finish_time>=#{beginDate} ]]>
     </if>
