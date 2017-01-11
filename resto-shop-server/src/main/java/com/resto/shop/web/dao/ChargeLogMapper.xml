@@ -52,6 +52,8 @@
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
+
+
     <!--店铺充值详细-->
    <!-- <select id="shopchargecord" resultType="">
         SELECT  o.id ,c.id , c.operation_phone,c.customer_phone,o.charge_money ,o.reward_money, o.finish_time,o.shop_detail_id  from tb_charge_log c

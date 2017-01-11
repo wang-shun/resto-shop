@@ -38,7 +38,7 @@ dt,dd{
 
 			<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
 			&nbsp;
-			<button type="button" class="btn btn-primary" id="shopreportExcel">下载报表</button>
+			<button type="button" class="btn btn-primary" id="shopDetailexcel">下载报表</button>
 			<br />
 
 		</form>
@@ -52,8 +52,7 @@ dt,dd{
 		<strong>店铺充值记录</strong>
 	</div>
 	<div class="panel-body">
-		<table class="table table-striped table-bordered table-hover"
-			id="shopOrder">
+		<table class="table table-striped table-bordered table-hover" id="shopdetail">
 		</table>
 	</div>
 </div>
@@ -74,11 +73,13 @@ dt,dd{
 		language : "zh-CN"
 	});
 
-	var shopId = "${shopId}"
-	$("#beginDate2").val("${beginDate}");
+	var shopDetailId = "${shopDetailId}"
+	console.log(shopDetailId);
+    $("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
 
-	var tb1 = $("#shopOrder").DataTable({
+
+	var tb1 = $("#shopdetail").DataTable({
 		"scrollY": "340px",
 		"autoWidth": false,
 		 "columnDefs": [
@@ -90,32 +91,37 @@ dt,dd{
 		                { "width": "6%", "targets":5  },
 		                { "width": "6%", "targets":6  },
 		              ],
-		"lengthMenu" : [ [ 15,50, 75, 100, -1 ], [15, 50, 75, 100, "All" ] ],
+		"lengthMenu" : [ [ 15,50, 75, 100, -1 ], [15, 50, 75,+ 100, "All" ] ],
 		ajax : {
-			url : "orderReport/AllOrder",
+			url : "recharge/queryShopchargecord",
 			dataSrc : "",
 			data : function(d) {
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
-				d.shopId = shopId;
+				d.shopDetailId =shopDetailId;
+          console.log(shopDetailId);
 				return d;
 			}
 		},
 		order: [[2,'desc'],[ 1, 'desc' ]],
 		columns : [ {
 			title : "店铺",
-			data : "shopName",
+			data : "chargelog.shopName"
 		},
 
 		{
 			title : "充值方式",
-			data : "beginTime",
+			data : "type",
 			createdCell : function(td, tdData) {
-				$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
+				if(tdData==1){
+					$(td).html("<span >微信充值</span>");
+				}else{
+					$(td).html("<span >pos充值</span>");
+				}
 			}
 		}, {
 			title : "充值手机",
-			data : "telephone",
+			data : "chargelog.customerPhone",
 			createdCell:function(td,tdData){
 				if(tdData=="" || tdData==null){
 					$(td).html("<span class='label label-danger'>没有填写</span>");
@@ -123,30 +129,27 @@ dt,dd{
 			}
 		}, {
 			title : "充值金额（元）",
-			data : "orderMoney"
+			data : "chargeMoney"
 		},
 			{
 				title : "充值赠送金额(元)",
-				data : "orderMoney"
+				data : "rewardMoney"
 			},
 			{
 			title : "充值时间",
-			data : "weChatPay",
+			data : "finishTime",
             createdCell:function (td,tdData,row) {
-			    console.log(row);
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
+				$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
             }
 
 		},{
 			title : "操作人手机",
-			data : "orderState",
-			createdCell : function(td,tdData){
-				if(tdData == "异常订单"){
-					$(td).html("<span class='label label-danger'>订单异常</span>");
+			data : "chargelog.operationPhone",
+				createdCell:function(td,tdData){
+					if(tdData=="" || tdData==null){
+						$(td).html("<span class='label label-danger'>没有填写</span>");
+					}
 				}
-			}
 		} ]
 	});
 
@@ -160,78 +163,14 @@ dt,dd{
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,
-			"shopId" : shopId
+			shopDetailId:shopDetailId,
+
 		};
 		tb1.ajax.reload();
 		toastr.success("查询成功");
 	}
 
-	$("#closeModal").click(function(e) {
-		e.stopPropagation();
-		var modal = $("#orderDetail");
-		//modal.find(".modal-body").html("");
-		modal.modal("hide");
-	})
 
-	function getState(state,productionStatus) {
-		var orderState = '';
-		switch (state) {
-            case 1:
-                orderState = "未支付";
-                break;
-            case 2:
-             if(productionStatus==0){
-                orderState= "已付款";
-             }else if(productionStatus==2){
-                 orderState = "已消费";
-             }else if(productionStatus==5){
-                 orderState = "异常订单";
-             }
-			break;
-		case 9:
-			orderState = "已取消";
-			break;
-		case 10:
-			orderState = "已确认";
-             if(productionStatus==5){
-                 orderState = "异常订单";
-             } else {
-                 orderState = "已消费";
-             }
-			break;
-		case 11:
-			orderState = "已评价";
-			break;
-		case 12:
-			orderState = "已分享";
-			break;
-		}
-		return orderState;
-	}
-
-	function getDistriubtioMode(mode) {
-		var distributionMode = ''
-		switch (mode) {
-		case 1:
-			distributionMode = "堂吃";
-			break;
-		case 2:
-			distributionMode = "自提外卖";
-			break;
-		case 3:
-			distributionMode = "外带";
-			break;
-
-		}
-		return distributionMode;
-	}
-
-	$("#closeModal2").click(function(e) {
-		e.stopPropagation();
-		var modal = $("#orderDetail");
-		modal.find(".modal-body").html("");
-		modal.modal("hide");
-	})
 
 	//查询今日
 
@@ -287,7 +226,7 @@ dt,dd{
 	})
 
 	//下载报表
-	$("#shopreportExcel").click(
+	$("#shopDetailexcel").click(
 			function() {
 				var beginDate = $("#beginDate2").val();
 				var endDate = $("#endDate2").val();
@@ -296,9 +235,9 @@ dt,dd{
 					toastr.error("开始时间不能大于结束时间");
 					return;
 				}
+				console.log(shopDetailId);
+				location.href ="recharge/shopDetail_excel?shopDetailId="+ shopDetailId
+						  +"&&beginDate="+ beginDate+"&&endDate="+endDate;
+			});
 
-				location.href = "orderReport/shop_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&shopId=" + shopId;
-
-			})
 </script>

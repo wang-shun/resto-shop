@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
@@ -12,8 +14,6 @@ import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.shop.web.dao.ChargePaymentMapper;
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.service.ChargePaymentService;
-
-import cn.restoplus.rpc.server.RpcService;
 
 /**
  *
@@ -35,14 +35,24 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return chargepaymentMapper.selectPayList(begin,end);
-    } 
-    
-    @Override
-    public RechargeLogDto selectRechargeLog(String beginDate, String endDate,String brandId) {
-    	// TODO Auto-generated method stub
-    	Date begin = DateUtil.getformatBeginDate(beginDate);
+    }
+
+	@Override
+	public RechargeLogDto selectRechargeLog(String beginDate, String endDate, String brandId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return chargepaymentMapper.selectRechargeLog(begin,end,brandId);
-    }
+	}
+
+	@Override
+	public RechargeLogDto selectShopRechargeLog(String beginDate, String endDate, String shopId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return chargepaymentMapper.selectShopRechargeLog(begin,end,shopId);
+	} 
+    
+    
 
 }

@@ -168,7 +168,8 @@
     });
     var tb2API = null;
     var tb2 = $("#shopReportTable").DataTable({
-    	"lengthMenu": [[15, 50, 75, 100, 150], [15, 50, 75, 100, "All"]],
+    	"lengthMenu": [[50, 75, 100, 150], [50, 75, 100, "All"]],
+    	//"sNext":Next.
     	data: dataSource.memberUserDtos,
     	"aoColumnDefs": [
     	      { "bSortable": false, "aTargets": [ 0 ,1,2,3,4,5,6,8,12] }

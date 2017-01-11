@@ -1,19 +1,18 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.model.Order;
 
+
 public interface ChargeOrderService extends GenericService<ChargeOrder, String> {
 
-	
 	/**
 	 * 创建微信充值订单
 	 * @param settingId
@@ -29,10 +28,10 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 
 	/**
-	 * 
+	 *
 	 * @param remainPay
 	 * @param customerId
-	 * @param order 
+	 * @param order
 	 * @return  array[0]充值支付金额  array[1]赠送支付金额
 	 */
 	void useChargePay(BigDecimal remainPay, String customerId, Order order);
@@ -60,6 +59,28 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
      * @return
      */
     List<ChargeOrder> selectByDateAndBrandId(String beginDate, String endDate, String id);
+	/**
+	 * 店铺详细
+	 *
+	 */
+
+	List<ChargeOrder> shopChargeCodes(String shopDetailId, Date beginDate, Date endDate);
+
+
+	/**
+	 * 下载报表
+	 */
+
+	public Map<String,Object>  shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate,String shopname);
+
+
+
+
+
+
+
+
+
     
     List<Map<String, Object>> selectByShopToDay(String shopId);
 }
