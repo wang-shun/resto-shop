@@ -620,11 +620,11 @@
             <if test="mealAllNumber != null">
                 #{mealAllNumber},
             </if>
-            <if test="mealAllNumber != null">
-                #{mealAllNumber},
-            </if>
             <if test="needScan != null">
                 #{needScan},
+            </if>
+            <if test="mealAllNumber != null">
+                #{mealAllNumber},
             </if>
         </trim>
     </insert>
