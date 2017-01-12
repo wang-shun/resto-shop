@@ -292,6 +292,7 @@
     <select id="selectByDateAndShopId" resultType="com.resto.shop.web.model.ChargeOrder">
         SELECT
         id,
+        create_time,
         order_state,
         charge_money,
         shop_detail_id,
