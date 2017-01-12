@@ -7,13 +7,25 @@
 	<c:if test="${fn:length(m.children)>0 }">
 		<ul class="sub-menu">
 			<c:forEach items="${m.children }" var="subMenu">
-				<s:hasPermission name="${subMenu.permissionSign }">		
 				<li class="nav-item">
-					<a href="${subMenu.permissionSign}" class="${subMenu.menuType==1?'ajaxify':''} ${subMenu.menuType==2?'iframeify':''}">
+					<a href="${subMenu.permissionSign}" class="nav-link nav-toggle ${subMenu.menuType==1?'ajaxify':''} ${subMenu.menuType==2?'iframeify':''}">
 					<i class="fa ${subMenu.menuIcon }"></i>
-					${subMenu.permissionName}</a>
+					<span class="title">${subMenu.permissionName}</span>
+					<span class="arrow "></span></a>
+					<c:if test="${fn:length(subMenu.children)>0 }">
+                    		<ul class="sub-menu">
+                    			<c:forEach items="${subMenu.children }" var="subMenuChild">
+                    			    <c:if test="${subMenuChild.menuType == 1 }">
+                                        <li class="nav-item">
+                                            <a href="${subMenuChild.permissionSign}" class="nav-link nav-toggle ${subMenuChild.menuType==1?'ajaxify':''} ${subMenuChild.menuType==2?'iframeify':''}">
+                                            <i class="fa ${subMenuChild.menuIcon }"></i>
+                                            ${subMenuChild.permissionName}
+                                        </li>
+                                    </c:if>
+                    			</c:forEach>
+                    		</ul>
+                    	</c:if>
 				</li>
-				</s:hasPermission>
 			</c:forEach>
 		</ul>
 	</c:if>
