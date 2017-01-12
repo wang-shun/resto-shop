@@ -162,10 +162,7 @@ public class OrderAspect {
         }
 
 
-        StringBuilder share = new StringBuilder();
-        share.append("邀请好友扫一扫，送他/她");
-        share.append("<img src=\"https://www.baidu.com/img/baidu_jgylogo3.gif\" /");
-        String result = WeChatUtils.sendCustomerMsg(share.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
 
     }
 
