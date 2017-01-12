@@ -1410,7 +1410,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
-        data.put("ARTICLE_COUNT", order.getArticleCount());
+        BigDecimal articleCount = new BigDecimal(order.getArticleCount());
+    	articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0 
+    			: order.getCustomerCount()));
+    	articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
+    			: order.getMealAllNumber()));
+        data.put("ARTICLE_COUNT", articleCount);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectPaymentCountByOrderId(order.getId());
         if(orderPaymentItems != null && orderPaymentItems.size() > 0){
@@ -2780,34 +2785,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            	oldMeal = oldMeal.add(oldMealAllNumber);
 	            	mealMap.put(orderAll.getId(), oldMealAllNumber.subtract(nowMealAllNumber));
 	        	}
-	        	Map<String, Object> selectMap = new HashMap<String, Object>();
-	        	selectMap.put("orderId", orderAll.getId());
-	            selectMap.put("count", "count != 0");
-	            List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
-	        	for(OrderItem orderItem : saledOrderItems){
-	        		saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
-	            	Map<String, Object> itemMap = new HashMap<String, Object>();
-	            	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-	            	itemMap.put("SUBTOTAL", orderItem.getCount());
-	            	saledProducts.add(itemMap);
-	            }
-	            selectMap.clear();
-	            selectMap.put("orderId", orderAll.getId());
-	            selectMap.put("count", "refund_count != 0");
-	            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectMap);
+            	selectOrderMap.clear();
+            	selectOrderMap.put("orderId", orderAll.getId());
+            	selectOrderMap.put("count", "refund_count != 0");
+	            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderId(selectOrderMap);
 	            BigDecimal refundPrice = new BigDecimal(0);
 	            if(canceledOrderItems.size() != 0){
 		        	String orderId = "";
 		            for(OrderItem orderItem : canceledOrderItems){
-		                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
 		              	if(!orderId.equals(orderItem.getOrderId())){
 		              		refundPrice = BigDecimal.ZERO;
 		              	}
 		          		refundPrice = refundPrice.add(orderItem.getUnitPrice().multiply(new BigDecimal(orderItem.getRefundCount())));
-		              	Map<String, Object> itemMap = new HashMap<String, Object>();
-		              	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-		              	itemMap.put("SUBTOTAL", orderItem.getRefundCount());
-		              	canceledProducts.add(itemMap);
 		              	if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
 			              	if(!orderId.equals(orderItem.getOrderId())){
 			              		refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(brandSetting.getServicePrice()));
@@ -2824,6 +2813,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            	refundPrice = refundPrice.add(oldCustomerCount.subtract(nowCustomerCount).multiply(brandSetting.getServicePrice()));
 	            	canceledOrderMap.put(orderAll.getId(), refundPrice);
 	            }
+            }
+            selectOrderMap.clear();
+            selectOrderMap.put("orderIds", orderIds);
+            selectOrderMap.put("count", "count != 0");
+            List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
+            for(OrderItem orderItem : saledOrderItems){
+        		saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+            	Map<String, Object> itemMap = new HashMap<String, Object>();
+            	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+            	itemMap.put("SUBTOTAL", orderItem.getCount());
+            	saledProducts.add(itemMap);
+            }
+            selectOrderMap.clear();
+            selectOrderMap.put("orderIds", orderIds);
+        	selectOrderMap.put("count", "refund_count != 0");
+            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
+            for(OrderItem orderItem : canceledOrderItems){
+                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
+              	Map<String, Object> itemMap = new HashMap<String, Object>();
+              	itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+              	itemMap.put("SUBTOTAL", orderItem.getRefundCount());
+              	canceledProducts.add(itemMap);
             }
             if(!nowService.equals(BigDecimal.ZERO)){
             	Map<String, Object> itemMap = new HashMap<String, Object>();
