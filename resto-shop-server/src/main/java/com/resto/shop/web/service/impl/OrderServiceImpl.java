@@ -1262,7 +1262,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
-                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+            	order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
                 if(order.getOrderState() == OrderState.SUBMIT){
                     order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
                 }
