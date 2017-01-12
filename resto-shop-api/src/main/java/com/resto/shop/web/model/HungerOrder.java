@@ -65,7 +65,16 @@ public class HungerOrder {
     //菜品总数
     private Integer sum;
 
-    //额外费用
+    private Integer detailCount;
+    
+    public Integer getDetailCount() {
+		return detailCount;
+	}
+
+	public void setDetailCount(Integer detailCount) {
+		this.detailCount = detailCount;
+	}
+	//额外费用
     private List<HungerOrderExtra> extra;
 
     //饿了吗订单明细分组
