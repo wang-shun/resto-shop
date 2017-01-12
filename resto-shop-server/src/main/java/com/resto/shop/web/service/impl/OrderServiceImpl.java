@@ -3403,109 +3403,160 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //计算 新增 (分享注册+自然注册)
         //今日--
-        for (String s1 : customerInToday) {  //今日有 但是今日之前没有的
-            if (!customerBeforeToday.contains(s1)) {
-                todayNewCutomer.add(s1);
-            }
-        }
-        for (String s1 : customerShareInToday) {//今日有且是分享注册 但是今日之前没有
-            if (!customerBeforeToday.contains(s1)) {
-                todayShareNewCutomer.add(s1);
-            }
-        }
-        for(String s1 :todayNewCutomer){
-            if(!todayShareNewCutomer.contains(s1)){
-                todayNormalNewCustomer.add(s1);
+
+        if(!customerInToday.isEmpty()){
+            for (String s1 : customerInToday) {  //今日有 但是今日之前没有的
+                if (!customerBeforeToday.contains(s1)) {
+                    todayNewCutomer.add(s1);
+                }
             }
         }
 
+        if(!customerShareInToday.isEmpty()){
+            for (String s1 : customerShareInToday) {//今日有且是分享注册 但是今日之前没有
+                if (!customerBeforeToday.contains(s1)) {
+                    todayShareNewCutomer.add(s1);
+                }
+            }
+        }
+
+        if(!todayNewCutomer.isEmpty()){
+            for(String s1 :todayNewCutomer){
+                if(!todayShareNewCutomer.contains(s1)){
+                    todayNormalNewCustomer.add(s1);
+                }
+            }
+        }
 
 
         //上旬---
-        for (String s1 : customerInFirstOfMonth) {  //上旬有 但是上旬之前没有的
-            if (!customerBeforeFirstOfMonth.contains(s1)) {
-                firstOfMonthNewCustomer.add(s1);
-            }
-        }
-        for (String s1 : customerShareInFirstOfMonth) {//上旬有且是分享注册 但是上旬之前没有
-            if (!customerBeforeFirstOfMonth.contains(s1)) {
-                firstOfMonthShareCustomer.add(s1);
+        if(!customerInFirstOfMonth.isEmpty()){
+            for (String s1 : customerInFirstOfMonth) {  //上旬有 但是上旬之前没有的
+                if (!customerBeforeFirstOfMonth.contains(s1)) {
+                    firstOfMonthNewCustomer.add(s1);
+                }
             }
         }
 
-        for(String s1 :firstOfMonthNewCustomer){
-            if(!firstOfMonthShareCustomer.contains(s1)){
-                firstOfMonthNormalCustomer.add(s1);
+        if(!customerShareInFirstOfMonth.isEmpty()){
+            for (String s1 : customerShareInFirstOfMonth) {//上旬有且是分享注册 但是上旬之前没有
+                if (!customerBeforeFirstOfMonth.contains(s1)) {
+                    firstOfMonthShareCustomer.add(s1);
+                }
             }
         }
+
+
+
+        if(!firstOfMonthNewCustomer.isEmpty()){
+            for(String s1 :firstOfMonthNewCustomer){
+                if(!firstOfMonthShareCustomer.contains(s1)){
+                    firstOfMonthNormalCustomer.add(s1);
+                }
+            }
+        }
+
 
 
         //中旬---
-        for (String s1 : customerInMiddleOfMonth) {  //中旬有 但是中旬之前没有的
-            if (!customerBeforeMiddleOfMonth.contains(s1)) {
-                middleOfMonthNewCustomer.add(s1);
-            }
-        }
-        for (String s1 : customerShareInMiddleOfMonth) {//中旬有且是分享注册 但是中旬之前没有
-            if (!customerBeforeMiddleOfMonth.contains(s1)) {
-                middleOfMonthShareCustomer.add(s1);
+        if(!customerInMiddleOfMonth.isEmpty()){
+            for (String s1 : customerInMiddleOfMonth) {  //中旬有 但是中旬之前没有的
+                if (!customerBeforeMiddleOfMonth.contains(s1)) {
+                    middleOfMonthNewCustomer.add(s1);
+                }
             }
         }
 
-        for(String s1 :middleOfMonthNewCustomer){
-            if(!middleOfMonthShareCustomer.contains(s1)){
-                middleOfMonthNormalCustomer.add(s1);
+
+
+        if(!customerShareInMiddleOfMonth.isEmpty()){
+            for (String s1 : customerShareInMiddleOfMonth) {//中旬有且是分享注册 但是中旬之前没有
+                if (!customerBeforeMiddleOfMonth.contains(s1)) {
+                    middleOfMonthShareCustomer.add(s1);
+                }
             }
         }
 
-        //下旬---
-        for (String s1 : customerInLastOfMonth) {  //下旬有 但是下旬之前没有的
-            if (!customerBeforeLastOfMonth.contains(s1)) {
-                lastOfMonthNewCustomer.add(s1);
+
+
+        if(!middleOfMonthNewCustomer.isEmpty()){
+            for(String s1 :middleOfMonthNewCustomer){
+                if(!middleOfMonthShareCustomer.contains(s1)){
+                    middleOfMonthNormalCustomer.add(s1);
+                }
             }
         }
+
+
+        if(!customerInLastOfMonth.isEmpty()){
+            //下旬---
+            for (String s1 : customerInLastOfMonth) {  //下旬有 但是下旬之前没有的
+                if (!customerBeforeLastOfMonth.contains(s1)) {
+                    lastOfMonthNewCustomer.add(s1);
+                }
+            }
+
+        }
+
         for (String s1 : customerShareInLastOfMonth) {//下旬有且是分享注册 但是下旬之前没有
             if (!customerBeforeLastOfMonth.contains(s1)) {
                 lastOfMonthShareCustomer.add(s1);
             }
         }
 
-        for(String s1 :lastOfMonthNewCustomer){
-            if(!lastOfMonthShareCustomer.contains(s1)){
-                lastOfMonthNormalCustomer.add(s1);
+        if(!lastOfMonthNewCustomer.isEmpty()){
+            for(String s1 :lastOfMonthNewCustomer){
+                if(!lastOfMonthShareCustomer.contains(s1)){
+                    lastOfMonthNormalCustomer.add(s1);
+                }
             }
         }
+
 
 
         //本月---
-        for (String s1 : customerInMonth) {  //本月有 但是本月之前没有的
-            if (!customerBeforeMonth.contains(s1)) {
-                monthNewCustomer.add(s1);
+
+        if(!customerInMonth.isEmpty()){
+            for (String s1 : customerInMonth) {  //本月有 但是本月之前没有的
+                if (!customerBeforeMonth.contains(s1)) {
+                    monthNewCustomer.add(s1);
+                }
             }
         }
-        for (String s1 : customerShareInMonth) {//本月有且是分享注册 但是本月之前没有
-            if (!customerBeforeMonth.contains(s1)) {
-                monthShareCustomer.add(s1);
+
+        if(!customerShareInMonth.isEmpty()){
+            for (String s1 : customerShareInMonth) {//本月有且是分享注册 但是本月之前没有
+                if (!customerBeforeMonth.contains(s1)) {
+                    monthShareCustomer.add(s1);
+                }
             }
         }
+
 
         System.out.println("monthNormalCustomer"+monthNormalCustomer);
         System.out.println("monthShareCustomer"+monthShareCustomer);
         System.out.println("monthNewCustomer"+monthNewCustomer);
-        for(String s1 :monthNewCustomer){
-            if(!monthShareCustomer.contains(s1)){
-                monthNormalCustomer.add(s1);
+
+        if(!monthNewCustomer.isEmpty()){
+            for(String s1 :monthNewCustomer){
+                if(!monthShareCustomer.contains(s1)){
+                    monthNormalCustomer.add(s1);
+                }
             }
         }
 
+
         //计算回头用户
         //今日回头
-        for (String s1 : customerBeforeToday) {//以前有 今日也有
-            if (customerInToday.contains(s1)) {
-                todayBackCustomer.add(s1);//去重 直接用长度来代替今日回头用户的总数
-                backCustomerToday.add(s1);//不去重
+        if(!customerBeforeToday.isEmpty()){
+            for (String s1 : customerBeforeToday) {//以前有 今日也有
+                if (customerInToday.contains(s1)) {
+                    todayBackCustomer.add(s1);//去重 直接用长度来代替今日回头用户的总数
+                    backCustomerToday.add(s1);//不去重
+                }
             }
         }
+
         //定义一个map 来存放当日每个回头用户存在的次数
         Map<String, Integer> todayBackCount = new HashMap();
         if (!backCustomerToday.isEmpty()) {
@@ -3518,21 +3569,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        for (String key : todayBackCount.keySet()) {//求算本日多次回头用户
-            if (todayBackCount.get(key) == 1) {
-                todayBackTwoCustomer.add(key);
-            } else {
-                todayBackTwoMoreCustomer.add(key);
+        if(!todayBackCount.isEmpty()){
+            for (String key : todayBackCount.keySet()) {//求算本日多次回头用户
+                if (todayBackCount.get(key) == 1) {
+                    todayBackTwoCustomer.add(key);
+                } else {
+                    todayBackTwoMoreCustomer.add(key);
+                }
             }
         }
 
         //上旬回头
-        for (String s1 : customerBeforeFirstOfMonth) {//上旬有 今日也有
-            if (customerInFirstOfMonth.contains(s1)) {
-                firstOfMonthBackCustomer.add(s1);//去重 直接用长度来代替上旬回头用户的总数
-                backCustomerFirstOfMonth.add(s1);//不去重
+        if(!customerBeforeFirstOfMonth.isEmpty()){
+            for (String s1 : customerBeforeFirstOfMonth) {//上旬有 今日也有
+                if (customerInFirstOfMonth.contains(s1)) {
+                    firstOfMonthBackCustomer.add(s1);//去重 直接用长度来代替上旬回头用户的总数
+                    backCustomerFirstOfMonth.add(s1);//不去重
+                }
             }
         }
+
         //定义一个map 来存放上旬每个回头用户存在的次数
         Map<String, Integer> firstOfMonthBackCount = new HashMap();
         if (!backCustomerFirstOfMonth.isEmpty()) {
@@ -3546,8 +3602,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (!todayBackCount.isEmpty()) {
-            for (String key : todayBackCount.keySet()) {//求算上旬
+        if (!firstOfMonthBackCount.isEmpty()) {
+            for (String key : firstOfMonthBackCount.keySet()) {//求算上旬
                 // 多次回头用户
                 if ("1".equals(firstOfMonthBackCount.get(key))) {
                     firstOfMonthBackTwoCustomer.add(key);
@@ -3558,13 +3614,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //中旬回头
-        for (String s1 : customerBeforeMiddleOfMonth) {//中旬有 今日也有
-            if (customerInMiddleOfMonth.contains(s1)) {
-                middleOfMonthBackCustomer.add(s1);//去重 直接用长度来代替上旬回头用户的总数
-                backCustomerMiddleOfMonth.add(s1);//不去重
+        if(!customerBeforeMiddleOfMonth.isEmpty()){
+            for (String s1 : customerBeforeMiddleOfMonth) {//中旬有 今日也有
+                if (customerInMiddleOfMonth.contains(s1)) {
+                    middleOfMonthBackCustomer.add(s1);//去重 直接用长度来代替上旬回头用户的总数
+                    backCustomerMiddleOfMonth.add(s1);//不去重
+                }
             }
         }
-        //定义一个map 来存放上旬每个回头用户存在的次数
+
+        //定义一个map 来存放中旬每个回头用户存在的次数
         Map<String, Integer> middleOfMonthBackCount = new HashMap();
         if (!backCustomerMiddleOfMonth.isEmpty()) {
             for (String s : backCustomerMiddleOfMonth) {
@@ -3576,22 +3635,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        for (String key : middleOfMonthBackCount.keySet()) {//求算中旬
-            // 多次回头用户
-            if ("1".equals(middleOfMonthBackCount.get(key))) {
-                middleOfMonthBackTwoCustomer.add(key);
-            } else {
-                middleOfMonthBackTwoMoreCustomer.add(key);
+
+        if(!middleOfMonthBackCount.isEmpty()){
+            for (String key : middleOfMonthBackCount.keySet()) {//求算中旬
+                // 多次回头用户
+                if ("1".equals(middleOfMonthBackCount.get(key))) {
+                    middleOfMonthBackTwoCustomer.add(key);
+                } else {
+                    middleOfMonthBackTwoMoreCustomer.add(key);
+                }
             }
         }
 
+
         //下旬回头
-        for (String s1 : customerBeforeLastOfMonth) {//下旬有 下旬之前也有
-            if (customerInLastOfMonth.contains(s1)) {
-                lastOfMonthBackCustomer.add(s1);//去重 直接用长度来代替下旬回头用户的总数
-                backCustomerLastOfMonth.add(s1);//不去重
+        if(!customerBeforeLastOfMonth.isEmpty()){
+            for (String s1 : customerBeforeLastOfMonth) {//下旬有 下旬之前也有
+                if (customerInLastOfMonth.contains(s1)) {
+                    lastOfMonthBackCustomer.add(s1);//去重 直接用长度来代替下旬回头用户的总数
+                    backCustomerLastOfMonth.add(s1);//不去重
+                }
             }
         }
+
         //定义一个map 来存放上旬每个回头用户存在的次数
         Map<String, Integer> LastOfMonthBackCount = new HashMap();
         if (!backCustomerLastOfMonth.isEmpty()) {
@@ -3604,22 +3670,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        for (String key : LastOfMonthBackCount.keySet()) {//求算下旬
-            // 多次回头用户
-            if ("1".equals(LastOfMonthBackCount.get(key))) {
-                lastOfMonthBackTwoCustomer.add(key);
-            } else {
-                lastOfMonthBackTwoMoreCustomer.add(key);
+
+        if(!LastOfMonthBackCount.isEmpty()){
+            for (String key : LastOfMonthBackCount.keySet()) {//求算下旬
+                // 多次回头用户
+                if ("1".equals(LastOfMonthBackCount.get(key))) {
+                    lastOfMonthBackTwoCustomer.add(key);
+                } else {
+                    lastOfMonthBackTwoMoreCustomer.add(key);
+                }
             }
         }
 
+
         //本月回头
-        for (String s1 : customerBeforeMonth) {//本月有 本月之前也有
-            if (customerInMonth.contains(s1)) {
-                monthBackCustomer.add(s1);//去重 直接用长度来代替本月回头用户的总数
-                backCustomerMonth.add(s1);//不去重
+
+        if(!customerBeforeMonth.isEmpty()){
+            for (String s1 : customerBeforeMonth) {//本月有 本月之前也有
+                if (customerInMonth.contains(s1)) {
+                    monthBackCustomer.add(s1);//去重 直接用长度来代替本月回头用户的总数
+                    backCustomerMonth.add(s1);//不去重
+                }
             }
         }
+
         //定义一个map 来存放本月每个回头用户存在的次数
         Map<String, Integer> monthBackCount = new HashMap();
         if (!backCustomerMonth.isEmpty()) {
@@ -3632,14 +3706,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        for (String key : monthBackCount.keySet()) {//求算本月
-            // 多次回头用户
-            if ("1".equals(monthBackCount.get(key))) {
-                monthBackTwoCustomer.add(key);
-            } else {
-                monthBackTwoMoreCustomer.add(key);
+
+        if(!monthBackCount.isEmpty()){
+            for (String key : monthBackCount.keySet()) {//求算本月
+                // 多次回头用户
+                if ("1".equals(monthBackCount.get(key))) {
+                    monthBackTwoCustomer.add(key);
+                } else {
+                    monthBackTwoMoreCustomer.add(key);
+                }
             }
         }
+
 
         int dayAppraiseNum = 0;//当日评价的总单数
         int firstOfMonthAppraiseNum = 0;//上旬评价的总单数
@@ -4143,6 +4221,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             System.err.println(todayNewShareCustomerRestoTotal);
             System.err.println("本日新增自然用户的订单总额");
             System.err.println(todayNewNormalCustomerRestoTotal);
+
+            System.err.println("上旬多次回头用户"+firstOfMonthBackTwoMoreCustomer);
+
 
             System.err.println("monthNormalCustomer"+monthNormalCustomer);
             System.err.println("本月新增分享用户的id");
