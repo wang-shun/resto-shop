@@ -533,4 +533,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectOrderHistoryList(@Param("shopId") String shopId, @Param("endDate") Date dateEnd);
+
+    /**
+     * 结店时查询生产状态未改变的订单
+     * @param shopId
+     * @param dateBegin
+     * @param dateEnd
+     * @return
+     */
+    List<Order> selectHasPayNoChangeStatus(@Param("shopId") String shopId, @Param("beginDate") Date dateBegin,@Param("endDate") Date dateEnd);
 }

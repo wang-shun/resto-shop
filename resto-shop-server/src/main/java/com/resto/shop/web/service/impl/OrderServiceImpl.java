@@ -21,6 +21,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.aspectj.weaver.ast.Or;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -3058,14 +3059,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void cleanShopOrder(String shopId,String shopName) {
-//        String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
-//        String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
-//        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
-//        for (Order order : orderList) {
-//            if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-//                sendWxRefundMsg(order);
-//            }
-//        }
+        String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
+        String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
+        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+        for (Order order : orderList) {
+            if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+                sendWxRefundMsg(order);
+            }
+        }
+        //查询已付款且有支付项但是生产状态没有改变的订单
+        List<Order> orderstates = orderMapper.selectHasPayNoChangeStatus(shopId,DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
+        if(!orderstates.isEmpty()){
+            for(Order o:orderstates){
+                if(o.getOrderMode()==ShopMode.CALL_NUMBER){
+                    o.setProductionStatus(ProductionStatus.HAS_CALL);
+                }else {
+                    o.setProductionStatus(ProductionStatus.PRINTED);
+                }
+                orderMapper.updateByPrimaryKeySelective(o);
+            }
+        }
+
+
         //----1.定义时间---
 
         //本月的开始时间 本月结束时间
@@ -3073,25 +3088,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String endMonth = DateUtil.getMonthEnd();
         Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));
         Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endMonth));
-//        //本日开始时间戳
-//        Long dayBefore = DateUtil.getDateBegin(new Date()).getTime();
-//        //本月上旬的结束时间戳
-//        Long firstEndOfMonth = DateUtil.getDateEnd(DateUtil.getAfterDayDate(begin, 10)).getTime();
-//        //本日结束时间戳
-//        Long dayAfter = DateUtil.getDateEnd(new Date()).getTime();
-//        //定义本日中订单中出现的顾客id
-//        //本月上旬开始 也就是本月的第一天开始时间戳
-//        Long firstBeginOfMonth = begin.getTime();
-//
-//        //本月中旬开始时间 -- 上旬结束时间
-//        Long middleBeginOfMonth = firstEndOfMonth;
-//        //本月中旬结束时间
-//        Long middelEndOfMonth = DateUtil.getDateEnd(DateUtil.getAfterDayDate(begin, 20)).getTime();
-//        //本月下旬开始时间  -- 也就是中旬结束时间
-//        Long lastBeginOfMonth = middelEndOfMonth;
-//        //本月下旬结束时间 -- 如果当天发送数据有下旬那么结束时间就是当天
-//        Long lastEndOfMonth = dayAfter;
-
         //2定义顾客id集合
         //本日之前出现的所有顾客的Id
         List<String> customerBeforeToday = new ArrayList<>();
@@ -4119,88 +4115,54 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-//            System.err.println("本日所有用户的id");
-//            System.err.println(customerInToday);
-//            System.err.println("本日所有分享用户的id");
-//            System.err.println(customerShareInToday);
-//            System.err.println("本日新增用户的id");
-//            System.err.println(todayNewCutomer);
-//            System.err.println("本日新增自然用户的id");
-//            System.err.println(todayNormalNewCustomer);
-//            System.err.println("本日新增分享用户的id");
-//            System.err.println(todayShareNewCutomer);
-//            System.err.println("本日resto的订单总额");
-//            System.err.println(todayRestoTotal);
-//            System.err.println("本日resto的订单总数");
-//            System.err.println(todayRestoCount.size());
-//            System.err.println("本日resto的实收总数");
-//            System.err.println(todayPayRestoTotal);
-//            System.err.println("本日resto的评价订单总数");
-//            System.err.println(dayAppraiseNum);
-//            System.err.println("本日resto的评价订单总分数");
-//            System.err.println(dayAppraiseSum);
-//            System.err.println("本日新增用户的订单总额");
-//            System.err.println(todayNewCustomerRestoTotal);
-//            System.err.println("本日新增分享用户的订单总额");
-//            System.err.println(todayNewShareCustomerRestoTotal);
-//            System.err.println("本日新增自然用户的订单总额");
-//            System.err.println(todayNewNormalCustomerRestoTotal);
 
+            System.out.println("----------------------------本日------------------------------------------");
+            System.err.println("本日所有用户的id");
+            System.err.println(customerInToday);
+            System.err.println("本日所有分享用户的id");
+            System.err.println(customerShareInToday);
+            System.err.println("本日新增用户的id");
+            System.err.println(todayNewCutomer);
+            System.err.println("本日新增自然用户的id");
+            System.err.println(todayNormalNewCustomer);
+            System.err.println("本日新增分享用户的id");
+            System.err.println(todayShareNewCutomer);
+            System.err.println("本日resto的订单总额");
+            System.err.println(todayRestoTotal);
+            System.err.println("本日resto的订单总数");
+            System.err.println(todayRestoCount.size());
+            System.err.println("本日resto的实收总数");
+            System.err.println(todayPayRestoTotal);
+            System.err.println("本日resto的评价订单总数");
+            System.err.println(dayAppraiseNum);
+            System.err.println("本日resto的评价订单总分数");
+            System.err.println(dayAppraiseSum);
+            System.err.println("本日新增用户的订单总额");
+            System.err.println(todayNewCustomerRestoTotal);
+            System.err.println("本日新增分享用户的订单总额");
+            System.err.println(todayNewShareCustomerRestoTotal);
+            System.err.println("本日新增自然用户的订单总额");
+            System.err.println(todayNewNormalCustomerRestoTotal);
 
-//            System.err.println("本月所有用户的id");
-//            System.err.println("customerInMonth"+customerInMonth);
-//            System.err.println("本月所有分享用户的id");
-//            System.err.println("customerShareInMonth"+customerShareInMonth);
-//            System.err.println("本月新增用户的id");
-//            System.err.println("monthNewCustomer"+monthNewCustomer);
-//            System.err.println("本月新增自然用户的id");
-//            System.err.println("monthNormalCustomer"+monthNormalCustomer);
-//            System.err.println("本月新增分享用户的id");
-//            System.err.println("monthShareCustomer"+monthShareCustomer);
-//            System.err.println("本月resto的订单总额");
-//            System.err.println("monthRestoTotal"+monthRestoTotal);
-//            System.err.println("本月resto的订单总数");
-//            System.err.println(monthRestoCount.size());
-//            System.err.println("本月resto的实收总数");
-//            System.err.println(monthPayRestoTotal);
-//            System.err.println("本月resto的评价订单总数");
-//            System.err.println(monthAppraiseNum);
-//            System.err.println("本月resto的评价订单总分数");
-//            System.err.println(monthAppraiseSum);
-//            System.err.println("本月新增用户的订单总额");
-//            System.err.println(monthNewCustomerRestoTotal);
-//            System.err.println("本月新增分享用户的订单总额");
-//            System.err.println(monthNewShareCustomerRestoTotal);
-//            System.err.println("本月新增自然用户的订单总额");
-//            System.err.println(monthNewNormalCustomerRestoTotal);
-
-            System.err.println("中旬所有用户的id");
-            System.err.println("customerInMonth"+customerInMonth);
-            System.err.println("中旬所有分享用户的id");
-            System.err.println("customerShareInMonth"+customerShareInMonth);
-            System.err.println("中旬新增用户的id");
-            System.err.println("monthNewCustomer"+monthNewCustomer);
-            System.err.println("中询新增自然用户的id");
             System.err.println("monthNormalCustomer"+monthNormalCustomer);
-            System.err.println("中旬新增分享用户的id");
+            System.err.println("本月新增分享用户的id");
             System.err.println("monthShareCustomer"+monthShareCustomer);
-            System.err.println("中旬resto的订单总额");
+            System.err.println("本月resto的订单总额");
             System.err.println("monthRestoTotal"+monthRestoTotal);
-            System.err.println("中旬resto的订单总数");
+            System.err.println("本月resto的订单总数");
             System.err.println(monthRestoCount.size());
-            System.err.println("中旬resto的实收总数");
+            System.err.println("本月resto的实收总数");
             System.err.println(monthPayRestoTotal);
-            System.err.println("中旬resto的评价订单总数");
+            System.err.println("本月resto的评价订单总数");
             System.err.println(monthAppraiseNum);
-            System.err.println("中旬resto的评价订单总分数");
+            System.err.println("本月resto的评价订单总分数");
             System.err.println(monthAppraiseSum);
-            System.err.println("中旬新增用户的订单总额");
+            System.err.println("本月新增用户的订单总额");
             System.err.println(monthNewCustomerRestoTotal);
-            System.err.println("中旬新增分享用户的订单总额");
+            System.err.println("本月新增分享用户的订单总额");
             System.err.println(monthNewShareCustomerRestoTotal);
-            System.err.println("中旬新增自然用户的订单总额");
+            System.err.println("本月新增自然用户的订单总额");
             System.err.println(monthNewNormalCustomerRestoTotal);
-
 
             int xun = DateUtil.getEarlyMidLate(new Date());
             //发送本日信息 本月信息 上旬信息
