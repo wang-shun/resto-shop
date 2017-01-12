@@ -2,6 +2,7 @@ package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.QRCodeUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandSettingService;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -158,6 +160,13 @@ public class OrderAspect {
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
         }
+
+
+        StringBuilder share = new StringBuilder();
+        share.append("邀请好友扫一扫，送他/她");
+        share.append("<img src=\"https://www.baidu.com/img/baidu_jgylogo3.gif\" /");
+        String result = WeChatUtils.sendCustomerMsg(share.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.orderWxPaySuccess(..))")
