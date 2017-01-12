@@ -16,6 +16,7 @@ public class OffLineOrder {
 
     private Integer entercount;
 
+
     private Integer numguest;
 
     private Date createTime;
