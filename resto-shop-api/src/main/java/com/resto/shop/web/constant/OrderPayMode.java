@@ -8,4 +8,8 @@ public class OrderPayMode {
     public static final int WX_PAY = 1;
 
     public static final int ALI_PAY = 2;
+
+    public static final int YL_PAY = 3;
+
+    public static final int XJ_PAY = 4;
 }

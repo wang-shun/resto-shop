@@ -212,6 +212,29 @@
 							</div>
 						</div>
 					</div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">日短信通知：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="isOpenSms"v-model="m.isOpenSms" value="1">是
+                                </label>
+                                <label> <input type="radio" name="isOpenSms" v-model="m.isOpenSms" value="0"> 否
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div  class="form-group" v-if="m.isOpenSms==1">
+                            <label class="col-sm-3 control-label">手机号：</label>
+                            <div class="col-sm-9">
+                                <input type="text" placeholder="多个手机号码以逗号隔开" class="form-control" name="noticeTelephone"
+                                       :value="m.noticeTelephone">
+                            </div>
+                    </div>
+
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>

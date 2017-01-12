@@ -40,4 +40,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	public List<Map<String, Object>> selectOrderItems(String beginDate,String endDate);
 	
 	public List<OrderItem> selectOrderItemByOrderIds(Map<String, Object> map);
+	
+	public List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map);
 }
