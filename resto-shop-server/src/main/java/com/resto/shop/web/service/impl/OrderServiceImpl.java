@@ -4203,6 +4203,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void updateArticle(Order order) {
         BigDecimal total = new BigDecimal(0);
+        BigDecimal origin = new BigDecimal(0);
         Order o = getOrderInfo(order.getId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
@@ -4212,6 +4213,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int mealCount = 0;
         BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
         for (OrderItem item : o.getOrderItems()) {
+            origin = origin.add(item.getOriginalPrice());
             total = total.add(item.getFinalPrice());
             if(o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES &&  shopDetail.getIsMealFee() == Common.YES){
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);;
@@ -4232,8 +4234,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
         o.setArticleCount(base - sum);
-        o.setPaymentAmount(total.add(o.getServicePrice()));
-        o.setOriginalAmount(total.add(o.getServicePrice()));
+//        o.setPaymentAmount(total.add(o.getServicePrice()));
+        o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         update(o);
     }
