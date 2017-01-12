@@ -1401,7 +1401,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
-        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        data.put("ORIGINAL_AMOUNT", order.getOrderMoney());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
