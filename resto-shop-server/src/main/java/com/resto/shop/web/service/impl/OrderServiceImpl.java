@@ -3501,10 +3501,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 monthNormalCustomer.add(s1);
             }
         }
-        System.out.println("monthNormalCustomer"+monthNormalCustomer);
-
-
-
 
         //计算回头用户
         //今日回头
@@ -3564,7 +3560,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
 
         //中旬回头
         for (String s1 : customerBeforeMiddleOfMonth) {//中旬有 今日也有
@@ -3924,6 +3919,90 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 //中旬end -------------------
 
+                //下旬begin------------------
+                if(getDay(o.getCreateTime()).contains(8)){
+                    //1.resto订单总额
+                    if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                        lastOfMonthRestoTotal = lastOfMonthRestoTotal.add(o.getAmountWithChildren());
+                    }else{
+                        lastOfMonthRestoTotal = lastOfMonthRestoTotal.add(o.getOrderMoney());
+                    }
+                    //2.满意度
+                    if (null != o.getAppraise()) {
+                        if (o.getAppraise().getLevel() != null) {
+                            lastOfMonthAppraiseNum++;
+                            lastOfMonthAppraiseSum += o.getAppraise().getLevel() * 20;
+                        }
+                    }
+                    lastOfMonthSatisfaction = String.valueOf(dayAppraiseNum != 0 ? lastOfMonthAppraiseSum / lastOfMonthAppraiseNum : "");
+                    //3.resto的订单总数
+                    if (o.getParentOrderId() == null) {
+                        lastOfMonthRestoCount.add(o.getId());
+                    }
+                    //4.订单中实收总额
+                    if (o.getOrderPaymentItems() != null) {
+                        for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+                            if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == PayMode.ALI_PAY || oi.getPaymentModeId() == PayMode.MONEY_PAY||oi.getPaymentModeId()==PayMode.ARTICLE_BACK_PAY) {
+                                lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(oi.getPayValue());
+                            }
+                        }
+                    }
+                    //5.新增用户的订单总额
+
+                    if(lastOfMonthNewCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            lastOfMonthNewCustomerRestoTotal = lastOfMonthNewCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthNewCustomerRestoTotal = lastOfMonthNewCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+                    //6自然到店的用户订单总额
+                    if(lastOfMonthNormalCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==5&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            lastOfMonthNewNormalCustomerRestoTotal = lastOfMonthNewNormalCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthNewNormalCustomerRestoTotal = lastOfMonthNewNormalCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+                    //7.分享到店的用户订单总额
+                    if(lastOfMonthShareCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==5&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            lastOfMonthNewShareCustomerRestoTotal = lastOfMonthNewShareCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthNewShareCustomerRestoTotal = lastOfMonthNewShareCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+
+                    //8.回头用户的订单总额
+                    if(lastOfMonthBackCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==5&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+
+                            lastOfMonthBackCustomerRestoTotal= lastOfMonthBackCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthBackCustomerRestoTotal = lastOfMonthBackCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+
+                    //9.二次回头用户的订单总额
+                    if(lastOfMonthBackTwoCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==5&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            lastOfMonthBackTwoCustomerRestoTotal = lastOfMonthBackTwoCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthBackTwoCustomerRestoTotal = lastOfMonthBackTwoCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+
+                    //10.多次回头用户的订单总额
+                    if(lastOfMonthBackTwoMoreCustomer.contains(o.getCustomerId())){
+                        if(o.getOrderMode()==5&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            lastOfMonthBackTwoMoreCustomerRestoTotal = lastOfMonthBackTwoMoreCustomerRestoTotal.add(o.getAmountWithChildren());
+                        }else{
+                            lastOfMonthBackTwoMoreCustomerRestoTotal = lastOfMonthBackTwoMoreCustomerRestoTotal.add(o.getOrderMoney());
+                        }
+                    }
+
+                }
+                //下旬end -------------------
 
                 //本月begin---------------
                 if(getDay(o.getCreateTime()).contains(10)){
@@ -4012,10 +4091,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //本月end---------------
 
 
-
-
-
-
             }
 
             //查询resto充值(微信充值+pos充值)  实收总额 = (微信支付+支付宝+其他支付)+(pos充值+微信充值)
@@ -4032,7 +4107,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     //中旬
                     if(getDay(c.getCreateTime()).contains(6)){
-                        middleOfMonthPayRestoTotal = middleOfMonthRestoTotal.add(c.getChargeMoney());
+                        lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(c.getChargeMoney());
                     }
                     //下旬
                     if(getDay(c.getCreateTime()).contains(8)){
@@ -4156,7 +4231,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("payOnlinePercent:").append("'").append(  todayRestoCount.size()/(todayRestoCount.size()+todayEnterCount)).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
-         //   SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_37160073");
+          SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_37160073");
 
             //发送上旬信息
             StringBuilder firstcontent = new StringBuilder();
@@ -4250,18 +4325,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //多次回头用户
                     .append("middleBackCustomersCount:").append("'").append(middleOfMonthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(middleOfMonthBackTwoMoreCustomerRestoTotal).append("'")
                     .append("}");
-            SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_37065121");
+
+            //封装下旬文本
+            StringBuilder lastcontent = new StringBuilder();
+            lastcontent.append("{")
+                    //满意度 店铺评分
+                    .append("lastSatisfied:").append("'").append(lastOfMonthSatisfaction).append("'").append(",")
+                    //用户消费占比 r订单总额/(r订单总额+线下订单总额)
+                    .append("lastCustomerPayPercent:").append("'").append(lastOfMonthRestoTotal + "/" + lastOfMonthRestoTotal.add(lastOfMonthEnterTotal)).append("'").append(",")
+                    //新增用户占比  新增用户总数/上旬总人数
+                    .append("lastNewCustomerCount:").append("'").append(lastOfMonthNewCustomer.size() + "/" + customerInLastOfMonth.size()).append("'").append(",")
+                    //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
+                    .append("lastOnlinePercent:").append("'").append(lastOfMonthRestoCount.size() + "/" + lastOfMonthEnterCount+lastOfMonthRestoCount.size()).append("'").append(",")
+                    //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
+                    .append("lasterTotalPayment:").append("'").append(lastOfMonthEnterTotal.add(lastOfMonthRestoTotal)).append("'").append(",")
+                    //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
+                    .append("lastCustomerPayment:").append("'").append(lastOfMonthPayRestoTotal).append("'").append(",")
+                    //新增用户消费 上旬新增用户订单/上旬订单总额
+                    .append("lastNewCustomerPay:").append("'").append(lastOfMonthNewCustomer.size()).append("位").append("'").append(",")
+                    .append("lastNewCustomerPayTotal:").append("'").append(lastOfMonthNewCustomerRestoTotal).append("'").append(",")
+                    //上旬新增 自然用户
+                    .append("lastOrginCustomerCount:").append("'").append(lastOfMonthNormalCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthNewNormalCustomerRestoTotal).append("'").append(",")
+                    //上旬新增分享用户
+                    .append("lastShareCustomerCount:").append("'").append(lastOfMonthShareCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthNewShareCustomerRestoTotal).append("'").append(",")
+                    //回头用户消费
+                    .append("lastBackPayment:").append("'").append(lastOfMonthBackCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthBackCustomerRestoTotal).append("'").append(",")
+                    //新增回头
+                    .append("lastNewBackCustomerCount:").append("'").append(lastOfMonthBackTwoCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthBackTwoCustomerRestoTotal).append("'").append(",")
+                    //多次回头用户
+                    .append("lastBackCustomersCount:").append("'").append(lastOfMonthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthBackTwoMoreCustomerRestoTotal).append("'")
+                    .append("}");
 
             if (xun == 1) {
                 //代表今天是上旬
 
             } else if (xun == 2) {//代表是中旬
                 //发送中旬信息
-
+                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_37065121");
 
             } else if (xun == 3) {//代表是下旬
                 //发送中旬和下旬信息
-
+                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_37065121");
+                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_36965049");
             }
         }
     }
