@@ -3605,9 +3605,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!firstOfMonthBackCount.isEmpty()) {
             for (String key : firstOfMonthBackCount.keySet()) {//求算上旬
                 // 多次回头用户
-                if ("1".equals(firstOfMonthBackCount.get(key))) {
+                if (firstOfMonthBackCount.get(key)==1) {
                     firstOfMonthBackTwoCustomer.add(key);
-                } else {
+                } else if(firstOfMonthBackCount.get(key)>1) {
                     firstOfMonthBackTwoMoreCustomer.add(key);
                 }
             }
@@ -3639,9 +3639,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(!middleOfMonthBackCount.isEmpty()){
             for (String key : middleOfMonthBackCount.keySet()) {//求算中旬
                 // 多次回头用户
-                if ("1".equals(middleOfMonthBackCount.get(key))) {
+                if (middleOfMonthBackCount.get(key)==1) {
                     middleOfMonthBackTwoCustomer.add(key);
-                } else {
+                } else if(middleOfMonthBackCount.get(key)>1) {
                     middleOfMonthBackTwoMoreCustomer.add(key);
                 }
             }
@@ -3658,7 +3658,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        //定义一个map 来存放上旬每个回头用户存在的次数
+        //定义一个map 来存放下旬每个回头用户存在的次数
         Map<String, Integer> LastOfMonthBackCount = new HashMap();
         if (!backCustomerLastOfMonth.isEmpty()) {
             for (String s : backCustomerLastOfMonth) {
@@ -3674,14 +3674,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(!LastOfMonthBackCount.isEmpty()){
             for (String key : LastOfMonthBackCount.keySet()) {//求算下旬
                 // 多次回头用户
-                if ("1".equals(LastOfMonthBackCount.get(key))) {
+                if (LastOfMonthBackCount.get(key)==1) {
                     lastOfMonthBackTwoCustomer.add(key);
-                } else {
+                } else if(LastOfMonthBackCount.get(key)>1) {
                     lastOfMonthBackTwoMoreCustomer.add(key);
                 }
             }
         }
-
 
         //本月回头
 
@@ -3710,14 +3709,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(!monthBackCount.isEmpty()){
             for (String key : monthBackCount.keySet()) {//求算本月
                 // 多次回头用户
-                if ("1".equals(monthBackCount.get(key))) {
+                if (monthBackCount.get(key)==1) {
                     monthBackTwoCustomer.add(key);
-                } else {
+                } else if(monthBackCount.get(key)>1) {
                     monthBackTwoMoreCustomer.add(key);
                 }
             }
         }
-
 
         int dayAppraiseNum = 0;//当日评价的总单数
         int firstOfMonthAppraiseNum = 0;//上旬评价的总单数
