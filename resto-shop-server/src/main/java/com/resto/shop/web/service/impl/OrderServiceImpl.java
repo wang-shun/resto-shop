@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysql.fabric.xmlrpc.base.Array;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
@@ -27,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -1326,7 +1328,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
 	            	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
 	            	if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
-		                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
+	            		refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
 		            }
 	            	refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount()-order.getCustomerCount()));
 	            	refundItems.add(refundItem);
@@ -4084,10 +4086,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
     
     @Override
-    public Map<String, Object> refundOrderPrintReceipt(String orderId) {
+    public Map<String, Object> refundOrderPrintReceipt(Order refundOrder) {
     	// 根据id查询订单
-        Order order = selectById(orderId);
+        Order order = selectById(refundOrder.getId());
         order.setDistributionModeId(DistributionType.REFUND_ORDER);
+        order.setBaseCustomerCount(0);
+        order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
         if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
             order.setProductionStatus(ProductionStatus.PRINTED);
@@ -4097,23 +4101,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
-        List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
-
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-            List<OrderItem> child = orderItemService.listByParentId(orderId);
-            for (OrderItem orderItem : child) {
-            	order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-                if(order.getOrderState() == OrderState.SUBMIT){
-                    order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
-                }
-
-            }
-            orderItems.addAll(child);
+        Map<String, Object> map = new HashMap<String, Object>();
+        List<String> orderItemIds = new ArrayList<String>();
+        for(OrderItem item : refundOrder.getOrderItems()){
+        	if(!item.getType().equals(ArticleType.SERVICE_PRICE)){
+        		orderItemIds.add(item.getId());
+        	}else{
+        		order.setBaseCustomerCount(item.getCount());
+        		order.setCustomerCount(0);
+        	}
         }
-
+        map.put("orderItemIds", orderItemIds);
+        List<OrderItem> orderItems = new ArrayList<OrderItem>();
+        if(orderItemIds.size() != 0){
+        	orderItems = orderItemService.selectRefundOrderItem(map);
+        }
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (printer.size() > 0) {
-            return printTicket(order, orderItems, shopDetail, printer.get(0));
+            return refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
         }
         return null;
     }
@@ -4144,6 +4149,141 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printTask.addAll(kitchenTicket);
         }
         return printTask;
+    }
+    
+    public Map<String, Object> refundOrderPrintTicket(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
+        if (printer == null) {
+            return null;
+        }
+        List<Map<String, Object>> refundItems = new ArrayList<>();
+        BigDecimal articleCount = new BigDecimal(0);
+        BigDecimal orderMoney = new BigDecimal(0);
+        for (OrderItem article : orderItems) {
+        	Map<String, Object> refundItem = new HashMap<>();
+        	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
+        	refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
+        	refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+        	refundItems.add(refundItem);
+        	articleCount = articleCount.add(new BigDecimal(article.getRefundCount()));
+        	orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
+        	if(order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0){
+            	refundItem = new HashMap<>();
+            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
+            	new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
+            	refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
+            	refundItem.put("ARTICLE_COUNT", -(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
+                refundItems.add(refundItem);
+                articleCount = articleCount.add(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber())));
+                orderMoney = orderMoney.add(shopDetail.getMealFeePrice().multiply(
+        		new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))));
+            }
+        }
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
+
+    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+        	Map<String, Object> refundItem = new HashMap<>();
+        	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
+        	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
+        	if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
+        		refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
+            }
+        	refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount()-order.getCustomerCount()));
+        	refundItems.add(refundItem);
+        	articleCount = articleCount.add(new BigDecimal(order.getBaseCustomerCount()-order.getCustomerCount()));
+        	orderMoney = orderMoney.add(brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))));
+        }
+        Map<String, Object> print = new HashMap<>();
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        print.put("TABLE_NO", tableNumber);
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
+        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ITEMS", refundItems);
+        List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
+    	Map<String, Object> payMentItem = new HashMap<String, Object>();
+    	payMentItem.put("SUBTOTAL", -order.getRefundMoney().doubleValue());
+    	payMentItem.put("PAYMENT_MODE", "退菜返还金额");
+		patMentItems.add(payMentItem);
+        data.put("PAYMENT_ITEMS", patMentItems);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        BigDecimal level = new BigDecimal(0);
+        if(appraise != null){
+	        if (appraise != null && appraise.getLevel() < 5) {
+	            for (int i = 0; i < appraise.getLevel(); i++) {
+	                star.append("★");
+	            }
+	            for (int i = 0; i < 5 - appraise.getLevel(); i++){
+	            	star.append("☆");
+	            }
+	        }else if(appraise != null && appraise.getLevel() == 5){
+	        	star.append("★★★★★");
+	        }
+	        Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+	        level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+	        			.divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())),2,BigDecimal.ROUND_HALF_UP);
+        }else{
+        	star.append("☆☆☆☆☆");
+        }
+        StringBuilder gao = new StringBuilder();
+        if(shopDetail.getIsUserIdentity().equals(1)){
+        	//得到有限制的情况下用户的订单数
+	        int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),shopDetail.getConsumeConfineTime());
+	        //得到无限制情况下用户的订单数
+	        int gaoCountlong =orderMapper.selectByCustomerCount(order.getCustomerId(),shopDetail.getConsumeConfineUnit(),0);
+	        if(shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber()&& shopDetail.getConsumeConfineUnit()!=3){
+	            gao.append("【高频】");
+	        }//无限制的时候
+	        else if(shopDetail.getConsumeConfineUnit()==3 && gaoCountlong>shopDetail.getConsumeNumber()){
+	            gao.append("【高频】");
+	        }
+        }
+        String modeText = getModeText(order);
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("ORIGINAL_AMOUNT", -orderMoney.doubleValue());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", 0);
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
+        data.put("PAYMENT_AMOUNT", orderMoney.subtract(order.getRefundMoney()));
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("ARTICLE_COUNT", -articleCount.intValue());
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", level);
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        if(account != null){
+        	customerStr.append("余额："+account.getRemain()+" ");
+        }else{
+        	customerStr.append("余额：0 ");
+        }
+        customerStr.append(""+gao.toString()+" ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+        if(customerDetail != null){
+        	if(customerDetail.getBirthDate() != null){
+	        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+	        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
+	        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+	        	}
+        	}
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+        print.put("TICKET_TYPE", TicketType.RECEIPT);
+        return print;
     }
     
     public static void main(String[] args) {
