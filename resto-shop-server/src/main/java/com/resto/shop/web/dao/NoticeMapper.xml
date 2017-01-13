@@ -42,7 +42,7 @@
       <if test="noticeImage != null">#{noticeImage,jdbcType=VARCHAR},</if>  
       <if test="noticeType != null">#{noticeType,jdbcType=TINYINT},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
-      <if test="showTimes != null">#{shopTimes},</if>
+      <if test="showTimes != null">#{showTimes},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Notice">update tb_notice 
