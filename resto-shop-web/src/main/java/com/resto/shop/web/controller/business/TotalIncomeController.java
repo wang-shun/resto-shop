@@ -43,14 +43,14 @@ import com.resto.shop.web.service.OrderPaymentItemService;
 @RequestMapping("totalIncome")
 public class TotalIncomeController extends GenericController {
 
-	@Resource
-	BrandService brandService;
+    @Resource
+    BrandService brandService;
 
-	@Resource
-	ShopDetailService shopDetailService;
+    @Resource
+    ShopDetailService shopDetailService;
 
-	@Resource
-	OrderPaymentItemService orderpaymentitemService;
+    @Resource
+    OrderPaymentItemService orderpaymentitemService;
 
     @Resource
     ChargeOrderService chargeOrderService;
@@ -78,13 +78,13 @@ public class TotalIncomeController extends GenericController {
         //从session中获取该品牌的信息
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
-                shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
         //给每个店铺的订单总额  红包支付总额 微信支付总额 ...附初始值
         for(ShopDetail s : shopDetailList){
-            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId(),BigDecimal.ZERO);
             shopIncomeDtos.add(sin);
         }
 
@@ -128,6 +128,7 @@ public class TotalIncomeController extends GenericController {
                             default:
                                 break;
                         }
+                        si.setOriginalAmount(oi.getOriginalAmount());
                         si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay());
                     }
                 }
@@ -146,6 +147,7 @@ public class TotalIncomeController extends GenericController {
         BigDecimal otherPayment = BigDecimal.ZERO;
         BigDecimal aliPayment = BigDecimal.ZERO;
         BigDecimal articleBackPay = BigDecimal.ZERO;
+        BigDecimal originalAmount = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
                 wechatIncome = wechatIncome.add(sdto.getWechatIncome());
@@ -157,6 +159,7 @@ public class TotalIncomeController extends GenericController {
                 otherPayment = otherPayment.add(sdto.getOtherPayment() == null? new BigDecimal(0) : sdto.getOtherPayment());
                 aliPayment = aliPayment.add(sdto.getAliPayment() == null ? new BigDecimal(0) : sdto.getAliPayment());
                 articleBackPay = articleBackPay.add(sdto.getArticleBackPay());
+                originalAmount=originalAmount.add(sdto.getOriginalAmount());
             }
         }
         BrandIncomeDto brandIncomeDto = new BrandIncomeDto();

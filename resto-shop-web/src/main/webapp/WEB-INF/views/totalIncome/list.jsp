@@ -141,12 +141,12 @@ var tb2 = $("#shopReportTable").DataTable({
 		{                 
 			title : "店铺名称",
 			data : "shopName",
-		},       
-//		{
-//			title : "营收总额(元)",
-//			data : "factIncome",
-//			defaultContent:'0'
-//		},
+		},
+		{
+			title : "原价销售总额(元)",
+			data : "originalAmount",
+			defaultContent:'0'
+		},
 		{
             title : "订单总额(元)",
             data : "totalIncome",
