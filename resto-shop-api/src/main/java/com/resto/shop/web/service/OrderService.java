@@ -537,4 +537,8 @@ public interface OrderService extends GenericService<Order, String> {
 	Integer selectByCustomerCount(String customerId,int consumeConfineUnit,int consumeConfineTime);
 	
 	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
+	
+	Map<String, Object> refundOrderPrintReceipt(String orderId);
+	
+	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
 }

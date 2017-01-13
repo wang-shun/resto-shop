@@ -63,4 +63,6 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     List<OrderItem> selectOrderItemByOrderIds(Map<String, Object> map);
     
     List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map);
+    
+    List<OrderItem> selectRefundOrderItem(Map<String, Object> map);
 }

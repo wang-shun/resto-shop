@@ -1108,10 +1108,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-                if(customerDetail.getBirthDate() != null){
-                	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
-                		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+                if(customerDetail != null){
+                	if(customerDetail.getBirthDate() != null){
+        	        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+        	        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
+        	        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+        	        	}
                 	}
                 }
                 data.put("CUSTOMER_PROPERTY", customerStr.toString());
@@ -1208,10 +1210,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 customerStr.append(""+gao.toString()+" ");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-                if(customerDetail.getBirthDate() != null){
-                	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
-                		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+                if(customerDetail != null){
+                	if(customerDetail.getBirthDate() != null){
+        	        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+        	        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
+        	        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+        	        	}
                 	}
                 }
                 data.put("CUSTOMER_PROPERTY", customerStr.toString());
@@ -1298,7 +1302,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             items.add(item);
             if(article.getRefundCount() != 0){
             	Map<String, Object> refundItem = new HashMap<>();
-            	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).intValue());
+            	refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
             	refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
             	refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
             	refundItems.add(refundItem);
@@ -1319,7 +1323,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            items.add(item);
 	            if(order.getBaseCustomerCount() != order.getCustomerCount()){
 	            	Map<String, Object> refundItem = new HashMap<>();
-	            	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).intValue());
+	            	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
 	            	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
 	            	if("27f56b31669f4d43805226709874b530".equals(brand.getId())){
 		                item.put("ARTICLE_NAME", "就餐人数" + "(退)");
@@ -1337,7 +1341,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	            items.add(item);
 	            if(order.getBaseMealAllCount() != order.getMealAllNumber()){
 	            	Map<String, Object> refundItem = new HashMap<>();
-	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount()-order.getMealAllNumber())).intValue());
+	            	refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount()-order.getMealAllNumber())).doubleValue());
 	            	refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
 	            	refundItem.put("ARTICLE_COUNT", -(order.getBaseMealAllCount()-order.getMealAllNumber()));
 		            refundItems.add(refundItem);
@@ -1444,10 +1448,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerStr.append(""+gao.toString()+" ");
         Customer customer = customerService.selectById(order.getCustomerId());
         CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if(customerDetail.getBirthDate() != null){
-        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
-        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+        if(customerDetail != null){
+        	if(customerDetail.getBirthDate() != null){
+	        	if(DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+	        			.equals(DateUtil.formatDate(new Date(), "MM-dd"))){
+	        		customerStr.append("★"+DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd")+"★");
+	        	}
         	}
         }
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
@@ -4075,6 +4081,69 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds) {
     	return orderMapper.selectOrderByOrderIds(orderIds);
+    }
+    
+    @Override
+    public Map<String, Object> refundOrderPrintReceipt(String orderId) {
+    	// 根据id查询订单
+        Order order = selectById(orderId);
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
+            order.setProductionStatus(ProductionStatus.PRINTED);
+            order.setPrintOrderTime(new Date());
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //查询店铺
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        // 查询订单菜品
+        List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for (OrderItem orderItem : child) {
+            	order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+                if(order.getOrderState() == OrderState.SUBMIT){
+                    order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+                }
+
+            }
+            orderItems.addAll(child);
+        }
+
+        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        if (printer.size() > 0) {
+            return printTicket(order, orderItems, shopDetail, printer.get(0));
+        }
+        return null;
+    }
+    
+    @Override
+    public List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder) {
+    	Order order = selectById(refundOrder.getId());
+    	order.setDistributionModeId(DistributionType.REFUND_ORDER);
+        //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
+        if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
+            order.setProductionStatus(ProductionStatus.PRINTED);
+            order.setPrintOrderTime(new Date());
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //得到退掉的订单明细
+        List<String> orderItemIds = new ArrayList<String>();
+        for(OrderItem item : refundOrder.getOrderItems()){
+        	orderItemIds.add(item.getId());
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("orderItemIds", orderItemIds);
+        List<OrderItem> items = orderItemService.selectRefundOrderItem(map);
+        //生成打印任务
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        //得到打印任务
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+        if (!kitchenTicket.isEmpty()) {
+            printTask.addAll(kitchenTicket);
+        }
+        return printTask;
     }
     
     public static void main(String[] args) {
