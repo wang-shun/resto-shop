@@ -387,17 +387,15 @@ public class OrderAspect {
             }
             msg.append("订单金额：" + sum + "\n");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            scanaQRcode(config, customer);
         }
 
     }
 
     //推送分享领红包，跳转到我的二维码界面
-    public void scanaQRcode(WechatConfig config, Customer customer){
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(customer.getBrandId());
+    public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting){
         StringBuffer str=new StringBuffer();
         str.append("邀请好友扫一扫,");
-        String jumpurl = "http://"+brandSetting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
+        String jumpurl = "http://"+setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
         str.append("<a href='"+jumpurl+"'>领取奖励红包</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
@@ -450,6 +448,7 @@ public class OrderAspect {
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("发送评论通知成功:" + msg + result);
+            scanaQRcode(config, customer, setting);
         }
         try {
             if (customer.getFirstOrderTime() == null) { //分享判定
