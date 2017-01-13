@@ -541,10 +541,12 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
 
-
 	/**
 	 * 返回未支付的订单的支付项
 	 */
 	Result refundPaymentByUnfinishedOrder(String orderId);
 
+	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
+	
+	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
 }

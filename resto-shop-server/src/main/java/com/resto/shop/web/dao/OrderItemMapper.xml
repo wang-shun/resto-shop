@@ -332,4 +332,13 @@ order by t.print_sort asc
 	where order_id = #{orderId}
 	and `status` = 1 and ${count}
   </select>
+  
+  <select id="selectRefundOrderItem" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select refund_count as count,tb_order_item.*
+  	from tb_order_item where id in
+  	<foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
+  		#{orderItemId}
+  	</foreach>
+  	and type not in (3,4)
+  </select>
 </mapper>
