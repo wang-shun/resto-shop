@@ -351,6 +351,11 @@ public class SpringContextConfig {
         return proxy.create(TableQrcodeService.class);
     }
 
+    @Bean
+    public OffLineOrderService offLineOrderService() {
+        return proxy.create(OffLineOrderService.class);
+    }
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

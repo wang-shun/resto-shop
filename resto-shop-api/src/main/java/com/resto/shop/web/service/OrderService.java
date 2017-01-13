@@ -11,6 +11,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
+import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -438,7 +439,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(String shopId,String shopName);
+    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder);
 
     public boolean cancelExceptionOrder(String orderId);
 

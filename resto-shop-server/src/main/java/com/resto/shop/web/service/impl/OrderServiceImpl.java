@@ -21,7 +21,6 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.aspectj.weaver.ast.Or;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -30,7 +29,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -144,6 +142,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     AccountLogService accountLogService;
+
+    @Autowired
+    OffLineOrderMapper offLineOrderMapper;
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
@@ -3488,17 +3489,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void cleanShopOrder(String shopId,String shopName){
+    public void cleanShopOrder(ShopDetail shopDetail,OffLineOrder offLineOrder){
+
+
         String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
         String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
-        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+        List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
         for (Order order : orderList) {
             if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
                 sendWxRefundMsg(order);
             }
         }
         //查询已付款且有支付项但是生产状态没有改变的订单
-        List<Order> orderstates = orderMapper.selectHasPayNoChangeStatus(shopId,DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
+        List<Order> orderstates = orderMapper.selectHasPayNoChangeStatus(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
         if(!orderstates.isEmpty()){
             for(Order o:orderstates){
                 if(o.getOrderMode()==ShopMode.CALL_NUMBER){
@@ -3657,6 +3660,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月r订单总额
         BigDecimal monthRestoTotal = BigDecimal.ZERO;
 
+
+
         //本日线下订单总额
         BigDecimal todayEnterTotal = BigDecimal.ZERO;
         //上旬线下订单总额
@@ -3770,12 +3775,44 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月线下订单总数
         int monthEnterCount = 0;
 
+        //查询pos端店铺录入信息
+        List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(),begin,end,OfflineOrderSource.OFFLINE_POS);
+        if(!offLineOrderList.isEmpty()){
+            for(OffLineOrder of : offLineOrderList){
+                List<Integer> getTime = getDay(of.getCreateTime());
+                if(getTime.contains(2)){//本日中
+                    todayEnterCount+=of.getEnterCount();
+                    todayEnterTotal=todayEnterTotal.add(of.getEnterTotal());
+                }
+
+                if(getTime.contains(4)){//上旬中
+                    firstOfMonthEnterCount+=of.getEnterCount();
+                    firstOfMonthEnterTotal=firstOfMonthEnterTotal.add(of.getEnterTotal());
+                }
+
+                if(getTime.contains(6)){//中旬中
+                    middleOfMonthEnterCount+=of.getEnterCount();
+                    middleOfMonthEnterTotal=middleOfMonthEnterTotal.add(of.getEnterTotal());
+                }
+
+                if(getTime.contains(8)){//下旬中
+                    lastOfMonthEnterCount +=of.getEnterCount();
+                    lastOfMonthEnterTotal=lastOfMonthRestoTotal.add(of.getEnterTotal());
+                }
+
+                if(getTime.contains(10)){//本月中
+                    monthEnterCount+=of.getEnterCount();
+                    monthEnterTotal=monthEnterTotal.add(of.getEnterTotal());
+                }
+            }
+        }
+
 
         //查询历史订单和人 目前是以店铺为基础 也就是 指用户在另一个店铺就餐，在当前店铺还是算第一次用户
-        List<Order> orderHistoryList = orderMapper.selectOrderHistoryList(shopId, DateUtil.getDateEnd(new Date()));
+        List<Order> orderHistoryList = orderMapper.selectOrderHistoryList(shopDetail.getId(), DateUtil.getDateEnd(new Date()));
 
         //yz 查询本月所有的已消费订单
-        List<Order> orders = orderMapper.selectListsmsByShopId(begin, end, shopId);
+        List<Order> orders = orderMapper.selectListsmsByShopId(begin, end, shopDetail.getId());
         if(!orders.isEmpty()){
             for (Order order : orderHistoryList) {
                 List<Integer> getTime = getDay(order.getCreateTime());
@@ -4596,7 +4633,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //查询resto充值(微信充值+pos充值)  实收总额 = (微信支付+支付宝+其他支付)+(pos充值+微信充值)
-            List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId(beginMonth, endMonth, shopId);
+            List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId(beginMonth, endMonth, shopDetail.getName());
             if(!chargeOrderList.isEmpty()){
                 for (ChargeOrder c : chargeOrderList) {
                     //本日
@@ -4678,7 +4715,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //本日信息
             StringBuilder todayContent = new StringBuilder();
             todayContent.append("{")
-                    .append("shopName:").append("'").append(shopName).append("'").append(",")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     .append("dateTime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")).append("'").append(",")//
                     .append("totalMoney:").append("'").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("orderCount:").append("'").append(todayRestoCount.size() + todayEnterCount).append("'").append(",")
@@ -4702,7 +4739,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("payOnlinePercent:").append("'").append(  todayRestoCount.size()/(todayRestoCount.size()+todayEnterCount)).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
-            SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_37160073");
+
 
             //发送上旬信息
             StringBuilder firstcontent = new StringBuilder();
@@ -4733,7 +4770,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //多次回头用户
                     .append("lastBackCustomersCount:").append("'").append(firstOfMonthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(firstOfMonthBackTwoMoreCustomerRestoTotal).append("'")
                     .append("}");
-            SMSUtils.sendMessage("13317182430", firstcontent.toString(), "餐加", "SMS_37030070");
 
             //发送本月信息
             StringBuilder monthContent = new StringBuilder();
@@ -4764,7 +4800,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //多次回头用户
                     .append("nowBackCustomersCount:").append("'").append(monthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(monthBackTwoMoreCustomerRestoTotal).append("'")
                     .append("}");
-            SMSUtils.sendMessage("13317182430", monthContent.toString(), "餐加", "SMS_37685377");
+
 
             //封装中询文本
 
@@ -4827,19 +4863,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("lastBackCustomersCount:").append("'").append(lastOfMonthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthBackTwoMoreCustomerRestoTotal).append("'")
                     .append("}");
 
-            if (xun == 1) {
-                //代表今天是上旬
+            if("1".equals(shopDetail.getIsOpenSms())&&null!=shopDetail.getnoticeTelephone()){
+                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), firstcontent.toString(), "餐加", "SMS_37030070");//推送上旬信息
+                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), monthContent.toString(), "餐加", "SMS_37685377");//推本月消息
 
-            } else if (xun == 2) {//代表是中旬
-                //发送中旬信息
-                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_37065121");
+                if (xun == 1) {
+                    //代表今天是上旬
 
-            } else if (xun == 3) {//代表是下旬
-                //发送中旬和下旬信息
-                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_37065121");
-                SMSUtils.sendMessage("13317182430", middlecontent.toString(), "餐加", "SMS_36965049");
+                } else if (xun == 2) {//代表是中旬
+                    //发送中旬信息
+                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_37065121");
+
+                } else if (xun == 3) {//代表是下旬
+                    //发送中旬和下旬信息
+                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_37065121");
+                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_36965049");
+                }
+             }
+
             }
-        }
+
+
+
+
     }
 
 
