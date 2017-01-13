@@ -387,14 +387,13 @@ public class OrderAspect {
             }
             msg.append("订单金额：" + sum + "\n");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            scanaQRcode(order, config);
+            scanaQRcode(order, config, customer);
         }
 
     }
 
     //推送分享领红包，跳转到我的二维码界面
-    public void scanaQRcode(Order order, WechatConfig config){
-        Customer customer = customerService.selectById(order.getCustomerId());
+    public void scanaQRcode(Order order, WechatConfig config, Customer customer){
         BrandSetting brandSetting = brandSettingService.selectByBrandId(customer.getBrandId());
         StringBuffer str=new StringBuffer();
         str.append("邀请好友扫一扫,");
