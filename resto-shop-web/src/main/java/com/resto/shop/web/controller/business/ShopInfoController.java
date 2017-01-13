@@ -63,6 +63,7 @@ public class ShopInfoController extends GenericController{
         if(shopDetail.getPrintKitchen() == null){
             shopDetail.setPrintKitchen(0);
         }
+        shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         shopDetailService.update(shopDetail);
         return Result.getSuccess();
     }
