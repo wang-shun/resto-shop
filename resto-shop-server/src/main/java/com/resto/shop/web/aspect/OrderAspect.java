@@ -2,7 +2,6 @@ package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.QRCodeUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandSettingService;
@@ -11,7 +10,9 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.model.*;
+import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -23,9 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -388,8 +387,22 @@ public class OrderAspect {
             }
             msg.append("订单金额：" + sum + "\n");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            scanaQRcode(order);
         }
 
+    }
+
+    //推送分享领红包，跳转到我的二维码界面
+    public void scanaQRcode(Order order){
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(customer.getBrandId());
+        StringBuffer str=new StringBuffer();
+        str.append("邀请好友扫一扫,");
+        String jumpurl = "http://"+brandSetting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
+        str.append("< a href='"+jumpurl+"'>领取奖励红包</ a>");
+
+        String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 
 //    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
