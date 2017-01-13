@@ -27,7 +27,8 @@
       <if test="enterTotal != null">enter_total,</if>  
       <if test="entercount != null">enterCount,</if>  
       <if test="numguest != null">numGuest,</if>  
-      <if test="createTime != null">create_time,</if> 
+      <if test="createTime != null">create_time,</if>
+        <if test="state != null">state,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -37,7 +38,8 @@
       <if test="enterTotal != null">#{enterTotal,jdbcType=DECIMAL},</if>  
       <if test="entercount != null">#{entercount,jdbcType=INTEGER},</if>  
       <if test="numguest != null">#{numguest,jdbcType=INTEGER},</if>  
-      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if> 
+      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+        <if test="state != null">#{state},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OffLineOrder">update tb_off_line_order 
@@ -48,9 +50,31 @@
       <if test="enterTotal != null">enter_total = #{enterTotal,jdbcType=DECIMAL},</if>  
       <if test="entercount != null">enterCount = #{entercount,jdbcType=INTEGER},</if>  
       <if test="numguest != null">numGuest = #{numguest,jdbcType=INTEGER},</if>  
-      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if> 
+      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>
+        <if test="state != null">state = #{state},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OffLineOrder">update tb_off_line_order set shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR}, resource = #{resource,jdbcType=INTEGER}, enter_total = #{enterTotal,jdbcType=DECIMAL}, enterCount = #{entercount,jdbcType=INTEGER}, numGuest = #{numguest,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="OffLineOrder">select * from tb_off_line_order</select>
+
+    <select id="selectByTimeSourceAndShopId" resultType="OffLineOrder">
+
+    SELECT id,shop_detail_id,brand_id,resource,enter_total,enterCount,numGuest,create_time,state FROM tb_off_line_order
+    WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
+    <![CDATA[
+     create_time > #{beginDate} AND create_time <= #{endDate}
+  ]]>
+</select>
+
+    <select id="selectlistByTimeSourceAndShopId" resultType="OffLineOrder">
+
+        SELECT id,shop_detail_id,brand_id,resource,enter_total,enterCount,numGuest,create_time,state FROM tb_off_line_order
+        WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
+        <![CDATA[
+     create_time > #{beginDate} AND create_time <= #{endDate}
+  ]]>
+    </select>
+
+
+
 </mapper>
