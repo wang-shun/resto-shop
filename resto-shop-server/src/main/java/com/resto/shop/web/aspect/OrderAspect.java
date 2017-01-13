@@ -473,7 +473,7 @@ public class OrderAspect {
         if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=account'>")
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
                 .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
                 .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
