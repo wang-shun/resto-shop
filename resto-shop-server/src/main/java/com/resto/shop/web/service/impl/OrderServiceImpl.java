@@ -3781,27 +3781,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for(OffLineOrder of : offLineOrderList){
                 List<Integer> getTime = getDay(of.getCreateTime());
                 if(getTime.contains(2)){//本日中
-                    todayEnterCount+=of.getEntercount();
+                    todayEnterCount+=of.getEnterCount();
                     todayEnterTotal=todayEnterTotal.add(of.getEnterTotal());
                 }
 
                 if(getTime.contains(4)){//上旬中
-                    firstOfMonthEnterCount+=of.getEntercount();
+                    firstOfMonthEnterCount+=of.getEnterCount();
                     firstOfMonthEnterTotal=firstOfMonthEnterTotal.add(of.getEnterTotal());
                 }
 
                 if(getTime.contains(6)){//中旬中
-                    middleOfMonthEnterCount+=of.getEntercount();
+                    middleOfMonthEnterCount+=of.getEnterCount();
                     middleOfMonthEnterTotal=middleOfMonthEnterTotal.add(of.getEnterTotal());
                 }
 
                 if(getTime.contains(8)){//下旬中
-                    lastOfMonthEnterCount +=of.getEntercount();
+                    lastOfMonthEnterCount +=of.getEnterCount();
                     lastOfMonthEnterTotal=lastOfMonthRestoTotal.add(of.getEnterTotal());
                 }
 
                 if(getTime.contains(10)){//本月中
-                    monthEnterCount+=of.getEntercount();
+                    monthEnterCount+=of.getEnterCount();
                     monthEnterTotal=monthEnterTotal.add(of.getEnterTotal());
                 }
             }

@@ -14,10 +14,10 @@ public class OffLineOrder {
 
     private BigDecimal enterTotal;
 
-    private Integer entercount;
+    private Integer enterCount;
 
 
-    private Integer numguest;
+    private Integer numGuest;
 
     private Date createTime;
 
@@ -73,20 +73,20 @@ public class OffLineOrder {
         this.enterTotal = enterTotal;
     }
 
-    public Integer getEntercount() {
-        return entercount;
+    public Integer getEnterCount() {
+        return enterCount;
     }
 
-    public void setEntercount(Integer entercount) {
-        this.entercount = entercount;
+    public void setEnterCount(Integer enterCount) {
+        this.enterCount = enterCount;
     }
 
-    public Integer getNumguest() {
-        return numguest;
+    public Integer getNumGuest() {
+        return numGuest;
     }
 
-    public void setNumguest(Integer numguest) {
-        this.numguest = numguest;
+    public void setNumGuest(Integer numGuest) {
+        this.numGuest = numGuest;
     }
 
     public Date getCreateTime() {

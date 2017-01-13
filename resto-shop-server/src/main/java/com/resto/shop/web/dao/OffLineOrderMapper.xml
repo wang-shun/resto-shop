@@ -8,16 +8,16 @@
     <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
     <result column="resource" property="resource" jdbcType="INTEGER"/>
     <result column="enter_total" property="enterTotal" jdbcType="DECIMAL"/>
-    <result column="enterCount" property="entercount" jdbcType="INTEGER"/>
-    <result column="numGuest" property="numguest" jdbcType="INTEGER"/>
+    <result column="enter_count" property="enterCount" jdbcType="INTEGER"/>
+    <result column="num_guest" property="numGuest" jdbcType="INTEGER"/>
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
   </resultMap>
-  <sql id="Base_Column_List">id, shop_detail_id, brand_id, resource, enter_total, enterCount, numGuest, create_time</sql>
+  <sql id="Base_Column_List">id, shop_detail_id, brand_id, resource, enter_total, enter_count, num_guest, create_time</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_off_line_order where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_off_line_order where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.OffLineOrder">insert into tb_off_line_order (id, shop_detail_id, brand_id, resource, enter_total, enterCount, numGuest, create_time) values (#{id,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{resource,jdbcType=INTEGER}, #{enterTotal,jdbcType=DECIMAL}, #{entercount,jdbcType=INTEGER}, #{numguest,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.OffLineOrder">insert into tb_off_line_order (id, shop_detail_id, brand_id, resource, enter_total, enter_count, num_guest, create_time) values (#{id,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{resource,jdbcType=INTEGER}, #{enterTotal,jdbcType=DECIMAL}, #{enterCount,jdbcType=INTEGER}, #{numGuest,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.OffLineOrder">insert into tb_off_line_order 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -25,8 +25,8 @@
       <if test="brandId != null">brand_id,</if>  
       <if test="resource != null">resource,</if>  
       <if test="enterTotal != null">enter_total,</if>  
-      <if test="entercount != null">enterCount,</if>  
-      <if test="numguest != null">numGuest,</if>  
+      <if test="enterCount != null">enter_count,</if>
+      <if test="numGuest != null">num_guest,</if>
       <if test="createTime != null">create_time,</if>
         <if test="state != null">state,</if>
     </trim>  
@@ -36,8 +36,8 @@
       <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>  
       <if test="resource != null">#{resource,jdbcType=INTEGER},</if>  
       <if test="enterTotal != null">#{enterTotal,jdbcType=DECIMAL},</if>  
-      <if test="entercount != null">#{entercount,jdbcType=INTEGER},</if>  
-      <if test="numguest != null">#{numguest,jdbcType=INTEGER},</if>  
+      <if test="enterCount != null">#{enterCount,jdbcType=INTEGER},</if>
+      <if test="numGuest != null">#{num_guest,jdbcType=INTEGER},</if>
       <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
         <if test="state != null">#{state},</if>
     </trim> 
@@ -48,18 +48,18 @@
       <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if>  
       <if test="resource != null">resource = #{resource,jdbcType=INTEGER},</if>  
       <if test="enterTotal != null">enter_total = #{enterTotal,jdbcType=DECIMAL},</if>  
-      <if test="entercount != null">enterCount = #{entercount,jdbcType=INTEGER},</if>  
-      <if test="numguest != null">numGuest = #{numguest,jdbcType=INTEGER},</if>  
+      <if test="enterCount != null">enter_count = #{enterCount,jdbcType=INTEGER},</if>
+      <if test="numGuest != null">num_guest = #{numGuest,jdbcType=INTEGER},</if>
       <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>
         <if test="state != null">state = #{state},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OffLineOrder">update tb_off_line_order set shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR}, resource = #{resource,jdbcType=INTEGER}, enter_total = #{enterTotal,jdbcType=DECIMAL}, enterCount = #{entercount,jdbcType=INTEGER}, numGuest = #{numguest,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.OffLineOrder">update tb_off_line_order set shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR}, resource = #{resource,jdbcType=INTEGER}, enter_total = #{enterTotal,jdbcType=DECIMAL}, enter_count = #{enterCount,jdbcType=INTEGER}, num_guest = #{numGuest,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="OffLineOrder">select * from tb_off_line_order</select>
 
     <select id="selectByTimeSourceAndShopId" resultType="OffLineOrder">
 
-    SELECT id,shop_detail_id,brand_id,resource,enter_total,enterCount,numGuest,create_time,state FROM tb_off_line_order
+    SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,num_guest,create_time,state FROM tb_off_line_order
     WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
     <![CDATA[
      create_time > #{beginDate} AND create_time <= #{endDate}
@@ -68,7 +68,7 @@
 
     <select id="selectlistByTimeSourceAndShopId" resultType="OffLineOrder">
 
-        SELECT id,shop_detail_id,brand_id,resource,enter_total,enterCount,numGuest,create_time,state FROM tb_off_line_order
+        SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,num_guest,create_time,state FROM tb_off_line_order
         WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
         <![CDATA[
      create_time > #{beginDate} AND create_time <= #{endDate}
