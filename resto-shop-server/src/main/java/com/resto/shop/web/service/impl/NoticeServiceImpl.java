@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import com.resto.shop.web.model.Notice;
 import com.resto.shop.web.service.NoticeService;
 
 import cn.restoplus.rpc.server.RpcService;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -48,5 +50,24 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
 	@Override
 	public List<Notice> selectListAllByShopId(String currentShopId) {
 		return noticeMapper.selectListAllByShopId(currentShopId);
+	}
+
+	@Override
+	public void bindSupportTime(Notice notice) {
+		//先清空绑定的时间
+		noticeMapper.clearSupportTime(notice.getId());
+		for(Integer time : notice.getSupportTimes()){
+			noticeMapper.insertSupportTime(notice.getId(),time);
+		}
+	}
+
+	@Override
+	public Integer[] getSupportTime(String noticeId) {
+    	List<Integer> supportTime = noticeMapper.getSupportTime(noticeId);
+    	if(CollectionUtils.isEmpty(supportTime)){
+    		return new Integer[0];
+		}else{
+    		return supportTime.toArray(new Integer[0]);
+		}
 	}
 }

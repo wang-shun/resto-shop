@@ -37,6 +37,7 @@ public class NoticeController extends GenericController{
 	@ResponseBody
 	public Result list_one(String id){
 		Notice notice = noticeService.selectById(id);
+		notice.setSupportTimes(noticeService.getSupportTime(id));
 		return getSuccessResult(notice);
 	}
 	
@@ -52,6 +53,7 @@ public class NoticeController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid Notice brand){
 		noticeService.update(brand);
+		noticeService.bindSupportTime(brand);
 		return Result.getSuccess();
 	}
 	

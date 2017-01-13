@@ -31,6 +31,28 @@ public class Notice {
     
     private Boolean isRead;
 
+    //弹窗显示次数
+    private Integer showTimes;
+
+    //显示时间段
+    private Integer[] supportTimes;
+
+    final public Integer[] getSupportTimes() {
+        return supportTimes;
+    }
+
+    final public void setSupportTimes(Integer[] supportTimes) {
+        this.supportTimes = supportTimes;
+    }
+
+    final public Integer getShowTimes() {
+        return showTimes;
+    }
+
+    final public void setShowTimes(Integer showTimes) {
+        this.showTimes = showTimes;
+    }
+
     public String getId() {
         return id;
     }
