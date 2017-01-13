@@ -392,10 +392,10 @@ public class OrderAspect {
     }
 
     //推送分享领红包，跳转到我的二维码界面
-    public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting){
+    public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order){
         StringBuffer str=new StringBuffer();
         str.append("邀请好友扫一扫,");
-        String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
+        String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>领取奖励红包</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
@@ -444,11 +444,11 @@ public class OrderAspect {
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
             msg.append("您有一个红包未领取\n");
-            msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "'>点击领取</a>");
+            msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("发送评论通知成功:" + msg + result);
-            scanaQRcode(config, customer, setting);
+            scanaQRcode(config, customer, setting, order);
         }
         try {
             if (customer.getFirstOrderTime() == null) { //分享判定
