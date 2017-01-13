@@ -77,4 +77,6 @@ public interface CustomerService extends GenericService<Customer, String> {
     
     //得到品牌用户信息
     String selectBrandUser();
+
+	Integer selectByShareCustomer(String customerId);
 }

@@ -106,7 +106,9 @@ public class MemberController extends GenericController{
 				countUserDto.setNotUser(Integer.valueOf(str));
 				break;
 			case 6:
-				double a=countUserDto.getUserAll();
+				BigDecimal userAll = new BigDecimal(0);
+				userAll = userAll.add(new BigDecimal(counts[7]));
+				double a=userAll.doubleValue();
 				double b=Double.valueOf(str);
 				double c=(b/a)*100;
 				BigDecimal d=new BigDecimal(c);

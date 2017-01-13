@@ -51,29 +51,29 @@
     <div class="modal fade" id="beginModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-full">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"   id="closeModal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                 </div>
+
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"   id="closeModal">关闭
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="endModal" tabindex="-1" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-full">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                          id="closeModal"></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
                 </div>
                 <div class="modal-body" id="reportModal1"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true"
-                           id="closeModal">关闭
-                    </button>
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
                 </div>
             </div>
         </div>
@@ -412,6 +412,7 @@
     	column0.search('', true, false);
     	column1.search('', true, false);
     	column4.search('', true, false);
+        toastr.success('正在查询...');
         //更新数据源
         $.ajax({
             url: 'member/myConList',

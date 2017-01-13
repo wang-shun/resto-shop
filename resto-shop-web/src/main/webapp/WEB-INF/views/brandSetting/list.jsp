@@ -182,11 +182,11 @@
 				</div>
 				<div class="form-group">
 				    <label>品牌标语</label>
-				    <input type="text" class="form-control" name="slogan" required="required" v-model="m.slogan">
+				    <input type="text" class="form-control" name="slogan" v-model="m.slogan">
 				</div>
 				<div class="form-group">
 				    <label>等位提示</label>
-				    <input type="text" class="form-control" name="queueNotice" required="required" v-model="m.queueNotice">
+				    <input type="text" class="form-control" name="queueNotice" v-model="m.queueNotice">
 				</div>
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />

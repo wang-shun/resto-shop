@@ -22,4 +22,11 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	int selectByCustomerIdNumber(String id);
 	
 	List<String> selectBrandMarketing(Map<String, String> selectMap);
+
+	/**
+	 * 根据 账户ID 查询 分享返利总额 s
+	 * @param accountId
+	 * @return
+     */
+	Integer selectByShareMoney(String accountId);
 }
