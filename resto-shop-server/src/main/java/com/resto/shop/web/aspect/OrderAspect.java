@@ -395,7 +395,7 @@ public class OrderAspect {
     public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting){
         StringBuffer str=new StringBuffer();
         str.append("邀请好友扫一扫,");
-        String jumpurl = "http://"+setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
+        String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my";
         str.append("<a href='"+jumpurl+"'>领取奖励红包</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
