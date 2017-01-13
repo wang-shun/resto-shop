@@ -13,7 +13,7 @@
     <result column="notice_type" property="noticeType" jdbcType="TINYINT"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, title, content, create_date, sort, status, notice_image, notice_type, shop_detail_id</sql>
+  <sql id="Base_Column_List">id, title, content, create_date, sort, status, notice_image, notice_type, shop_detail_id,show_times</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_notice where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -80,4 +80,18 @@
   <update id="addNoticeHistory">
   	insert into tb_customer_notice_history (customer_id,notice_id)values(#{0},#{1})
   </update>
+
+  <delete id="clearSupportTime">
+    delete from tb_notice_support_time where notice_id = #{noticeId}
+  </delete>
+
+  <insert id="insertSupportTime">
+    insert into tb_notice_support_time
+    (notice_id,support_time_id) values(#{noticeId},#{time})
+  </insert>
+
+
+  <select id="getSupportTime" resultType="Integer">
+    select  support_time_id from tb_notice_support_time where notice_id=#{noticeId}
+  </select>
 </mapper>
