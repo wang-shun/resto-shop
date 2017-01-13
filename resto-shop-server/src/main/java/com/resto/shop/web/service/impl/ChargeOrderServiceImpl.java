@@ -266,11 +266,6 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		return map;
 	}
 
-
-
-
-
-
 	public void wxPush(ChargeOrder chargeOrder){
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
 		Customer customer = customerService.selectById(chargeOrder.getCustomerId());

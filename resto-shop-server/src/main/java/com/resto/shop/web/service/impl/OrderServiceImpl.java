@@ -3777,6 +3777,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //查询pos端店铺录入信息
         List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(),begin,end,OfflineOrderSource.OFFLINE_POS);
+
         if(!offLineOrderList.isEmpty()){
             for(OffLineOrder of : offLineOrderList){
                 List<Integer> getTime = getDay(of.getCreateTime());
@@ -3999,10 +4000,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
-        System.out.println("monthNormalCustomer"+monthNormalCustomer);
-        System.out.println("monthShareCustomer"+monthShareCustomer);
-        System.out.println("monthNewCustomer"+monthNewCustomer);
 
         if(!monthNewCustomer.isEmpty()){
             for(String s1 :monthNewCustomer){
@@ -4736,10 +4733,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("customerPayPercent:").append("'").append(todayRestoTotal).append("/").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("newCustomerPercent:").append("'").append(todayNewCutomer.size()).append("/").append((todayBackCustomer.size()+todayNewCutomer.size())).append("'").append(",")
                     //r订单总数/(r订单总数+线下订单总数)
-                    .append("payOnlinePercent:").append("'").append(  todayRestoCount.size()/(todayRestoCount.size()+todayEnterCount)).append("'").append(",")
+                    .append("payOnlinePercent:").append("'").append(todayRestoCount.size()).append("/").append(todayRestoCount.size()+todayEnterCount).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
 
+            System.out.println("toadyEnterCount:"+todayEnterCount);
 
             //发送上旬信息
             StringBuilder firstcontent = new StringBuilder();
@@ -4862,23 +4860,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //多次回头用户
                     .append("lastBackCustomersCount:").append("'").append(lastOfMonthBackTwoMoreCustomer.size()).append("位").append("/").append("￥:").append(lastOfMonthBackTwoMoreCustomerRestoTotal).append("'")
                     .append("}");
+            System.out.println(shopDetail.getIsOpenSms());
+            System.out.println(shopDetail.getnoticeTelephone());
+            System.err.println(1==shopDetail.getIsOpenSms()&&null!=shopDetail.getnoticeTelephone());
 
-            if("1".equals(shopDetail.getIsOpenSms())&&null!=shopDetail.getnoticeTelephone()){
-                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
-                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), firstcontent.toString(), "餐加", "SMS_37030070");//推送上旬信息
-                SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), monthContent.toString(), "餐加", "SMS_37685377");//推本月消息
+
+
+            if(1==shopDetail.getIsOpenSms()&&null!=shopDetail.getnoticeTelephone()){
+                //截取电话号码
+                String[] telephones = shopDetail.getnoticeTelephone().split("，");
+                for(String tel :telephones){
+                    SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                    SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_37030070");//推送上旬信息
+                    SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_37685377");//推本月消息
+                }
 
                 if (xun == 1) {
                     //代表今天是上旬
 
                 } else if (xun == 2) {//代表是中旬
-                    //发送中旬信息
-                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_37065121");
+                    for(String tel:telephones){
+                        //发送中旬信息
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
+                    }
 
                 } else if (xun == 3) {//代表是下旬
-                    //发送中旬和下旬信息
-                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_37065121");
-                    SMSUtils.sendMessage(shopDetail.getnoticeTelephone(), middlecontent.toString(), "餐加", "SMS_36965049");
+                    for(String tel:telephones){
+                        //发送中旬和下旬信息
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_36965049");
+                    }
                 }
              }
 

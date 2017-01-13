@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -452,6 +453,9 @@ public class OrderAspect {
                             BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting, order, shareCustomer, customer);
                             log.info("准备发送返利通知");
                             sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney,order);
+                        } else{
+                            log.info("准备发送返利通知  but品牌没有设置返利  so返利0元");
+                            sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO,order);
                         }
                     }
                 }
@@ -466,8 +470,10 @@ public class OrderAspect {
     private void sendRewardShareMsg(Customer shareCustomer, Customer customer, WechatConfig config,
                                     BrandSetting setting, BigDecimal rewardMoney, Order order) {
         StringBuffer msg = new StringBuffer();
-        rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=account'>")
+        if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
+            rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
                 .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
                 .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
