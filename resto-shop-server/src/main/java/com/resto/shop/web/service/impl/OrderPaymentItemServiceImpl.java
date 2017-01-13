@@ -133,4 +133,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId) {
     	return orderpaymentitemMapper.selectPaymentCountByOrderId(orderId);
     }
+    
+    @Override
+    public OrderPaymentItem selectPayMentSumByrefundOrder(String orderId) {
+    	return null;
+    }
 }

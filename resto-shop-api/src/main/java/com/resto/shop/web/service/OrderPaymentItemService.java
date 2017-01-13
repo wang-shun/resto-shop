@@ -58,4 +58,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map);
     
     public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId);
+    
+    public OrderPaymentItem selectPayMentSumByrefundOrder(String orderId);
 }
