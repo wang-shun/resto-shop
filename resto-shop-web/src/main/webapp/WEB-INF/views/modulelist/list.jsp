@@ -50,7 +50,7 @@
 							btn.click(function(){
 								C.loadForm({
 									url:"modulelist/edit/"+data,
-									width:600
+									width:800
 								});
 							});
 						}
