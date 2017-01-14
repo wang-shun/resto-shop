@@ -1507,17 +1507,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 查询订单菜品
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
 
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+//        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
-            	order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+                orderItem.setArticleName(orderItem.getArticleName() + "(加)");
+                order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
                 if(order.getOrderState() == OrderState.SUBMIT){
                     order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
                 }
 
             }
             orderItems.addAll(child);
-        }
+//        }
 
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
@@ -1663,6 +1664,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 : order.getCustomerCount()));
         articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
                 : order.getMealAllNumber()));
+        List<Order> childList = orderMapper.selectListByParentId(order.getId());
+        for(Order child : childList){
+            articleCount = articleCount.add(BigDecimal.valueOf(child.getArticleCount()));
+            articleCount = articleCount.add(BigDecimal.valueOf(child.getMealAllNumber() == null ? 0 : child.getMealAllNumber()));
+        }
+
         data.put("ARTICLE_COUNT", articleCount);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectPaymentCountByOrderId(order.getId());
@@ -1751,11 +1758,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {
         Date begin = DateUtil.getDateBegin(date);
         Date end = DateUtil.getDateEnd(date);
-        if (shopMode == ShopMode.HOUFU_ORDER) {
+//        if (shopMode == ShopMode.HOUFU_ORDER) {
             return orderMapper.listHoufuFinishedOrder(currentShopId);
-        } else {
-            return orderMapper.selectHistoryOrderList(currentShopId, begin, end, shopMode);
-        }
+//        } else {
+//            return orderMapper.selectHistoryOrderList(currentShopId, begin, end, shopMode);
+//        }
 
     }
 
@@ -1827,6 +1834,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (setting.getAutoPrintTotal().intValue() == 0 && shopDetail.getAutoPrintTotal() == 0 &&
                 (order.getOrderMode() != ShopMode.HOUFU_ORDER || (order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER))) {
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for (OrderItem orderItem : child) {
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+//                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            }
+            child.addAll(items);
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = printTicket(order, items, shop, printer);
                 if (ticket != null) {
@@ -2693,10 +2706,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            }
 //        }
 
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+//        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for(OrderItem item : child){
+                item.setArticleName(item.getArticleName()+"(加)");
+            }
             items.addAll(child);
-        }
+//        }
 
 
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
