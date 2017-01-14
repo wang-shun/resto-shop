@@ -79,7 +79,11 @@
 					data : "pictureUrl",
 					defaultContent:'',
 					createdCell:function(td,tdData){
-						$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+						if(tdData !=null && tdData.substring(0,4)=="http"){
+							$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+						}else{
+							$(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+						}
 					}
 				},                 
 				{                 
