@@ -60,6 +60,13 @@ public class ArticleSellController extends GenericController{
     public void list(){
     }
 	
+	@RequestMapping("/brandList")
+    public void brandList(){
+    }
+	
+	@RequestMapping("/shopList")
+    public void shopList(){
+    }
 	
 	@RequestMapping("/show/{type}")
 	public String showModal(@PathVariable("type")String type,String beginDate,String endDate,String shopId,HttpServletRequest request){
