@@ -45,7 +45,8 @@ public class NoticeController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid Notice notice,HttpServletRequest request){
 		notice.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
-		noticeService.create(notice);
+		Notice no = noticeService.create(notice);
+		noticeService.bindSupportTime(no);
 		return Result.getSuccess();
 	}
 	

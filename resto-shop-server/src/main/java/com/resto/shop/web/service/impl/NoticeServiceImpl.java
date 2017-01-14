@@ -42,10 +42,11 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
     } 
     
     @Override
-    public void create(Notice notice) {
+    public Notice create(Notice notice) {
     	notice.setId(ApplicationUtils.randomUUID());
     	notice.setCreateDate(new Date());
     	insert(notice);
+    	return notice;
     }
 
 	@Override

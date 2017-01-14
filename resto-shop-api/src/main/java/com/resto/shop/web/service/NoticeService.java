@@ -19,7 +19,7 @@ public interface NoticeService extends GenericService<Notice, String> {
 	 * 添加通知
 	 * @param notice
 	 */
-    void create(Notice notice);
+    Notice create(Notice notice);
 
 	void addNoticeHistory(String customerId, String noticeId);
 
