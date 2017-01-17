@@ -178,10 +178,11 @@ public class OrderAspect {
         String jumpUrl = "http://www.baidu.com";
         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
         Map<String, Object> first = new HashMap<String, Object>();
+
         if(order.getParentOrderId() == null){
-            first.put("value", "下单成功！您于"+order.getCreateTime()+"的订单已下厨，请稍候~");
+            first.put("value", "下单成功！您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
         }else{
-            first.put("value", "加菜成功！您于"+order.getCreateTime()+"的订单已下厨，请稍候~");
+            first.put("value", "加菜成功！您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
         }
         first.put("color", "#00DB00");
         Map<String, Object> keyword1 = new HashMap<String, Object>();
