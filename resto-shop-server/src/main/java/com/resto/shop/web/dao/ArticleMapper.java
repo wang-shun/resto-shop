@@ -108,5 +108,5 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	
 	List<Article> selectsingleItem(@Param("shopId") String shopId);
 	
-	List<ArticleSellDto> queryOrderArtcile(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+	List<ArticleSellDto> queryOrderArtcile(@Param("beginDate") String beginDate, @Param("endDate") String endDate,@Param("type") Integer type);
 }

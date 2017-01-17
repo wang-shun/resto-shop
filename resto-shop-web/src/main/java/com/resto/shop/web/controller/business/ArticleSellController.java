@@ -29,6 +29,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.ArticleFamilyService;
+import com.resto.shop.web.service.ArticleService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
 
@@ -54,6 +55,9 @@ public class ArticleSellController extends GenericController{
 	
 	@Resource
 	ArticleFamilyService articleFamilyService;
+	
+	@Resource
+	ArticleService articleService;
 	
 	
 	@RequestMapping("/list")
@@ -90,8 +94,9 @@ public class ArticleSellController extends GenericController{
 
 	@RequestMapping("/queryOrderArtcile")
 	@ResponseBody
-	public Result queryOrderArtcile(String beginDate, String endDate){
-		return getSuccessResult();
+	public Result queryOrderArtcile(String beginDate, String endDate, Integer type){
+		List<ArticleSellDto> articleSellDtos = articleService.queryOrderArtcile(beginDate, endDate, type);
+		return getSuccessResult(articleSellDtos);
 	}
 	
 	@RequestMapping("/list_brand")

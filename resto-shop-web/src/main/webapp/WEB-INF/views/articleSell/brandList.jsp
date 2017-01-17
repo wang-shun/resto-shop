@@ -166,13 +166,14 @@ var vueObj = new Vue({
             var that = this;
             //单品datatable对象
             that.brandArticleUnitTable=$("#brandArticleUnitTable").DataTable({
-                lengthMenu: [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+                lengthMenu: [ [20,50, 75, 100, 150], [20,50, 75, 100, "All"] ],
                 ajax : {
-                    url : "articleSell/brand_id_data",
+                    url : "articleSell/queryOrderArtcile",
                     dataSrc : "data",
                     data:function(d){
                             d.beginDate = that.searchDate.beginDate;
                             d.endDate = that.searchDate.endDate;
+                            d.type = that.currentType;
                             return d;
                     }
                 },
@@ -195,12 +196,18 @@ var vueObj = new Vue({
                     },
                     {
                         title : "销量(份)",
-                        data : "brandSellNum",
+                        data : "brandSellNum"
                     },
                     {
                         title : "销量占比",
                         data : "numRatio",
-                        orderable : false
+                        orderable : false,
+                        createdCell: function (td, tdData, rowData) {
+                        	var brandSellNum = rowData.brandSellNum;
+                        	var brandSellNumAll = rowData.numRatio;
+                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
+                        	$(td).html((numRatio * 100).toFixed(2) + "%");
+                       	}
                     },
                     {
                         title : "销售额(元)",
@@ -210,7 +217,13 @@ var vueObj = new Vue({
                     {
                         title : "销售额占比",
                         data : "salesRatio",
-                        orderable : false
+                        orderable : false,
+                        createdCell: function (td, tdData, rowData) {
+                        	var salles = rowData.salles;
+                        	var sallesAll = rowData.salesRatio;
+                        	var salesRatio = ((salles/sallesAll).toFixed(2));
+                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
+                       	}
                     },
                     {
                         title:"退菜数量" ,
@@ -231,14 +244,14 @@ var vueObj = new Vue({
             });
             //套餐datatable对象
             that.brandArticleFamilyTable=$("#brandArticleFamilyTable").DataTable({
-                lengthMenu: [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+            	lengthMenu: [ [20,50, 75, 100, 150], [20,50, 75, 100, "All"] ],
                 ajax : {
-                    url : "articleSell/brand_id_data",
+                    url : "articleSell/queryOrderArtcile",
                     dataSrc : "data",
                     data:function(d){
                             d.beginDate = that.searchDate.beginDate;
                             d.endDate = that.searchDate.endDate;
-                            d.sort = sort;//默认按销量排序
+                            d.type = that.currentType;
                             return d;
                     }
                 },

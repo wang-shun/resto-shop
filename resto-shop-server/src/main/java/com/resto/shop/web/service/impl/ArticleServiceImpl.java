@@ -449,7 +449,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
     
     @Override
-    public List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate) {
-    	return articleMapper.queryOrderArtcile(beginDate, endDate);
+    public List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate, Integer type) {
+    	return articleMapper.queryOrderArtcile(beginDate, endDate, type);
     }
 }

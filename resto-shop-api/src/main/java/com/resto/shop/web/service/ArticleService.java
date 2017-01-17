@@ -89,5 +89,5 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<Article> selectsingleItem(String shopId);
 	
-	List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate);
+	List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate, Integer type);
 }
