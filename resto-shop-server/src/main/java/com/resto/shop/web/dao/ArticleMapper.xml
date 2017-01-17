@@ -525,7 +525,7 @@
             #{id}
         </foreach>
         LEFT JOIN tb_support_time st on ast.support_time_id = st.id
-        where  a.shop_detail_id =#{shopId}and a.state=1 GROUP BY a.id;
+        where  a.shop_detail_id =#{shopId} and a.state=1 and discount is not null GROUP BY a.id;
     </select>
 
     <!-- 根据是否谷清查询菜品信息 -->

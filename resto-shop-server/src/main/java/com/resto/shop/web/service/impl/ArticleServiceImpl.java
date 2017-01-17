@@ -141,10 +141,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
                 a.setMealAttrs(mealAttrs);
             }
-            //设置菜品的折扣百分比
-            a.setDiscount(articleMap.get(a.getId()).getDiscount());
             if (!articleMap.containsKey(a.getId())) {
                 a.setIsEmpty(true);
+            }else{
+                //设置菜品的折扣百分比
+                a.setDiscount(articleMap.get(a.getId()).getDiscount());
             }
         }
         return articleList;
