@@ -827,6 +827,11 @@ GROUP BY article_id
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 			where toi.article_id = ta.id),0) refundTotal,
 			SUM(ta.likes) likes
+			<if test="type == 2">
+				,(select GROUP_CONCAT(tma.id) 
+				from tb_meal_attr tma 
+				where tma.article_id = ta.id) mealAttrId
+			</if>
 			from tb_article ta
 			left join tb_article_family taf
 			on ta.article_family_id = taf.id

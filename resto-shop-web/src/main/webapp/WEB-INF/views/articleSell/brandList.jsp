@@ -203,10 +203,14 @@ var vueObj = new Vue({
                         data : "numRatio",
                         orderable : false,
                         createdCell: function (td, tdData, rowData) {
-                        	var brandSellNum = rowData.brandSellNum;
-                        	var brandSellNumAll = rowData.numRatio;
-                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
-                        	$(td).html((numRatio * 100).toFixed(2) + "%");
+                        	if(rowData.numRatio != 0){
+	                        	var brandSellNum = rowData.brandSellNum;
+	                        	var brandSellNumAll = rowData.numRatio;
+	                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
+	                        	$(td).html((numRatio * 100).toFixed(2) + "%");
+                        	}else{
+                        		$(td).html("0.00%");
+                        	}
                        	}
                     },
                     {
@@ -219,10 +223,15 @@ var vueObj = new Vue({
                         data : "salesRatio",
                         orderable : false,
                         createdCell: function (td, tdData, rowData) {
-                        	var salles = rowData.salles;
-                        	var sallesAll = rowData.salesRatio;
-                        	var salesRatio = ((salles/sallesAll).toFixed(2));
-                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
+                        	if(rowData.salesRatio != 0){
+	                        	var salles = rowData.salles;
+	                        	var sallesAll = rowData.salesRatio;
+	                        	var salesRatio = ((salles/sallesAll).toFixed(2));
+	                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
+                        	}
+                        	else{
+                        		$(td).html("0.00%");
+                        	}
                        	}
                     },
                     {
@@ -279,7 +288,17 @@ var vueObj = new Vue({
                     {
                         title : "销量占比",
                         data : "numRatio",
-                        orderable : false
+                        orderable : false,
+                        createdCell: function (td, tdData, rowData) {
+                        	if(rowData.numRatio != 0){
+	                        	var brandSellNum = rowData.brandSellNum;
+	                        	var brandSellNumAll = rowData.numRatio;
+	                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
+	                        	$(td).html((numRatio * 100).toFixed(2) + "%");
+                        	}else{
+                        		$(td).html("0.00%");
+                        	}
+                       	}
                     },
                     {
                         title : "销售额(元)",
@@ -289,7 +308,18 @@ var vueObj = new Vue({
                     {
                         title : "销售额占比",
                         data : "salesRatio",
-                        orderable : false
+                        orderable : false,
+                        createdCell: function (td, tdData, rowData) {
+                        	if(rowData.salesRatio != 0){
+	                        	var salles = rowData.salles;
+	                        	var sallesAll = rowData.salesRatio;
+	                        	var salesRatio = ((salles/sallesAll).toFixed(2));
+	                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
+                        	}
+                        	else{
+                        		$(td).html("0.00%");
+                        	}
+                       	}
                     },
                     {
                         title:"退菜数量" ,
