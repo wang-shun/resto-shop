@@ -226,11 +226,11 @@
                         </div>
                     </div>
 
+
                     <div  class="form-group" v-if="m.isOpenSms==1">
                             <label class="col-sm-3 control-label">手机号：</label>
                             <div class="col-sm-8">
-                                <input type="text" placeholder="多个手机号码以逗号隔开" class="form-control" name="noticeTelephone"
-                                       :value="m.noticeTelephone">
+                                <input type="text"  name="noticeTelephone" placeholder="多个手机号码以逗号隔开" class="form-control"  v-model="m.noticeTelephone">
                             </div>
                     </div>
 
