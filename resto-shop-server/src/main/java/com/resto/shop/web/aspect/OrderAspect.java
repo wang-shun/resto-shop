@@ -204,8 +204,13 @@ public class OrderAspect {
         Map<String, Object> keyword5 = new HashMap<String, Object>();
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
         StringBuffer msg = new StringBuffer();
-        for (OrderItem item : orderItem) {
-            msg.append("  \t\t" + item.getArticleName() + "x" + item.getCount() + "\n");
+        for (int i=0; i< orderItem.size(); i++) {
+            OrderItem item = orderItem.get(i);
+            if(i == 0){
+                msg.append(" " + item.getArticleName() + "x" + item.getCount() + "\n");
+            }else{
+                msg.append(" \t\t" + item.getArticleName() + "x" + item.getCount() + "\n");
+            }
         }
         keyword5.put("value", msg.toString());
         keyword5.put("color", "#000000");
