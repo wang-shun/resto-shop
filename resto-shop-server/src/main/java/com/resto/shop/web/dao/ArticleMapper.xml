@@ -769,4 +769,30 @@ GROUP BY article_id
 		and ar.id not in (select article_id from tb_article_unit_new group by article_id)
 		and ar.shop_detail_id = #{shopId}
     </select>
+    
+    <select id="queryOrderArtcile" resultType="com.resto.brand.web.dto.ArticleSellDto">
+    	select
+			ta.id articleId,
+			if(ta.article_type=1,'单品','套餐') typeName,
+			tbf.`name`articleFamilyName,
+			ta.`name` articleName,
+			SUM(toi.count) brandSellNum,
+			SUM(toi.final_price) salles,
+			SUM(toi.refund_count) refundCount,
+			SUM(toi.refund_count * toi.unit_price) refundTotal,
+			SUM(ta.likes) likes
+		from tb_order td
+			inner join tb_order_item toi
+				on td.id = toi.order_id 
+			inner join tb_article ta
+				on ta.id = toi.article_id
+			inner join tb_article_family tbf
+				on ta.article_family_id = tbf.id
+		where td.order_state in (2,10,11,12,13)
+			and td.production_status in (2,3)
+			and ta.article_type = 1
+			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+		group by ta.id,ta.`name`
+    </select>
 </mapper>

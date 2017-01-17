@@ -5,6 +5,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.dao.ArticleMapper;
@@ -445,5 +446,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectsingleItem(String shopId) {
     	return articleMapper.selectsingleItem(shopId);
+    }
+    
+    @Override
+    public List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate) {
+    	return articleMapper.queryOrderArtcile(beginDate, endDate);
     }
 }

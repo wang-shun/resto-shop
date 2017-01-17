@@ -224,7 +224,7 @@ var vueObj = new Vue({
                     },
                     {
                         title:"点赞数量" ,
-                        data:"refundTotal",
+                        data:"likes",
                         orderable : false
                     }
                 ]

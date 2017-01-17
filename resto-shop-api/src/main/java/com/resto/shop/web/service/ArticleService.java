@@ -3,6 +3,7 @@ package com.resto.shop.web.service;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleStock;
@@ -87,4 +88,6 @@ public interface ArticleService extends GenericService<Article, String> {
 	void addArticleLikes(String articleId);
 	
 	List<Article> selectsingleItem(String shopId);
+	
+	List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate);
 }

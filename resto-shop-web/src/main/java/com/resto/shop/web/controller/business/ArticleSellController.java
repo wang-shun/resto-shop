@@ -88,6 +88,12 @@ public class ArticleSellController extends GenericController{
 //	}
 
 
+	@RequestMapping("/queryOrderArtcile")
+	@ResponseBody
+	public Result queryOrderArtcile(String beginDate, String endDate){
+		return getSuccessResult();
+	}
+	
 	@RequestMapping("/list_brand")
 	@ResponseBody
 	public brandArticleReportDto list_brand(String beginDate,String endDate){
