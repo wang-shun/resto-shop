@@ -156,6 +156,7 @@
         SELECT
         o.shop_detail_id,
         sum(oi. pay_value)pay_value,
+        sum(o.original_amount)original_amount,
         oi.payment_mode_id
         FROM
         tb_order_payment_item oi
@@ -166,9 +167,8 @@
         AND o.brand_id=#{brandId}
         AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-         GROUP BY o.shop_detail_id,oi.payment_mode_id
+        GROUP BY o.shop_detail_id,oi.payment_mode_id
     </select>
-
 
 
     <!--(pos端) 店铺收入报表 2016-10-29 -->
