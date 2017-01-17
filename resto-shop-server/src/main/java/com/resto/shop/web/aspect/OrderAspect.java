@@ -209,7 +209,7 @@ public class OrderAspect {
             if(i == 0){
                 msg.append(" " + item.getArticleName() + "x" + item.getCount() + "\n");
             }else{
-                msg.append(" \t\t" + item.getArticleName() + "x" + item.getCount() + "\n");
+                msg.append(" \t \t " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
         }
         keyword5.put("value", msg.toString());
