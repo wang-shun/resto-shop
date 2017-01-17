@@ -38,27 +38,13 @@ public class ShopInfoController extends GenericController{
     * name:yjunay
     * 服务设置
     *
-    */
-/*
-    @RequestMapping("service")
-    @ResponseBody
-    public Result service(){
-        Brand brand = brandService.selectById(getCurrentBrandId());
-        String brandSettingId = brand.getBrandSettingId();
-        BrandSetting brandSetting = brandSettingService.selectById(brandSettingId);
-        return getSuccessResult(brandSetting);
-    }*/
-
-  /***/
+     **/
 
     @RequestMapping("list_one")
     @ResponseBody
     public Result list_one(){
-      /*  Brand brand = brandService.selectById(getCurrentBrandId());
-        String brandSettingId = brand.getBrandSettingId();
-        BrandSetting brandSetting = brandSettingService.selectById(brandSettingId);
-*/
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+
         return getSuccessResult(shopDetail);
     }
 
