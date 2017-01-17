@@ -548,7 +548,7 @@ dt,dd{
 				}
 
 				location.href = "orderReport/shop_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&=" + shopId;
+						+ "&&endDate=" + endDate + "&&shopId=" + shopId;
 
 			})
 </script>

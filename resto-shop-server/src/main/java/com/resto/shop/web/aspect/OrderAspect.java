@@ -98,7 +98,10 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+            if(order.getOrderState() == OrderState.PAYMENT && order.getOrderMode() != ShopMode.HOUFU_ORDER){
+                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+            }
+
             //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
             log.info("当天24小时开启自动退款:" + order.getId());
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
@@ -245,7 +248,9 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
-
+        if(order.getOrderMode() != ShopMode.HOUFU_ORDER){
+            shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+        }
 
 
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
