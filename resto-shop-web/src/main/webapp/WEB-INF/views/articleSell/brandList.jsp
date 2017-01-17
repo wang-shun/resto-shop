@@ -166,7 +166,7 @@ var vueObj = new Vue({
             var that = this;
             //单品datatable对象
             that.brandArticleUnitTable=$("#brandArticleUnitTable").DataTable({
-                lengthMenu: [ [20,50, 75, 100, 150], [20,50, 75, 100, "All"] ],
+                lengthMenu: [ [20,50, 75, 100, -1], [20,50, 75, 100, "All"] ],
                 ajax : {
                     url : "articleSell/queryOrderArtcile",
                     dataSrc : "data",
@@ -253,7 +253,7 @@ var vueObj = new Vue({
             });
             //套餐datatable对象
             that.brandArticleFamilyTable=$("#brandArticleFamilyTable").DataTable({
-            	lengthMenu: [ [20,50, 75, 100, 150], [20,50, 75, 100, "All"] ],
+            	lengthMenu: [ [20,50, 75, 100, -1], [20,50, 75, 100, "All"] ],
                 ajax : {
                     url : "articleSell/queryOrderArtcile",
                     dataSrc : "data",
