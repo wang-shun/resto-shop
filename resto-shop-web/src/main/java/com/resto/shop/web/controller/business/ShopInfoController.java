@@ -54,11 +54,8 @@ public class ShopInfoController extends GenericController{
     @RequestMapping("list_one")
     @ResponseBody
     public Result list_one(){
-      /*  Brand brand = brandService.selectById(getCurrentBrandId());
-        String brandSettingId = brand.getBrandSettingId();
-        BrandSetting brandSetting = brandSettingService.selectById(brandSettingId);
-*/
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+
         return getSuccessResult(shopDetail);
     }
 

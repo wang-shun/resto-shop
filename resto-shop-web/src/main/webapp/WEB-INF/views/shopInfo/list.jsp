@@ -237,22 +237,26 @@
 					<div class="form-group" style="margin-left: 55px;">
 						<div class="control-label" style="text-align: inherit">是否启用服务费</div>
 						<label style="position: relative;left: 195px;bottom: 21px;">
-							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="0" onchange="hideServicePrice()">
+							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="0">
 							否
 						</label>
 						<label style="position: relative;left: 105px;bottom: 21px;">
-							<input type="radio" name="isUseServicePrices" onchange="showServicePrice()" v-model="m.isUseServicePrice" value="1">
+							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="1">
 							是
 						</label>
 					</div>
-					<div class="form-group" id="serviceDivOne" style="display:none">
-						<label >名称</label>
+					<div v-if="m.isUseServicePrices==1">
+					<div v-if="showp" >
+					<div class="form-group" id="serviceDivOne"  >
+						<label>名称</label>
 						<input type="test" class="form-control" name="serviceNames" v-if="!m.serviceNames" value="服务费" required="required">
-						<input type="test" class="form-control" name="serviceNames" v-if="m.serviceNames" v-model="m.serviceName" required="required">
+						<input type="test" class="form-control" name="serviceNames" v-if="m.serviceNames" v-model="m.serviceNames" required="required">
 					</div>
-					<div class="form-group" id="serviceDivTwo" style="display: none">
-						<label>服务费/每人</label>
-						<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required">
+						<div class="form-group" id="serviceDivTwo">
+							<label>服务费/每人</label>
+							<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required">
+						</div>
+					   </div>
 					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
@@ -265,27 +269,10 @@
 </div>
 
 <script>
-	function showServicePrice(){
-		$('#serviceDivOne').show();
-		$('#serviceDivTwo').show();
-	}
-
-	function hideServicePrice(){
-		$('#serviceDivOne').hide();
-		$('#serviceDivTwo').hide();
-	}
 	$.ajax({
 		url:"shopInfo/list_one",
 		success:function(result){
-			if(result.data.isUseServicePrices == 1){
-				$('#serviceDivOne').show();
-				$('#serviceDivTwo').show();
-			}else{
-				$('#serviceDivOne').hide();
-				$('#serviceDivTwo').hide();
-			}
 			$(document).ready(function() {
-				//initcontent();
 				toastr.options = {
 					"closeButton" : true,
 					"debug" : false,
@@ -307,12 +294,22 @@
 					data : {
 						m : result.data,
 						showa:true,
-						showlate:true
+						showlate:true,
+						showp:true
 					},
 					watch: {
-						'm.consumeConfineUnit': 'hideShowa'
+						'm.consumeConfineUnit': 'hideShowa',
+						'm.isUseServicePrices':'hideServiceP'
 					},
 					methods : {
+						hideServiceP  :function (){
+							console.log(result.data.isUseServicePrices)
+						if(result.data.isUseServicePrices ==0){
+							this.showp = false;
+						}else{
+							this.showp = true;
+						}
+							},
 						hideShowa : function(){
 							if(this.m.consumeConfineUnit == 3){
 								this.showa = false;
@@ -335,6 +332,7 @@
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
 								success : function(result) {
+									console.log(result+"----");
 									if (result.success) {
 										toastr.clear();
 										toastr.success("保存成功！");
@@ -367,9 +365,9 @@
 					$.ajax({
 						url:"shopInfo/list_one",
 						success:function(result){
-							console.log(result.data);
 							vueObj.m=result.data;
-							if(result.data.isUseServicePrice == 1){
+							console.log(m.isUseServicePrices);
+							if(result.data.isUseServicePrices == 1){
 								$('#serviceDivOne').show();
 								$('#serviceDivTwo').show();
 							}else{
@@ -379,6 +377,7 @@
 						}
 					})
 				}*/
+
 			}());
 		}
 
