@@ -180,9 +180,9 @@ public class OrderAspect {
         Map<String, Object> first = new HashMap<String, Object>();
 
         if(order.getParentOrderId() == null){
-            first.put("value", "下单成功！您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
+            first.put("value", "下单成功！\n您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
         }else{
-            first.put("value", "加菜成功！您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
+            first.put("value", "加菜成功！\n您于"+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd hh:mm:ss")+"的订单已下厨，请稍候~");
         }
         first.put("color", "#00DB00");
         Map<String, Object> keyword1 = new HashMap<String, Object>();
@@ -205,7 +205,7 @@ public class OrderAspect {
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
         StringBuffer msg = new StringBuffer();
         for (OrderItem item : orderItem) {
-            msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+            msg.append("  \t\t" + item.getArticleName() + "x" + item.getCount() + "\n");
         }
         keyword5.put("value", msg.toString());
         keyword5.put("color", "#000000");
