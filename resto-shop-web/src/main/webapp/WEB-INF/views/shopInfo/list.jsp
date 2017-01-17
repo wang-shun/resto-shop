@@ -234,7 +234,26 @@
                             </div>
                     </div>
 
-
+					<div class="form-group" style="margin-left: 55px;">
+						<div class="control-label" style="text-align: inherit">是否启用服务费</div>
+						<label style="position: relative;left: 195px;bottom: 21px;">
+							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="0" onchange="hideServicePrice()">
+							否
+						</label>
+						<label style="position: relative;left: 105px;bottom: 21px;">
+							<input type="radio" name="isUseServicePrices" onchange="showServicePrice()" v-model="m.isUseServicePrice" value="1">
+							是
+						</label>
+					</div>
+					<div class="form-group" id="serviceDivOne" style="display:none">
+						<label >名称</label>
+						<input type="test" class="form-control" name="serviceNames" v-if="!m.serviceNames" value="服务费" required="required">
+						<input type="test" class="form-control" name="serviceNames" v-if="m.serviceNames" v-model="m.serviceName" required="required">
+					</div>
+					<div class="form-group" id="serviceDivTwo" style="display: none">
+						<label>服务费/每人</label>
+						<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required">
+					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
@@ -246,10 +265,27 @@
 </div>
 
 <script>
+	function showServicePrice(){
+		$('#serviceDivOne').show();
+		$('#serviceDivTwo').show();
+	}
+
+	function hideServicePrice(){
+		$('#serviceDivOne').hide();
+		$('#serviceDivTwo').hide();
+	}
 	$.ajax({
 		url:"shopInfo/list_one",
 		success:function(result){
+			if(result.data.isUseServicePrices == 1){
+				$('#serviceDivOne').show();
+				$('#serviceDivTwo').show();
+			}else{
+				$('#serviceDivOne').hide();
+				$('#serviceDivTwo').hide();
+			}
 			$(document).ready(function() {
+				//initcontent();
 				toastr.options = {
 					"closeButton" : true,
 					"debug" : false,
@@ -264,6 +300,7 @@
 					"showMethod" : "fadeIn",
 					"hideMethod" : "fadeOut"
 				}
+
 				var temp;
 				var vueObj = new Vue({
 					el : "#control",
@@ -326,7 +363,22 @@
 						}
 					}
 				});
-
+				/*function initcontent(){
+					$.ajax({
+						url:"shopInfo/list_one",
+						success:function(result){
+							console.log(result.data);
+							vueObj.m=result.data;
+							if(result.data.isUseServicePrice == 1){
+								$('#serviceDivOne').show();
+								$('#serviceDivTwo').show();
+							}else{
+								$('#serviceDivOne').hide();
+								$('#serviceDivTwo').hide();
+							}
+						}
+					})
+				}*/
 			}());
 		}
 

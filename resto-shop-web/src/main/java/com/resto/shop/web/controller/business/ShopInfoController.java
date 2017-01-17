@@ -1,7 +1,11 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.stereotype.Controller;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServlet;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -20,16 +25,39 @@ import java.util.List;
 public class ShopInfoController extends GenericController{
     @Resource
     ShopDetailService shopDetailService;
+    @Resource
+    BrandService brandService;
+    @Resource
+    BrandSettingService brandSettingService;
 
     @RequestMapping("/list")
     public void list(){
 
     }
+   /***
+    * name:yjunay
+    * 服务设置
+    *
+    */
+/*
+    @RequestMapping("service")
+    @ResponseBody
+    public Result service(){
+        Brand brand = brandService.selectById(getCurrentBrandId());
+        String brandSettingId = brand.getBrandSettingId();
+        BrandSetting brandSetting = brandSettingService.selectById(brandSettingId);
+        return getSuccessResult(brandSetting);
+    }*/
 
+  /***/
 
     @RequestMapping("list_one")
     @ResponseBody
     public Result list_one(){
+      /*  Brand brand = brandService.selectById(getCurrentBrandId());
+        String brandSettingId = brand.getBrandSettingId();
+        BrandSetting brandSetting = brandSettingService.selectById(brandSettingId);
+*/
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
         return getSuccessResult(shopDetail);
     }

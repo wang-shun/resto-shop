@@ -27,7 +27,17 @@ public class OrderPaymentItem {
     private  BigDecimal factIncome;
 
     //新增用来关联店铺id
+    private BigDecimal originalAmount;
+
     private  String shopDetailId;
+
+    public BigDecimal getOriginalAmount() {
+        return originalAmount;
+    }
+
+    public void setOriginalAmount(BigDecimal originalAmount) {
+        this.originalAmount = originalAmount;
+    }
 
     public String getShopDetailId() {
         return shopDetailId;
