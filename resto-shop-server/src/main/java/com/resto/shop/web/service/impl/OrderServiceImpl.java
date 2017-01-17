@@ -670,7 +670,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
         parent.setCountWithChild(articleCountWithChildren);
-        parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+        if(amountWithChildren == parent.getOrderMoney().doubleValue()){
+            parent.setAmountWithChildren(new BigDecimal(0.0));
+        }else{
+            parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+        }
+
         update(parent);
     }
 
@@ -5667,6 +5672,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         update(o);
+
     }
 
     @Override
