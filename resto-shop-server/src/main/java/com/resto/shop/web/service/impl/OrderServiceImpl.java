@@ -1570,7 +1570,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
         if (order.getDistributionModeId() == 1) {
-        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0 
+        			&& StringUtils.isBlank(order.getParentOrderId())){
 	            Map<String, Object> item = new HashMap<>();
 	            item.put("SUBTOTAL", brandSetting.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
 	            item.put("ARTICLE_NAME", brandSetting.getServiceName());
@@ -3053,10 +3054,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 BigDecimal nowCustomerCount = new BigDecimal(orderAll.getCustomerCount() == null ? 0 : orderAll.getCustomerCount());
                 BigDecimal oldCustomerCount = new BigDecimal(orderAll.getBaseCustomerCount() == null ? 0 : orderAll.getBaseCustomerCount());
                 if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
-                    nowService = nowService.add(nowCustomerCount);
-                    oldService = oldService.add(oldCustomerCount);
-                    serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
-                }else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
+                	if(StringUtils.isBlank(orderAll.getParentOrderId())){
+                		serviceMap.put(orderAll.getId(), 0);
+                	}else{
+	                    nowService = nowService.add(nowCustomerCount);
+	                    oldService = oldService.add(oldCustomerCount);
+	                    serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
+                	}
+            	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
                     BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
                     BigDecimal oldMealAllNumber = new BigDecimal(orderAll.getBaseMealAllCount() == null ? 0 : orderAll.getBaseMealAllCount());
                     nowMeal = nowMeal.add(nowMealAllNumber);
@@ -5903,7 +5908,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0 
+    			&& StringUtils.isBlank(order.getParentOrderId())){
         	Map<String, Object> refundItem = new HashMap<>();
         	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
         	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
