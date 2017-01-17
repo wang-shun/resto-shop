@@ -3630,7 +3630,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月新增自然用户个数
         Set<String> monthNormalCustomer = new HashSet<>();
 
-
         //本日新增分享用户个数
         Set<String> todayShareNewCutomer = new HashSet<>();
         //上旬新增分享用户个数
@@ -3702,8 +3701,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月r订单总额
         BigDecimal monthRestoTotal = BigDecimal.ZERO;
 
-
-
         //本日线下订单总额
         BigDecimal todayEnterTotal = BigDecimal.ZERO;
         //上旬线下订单总额
@@ -3748,7 +3745,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月新增分享用户的订单总额
         BigDecimal monthNewNormalCustomerRestoTotal = BigDecimal.ZERO;
 
-
         //本日新增自然用户的订单总额
         BigDecimal todayNewShareCustomerRestoTotal = BigDecimal.ZERO;
         //上旬新增自然用户的订单总额
@@ -3771,7 +3767,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 5.本月回头用户的订单总额
         BigDecimal monthBackCustomerRestoTotal = BigDecimal.ZERO;
 
-
         //1.本日二次回头用户的订单总额
         BigDecimal todayBackTwoCustomerRestoTotal = BigDecimal.ZERO;
         //2.上旬二次回头用户的订单总额
@@ -3793,7 +3788,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal lastOfMonthBackTwoMoreCustomerRestoTotal = BigDecimal.ZERO;
         // 5.本月多次次回头用户的订单总额
         BigDecimal monthBackTwoMoreCustomerRestoTotal = BigDecimal.ZERO;
-
 
         //本日resto订单总数
         Set<String> todayRestoCount = new HashSet<>();
@@ -3849,7 +3843,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
 
         //查询历史订单和人 目前是以店铺为基础 也就是 指用户在另一个店铺就餐，在当前店铺还是算第一次用户
         List<Order> orderHistoryList = orderMapper.selectOrderHistoryList(shopDetail.getId(), DateUtil.getDateEnd(new Date()));
@@ -3938,7 +3931,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
         //上旬---
         if(!customerInFirstOfMonth.isEmpty()){
             for (String s1 : customerInFirstOfMonth) {  //上旬有 但是上旬之前没有的
@@ -3956,8 +3948,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
-
         if(!firstOfMonthNewCustomer.isEmpty()){
             for(String s1 :firstOfMonthNewCustomer){
                 if(!firstOfMonthShareCustomer.contains(s1)){
@@ -3965,8 +3955,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
-
 
         //中旬---
         if(!customerInMiddleOfMonth.isEmpty()){
@@ -3977,8 +3965,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
-
         if(!customerShareInMiddleOfMonth.isEmpty()){
             for (String s1 : customerShareInMiddleOfMonth) {//中旬有且是分享注册 但是中旬之前没有
                 if (!customerBeforeMiddleOfMonth.contains(s1)) {
@@ -3986,8 +3972,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
-
 
         if(!middleOfMonthNewCustomer.isEmpty()){
             for(String s1 :middleOfMonthNewCustomer){
@@ -3997,7 +3981,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
         if(!customerInLastOfMonth.isEmpty()){
             //下旬---
             for (String s1 : customerInLastOfMonth) {  //下旬有 但是下旬之前没有的
@@ -4005,7 +3988,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     lastOfMonthNewCustomer.add(s1);
                 }
             }
-
         }
 
         for (String s1 : customerShareInLastOfMonth) {//下旬有且是分享注册 但是下旬之前没有
@@ -4021,8 +4003,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
-
 
         //本月---
 
@@ -4410,7 +4390,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 //上旬end -------------------
 
-
                 //中旬begin------------------
                 if(getDay(o.getCreateTime()).contains(6)){
                     //1.resto订单总额
@@ -4667,8 +4646,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
 
                 //本月end---------------
-
-
             }
 
             //查询resto充值(微信充值+pos充值)  实收总额 = (微信支付+支付宝+其他支付)+(pos充值+微信充值)
@@ -4697,57 +4674,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-
-            System.out.println("----------------------------本日------------------------------------------");
-            System.err.println("本日所有用户的id");
-            System.err.println(customerInToday);
-            System.err.println("本日所有分享用户的id");
-            System.err.println(customerShareInToday);
-            System.err.println("本日新增用户的id");
-            System.err.println(todayNewCutomer);
-            System.err.println("本日新增自然用户的id");
-            System.err.println(todayNormalNewCustomer);
-            System.err.println("本日新增分享用户的id");
-            System.err.println(todayShareNewCutomer);
-            System.err.println("本日resto的订单总额");
-            System.err.println(todayRestoTotal);
-            System.err.println("本日resto的订单总数");
-            System.err.println(todayRestoCount.size());
-            System.err.println("本日resto的实收总数");
-            System.err.println(todayPayRestoTotal);
-            System.err.println("本日resto的评价订单总数");
-            System.err.println(dayAppraiseNum);
-            System.err.println("本日resto的评价订单总分数");
-            System.err.println(dayAppraiseSum);
-            System.err.println("本日新增用户的订单总额");
-            System.err.println(todayNewCustomerRestoTotal);
-            System.err.println("本日新增分享用户的订单总额");
-            System.err.println(todayNewShareCustomerRestoTotal);
-            System.err.println("本日新增自然用户的订单总额");
-            System.err.println(todayNewNormalCustomerRestoTotal);
-
-            System.err.println("上旬多次回头用户"+firstOfMonthBackTwoMoreCustomer);
-
-
-            System.err.println("monthNormalCustomer"+monthNormalCustomer);
-            System.err.println("本月新增分享用户的id");
-            System.err.println("monthShareCustomer"+monthShareCustomer);
-            System.err.println("本月resto的订单总额");
-            System.err.println("monthRestoTotal"+monthRestoTotal);
-            System.err.println("本月resto的订单总数");
-            System.err.println(monthRestoCount.size());
-            System.err.println("本月resto的实收总数");
-            System.err.println(monthPayRestoTotal);
-            System.err.println("本月resto的评价订单总数");
-            System.err.println(monthAppraiseNum);
-            System.err.println("本月resto的评价订单总分数");
-            System.err.println(monthAppraiseSum);
-            System.err.println("本月新增用户的订单总额");
-            System.err.println(monthNewCustomerRestoTotal);
-            System.err.println("本月新增分享用户的订单总额");
-            System.err.println(monthNewShareCustomerRestoTotal);
-            System.err.println("本月新增自然用户的订单总额");
-            System.err.println(monthNewNormalCustomerRestoTotal);
 
             int xun = DateUtil.getEarlyMidLate(new Date());
             //发送本日信息 本月信息 上旬信息
@@ -4936,10 +4862,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
              }
 
             }
-
-
-
-
     }
 
 
