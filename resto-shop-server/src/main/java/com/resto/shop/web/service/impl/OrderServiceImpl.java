@@ -500,7 +500,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.error(order.getWaitId() + "-----------222222222222222");
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
             getNumberService.update(getNumber);
-
         }
 
         payMoney = payMoney.subtract(order.getWaitMoney());
@@ -525,7 +524,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
                 if (payValue.doubleValue() > 0) {
                     payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
-
 //				OrderPaymentItem item = new OrderPaymentItem();
 //				item.setId(ApplicationUtils.randomUUID());
 //				item.setOrderId(orderId);
@@ -543,6 +541,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
+        //如果是余额不满足时，使用现金或者银联支付
+        if(payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3){
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.BANK_CART_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("银联支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            payMoney = BigDecimal.ZERO;
+        }else if(payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4){
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.MONEY_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("现金支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            payMoney = BigDecimal.ZERO;
+        }
+
+
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
         order.setAllowCancel(true); // 订单是否允许取消
@@ -556,12 +578,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
         order.setPrintTimes(0);
 
-
         order.setOrderMode(detail.getShopMode());
         if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
             order.setTableNumber(order.getVerCode());
         }
-
 
 //        if(!order.getOrderMode().equals(ShopMode.HOUFU_ORDER)){
         if (!StringUtils.isEmpty(order.getTableNumber())) {
@@ -590,13 +610,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setCustomerCount(parentOrder.getCustomerCount());
                     }
                 }
-
             }
-
-
-//            }
-
-
         }
         //判断是否是后付款模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
@@ -640,7 +654,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
-
             }
         }
         return jsonResult;
@@ -1557,7 +1570,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
         if (order.getDistributionModeId() == 1) {
-        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+        	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0 
+        			&& StringUtils.isBlank(order.getParentOrderId())){
 	            Map<String, Object> item = new HashMap<>();
 	            item.put("SUBTOTAL", brandSetting.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
 	            item.put("ARTICLE_NAME", brandSetting.getServiceName());
@@ -3040,10 +3054,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 BigDecimal nowCustomerCount = new BigDecimal(orderAll.getCustomerCount() == null ? 0 : orderAll.getCustomerCount());
                 BigDecimal oldCustomerCount = new BigDecimal(orderAll.getBaseCustomerCount() == null ? 0 : orderAll.getBaseCustomerCount());
                 if(orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){
-                    nowService = nowService.add(nowCustomerCount);
-                    oldService = oldService.add(oldCustomerCount);
-                    serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
-                }else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
+                	if(StringUtils.isBlank(orderAll.getParentOrderId())){
+                		serviceMap.put(orderAll.getId(), 0);
+                	}else{
+	                    nowService = nowService.add(nowCustomerCount);
+	                    oldService = oldService.add(oldCustomerCount);
+	                    serviceMap.put(orderAll.getId(), oldCustomerCount.subtract(nowCustomerCount));
+                	}
+            	}else if(orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){
                     BigDecimal nowMealAllNumber = new BigDecimal(orderAll.getMealAllNumber() == null ? 0 : orderAll.getMealAllNumber());
                     BigDecimal oldMealAllNumber = new BigDecimal(orderAll.getBaseMealAllCount() == null ? 0 : orderAll.getBaseMealAllCount());
                     nowMeal = nowMeal.add(nowMealAllNumber);
@@ -5890,7 +5908,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0 
+    			&& StringUtils.isBlank(order.getParentOrderId())){
         	Map<String, Object> refundItem = new HashMap<>();
         	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
         	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
