@@ -1235,7 +1235,7 @@ SELECT
     <select id="selectBrandArticleNum" resultType="integer">
        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
        INNER JOIN tb_article ta ON oi.article_id = ta.id
-        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and oi.type!=3
+        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
