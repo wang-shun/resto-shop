@@ -254,7 +254,7 @@
 					</div>
 						<div class="form-group" id="serviceDivTwo">
 							<label>服务费/每人</label>
-							<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required">
+							<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required" min="0">
 						</div>
 					   </div>
 					</div>
@@ -303,7 +303,6 @@
 					},
 					methods : {
 						hideServiceP  :function (){
-							console.log(result.data.isUseServicePrices)
 						if(result.data.isUseServicePrices ==0){
 							this.showp = false;
 						}else{
@@ -361,22 +360,6 @@
 						}
 					}
 				});
-				/*function initcontent(){
-					$.ajax({
-						url:"shopInfo/list_one",
-						success:function(result){
-							vueObj.m=result.data;
-							console.log(m.isUseServicePrices);
-							if(result.data.isUseServicePrices == 1){
-								$('#serviceDivOne').show();
-								$('#serviceDivTwo').show();
-							}else{
-								$('#serviceDivOne').hide();
-								$('#serviceDivTwo').hide();
-							}
-						}
-					})
-				}*/
 
 			}());
 		}
