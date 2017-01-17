@@ -1810,7 +1810,7 @@ AND
 
     <select id="getOrderAccountHoufu" resultMap="BaseResultMap">
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
-        ifnull(parent_order_id,sum(customer_count)) as customer_count
+        if(parent_order_id is null,sum(customer_count),sum(customer_count) - customer_count) as customer_count
 		from ( select t.id,t.parent_order_id,
 		if(t.amount_with_children = 0,t.order_money,t.amount_with_children) as orderTotal,t.customer_count from tb_order t
 		INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
@@ -1823,7 +1823,7 @@ AND
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
-        ifnull(parent_order_id,sum(customer_count)) as customer_count
+        if(parent_order_id is null,sum(customer_count),sum(customer_count) - customer_count) as customer_count
 		from ( select t.id,t.parent_order_id,
           t.order_money as orderTotal,t.customer_count from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
