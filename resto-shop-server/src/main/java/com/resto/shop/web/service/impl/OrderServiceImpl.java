@@ -5895,7 +5895,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0){
+    	if(order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0 
+    			&& StringUtils.isBlank(order.getParentOrderId())){
         	Map<String, Object> refundItem = new HashMap<>();
         	refundItem.put("SUBTOTAL", -brandSetting.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount()-order.getCustomerCount()))).doubleValue());
         	refundItem.put("ARTICLE_NAME", brandSetting.getServiceName() + "(退)");
