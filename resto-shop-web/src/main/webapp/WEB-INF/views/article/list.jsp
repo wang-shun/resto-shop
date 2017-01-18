@@ -1358,13 +1358,21 @@
                             var that = this;
                             $("#supportTimeRemark").html("");   //清除错误提示
                             this.canSave = true;//还原为可以保存的状态
+                            var deleted = [];//无效的供应时间
                             //判断所选的时间是否有覆盖区间
                             for (var i in that.m.supportTimes) {
                                 var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
+                                if(itemX == null){//如果为空，可能当前供应时间已被删除
+                                    deleted.push(i);
+                                    continue;
+                                }
                                 for (var y in that.m.supportTimes) {
                                     var itemY = getSupportTimesInfo(that.m.supportTimes[y]);
+                                    if(itemY == null){//如果为空，可能当前供应时间已被删除
+                                        continue;
+                                    }
                                     if(i == y){//不和自己做对比
-                                        break;
+                                        continue;
                                     }
                                     if(strFormat(itemX.beginTime)>=strFormat(itemY.beginTime) && strFormat(itemX.beginTime)<=strFormat(itemY.endTime) ){      //X 开始时间    在       Y区间之间
                                         if(itemX.supportWeekBin&itemY.supportWeekBin){//如果两个供应时间，存在时间重叠，并且选中的星期也存在重叠，则不允许保存。
@@ -1385,6 +1393,11 @@
                                         }
                                     }
                                 }
+                            }
+
+                            //删除无效的供应时间
+                            for(var i in deleted){
+                                that.m.supportTimes.splice(deleted[i], 1);
                             }
 
                             //根据ID获取供应时间的信息
