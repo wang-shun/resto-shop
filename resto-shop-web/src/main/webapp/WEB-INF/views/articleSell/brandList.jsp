@@ -286,6 +286,11 @@ var vueObj = new Vue({
                 order: [[ 3, "desc" ]],
                 columns : [
                     {
+                    	title : "菜品Id",
+                    	data : "articleId",
+                    	visible : false
+                    },
+                    {
                         title : "菜品类型",
                         data : "typeName",
                         orderable : false
@@ -362,7 +367,7 @@ var vueObj = new Vue({
                         createdCell: function (td, tdData, rowData) {
                             var button = $("<button class='btn green'>查看详情</button>");
                             button.click(function () {
-                                openModal(tdData);
+                                openModal(tdData,rowData.articleId);
                             })
                             $(td).html(button);
                         }
@@ -467,7 +472,7 @@ function Trim(str)
     return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
 
-function openModal(mealAttrId) {
+function openModal(mealAttrId, articleId) {
     $.ajax({
         url: 'articleSell/showMealAttr',
         data: {

@@ -23,9 +23,11 @@
 	    data:{  
 	    	'customerId':customerId
 	    },  
-	    success:function(data) { 
-	    	if(data != null ){
-	    		dataSource=data.data.coupons;
+	    success:function(result) { 
+	    	if(result.success == true){
+	    		dataSource=[];
+	    	}else{
+	    		dataSource=[];
 	    	}
 	     },  
 	     error : function() { 
