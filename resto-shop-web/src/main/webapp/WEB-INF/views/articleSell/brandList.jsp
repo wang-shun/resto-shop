@@ -342,6 +342,7 @@ var vueObj = new Vue({
                     {
                         title: "套餐属性",
                         data: "mealAttrId",
+                        orderable : false,
                         createdCell: function (td, tdData, rowData) {
                             var button = $("<button class='btn green'>查看详情</button>");
                             button.click(function () {

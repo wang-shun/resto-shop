@@ -773,7 +773,7 @@ GROUP BY article_id
     <select id="queryOrderArtcile" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		select 
 			ta.id articleId,
-			if(ta.article_type=1,'单品','套餐') typeName,
+			if(ta.article_type = 1,'单品','套餐') typeName,
 			IFNULL(taf.`name`,'其他')articleFamilyName,
 			ta.`name` articleName,
 			IFNULL((select SUM(toi.count) from tb_order_item toi 
