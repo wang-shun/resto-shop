@@ -43,6 +43,7 @@
 								<th>品牌名称</th>
 								<th>菜品总销量(份)</th>
 								<th>菜品销售总额(元)</th>
+								<th>折扣总额(元)</th>
 		                        <th>退菜总数(份)</th>
 		                        <th>退菜总额(元)</th>
 							</tr>
@@ -52,6 +53,7 @@
 								<td><strong>{{brandReport.brandName}}</strong></td>
 								<td>{{brandReport.totalNum}}</td>
 								<td>{{brandReport.sellIncome}}</td>
+		                        <td>{{brandReport.discountTotal}}</td>
 		                        <td>{{brandReport.refundCount}}</td>
 		                        <td>{{brandReport.refundTotal}}</td>
 							</tr>
@@ -141,6 +143,7 @@ var vueObj = new Vue({
             brandName : "",
             totalNum : 0,
             sellIncome:0,
+            discountTotal:0,
             refundTotal:0,
             refundCount:0,
         },
@@ -215,8 +218,11 @@ var vueObj = new Vue({
                     },
                     {
                         title : "销售额(元)",
-                        data : "salles",
-                        orderable : false
+                        data : "salles"
+                    },
+                    {
+                        title : "折扣金额(元)",
+                        data : "discountMoney"
                     },
                     {
                         title : "销售额占比",
@@ -236,18 +242,15 @@ var vueObj = new Vue({
                     },
                     {
                         title:"退菜数量" ,
-                        data:"refundCount",
-                        orderable : false
+                        data:"refundCount"
                     },
                     {
                         title:"退菜金额" ,
-                        data:"refundTotal",
-                        orderable : false
+                        data:"refundTotal"
                     },
                     {
                         title:"点赞数量" ,
-                        data:"likes",
-                        orderable : false
+                        data:"likes"
                     }
                 ]
             });
@@ -302,8 +305,11 @@ var vueObj = new Vue({
                     },
                     {
                         title : "销售额(元)",
-                        data : "salles",
-                        orderable : false
+                        data : "salles"
+                    },
+                    {
+                        title : "折扣金额(元)",
+                        data : "discountMoney"
                     },
                     {
                         title : "销售额占比",
@@ -323,18 +329,15 @@ var vueObj = new Vue({
                     },
                     {
                         title:"退菜数量" ,
-                        data:"refundCount",
-                        orderable : false
+                        data:"refundCount"
                     },
                     {
                         title:"退菜金额" ,
-                        data:"refundTotal",
-                        orderable : false
+                        data:"refundTotal"
                     },
                     {
                         title:"点赞数量" ,
-                        data:"refundTotal",
-                        orderable : false
+                        data:"likes"
                     },
                     {
                         title: "套餐属性",
@@ -370,6 +373,7 @@ var vueObj = new Vue({
                         that.brandReport.brandName = result.brandName;
                         that.brandReport.totalNum = result.totalNum;
                         that.brandReport.sellIncome=result.sellIncome;
+                        that.brandReport.discountTotal=result.discountTotal;
                         that.brandReport.refundCount=result.refundCount;
                         that.brandReport.refundTotal=result.refundTotal;
                         if(!isInit){
@@ -384,6 +388,7 @@ var vueObj = new Vue({
                     	that.brandReport.brandName = result.brandName;
                         that.brandReport.totalNum = result.totalNum;
                         that.brandReport.sellIncome=result.sellIncome;
+                        that.brandReport.discountTotal=result.discountTotal;
                         that.brandReport.refundCount=result.refundCount;
                         that.brandReport.refundTotal=result.refundTotal;
                         that.brandArticleFamilyTable.ajax.reload();

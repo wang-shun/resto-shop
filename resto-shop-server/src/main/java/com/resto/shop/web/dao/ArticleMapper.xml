@@ -826,6 +826,14 @@ GROUP BY article_id
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 			where toi.article_id = ta.id),0) refundTotal,
+			IFNULL((select SUM((toi.count * toi.original_price) - toi.final_price) from tb_order_item toi 
+			inner join tb_order td
+			on toi.order_id = td.id
+			and td.order_state in (2,10,11,12)
+			and td.production_status in (2,3)
+			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+			where toi.article_id = ta.id),0) discountMoney,
 			SUM(ta.likes) likes
 			<if test="type == 2">
 				,(select GROUP_CONCAT(tma.id) 

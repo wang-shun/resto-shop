@@ -1289,9 +1289,10 @@ SELECT
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
          SELECT
-	ifnull(sum(oi.final_price),0.00) sellIncome,
+	IFNULL(sum(oi.final_price),0.00) sellIncome,
 	IFNULL(sum(oi.refund_count),0)refundCount,
-	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal
+	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
+	IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
 FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
