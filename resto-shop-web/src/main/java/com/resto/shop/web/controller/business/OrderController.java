@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
 import com.resto.brand.core.entity.DatatablesViewPage;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.model.OrderItem;
@@ -157,18 +158,18 @@ public class OrderController extends GenericController{
 		//获取前台额外传递过来的查询条件
 
 		 //定义过滤条件查询过滤后的记录数sql
-		//String seach="  and  o.create_time||o.order_money||c.telephone||o.service_price  LIKE '%" "%'";
-
-
-
-
-
+		String search;
+		if(!extra_search.equals("")){
+		    search=" and c.telephone  LIKE '%"+extra_search+"%'";
+		}else {
+			search=null;
+		}
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
 
 
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,Integer.parseInt(start),Integer.parseInt(length));
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,Integer.parseInt(start),Integer.parseInt(length),search);
 
 
 		for (Order o : list) {
@@ -285,7 +286,7 @@ public class OrderController extends GenericController{
 			ot.setOrderMoney(o.getOrderMoney());
 			listDto.add(ot);
 		}
-		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0);
+		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0,search);
 		view.setAaData(listDto);
 		view.setiTotalDisplayRecords(la.size());
 		view.setiTotalRecords(la.size());

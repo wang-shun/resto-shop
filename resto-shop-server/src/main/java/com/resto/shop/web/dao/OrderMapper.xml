@@ -1765,6 +1765,10 @@ AND
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
          AND o.production_status IN (2, 3)
+        <if test="search != null">
+            ${search}
+        </if>
+
         <if test="start >-1 and length !=0 ">
             limit  #{start} , #{length}
         </if>
