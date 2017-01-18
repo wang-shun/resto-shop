@@ -146,8 +146,8 @@ public class OrderController extends GenericController{
 	}
 	
 	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
-		//return orderService.selectListByTime(beginDate,endDate,shopId);
 				//查询店铺名称
+		BigDecimal  sum=BigDecimal.ZERO;
 				ShopDetail shop = shopDetailService.selectById(shopId);
 				List<OrderDetailDto> listDto = new ArrayList<>();
 				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
@@ -219,6 +219,7 @@ public class OrderController extends GenericController{
 						}
 					}
 					//订单支付
+
 					if(o.getOrderPaymentItems()!=null){
 						if(!o.getOrderPaymentItems().isEmpty()){
 							for(OrderPaymentItem oi : o.getOrderPaymentItems()){
@@ -235,6 +236,7 @@ public class OrderController extends GenericController{
 										break;
 									case 6:
 										ot.setChargePay(oi.getPayValue());
+										sum=sum.add(oi.getPayValue());
 										break;
 									case 7:
 										ot.setRewardPay(oi.getPayValue());
@@ -248,6 +250,7 @@ public class OrderController extends GenericController{
 							}
 						}
 					}
+
 					if(null!=o.getParentOrderId()){
 					    //该订单是子订单
                         ot.setChildOrder(true);
@@ -265,6 +268,7 @@ public class OrderController extends GenericController{
 					ot.setOrderMoney(o.getOrderMoney());
 					listDto.add(ot);
 				}
+		System.out.println(sum+"--------------------------------------------------------------------------");
 				return listDto;
 	}
 	

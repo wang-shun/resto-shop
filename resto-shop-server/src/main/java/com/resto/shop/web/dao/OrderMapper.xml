@@ -1722,7 +1722,8 @@ AND
         o.order_mode,
         c.telephone,
         a.level,
-        oi.pay_value,
+        IF(oi.pay_value>0,oi.pay_value,0) pay_value,
+
         oi.payment_mode_id
         FROM
         tb_order o
@@ -1731,6 +1732,7 @@ AND
         LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+         AND o.production_status IN (2, 3)
     </select>
 
 

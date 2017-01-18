@@ -61,6 +61,8 @@ public class TotalIncomeController extends GenericController {
     public void list() {
     }
 
+
+
     @RequestMapping("reportIncome")
     @ResponseBody
     public Map<String, Object> selectIncomeReportList(@RequestParam("beginDate") String beginDate,@RequestParam("endDate") String endDate) {
@@ -76,6 +78,7 @@ public class TotalIncomeController extends GenericController {
      */
     private Map<String,Object> getIncomeReportList(String beginDate, String endDate) {
         //从session中获取该品牌的信息
+        System.out.println(getCurrentBrandId()+"-================================");
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
@@ -90,7 +93,7 @@ public class TotalIncomeController extends GenericController {
 
         //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.等位红包支付 7.店铺名字 8 店铺 ID
         //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
-        //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
+        //     BigDecimal chargeAccountIncome==================, BigDecimal chargeGifAccountIncome,  String shopName,
         //     String shopDetailId
         //查询订单支付
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
@@ -162,6 +165,7 @@ public class TotalIncomeController extends GenericController {
                 originalAmount=originalAmount.add(sdto.getOriginalAmount());
             }
         }
+
         BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
         brandIncomeDto.setWechatIncome(wechatIncome);
         brandIncomeDto.setRedIncome(redIncome);
