@@ -152,7 +152,7 @@ public class OrderAspect {
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
         if(order.getOrderMode() == ShopMode.BOSS_ORDER){
-            String url = setting.getWechatWelcomeUrl()+"?orderId=" + order.getId();
+            String url = setting.getWechatWelcomeUrl()+"?orderId=" + order.getId() + "&shopId=" +order.getShopDetailId();
             msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
         }
         try {
