@@ -49,8 +49,8 @@
 	</div>
 	<div class="panel-body">
 		<div style="float: right">
-			<input type="text" id="level1">
-			<input type="button" onclick="search()"  value="查询">
+			<input type="text" id="level1" value="123">
+			<input type="button" id="search" value="查询">
 		</div>
 		<table class="table table-striped table-bordered table-hover"
 			   id="shopOrder">
@@ -321,7 +321,14 @@
 		search(beginDate, endDate,level1);
 	})
 
+	$("#search").click(function() {
+		var beginDate = $("#beginDate2").val();
+		var endDate = $("#endDate2").val();
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
+	})
 	function search(beginDate, endDate,level1) {
+
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,

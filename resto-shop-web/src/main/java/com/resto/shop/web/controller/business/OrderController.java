@@ -143,6 +143,10 @@ public class OrderController extends GenericController{
 	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
 	@ResponseBody
 	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
+		String start = getRequest().getParameter("start");
+		String length = getRequest().getParameter("length");
+		//获取前台额外传递过来的查询条件
+		String ss = getRequest().getParameter("extra_search");
 		return this.listResult(beginDate, endDate, shopId);
 	}
 	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId){
