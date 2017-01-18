@@ -68,14 +68,11 @@ public class OrderAspect {
 
     ;
 
-
-
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrderByEmployee(..))")
     public void createOrderByEmployee() {
     }
 
     ;
-
 
     @AfterReturning(value = "createOrderByEmployee()", returning = "jsonResult")
     public void createOrderByEmployeeAround(JSONResult jsonResult) throws Throwable {
@@ -88,7 +85,6 @@ public class OrderAspect {
             if (!updateStockSuccess) {
                 log.info("库存变更失败:" + order.getId());
             }
-
         }
     }
 
@@ -117,7 +113,6 @@ public class OrderAspect {
             if (!updateStockSuccess) {
                 log.info("库存变更失败:" + order.getId());
             }
-
         }
     }
 
@@ -156,6 +151,10 @@ public class OrderAspect {
             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER){
+            String url = setting.getWechatWelcomeUrl()+"?orderId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
+            msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
+        }
         try {
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
             log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
