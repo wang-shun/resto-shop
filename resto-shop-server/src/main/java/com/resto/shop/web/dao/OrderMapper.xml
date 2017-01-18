@@ -1752,6 +1752,7 @@ AND
         c.telephone,
         a.level,
         IF(oi.pay_value>0,oi.pay_value,0) pay_value,
+
         oi.payment_mode_id
         FROM
         tb_order o
