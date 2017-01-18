@@ -1304,7 +1304,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         for (OrderItem obj : list) {
                             Map<String, Object> child_item = new HashMap<String, Object>();
                             child_item.put("ARTICLE_NAME", obj.getArticleName());
-                            child_item.put("ARTICLE_COUNT", obj.getCount());
+                            if(order.getIsRefund() != null && order.getIsRefund() == Common.YES){
+                                child_item.put("ARTICLE_COUNT", obj.getRefundCount());
+                            }else{
+                                child_item.put("ARTICLE_COUNT", obj.getCount());
+                            }
+
                             items.add(child_item);
                         }
                     }
@@ -5611,12 +5616,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
+
+
+    }
+
+    @Override
+    public void refundItem(Order order) {
+        Order o = getOrderInfo(order.getId());
         int customerCount = 0;
         BigDecimal servicePrice = new BigDecimal(0);
         BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
         for (OrderItem orderItem : order.getOrderItems()) {
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
+                OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
+                if(item.getType() == OrderItemType.SETMEALS){
+                    //如果退了套餐，清空子品
+                    orderitemMapper.refundArticleChild(orderItem.getId());
+                }
+
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                 customerCount = o.getCustomerCount() - orderItem.getCount();
                 servicePrice = setting.getServicePrice().multiply(new BigDecimal(customerCount));
@@ -5624,9 +5642,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
     }
-
 
     @Override
     public boolean checkOrder(Order order) {
@@ -5655,7 +5671,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int mealCount = 0;
         BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
         for (OrderItem item : o.getOrderItems()) {
-            origin = origin.add(item.getOriginalPrice());
+            origin = origin.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount())));
             total = total.add(item.getFinalPrice());
             if (o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES && shopDetail.getIsMealFee() == Common.YES) {
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -5664,11 +5680,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 mealCount += item.getCount() * item.getMealFeeNumber();
                 total = total.add(mealPrice);
             }
-            if (item.getRefundCount() > 0) {
+            if (item.getRefundCount() > 0 && item.getType() != OrderItemType.MEALS_CHILDREN ) {
                 sum += item.getRefundCount();
 
             }
-            base += item.getOrginCount();
+            if(item.getType() != OrderItemType.MEALS_CHILDREN){
+                base += item.getOrginCount();
+            }
+
+
         }
 
         if (o.getServicePrice() == null) {
@@ -5680,6 +5700,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
+        if(o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0){
+            o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
+        }
+        if (o.getParentOrderId() != null) {
+            Order parent = selectById(o.getParentOrderId());
+            parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
+            update(parent);
+        }
         update(o);
 
     }
@@ -5687,9 +5715,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void refundArticleMsg(Order order) {
         Order o = getOrderInfo(order.getId());
-        if (o.getParentOrderId() != null) {
-            updateOrderChild(o.getId());
-        }
+
         Customer customer = customerService.selectById(o.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
@@ -5738,6 +5764,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
+                if(item.getType() == OrderItemType.SETMEALS){
+                    List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
+                    for(OrderItem c : child ){
+                        //                childItem.setArticleName("|__" + childItem.getArticleName());
+                        msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
+                    }
+                }
+
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                 msg.append("\t").append(brandSetting.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
             }
@@ -5827,9 +5861,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("orderItemIds", orderItemIds);
         List<OrderItem> items = orderItemService.selectRefundOrderItem(map);
+        for(OrderItem item : items){
+            if(item.getType() == OrderItemType.SETMEALS){
+                List<OrderItem> list = orderitemMapper.getListBySort(item.getId(), item.getArticleId());
+                item.setChildren(list);
+            }
+        }
+
         //生成打印任务
         List<Map<String, Object>> printTask = new ArrayList<>();
         //得到打印任务
+        order.setIsRefund(Common.YES);
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
@@ -5852,7 +5894,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             refundItems.add(refundItem);
             articleCount = articleCount.add(new BigDecimal(article.getRefundCount()));
             orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
-            if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
+            if (article.getType() != OrderItemType.MEALS_CHILDREN &&  order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
