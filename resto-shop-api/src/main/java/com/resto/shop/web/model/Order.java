@@ -138,6 +138,12 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    //该订单是否使用优惠券
+    private Boolean isCoupon;
+
+    //该订单的优惠券信息
+    private Coupon couponInfo;
+
     private  List<Order> childList; //子订单
 
     //新增微信支付单号
@@ -763,5 +769,19 @@ public class Order implements Serializable{
 		this.aliPayDiscountMoney = aliPayDiscountMoney;
 	}
 
+    public Boolean getIsCoupon() {
+        return isCoupon;
+    }
 
+    public void setIsCoupon(Boolean isCoupon) {
+        isCoupon = isCoupon;
+    }
+
+    public Coupon getCouponInfo() {
+        return couponInfo;
+    }
+
+    public void setCouponInfo(Coupon couponInfo) {
+        this.couponInfo = couponInfo;
+    }
 }
