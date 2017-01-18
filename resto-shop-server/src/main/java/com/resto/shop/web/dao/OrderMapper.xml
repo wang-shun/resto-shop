@@ -234,6 +234,7 @@
 
 
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
+        <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
@@ -1737,6 +1738,7 @@ AND
 
     <select id="selectListByTime" resultMap="selectOrdersMap">
         SELECT
+        convert((@rowNo :=@rowNo +1),signed) as tag ,
         o.id,
         o.brand_id,
         o.parent_order_id,
@@ -1758,10 +1760,12 @@ AND
         tb_order o
         LEFT JOIN tb_customer c ON o.customer_id = c.id
         LEFT JOIN tb_appraise a ON o.id = a.order_id
-        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
+        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id,
+        (SELECT  @rowNo:=0) _rowNo
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
          AND o.production_status IN (2, 3)
+           limit  #{start} , #{length}
     </select>
 
 

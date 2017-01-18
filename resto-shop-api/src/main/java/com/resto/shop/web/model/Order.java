@@ -14,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Order implements Serializable{
+
+    private Integer tag;//不去重
+
     private String id;
 
     private String tableNumber;
@@ -152,6 +155,14 @@ public class Order implements Serializable{
         this.childList = childList;
     }
 
+
+    public Integer getTag() {
+        return tag;
+    }
+
+    public void setTag(Integer tag) {
+        this.tag = tag;
+    }
 
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;

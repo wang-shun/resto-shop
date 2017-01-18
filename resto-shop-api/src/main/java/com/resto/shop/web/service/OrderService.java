@@ -294,7 +294,7 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
 			String sort);
 
-	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
+	public List<Order> selectListByTime(String beginDate, String endDate, String shopId,int start,int length);
 
 	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
 
