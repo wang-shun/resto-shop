@@ -63,11 +63,7 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
     </resultMap>
-
     <!-- 结束 -->
-
-
-
     <!-- 每日短信报表数据 用户数分析 -->
     <resultMap id="selectOrderHistoryListMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id"/>
@@ -90,9 +86,7 @@
             <result column="share_customer" property="shareCustomer"/>
         </association>
         <!-- 评论 -->
-
     </resultMap>
-
 
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -165,6 +159,7 @@
         <result column="meal_all_number" property="mealAllNumber"/>
         <result column="is_pay" property="isPay"/>
         <result column="base_meal_all_count" property="baseMealAllCount"/>
+        <result column="pay_type" property="payType"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="orderPaymentId" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -175,7 +170,6 @@
             <result column="count" property="count"/>
         </collection>
     </resultMap>
-
 
     <resultMap id="selectOrderDetailsMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -232,7 +226,6 @@
         </collection>
     </resultMap>
 
-
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
@@ -263,7 +256,6 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
     </resultMap>
-
 
     <resultMap id="orderPaymentlist" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -321,15 +313,10 @@
 
     <resultMap id="selectOrderTableNumberMap" type="Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
-
         <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
-
         <result column="payment_amount" property="paymentAmount" jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-
-
     </resultMap>
-
 
     <sql id="Base_Column_List">
         id, table_number, customer_count, accounting_time,
@@ -350,7 +337,7 @@
         parent_order_id, allow_continue_order,
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
-        ,is_pay,need_scan, base_meal_all_count
+        ,is_pay,need_scan, base_meal_all_count, pay_type
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -386,7 +373,7 @@
         brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time)
+        last_order_time, pay_type)
         values (#{id,jdbcType=VARCHAR},
         #{tableNumber,jdbcType=VARCHAR},
         #{customerCount,jdbcType=INTEGER},
@@ -415,7 +402,8 @@
         #{brandId,jdbcType=VARCHAR}, #{amountWithChildren,jdbcType=DECIMAL},
         #{parentOrderId,jdbcType=VARCHAR}, #{allowContinueOrder,jdbcType=BIT},
         #{countWithChild,jdbcType=INTEGER},
-        #{lastOrderTime,jdbcType=TIMESTAMP})
+        #{lastOrderTime,jdbcType=TIMESTAMP},
+        #{payType})
     </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order">
         insert into tb_order
@@ -555,6 +543,9 @@
             <if test="mealAllNumber != null">
                 base_meal_all_count,
             </if>
+            <if test="payType != null">
+                pay_type,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -692,6 +683,9 @@
             <if test="mealAllNumber != null">
                 #{mealAllNumber},
             </if>
+            <if test="payType != null">
+                #{payType},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -824,76 +818,51 @@
             <if test="isPay != null">
                 is_pay = #{isPay},
             </if>
+            <if test="payType != null">
+                pay_type = #{payType},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Order">
         update tb_order
         set table_number = #{tableNumber,jdbcType=VARCHAR},
-        customer_count =
-        #{customerCount,jdbcType=INTEGER},
-        accounting_time =
-        #{accountingTime,jdbcType=DATE},
-        order_state =
-        #{orderState,jdbcType=INTEGER},
-        production_status =
-        #{productionStatus,jdbcType=INTEGER},
-        original_amount =
-        #{originalAmount,jdbcType=DECIMAL},
-        reduction_amount =
-        #{reductionAmount,jdbcType=DECIMAL},
-        payment_amount =
-        #{paymentAmount,jdbcType=DECIMAL},
-        order_money =
-        #{orderMoney,jdbcType=DECIMAL},
-        article_count =
-        #{articleCount,jdbcType=INTEGER},
-        serial_number =
-        #{serialNumber,jdbcType=VARCHAR},
-        confirm_time =
-        #{confirmTime,jdbcType=TIMESTAMP},
-        print_times =
-        #{printTimes,jdbcType=INTEGER},
-        allow_cancel =
-        #{allowCancel,jdbcType=BIT},
-        allow_appraise =
-        #{allowAppraise,jdbcType=BIT},
+        customer_count = #{customerCount,jdbcType=INTEGER},
+        accounting_time = #{accountingTime,jdbcType=DATE},
+        order_state = #{orderState,jdbcType=INTEGER},
+        production_status = #{productionStatus,jdbcType=INTEGER},
+        original_amount = #{originalAmount,jdbcType=DECIMAL},
+        reduction_amount = #{reductionAmount,jdbcType=DECIMAL},
+        payment_amount = #{paymentAmount,jdbcType=DECIMAL},
+        order_money = #{orderMoney,jdbcType=DECIMAL},
+        article_count = #{articleCount,jdbcType=INTEGER},
+        serial_number = #{serialNumber,jdbcType=VARCHAR},
+        confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
+        print_times = #{printTimes,jdbcType=INTEGER},
+        allow_cancel = #{allowCancel,jdbcType=BIT},
+        allow_appraise = #{allowAppraise,jdbcType=BIT},
         closed = #{closed,jdbcType=BIT},
-        remark =
-        #{remark,jdbcType=VARCHAR},
-        create_time =
-        #{createTime,jdbcType=TIMESTAMP},
-        operator_id =
-        #{operatorId,jdbcType=VARCHAR},
-        customer_id =
-        #{customerId,jdbcType=VARCHAR},
-        distribution_date =
-        #{distributionDate,jdbcType=DATE},
-        distribution_time_id =
-        #{distributionTimeId,jdbcType=INTEGER},
-        delivery_point_id =
-        #{deliveryPointId,jdbcType=INTEGER},
-        shop_detail_id =
-        #{shopDetailId,jdbcType=VARCHAR},
-        distribution_mode_id =
-        #{distributionModeId,jdbcType=INTEGER},
-        ver_code =
-        #{verCode,jdbcType=VARCHAR},
-        push_order_time =
-        #{pushOrderTime,jdbcType=TIMESTAMP},
-        print_order_time =
-        #{printOrderTime,jdbcType=TIMESTAMP},
-        call_number_time =
-        #{callNumberTime,jdbcType=TIMESTAMP},
-        order_mode =
-        #{orderMode,jdbcType=INTEGER},
+        remark = #{remark,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        operator_id = #{operatorId,jdbcType=VARCHAR},
+        customer_id = #{customerId,jdbcType=VARCHAR},
+        distribution_date = #{distributionDate,jdbcType=DATE},
+        distribution_time_id = #{distributionTimeId,jdbcType=INTEGER},
+        delivery_point_id = #{deliveryPointId,jdbcType=INTEGER},
+        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+        distribution_mode_id = #{distributionModeId,jdbcType=INTEGER},
+        ver_code = #{verCode,jdbcType=VARCHAR},
+        push_order_time = #{pushOrderTime,jdbcType=TIMESTAMP},
+        print_order_time = #{printOrderTime,jdbcType=TIMESTAMP},
+        call_number_time = #{callNumberTime,jdbcType=TIMESTAMP},
+        order_mode = #{orderMode,jdbcType=INTEGER},
         brand_id = #{brandId,jdbcType=VARCHAR},
         amount_with_children = #{amountWithChildren,jdbcType=DECIMAL},
         parent_order_id = #{parentOrderId,jdbcType=VARCHAR},
         allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
         count_with_child = #{countWithChild,jdbcType=INTEGER},
-        last_order_time
-        = #{lastOrderTime,jdbcType=TIMESTAMP}
+        last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
+        pay_type = #{payType}
         where id = #{id,jdbcType=VARCHAR}
     </update>
 

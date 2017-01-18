@@ -107,8 +107,6 @@ public class Order implements Serializable{
 
     private Integer payMode;
 
-
-
     private Long employeeId;
 
     /**
@@ -123,9 +121,7 @@ public class Order implements Serializable{
 
     private Boolean timeOut;
 
-    //
     private String telephone;
-
 
     private BigDecimal payValue;
 
@@ -143,15 +139,6 @@ public class Order implements Serializable{
     private Integer isShare;
 
     private  List<Order> childList; //子订单
-
-    public List<Order> getChildList() {
-        return childList;
-    }
-
-    public void setChildList(List<Order> childList) {
-        this.childList = childList;
-    }
-
 
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
@@ -178,6 +165,24 @@ public class Order implements Serializable{
 
     //是否需要扫码 0不需要 1需要
     private Integer needScan;
+
+    private Integer payType;
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
+    public List<Order> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<Order> childList) {
+        this.childList = childList;
+    }
 
     public Integer getIsPay() {
         return isPay;
