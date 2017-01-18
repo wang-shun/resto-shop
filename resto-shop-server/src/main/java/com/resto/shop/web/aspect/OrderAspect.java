@@ -82,7 +82,6 @@ public class OrderAspect {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
             shopCartService.clearShopCartGeekPos(String.valueOf(order.getEmployeeId()), order.getShopDetailId());
-
             //出单时减少库存
             Boolean updateStockSuccess = false;
             updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
@@ -93,7 +92,6 @@ public class OrderAspect {
         }
     }
 
-
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
@@ -101,20 +99,18 @@ public class OrderAspect {
             if(order.getOrderState() == OrderState.PAYMENT && order.getOrderMode() != ShopMode.HOUFU_ORDER){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-
             //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
             log.info("当天24小时开启自动退款:" + order.getId());
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                 MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
             }
             //自动取消订单，不包含后付款模式
-            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() != ShopMode.HOUFU_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
+            if (order.getOrderState().equals(OrderState.SUBMIT)&&(order.getOrderMode()!=ShopMode.HOUFU_ORDER||order.getOrderMode()!=ShopMode.BOSS_ORDER)) {//未支付和未完全支付的订单，不包括后付款模式
             	long delay = 1000*60*60*2;//两个小时后自动取消订单
                 MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode() != ShopMode.TABLE_MODE) { //坐下点餐模式不发送
+            } else if (order.getOrderState().equals((OrderState.PAYMENT))&&(order.getOrderMode()!=ShopMode.TABLE_MODE||order.getOrderMode()!=ShopMode.BOSS_ORDER)) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
-
             //出单时减少库存
             Boolean updateStockSuccess = false;
             updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
@@ -237,7 +233,8 @@ public class OrderAspect {
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
     public void orderPayAfter(Order order) {
-        if (order != null && order.getOrderState().equals(OrderState.PAYMENT) && ShopMode.TABLE_MODE != order.getOrderMode()) {//坐下点餐模式不发送该消息
+        if (order != null && order.getOrderState().equals(OrderState.PAYMENT) &&
+                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息
             sendPaySuccessMsg(order);
         }
         if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
@@ -248,7 +245,8 @@ public class OrderAspect {
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
-                && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO)) && order.getOrderMode() == ShopMode.TABLE_MODE){
+                && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
+                && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER )){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
@@ -256,13 +254,10 @@ public class OrderAspect {
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
         }
 
-
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
-
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
 //            MQMessageProducer.sendPlaceOrderMessage(order);
@@ -349,15 +344,11 @@ public class OrderAspect {
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
 						MQMessageProducer.sendPlaceOrderMessage(order);
-//
 					}
 				}
-
-
-
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
-                if (order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
+                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
                     log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
                     sendPaySuccessMsg(order);
                 }
@@ -383,7 +374,6 @@ public class OrderAspect {
                             orderService.update(order);
                             MQMessageProducer.sendPlaceOrderMessageAgain(order,6000);
                         }
-
                     }
                 }
                 if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
@@ -404,7 +394,6 @@ public class OrderAspect {
             } else if (ProductionStatus.HAS_CALL == order.getProductionStatus()) {
                 log.info("发送叫号信息");
                 MQMessageProducer.sendPlaceOrderMessage(order);
-
             }
         }
     }
@@ -414,7 +403,6 @@ public class OrderAspect {
     }
 
     ;
-
 
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
@@ -610,7 +598,6 @@ public class OrderAspect {
             if (order.getParentOrderId() != null) {  //子订单
                 orderService.updateOrderChild(order.getId());
             }
-
 //			//拒绝订单后还原库存
 //			Boolean addStockSuccess  = false;
 //			addStockSuccess	= orderService.addStock(orderService.getOrderInfo(order.getId()));
@@ -630,6 +617,4 @@ public class OrderAspect {
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         log.info("发送取餐信息成功:" + result);
     }
-
-
 }
