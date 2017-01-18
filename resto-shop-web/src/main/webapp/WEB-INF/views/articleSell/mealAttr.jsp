@@ -19,14 +19,15 @@
 	var articleId = "${articleId}";
 	var mealAttrId = "${mealAttrId}";
 	$.ajax( {  
-	    url:'member/list_all_shopId',
+	    url:'articleSell/queryArticleMealAttr',
 	    async:false,
 	    data:{  
-	    	'customerId':articleId
+	    	'articleId':articleId,
+	    	'mealAttrId':mealAttrId
 	    },  
 	    success:function(result) { 
 	    	if(result.success == true){
-	    		dataSource=[];
+	    		dataSource=result.data;
 	    	}else{
 	    		dataSource=[];
 	    	}
@@ -42,14 +43,14 @@
 		columns : [
 			{
 				title : "属性类型",
-				data : "isUsed"
+				data : "articleFamilyName"
 			},
 			{
 				title : "属性名称",
-				data : "brandId"
+				data : "articleName"
 			},{
 				title : "销量",
-				data : "couponType"
+				data : "brandSellNum"
 			}
 		]
 	});

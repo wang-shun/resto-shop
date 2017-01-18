@@ -112,6 +112,13 @@ public class ArticleSellController extends GenericController{
 		return "articleSell/mealAttr";
 	}
 	
+	@RequestMapping("/queryArticleMealAttr")
+	@ResponseBody
+	public Result queryArticleMealAttr(String articleId, String mealAttrId){
+		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(articleId);
+		return getSuccessResult(articleSellDtos);
+	}
+	
 	
 	@RequestMapping("/list_shop")
 	@ResponseBody
