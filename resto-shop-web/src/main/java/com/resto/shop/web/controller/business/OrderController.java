@@ -16,11 +16,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.resto.brand.core.entity.DatatablesViewPage;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.model.OrderItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
@@ -136,144 +139,159 @@ public class OrderController extends GenericController{
 		}
 		return "orderReport/shopReport";
 	}
-	
-	
-	@RequestMapping("AllOrder")
+
+
+	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
 	@ResponseBody
-	public List<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
-		
-		return this.listResult(beginDate, endDate, shopId);
+	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String extra_search){
+		String start = getRequest().getParameter("start");
+		String length = getRequest().getParameter("length");
+		//获取前台额外传递过来的查询条件
+		//String ss = getRequest().getParameter("extra_search");
+		return this.listResult(beginDate, endDate, shopId,extra_search);
 	}
-	
-	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
-				//查询店铺名称
-		BigDecimal  sum=BigDecimal.ZERO;
-				ShopDetail shop = shopDetailService.selectById(shopId);
-				List<OrderDetailDto> listDto = new ArrayList<>();
-				List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
-				for (Order o : list) {
-					OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
-					if(o.getCustomer()!=null){
-						//手机号
-						if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
-							ot.setTelephone(o.getCustomer().getTelephone());
-						}
-					}
-					//订单状态
-					if(o.getOrderState()!=null){
-						switch (o.getOrderState()) {
-						case 1:
-							ot.setOrderState("未支付");
-							break;
-						case 2:
-							if(o.getProductionStatus()==0){
-								ot.setOrderState("已付款");
-							}else if(o.getProductionStatus()==2){
-								ot.setOrderState("已消费");
-							}else if(o.getProductionStatus()==5){
-								ot.setOrderState("异常订单");
-							}
-							break;
-						case 9:
-							ot.setOrderState("已取消");
-							break;
-						case 10:
-							if(o.getProductionStatus()==5){
-								ot.setOrderState("异常订单");
-							}else {
-								ot.setOrderState("已消费");
-							}
-							break;
-						case 11:
-							ot.setOrderState("已评价");
-							break;
-						case 12:
-							ot.setOrderState("已分享");
-							break;
-						default:
-							break;
-						}
-					}
-					//订单评价
-					//判断是否为空，不是所有订单都评价
-					
-					if(null!=o.getAppraise()){
-						switch (o.getAppraise().getLevel()) {
-						case 1:
-							ot.setLevel("一星");
-							break;
-						case 2:
-							ot.setLevel("二星");
-							break;
-						case 3:
-							ot.setLevel("三星");
-							break;
-						case 4:
-							ot.setLevel("四星");
-							break;
-						case 5:
-							ot.setLevel("五星");
-							break;
-						default:
-							break;
-						}
-					}
-					//订单支付
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search){
+		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
+		//获取分页控件的信息
+		String start = getRequest().getParameter("start");
+		String length = getRequest().getParameter("length");
+		//获取前台额外传递过来的查询条件
 
-					if(o.getOrderPaymentItems()!=null){
-						if(!o.getOrderPaymentItems().isEmpty()){
-							for(OrderPaymentItem oi : o.getOrderPaymentItems()){
-								if(null!=oi.getPaymentModeId()){
-									switch (oi.getPaymentModeId()) {
-									case 1:
-										ot.setWeChatPay(oi.getPayValue());
-										break;
-									case 2:
-										ot.setAccountPay(oi.getPayValue());
-										break;
-									case 3:
-										ot.setCouponPay(oi.getPayValue());
-										break;
-									case 6:
-										ot.setChargePay(oi.getPayValue());
-										sum=sum.add(oi.getPayValue());
-										break;
-									case 7:
-										ot.setRewardPay(oi.getPayValue());
-										break;
-                                        case 8:
-                                            ot.setWaitRedPay(oi.getPayValue());
-									default:
-										break;
-									}
-								}
-							}
-						}
-					}
+		 //定义过滤条件查询过滤后的记录数sql
+		String search;
+		if(!extra_search.equals("")){
+		    search=" and c.telephone  LIKE '%"+extra_search+"%'";
+		}else {
+			search=null;
+		}
+		//查询店铺名称
+		ShopDetail shop = shopDetailService.selectById(shopId);
+		List<OrderDetailDto> listDto = new ArrayList<>();
 
-					if(null!=o.getParentOrderId()){
-					    //该订单是子订单
-                        ot.setChildOrder(true);
-                    }
-                    ot.setOrderMode(o.getOrderMode());
-					//设置营销撬动率  实际/虚拟
-					BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
-					BigDecimal temp = o.getOrderMoney().subtract(real);
-					String incomPrize = "";
-					if(temp.compareTo(BigDecimal.ZERO)>0){
-						incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
-					}
-					ot.setIncomePrize(incomPrize);
-					//订单金额
-					ot.setOrderMoney(o.getOrderMoney());
-					listDto.add(ot);
+
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,Integer.parseInt(start),Integer.parseInt(length),search);
+
+
+		for (Order o : list) {
+			OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
+			if(o.getCustomer()!=null){
+				//手机号
+				if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
+					ot.setTelephone(o.getCustomer().getTelephone());
 				}
-		System.out.println(sum+"--------------------------------------------------------------------------");
-				return listDto;
+			}
+			//订单状态
+			if(o.getOrderState()!=null){
+				switch (o.getOrderState()) {
+					case 1:
+						ot.setOrderState("未支付");
+						break;
+					case 2:
+						if(o.getProductionStatus()==0){
+							ot.setOrderState("已付款");
+						}else if(o.getProductionStatus()==2){
+							ot.setOrderState("已消费");
+						}else if(o.getProductionStatus()==5){
+							ot.setOrderState("异常订单");
+						}
+						break;
+					case 9:
+						ot.setOrderState("已取消");
+						break;
+					case 10:
+						if(o.getProductionStatus()==5){
+							ot.setOrderState("异常订单");
+						}else {
+							ot.setOrderState("已消费");
+						}
+						break;
+					case 11:
+						ot.setOrderState("已评价");
+						break;
+					case 12:
+						ot.setOrderState("已分享");
+						break;
+					default:
+						break;
+				}
+			}
+			//订单评价
+			//判断是否为空，不是所有订单都评价
+
+			if(null!=o.getAppraise()){
+				switch (o.getAppraise().getLevel()) {
+					case 1:
+						ot.setLevel("一星");
+						break;
+					case 2:
+						ot.setLevel("二星");
+						break;
+					case 3:
+						ot.setLevel("三星");
+						break;
+					case 4:
+						ot.setLevel("四星");
+						break;
+					case 5:
+						ot.setLevel("五星");
+						break;
+					default:
+						break;
+				}
+			}
+			//订单支付
+			if(o.getOrderPaymentItems()!=null){
+				if(!o.getOrderPaymentItems().isEmpty()){
+					for(OrderPaymentItem oi : o.getOrderPaymentItems()){
+						if(null!=oi.getPaymentModeId()){
+							switch (oi.getPaymentModeId()) {
+								case 1:
+									ot.setWeChatPay(oi.getPayValue());
+									break;
+								case 2:
+									ot.setAccountPay(oi.getPayValue());
+									break;
+								case 3:
+									ot.setCouponPay(oi.getPayValue());
+									break;
+								case 6:
+									ot.setChargePay(oi.getPayValue());
+									break;
+								case 7:
+									ot.setRewardPay(oi.getPayValue());
+									break;
+								case 8:
+									ot.setWaitRedPay(oi.getPayValue());
+								default:
+									break;
+							}
+						}
+					}
+				}
+			}
+			if(null!=o.getParentOrderId()){
+				//该订单是子订单
+				ot.setChildOrder(true);
+			}
+			ot.setOrderMode(o.getOrderMode());
+			//设置营销撬动率  实际/虚拟
+			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
+			BigDecimal temp = o.getOrderMoney().subtract(real);
+			String incomPrize = "";
+			if(temp.compareTo(BigDecimal.ZERO)>0){
+				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
+			}
+			ot.setIncomePrize(incomPrize);
+			//订单金额
+			ot.setOrderMoney(o.getOrderMoney());
+			listDto.add(ot);
+		}
+		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0,search);
+		view.setAaData(listDto);
+		view.setiTotalDisplayRecords(la.size());
+		view.setiTotalRecords(la.size());
+		return view;
 	}
-	
-	
-	
 	
 	
 	
@@ -291,7 +309,7 @@ public class OrderController extends GenericController{
 	
 	//下载店铺订单列表
 	
-	@RequestMapping("shop_excel")
+	/*@RequestMapping("shop_excel")
 	@ResponseBody
 	public void reportOrder(String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
@@ -328,7 +346,7 @@ public class OrderController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-
+*/
 	@RequestMapping("/refund")
 	public void refund(String orderId){
 		orderService.cancelOrder(orderId);

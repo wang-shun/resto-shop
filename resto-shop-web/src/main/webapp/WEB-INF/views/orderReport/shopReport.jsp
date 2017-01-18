@@ -2,12 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <style>
-th {
-	width: 30%;
-}
-dt,dd{
-	height: 25px;
-}
+	th {
+		width: 30%;
+	}
+	dt,dd{
+		height: 25px;
+	}
 </style>
 <h2 class="text-center">
 	<strong>订单列表</strong>
@@ -18,21 +18,17 @@ dt,dd{
 		<form class="form-inline">
 			<div class="form-group" style="margin-right: 50px;">
 				<label for="beginDate2">开始时间：</label> <input type="text"
-					class="form-control form_datetime2" id="beginDate2"
-					readonly="readonly">
+															 class="form-control form_datetime2" id="beginDate2"
+															 readonly="readonly">
 			</div>
 			<div class="form-group" style="margin-right: 50px;">
 				<label for="endDate2">结束时间：</label> <input type="text"
-					class="form-control form_datetime2" id="endDate2"
-					readonly="readonly">
+														   class="form-control form_datetime2" id="endDate2"
+														   readonly="readonly">
 			</div>
-
 			<button type="button" class="btn btn-primary" id="today">今日</button>
 
 			<button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
-
-			<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
-
 			<button type="button" class="btn btn-primary" id="week">本周</button>
 			<button type="button" class="btn btn-primary" id="month">本月</button>
 
@@ -52,18 +48,23 @@ dt,dd{
 		<strong>店铺订单列表</strong>
 	</div>
 	<div class="panel-body">
-		<table class="table table-striped table-bordered table-hover"
-			id="shopOrder">
+		<table class="table table-striped table-bordered table-hover" id="shopOrder">
+			<div style="float: right">
+				<input type="text" id="level1">
+				<input type="button" id="search" value="查询">
+			</div>
 		</table>
 	</div>
 </div>
+
+
 
 <div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"
-					id="closeModal2" aria-label="Close">
+						id="closeModal2" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 				<h4 class="modal-title text-center">
@@ -74,13 +75,13 @@ dt,dd{
 				<dl class="dl-horizontal">
 					<dt>店铺名称：</dt>
 					<dd id="shopName"></dd>
-                    <dt>订单编号：</dt>
-                    <dd id="orderId"></dd>
+					<dt>订单编号：</dt>
+					<dd id="orderId"></dd>
 
-                    <div id="addOrderDiv"></div>
+					<div id="addOrderDiv"></div>
 
-                    <dt>微信支付单号：</dt>
-                    <dd id="orderPaymentItem_id"></dd>
+					<dt>微信支付单号：</dt>
+					<dd id="orderPaymentItem_id"></dd>
 					<dt>订单时间：</dt>
 					<dd id="createTime"></dd>
 					<dt>就餐模式：</dt>
@@ -97,22 +98,22 @@ dt,dd{
 					<dd id="content"></dd>
 					<dt>状&nbsp;&nbsp;态：</dt>
 					<dd id="orderState"></dd>
-                    <dt>菜品总价：</dt>
-                    <dd id="articleTotalPrice"></dd>
-                    <dt>服&nbsp;务&nbsp;费：</dt>
-                    <dd id="servicePrice"></dd>
+					<dt>菜品总价：</dt>
+					<dd id="articleTotalPrice"></dd>
+					<dt>服&nbsp;务&nbsp;费：</dt>
+					<dd id="servicePrice"></dd>
 				</dl>
 			</div>
 			<div class="table-scrollable">
 				<table class="table table-condensed table-hover">
 					<thead>
-						<tr>
-							<th>餐品类别</th>
-							<th>餐品名称</th>
-							<th>餐品单价</th>
-							<th>餐品数量</th>
-							<th>小记</th>
-						</tr>
+					<tr>
+						<th>餐品类别</th>
+						<th>餐品名称</th>
+						<th>餐品单价</th>
+						<th>餐品数量</th>
+						<th>小记</th>
+					</tr>
 					</thead>
 					<tbody id="articleList" style="height: 300px;">
 					</tbody>
@@ -122,7 +123,7 @@ dt,dd{
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-block btn-primary" data-dismiss="modal"
-					id="closeModal">关闭</button>
+						id="closeModal">关闭</button>
 			</div>
 		</div>
 	</div>
@@ -146,158 +147,192 @@ dt,dd{
 	var shopId = "${shopId}"
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
+	//var level1 = $('#level1').val();
+	/***************/
+	tb1 = $('#shopOrder').DataTable( {
+		"pagingType": "simple_numbers",//设置分页控件的模式
+		searching: false,//屏蔽datatales的查询框
+		aLengthMenu:[10,20,40,50,100],//设置一页展示10条记录
+		//"bLengthChange": false,//屏蔽tables的一页展示多少条记录的下拉列表
+		"oLanguage": {  //对表格国际化
+			"sLengthMenu": "每页显示 _MENU_条",
+			"sZeroRecords": "没有找到符合条件的数据",
+			 // "sProcessing": "&lt;img src=’/webapp/loa.gif",
+			"sInfo": "当前第 _START_ - _END_ 条　共计 _TOTAL_ 条",
+			"sInfoEmpty": "木有记录",
+			"sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
+			"sSearch": "搜索：",
+			"oPaginate": {
+				"sFirst": "首页",
+				"sPrevious": "前一页",
+				"sNext": "后一页",
+				"sLast": "尾页"
 
-	var tb1 = $("#shopOrder").DataTable({
-		"scrollY": "340px",
-		"autoWidth": false,
-		 "columnDefs": [
-		                { "width": "8%", "targets":0  },
-		                { "width": "8%", "targets":1  },
-		                { "width": "8%", "targets":2  },
-		                { "width": "6%", "targets":3  },
-		                { "width": "6%", "targets":4  },
-		                { "width": "6%", "targets":5  },
-		                { "width": "6%", "targets":6  },
-		                { "width": "8%", "targets":7  },
-		                { "width": "8%", "targets":8  },
-		                { "width": "6%", "targets":9  },
-		                { "width": "6%", "targets":10  },
-		                { "width": "6%", "targets":11  },
-		                { "width": "3%", "targets":12  },
-		              ],
-		"lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
-		ajax : {
+			}
+		},
+		"columnDefs": [
+			{ "width": "8%", "targets":0  },
+			{ "width": "8%", "targets":1  },
+			{ "width": "8%", "targets":2  },
+			{ "width": "6%", "targets":3  },
+			{ "width": "6%", "targets":4  },
+			{ "width": "6%", "targets":5  },
+			{ "width": "6%", "targets":6  },
+			{ "width": "8%", "targets":7  },
+			{ "width": "8%", "targets":8  },
+			{ "width": "6%", "targets":9  },
+			{ "width": "6%", "targets":10  },
+			{ "width": "6%", "targets":11  },
+			{ "width": "3%", "targets":12  },
+		],
+		"processing": true, //打开数据加载时的等待效果
+		"serverSide": true,//打开后台分页
+		"ajax": {
 			url : "orderReport/AllOrder",
-			dataSrc : "",
-			data : function(d) {
+			"dataSrc": "aaData",
+			//type:"get",
+			//"aLengthMenu":[10,15,20],
+			"data": function ( d ) {
+				console.log(d);
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
 				d.shopId = shopId;
-				return d;
+				//添加额外的参数传给服务器
+				d.extra_search = $('#level1').val();
 			}
 		},
-		order: [[2,'desc'],[ 1, 'desc' ]],
-		columns : [ {
+		"columns": [ {
 			title : "店铺",
 			data : "shopName",
 		},
 
-		{
-			title : "下单时间",
-			data : "beginTime",
-			createdCell : function(td, tdData) {
-				$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
-			}
-		}, {
-			title : "手机号",
-			data : "telephone",
-			createdCell:function(td,tdData){
-				if(tdData=="" || tdData==null){
-					$(td).html("<span class='label label-danger'>没有填写</span>");
+			{
+				title : "下单时间",
+				data : "beginTime",
+				createdCell : function(td, tdData) {
+					$(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
 				}
-			}
-		}, {
-			title : "订单金额",
-			data : "orderMoney"
-		}, {
-			title : "微信支付",
-			data : "weChatPay",
-            createdCell:function (td,tdData,row) {
-			    console.log(row);
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
+			}, {
+				title : "手机号",
+				data : "telephone",
+				createdCell:function(td,tdData){
+					if(tdData=="" || tdData==null){
+						$(td).html("<span class='label label-danger'>没有填写</span>");
+					}
+				}
+			}, {
+				title : "订单金额",
+				data : "orderMoney"
+			}, {
+				title : "微信支付",
+				data : "weChatPay",
+				createdCell:function (td,tdData,row) {
+					console.log(row);
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
 
-		}, {
-			title : "红包支付",
-			data : "accountPay",
-            createdCell:function (td,tdData,row) {
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
-		}, {
-			title : "优惠券支付",
-			data : "couponPay",
-            createdCell:function (td,tdData,row) {
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
-		}, {
-			title : "充值金额支付",
-			data : "chargePay",
-            createdCell:function (td,tdData,row) {
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
-		}, {
-			title : "充值赠送金额支付",
-			data : "rewardPay",
-            createdCell:function (td,tdData,row) {
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
-		},{
-                title : "等位支付",
-                data : "waitRedPay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            },
-            {
-			title : "营销撬动率",
-			data : 'incomePrize',
-            createdCell:function (td,tdData,row) {
-                if(row.childOrder==true&&row.orderMode==5){
-                    $(td).html("--")
-                }
-            }
-		}, {
-			title : "评价",
-			data : "level",
-            createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-			title : "订单状态",
-			data : "orderState",
-			createdCell : function(td,tdData){
-				if(tdData == "异常订单"){
-					$(td).html("<span class='label label-danger'>订单异常</span>");
+			}, {
+				title : "红包支付",
+				data : "accountPay",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
 				}
-			}
-		}, {
-			title : "操作",
-			data : "orderId",
-			createdCell : function(td, tdData,rowData) {
-				var button = $("<button class='btn green' @click='showShopReport(shop.shopName,shop.shopDetailId)'>查看详情</button>");
-				button.click(function() {
-					showDetails(tdData);
-				})
-				$(td).html(button);
-			}
-		} ]
-	});
+			}, {
+				title : "优惠券支付",
+				data : "couponPay",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			}, {
+				title : "充值金额支付",
+				data : "chargePay",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			}, {
+				title : "充值赠送金额支付",
+				data : "rewardPay",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			},{
+				title : "等位支付",
+				data : "waitRedPay",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			},
+			{
+				title : "营销撬动率",
+				data : 'incomePrize',
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			}, {
+				title : "评价",
+				data : "level",
+				createdCell:function (td,tdData,row) {
+					if(row.childOrder==true&&row.orderMode==5){
+						$(td).html("--")
+					}
+				}
+			}, {
+				title : "订单状态",
+				data : "orderState",
+				createdCell : function(td,tdData){
+					if(tdData == "异常订单"){
+						$(td).html("<span class='label label-danger'>订单异常</span>");
+					}
+				}
+			}, {
+				title : "操作",
+				data : "orderId",
+				createdCell : function(td, tdData,rowData) {
+					var button = $("<button class='btn green' @click='showShopReport(shop.shopName,shop.shopDetailId)'>查看详情</button>");
+					button.click(function() {
+						showDetails(tdData);
+					})
+					$(td).html(button);
+				}
+			} ]
+
+	} );
 
 	$("#searchInfo2").click(function() {
 		var beginDate = $("#beginDate2").val();
 		var endDate = $("#endDate2").val();
-		search(beginDate, endDate);
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
 	})
 
-	function search(beginDate, endDate) {
+	$("#search").click(function() {
+		var beginDate = $("#beginDate2").val();
+		var endDate = $("#endDate2").val();
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
+	})
+	function search(beginDate, endDate,level1) {
+
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,
-			"shopId" : shopId
+			"shopId" : shopId,
+			"extra_search":level1
+
 		};
 		tb1.ajax.reload();
 		toastr.success("查询成功");
@@ -309,6 +344,13 @@ dt,dd{
 		//modal.find(".modal-body").html("");
 		modal.modal("hide");
 	})
+
+
+
+
+
+
+
 
 	function showDetails(orderId) {
 		$.ajax({
@@ -323,13 +365,13 @@ dt,dd{
 					var data = result.data;
 					console.log(data);
 
-                    if(data.orderMode == 5){
-                        $("#addOrderDiv").html("");//清空上一次的内容
-                        $(data.childList).each(function(index , item){
-                            var str = "<dt>加菜订单编号["+(++index)+"]：</dt> <dd >"+item.id+"</dd>";
-                            $("#addOrderDiv").append(str);
-                        });
-                    }
+					if(data.orderMode == 5){
+						$("#addOrderDiv").html("");//清空上一次的内容
+						$(data.childList).each(function(index , item){
+							var str = "<dt>加菜订单编号["+(++index)+"]：</dt> <dd >"+item.id+"</dd>";
+							$("#addOrderDiv").append(str);
+						});
+					}
 
 
 					$("#shopName").html(data.shopName);
@@ -340,20 +382,20 @@ dt,dd{
 					$("#distributionMode").html(
 							getDistriubtioMode(data.distributionModeId));
 					$("#verCode").html(data.verCode);
-                    var telephone = ""
-                    if (typeof(data.customer) !="undefined") {
-                        telephone = data.customer.telephone;
-                    }
-                    var orderPaymentItem_id="";
-                    if(typeof (data.orderPaymentItem)!="undefined"){
-                        orderPaymentItem_id=data.orderPaymentItem.id;
-                    }
-                    $("#orderPaymentItem_id").html(orderPaymentItem_id);
-                    $("#telephone").html(telephone);
+					var telephone = ""
+					if (typeof(data.customer) !="undefined") {
+						telephone = data.customer.telephone;
+					}
+					var orderPaymentItem_id="";
+					if(typeof (data.orderPaymentItem)!="undefined"){
+						orderPaymentItem_id=data.orderPaymentItem.id;
+					}
+					$("#orderPaymentItem_id").html(orderPaymentItem_id);
+					$("#telephone").html(telephone);
 					$("#orderMoney").html(data.orderMoney + "元");
 // 					if (data.appraise) {
-						$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
-						$("#content").html(data.appraise!=null ? data.appraise.content:null);
+					$("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
+					$("#content").html(data.appraise!=null ? data.appraise.content:null);
 // 					}
 					$("#orderState").html(getState(data.orderState,data.productionStatus));
 					$('#articleList').text("");
@@ -367,33 +409,17 @@ dt,dd{
 								+ obj.unitPrice + "</td><td>" + obj.count
 								+ "</td><td>" + obj.finalPrice + "</td></tr>";
 						$('#articleList').append(article);
-                        articleTotalPrice+=obj.finalPrice;
+						articleTotalPrice+=obj.finalPrice;
 					}
 
 					$("#articleTotalPrice").html(articleTotalPrice+"元");
 					$("#servicePrice").html(data.servicePrice+"元");
 					$("#mealFreePrice").html(data.mealFreePrice+"元");
-					//-----------------------------------------------------------------------
 
-					// 					 var oLogin = $("#orderDetail").html();
-					// 					 console.log(oLogin);
-
-					// 					 $('body').append( oLogin );
-
-					// 					oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-					// 					oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 );
-
-					// 					$(window).on('scroll',function(){
-
-					// 						oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-					// 						oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 + $(window).scrollTop() );
-
-					// 					});
-					//----------------------------------------------------------------					 					
 					$("#orderDetail").modal();
 				}else{
-                    $("#orderState").html("<h1>没有数据</h1>");
-                }
+					$("#orderState").html("<h1>没有数据</h1>");
+				}
 
 			}
 		});
@@ -403,21 +429,21 @@ dt,dd{
 	function getLevel(level) {
 		var levelName = '';
 		switch (level) {
-		case 1:
-			levelName = "一星";
-			break;
-		case 2:
-			levelName = "二星";
-			break;
-		case 3:
-			levelName = "三星";
-			break;
-		case 4:
-			levelName = "四星";
-			break;
-		case 5:
-			levelName = "五星";
-			break;
+			case 1:
+				levelName = "一星";
+				break;
+			case 2:
+				levelName = "二星";
+				break;
+			case 3:
+				levelName = "三星";
+				break;
+			case 4:
+				levelName = "四星";
+				break;
+			case 5:
+				levelName = "五星";
+				break;
 
 		}
 		return levelName;
@@ -426,35 +452,35 @@ dt,dd{
 	function getState(state,productionStatus) {
 		var orderState = '';
 		switch (state) {
-            case 1:
-                orderState = "未支付";
-                break;
-            case 2:
-             if(productionStatus==0){
-                orderState= "已付款";
-             }else if(productionStatus==2){
-                 orderState = "已消费";
-             }else if(productionStatus==5){
-                 orderState = "异常订单";
-             }
-			break;
-		case 9:
-			orderState = "已取消";
-			break;
-		case 10:
-			orderState = "已确认";
-             if(productionStatus==5){
-                 orderState = "异常订单";
-             } else {
-                 orderState = "已消费";
-             }
-			break;
-		case 11:
-			orderState = "已评价";
-			break;
-		case 12:
-			orderState = "已分享";
-			break;
+			case 1:
+				orderState = "未支付";
+				break;
+			case 2:
+				if(productionStatus==0){
+					orderState= "已付款";
+				}else if(productionStatus==2){
+					orderState = "已消费";
+				}else if(productionStatus==5){
+					orderState = "异常订单";
+				}
+				break;
+			case 9:
+				orderState = "已取消";
+				break;
+			case 10:
+				orderState = "已确认";
+				if(productionStatus==5){
+					orderState = "异常订单";
+				} else {
+					orderState = "已消费";
+				}
+				break;
+			case 11:
+				orderState = "已评价";
+				break;
+			case 12:
+				orderState = "已分享";
+				break;
 		}
 		return orderState;
 	}
@@ -462,15 +488,15 @@ dt,dd{
 	function getDistriubtioMode(mode) {
 		var distributionMode = ''
 		switch (mode) {
-		case 1:
-			distributionMode = "堂吃";
-			break;
-		case 2:
-			distributionMode = "自提外卖";
-			break;
-		case 3:
-			distributionMode = "外带";
-			break;
+			case 1:
+				distributionMode = "堂吃";
+				break;
+			case 2:
+				distributionMode = "自提外卖";
+				break;
+			case 3:
+				distributionMode = "外带";
+				break;
 
 		}
 		return distributionMode;
@@ -548,7 +574,7 @@ dt,dd{
 				}
 
 				location.href = "orderReport/shop_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&shopId=" + shopId;
+						+ "&&endDate=" + endDate + "&&=" + shopId;
 
 			})
 </script>
