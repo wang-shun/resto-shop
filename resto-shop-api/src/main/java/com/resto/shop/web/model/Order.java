@@ -139,7 +139,7 @@ public class Order implements Serializable{
     private Integer isShare;
 
     //该订单是否使用优惠券
-    private Boolean isCoupon;
+    private Boolean ifUseCoupon;
 
     //该订单的优惠券信息
     private Coupon couponInfo;
@@ -781,12 +781,12 @@ public class Order implements Serializable{
 		this.aliPayDiscountMoney = aliPayDiscountMoney;
 	}
 
-    public Boolean getIsCoupon() {
-        return isCoupon;
+    public Boolean getIfUseCoupon() {
+        return ifUseCoupon;
     }
 
-    public void setIsCoupon(Boolean isCoupon) {
-        isCoupon = isCoupon;
+    public void setIfUseCoupon(Boolean ifUseCoupon) {
+        this.ifUseCoupon = ifUseCoupon;
     }
 
     public Coupon getCouponInfo() {
