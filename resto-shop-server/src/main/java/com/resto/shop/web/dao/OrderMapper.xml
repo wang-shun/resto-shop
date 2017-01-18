@@ -1751,7 +1751,7 @@ AND
         o.order_mode,
         c.telephone,
         a.level,
-        oi.pay_value,
+        IF(oi.pay_value>0,oi.pay_value,0) pay_value,
         oi.payment_mode_id
         FROM
         tb_order o
