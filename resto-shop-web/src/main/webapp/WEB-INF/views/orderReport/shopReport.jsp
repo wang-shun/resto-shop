@@ -187,11 +187,12 @@
 			{ "width": "3%", "targets":12  },
 		],
 		"processing": true, //打开数据加载时的等待效果
-		//"serverSide": true,//打开后台分页
+		"serverSide": true,//打开后台分页
 		"ajax": {
 			url : "orderReport/AllOrder",
 			"dataSrc": "aaData",
-			type:"get",
+			//type:"get",
+			"aLengthMenu":[10,15,20],
 			"data": function ( d ) {
 				console.log(d);
 				d.beginDate = $("#beginDate2").val();
@@ -409,6 +410,7 @@
 					$("#articleTotalPrice").html(articleTotalPrice+"元");
 					$("#servicePrice").html(data.servicePrice+"元");
 					$("#mealFreePrice").html(data.mealFreePrice+"元");
+
 					$("#orderDetail").modal();
 				}else{
 					$("#orderState").html("<h1>没有数据</h1>");

@@ -151,15 +151,16 @@ public class OrderController extends GenericController{
 		String length = getRequest().getParameter("length");
 		//获取前台额外传递过来的查询条件
 		String extra_search = getRequest().getParameter("extra_search");
+		String sSearch = getRequest().getParameter("search");
+        System.out.println("++++++++++++++++++++++++++"+extra_search+sSearch);
+
 		System.out.println(extra_search);
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
-		int st=Integer.parseInt(start);
-		int len=Integer.parseInt(length);
-		view.setStart(st);
-		view.setLength(len);
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,st,len);
+
+
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,Integer.parseInt(start),Integer.parseInt(length));
 
 
 		for (Order o : list) {
@@ -276,9 +277,9 @@ public class OrderController extends GenericController{
 			ot.setOrderMoney(o.getOrderMoney());
 			listDto.add(ot);
 		}
-
+		view.setStart(Integer.parseInt(start));
+		view.setLength(Integer.parseInt(length));
 		view.setAaData(listDto);
-		System.out.println(list.size());
 		view.setiTotalDisplayRecords(Integer.parseInt(length));
 		view.setiTotalRecords(listDto.size());
 		return view;
