@@ -105,6 +105,12 @@ public class ArticleSellController extends GenericController{
 		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId(),getBrandName());
 	}
 	
+	@RequestMapping("/showMealAttr")
+	public String showMealAttr(HttpServletRequest request, String mealAttrId){
+		request.setAttribute("mealAttrId", mealAttrId);
+		return "articleSell/mealAttr";
+	}
+	
 	
 	@RequestMapping("/list_shop")
 	@ResponseBody

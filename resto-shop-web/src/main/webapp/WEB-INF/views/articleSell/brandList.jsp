@@ -118,6 +118,22 @@
 	    </div>
 	    </div>
 	</div>
+	<div class="modal fade" id="mealAttrModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+                </div>
+
+                <div class="modal-body" id="reportModal1"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
@@ -452,21 +468,20 @@ function Trim(str)
 }
 
 function openModal(mealAttrId) {
-    //更新数据源
-    /* $.ajax({
-        url: 'member/show/billReport',
+    $.ajax({
+        url: 'articleSell/showMealAttr',
         data: {
-            'customerId': customerId
+            'mealAttrId': mealAttrId
         },
         success: function (result) {
-            var modal = $("#endModal");
+            var modal = $("#mealAttrModal");
             modal.find(".modal-body").html(result);
             modal.modal()
         },
         error: function () {
             toastr.error("系统异常请重新刷新");
         }
-    }); */
+    });
 }
 </script>
 
