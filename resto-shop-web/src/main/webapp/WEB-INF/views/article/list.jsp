@@ -1358,10 +1358,12 @@
                             var that = this;
                             $("#supportTimeRemark").html("");   //清除错误提示
                             this.canSave = true;//还原为可以保存的状态
+                            var deleted = [];//无效的供应时间
                             //判断所选的时间是否有覆盖区间
                             for (var i in that.m.supportTimes) {
                                 var itemX = getSupportTimesInfo(that.m.supportTimes[i]);
                                 if(itemX == null){//如果为空，可能当前供应时间已被删除
+                                    deleted.push(i);
                                     continue;
                                 }
                                 for (var y in that.m.supportTimes) {
@@ -1391,6 +1393,11 @@
                                         }
                                     }
                                 }
+                            }
+
+                            //删除无效的供应时间
+                            for(var i in deleted){
+                                that.m.supportTimes.splice(deleted[i], 1);
                             }
 
                             //根据ID获取供应时间的信息
