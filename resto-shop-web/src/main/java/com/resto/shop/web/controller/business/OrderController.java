@@ -22,6 +22,7 @@ import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.model.OrderItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
@@ -139,22 +140,21 @@ public class OrderController extends GenericController{
 	}
 
 
-	@RequestMapping("AllOrder")
+	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
 	@ResponseBody
-	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String extra_search){
-		return this.listResult(beginDate, endDate, shopId, extra_search);
+	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
+		return this.listResult(beginDate, endDate, shopId);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search){
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId){
 		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
 		//获取分页控件的信息
 		String start = getRequest().getParameter("start");
 		String length = getRequest().getParameter("length");
 		//获取前台额外传递过来的查询条件
 		String ss = getRequest().getParameter("extra_search");
-		String sSearch = getRequest().getParameter("search");
         System.out.println("++++++++++++++++++++++++++"+ss);
 
-		System.out.println(extra_search);
+
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
@@ -280,7 +280,7 @@ public class OrderController extends GenericController{
 		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0);
 		view.setAaData(listDto);
 		view.setiTotalDisplayRecords(la.size());
-		//view.setiTotalRecords(38);
+		view.setiTotalRecords(la.size());
 		return view;
 	}
 	
