@@ -50,7 +50,7 @@
 	<div class="panel-body">
 		<div style="float: right">
 			<input type="text" id="level1">
-			<input type="button" onclick="search1()"  value="查询">
+			<input type="button" onclick="search()"  value="查询">
 		</div>
 		<table class="table table-striped table-bordered table-hover"
 			   id="shopOrder">
@@ -192,7 +192,7 @@
 			url : "orderReport/AllOrder",
 			"dataSrc": "aaData",
 			//type:"get",
-			"aLengthMenu":[10,15,20],
+			//"aLengthMenu":[10,15,20],
 			"data": function ( d ) {
 				console.log(d);
 				d.beginDate = $("#beginDate2").val();
@@ -321,7 +321,7 @@
 		search(beginDate, endDate,level1);
 	})
 
-	function search1(beginDate, endDate,level1) {
+	function search(beginDate, endDate,level1) {
 		var data = {
 			"beginDate" : beginDate,
 			"endDate" : endDate,

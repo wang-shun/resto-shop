@@ -141,18 +141,18 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("AllOrder")
 	@ResponseBody
-	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
-		return this.listResult(beginDate, endDate, shopId);
+	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String extra_search){
+		return this.listResult(beginDate, endDate, shopId, extra_search);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId){
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search){
 		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
 		//获取分页控件的信息
 		String start = getRequest().getParameter("start");
 		String length = getRequest().getParameter("length");
 		//获取前台额外传递过来的查询条件
-		String extra_search = getRequest().getParameter("extra_search");
+		String ss = getRequest().getParameter("extra_search");
 		String sSearch = getRequest().getParameter("search");
-        System.out.println("++++++++++++++++++++++++++"+extra_search+sSearch);
+        System.out.println("++++++++++++++++++++++++++"+ss);
 
 		System.out.println(extra_search);
 		//查询店铺名称
@@ -277,11 +277,10 @@ public class OrderController extends GenericController{
 			ot.setOrderMoney(o.getOrderMoney());
 			listDto.add(ot);
 		}
-		view.setStart(Integer.parseInt(start));
-		view.setLength(Integer.parseInt(length));
+		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0);
 		view.setAaData(listDto);
-		view.setiTotalDisplayRecords(Integer.parseInt(length));
-		view.setiTotalRecords(listDto.size());
+		view.setiTotalDisplayRecords(la.size());
+		//view.setiTotalRecords(38);
 		return view;
 	}
 	
