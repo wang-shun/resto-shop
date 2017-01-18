@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
@@ -26,4 +27,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
      * @return
      */
     List<NewCustomCoupon> selectListShopId(String currentShopId);
+    
+    
+    void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,Integer pushDay);
 }
