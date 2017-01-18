@@ -543,4 +543,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectHasPayNoChangeStatus(@Param("shopId") String shopId, @Param("beginDate") Date dateBegin,@Param("endDate") Date dateEnd);
+
+	/**
+	 * 大boss模式下查询新增订单
+	 */
+
+	List<Order> selectOrderByBoss(String shopId);
 }

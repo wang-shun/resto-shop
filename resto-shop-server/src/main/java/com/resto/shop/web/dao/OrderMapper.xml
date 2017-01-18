@@ -950,7 +950,7 @@
     </select>
 
     <select id="listHoufuFinishedOrder" resultType="Order">
-SELECT
+        SELECT
         push_order_time,
         id,
         ver_code,
@@ -1005,6 +1005,38 @@ SELECT
         order by create_time DESC;
 
     </select>
+
+
+    <select id="selectOrderByBoss" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        ver_code,
+        article_count,
+        table_number,
+        parent_order_id,
+        order_money,
+        order_mode,
+        pay_type,
+        amount_with_children,
+        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
+        FROM
+        tb_order
+
+
+        WHERE
+        shop_detail_id=#{shopId}
+        AND
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and((order_state = 2 and pay_type = 0) or (order_state = 1 and pay_type = 1))
+        and production_status = 1
+        and table_number is not null
+        and parent_order_id is null
+        order by create_time DESC;
+
+    </select>
+
 
     <select id="selectErrorOrderList" resultType="Order">
         SELECT
@@ -2381,8 +2413,8 @@ AND o.production_status IN (2, 3)
 
     </select>
 
-<!-- 每日短信报表数据 -->
-<select id="selectListsmsByShopId" resultMap="everdayReport">
+    <!-- 每日短信报表数据 -->
+    <select id="selectListsmsByShopId" resultMap="everdayReport">
     SELECT
 	o.id,
 	o.order_state,
@@ -2460,11 +2492,11 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and  <![CDATA[ o.create_time <= #{endDate} ]]>
         AND  o.order_state in(2,10,11,12) AND  o.production_status not in(2,3)
     </select>
-	<select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
-		select * from tb_order where id in
-		<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
-			#{orderId}
-		</foreach>
-	</select>
+    <select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
+        select * from tb_order where id in
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </select>
 
 </mapper>
