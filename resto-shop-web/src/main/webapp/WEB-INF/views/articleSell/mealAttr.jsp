@@ -16,12 +16,13 @@
  <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
 	var dataSource;
-	var customerId = "asdasd4343";
+	var articleId = "${articleId}";
+	var mealAttrId = "${mealAttrId}";
 	$.ajax( {  
 	    url:'member/list_all_shopId',
 	    async:false,
 	    data:{  
-	    	'customerId':customerId
+	    	'customerId':articleId
 	    },  
 	    success:function(result) { 
 	    	if(result.success == true){

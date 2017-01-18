@@ -476,7 +476,8 @@ function openModal(mealAttrId, articleId) {
     $.ajax({
         url: 'articleSell/showMealAttr',
         data: {
-            'mealAttrId': mealAttrId
+            'mealAttrId': mealAttrId,
+            'articleId': articleId
         },
         success: function (result) {
             var modal = $("#mealAttrModal");

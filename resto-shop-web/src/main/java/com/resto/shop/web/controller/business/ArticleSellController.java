@@ -106,8 +106,9 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	@RequestMapping("/showMealAttr")
-	public String showMealAttr(HttpServletRequest request, String mealAttrId){
+	public String showMealAttr(HttpServletRequest request, String mealAttrId, String articleId){
 		request.setAttribute("mealAttrId", mealAttrId);
+		request.setAttribute("articleId", articleId);
 		return "articleSell/mealAttr";
 	}
 	
