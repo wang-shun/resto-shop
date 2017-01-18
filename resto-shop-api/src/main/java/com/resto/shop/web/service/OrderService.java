@@ -549,4 +549,6 @@ public interface OrderService extends GenericService<Order, String> {
 	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
 	
 	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
+
+	void refundItem(Order order);
 }

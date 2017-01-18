@@ -339,6 +339,24 @@ order by t.print_sort asc
   	<foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
   		#{orderItemId}
   	</foreach>
-  	and type not in (3,4)
+    or parent_id in
+    <foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
+      #{orderItemId}
+    </foreach>
+
   </select>
+
+  <update id="refundArticleChild">
+    update tb_order_item
+    set count = 0,
+    refund_count = 1
+    where parent_id = #{parentId}
+  </update>
+
+
+  <select id="getListByParentId" resultType="OrderItem">
+    select * from tb_order_item
+    where parent_id =  #{parentId}
+  </select>
+
 </mapper>

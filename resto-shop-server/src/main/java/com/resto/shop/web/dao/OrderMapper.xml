@@ -974,7 +974,7 @@ SELECT
         and closed=0 and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
-        order by create_time DESC;
+        order by pay_type desc,create_time DESC
 
     </select>
 

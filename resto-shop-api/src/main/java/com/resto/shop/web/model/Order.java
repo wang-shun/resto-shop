@@ -168,6 +168,18 @@ public class Order implements Serializable{
 
     private Integer payType;
 
+
+    //是否是退菜订单 0 不是 1是
+    private Integer isRefund;
+
+    final public Integer getIsRefund() {
+        return isRefund;
+    }
+
+    final public void setIsRefund(Integer isRefund) {
+        this.isRefund = isRefund;
+    }
+
     public Integer getPayType() {
         return payType;
     }
