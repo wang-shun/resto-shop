@@ -48,12 +48,11 @@
 		<strong>店铺订单列表</strong>
 	</div>
 	<div class="panel-body">
-		<div style="float: right">
-			<input type="text" id="level1" value="123">
-			<input type="button" id="search" value="查询">
-		</div>
-		<table class="table table-striped table-bordered table-hover"
-			   id="shopOrder">
+		<table class="table table-striped table-bordered table-hover" id="shopOrder">
+			<div style="float: right">
+				<input type="text" id="level1">
+				<input type="button" id="search" value="查询">
+			</div>
 		</table>
 	</div>
 </div>
@@ -148,17 +147,17 @@
 	var shopId = "${shopId}"
 	$("#beginDate2").val("${beginDate}");
 	$("#endDate2").val("${endDate}");
-	var level1 = $('#level1').val();
+	//var level1 = $('#level1').val();
 	/***************/
 	tb1 = $('#shopOrder').DataTable( {
 		"pagingType": "simple_numbers",//设置分页控件的模式
 		searching: false,//屏蔽datatales的查询框
-		aLengthMenu:[10],//设置一页展示10条记录
-		"bLengthChange": false,//屏蔽tables的一页展示多少条记录的下拉列表
+		aLengthMenu:[10,20,40,50,100],//设置一页展示10条记录
+		//"bLengthChange": false,//屏蔽tables的一页展示多少条记录的下拉列表
 		"oLanguage": {  //对表格国际化
 			"sLengthMenu": "每页显示 _MENU_条",
 			"sZeroRecords": "没有找到符合条件的数据",
-			//  "sProcessing": "&lt;img src=’./loading.gif’ /&gt;",
+			 // "sProcessing": "&lt;img src=’/webapp/loa.gif",
 			"sInfo": "当前第 _START_ - _END_ 条　共计 _TOTAL_ 条",
 			"sInfoEmpty": "木有记录",
 			"sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
@@ -198,9 +197,8 @@
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
 				d.shopId = shopId;
-
 				//添加额外的参数传给服务器
-				d.extra_search = level1;
+				d.extra_search = $('#level1').val();
 			}
 		},
 		"columns": [ {

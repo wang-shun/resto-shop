@@ -142,21 +142,25 @@ public class OrderController extends GenericController{
 
 	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
 	@ResponseBody
-	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
+	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String extra_search){
 		String start = getRequest().getParameter("start");
 		String length = getRequest().getParameter("length");
 		//获取前台额外传递过来的查询条件
-		String ss = getRequest().getParameter("extra_search");
-		return this.listResult(beginDate, endDate, shopId);
+		//String ss = getRequest().getParameter("extra_search");
+		return this.listResult(beginDate, endDate, shopId,extra_search);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId){
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search){
 		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
 		//获取分页控件的信息
 		String start = getRequest().getParameter("start");
 		String length = getRequest().getParameter("length");
 		//获取前台额外传递过来的查询条件
-		String ss = getRequest().getParameter("extra_search");
-        System.out.println("++++++++++++++++++++++++++"+ss);
+
+		 //定义过滤条件查询过滤后的记录数sql
+		//String seach="  and  o.create_time||o.order_money||c.telephone||o.service_price  LIKE '%" "%'";
+
+
+
 
 
 		//查询店铺名称
