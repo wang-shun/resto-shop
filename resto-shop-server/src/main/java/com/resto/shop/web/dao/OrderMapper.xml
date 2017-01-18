@@ -959,6 +959,7 @@ SELECT
         parent_order_id,
         order_money,
         order_mode,
+        pay_type,
         amount_with_children,
         (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
