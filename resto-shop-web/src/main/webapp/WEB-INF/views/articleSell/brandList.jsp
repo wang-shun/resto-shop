@@ -335,6 +335,17 @@ var vueObj = new Vue({
                         title:"点赞数量" ,
                         data:"refundTotal",
                         orderable : false
+                    },
+                    {
+                        title: "套餐属性",
+                        data: "mealAttrId",
+                        createdCell: function (td, tdData, rowData) {
+                            var button = $("<button class='btn green'>查看详情</button>");
+                            button.click(function () {
+                                openModal(tdData);
+                            })
+                            $(td).html(button);
+                        }
                     }
                 ]
             });
@@ -434,5 +445,22 @@ function Trim(str)
     return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
 
+function openModal(mealAttrId) {
+    //更新数据源
+    /* $.ajax({
+        url: 'member/show/billReport',
+        data: {
+            'customerId': customerId
+        },
+        success: function (result) {
+            var modal = $("#endModal");
+            modal.find(".modal-body").html(result);
+            modal.modal()
+        },
+        error: function () {
+            toastr.error("系统异常请重新刷新");
+        }
+    }); */
+}
 </script>
 
