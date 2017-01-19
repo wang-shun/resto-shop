@@ -157,16 +157,17 @@ public class OrderController extends GenericController{
 
 		 //定义过滤条件查询过滤后的记录数sql
 		String search;
-		if(!extra_search.equals("")||extra_search!=null){
+		if(extra_search!=null){
 		    search=" and c.telephone  LIKE '%"+extra_search+"%'";
 		}else {
 			search=null;
 		}
-		int st=-2;
+		int st=-1;
 		int len=0;
 		if(start!=null||!start.equals("")){
 			 st =Integer.parseInt(start);
 			 len=Integer.parseInt(length);
+
 		}
 
 		//查询店铺名称
@@ -316,7 +317,7 @@ public class OrderController extends GenericController{
 	
 	@RequestMapping("shop_excel")
 	@ResponseBody
-	public void reportOrder(String beginDate,String endDate,String shopId,String start,String length,String extra_search){
+	public void reportOrder(String beginDate,String endDate,String shopId,String start,String length,String extra_search,HttpServletResponse response){
 		//导出文件名
 		String fileName = "店铺订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
@@ -326,9 +327,9 @@ public class OrderController extends GenericController{
 		//获取前台额外传递过来的查询条件
 		//String search = getRequest().getParameter("extra_search");
 		//定义数据
-		if(extra_search.equals("")){
+		/*if(extra_search.equals("")){
 			extra_search=null;
-		}
+		}*/
 
 		DatatablesViewPage<OrderDetailDto> view=this.listResult(beginDate, endDate, shopId,start,length,extra_search);
 		System.out.println(view.getAaData().size());
@@ -352,7 +353,7 @@ public class OrderController extends GenericController{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
-			excelUtil.download(path, getResponse());
+			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
 		}catch(Exception e){
