@@ -100,6 +100,10 @@
 	                        data : "sellIncome"
 	                    },
 	                    {
+	                        title : "折扣总额",
+	                        data : "discountTotal"
+	                    },
+	                    {
 	                        title : "品牌销售占比",
 	                        data : "occupy"
 	                    },

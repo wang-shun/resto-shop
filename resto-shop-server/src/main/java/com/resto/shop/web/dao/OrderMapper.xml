@@ -1276,8 +1276,8 @@ SELECT
         SUM(oi.final_price)sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
-       IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal
-
+       	IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
+		IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
         from tb_order_item oi INNER JOIN tb_order o
         on o.id=oi.order_id WHERE
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
