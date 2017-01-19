@@ -124,6 +124,55 @@ public class ArticleSellController extends GenericController{
 		return getSuccessResult(articleSellDtos);
 	}
 	
+	/**
+	 * 下载品牌菜品销售表(单品)
+	 */
+	public void downloadBrnadUnitArticle(HttpServletRequest request, HttpServletResponse response,
+			String beginDate, String endDate, Integer type){
+		//导出文件名
+		String fileName = "品牌菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
+		//定义读取文件的路径
+		String path = request.getSession().getServletContext().getRealPath(fileName);
+		//定义列
+		String[]columns={};
+		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+		Map<String,String> map = new HashMap<>();
+		Brand brand = brandServie.selectById(getCurrentBrandId());
+		//获取店铺名称
+		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+		String shopName="";
+		for (ShopDetail shopDetail : shops) {
+			shopName += shopDetail.getName()+",";
+		}
+		//去掉最后一个逗号
+		shopName.substring(0, shopName.length()-1);
+		map.put("brandName", brand.getBrandName());
+		map.put("shops", shopName);
+		map.put("beginDate", beginDate);
+		map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
+		map.put("endDate", endDate);
+		map.put("num", "8");//显示的位置
+		map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
+		map.put("timeType", "yyyy-MM-dd");
+		
+		//定义数据
+//		List<ArticleSellDto> result = null; = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
+//		String[][] headers = {{"分类","25"},{"菜名","25"},{"菜品类型","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"},{"退菜数量","25"},{"退菜金额","25"}};
+
+		//定义excel工具类对象
+//		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+//		try{
+//			OutputStream out = new FileOutputStream(path);
+//			excelUtil.ExportExcel(headers, columns, result, out, map);
+//			out.close();
+//			excelUtil.download(path, response);
+//			JOptionPane.showMessageDialog(null, "导出成功！");
+//			log.info("excel导出成功");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	
 	@RequestMapping("/list_shop")
 	@ResponseBody

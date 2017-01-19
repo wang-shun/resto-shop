@@ -33,7 +33,7 @@
 				  	<strong style="margin-right:100px;font-size:22px">
 				  		品牌菜品销售表
 				  	</strong>
-				  	<button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
+				  	<button type="button" class="btn btn-primary" style="float: right;">下载报表</button>
 				  </div>
 				  <div class="panel-body">
 				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" style="width: 100%">
