@@ -143,33 +143,38 @@ public class OrderController extends GenericController{
 
 	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
 	@ResponseBody
-	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String extra_search){
-		String start = getRequest().getParameter("start");
-		String length = getRequest().getParameter("length");
-		//获取前台额外传递过来的查询条件
-		//String ss = getRequest().getParameter("extra_search");
-		return this.listResult(beginDate, endDate, shopId,extra_search);
+	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String start ,String length,String extra_search){
+
+		return this.listResult(beginDate, endDate, shopId,extra_search,start,length);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search){
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search,String start ,String length){
 		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
-		//获取分页控件的信息
+	/*	//获取分页控件的信息
 		String start = getRequest().getParameter("start");
-		String length = getRequest().getParameter("length");
+		String length = getRequest().getParameter("length");*/
+
 		//获取前台额外传递过来的查询条件
 
 		 //定义过滤条件查询过滤后的记录数sql
 		String search;
-		if(!extra_search.equals("")){
+		if(!extra_search.equals("")||extra_search!=null){
 		    search=" and c.telephone  LIKE '%"+extra_search+"%'";
 		}else {
 			search=null;
 		}
+		int st=-1;
+		int len=0;
+		if(start!=null||!start.equals("")){
+			 st =Integer.parseInt(start);
+			 len=Integer.parseInt(length);
+		}
+
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
 
 
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,Integer.parseInt(start),Integer.parseInt(length),search);
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,st,len,search);
 
 
 		for (Order o : list) {
@@ -309,17 +314,25 @@ public class OrderController extends GenericController{
 	
 	//下载店铺订单列表
 	
-	/*@RequestMapping("shop_excel")
+	@RequestMapping("shop_excel")
 	@ResponseBody
-	public void reportOrder(String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
+	public void reportOrder(String beginDate,String endDate,String shopId,String start,String length,String extra_search){
 		//导出文件名
 		String fileName = "店铺订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
+		String path = getRequest().getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","incomePrize","level","orderState"};
+		//获取前台额外传递过来的查询条件
+		//String search = getRequest().getParameter("extra_search");
 		//定义数据
-		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
+		if(extra_search.equals("")){
+			extra_search=null;
+		}
+
+		DatatablesViewPage<OrderDetailDto> view=this.listResult(beginDate, endDate, shopId,start,length,extra_search);
+		System.out.println(view.getAaData().size());
+		List<OrderDetailDto> result=view.getAaData();
 		//获取店铺名称
 		ShopDetail s = shopDetailService.selectById(shopId);
 		Map<String,String> map = new HashMap<>();
@@ -339,14 +352,14 @@ public class OrderController extends GenericController{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
-			excelUtil.download(path, response);
+			excelUtil.download(path, getResponse());
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-*/
+
 	@RequestMapping("/refund")
 	public void refund(String orderId){
 		orderService.cancelOrder(orderId);
