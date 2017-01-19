@@ -19,9 +19,7 @@
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
              <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
-              &nbsp;
-		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button>
-              <br/>
+             <br/>
           </div>
 		</form>
 	<div>
@@ -35,6 +33,7 @@
 				  	<strong style="margin-right:100px;font-size:22px">
 				  		品牌菜品销售表
 				  	</strong>
+				  	<button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 				  </div>
 				  <div class="panel-body">
 				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" style="width: 100%">
@@ -88,6 +87,7 @@
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
 			  	   <strong style="margin-right:100px;font-size:22px">品牌菜品销售表(单品)</strong>
+			  	   <button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleUnitTable" class="table table-striped table-bordered table-hover"
@@ -104,6 +104,7 @@
 	    	<div class="panel panel-info">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表(套餐)</strong>
+			  	<button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleFamilyTable" class="table table-striped table-bordered table-hover"
@@ -443,7 +444,7 @@ var vueObj = new Vue({
             return data;
         },
         brandreportExcel : function(){
-            /* var that = this;
+            var that = this;
             var beginDate = that.searchDate.beginDate;
             var endDate = that.searchDate.endDate;
             switch(this.currentType){
@@ -453,7 +454,7 @@ var vueObj = new Vue({
                 case 2:
                     location.href="articleSell/shop_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
                     break;
-            } */
+            }
         },
         today : function(){
             date = new Date().format("yyyy-MM-dd");
