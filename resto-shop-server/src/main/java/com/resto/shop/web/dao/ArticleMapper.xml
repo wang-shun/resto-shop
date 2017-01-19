@@ -890,22 +890,4 @@ GROUP BY article_id
 		where tma.article_id = #{articleId}
 		order by tma.sort asc
     </select>
-    
-    <select id="queryShopArticleTotal" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-    	select sum(r.count) as totalNum,sum(r.final_price) as sellIncome,r.shopId from (SELECT
-        DISTINCT(t.order_id),t.article_name,t.count,t.final_price,t2.shop_detail_id as shopId
-        FROM
-        tb_order_item t
-        INNER JOIN tb_order t2 ON t2.id = t.order_id
-        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
-        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
-        WHERE
-        t2.brand_id = #{brandId}
-        AND t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status in (2,3)
-        AND t.type != 3
-        AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
-        ) as r
-        GROUP BY r.shopId
-    </select>
 </mapper>
