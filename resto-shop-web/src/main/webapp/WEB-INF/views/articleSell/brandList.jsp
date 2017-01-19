@@ -18,7 +18,7 @@
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-             <button type="button" class="btn btn-primary" @click="searchInfo(false)">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
               &nbsp;
 		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button>
               <br/>
@@ -151,7 +151,8 @@
     });
 
 var sort = "desc";
-
+var brandUnitAPI = null;
+var brandFamilyAPI = null;
 var vueObj = new Vue({
     el : "#control",
     data : {
@@ -171,13 +172,14 @@ var vueObj = new Vue({
         brandArticleUnitTable:{},//单品dataTables对象
         brandArticleFamilyTable:{},//套餐datatables对象
         api:{},
+        resultData:[]
     },
     created : function() {
         var date = new Date().format("yyyy-MM-dd");
         this.searchDate.beginDate = date;
         this.searchDate.endDate = date;
-        this.searchInfo(true);
         this.initDataTables();
+        this.searchInfo();
     },
     methods : {
         initDataTables:function () {
@@ -186,16 +188,6 @@ var vueObj = new Vue({
             //单品datatable对象
             that.brandArticleUnitTable=$("#brandArticleUnitTable").DataTable({
                 lengthMenu: [ [20,50, 75, 100, -1], [20,50, 75, 100, "All"] ],
-                ajax : {
-                    url : "articleSell/queryOrderArtcile",
-                    dataSrc : "data",
-                    data:function(d){
-                            d.beginDate = that.searchDate.beginDate;
-                            d.endDate = that.searchDate.endDate;
-                            d.type = that.currentType;
-                            return d;
-                    }
-                },
                 order: [[ 3, "desc" ]],
                 columns : [
                     {
@@ -206,7 +198,8 @@ var vueObj = new Vue({
                     {
                         title : "菜名类别",
                         data : "articleFamilyName",
-                        orderable : false
+                        orderable : false,
+                        s_filter: true
                     },
                     {
                         title : "菜品名称",
@@ -268,21 +261,15 @@ var vueObj = new Vue({
                         title:"点赞数量" ,
                         data:"likes"
                     }
-                ]
+                ],
+                initComplete: function () {
+                	brandUnitAPI = this.api();
+                	that.brandUnitTable();
+                }
             });
             //套餐datatable对象
             that.brandArticleFamilyTable=$("#brandArticleFamilyTable").DataTable({
             	lengthMenu: [ [20,50, 75, 100, -1], [20,50, 75, 100, "All"] ],
-                ajax : {
-                    url : "articleSell/queryOrderArtcile",
-                    dataSrc : "data",
-                    data:function(d){
-                            d.beginDate = that.searchDate.beginDate;
-                            d.endDate = that.searchDate.endDate;
-                            d.type = that.currentType;
-                            return d;
-                    }
-                },
                 order: [[ 3, "desc" ]],
                 columns : [
                     {
@@ -293,7 +280,8 @@ var vueObj = new Vue({
                     {
                         title : "菜名类别",
                         data : "articleFamilyName",
-                        orderable : false
+                        orderable : false,
+                        s_filter: true
                     },
                     {
                         title : "菜品名称",
@@ -367,7 +355,11 @@ var vueObj = new Vue({
                             $(td).html(button);
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                	brandFamilyAPI = this.api();
+                	that.brandFamilyTable();
+                }
             });
         },
         //切换单品、套餐 type 1:单品 2:套餐
@@ -376,49 +368,77 @@ var vueObj = new Vue({
           this.searchInfo();
         },
         searchInfo : function(isInit) {
-            var that = this;
-            //判断 时间范围是否合法
-            if (this.searchDate.beginDate > this.searchDate.endDate) {
-                toastr.error("开始时间不能大于结束时间");
-                toastr.clear();
-                return false;
-            }
-            switch (this.currentType)
-            {
-                case 1:
-                    $.post("articleSell/list_brand", this.getDate(), function(result) {
-                        that.brandReport.brandName = result.brandName;
-                        that.brandReport.totalNum = result.totalNum;
-                        that.brandReport.sellIncome=result.sellIncome;
-                        that.brandReport.discountTotal=result.discountTotal;
-                        that.brandReport.refundCount=result.refundCount;
-                        that.brandReport.refundTotal=result.refundTotal;
-                        if(!isInit){
-                            that.brandArticleUnitTable.ajax.reload();
-                        }
-                        toastr.success("查询成功");
-                        toastr.clear();
-                    });
-                    break;
-                case 2:
-                    $.post("articleSell/list_brand", this.getDate(), function(result) {
-                    	that.brandReport.brandName = result.brandName;
-                        that.brandReport.totalNum = result.totalNum;
-                        that.brandReport.sellIncome=result.sellIncome;
-                        that.brandReport.discountTotal=result.discountTotal;
-                        that.brandReport.refundCount=result.refundCount;
-                        that.brandReport.refundTotal=result.refundTotal;
-                        that.brandArticleFamilyTable.ajax.reload();
-                        toastr.success("查询成功");
-                        toastr.clear();
-                    });
-                    break;
-            }
+        	try{
+	            var that = this;
+	            var api1 = brandUnitAPI;
+	            var api2 = brandFamilyAPI;
+	            //判断 时间范围是否合法
+	            if (that.searchDate.beginDate > that.searchDate.endDate) {
+	                toastr.error("开始时间不能大于结束时间");
+	                toastr.clear();
+	                return false;
+	            }
+	            that.selectBrandArticleToatl();
+	            //var data = that.selectBrandArticle();
+	            switch (that.currentType)
+	            {
+	                case 1:
+	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
+		                	if(result.success == true){
+		            			//清空datatable的column搜索条件
+			                	api1.search('');
+			                	var column1 = api1.column(1);
+			                	column1.search('', true, false);
+			                	//清空表格
+			                	that.brandArticleUnitTable.clear().draw();
+			                    that.brandUnitTable();
+			                    that.brandArticleUnitTable.rows.add(result.data).draw();
+			                  	//重绘搜索列
+			                    that.brandUnitTable();
+		            		}
+	                    });
+	                	break;
+	                case 2:
+	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
+		                	if(result.success == true){
+		                		//清空datatable的column搜索条件
+		                        api2.search('');
+		                    	var column1 = api2.column(1);
+		                    	column1.search('', true, false);
+		                    	//清空表格
+		                    	that.brandArticleFamilyTable.clear().draw();
+		                        that.brandFamilyTable();
+		                        that.brandArticleFamilyTable.rows.add(result.data).draw();
+		                        //重绘搜索列
+		                        that.brandFamilyTable();
+		            		}
+	                    });
+	                   break;
+	            }
+        	}catch(e){
+        		toastr.error("查询品牌菜品销售表失败!");
+	            toastr.clear();
+	            return;
+        	}
+            toastr.success("查询成功");
+            toastr.clear(); 
+        },
+        selectBrandArticleToatl : function(){
+        	var that = this;
+        	$.post("articleSell/list_brand", this.getDate(), function(result) {
+                that.brandReport.brandName = result.brandName;
+                that.brandReport.totalNum = result.totalNum;
+                that.brandReport.sellIncome=result.sellIncome;
+                that.brandReport.discountTotal=result.discountTotal;
+                that.brandReport.refundCount=result.refundCount;
+                that.brandReport.refundTotal=result.refundTotal;
+            });
         },
         getDate : function(){
             var data = {
                 beginDate : this.searchDate.beginDate,
                 endDate : this.searchDate.endDate,
+                type : this.currentType
             };
             return data;
         },
@@ -457,9 +477,53 @@ var vueObj = new Vue({
             this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
             this.searchInfo();
         },
-
-    },
-
+        brandUnitTable : function(){
+         	var api = brandUnitAPI;
+            api.search('');
+            var data = api.data();
+            var columnsSetting = api.settings()[0].oInit.columns;
+            $(columnsSetting).each(function (i) {
+                if (this.s_filter) {
+                    var column = api.column(i);
+                    var title = this.title;
+                    var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                    var that = this;
+                    column.data().unique().each(function (d) {
+                        select.append('<option value="' + d + '">' + d + '</option>')
+                    });
+                    select.appendTo($(column.header()).empty()).on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                        );
+                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+                    });
+                }
+            });
+        },
+        brandFamilyTable : function(){
+       		var api = brandFamilyAPI;
+           	api.search('');
+           	var data = api.data();
+           	var columnsSetting = api.settings()[0].oInit.columns;
+           	$(columnsSetting).each(function (i) {
+               if (this.s_filter) {
+                   var column = api.column(i);
+                   var title = this.title;
+                   var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                   var that = this;
+                   column.data().unique().each(function (d) {
+                       select.append('<option value="' + d + '">' + d + '</option>')
+                   });
+                   select.appendTo($(column.header()).empty()).on('change', function () {
+                       var val = $.fn.dataTable.util.escapeRegex(
+                               $(this).val()
+                       );
+                       column.search(val ? '^' + val + '$' : '', true, false).draw();
+                   });
+               }
+           });
+        }
+    }
 });
 
 function Trim(str)
