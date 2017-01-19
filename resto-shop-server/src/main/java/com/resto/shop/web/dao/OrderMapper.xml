@@ -1162,7 +1162,7 @@
         <if test="shopMode != 5">
             and order_state not in (1,9)
         </if>
-        <if test="shopMode == 5 and shopMode == 6">
+        <if test="shopMode == 5">
             and order_state != 9
         </if>
 
