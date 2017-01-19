@@ -784,7 +784,15 @@ GROUP BY article_id
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 			where toi.article_id = ta.id),0) brandSellNum,
-			IFNULL((select SUM(toi.count) from tb_order_item toi 
+			CONCAT(ROUND(((IFNULL((select SUM(toi.count) from tb_order_item toi 
+			inner join tb_order td
+			on toi.order_id = td.id
+			and td.order_state in (2,10,11,12)
+			and td.production_status in (2,3)
+			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+			where toi.article_id = ta.id),0))/
+			(IFNULL((select SUM(toi.count) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
 			inner join tb_article tt
@@ -792,7 +800,7 @@ GROUP BY article_id
 			and td.order_state in (2,10,11,12)
 			and td.production_status in (2,3)
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) numRatio,
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0)) * 100),2),'%') numRatio,
 			IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
@@ -801,7 +809,15 @@ GROUP BY article_id
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 			where toi.article_id = ta.id),0) salles,
-		    IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
+		  CONCAT((ROUND(((IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
+			inner join tb_order td
+			on toi.order_id = td.id
+			and td.order_state in (2,10,11,12)
+			and td.production_status in (2,3)
+			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+			where toi.article_id = ta.id),0))/
+			(IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
 			inner join tb_article tt
@@ -809,7 +825,7 @@ GROUP BY article_id
 			and td.order_state in (2,10,11,12)
 			and td.production_status in (2,3)
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) salesRatio,
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0)) * 100),2)),'%') salesRatio,
 			IFNULL((select SUM(toi.refund_count) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
@@ -839,7 +855,7 @@ GROUP BY article_id
 			left join tb_article_family taf
 			on ta.article_family_id = taf.id
 		where ta.article_type = ${type}
-			group by ta.id,ta.`name`;
+			group by ta.id,ta.`name`
     </select>
     
     <select id="queryArticleMealAttr" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">

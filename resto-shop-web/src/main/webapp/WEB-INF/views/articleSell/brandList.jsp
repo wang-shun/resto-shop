@@ -214,17 +214,7 @@ var vueObj = new Vue({
                     {
                         title : "销量占比",
                         data : "numRatio",
-                        orderable : false,
-                        createdCell: function (td, tdData, rowData) {
-                        	if(rowData.numRatio != 0){
-	                        	var brandSellNum = rowData.brandSellNum;
-	                        	var brandSellNumAll = rowData.numRatio;
-	                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
-	                        	$(td).html((numRatio * 100).toFixed(2) + "%");
-                        	}else{
-                        		$(td).html("0.00%");
-                        	}
-                       	}
+                        orderable : false
                     },
                     {
                         title : "销售额(元)",
@@ -237,18 +227,7 @@ var vueObj = new Vue({
                     {
                         title : "销售额占比",
                         data : "salesRatio",
-                        orderable : false,
-                        createdCell: function (td, tdData, rowData) {
-                        	if(rowData.salesRatio != 0){
-	                        	var salles = rowData.salles;
-	                        	var sallesAll = rowData.salesRatio;
-	                        	var salesRatio = ((salles/sallesAll).toFixed(2));
-	                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
-                        	}
-                        	else{
-                        		$(td).html("0.00%");
-                        	}
-                       	}
+                        orderable : false
                     },
                     {
                         title:"退菜数量" ,
@@ -296,17 +275,7 @@ var vueObj = new Vue({
                     {
                         title : "销量占比",
                         data : "numRatio",
-                        orderable : false,
-                        createdCell: function (td, tdData, rowData) {
-                        	if(rowData.numRatio != 0){
-	                        	var brandSellNum = rowData.brandSellNum;
-	                        	var brandSellNumAll = rowData.numRatio;
-	                        	var numRatio = ((brandSellNum/brandSellNumAll).toFixed(2));
-	                        	$(td).html((numRatio * 100).toFixed(2) + "%");
-                        	}else{
-                        		$(td).html("0.00%");
-                        	}
-                       	}
+                        orderable : false
                     },
                     {
                         title : "销售额(元)",
@@ -319,18 +288,7 @@ var vueObj = new Vue({
                     {
                         title : "销售额占比",
                         data : "salesRatio",
-                        orderable : false,
-                        createdCell: function (td, tdData, rowData) {
-                        	if(rowData.salesRatio != 0){
-	                        	var salles = rowData.salles;
-	                        	var sallesAll = rowData.salesRatio;
-	                        	var salesRatio = ((salles/sallesAll).toFixed(2));
-	                        	$(td).html((salesRatio * 100).toFixed(2) + "%");
-                        	}
-                        	else{
-                        		$(td).html("0.00%");
-                        	}
-                       	}
+                        orderable : false
                     },
                     {
                         title:"退菜数量" ,
@@ -380,7 +338,6 @@ var vueObj = new Vue({
 	                return false;
 	            }
 	            that.selectBrandArticleToatl();
-	            //var data = that.selectBrandArticle();
 	            switch (that.currentType)
 	            {
 	                case 1:
@@ -447,12 +404,12 @@ var vueObj = new Vue({
             var that = this;
             var beginDate = that.searchDate.beginDate;
             var endDate = that.searchDate.endDate;
-            switch(this.currentType){
+            switch(that.currentType){
                 case 1:
-                    location.href="articleSell/brand_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
                     break;
                 case 2:
-                    location.href="articleSell/shop_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
                     break;
             }
         },

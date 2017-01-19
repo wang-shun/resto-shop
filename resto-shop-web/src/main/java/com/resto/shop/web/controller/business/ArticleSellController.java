@@ -27,6 +27,7 @@ import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.ArticleFamilyService;
 import com.resto.shop.web.service.ArticleService;
@@ -125,19 +126,19 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	/**
-	 * 下载品牌菜品销售表(单品)
+	 * 下载品牌菜品销售表
 	 */
-	public void downloadBrnadUnitArticle(HttpServletRequest request, HttpServletResponse response,
+	@RequestMapping("/downloadBrnadArticle")
+	@ResponseBody
+	public void downloadBrnadArticle(HttpServletRequest request, HttpServletResponse response,
 			String beginDate, String endDate, Integer type){
 		//导出文件名
-		String fileName = "品牌菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
+		String fileName = null;
 		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={};
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
+		String path = null;
+		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
+		String[]columns={"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
+		String[][] headers = {{"菜品类型","25"},{"菜名类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
 		//获取店铺名称
 		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
 		String shopName="";
@@ -146,28 +147,43 @@ public class ArticleSellController extends GenericController{
 		}
 		//去掉最后一个逗号
 		shopName.substring(0, shopName.length()-1);
+		//定义数据
+		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
+		Map<String,String> map = new HashMap<>();
+		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
 		map.put("brandName", brand.getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "8");//显示的位置
-		map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
+		map.put("num", "10");//显示的位置
 		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义数据
-//		List<ArticleSellDto> result = null; = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-//		String[][] headers = {{"分类","25"},{"菜名","25"},{"菜品类型","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"},{"退菜数量","25"},{"退菜金额","25"}};
-
+		//如果是单品
+		if(type.equals(ArticleType.SIMPLE_ARTICLE)){
+			//导出文件名
+			fileName = "品牌菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
+			path = request.getSession().getServletContext().getRealPath(fileName);
+			map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
+			map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
+			//定义数据
+			result = articleService.queryOrderArtcile(beginDate, endDate, type);
+		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
+			//导出文件名
+			fileName = "品牌菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
+			path = request.getSession().getServletContext().getRealPath(fileName);
+			map.put("reportType", "品牌菜品销售报表(套餐)");//表的头，第一行内容
+			map.put("reportTitle", "品牌菜品销售报表(套餐)");//表的名字
+			//定义数据
+			result = articleService.queryOrderArtcile(beginDate, endDate, type);
+		}
 		//定义excel工具类对象
-//		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-//		try{
-//			OutputStream out = new FileOutputStream(path);
-//			excelUtil.ExportExcel(headers, columns, result, out, map);
-//			out.close();
-//			excelUtil.download(path, response);
-//			JOptionPane.showMessageDialog(null, "导出成功！");
-//			log.info("excel导出成功");
+		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+		try{
+			OutputStream out = new FileOutputStream(path);
+			excelUtil.ExportExcel(headers, columns, result, out, map);
+			out.close();
+			excelUtil.download(path, response);
+			JOptionPane.showMessageDialog(null, "导出成功！");
+			log.info("excel导出成功");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
