@@ -181,6 +181,10 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                     coupon.setBeginDate(cfg.getBeginDateTime());
                     coupon.setEndDate(cfg.getEndDateTime());
                 }
+                //如果没有设置优惠券推送时间，那么，默认为3天
+                if(cfg.getPushDay()==null){
+                	coupon.setPushDay(3);
+                }
                 for(int i=0;i<cfg.getCouponNumber();i++){
                     couponService.insertCoupon(coupon);
                 }

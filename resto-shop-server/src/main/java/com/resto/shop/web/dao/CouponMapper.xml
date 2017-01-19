@@ -48,7 +48,7 @@
        <!--如果存了店铺id 说明是店铺专有的优惠券 -->
         <if test="shopDetailId != null">shop_detail_id,</if>
         <if test="brandId != null">brand_id,</if>
-
+        <if test="pushDay !=null">push_day,</if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -69,7 +69,7 @@
       <if test="couponType != null">#{couponType,jdbcType=VARCHAR},</if>
         <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
         <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>
-
+        <if test="pushDay != null">#{pushDay,jdbcType=INTEGER},</if>
 
     </trim> 
   </insert>
