@@ -770,7 +770,7 @@ GROUP BY article_id
 		and ar.shop_detail_id = #{shopId}
     </select>
     
-    <select id="queryOrderArtcile" resultType="com.resto.brand.web.dto.ArticleSellDto">
+    <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		select 
 			ta.id articleId,
 			if(ta.article_type = 1,'单品','套餐') typeName,
@@ -783,8 +783,10 @@ GROUP BY article_id
 			and td.production_status in (2,3)
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-			where toi.article_id = ta.id),0) brandSellNum,
-			CONCAT(ROUND(((IFNULL((select SUM(toi.count) from tb_order_item toi 
+			where toi.article_id = ta.id),0) 
+			<if test="shopDetailId != null and shopDetailId !=''">shopSellNum</if>
+			<if test="shopDetailId == null or shopDetailId ==''">brandSellNum</if>,
+			IFNULL(CONCAT(ROUND(((IFNULL((select SUM(toi.count) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
 			and td.order_state in (2,10,11,12)
@@ -800,7 +802,10 @@ GROUP BY article_id
 			and td.order_state in (2,10,11,12)
 			and td.production_status in (2,3)
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0)) * 100),2),'%') numRatio,
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+			<if test="shopDetailId != null and shopDetailId !=''">
+				and td.shop_detail_id = #{shopDetailId}
+			</if>),0)) * 100),2),'%'),'0.00%') numRatio,
 			IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
@@ -809,7 +814,7 @@ GROUP BY article_id
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
 			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 			where toi.article_id = ta.id),0) salles,
-		  CONCAT((ROUND(((IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
+		  	IFNULL(CONCAT((ROUND(((IFNULL((select SUM(toi.count * toi.unit_price) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
 			and td.order_state in (2,10,11,12)
@@ -825,7 +830,10 @@ GROUP BY article_id
 			and td.order_state in (2,10,11,12)
 			and td.production_status in (2,3)
 			and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0)) * 100),2)),'%') salesRatio,
+			and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+			<if test="shopDetailId != null and shopDetailId !=''">
+				and td.shop_detail_id = #{shopDetailId}
+			</if>),0)) * 100),2)),'%'),'0.00%') salesRatio,
 			IFNULL((select SUM(toi.refund_count) from tb_order_item toi 
 			inner join tb_order td
 			on toi.order_id = td.id
@@ -855,6 +863,9 @@ GROUP BY article_id
 			left join tb_article_family taf
 			on ta.article_family_id = taf.id
 		where ta.article_type = ${type} and ta.state = 1
+		<if test="shopDetailId != null and shopDetailId !=''">
+			and ta.shop_detail_id = #{shopDetailId}
+		</if>
 			group by ta.id,ta.`name`
     </select>
     
@@ -863,14 +874,38 @@ GROUP BY article_id
 		IFNULL(
 		(select SUM(ti.count) from tb_order_item ti 
 		where ti.parent_id in 
-		(select toi.id from tb_order_item toi where toi.article_id = #{articleId}
+		(select toi.id from tb_order_item toi 
+		inner join tb_order tr
+		on toi.order_id = tr.id
+		where toi.article_id = #{articleId}
 		and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00') 
 		and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+		<if test="shopDetailId != null and shopDetailId !=''">
+			and tr.shop_detail_id = #{shopDetailId}
+		</if>
 		) and ti.article_id = tmi.article_id),0) brandSellNum
 		from tb_meal_attr tma
 		inner join tb_meal_item tmi
 		on tma.id = tmi.meal_attr_id
 		where tma.article_id = #{articleId}
 		order by tma.sort asc
+    </select>
+    
+    <select id="queryShopArticleTotal" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+    	select sum(r.count) as totalNum,sum(r.final_price) as sellIncome,r.shopId from (SELECT
+        DISTINCT(t.order_id),t.article_name,t.count,t.final_price,t2.shop_detail_id as shopId
+        FROM
+        tb_order_item t
+        INNER JOIN tb_order t2 ON t2.id = t.order_id
+        INNER JOIN tb_order_payment_item t3 ON t3.order_id = t2.id
+        INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
+        WHERE
+        t2.brand_id = #{brandId}
+        AND t2.order_state IN (2, 10, 11, 12)
+        AND t2.production_status in (2,3)
+        AND t.type != 3
+        AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
+        ) as r
+        GROUP BY r.shopId
     </select>
 </mapper>

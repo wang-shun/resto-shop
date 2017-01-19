@@ -7,6 +7,7 @@ import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Article;
 
 public interface ArticleMapper extends GenericDao<Article, String>{
@@ -107,7 +108,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	
 	List<Article> selectsingleItem(@Param("shopId") String shopId);
 	
-	List<ArticleSellDto> queryOrderArtcile(@Param("beginDate") String beginDate, @Param("endDate") String endDate,@Param("type") Integer type);
+	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
 	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
 }

@@ -5,8 +5,13 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
@@ -66,6 +71,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Autowired
     private ArticleUnitService articleUnitService;
+    
+    @Autowired
+    private ShopDetailService shopDetailService;
 
 
     @Override
@@ -449,12 +457,30 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
     
     @Override
-    public List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate, Integer type) {
-    	return articleMapper.queryOrderArtcile(beginDate, endDate, type);
+    public List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap) {
+    	return articleMapper.queryOrderArtcile(selectMap);
     }
     
     @Override
     public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
     	return articleMapper.queryArticleMealAttr(selectMap);
+    }
+    
+    @Override
+    public ShopArticleReportDto queryShopArticleTotal(String beginDate, String endDate, String shopId) {
+    	Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        Integer totalNum = 0;
+        /**
+         * 菜品总数单独算是因为 要出去套餐的数量
+         */
+        totalNum = orderMapper.selectShopArticleNum(begin, end, shopId);
+        ShopDetail detail = shopDetailService.selectById(shopId);
+        //查询菜品总额，退菜总数，退菜金额
+        ShopArticleReportDto po = orderMapper.selectShopConfirmMoney(begin, end, shopId);
+        po.setTotalNum(totalNum);
+        po.setShopName(detail.getName());
+        return po;
+    	
     }
 }

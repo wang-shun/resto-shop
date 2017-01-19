@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleStock;
@@ -90,7 +91,9 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<Article> selectsingleItem(String shopId);
 	
-	List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate, Integer type);
+	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
 	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+	
+	ShopArticleReportDto queryShopArticleTotal(String beginDate, String endDate, String shopId);
 }
