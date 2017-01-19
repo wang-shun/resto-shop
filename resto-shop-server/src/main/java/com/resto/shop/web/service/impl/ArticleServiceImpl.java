@@ -454,7 +454,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
     
     @Override
-    public List<ArticleSellDto> queryArticleMealAttr(String articleId) {
-    	return articleMapper.queryArticleMealAttr(articleId);
+    public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
+    	return articleMapper.queryArticleMealAttr(selectMap);
     }
 }

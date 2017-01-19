@@ -106,16 +106,21 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	@RequestMapping("/showMealAttr")
-	public String showMealAttr(HttpServletRequest request, String mealAttrId, String articleId){
-		request.setAttribute("mealAttrId", mealAttrId);
+	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate){
 		request.setAttribute("articleId", articleId);
+		request.setAttribute("beginDate", beginDate);
+		request.setAttribute("endDate", endDate);
 		return "articleSell/mealAttr";
 	}
 	
 	@RequestMapping("/queryArticleMealAttr")
 	@ResponseBody
-	public Result queryArticleMealAttr(String articleId, String mealAttrId){
-		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(articleId);
+	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate){
+		Map<String, Object> selectMap = new HashMap<String, Object>();
+		selectMap.put("articleId", articleId);
+		selectMap.put("beginDate", beginDate);
+		selectMap.put("endDate", endDate);
+		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
 	

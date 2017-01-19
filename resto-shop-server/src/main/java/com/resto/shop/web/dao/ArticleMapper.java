@@ -1,6 +1,8 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
+
 import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
 import com.resto.brand.core.generic.GenericDao;
@@ -107,5 +109,5 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	
 	List<ArticleSellDto> queryOrderArtcile(@Param("beginDate") String beginDate, @Param("endDate") String endDate,@Param("type") Integer type);
 	
-	List<ArticleSellDto> queryArticleMealAttr(@Param("articleId") String articleId);
+	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
 }

@@ -1,6 +1,8 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
+
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.model.BrandSetting;
@@ -90,5 +92,5 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<ArticleSellDto> queryOrderArtcile(String beginDate, String endDate, Integer type);
 	
-	List<ArticleSellDto> queryArticleMealAttr(String articleId);
+	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
 }

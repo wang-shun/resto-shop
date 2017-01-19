@@ -12,7 +12,7 @@
 		  </div>
 		  <div class="form-group" style="margin-right: 50px;">
 		    <label>结束时间：
-		    <input type="text" class="form-control form_datetime" :value="searchDate.endDate" v-model="searchDate.endDate" readonly="readonly">
+		    <input type="text" id="endDate" class="form-control form_datetime" :value="searchDate.endDate" v-model="searchDate.endDate" readonly="readonly">
             </label>
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
@@ -286,11 +286,6 @@ var vueObj = new Vue({
                 order: [[ 3, "desc" ]],
                 columns : [
                     {
-                    	title : "菜品Id",
-                    	data : "articleId",
-                    	visible : false
-                    },
-                    {
                         title : "菜品类型",
                         data : "typeName",
                         orderable : false
@@ -362,12 +357,12 @@ var vueObj = new Vue({
                     },
                     {
                         title: "套餐属性",
-                        data: "mealAttrId",
+                        data: "articleId",
                         orderable : false,
                         createdCell: function (td, tdData, rowData) {
                             var button = $("<button class='btn green'>查看详情</button>");
                             button.click(function () {
-                                openModal(tdData,rowData.articleId);
+                                openModal(tdData);
                             })
                             $(td).html(button);
                         }
@@ -472,12 +467,15 @@ function Trim(str)
     return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
 
-function openModal(mealAttrId, articleId) {
+function openModal(articleId) {
+	var beginDate = $("#beginDate").val();
+	var endDate = $("#endDate").val();
     $.ajax({
         url: 'articleSell/showMealAttr',
         data: {
-            'mealAttrId': mealAttrId,
-            'articleId': articleId
+            'articleId': articleId,
+            'beginDate': beginDate,
+            'endDate': endDate
         },
         success: function (result) {
             var modal = $("#mealAttrModal");

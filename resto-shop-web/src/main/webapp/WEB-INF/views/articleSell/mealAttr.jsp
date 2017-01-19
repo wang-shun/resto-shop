@@ -17,13 +17,15 @@
 <script>
 	var dataSource;
 	var articleId = "${articleId}";
-	var mealAttrId = "${mealAttrId}";
+	var beginDate = "${beginDate}";
+	var endDate = "${endDate}";
 	$.ajax( {  
 	    url:'articleSell/queryArticleMealAttr',
 	    async:false,
 	    data:{  
 	    	'articleId':articleId,
-	    	'mealAttrId':mealAttrId
+	    	'beginDate':beginDate,
+	    	'endDate':endDate
 	    },  
 	    success:function(result) { 
 	    	if(result.success == true){
