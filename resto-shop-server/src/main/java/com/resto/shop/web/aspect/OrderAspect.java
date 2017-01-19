@@ -1,6 +1,7 @@
 package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
@@ -239,6 +240,22 @@ public class OrderAspect {
     }
 
     ;
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.afterPay(..))")
+    public void afterPay() {
+
+    };
+
+
+    @AfterReturning(value = "afterPay()", returning = "order")
+    public void afterPay(Order order) {
+        if(order.getOrderState() == OrderState.PAYMENT){ //已支付
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+    }
+
+
+
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
     public void orderPayAfter(Order order) {

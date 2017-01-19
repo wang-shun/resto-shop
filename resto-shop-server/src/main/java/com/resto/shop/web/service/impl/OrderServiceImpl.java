@@ -874,11 +874,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return false;
         }
 
+
+
+
     }
 
     @Override
     public Result refundPaymentByUnfinishedOrder(String orderId) {
-        return new Result(autoRefundOrder(orderId));
+        Result result =  new Result(autoRefundOrder(orderId));
+        Order order = selectById(orderId);
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED){
+            refundOrder(order);
+        }
+
+        return result;
 //        Result result = new Result();
 //
 //        //首先获得订单
@@ -1867,16 +1876,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printOrderAll(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+        List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
+
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1){
+            List<OrderItem> child = orderItemService.listByParentId(orderId);
+            for (OrderItem orderItem : child) {
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+//                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
+            }
+            child.addAll(items);
+
+            for (Printer printer : ticketPrinter) {
+                Map<String, Object> ticket = printTicket(order, child, shop, printer);
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
+            }
+            return printTask;
+        }
+
+
         if ((order.getPrintOrderTime() != null || order.getProductionStatus() >= 2) && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             return printTask;
         }
 
-        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
-        List<OrderItem> items = orderItemService.listByOrderId(orderId);
 
-
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (setting.getAutoPrintTotal().intValue() == 0 && shopDetail.getAutoPrintTotal() == 0 &&
@@ -5658,6 +5685,96 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderMapper.refundServicePrice(o.getId(), servicePrice, customerCount);
             }
         }
+
+    }
+
+    @Override
+    public Order afterPay(String orderId, String couponId, BigDecimal price, BigDecimal pay, BigDecimal waitMoney, Integer payMode) {
+        Order order = selectById(orderId);
+        JSONResult result = new JSONResult<>();
+        Customer customer = customerService.selectById(order.getCustomerId());
+        BigDecimal totalMoney = order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren();
+        try {
+            if(!StringUtils.isEmpty(couponId)){ //使用了优惠券
+                Coupon coupon = couponService.useCoupon(totalMoney, order);
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.COUPON_PAY);
+                item.setPayTime(new Date());
+                item.setPayValue(coupon.getValue());
+                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setResultData(coupon.getId());
+                orderPaymentItemService.insert(item);
+            }
+            if(waitMoney.doubleValue() > 0){ //等位红包支付
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.WAIT_MONEY);
+                item.setPayTime(new Date());
+                item.setPayValue(order.getWaitMoney());
+                item.setRemark("等位红包支付:" + order.getWaitMoney());
+                item.setResultData(order.getWaitId());
+                orderPaymentItemService.insert(item);
+
+                GetNumber getNumber = getNumberService.selectById(order.getWaitId());
+                getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
+                getNumberService.update(getNumber);
+            }
+
+            if(price.doubleValue() > 0){  //余额支付
+                accountService.payOrder(order, price, customer);
+            }
+
+            if(pay.doubleValue() > 0){ //还需要支付
+                order.setPaymentAmount(pay);
+                switch (payMode){
+                    case OrderPayMode.WX_PAY :
+                        order.setPayMode(OrderPayMode.WX_PAY);
+                        break;
+                    case OrderPayMode.ALI_PAY:
+                        order.setPayMode(OrderPayMode.ALI_PAY);
+                        break;
+                    case OrderPayMode.YL_PAY:
+                        order.setOrderState(OrderState.PAYMENT);
+                        order.setPayMode(OrderPayMode.YL_PAY);
+                        order.setPrintTimes(1);
+                        break;
+                    case OrderPayMode.XJ_PAY:
+                        order.setOrderState(OrderState.PAYMENT);
+                        order.setPayMode(OrderPayMode.XJ_PAY);
+                        order.setPrintTimes(1);
+                        break;
+                    default:
+                        break;
+
+                }
+
+                update(order);
+            }else{ //支付完成
+                if (order.getOrderState() < OrderState.PAYMENT) {
+                    order.setOrderState(OrderState.PAYMENT);
+                    order.setAllowCancel(false);
+                    order.setPaymentAmount(BigDecimal.valueOf(0));
+                    update(order);
+                    List<Order> orders = orderMapper.selectByParentId(order.getId());
+                    for (Order child : orders) {
+                        if (child.getOrderState() < OrderState.PAYMENT) {
+                            child.setOrderState(OrderState.PAYMENT);
+                            child.setPaymentAmount(BigDecimal.valueOf(0));
+                            child.setAllowCancel(false);
+                            child.setAllowContinueOrder(false);
+                            update(child);
+                        }
+                    }
+
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+        return order;
 
     }
 
