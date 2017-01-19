@@ -949,6 +949,8 @@
         order by create_time DESC;
     </select>
 
+
+
     <select id="listHoufuFinishedOrder" resultType="Order">
         SELECT
         push_order_time,
@@ -974,6 +976,7 @@
         and closed=0 and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
+        and pay_type = 0
         order by pay_type desc,create_time DESC
 
     </select>
@@ -1029,8 +1032,8 @@
         shop_detail_id=#{shopId}
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and((order_state = 2 and pay_type = 0) or (order_state = 1 and pay_type = 1))
-        and production_status = 1
+        and((order_state = 2 and pay_type = 0 and production_status = 1) or
+        (order_state = 1 and pay_type = 1))
         and table_number is not null
         and parent_order_id is null
         order by create_time DESC;
