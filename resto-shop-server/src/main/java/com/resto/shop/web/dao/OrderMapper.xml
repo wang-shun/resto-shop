@@ -227,6 +227,7 @@
     </resultMap>
 
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
+        <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
@@ -1753,6 +1754,7 @@ AND
 
     <select id="selectListByTime" resultMap="selectOrdersMap">
         SELECT
+        convert((@rowNo :=@rowNo +1),signed) as tag ,
         o.id,
         o.brand_id,
         o.parent_order_id,
@@ -1767,15 +1769,26 @@ AND
         o.order_mode,
         c.telephone,
         a.level,
-        oi.pay_value,
+        IF(oi.pay_value>0,oi.pay_value,0) pay_value,
         oi.payment_mode_id
         FROM
         tb_order o
         LEFT JOIN tb_customer c ON o.customer_id = c.id
         LEFT JOIN tb_appraise a ON o.id = a.order_id
-        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
-        where
-        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id,
+        (SELECT  @rowNo:=0) _rowNo
+        where  o.order_state IN (2,10, 11, 12)  AND o.production_status IN (2, 3)
+          AND  <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+        <if test="search != null">
+            ${search}
+        </if>
+
+        <if test="start >-1 and length !=0 ">
+            limit  #{start} , #{length}
+        </if>
+
+
+
     </select>
 
 
@@ -2107,6 +2120,7 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.brand_id=#{brandId}
     </select>
+
 
 
     <select id="selectShopArticleSellList" resultType="java.util.HashMap">

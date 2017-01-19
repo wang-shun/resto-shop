@@ -31,6 +31,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.feature.orm.mybatis.Page;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.shop.web.config.SessionKey;
+import org.springframework.web.context.request.ServletWebRequest;
 
 @Component
 public abstract class GenericController{
@@ -90,6 +91,16 @@ public abstract class GenericController{
 	
 	public HttpServletRequest getRequest(){
 		return  ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest(); 
+	}
+
+	/**
+	 * name:yjuany
+	 * @return
+	 */
+	public HttpServletResponse getResponse(){
+
+
+		return ((ServletWebRequest)RequestContextHolder.getRequestAttributes()).getResponse();
 	}
 	
 	public HttpSession getSession(){

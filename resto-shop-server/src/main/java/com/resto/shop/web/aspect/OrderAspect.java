@@ -108,6 +108,7 @@ public class OrderAspect {
                 sendPaySuccessMsg(order);
             }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
+                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
             //出单时减少库存
