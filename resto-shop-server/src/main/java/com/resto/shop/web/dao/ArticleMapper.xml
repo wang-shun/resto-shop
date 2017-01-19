@@ -854,7 +854,7 @@ GROUP BY article_id
 			from tb_article ta
 			left join tb_article_family taf
 			on ta.article_family_id = taf.id
-		where ta.article_type = ${type}
+		where ta.article_type = ${type} and ta.state = 1
 			group by ta.id,ta.`name`
     </select>
     
