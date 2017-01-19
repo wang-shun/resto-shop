@@ -13,9 +13,9 @@ public class PayMode {
     public static final int HUNGER_MONEY = 9; //饿了吗
     public static final int ALI_PAY = 10; //支付宝
     public static final int ARTICLE_BACK_PAY = 11; //菜品退款支付
+    public static final int OTHER_PAY_m= 12; //其他支付
 
-	
-	public static String getPayModeName(int state){
+    public static String getPayModeName(int state){
 	    switch (state) {
             case WEIXIN_PAY:
                 return "微信支付";
@@ -39,6 +39,8 @@ public class PayMode {
                 return "支付宝支付";
             case ARTICLE_BACK_PAY:
                 return "退菜返还金额";
+            case OTHER_PAY_m:
+                return "其他支付";
             default:
                 return "未知";
             }
