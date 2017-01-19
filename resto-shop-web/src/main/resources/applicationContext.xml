@@ -25,6 +25,7 @@
         </property>
     </bean>
 
+
     <bean id="serviceDiscovery" class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceDiscovery">
         <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
     </bean>

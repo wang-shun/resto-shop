@@ -7,8 +7,10 @@ import com.aliyun.openservices.ons.api.ConsumeContext;
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -27,8 +29,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class OrderMessageListener implements MessageListener {
@@ -41,7 +47,10 @@ public class OrderMessageListener implements MessageListener {
     WechatConfigService wechatConfigService;
     @Resource
     BrandSettingService brandSettingService;
-
+    
+    @Resource
+    BrandService brandService;
+    
     @Resource
     CustomerService customerService;
 
@@ -92,6 +101,8 @@ public class OrderMessageListener implements MessageListener {
             return executeSendCallMessage(message);
         }else if (tag.equals(MQSetting.TAG_REMIND_MSG)){
         	return executeRemindMsg(message);
+        }else if (tag.equals(MQSetting.TAG_AUTO_SEND_REMMEND)){
+        	return executeRecommendMsg(message);
         }
         return Action.CommitMessage;
     }
@@ -117,6 +128,39 @@ public class OrderMessageListener implements MessageListener {
         return Action.CommitMessage;
     }
     
+    
+    //优惠券过期提前推送消息队列
+    private Action executeRecommendMsg(Message message) throws UnsupportedEncodingException {
+    	String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+    	JSONObject obj = JSONObject.parseObject(msg);
+    	Customer customer = customerService.selectById(obj.getString("id"));
+    	WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+        String pr = obj.getString("pr");
+        String name = obj.getString("name");
+        String pushDay = obj.getInteger("pushDay")+"";
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+    	StringBuffer str=new StringBuffer();
+        String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
+    	str.append("到期提醒通知"+"\n");
+    	str.append(sdf.format(new Date())+"\n");
+    	str.append("<a href='"+jumpurl+"'>您的价值的"+pr+"元的"+name+""+pushDay+"天后即将到期，快来享受优惠吧</a>");
+        WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+        sendNote(pr,name,pushDay,customer.getId());
+        return Action.CommitMessage;
+    }
+    
+  //发送短信
+    private void sendNote(String price,String name,String pushDay,String customerId){
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Customer customer=customerService.selectById(customerId);
+        System.out.println("电话"+customer.getTelephone());
+    	Map param = new HashMap();
+		param.put("price", price);
+		param.put("name", name);
+		param.put("day", pushDay);
+		System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_40860094"));
+    }
 
     private void noticeShareCustomer(Customer customer) {
         Customer shareCustomer = customerService.selectById(customer.getShareCustomer());

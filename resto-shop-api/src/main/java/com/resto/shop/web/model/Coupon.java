@@ -40,6 +40,8 @@ public class Coupon {
 
     private  String brandId;
 
+    private Integer pushDay;//推送天数(默认3天)
+    
     public Boolean getUsed() {
         return isUsed;
     }
@@ -190,6 +192,14 @@ public class Coupon {
 
 	public void setCouponType(Integer couponType) {
 		this.couponType = couponType;
+	}
+
+	public Integer getPushDay() {
+		return pushDay;
+	}
+
+	public void setPushDay(Integer pushDay) {
+		this.pushDay = pushDay;
 	}
     
 }
