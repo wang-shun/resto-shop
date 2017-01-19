@@ -2681,6 +2681,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
             order = orderMapper.getOrderAccountHoufu(shopId);
+        }else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER){
+            order = orderMapper.getOrderAccountBoss(shopId);
         } else {
             order = orderMapper.getOrderAccount(shopId);
         }

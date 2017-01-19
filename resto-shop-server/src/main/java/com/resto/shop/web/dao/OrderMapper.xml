@@ -959,6 +959,7 @@
         article_count,
         table_number,
         parent_order_id,
+        order_state,
         order_money,
         order_mode,
         pay_type,
@@ -976,7 +977,6 @@
         and closed=0 and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
-        and pay_type = 0
         order by pay_type desc,create_time DESC
 
     </select>
@@ -1830,6 +1830,23 @@ AND
 		GROUP BY t.id
 		) as r
     </select>
+
+    <select id="getOrderAccountBoss" resultMap="BaseResultMap">
+        select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
+        sum(customer_count) as customer_count
+        from ( select t.id,t.parent_order_id,
+        if(t.amount_with_children = 0,t.order_money,t.amount_with_children) as orderTotal,
+        if(t.parent_order_id
+        is null,t.customer_count,0) customer_count
+        from tb_order t
+        INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+        where
+        shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
+        GROUP BY t.id
+        ) as r
+    </select>
+
 
     <select id="getOrderAccount" resultMap="BaseResultMap">
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
