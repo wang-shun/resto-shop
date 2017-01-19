@@ -40,6 +40,7 @@
 	});
 	
 	var tb = $("#mealAttrList").DataTable({
+		lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
 		data:dataSource,
 		bSort:false,
 		columns : [
