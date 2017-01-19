@@ -744,13 +744,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer[] orderState = new Integer[]{OrderState.SUBMIT, OrderState.PAYMENT, OrderState.CONFIRM};
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
-            if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER)) {
+            if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER
+             || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
             order.setOrderItems(itemList);
-            if ((order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER
-                    || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))) {
+            if (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER
+                    || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY)) {
                 List<String> childIds = selectChildIdsByParentId(order.getId());
                 List<OrderItem> childItems = orderItemService.listByOrderIds(childIds);
                 order.getOrderItems().addAll(childItems);
