@@ -1,4 +1,4 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 
 import java.io.FileOutputStream;
@@ -42,10 +42,10 @@ import com.resto.shop.web.service.OrderService;
 @Controller
 @RequestMapping("orderReport")
 public class OrderController extends GenericController{
-	
+
 	@Resource
 	private OrderService orderService;
-	
+
 	@Resource
 	private BrandService brandService;
 	@Resource
@@ -53,37 +53,37 @@ public class OrderController extends GenericController{
 
 
 	@Resource
-    private OrderExceptionService orderExceptionService;
-	
+	private OrderExceptionService orderExceptionService;
+
 	@RequestMapping("/list")
-    public void list(){
-    }
-	
+	public void list(){
+	}
+
 	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
 	@RequestMapping("brand_data")
 	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
-		
+
 		return this.getResult(beginDate, endDate);
 	}
-	
+
 	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 
 	}
-	
-	
+
+
 	//下载品牌订单报表
-	
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping("brand_excel")
 	@ResponseBody
 	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
 
-        List<ShopDetail> shopDetailList = getCurrentShopDetails();
-        if(shopDetailList==null){
-            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
-        }
+		List<ShopDetail> shopDetailList = getCurrentShopDetails();
+		if(shopDetailList==null){
+			shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+		}
 		//导出文件名
 		String fileName = "品牌订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
@@ -93,11 +93,11 @@ public class OrderController extends GenericController{
 		//定义数据
 		//List<OrderPayDto> result = this.getResult(beginDate, endDate);
 		List<OrderPayDto>  result = new LinkedList<>();
-		
+
 		Map<String,Object>  resultMap = this.getResult(beginDate, endDate);
 		result.addAll((Collection<? extends OrderPayDto>) resultMap.get("shopId"));
 		result.add((OrderPayDto) resultMap.get("brandId"));
-		
+
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
 			shopName += shopDetail.getName()+",";
@@ -111,7 +111,7 @@ public class OrderController extends GenericController{
 		map.put("num", "4");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
-		
+
 		String[][] headers = {{"名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
@@ -126,7 +126,7 @@ public class OrderController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
+
 	//
 	@RequestMapping("/show/shopReport")
 	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
@@ -155,19 +155,18 @@ public class OrderController extends GenericController{
 
 		//获取前台额外传递过来的查询条件
 
-		 //定义过滤条件查询过滤后的记录数sql
+		//定义过滤条件查询过滤后的记录数sql
 		String search;
-		if(extra_search!=null){
-		    search=" and c.telephone  LIKE '%"+extra_search+"%'";
+		if(StringUtils.isNotEmpty(extra_search)){
+			search=" and c.telephone  LIKE '%"+extra_search+"%'";
 		}else {
 			search=null;
 		}
 		int st=-1;
 		int len=0;
-		if(start!=null||!start.equals("")){
-			 st =Integer.parseInt(start);
-			 len=Integer.parseInt(length);
-
+		if(StringUtils.isNotEmpty(start)&&!start.equals("")){
+			st =Integer.parseInt(start);
+			len=Integer.parseInt(length);
 		}
 
 		//查询店铺名称
@@ -298,23 +297,23 @@ public class OrderController extends GenericController{
 		view.setiTotalRecords(la.size());
 		return view;
 	}
-	
-	
-	
+
+
+
 	@RequestMapping("detailInfo")
 	@ResponseBody
 	public Result showDetail(String orderId){
 		Order o = orderService.selectOrderDetails(orderId);
 		List<Order> childList = orderService.selectListByParentId(orderId);
 		if(!childList.isEmpty()){
-                o.setChildList(childList);
-        }
+			o.setChildList(childList);
+		}
 
 		return getSuccessResult(o);
 	}
-	
+
 	//下载店铺订单列表
-	
+
 	@RequestMapping("shop_excel")
 	@ResponseBody
 	public void reportOrder(String beginDate,String endDate,String shopId,String start,String length,String extra_search,HttpServletResponse response){
@@ -327,12 +326,12 @@ public class OrderController extends GenericController{
 		//获取前台额外传递过来的查询条件
 		//String search = getRequest().getParameter("extra_search");
 		//定义数据
-		/*if(extra_search.equals("")){
+		if(extra_search.equals("")){
 			extra_search=null;
-		}*/
+		}
 
 		DatatablesViewPage<OrderDetailDto> view=this.listResult(beginDate, endDate, shopId,start,length,extra_search);
-		System.out.println(view.getAaData().size());
+ 		System.out.println(view.getAaData().size());
 		List<OrderDetailDto> result=view.getAaData();
 		//获取店铺名称
 		ShopDetail s = shopDetailService.selectById(shopId);
@@ -345,7 +344,7 @@ public class OrderController extends GenericController{
 		map.put("num", "11");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
-		
+
 		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
@@ -367,64 +366,64 @@ public class OrderController extends GenericController{
 	}
 
 	@RequestMapping("houFuChekc")
-    @ResponseBody
-    public  Result checkHoufu(String beginDate,String endDate){
-        List<Order> orderList = orderService.selectOrderListItemByBrandId(beginDate,endDate,getCurrentBrandId());
-        if(!orderList.isEmpty()){
-            for(Order o :orderList){
-                BigDecimal temp = BigDecimal.ZERO;
-                for(OrderItem oi:o.getOrderItems()){
-                    temp=temp.add(oi.getFinalPrice());//查询所有的菜品的总价
-                }
-                //判断当前的订单的总额orderMoney 是否=菜品价格+服务费
-                if(o.getOrderMoney().compareTo(temp.add(o.getServicePrice()))!=0){
-                    OrderException orderException = new OrderException();
-                    orderException.setOrderId(o.getId());
-                    orderException.setOrderMoney(o.getOrderMoney());
-                    orderException.setWhy("服务费+菜品费不等于订单价格");
-                    orderException.setShopName("花千锅");
-                    orderException.setCreateTime(o.getCreateTime());
-                    orderException.setBrandName(getBrandName());
-                    orderExceptionService.insert(orderException);
+	@ResponseBody
+	public  Result checkHoufu(String beginDate,String endDate){
+		List<Order> orderList = orderService.selectOrderListItemByBrandId(beginDate,endDate,getCurrentBrandId());
+		if(!orderList.isEmpty()){
+			for(Order o :orderList){
+				BigDecimal temp = BigDecimal.ZERO;
+				for(OrderItem oi:o.getOrderItems()){
+					temp=temp.add(oi.getFinalPrice());//查询所有的菜品的总价
+				}
+				//判断当前的订单的总额orderMoney 是否=菜品价格+服务费
+				if(o.getOrderMoney().compareTo(temp.add(o.getServicePrice()))!=0){
+					OrderException orderException = new OrderException();
+					orderException.setOrderId(o.getId());
+					orderException.setOrderMoney(o.getOrderMoney());
+					orderException.setWhy("服务费+菜品费不等于订单价格");
+					orderException.setShopName("花千锅");
+					orderException.setCreateTime(o.getCreateTime());
+					orderException.setBrandName(getBrandName());
+					orderExceptionService.insert(orderException);
 
-                }
-            }
-        }
-
-
-        List<Order> orderPayList = orderService.selectHoufuOrderList(beginDate, endDate, getCurrentBrandId());
-        if(!orderPayList.isEmpty()){
-            for(Order od : orderPayList ){
-                   BigDecimal temp = BigDecimal.ZERO;
-                   if(od.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                       temp = od.getAmountWithChildren();
-                   }else {
-                       temp= od.getOrderMoney();
-                   }
-
-                   BigDecimal tempoi = BigDecimal.ZERO;
-                   for( OrderPaymentItem oi :od.getOrderPaymentItems()){
-                       tempoi=tempoi.add(oi.getPayValue());
-                   }
-                   if(temp.compareTo(tempoi)!=0){
-                       OrderException orderException2 = new OrderException();
-                       orderException2.setOrderId(od.getId());
-                       orderException2.setOrderMoney(od.getOrderMoney());
-                       orderException2.setWhy("支付项比支付金额");
-                       orderException2.setShopName("花千锅");
-                       orderException2.setCreateTime(od.getCreateTime());
-                       orderException2.setBrandName(getBrandName());
-                       orderExceptionService.insert(orderException2);
-
-                   }
+				}
+			}
+		}
 
 
-            }
-        }
+		List<Order> orderPayList = orderService.selectHoufuOrderList(beginDate, endDate, getCurrentBrandId());
+		if(!orderPayList.isEmpty()){
+			for(Order od : orderPayList ){
+				BigDecimal temp = BigDecimal.ZERO;
+				if(od.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+					temp = od.getAmountWithChildren();
+				}else {
+					temp= od.getOrderMoney();
+				}
 
-	    return  getSuccessResult();
+				BigDecimal tempoi = BigDecimal.ZERO;
+				for( OrderPaymentItem oi :od.getOrderPaymentItems()){
+					tempoi=tempoi.add(oi.getPayValue());
+				}
+				if(temp.compareTo(tempoi)!=0){
+					OrderException orderException2 = new OrderException();
+					orderException2.setOrderId(od.getId());
+					orderException2.setOrderMoney(od.getOrderMoney());
+					orderException2.setWhy("支付项比支付金额");
+					orderException2.setShopName("花千锅");
+					orderException2.setCreateTime(od.getCreateTime());
+					orderException2.setBrandName(getBrandName());
+					orderExceptionService.insert(orderException2);
 
-    }
+				}
+
+
+			}
+		}
+
+		return  getSuccessResult();
+
+	}
 
 
 }
