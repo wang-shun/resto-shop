@@ -763,7 +763,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private List<String> selectChildIdsByParentId(String id) {
         Order order = orderMapper.selectByPrimaryKey(id);
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER ||
+                (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY)) {
             return orderMapper.selectChildIdsByParentIdByFive(id);
         } else {
             return orderMapper.selectChildIdsByParentId(id);
