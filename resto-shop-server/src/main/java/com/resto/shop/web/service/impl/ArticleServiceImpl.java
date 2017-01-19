@@ -465,22 +465,4 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
     	return articleMapper.queryArticleMealAttr(selectMap);
     }
-    
-    @Override
-    public ShopArticleReportDto queryShopArticleTotal(String beginDate, String endDate, String shopId) {
-    	Date begin = DateUtil.getformatBeginDate(beginDate);
-        Date end = DateUtil.getformatEndDate(endDate);
-        Integer totalNum = 0;
-        /**
-         * 菜品总数单独算是因为 要出去套餐的数量
-         */
-        totalNum = orderMapper.selectShopArticleNum(begin, end, shopId);
-        ShopDetail detail = shopDetailService.selectById(shopId);
-        //查询菜品总额，退菜总数，退菜金额
-        ShopArticleReportDto po = orderMapper.selectShopConfirmMoney(begin, end, shopId);
-        po.setTotalNum(totalNum);
-        po.setShopName(detail.getName());
-        return po;
-    	
-    }
 }

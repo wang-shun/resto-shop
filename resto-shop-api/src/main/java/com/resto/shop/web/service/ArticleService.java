@@ -94,6 +94,4 @@ public interface ArticleService extends GenericService<Article, String> {
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
 	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
-	
-	ShopArticleReportDto queryShopArticleTotal(String beginDate, String endDate, String shopId);
 }

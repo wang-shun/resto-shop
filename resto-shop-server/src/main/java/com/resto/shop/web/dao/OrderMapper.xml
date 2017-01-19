@@ -1240,15 +1240,6 @@ SELECT
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
     
-    <!--查询店铺菜品的总数 -->
-    <select id="selectShopArticleNum" resultType="integer">
-       SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
-       INNER JOIN tb_article ta ON oi.article_id = ta.id
-        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
-        AND
-        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.shop_detail_id=#{shopId}
-    </select>
-
     <!--查询品牌菜品销售的总价-->
     <select id="selectBrandArticleSell" resultType="BigDecimal">
         SELECT sum(t.final_price)sellIncome FROM
@@ -1313,23 +1304,6 @@ AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
     </select>
     
-    <select id="selectShopConfirmMoney" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-         SELECT
-	IFNULL(sum(oi.final_price),0.00) sellIncome,
-	IFNULL(sum(oi.refund_count),0)refundCount,
-	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
-	IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
-FROM
-	tb_order o
-INNER JOIN tb_order_item oi ON o.id = oi.order_id
-INNER JOIN tb_article ta ON oi.article_id = ta.id
-WHERE
-	o.order_state IN (10, 2, 11, 12)
-AND o.production_status IN (2, 3)
-AND
-        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id =#{shopId}
-    </select>
-
     <!-- 品牌菜品销售 -->
     <select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
@@ -1571,7 +1545,7 @@ AND
     </select>
 
 
-    <!-- <select id="selectShopArticleNum" resultType="Integer">
+    <select id="selectShopArticleNum" resultType="Integer">
 
         SELECT IFNULL(SUM(shop_article_report.shopSellNum),0) totalNum FROM
         (SELECT
@@ -1597,7 +1571,7 @@ AND
         )as shop_article_report
 
 
-    </select> -->
+    </select>
 
     <select id="selectBrandArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 

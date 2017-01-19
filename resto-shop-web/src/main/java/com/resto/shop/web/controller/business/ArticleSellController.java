@@ -255,12 +255,6 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	
-	@RequestMapping("/queryShopArticleTotal")
-	@ResponseBody
-	public ShopArticleReportDto queryShopArticleTotal(String beginDate,String endDate){
-		return articleService.queryShopArticleTotal(beginDate, endDate, getCurrentShopId());
-	}
-	
 	@RequestMapping("/queryShopOrderArtcile")
 	@ResponseBody
 	public Result queryShopOrderArtcile(String beginDate, String endDate, Integer type){
@@ -324,50 +318,6 @@ public class ArticleSellController extends GenericController{
 		}
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * 下载品牌菜品销售表
-	 */
-	@RequestMapping("/downloadShopArticleTotal")
-	@ResponseBody
-	public void downloadShopArticleTotal(HttpServletRequest request, HttpServletResponse response,
-			String beginDate, String endDate){
-		//导出文件名
-		String fileName = "店铺菜品销售报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
-		String[]columns={"shopName","totalNum","sellIncome","discountTotal","refundCount","refundTotal"};
-		String[][] headers = {{"店铺名称","25"},{"菜品总销量(份)","25"},{"菜品销售总额(元)","25"},{"折扣总额(元)","25"},{"退菜总数(份)","25"},{"退菜总额(元)","25"}};
-		//定义数据
-		ShopArticleReportDto articleReportDto = articleService.queryShopArticleTotal(beginDate, endDate, getCurrentShopId());
-		List<ShopArticleReportDto> result = new ArrayList<ShopArticleReportDto>();
-		result.add(articleReportDto);
-		
-		String shopName= shopDetailService.selectById(getCurrentShopId()).getName();
-		Map<String,String> map = new HashMap<>();
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("endDate", endDate);
-		map.put("num", "5");//显示的位置
-		map.put("timeType", "yyyy-MM-dd");
-		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
-		map.put("reportTitle", "店铺菜品销售报表");//表的名字
-		//定义excel工具类对象
-		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
