@@ -119,7 +119,18 @@ var tb1 = $("#brandReportTable").DataTable({
         },
 		{
 			title : "支付宝支付(元)",
-			data : "aliPayment"
+			data : "aliPayment",
+		},
+		{
+			title : "银联支付(元)",
+			data : "backCartPay",
+			defaultContent: '0'
+		},
+		{
+			title : "现金支付(元)",
+			data : "moneyPay",
+			defaultContent: '0',
+
 		},
         {
             title : "退菜支付(元)",
@@ -129,6 +140,7 @@ var tb1 = $("#brandReportTable").DataTable({
 		{
 			title : "其他方式支付(元)",
 			data : "otherPayment",
+			defaultContent: '0',
 		}
     ]
 	
@@ -179,6 +191,16 @@ var tb2 = $("#shopReportTable").DataTable({
 		{
 			title : "支付宝支付(元)",
 			data : "aliPayment",
+		},{
+			title : "银联支付(元)",
+			data : "backCartPay",
+			defaultContent: '0'
+		},
+		{
+			title : "现金支付(元)",
+			data : "moneyPay",
+			defaultContent: '0'
+
 		},
         {
             title : "退菜支付(元)",
