@@ -383,15 +383,15 @@ var vueObj = new Vue({
 	            switch (that.currentType)
 	            {
 	                case 1:
+	                	//清空datatable的column搜索条件
+	                	api1.search('');
+	                	var column1 = api1.column(1);
+	                	column1.search('', true, false);
+	                	//清空表格
+	                	that.brandArticleUnitTable.clear().draw();
+	                    that.brandUnitTable();
 	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
 		                	if(result.success == true){
-		            			//清空datatable的column搜索条件
-			                	api1.search('');
-			                	var column1 = api1.column(1);
-			                	column1.search('', true, false);
-			                	//清空表格
-			                	that.brandArticleUnitTable.clear().draw();
-			                    that.brandUnitTable();
 			                    that.brandArticleUnitTable.rows.add(result.data).draw();
 			                  	//重绘搜索列
 			                    that.brandUnitTable();
@@ -399,15 +399,15 @@ var vueObj = new Vue({
 	                    });
 	                	break;
 	                case 2:
+                		//清空datatable的column搜索条件
+                        api2.search('');
+                    	var column1 = api2.column(1);
+                    	column1.search('', true, false);
+                    	//清空表格
+                    	that.brandArticleFamilyTable.clear().draw();
+                        that.brandFamilyTable();
 	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
 		                	if(result.success == true){
-		                		//清空datatable的column搜索条件
-		                        api2.search('');
-		                    	var column1 = api2.column(1);
-		                    	column1.search('', true, false);
-		                    	//清空表格
-		                    	that.brandArticleFamilyTable.clear().draw();
-		                        that.brandFamilyTable();
 		                        that.brandArticleFamilyTable.rows.add(result.data).draw();
 		                        //重绘搜索列
 		                        that.brandFamilyTable();
