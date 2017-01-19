@@ -72,6 +72,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order getOrderAccount(String shopId);
 
 	Order getOrderAccountHoufu(String shopId);
+
+	Order getOrderAccountBoss(String shopId);
 	/**
 	 * 查询某天的历史订单
 	 * 根据店铺模式查询不同状态的历史订单。（2016-10-11，已取消此功能，改为所有模式的店铺的历史订单都不为取消状态和未支付状态）
@@ -84,6 +86,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectHistoryOrderList(@Param("shopId") String currentShopId, @Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd, @Param("shopMode") Integer shopMode);
 
 	List<Order>listHoufuFinishedOrder(String shopId);
+
+
+
 
 	List<Order>listHoufuUnFinishedOrder(String shopId);
 
@@ -143,9 +148,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Double selectParentAmount(@Param("orderId")String orderId,@Param("shopMode") Integer shopMode);
 
+	Double selectParentAmountByBossOrder(String orderId);
+
 	void changeAllowContinue(String id, boolean b);
 
 	Integer selectArticleCountById(@Param("id")String id,@Param("shopMode")Integer shopMode);
+
+	Integer selectArticleCountByIdBossOrder(String id);
 
 	List<Order> selectByParentId(String parentOrderId);
 
@@ -543,4 +552,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectHasPayNoChangeStatus(@Param("shopId") String shopId, @Param("beginDate") Date dateBegin,@Param("endDate") Date dateEnd);
+
+	/**
+	 * 大boss模式下查询新增订单
+	 */
+
+	List<Order> selectOrderByBoss(String shopId);
 }

@@ -874,7 +874,7 @@
         SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5) or (order_state = 1 and order_mode != 5
-        )
+        ) or (order_state = 1 and order_mode != 6)
         or (order_mode = 5 and parent_order_id is null))
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
@@ -950,14 +950,17 @@
         order by create_time DESC;
     </select>
 
+
+
     <select id="listHoufuFinishedOrder" resultType="Order">
-SELECT
+        SELECT
         push_order_time,
         id,
         ver_code,
         article_count,
         table_number,
         parent_order_id,
+        order_state,
         order_money,
         order_mode,
         pay_type,
@@ -1006,6 +1009,39 @@ SELECT
         order by create_time DESC;
 
     </select>
+
+
+    <select id="selectOrderByBoss" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        ver_code,
+        article_count,
+        table_number,
+        parent_order_id,
+        order_money,
+        order_mode,
+        order_state,
+        pay_type,
+        amount_with_children,
+        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
+        FROM
+        tb_order
+
+
+        WHERE
+        shop_detail_id=#{shopId}
+        AND
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and((order_state = 2 and pay_type = 0 and production_status = 1) or
+        (order_state = 1 and pay_type = 1))
+        and table_number is not null
+        and parent_order_id is null
+        order by create_time DESC;
+
+    </select>
+
 
     <select id="selectErrorOrderList" resultType="Order">
         SELECT
@@ -1130,7 +1166,12 @@ SELECT
         <if test="shopMode == 5">
             and order_state != 9
         </if>
+    </select>
 
+    <select id="selectParentAmountByBossOrder" resultType="java.lang.Double">
+        SELECT
+        SUM(order_money) FROM tb_order WHERE id=#{orderId} OR parent_order_id=#{orderId}
+        and order_state != 9
     </select>
 
     <update id="updateParentAmount">
@@ -1151,7 +1192,11 @@ SELECT
         <if test="shopMode == 5">
             and order_state != 9
         </if>
-
+    </select>
+    <select id="selectArticleCountByIdBossOrder" resultType="Integer">
+        select
+        sum(article_count) from tb_order WHERE id=#{id} OR
+        parent_order_id=#{id} and order_state != 9
     </select>
     <select id="selectByParentId" resultType="Order">
         select * from tb_order
@@ -1810,6 +1855,23 @@ AND
 		) as r
     </select>
 
+    <select id="getOrderAccountBoss" resultMap="BaseResultMap">
+        select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
+        sum(customer_count) as customer_count
+        from ( select t.id,t.parent_order_id,
+        if(t.amount_with_children = 0,t.order_money,t.amount_with_children) as orderTotal,
+        if(t.parent_order_id
+        is null,t.customer_count,0) customer_count
+        from tb_order t
+        INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+        where
+        shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
+        GROUP BY t.id
+        ) as r
+    </select>
+
+
     <select id="getOrderAccount" resultMap="BaseResultMap">
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
         sum(customer_count) as customer_count
@@ -2397,8 +2459,8 @@ AND o.production_status IN (2, 3)
 
     </select>
 
-<!-- 每日短信报表数据 -->
-<select id="selectListsmsByShopId" resultMap="everdayReport">
+    <!-- 每日短信报表数据 -->
+    <select id="selectListsmsByShopId" resultMap="everdayReport">
     SELECT
 	o.id,
 	o.order_state,
@@ -2476,11 +2538,11 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and  <![CDATA[ o.create_time <= #{endDate} ]]>
         AND  o.order_state in(2,10,11,12) AND  o.production_status not in(2,3)
     </select>
-	<select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
-		select * from tb_order where id in
-		<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
-			#{orderId}
-		</foreach>
-	</select>
+    <select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
+        select * from tb_order where id in
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </select>
 
 </mapper>

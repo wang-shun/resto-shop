@@ -2,7 +2,6 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysql.fabric.xmlrpc.base.Array;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
@@ -28,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.*;
@@ -502,7 +500,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         payMoney = payMoney.subtract(order.getWaitMoney());
 
-        if (detail.getShopMode() != 5) {
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -534,34 +532,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
             }
+            //如果是余额不满足时，使用现金或者银联支付
+            if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(payMoney);
+                item.setRemark("银联支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+                payMoney = BigDecimal.ZERO;
+            } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.MONEY_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(payMoney);
+                item.setRemark("现金支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+                payMoney = BigDecimal.ZERO;
+            }
         }
 
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
-        //如果是余额不满足时，使用现金或者银联支付
-        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.BANK_CART_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(payMoney);
-            item.setRemark("银联支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
-        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.MONEY_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(payMoney);
-            item.setRemark("现金支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
-        }
-
 
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
@@ -610,8 +607,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        //判断是否是后付款模式
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        //判断是否是后付款模式或者稍后支付模式
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getPayType() == PayType.NOPAY) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setAllowContinueOrder(true);
@@ -633,7 +630,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setNeedScan(Common.YES);
         }
 
-
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -641,7 +637,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         jsonResult.setData(order);
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER ) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
@@ -649,6 +645,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     parent.setLastOrderTime(order.getCreateTime());
                 }
                 Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
+            }
+        }else if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER){
+            if (order.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(order.getParentOrderId());
+                int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(order.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
@@ -1304,9 +1312,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         for (OrderItem obj : list) {
                             Map<String, Object> child_item = new HashMap<String, Object>();
                             child_item.put("ARTICLE_NAME", obj.getArticleName());
-                            if(order.getIsRefund() != null && order.getIsRefund() == Common.YES){
+                            if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
                                 child_item.put("ARTICLE_COUNT", obj.getRefundCount());
-                            }else{
+                            } else {
                                 child_item.put("ARTICLE_COUNT", obj.getCount());
                             }
 
@@ -1800,14 +1808,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {
-        Date begin = DateUtil.getDateBegin(date);
-        Date end = DateUtil.getDateEnd(date);
-//        if (shopMode == ShopMode.HOUFU_ORDER) {
-        return orderMapper.listHoufuFinishedOrder(currentShopId);
-//        } else {
-//            return orderMapper.selectHistoryOrderList(currentShopId, begin, end, shopMode);
-//        }
-
+            return orderMapper.listHoufuFinishedOrder(currentShopId);
     }
 
     @Override
@@ -2692,6 +2693,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
             order = orderMapper.getOrderAccountHoufu(shopId);
+        }else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER){
+            order = orderMapper.getOrderAccountBoss(shopId);
         } else {
             order = orderMapper.getOrderAccount(shopId);
         }
@@ -3410,6 +3413,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
             return orderMapper.listHoufuUnFinishedOrder(shopId);
+
+        } else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER) {
+            return orderMapper.selectOrderByBoss(shopId);
         } else {
             return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
         }
@@ -5616,8 +5622,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-
-
     }
 
     @Override
@@ -5630,7 +5634,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
-                if(item.getType() == OrderItemType.SETMEALS){
+                if (item.getType() == OrderItemType.SETMEALS) {
                     //如果退了套餐，清空子品
                     orderitemMapper.refundArticleChild(orderItem.getId());
                 }
@@ -5680,11 +5684,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 mealCount += item.getCount() * item.getMealFeeNumber();
                 total = total.add(mealPrice);
             }
-            if (item.getRefundCount() > 0 && item.getType() != OrderItemType.MEALS_CHILDREN ) {
+            if (item.getRefundCount() > 0 && item.getType() != OrderItemType.MEALS_CHILDREN) {
                 sum += item.getRefundCount();
 
             }
-            if(item.getType() != OrderItemType.MEALS_CHILDREN){
+            if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
             }
 
@@ -5700,7 +5704,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
-        if(o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0){
+        if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
         }
         if (o.getParentOrderId() != null) {
@@ -5764,9 +5768,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
-                if(item.getType() == OrderItemType.SETMEALS){
+                if (item.getType() == OrderItemType.SETMEALS) {
                     List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
-                    for(OrderItem c : child ){
+                    for (OrderItem c : child) {
                         //                childItem.setArticleName("|__" + childItem.getArticleName());
                         msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
                     }
@@ -5861,8 +5865,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("orderItemIds", orderItemIds);
         List<OrderItem> items = orderItemService.selectRefundOrderItem(map);
-        for(OrderItem item : items){
-            if(item.getType() == OrderItemType.SETMEALS){
+        for (OrderItem item : items) {
+            if (item.getType() == OrderItemType.SETMEALS) {
                 List<OrderItem> list = orderitemMapper.getListBySort(item.getId(), item.getArticleId());
                 item.setChildren(list);
             }
@@ -5894,7 +5898,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             refundItems.add(refundItem);
             articleCount = articleCount.add(new BigDecimal(article.getRefundCount()));
             orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
-            if (article.getType() != OrderItemType.MEALS_CHILDREN &&  order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
+            if (article.getType() != OrderItemType.MEALS_CHILDREN && order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
