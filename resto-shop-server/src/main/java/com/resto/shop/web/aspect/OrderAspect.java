@@ -107,6 +107,9 @@ public class OrderAspect {
             } else if (order.getOrderState().equals((OrderState.PAYMENT))&&(order.getOrderMode()!=ShopMode.TABLE_MODE||order.getOrderMode()!=ShopMode.BOSS_ORDER)) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
+            if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
+                MQMessageProducer.sendPlaceOrderMessage(order);
+            }
             //出单时减少库存
             Boolean updateStockSuccess = false;
             updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
@@ -405,7 +408,9 @@ public class OrderAspect {
 
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
-        if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.SUBMIT
+        if (order != null
+                && (order.getOrderMode() == ShopMode.HOUFU_ORDER || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))
+                && order.getOrderState() == OrderState.SUBMIT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -438,9 +443,12 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + sum + "\n");
+            if(order.getOrderMode() == ShopMode.BOSS_ORDER){
+                String url = setting.getWechatWelcomeUrl()+"?orderId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
+                msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
+            }
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
-
     }
 
     //推送分享领红包，跳转到我的二维码界面
@@ -476,15 +484,12 @@ public class OrderAspect {
 //                sum = sum.add(order.getServicePrice());
 //            }
 //
-//
 //            msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
 //            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
 //            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        }
 //
 //    }
-
-
 
     @AfterReturning(value = "confirmOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
@@ -603,7 +608,6 @@ public class OrderAspect {
 //			if(!addStockSuccess){
 //				log.info("库存还原失败:"+order.getId());
 //			}
-
         }
     }
 
