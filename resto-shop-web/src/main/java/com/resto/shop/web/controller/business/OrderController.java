@@ -259,6 +259,12 @@ public class OrderController extends GenericController{
 								case 3:
 									ot.setCouponPay(oi.getPayValue());
 									break;
+								case 4:
+									ot.setMoneyPay(oi.getPayValue());
+									break;
+								case 5:
+									ot.setBackCartPay(oi.getPayValue());
+									break;
 								case 6:
 									ot.setChargePay(oi.getPayValue());
 									break;

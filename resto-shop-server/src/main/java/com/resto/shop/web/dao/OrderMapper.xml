@@ -1770,7 +1770,6 @@ AND
         c.telephone,
         a.level,
         IF(oi.pay_value>0,oi.pay_value,0) pay_value,
-
         oi.payment_mode_id
         FROM
         tb_order o
@@ -1778,9 +1777,8 @@ AND
         LEFT JOIN tb_appraise a ON o.id = a.order_id
         LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id,
         (SELECT  @rowNo:=0) _rowNo
-        where
-        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
-         AND o.production_status IN (2, 3)
+        where  o.order_state IN (2,10, 11, 12)  AND o.production_status IN (2, 3)
+          AND  <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
         <if test="search != null">
             ${search}
         </if>
