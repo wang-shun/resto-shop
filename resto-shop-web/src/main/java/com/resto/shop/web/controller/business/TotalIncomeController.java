@@ -241,9 +241,9 @@ public class TotalIncomeController extends GenericController {
         map.put("timeType", "yyyy-MM-dd");
 
         String[][] headers = { { "品牌", "20" },{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
-                { "充值赠送支付(元)", "23" },{"等位红包支付","23"},{"支付宝支付","23"},{"退菜支付","23"},{"其它支付","23"} };
+                { "充值赠送支付(元)", "23" },{"等位红包支付","23"},{"支付宝支付","23"},{"银联支付","23"},{"现金支付","23"},{"退菜支付","23"},{"其它支付","23"} };
         String[] columns = { "name", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
-                "chargeGifAccountIncome","waitNumberIncome","aliPayment","articleBackPay","otherPayment" };
+                "chargeGifAccountIncome","waitNumberIncome","aliPayment","backCartPay","moneyPay","articleBackPay","otherPayment" };
 
         List<ReportIncomeDto> result = new LinkedList<>();
         List<BrandIncomeDto> brandresult = (List<BrandIncomeDto>) getIncomeReportList(beginDate, endDate).get("brandIncome");
@@ -261,6 +261,8 @@ public class TotalIncomeController extends GenericController {
             rt.setAliPayment(shopIncomeDto.getAliPayment());
             rt.setOtherPayment(shopIncomeDto.getOtherPayment());
             rt.setArticleBackPay(shopIncomeDto.getArticleBackPay());
+            rt.setBackCartPay(shopIncomeDto.getBackCartPay());
+            rt.setMoneyPay(shopIncomeDto.getMoneyPay());
             result.add(rt);
         }
         for (BrandIncomeDto brandIncomeDto : brandresult) {
@@ -276,6 +278,8 @@ public class TotalIncomeController extends GenericController {
             rt.setArticleBackPay(brandIncomeDto.getArticleBackPay());
             rt.setAliPayment(brandIncomeDto.getAliPayment());
             rt.setOtherPayment(brandIncomeDto.getOtherPayment());
+            rt.setBackCartPay(brandIncomeDto.getBackCartPay());
+            rt.setMoneyPay(brandIncomeDto.getMoneyPay());
             result.add(rt);
         }
         ExcelUtil<ReportIncomeDto> excelUtil = new ExcelUtil<ReportIncomeDto>();
