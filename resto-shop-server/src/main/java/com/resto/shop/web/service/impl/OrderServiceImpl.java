@@ -500,7 +500,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         payMoney = payMoney.subtract(order.getWaitMoney());
 
-        if (detail.getShopMode() != 5) {
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -532,34 +532,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
             }
+            //如果是余额不满足时，使用现金或者银联支付
+            if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(payMoney);
+                item.setRemark("银联支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+                payMoney = BigDecimal.ZERO;
+            } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.MONEY_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(payMoney);
+                item.setRemark("现金支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+                payMoney = BigDecimal.ZERO;
+            }
         }
 
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
-        //如果是余额不满足时，使用现金或者银联支付
-        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.BANK_CART_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(payMoney);
-            item.setRemark("银联支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
-        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.MONEY_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(payMoney);
-            item.setRemark("现金支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
-        }
-
 
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
@@ -608,8 +607,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        //判断是否是后付款模式
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        //判断是否是后付款模式或者稍后支付模式
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getPayType() == PayType.NOPAY) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setAllowContinueOrder(true);
@@ -631,7 +630,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setNeedScan(Common.YES);
         }
 
-
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -639,7 +637,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         jsonResult.setData(order);
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getPayType() == PayType.NOPAY) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());

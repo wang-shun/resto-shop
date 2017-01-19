@@ -184,8 +184,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 for(int i=0;i<cfg.getCouponNumber();i++){
                     couponService.insertCoupon(coupon);
                 }
-                long begin=coupon.getBeginDate().getTime()+cfg.getBeginDateTime().getTime();
-                long end=coupon.getEndDate().getTime()+cfg.getEndDateTime().getTime();
+                long begin=coupon.getBeginDate().getTime();
+                long end=coupon.getEndDate().getTime();
                 timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),coupon.getPushDay());
             }
         }
