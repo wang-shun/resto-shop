@@ -145,9 +145,9 @@ public class OrderController extends GenericController{
 	@ResponseBody
 	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String start ,String length,String extra_search){
 
-		return this.listResult(beginDate, endDate, shopId,extra_search,start,length);
+		return this.listResult(beginDate, endDate, shopId,start,length,extra_search);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String extra_search,String start ,String length){
+	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String start ,String length,String extra_search){
 		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
 	/*	//获取分页控件的信息
 		String start = getRequest().getParameter("start");
@@ -162,7 +162,7 @@ public class OrderController extends GenericController{
 		}else {
 			search=null;
 		}
-		int st=-1;
+		int st=-2;
 		int len=0;
 		if(start!=null||!start.equals("")){
 			 st =Integer.parseInt(start);
