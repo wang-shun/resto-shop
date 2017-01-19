@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -111,20 +112,24 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	@RequestMapping("/showMealAttr")
-	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate){
+	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate, String shopId){
 		request.setAttribute("articleId", articleId);
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
+		request.setAttribute("shopId", shopId);
 		return "articleSell/mealAttr";
 	}
 	
 	@RequestMapping("/queryArticleMealAttr")
 	@ResponseBody
-	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate){
+	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate, String shopId){
 		Map<String, Object> selectMap = new HashMap<String, Object>();
 		selectMap.put("articleId", articleId);
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
+		if(StringUtils.isNotBlank(shopId)){
+			selectMap.put("shopDetailId", getCurrentShopId());
+		}
 		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
@@ -265,18 +270,6 @@ public class ArticleSellController extends GenericController{
 		selectMap.put("type", type);
 		selectMap.put("shopDetailId", getCurrentShopId());
 		List<ArticleSellDto> articleSellDtos = articleService.queryOrderArtcile(selectMap);
-		return getSuccessResult(articleSellDtos);
-	}
-	
-	@RequestMapping("/queryShopArticleMealAttr")
-	@ResponseBody
-	public Result queryShopArticleMealAttr(String articleId, String beginDate, String endDate){
-		Map<String, Object> selectMap = new HashMap<String, Object>();
-		selectMap.put("articleId", articleId);
-		selectMap.put("beginDate", beginDate);
-		selectMap.put("endDate", endDate);
-		selectMap.put("shopDetailId", getCurrentShopId());
-		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
 	
