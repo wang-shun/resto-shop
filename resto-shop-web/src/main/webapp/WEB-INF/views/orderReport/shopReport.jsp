@@ -193,7 +193,6 @@
 			//type:"get",
 			//"aLengthMenu":[10,15,20],
 			"data": function ( d ) {
-				console.log(d);
 				d.beginDate = $("#beginDate2").val();
 				d.endDate = $("#endDate2").val();
 				d.shopId = shopId;
@@ -227,7 +226,6 @@
 				title : "微信支付",
 				data : "weChatPay",
 				createdCell:function (td,tdData,row) {
-					console.log(row);
 					if(row.childOrder==true&&row.orderMode==5){
 						$(td).html("--")
 					}
@@ -360,10 +358,8 @@
 				"orderId" : orderId
 			},
 			success : function(result) {
-				console.log(orderId+"_______________");
 				if (result) {
 					var data = result.data;
-					console.log(data);
 
 					if(data.orderMode == 5){
 						$("#addOrderDiv").html("");//清空上一次的内容
@@ -518,7 +514,8 @@
 		$("#endDate2").val(date);
 
 		//查询
-		search(date, date);
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
 
 	})
 
@@ -531,7 +528,8 @@
 		$("#beginDate2").val(beginDate);
 		$("#endDate2").val(endDate);
 		//查询
-		search(beginDate, endDate);
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
 
 	})
 
@@ -545,7 +543,8 @@
 		$("#beginDate2").val(beginDate);
 		$("#endDate2").val(endDate);
 		//查询
-		search(beginDate, endDate);
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
 
 	})
 
@@ -558,12 +557,14 @@
 		$("#beginDate2").val(beginDate);
 		$("#endDate2").val(endDate);
 		//查询
-		search(beginDate, endDate);
+		var level1 = $('#level1').val();
+		search(beginDate, endDate,level1);
 
 	})
 
 	//下载报表
 	$("#shopreportExcel").click(
+
 			function() {
 				var beginDate = $("#beginDate2").val();
 				var endDate = $("#endDate2").val();
@@ -572,9 +573,12 @@
 					toastr.error("开始时间不能大于结束时间");
 					return;
 				}
-
+				tb1.ajax.reload();
 				location.href = "orderReport/shop_excel?beginDate=" + beginDate
-						+ "&&endDate=" + endDate + "&&=" + shopId;
+						+ "&&endDate=" + endDate + "&&shopId="+ shopId+"&&start=-1&&length=0"+"&&extra_search="+$('#level1').val();
 
 			})
+
+
+
 </script>
