@@ -5441,14 +5441,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
 
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
-                int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
+                int articleCountWithChildren = 0;
+
+
                 if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
                     parent.setLastOrderTime(order.getCreateTime());
                 }
-                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+                Double amountWithChildren = 0.0;
+                if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+                    articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
+                    amountWithChildren= orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+                }else{
+                    articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
+                    amountWithChildren= orderMapper.selectParentAmountByBossOrder(parent.getId());
+                }
+
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
