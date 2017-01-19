@@ -363,7 +363,7 @@ public class OrderAspect {
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
-                if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
+                if (order.getOrderMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
