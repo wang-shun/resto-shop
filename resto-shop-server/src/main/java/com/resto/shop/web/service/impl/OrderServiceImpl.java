@@ -1798,21 +1798,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {
-        Date begin = DateUtil.getDateBegin(date);
-        Date end = DateUtil.getDateEnd(date);
-//        if (shopMode == ShopMode.HOUFU_ORDER) {
-
-//        if(shopMode == ShopMode.BOSS_ORDER){
-//
-//        }else{
             return orderMapper.listHoufuFinishedOrder(currentShopId);
-//        }
-
-
-//        } else {
-//            return orderMapper.selectHistoryOrderList(currentShopId, begin, end, shopMode);
-//        }
-
     }
 
     @Override
