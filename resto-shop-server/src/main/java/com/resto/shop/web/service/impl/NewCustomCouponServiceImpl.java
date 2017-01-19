@@ -209,7 +209,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	                sendNote(pr,name,pushDay,customerId);//发送短信
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
-	    			calendar.setTime(new Date(EndDate-(1000*60*60*24*pushDay)));
+	    			calendar.setTime(new Date(new Date().getTime()+(1000*60*2)));
 	    			calendar.set(Calendar.HOUR, new Date().getHours());
 	    			calendar.set(Calendar.SECOND,new Date().getSeconds());
 	    			String pr=price+"";
