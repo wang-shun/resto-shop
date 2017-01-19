@@ -872,7 +872,7 @@
     <select id="orderList" resultType="Order">
         SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
-        and ( (order_state != 1 and parent_order_id is null and order_mode != 5) or (order_state = 1 and order_mode != 5
+        and ( (order_state != 1 and parent_order_id is null and order_mode != 5) or (order_state = 1 and order_mode != 5 and order_mode != 6
         )
         or (order_mode = 5 and parent_order_id is null))
         <if test="orderState != null and orderState != '' ">
