@@ -108,6 +108,7 @@ public class OrderAspect {
                 sendPaySuccessMsg(order);
             }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
+                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
             //出单时减少库存
@@ -384,9 +385,9 @@ public class OrderAspect {
                         }
                     }
                 }
-                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
-                    sendPaySuccessMsg(order);
-                }
+//                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
+//                    sendPaySuccessMsg(order);
+//                }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
