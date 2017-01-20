@@ -1896,6 +1896,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for(String c : childs){
                     Order childOrder = selectById(c);
                     order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
+                    order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
                 }
             }
 
