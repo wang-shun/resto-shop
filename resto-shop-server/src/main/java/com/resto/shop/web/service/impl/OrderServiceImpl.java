@@ -1726,7 +1726,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
-        data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
