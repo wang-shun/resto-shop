@@ -293,12 +293,12 @@ public class OrderController extends GenericController{
 				ot.setChildOrder(true);
 			}
 			ot.setOrderMode(o.getOrderMode());
-			//设置营销撬动率  实际（)/虚拟
+			//设置营销撬动率  实际（微信+充值+支付宝+现金+银联+其他)/虚拟（评论红包+分享+充值红包+优惠劵）
 			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getBackCartPay()).add(ot.getAliPayment()).add(ot.getMoneyPay());
 			BigDecimal temp = o.getOrderMoney().subtract(real);//subtract 减法
 			String incomPrize = "";
-			if(temp.compareTo(BigDecimal.ZERO)>0){
-				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
+			if(temp.compareTo(BigDecimal.ZERO)>0){//分母不能为0
+				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";//ROUND_HALF_UP舍五入
 			}
 			ot.setIncomePrize(incomPrize);
 			//订单金额
