@@ -28,6 +28,8 @@ public class AccountLog {
     private String accountId;
     
     private Integer source;
+    
+    private String shopDetailId;
 
     public String getId() {
         return id;
@@ -91,5 +93,13 @@ public class AccountLog {
 
 	public void setSource(Integer source) {
 		this.source = source;
+	}
+
+	public String getShopDetailId() {
+		return shopDetailId;
+	}
+
+	public void setShopDetailId(String shopDetailId) {
+		this.shopDetailId = shopDetailId;
 	}
 }
