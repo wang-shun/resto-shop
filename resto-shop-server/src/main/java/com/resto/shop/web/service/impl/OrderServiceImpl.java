@@ -707,7 +707,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() != null && order.getPayType() == PayType.NOPAY){
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() == null && order.getPayType() == PayType.NOPAY){
             updateChild(order);
         }
 
