@@ -276,18 +276,18 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	/**
-	 * 下载品牌菜品销售表(单品/套餐)
+	 * 下载店铺菜品销售表(单品/套餐)
 	 */
 	@RequestMapping("/downloadShopArticle")
 	@ResponseBody
 	public void downloadShopArticle(HttpServletRequest request, HttpServletResponse response,
-			String beginDate, String endDate, Integer type){
+			String beginDate, String endDate, Integer type, String shopId){
 		//查询条件
 		Map<String, Object> selectMap = new HashMap<String, Object>();
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
 		selectMap.put("type", type);
-		selectMap.put("shopDetailId", getCurrentShopId());
+		selectMap.put("shopDetailId", shopId);
 		//导出文件名
 		String fileName = null;
 		//定义读取文件的路径
@@ -295,7 +295,7 @@ public class ArticleSellController extends GenericController{
 		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
 		String[]columns={"typeName","articleFamilyName","articleName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
 		String[][] headers = {{"菜品类型","25"},{"菜名类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
-		String shopName= shopDetailService.selectById(getCurrentShopId()).getName();
+		String shopName= shopDetailService.selectById(shopId).getName();
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
 		Map<String,String> map = new HashMap<>();
