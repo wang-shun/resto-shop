@@ -259,9 +259,9 @@ public class OrderController extends GenericController{
 								case 3:
 									ot.setCouponPay(oi.getPayValue());
 									break;
-								case 4:
-									ot.setMoneyPay(oi.getPayValue());
-									break;
+                                case 4:
+                                    ot.setOtherPayment(oi.getPayValue());
+                                    break;
 								case 5:
 									ot.setBackCartPay(oi.getPayValue());
 									break;
@@ -271,8 +271,16 @@ public class OrderController extends GenericController{
 								case 7:
 									ot.setRewardPay(oi.getPayValue());
 									break;
+
 								case 8:
 									ot.setWaitRedPay(oi.getPayValue());
+                                    break;
+                                case 10:
+                                    ot.setAliPayment(oi.getPayValue());
+                                    break;
+                                case 12:
+                                    ot.setMoneyPay(oi.getPayValue());
+                                    break;
 								default:
 									break;
 							}
@@ -285,9 +293,9 @@ public class OrderController extends GenericController{
 				ot.setChildOrder(true);
 			}
 			ot.setOrderMode(o.getOrderMode());
-			//设置营销撬动率  实际/虚拟
-			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
-			BigDecimal temp = o.getOrderMoney().subtract(real);
+			//设置营销撬动率  实际（)/虚拟
+			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getBackCartPay()).add(ot.getAliPayment()).add(ot.getMoneyPay());
+			BigDecimal temp = o.getOrderMoney().subtract(real);//subtract 减法
 			String incomPrize = "";
 			if(temp.compareTo(BigDecimal.ZERO)>0){
 				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";

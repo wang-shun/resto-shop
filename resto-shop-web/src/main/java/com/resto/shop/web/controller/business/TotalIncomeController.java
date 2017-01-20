@@ -119,8 +119,8 @@ public class TotalIncomeController extends GenericController {
                             case PayMode.WAIT_MONEY:
                                 si.setWaitNumberIncome(oi.getPayValue());
                                 break;
-                            case PayMode.MONEY_PAY://现金支付
-                                si.setMoneyPay(oi.getPayValue());
+                            case PayMode.MONEY_PAY:
+                                si.setOtherPayment(oi.getPayValue());
                                 break;
                             case PayMode.ALI_PAY:
                                 si.setAliPayment(oi.getPayValue());
@@ -131,8 +131,8 @@ public class TotalIncomeController extends GenericController {
                             case PayMode.BANK_CART_PAY://银行卡
                                 si.setBackCartPay(oi.getPayValue());
                                 break;
-                             case PayMode.CRASH_PAY:
-                                si.setOtherPayment(oi.getPayValue());
+                             case PayMode.CRASH_PAY://现金支付
+                                si.setMoneyPay(oi.getPayValue());
 
                             default:
                                 break;
