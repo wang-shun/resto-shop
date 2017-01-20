@@ -133,6 +133,7 @@ public class TotalIncomeController extends GenericController {
                                 break;
                              case PayMode.CRASH_PAY://现金支付
                                 si.setMoneyPay(oi.getPayValue());
+                                 break;
 
                             default:
                                 break;
