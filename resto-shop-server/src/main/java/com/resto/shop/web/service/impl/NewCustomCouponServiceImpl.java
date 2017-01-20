@@ -213,9 +213,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	                sendNote(pr,name,pushDay,customerId);//发送短信
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
-	    			calendar.setTime(new Date(new Date().getTime()+(1000*60*2)));
-	    			calendar.set(Calendar.HOUR, new Date().getHours());
-	    			calendar.set(Calendar.SECOND,new Date().getSeconds());
+	    			calendar.setTime(new Date());
+	    			calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE) + 1);
 	    			String pr=price+"";
 	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay);
 	    		}
