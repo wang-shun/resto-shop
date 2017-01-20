@@ -1625,11 +1625,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else if (order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2) {
             if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 Map<String, Object> item = new HashMap<>();
-                item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount())));
+
+                List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+                BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
+                BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
+                if(!CollectionUtils.isEmpty(childs)){
+                    for(String c : childs){
+                        Order childOrder = selectById(c);
+                        mealCount = mealCount.add(BigDecimal.valueOf(childOrder.getBaseMealAllCount()));
+                        mealAllNumber = mealAllNumber.add(BigDecimal.valueOf(childOrder.getMealAllNumber()));
+                    }
+                }
+                item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
                 item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-                item.put("ARTICLE_COUNT", order.getBaseMealAllCount());
+                item.put("ARTICLE_COUNT", mealCount);
                 items.add(item);
-                if (order.getBaseMealAllCount() != order.getMealAllNumber()) {
+                if (mealCount != mealAllNumber) {
                     Map<String, Object> refundItem = new HashMap<>();
                     refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount() - order.getMealAllNumber())).doubleValue());
                     refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
@@ -1883,21 +1894,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1){
             List<OrderItem> child = orderItemService.listByParentId(orderId);
-            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+
             for (OrderItem orderItem : child) {
                 order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-//                if(orderItem.getType() != OrderItemType.MEALS_CHILDREN){
-//                    order.setArticleCount(order.getArticleCount() + orderItem.getCount());
-//                }
-//                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
-            if(!CollectionUtils.isEmpty(child)){
+            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+            if(!CollectionUtils.isEmpty(childs)){
                 for(String c : childs){
                     Order childOrder = selectById(c);
 //                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
                     order.setOrderMoney(order.getOrderMoney().add(childOrder.getMealFeePrice().multiply(BigDecimal.valueOf(childOrder.getMealAllNumber()))));
-                    order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
-                    order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
+//                    order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
+//                    order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
                 }
             }
 
