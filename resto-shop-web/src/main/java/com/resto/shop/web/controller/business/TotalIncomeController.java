@@ -131,7 +131,7 @@ public class TotalIncomeController extends GenericController {
                             case PayMode.BANK_CART_PAY://银行卡
                                 si.setBackCartPay(oi.getPayValue());
                                 break;
-                             case PayMode.OTHER_PAY_m:
+                             case PayMode.CRASH_PAY:
                                 si.setOtherPayment(oi.getPayValue());
 
                             default:
