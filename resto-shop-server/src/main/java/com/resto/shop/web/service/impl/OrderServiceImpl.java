@@ -707,6 +707,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() != null && order.getPayType() == PayType.NOPAY){
+            updateChild(order);
+        }
+
+
+
+
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
             int articleCountWithChildren = selectArticleCountById(parent.getId(), parent.getOrderMode());
@@ -5804,16 +5811,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     order.setAllowCancel(false);
                     order.setPaymentAmount(BigDecimal.valueOf(0));
                     update(order);
-                    List<Order> orders = orderMapper.selectByParentId(order.getId());
-                    for (Order child : orders) {
-                        if (child.getOrderState() < OrderState.PAYMENT) {
-                            child.setOrderState(OrderState.PAYMENT);
-                            child.setPaymentAmount(BigDecimal.valueOf(0));
-                            child.setAllowCancel(false);
-                            child.setAllowContinueOrder(false);
-                            update(child);
-                        }
-                    }
+                    updateChild(order);
 
                 }
             }
