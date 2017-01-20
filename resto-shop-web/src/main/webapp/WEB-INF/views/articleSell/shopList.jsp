@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<div id="control">
+<div id="controlShop">
 	<h2 class="text-center"><strong>店铺菜品销售报表</strong></h2><br/>
 	<div class="row" id="searchTools">
 		<div class="col-md-12">
@@ -45,6 +45,24 @@
 				 </div>
 				</div>
 		</div>
+		
+		<!-- 查看详情窗口 -->
+		<div class="modal fade" id="mealAttrModal" tabindex="-1" role="dialog" data-backdrop="static">
+	        <div class="modal-dialog modal-full">
+	            <div class="modal-content">
+	
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
+	                </div>
+	
+	                <div class="modal-body" id="reportModal1"></div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal">关闭</button>
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+    	</div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
@@ -62,7 +80,7 @@
     });
     var sort = "desc";
 	var vueObj = new Vue({
-	    el : "#control",
+	    el : "#controlShop",
 	    data : {
 	        searchDate : {
 	            beginDate : "",
@@ -193,16 +211,15 @@
 	    return str.replace(/(^\s*)|(\s*$)/g, ""); 
 	}
 	
-	function openModal(articleId) {
+	function openModal(shopId) {
 		var beginDate = $("#beginDate").val();
 		var endDate = $("#endDate").val();
 	    $.ajax({
-	        url: 'articleSell/showMealAttr',
+	        url: 'articleSell/showShopArticle',
 	        data: {
-	            'articleId': articleId,
 	            'beginDate': beginDate,
 	            'endDate': endDate,
-	            'shopId': 'shopId'
+	            'shopId': shopId
 	        },
 	        success: function (result) {
 	            var modal = $("#mealAttrModal");

@@ -120,6 +120,14 @@ public class ArticleSellController extends GenericController{
 		return "articleSell/mealAttr";
 	}
 	
+	@RequestMapping("/showShopArticle")
+	public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId){
+		request.setAttribute("beginDate", beginDate);
+		request.setAttribute("endDate", endDate);
+		request.setAttribute("shopId", shopId);
+		return "articleSell/shopArticle";
+	}
+	
 	@RequestMapping("/queryArticleMealAttr")
 	@ResponseBody
 	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate, String shopId){
@@ -128,7 +136,7 @@ public class ArticleSellController extends GenericController{
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
 		if(StringUtils.isNotBlank(shopId)){
-			selectMap.put("shopDetailId", getCurrentShopId());
+			selectMap.put("shopDetailId", shopId);
 		}
 		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
@@ -257,12 +265,12 @@ public class ArticleSellController extends GenericController{
 	
 	@RequestMapping("/queryShopOrderArtcile")
 	@ResponseBody
-	public Result queryShopOrderArtcile(String beginDate, String endDate, Integer type){
+	public Result queryShopOrderArtcile(String beginDate, String endDate, Integer type, String shopId){
 		Map<String, Object> selectMap = new HashMap<String, Object>();
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
 		selectMap.put("type", type);
-		selectMap.put("shopDetailId", getCurrentShopId());
+		selectMap.put("shopDetailId", shopId);
 		List<ArticleSellDto> articleSellDtos = articleService.queryOrderArtcile(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
