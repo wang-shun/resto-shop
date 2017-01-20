@@ -2482,7 +2482,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int number = 0;
         //品牌订单营销撬动率
         String marketPrize = "";
-        Set<String> ids = new HashSet<>();
+        List<String> ids = new ArrayList<String>();
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
@@ -2505,7 +2505,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                     //品牌实际支付  微信支付+
-                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11||oi.getPaymentModeId() == 12||oi.getPaymentModeId() ==5) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
