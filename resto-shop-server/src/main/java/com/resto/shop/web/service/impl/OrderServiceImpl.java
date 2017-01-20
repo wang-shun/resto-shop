@@ -1885,6 +1885,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+                if(orderItem.getType() != OrderItemType.MEALS_CHILDREN){
+                    order.setArticleCount(order.getArticleCount() + orderItem.getCount());
+                }
+
 //                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
             child.addAll(items);
@@ -5738,6 +5742,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
+                        order.setPaymentAmount(BigDecimal.valueOf(0));
                         order.setOrderState(OrderState.PAYMENT);
                         order.setPrintTimes(1);
                         item.setId(ApplicationUtils.randomUUID());
@@ -5749,6 +5754,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         orderPaymentItemService.insert(item);
                         break;
                     case OrderPayMode.XJ_PAY:
+                        order.setPaymentAmount(BigDecimal.valueOf(0));
                         order.setOrderState(OrderState.PAYMENT);
                         order.setPrintTimes(1);
                         item.setId(ApplicationUtils.randomUUID());
