@@ -469,9 +469,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
     Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
+    
     brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
+    
     /**
      * 手动取消订单
      * @param brandId

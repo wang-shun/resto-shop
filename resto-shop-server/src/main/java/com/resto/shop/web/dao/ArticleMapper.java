@@ -1,12 +1,13 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.shop.web.model.ArticleStock;
-import com.resto.shop.web.model.FreeDay;
 import org.apache.ibatis.annotations.Param;
-
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Article;
 
 public interface ArticleMapper extends GenericDao<Article, String>{
@@ -106,4 +107,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void addArticleLikes(String articleId);
 	
 	List<Article> selectsingleItem(@Param("shopId") String shopId);
+	
+	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
+	
+	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
 }
