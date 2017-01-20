@@ -2300,7 +2300,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
         for (ShopDetail shop : shopDetails) {
-            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%", 0, BigDecimal.ZERO);
+            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%",0,BigDecimal.ZERO,BigDecimal.ZERO);
             listArticles.add(st);
         }
 
@@ -2317,6 +2317,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (ShopArticleReportDto shopArticleReportDto2 : list) {
                     if (shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())) {
                         shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
+                        shopArticleReportDto.setDiscountTotal(shopArticleReportDto2.getDiscountTotal());
                         shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
                         shopArticleReportDto.setRefundCount(shopArticleReportDto2.getRefundCount());
                         shopArticleReportDto.setRefundTotal(shopArticleReportDto2.getRefundTotal());

@@ -1258,11 +1258,12 @@
     <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="integer">
        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
-        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and oi.type!=3
+       INNER JOIN tb_article ta ON oi.article_id = ta.id
+        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
-
+    
     <!--查询品牌菜品销售的总价-->
     <select id="selectBrandArticleSell" resultType="BigDecimal">
         SELECT sum(t.final_price)sellIncome FROM
@@ -1286,9 +1287,9 @@
         SUM(oi.count)totalNum,
         o.shop_detail_id shop_id
 	     from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
+	     INNER JOIN tb_article ta on oi.article_id = ta.id and ta.article_type = 1
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
-        AND oi.type!=3
         GROUP BY o.shop_detail_id
     </select>
 
@@ -1299,10 +1300,12 @@
         SUM(oi.final_price)sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
-       IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal
-
+       	IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
+		IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
         from tb_order_item oi INNER JOIN tb_order o
-        on o.id=oi.order_id WHERE
+        on o.id=oi.order_id 
+        INNER JOIN tb_article ta ON oi.article_id = ta.id
+        WHERE
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
@@ -1312,19 +1315,21 @@
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
          SELECT
-	ifnull(sum(oi.final_price),0.00) sellIncome,
+	IFNULL(sum(oi.final_price),0.00) sellIncome,
 	IFNULL(sum(oi.refund_count),0)refundCount,
-	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal
+	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
+	IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
 FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
+INNER JOIN tb_article ta ON oi.article_id = ta.id
 WHERE
 	o.order_state IN (10, 2, 11, 12)
 AND o.production_status IN (2, 3)
 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
     </select>
-
+    
     <!-- 品牌菜品销售 -->
     <select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
