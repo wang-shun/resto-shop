@@ -1886,15 +1886,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
             for (OrderItem orderItem : child) {
                 order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-                if(orderItem.getType() != OrderItemType.MEALS_CHILDREN){
-                    order.setArticleCount(order.getArticleCount() + orderItem.getCount());
-                }
-
+//                if(orderItem.getType() != OrderItemType.MEALS_CHILDREN){
+//                    order.setArticleCount(order.getArticleCount() + orderItem.getCount());
+//                }
 //                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
             if(!CollectionUtils.isEmpty(child)){
                 for(String c : childs){
                     Order childOrder = selectById(c);
+                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
+                    order.setOrderMoney(order.getOrderMoney().add(childOrder.getMealFeePrice().multiply(BigDecimal.valueOf(childOrder.getMealAllNumber()))));
                     order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
                     order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
                 }
