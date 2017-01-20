@@ -1894,7 +1894,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(!CollectionUtils.isEmpty(child)){
                 for(String c : childs){
                     Order childOrder = selectById(c);
-                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
+//                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
                     order.setOrderMoney(order.getOrderMoney().add(childOrder.getMealFeePrice().multiply(BigDecimal.valueOf(childOrder.getMealAllNumber()))));
                     order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
                     order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
