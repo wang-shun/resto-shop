@@ -1008,7 +1008,7 @@
         and order_state = 1
         and table_number is not null
         and parent_order_id is null
-        order by create_time DESC;
+        order by create_time ASC;
 
     </select>
 
@@ -1040,7 +1040,7 @@
         (order_state = 1 and pay_type = 1))
         and table_number is not null
         and parent_order_id is null
-        order by create_time DESC;
+        order by create_time ASC;
 
     </select>
 
@@ -2278,7 +2278,7 @@ GROUP BY r.table_number
             </foreach>
         </if>
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        ORDER BY create_time DESC
+        ORDER BY create_time ASC
     </select>
 
 
