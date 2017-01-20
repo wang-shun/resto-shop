@@ -314,14 +314,14 @@ public class OrderController extends GenericController{
 			}
 			List<Order> la = orderService.selectListByTime(beginDate, endDate, shopId, -1, 0, search);
 			int sizeLenth=0;
-			for (Order  s:la) {
-              if(s.getParentOrderId()==null){
-				  sizeLenth=sizeLenth+1;
-			  }
-			}
+			/*for (Order  s:la) {
+              //if(s.getParentOrderId()==null){
+				 // sizeLenth=sizeLenth+1;
+			 //// }
+			}*/
 			view.setAaData(listDto);
-			view.setiTotalDisplayRecords(sizeLenth);
-			view.setiTotalRecords(sizeLenth);
+			view.setiTotalDisplayRecords(la.size());
+			view.setiTotalRecords(la.size());
 		}
 		return view;
 	}
