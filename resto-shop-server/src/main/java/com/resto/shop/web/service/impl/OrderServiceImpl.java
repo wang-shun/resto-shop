@@ -1884,7 +1884,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1){
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
-                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+                order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
 //                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
             child.addAll(items);
@@ -5728,12 +5728,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             OrderPaymentItem item = new OrderPaymentItem();
             if(pay.doubleValue() > 0){ //还需要支付
-                order.setPaymentAmount(pay);
+
                 order.setPayMode(payMode);
                 switch (payMode){
                     case OrderPayMode.WX_PAY :
+                        order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.ALI_PAY:
+                        order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
                         order.setOrderState(OrderState.PAYMENT);
