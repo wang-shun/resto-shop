@@ -896,7 +896,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             refundOrder(order);
             result.setSuccess(true);
         }else{
-            autoRefundOrder(orderId);
+            result.setSuccess(autoRefundOrder(orderId));
+
         }
 
 
