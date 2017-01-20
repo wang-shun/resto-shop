@@ -883,10 +883,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result =  new Result(autoRefundOrder(orderId));
         Order order = selectById(orderId);
+        order.setIsPay(OrderPayState.NOT_PAY);
+
         if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED){
             refundOrder(order);
+            result.setSuccess(true);
         }
-
+        update(order);
         return result;
 //        Result result = new Result();
 //
