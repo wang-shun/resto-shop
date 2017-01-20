@@ -108,7 +108,7 @@ public class OrderAspect {
             if (order.getOrderState().equals(OrderState.SUBMIT)&&(order.getOrderMode()!=ShopMode.HOUFU_ORDER||order.getOrderMode()!=ShopMode.BOSS_ORDER)) {//未支付和未完全支付的订单，不包括后付款模式
             	long delay = 1000*60*60*2;//两个小时后自动取消订单
                 MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            } else if (order.getOrderState().equals((OrderState.PAYMENT))&&(order.getOrderMode()!=ShopMode.TABLE_MODE||order.getOrderMode()!=ShopMode.BOSS_ORDER)) { //坐下点餐模式不发送
+            } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode()!=ShopMode.TABLE_MODE && order.getOrderMode()!=ShopMode.BOSS_ORDER) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
@@ -405,9 +405,9 @@ public class OrderAspect {
                         }
                     }
                 }
-//                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
-//                    sendPaySuccessMsg(order);
-//                }
+                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
+                    sendPaySuccessMsg(order);
+                }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
