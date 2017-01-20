@@ -54,6 +54,9 @@
 							</div>
 						</div>
 
+
+
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>
 							<div class="col-sm-9">
@@ -83,6 +86,20 @@
 								</div>
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">允许后付（仅混合支付模式有效）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="allowAfterPay"
+												   v-model="m.allowAfterPay" value="0"> 允许
+									</label> <label> <input type="radio" name="allowAfterPay"
+															v-model="m.allowAfterPay" value="1"> 不允许
+								</label>
+								</div>
+							</div>
+						</div>
+
 
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
