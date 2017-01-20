@@ -178,137 +178,151 @@ public class OrderController extends GenericController{
 
 
 		for (Order o : list) {
-			OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
-			if(o.getCustomer()!=null){
-				//手机号
-				if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
-					ot.setTelephone(o.getCustomer().getTelephone());
-				}
-			}
-			//订单状态
-			if(o.getOrderState()!=null){
-				switch (o.getOrderState()) {
-					case 1:
-						ot.setOrderState("未支付");
-						break;
-					case 2:
-						if(o.getProductionStatus()==0){
-							ot.setOrderState("已付款");
-						}else if(o.getProductionStatus()==2){
-							ot.setOrderState("已消费");
-						}else if(o.getProductionStatus()==5){
-							ot.setOrderState("异常订单");
-						}
-						break;
-					case 9:
-						ot.setOrderState("已取消");
-						break;
-					case 10:
-						if(o.getProductionStatus()==5){
-							ot.setOrderState("异常订单");
-						}else {
-							ot.setOrderState("已消费");
-						}
-						break;
-					case 11:
-						ot.setOrderState("已评价");
-						break;
-					case 12:
-						ot.setOrderState("已分享");
-						break;
-					default:
-						break;
-				}
-			}
-			//订单评价
-			//判断是否为空，不是所有订单都评价
+			if (o.getParentOrderId() == null) {
 
-			if(null!=o.getAppraise()){
-				switch (o.getAppraise().getLevel()) {
-					case 1:
-						ot.setLevel("一星");
-						break;
-					case 2:
-						ot.setLevel("二星");
-						break;
-					case 3:
-						ot.setLevel("三星");
-						break;
-					case 4:
-						ot.setLevel("四星");
-						break;
-					case 5:
-						ot.setLevel("五星");
-						break;
-					default:
-						break;
+				OrderDetailDto ot = new OrderDetailDto(o.getId(), o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "", false);
+				if (o.getCustomer() != null) {
+					//手机号
+					if (o.getCustomer().getTelephone() != null && o.getCustomer().getTelephone() != "") {
+						ot.setTelephone(o.getCustomer().getTelephone());
+					}
 				}
-			}
-			//订单支付
-			if(o.getOrderPaymentItems()!=null){
-				if(!o.getOrderPaymentItems().isEmpty()){
-					for(OrderPaymentItem oi : o.getOrderPaymentItems()){
-						if(null!=oi.getPaymentModeId()){
-							switch (oi.getPaymentModeId()) {
-								case 1:
-									ot.setWeChatPay(oi.getPayValue());
-									break;
-								case 2:
-									ot.setAccountPay(oi.getPayValue());
-									break;
-								case 3:
-									ot.setCouponPay(oi.getPayValue());
-									break;
-                                case 4:
-                                    ot.setOtherPayment(oi.getPayValue());
-                                    break;
-								case 5:
-									ot.setBackCartPay(oi.getPayValue());
-									break;
-								case 6:
-									ot.setChargePay(oi.getPayValue());
-									break;
-								case 7:
-									ot.setRewardPay(oi.getPayValue());
-									break;
+				//订单状态
+				if (o.getOrderState() != null) {
+					switch (o.getOrderState()) {
+						case 1:
+							ot.setOrderState("未支付");
+							break;
+						case 2:
+							if (o.getProductionStatus() == 0) {
+								ot.setOrderState("已付款");
+							} else if (o.getProductionStatus() == 2) {
+								ot.setOrderState("已消费");
+							} else if (o.getProductionStatus() == 5) {
+								ot.setOrderState("异常订单");
+							}
+							break;
+						case 9:
+							ot.setOrderState("已取消");
+							break;
+						case 10:
+							if (o.getProductionStatus() == 5) {
+								ot.setOrderState("异常订单");
+							} else {
+								ot.setOrderState("已消费");
+							}
+							break;
+						case 11:
+							ot.setOrderState("已评价");
+							break;
+						case 12:
+							ot.setOrderState("已分享");
+							break;
+						default:
+							break;
+					}
+				}
+				//订单评价
+				//判断是否为空，不是所有订单都评价
 
-								case 8:
-									ot.setWaitRedPay(oi.getPayValue());
-                                    break;
-                                case 10:
-                                    ot.setAliPayment(oi.getPayValue());
-                                    break;
-                                case 12:
-                                    ot.setMoneyPay(oi.getPayValue());
-                                    break;
-								default:
-									break;
+				if (null != o.getAppraise()) {
+					switch (o.getAppraise().getLevel()) {
+						case 1:
+							ot.setLevel("一星");
+							break;
+						case 2:
+							ot.setLevel("二星");
+							break;
+						case 3:
+							ot.setLevel("三星");
+							break;
+						case 4:
+							ot.setLevel("四星");
+							break;
+						case 5:
+							ot.setLevel("五星");
+							break;
+						default:
+							break;
+					}
+				}
+				//订单支付
+				if (o.getOrderPaymentItems() != null) {
+					if (!o.getOrderPaymentItems().isEmpty()) {
+						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+							if (null != oi.getPaymentModeId()) {
+								switch (oi.getPaymentModeId()) {
+									case 1:
+										ot.setWeChatPay(oi.getPayValue());
+										break;
+									case 2:
+										ot.setAccountPay(oi.getPayValue());
+										break;
+									case 3:
+										ot.setCouponPay(oi.getPayValue());
+										break;
+									case 4:
+										ot.setOtherPayment(oi.getPayValue());
+										break;
+									case 5:
+										ot.setBackCartPay(oi.getPayValue());
+										break;
+									case 6:
+										ot.setChargePay(oi.getPayValue());
+										break;
+									case 7:
+										ot.setRewardPay(oi.getPayValue());
+										break;
+
+									case 8:
+										ot.setWaitRedPay(oi.getPayValue());
+										break;
+									case 10:
+										ot.setAliPayment(oi.getPayValue());
+										break;
+									case 12:
+										ot.setMoneyPay(oi.getPayValue());
+										break;
+									default:
+										break;
+								}
 							}
 						}
 					}
 				}
+				if (null != o.getParentOrderId()) {
+					//该订单是子订单
+					ot.setChildOrder(true);
+				}
+				ot.setOrderMode(o.getOrderMode());
+				//设置营销撬动率  实际（微信+充值+支付宝+现金+银联+其他)/虚拟（评论红包+分享+充值红包+优惠劵）
+				BigDecimal real = ot.getChargePay().add(ot.getWeChatPay())
+						.add(ot.getMoneyPay() == null ? new BigDecimal(0) : ot.getMoneyPay())
+						.add(ot.getBackCartPay() == null ? new BigDecimal(0) : ot.getBackCartPay())
+						.add(ot.getOtherPayment() == null ? new BigDecimal(0) : ot.getOtherPayment());
+				BigDecimal temp = o.getOrderMoney().subtract(real);
+				String incomPrize = "";
+				if (temp.compareTo(BigDecimal.ZERO) > 0) {
+					incomPrize = real.divide(temp, 2, BigDecimal.ROUND_HALF_UP) + "";
+				}
+
+
+				ot.setIncomePrize(incomPrize);
+				//订单金额
+				ot.setOrderMoney(o.getOrderMoney());
+				listDto.add(ot);
 			}
-			if(null!=o.getParentOrderId()){
-				//该订单是子订单
-				ot.setChildOrder(true);
+			List<Order> la = orderService.selectListByTime(beginDate, endDate, shopId, -1, 0, search);
+			int sizeLenth=0;
+			for (Order  s:la) {
+              if(s.getParentOrderId()==null){
+				  sizeLenth=sizeLenth+1;
+			  }
 			}
-			ot.setOrderMode(o.getOrderMode());
-			//设置营销撬动率  实际（微信+充值+支付宝+现金+银联+其他)/虚拟（评论红包+分享+充值红包+优惠劵）
-			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getBackCartPay()).add(ot.getAliPayment()).add(ot.getMoneyPay());
-			BigDecimal temp = o.getOrderMoney().subtract(real);//subtract 减法
-			String incomPrize = "";
-			if(temp.compareTo(BigDecimal.ZERO)>0){//分母不能为0
-				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";//ROUND_HALF_UP舍五入
-			}
-			ot.setIncomePrize(incomPrize);
-			//订单金额
-			ot.setOrderMoney(o.getOrderMoney());
-			listDto.add(ot);
+			view.setAaData(listDto);
+			view.setiTotalDisplayRecords(sizeLenth);
+			view.setiTotalRecords(sizeLenth);
 		}
-		List<Order> la =orderService.selectListByTime(beginDate,endDate,shopId,-1,0,search);
-		view.setAaData(listDto);
-		view.setiTotalDisplayRecords(la.size());
-		view.setiTotalRecords(la.size());
 		return view;
 	}
 
