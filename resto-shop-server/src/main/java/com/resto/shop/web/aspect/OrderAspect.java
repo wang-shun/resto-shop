@@ -108,7 +108,7 @@ public class OrderAspect {
             if (order.getOrderState().equals(OrderState.SUBMIT)&&(order.getOrderMode()!=ShopMode.HOUFU_ORDER||order.getOrderMode()!=ShopMode.BOSS_ORDER)) {//未支付和未完全支付的订单，不包括后付款模式
             	long delay = 1000*60*60*2;//两个小时后自动取消订单
                 MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            } else if (order.getOrderState().equals((OrderState.PAYMENT))&&(order.getOrderMode()!=ShopMode.TABLE_MODE||order.getOrderMode()!=ShopMode.BOSS_ORDER)) { //坐下点餐模式不发送
+            } else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode()!=ShopMode.TABLE_MODE && order.getOrderMode()!=ShopMode.BOSS_ORDER) { //坐下点餐模式不发送
                 sendPaySuccessMsg(order);
             }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
@@ -377,10 +377,10 @@ public class OrderAspect {
 				}
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
-//                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
-//                    log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
-//                    sendPaySuccessMsg(order);
-//                }
+                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
+                    log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
+                    sendPaySuccessMsg(order);
+                }
                 log.info("检查打印异常");
 //                int times = setting.getReconnectTimes();
 //                int seconds = setting.getReconnectSecond();
@@ -405,9 +405,9 @@ public class OrderAspect {
                         }
                     }
                 }
-//                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
-//                    sendPaySuccessMsg(order);
-//                }
+                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
+                    sendPaySuccessMsg(order);
+                }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
