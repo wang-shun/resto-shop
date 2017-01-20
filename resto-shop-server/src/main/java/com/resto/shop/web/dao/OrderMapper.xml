@@ -259,6 +259,7 @@
     </resultMap>
 
     <resultMap id="orderPaymentlist" type="com.resto.shop.web.model.Order">
+        <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="INTEGER"/>
@@ -267,8 +268,6 @@
         <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
         <result column="order_mode" property="orderMode"/>
         <result column="parent_order_id" property="parentOrderId"/>
-
-
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItem_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -1688,20 +1687,22 @@ AND
 
     <select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">
         SELECT
+        convert((@rowNo :=@rowNo +1),signed) as tag ,
+        o.id,
         o.shop_detail_id,
         o.amount_with_children,
         o.order_money,
         o.order_mode,
-        o.id,
         o.parent_order_id,
         oi.payment_mode_id,
         oi.pay_value
         FROM
         tb_order o
-        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id,
+        (SELECT  @rowNo:=0) _rowNo
         WHERE
         o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>  and brand_id=#{brandId}
     </select>
 
     <select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
