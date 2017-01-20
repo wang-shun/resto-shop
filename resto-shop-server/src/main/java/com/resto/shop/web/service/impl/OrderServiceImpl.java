@@ -1653,7 +1653,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
                 item.put("ARTICLE_COUNT", mealCount);
                 items.add(item);
-                if (mealCount != mealAllNumber) {
+                if (mealCount.doubleValue() != mealAllNumber.doubleValue()) {
                     Map<String, Object> refundItem = new HashMap<>();
                     refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount() - order.getMealAllNumber())).doubleValue());
                     refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
@@ -1719,9 +1719,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
-        data.put("ORIGINAL_AMOUNT", order.getOrderMoney());
+        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
-        data.put("REDUCTION_AMOUNT", order.getReductionAmount());
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getOrderMoney()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
