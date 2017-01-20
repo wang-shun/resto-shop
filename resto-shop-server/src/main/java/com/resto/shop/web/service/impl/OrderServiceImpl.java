@@ -2520,7 +2520,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //店铺订单数目初始值
             int snumber = 0;
 
-            Set<String> sids = new HashSet<>();
+            List<String> sids = new ArrayList<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
                     if (!os.getOrderPaymentItems().isEmpty()) {
