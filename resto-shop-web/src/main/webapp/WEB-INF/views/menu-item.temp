@@ -8,20 +8,11 @@
 		<ul class="sub-menu">
 			<c:forEach items="${m.children }" var="subMenu">
 				<li class="nav-item">
-				    <c:if test="${subMenu.isChildLink == false }">
 				        <a href="${subMenu.permissionSign}" class="nav-link nav-toggle ${subMenu.menuType==1?'ajaxify':''} ${subMenu.menuType==2?'iframeify':''}">
                             <i class="fa ${subMenu.menuIcon }"></i>
                             ${subMenu.permissionName}
                             <span class="arrow "></span>
                         </a>
-				    </c:if>
-                    <c:if test="${subMenu.isChildLink == true }">
-				        <a href="javascript:;" class="nav-link nav-toggle">
-                            <i class="fa ${subMenu.menuIcon }"></i>
-                            ${subMenu.permissionName}
-                            <span class="arrow "></span>
-                        </a>
-				    </c:if>
 					<c:if test="${fn:length(subMenu.children)>0 }">
                         <ul class="sub-menu">
                             <c:forEach items="${subMenu.children }" var="subMenuChild">
