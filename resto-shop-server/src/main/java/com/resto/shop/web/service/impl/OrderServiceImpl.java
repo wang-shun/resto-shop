@@ -5777,6 +5777,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("银联支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
+                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setPaymentAmount(BigDecimal.valueOf(0));
@@ -5789,22 +5790,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("现金支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
+                        updateChild(order);
                         break;
                     default:
                         break;
 
                 }
                 update(order);
-                List<Order> orders = orderMapper.selectByParentId(order.getId());
-                for (Order child : orders) {
-                    if (child.getOrderState() < OrderState.PAYMENT) {
-                        child.setOrderState(OrderState.PAYMENT);
-                        child.setPaymentAmount(BigDecimal.valueOf(0));
-                        child.setAllowCancel(false);
-                        child.setAllowContinueOrder(false);
-                        update(child);
-                    }
-                }
+
             }else{ //支付完成
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
@@ -5829,6 +5822,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         return order;
 
+    }
+
+
+    private void updateChild(Order order){
+        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        for (Order child : orders) {
+            if (child.getOrderState() < OrderState.PAYMENT) {
+                child.setOrderState(OrderState.PAYMENT);
+                child.setPaymentAmount(BigDecimal.valueOf(0));
+                child.setAllowCancel(false);
+                child.setAllowContinueOrder(false);
+                update(child);
+            }
+        }
     }
 
     @Override
