@@ -117,6 +117,17 @@
 							</div>
 						</div>
 
+
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">红包到期提醒时间：</label>
+							<div class="col-sm-9">
+								<input type="number" class="form-control"
+									   name="recommendTime" placeholder="(输入整数)"
+									   v-model="m.recommendTime" required="required" min="0">
+							</div>
+						</div>
+
 						<div class="form-group" v-if="m.isPush==1">
 							<label class="col-sm-3 control-label">消息内容：</label>
 							<div class="col-sm-9">

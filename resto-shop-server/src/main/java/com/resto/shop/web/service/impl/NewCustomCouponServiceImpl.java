@@ -148,6 +148,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             couponType = -1;
             couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         }
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         //根据优惠卷配置，添加对应数量的优惠卷
         Date beginDate  = new Date();
         for(NewCustomCoupon cfg: couponConfigs){
@@ -190,7 +191,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 }
                 long begin=coupon.getBeginDate().getTime();
                 long end=coupon.getEndDate().getTime();
-                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),coupon.getPushDay());
+                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail.getRecommendTime());
             }
         }
     }
@@ -214,7 +215,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
 	    			calendar.setTime(new Date());
-	    			calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE) + 1);
+	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
 	    			String pr=price+"";
 	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay);
 	    		}
