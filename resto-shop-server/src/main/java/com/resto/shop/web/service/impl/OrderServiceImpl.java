@@ -5726,32 +5726,52 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(price.doubleValue() > 0){  //余额支付
                 accountService.payOrder(order, price, customer);
             }
-
+            OrderPaymentItem item = new OrderPaymentItem();
             if(pay.doubleValue() > 0){ //还需要支付
                 order.setPaymentAmount(pay);
+                order.setPayMode(payMode);
                 switch (payMode){
                     case OrderPayMode.WX_PAY :
-                        order.setPayMode(OrderPayMode.WX_PAY);
                         break;
                     case OrderPayMode.ALI_PAY:
-                        order.setPayMode(OrderPayMode.ALI_PAY);
                         break;
                     case OrderPayMode.YL_PAY:
                         order.setOrderState(OrderState.PAYMENT);
-                        order.setPayMode(OrderPayMode.YL_PAY);
                         order.setPrintTimes(1);
+                        item.setId(ApplicationUtils.randomUUID());
+                        item.setOrderId(orderId);
+                        item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                        item.setPayTime(new Date());
+                        item.setPayValue(pay);
+                        item.setRemark("银联支付:" + item.getPayValue());
+                        orderPaymentItemService.insert(item);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setOrderState(OrderState.PAYMENT);
-                        order.setPayMode(OrderPayMode.XJ_PAY);
                         order.setPrintTimes(1);
+                        item.setId(ApplicationUtils.randomUUID());
+                        item.setOrderId(orderId);
+                        item.setPaymentModeId(PayMode.CRASH_PAY);
+                        item.setPayTime(new Date());
+                        item.setPayValue(pay);
+                        item.setRemark("现金支付:" + item.getPayValue());
+                        orderPaymentItemService.insert(item);
                         break;
                     default:
                         break;
 
                 }
-
                 update(order);
+                List<Order> orders = orderMapper.selectByParentId(order.getId());
+                for (Order child : orders) {
+                    if (child.getOrderState() < OrderState.PAYMENT) {
+                        child.setOrderState(OrderState.PAYMENT);
+                        child.setPaymentAmount(BigDecimal.valueOf(0));
+                        child.setAllowCancel(false);
+                        child.setAllowContinueOrder(false);
+                        update(child);
+                    }
+                }
             }else{ //支付完成
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
