@@ -150,6 +150,9 @@
 	//var level1 = $('#level1').val();
 	/***************/
 	tb1 = $('#shopOrder').DataTable( {
+		"bSort": false,
+		"ordering": false, // 禁止排序
+	orderable:false,//禁用排序
 		"pagingType": "simple_numbers",//设置分页控件的模式
 		searching: false,//屏蔽datatales的查询框
 		aLengthMenu:[10,20,40,50,100],//设置一页展示10条记录
@@ -168,7 +171,8 @@
 				"sNext": "后一页",
 				"sLast": "尾页"
 
-			}
+			},
+
 		},
 		"columnDefs": [
 			{ "width": "8%", "targets":0  },
@@ -185,7 +189,9 @@
 			{ "width": "6%", "targets":11  },
 			{ "width": "3%", "targets":12  },
 		],
-		"processing": true, //打开数据加载时的等待效果
+
+
+	   "processing": true, //打开数据加载时的等待效果
 		"serverSide": true,//打开后台分页
 		"ajax": {
 			url : "orderReport/AllOrder",
@@ -271,6 +277,21 @@
 						$(td).html("--")
 					}
 				}
+			}
+			,{
+				title : "支付宝支付",
+				data : "aliPayment",
+				defaultContent: '0'
+			}
+			,{
+				title : "现金支付",
+				data : "backCartPay",
+				defaultContent: '0'
+			},
+			{
+				title : "银联支付",
+				data : "moneyPay",
+				defaultContent: '0'
 			},
 			{
 				title : "营销撬动率",
@@ -578,6 +599,7 @@
 						+ "&&endDate=" + endDate + "&&shopId="+ shopId+"&&start=-1&&length=0"+"&&extra_search="+$('#level1').val();
 
 			})
+
 
 
 
