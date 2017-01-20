@@ -151,7 +151,7 @@ public class OrderAspect {
             msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
         }
         if(setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-            msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+            msg.append(shopDetail.getMealFeeName()+"：333" + order.getMealFeePrice() + "\n");
         }
         msg.append("订单明细：\n");
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
@@ -457,7 +457,7 @@ public class OrderAspect {
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
             if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+                msg.append(shopDetail.getMealFeeName()+"：222" + order.getMealFeePrice() + "\n");
             }
             BigDecimal sum = order.getOrderMoney();
             List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
@@ -616,7 +616,7 @@ public class OrderAspect {
                 msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
             if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+                msg.append(shopDetail.getMealFeeName()+"：111" + order.getMealFeePrice() + "\n");
             }
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
