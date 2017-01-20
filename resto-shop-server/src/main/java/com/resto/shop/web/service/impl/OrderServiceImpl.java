@@ -1595,13 +1595,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> refundItems = new ArrayList<>();
         for (OrderItem article : orderItems) {
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getUnitPrice().multiply(new BigDecimal(article.getOrginCount())));
+            item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
             item.put("ARTICLE_NAME", article.getArticleName());
             item.put("ARTICLE_COUNT", article.getOrginCount());
             items.add(item);
             if (article.getRefundCount() != 0) {
                 Map<String, Object> refundItem = new HashMap<>();
-                refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
+                refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
                 if (article.getArticleName().contains("加")) {
                     article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
                 }
