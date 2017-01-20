@@ -877,7 +877,8 @@ GROUP BY article_id
 		(select toi.id from tb_order_item toi 
 		inner join tb_order tr
 		on toi.order_id = tr.id
-		where toi.article_id = #{articleId}
+		where tr.order_state in (2,10,11,12) and tr.production_status in (2,3) 
+		and toi.article_id = #{articleId}
 		and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00') 
 		and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
 		<if test="shopDetailId != null and shopDetailId !=''">

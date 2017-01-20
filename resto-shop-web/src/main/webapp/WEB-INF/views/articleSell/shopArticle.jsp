@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <div id="controlShop">
+<a class="btn btn-info btn-xs ajaxify" href="articleSell/shopList">
+	<span class="glyphicon glyphicon-circle-arrow-left"></span>
+	返回上级
+</a>
 <h2 class="text-center"><strong>店铺菜品销售报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
