@@ -377,10 +377,10 @@ public class OrderAspect {
 				}
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
-                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
-                    log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
-                    sendPaySuccessMsg(order);
-                }
+//                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知
+//                    log.info("坐下点餐在立即下单的时候，发送支付成功消息通知:" + order.getId());
+//                    sendPaySuccessMsg(order);
+//                }
                 log.info("检查打印异常");
 //                int times = setting.getReconnectTimes();
 //                int seconds = setting.getReconnectSecond();
