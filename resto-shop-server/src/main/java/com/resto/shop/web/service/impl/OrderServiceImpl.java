@@ -1883,6 +1883,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1){
             List<OrderItem> child = orderItemService.listByParentId(orderId);
+            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
             for (OrderItem orderItem : child) {
                 order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
                 if(orderItem.getType() != OrderItemType.MEALS_CHILDREN){
@@ -1891,6 +1892,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 //                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
+            if(!CollectionUtils.isEmpty(child)){
+                for(String c : childs){
+                    Order childOrder = selectById(c);
+                    order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
+                }
+            }
+
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
