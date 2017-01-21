@@ -558,4 +558,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 
 	List<Order> selectOrderByBoss(String shopId);
+
+	/**
+	 * 返回用户的最后一比订单时间
+	 */
+	Order getCustomerLastOrder(String customerId);
 }

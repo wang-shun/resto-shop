@@ -2553,4 +2553,10 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         </foreach>
     </select>
 
+
+    <select id="getCustomerLastOrder" resultType="Order">
+        select id,create_time from tb_order where customer_id = #{customerId}
+        order by create_time desc limit 1
+    </select>
+
 </mapper>

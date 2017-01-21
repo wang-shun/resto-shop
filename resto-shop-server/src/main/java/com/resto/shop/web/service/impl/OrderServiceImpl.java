@@ -6212,4 +6212,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal a = new BigDecimal(0.00);
         System.out.println(a.equals(BigDecimal.ZERO));
     }
+
+    @Override
+    public Order getCustomerLastOrder(String customerId) {
+        return orderMapper.getCustomerLastOrder(customerId);
+    }
 }
