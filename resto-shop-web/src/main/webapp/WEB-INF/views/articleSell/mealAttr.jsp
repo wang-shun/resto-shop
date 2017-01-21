@@ -47,11 +47,11 @@
 		bSort:false,
 		columns : [
 			{
-				title : "属性类型",
+				title : "属性名称",
 				data : "articleFamilyName"
 			},
 			{
-				title : "属性名称",
+				title : "菜品名称",
 				data : "articleName"
 			},{
 				title : "销量",
