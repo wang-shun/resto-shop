@@ -2325,7 +2325,7 @@ GROUP BY r.table_number
         and #{time} > now() - create_time
         and table_number is not null
         and allow_continue_order = 1
-        and distribution_mode_id == 1
+        and distribution_mode_id = 1
         order by create_time desc limit 1
 
     </select>
