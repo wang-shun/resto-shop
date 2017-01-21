@@ -1791,7 +1791,7 @@ AND
         <if test="search != null">
             ${search}
         </if>
-
+        GROUP BY o.id
         <if test="start >-1 and length !=0 ">
             limit  #{start} , #{length}
         </if>
