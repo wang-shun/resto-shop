@@ -189,6 +189,17 @@ public class Order implements Serializable{
     //是否是退菜订单 0 不是 1是
     private Integer isRefund;
 
+    //是否确认 0-未确认 1-已确认
+    private Integer isConfirm;
+
+    final public Integer getIsConfirm() {
+        return isConfirm;
+    }
+
+    final public void setIsConfirm(Integer isConfirm) {
+        this.isConfirm = isConfirm;
+    }
+
     final public Integer getIsRefund() {
         return isRefund;
     }

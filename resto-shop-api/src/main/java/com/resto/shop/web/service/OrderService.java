@@ -556,4 +556,6 @@ public interface OrderService extends GenericService<Order, String> {
 	Order afterPay(String orderId,String couponId,BigDecimal price,BigDecimal pay,BigDecimal waitMoney,Integer payMode);
 
 	Order getCustomerLastOrder(String customerId);
+
+	void confirmOrderPos(String orderId);
 }
