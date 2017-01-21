@@ -2483,30 +2483,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int number = 0;
         //品牌订单营销撬动率
         String marketPrize = "";
-        List<String> ids = new ArrayList<String>();
+        Set<String> ids = new HashSet<>();
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
             //判断是否是后付款模式
-            if (o.getOrderMode() == 5) {
-                if (o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
-                    d = d.add(o.getAmountWithChildren());
-                } else {
+            if(o.getOrderMode()==5){
+                if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                    d=d.add(o.getAmountWithChildren());
+                }else {
                     d = d.add(o.getOrderMoney());
                 }
-            } else {
+            }else {
                 d = d.add(o.getOrderMoney());
             }
             //品牌订单数目 加菜订单和父订单算一个订单
 
-            if (o.getParentOrderId() == null) {
+            if(o.getParentOrderId()==null){
                 ids.add(o.getId());
             }
 
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                     //品牌实际支付  微信支付+
-                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11||oi.getPaymentModeId() == 12||oi.getPaymentModeId() ==5) {
+                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6|| oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
@@ -2557,13 +2557,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //店铺订单数目初始值
             int snumber = 0;
 
-            List<String> sids = new ArrayList<>();
+            Set<String> sids = new HashSet<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
                     if (!os.getOrderPaymentItems().isEmpty()) {
                         for (OrderPaymentItem oi : os.getOrderPaymentItems()) {
                             //店铺实际支付
-                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId()==9||oi.getPaymentModeId()==10||oi.getPaymentModeId()==11) {
                                 ds2 = ds2.add(oi.getPayValue());
                             }
                             //店铺虚拟支付
@@ -2581,18 +2581,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    }
 
                     //判断是否是后付款模式
-                    if (os.getOrderMode() == 5) {
-                        if (os.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
-                            ds1 = ds1.add(os.getAmountWithChildren());
-                        } else {
+                    if(os.getOrderMode()==5){
+                        if(os.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
+                            ds1=ds1.add(os.getAmountWithChildren());
+                        }else {
                             ds1 = ds1.add(os.getOrderMoney());
                         }
-                    } else {
+                    }else {
                         ds1 = ds1.add(os.getOrderMoney());
                     }
 
                     //计算店铺的订单数目
-                    if (os.getParentOrderId() == null) {
+                    if(os.getParentOrderId()==null){
                         sids.add(os.getId());
                     }
                     if (sids.size() > 0) {
@@ -2628,6 +2628,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         return map;
     }
+
 
     @Override
     public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId, String sort) {
