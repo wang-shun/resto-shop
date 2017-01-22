@@ -897,6 +897,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
+        if (order.getParentOrderId() != null) {  //子订单
+            Order parent = selectById(order.getParentOrderId());
+            int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
+            if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                parent.setLastOrderTime(order.getCreateTime());
+            }
+            Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+            parent.setCountWithChild(articleCountWithChildren);
+            parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+            update(parent);
+        }
+
+
         return result;
 //        Result result = new Result();
 //
@@ -1719,7 +1732,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
-        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getOrderMoney()));
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
@@ -1905,21 +1918,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
-
             for (OrderItem orderItem : child) {
-                order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
             }
-            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
-            if (!CollectionUtils.isEmpty(childs)) {
-                for (String c : childs) {
-                    Order childOrder = selectById(c);
-//                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
-                    order.setOrderMoney(order.getOrderMoney().add(childOrder.getMealFeePrice().multiply(BigDecimal.valueOf(childOrder.getMealAllNumber()))));
-//                    order.setBaseMealAllCount(order.getBaseMealAllCount() + childOrder.getBaseMealAllCount());
-//                    order.setMealAllNumber(order.getMealAllNumber() + childOrder.getMealAllNumber());
-                }
-            }
-
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
@@ -1943,7 +1944,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 (order.getOrderMode() != ShopMode.HOUFU_ORDER || (order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER))) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
-                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+                order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
 //                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             }
             child.addAll(items);
