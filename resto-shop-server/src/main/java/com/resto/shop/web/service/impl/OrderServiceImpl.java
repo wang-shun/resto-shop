@@ -1828,6 +1828,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
+        if(order.getOrderState() != OrderState.PAYMENT){
+            return null;
+        }
         log.info("开始确认订单:" + order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
