@@ -2564,4 +2564,9 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and customer_id != #{customerId}
     </select>
 
+    <update id="confirmOrderPos">
+        update tb_order
+        set is_confirm = 1 where id =  #{orderId}
+    </update>
+
 </mapper>
