@@ -38,4 +38,6 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
      * @return
      */
     List<OffLineOrder> selectlistByTimeSourceAndShopId(@Param("shopId") String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate,@Param("source") Integer source);
+
+    List<OffLineOrder> selectByShopIdAndTime(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
 }

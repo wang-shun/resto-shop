@@ -68,12 +68,25 @@
 
     <select id="selectlistByTimeSourceAndShopId" resultType="OffLineOrder">
 
+    SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,num_guest,create_time,state FROM tb_off_line_order
+    WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
+    <![CDATA[
+     create_time > #{beginDate} AND create_time <= #{endDate}
+  ]]>
+</select>
+
+
+    <select id="selectByShopIdAndTime" resultType="OffLineOrder">
+
         SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,num_guest,create_time,state FROM tb_off_line_order
-        WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
+        WHERE  shop_detail_id =#{shopId} AND  state =1 AND
         <![CDATA[
      create_time > #{beginDate} AND create_time <= #{endDate}
   ]]>
     </select>
+
+
+
 
 
 

@@ -46,9 +46,10 @@ public class CodeGenerateFromJavaTemp {
 		 * 实体类型 主键  和  表名
 		 */
 		String [][]  classPrimay = new String[][]{
-		new String[]{"OffLineOrder","String","tb_off_line_order"},
+		new String[]{"WeOrderDetail","Integer","we_order_detail"},
 		};
-		
+
+
 		for (String[] cp: classPrimay) {
 			String modelName = cp[0];
 			if(modelName==null){

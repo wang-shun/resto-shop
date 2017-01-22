@@ -10,6 +10,7 @@ import com.resto.shop.web.service.OffLineOrderService;
 import cn.restoplus.rpc.server.RpcService;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -32,5 +33,15 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
 
         return offlineorderMapper.selectByTimeSourceAndShopId(source,shopId,begin,end);
 
+    }
+
+    @Override
+    public List<OffLineOrder> selectByShopIdAndTime(String shopId, Date beginDate, Date endDate) {
+        return offlineorderMapper.selectByShopIdAndTime(shopId,beginDate,endDate);
+    }
+
+    @Override
+    public List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, Date begin, Date end, int offlinePos) {
+        return offlineorderMapper.selectlistByTimeSourceAndShopId(id,begin,end,offlinePos);
     }
 }

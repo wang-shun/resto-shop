@@ -2564,4 +2564,76 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and customer_id != #{customerId}
     </select>
 
+    <update id="confirmOrderPos">
+        update tb_order
+        set is_confirm = 1 where id =  #{orderId}
+    </update>
+
+    <select id="selectHasPayNoChangeStatusByBrandId" resultType="Order">
+        SELECT
+        o.id,
+        o.production_status,
+        o.order_mode
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE  o.brand_id =#{brandId}
+        and  <![CDATA[ o.create_time <= #{endDate} ]]>
+        AND  o.order_state in(2,10,11,12) AND  o.production_status not in(2,3)
+    </select>
+
+    <!--2017-01-21 查询品牌分数-->
+
+    <select id="selectAppraiseBybrandId" resultType="Double">
+    SELECT
+    IFNULL(sum(level*20)/COUNT(*),0)
+FROM
+	tb_order o
+INNER JOIN tb_appraise a ON o.id = a.order_id
+WHERE
+	o.order_state IN (2, 10, 11, 12)
+AND o.production_status IN (2, 3)
+AND o.brand_id = #{brandId}
+ and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]>
+    </select>
+
+    <!--2017-01-21 查询店铺订单总额-->
+
+<select id="selectOrderMoneyByShopIdAndTime" resultType="BigDecimal">
+    SELECT IFNULL(sum(b.order_money),0) FROM
+    (SELECT
+    DISTINCT(o.id),
+    if(o.order_mode = 5 and o.amount_with_children>0,o.amount_with_children,o.order_money)order_money
+    FROM
+    tb_order o
+    INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+    WHERE
+    o.shop_detail_id = #{shopId} AND
+    o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+    <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]> )as b
+</select>
+
+    <!-- 查询店铺分数 -->
+<select id="selectAppraiseSumByShopId" resultType="Double">
+        SELECT
+        IFNULL(sum(level*20)/COUNT(*),0)
+    FROM
+    tb_order o
+    INNER JOIN tb_appraise a ON o.id = a.order_id
+    WHERE
+    o.order_state IN (2, 10, 11, 12)
+    AND o.production_status IN (2, 3)
+    AND o.shop_detail_id = #{shopId}
+    and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]>
+</select>
+
+
+
+
+
+
+
+
+
+
 </mapper>
