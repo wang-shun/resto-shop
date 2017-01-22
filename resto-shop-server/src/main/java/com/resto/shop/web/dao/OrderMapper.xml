@@ -259,7 +259,6 @@
     </resultMap>
 
     <resultMap id="orderPaymentlist" type="com.resto.shop.web.model.Order">
-        <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="order_state" property="orderState" jdbcType="INTEGER"/>
@@ -966,7 +965,6 @@
         order_money,
         order_mode,
         pay_type,
-        is_confirm,
         amount_with_children,
         (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
@@ -981,9 +979,6 @@
         and closed=0 and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
-        <if test="shopMode == 6">
-            and ((is_confirm = 1 and pay_type = 1) or (is_confirm = 0 and pay_type = 0))
-        </if>
         order by pay_type desc,create_time DESC
 
     </select>
@@ -1029,7 +1024,6 @@
         order_mode,
         order_state,
         pay_type,
-        is_confirm,
         amount_with_children,
         (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
@@ -1042,7 +1036,7 @@
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and((order_state = 2 and pay_type = 0 and production_status = 1) or
-          (pay_type = 1 and is_confirm = 0 and order_state != 9))
+        (order_state = 1 and pay_type = 1))
         and table_number is not null
         and parent_order_id is null
         order by create_time ASC;
@@ -1065,9 +1059,9 @@
         AND
         <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
         and( (production_status = 5 and order_state != 9 and print_times = 0) or
-         (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 90  )
-         or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
-         )
+        (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 90  )
+        or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
+        )
 
 
 
@@ -1217,7 +1211,7 @@
     </select>
 
     <select id="selectChildIdsByParentIdByFive" resultType="String">
-         select id from
+        select id from
         tb_order where parent_order_id=#{0}
         and order_state in (1,2,10,11,12)
     </select>
@@ -1262,13 +1256,13 @@
 
     <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="integer">
-       SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
-       INNER JOIN tb_article ta ON oi.article_id = ta.id
+        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
+        INNER JOIN tb_article ta ON oi.article_id = ta.id
         WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
-    
+
     <!--查询品牌菜品销售的总价-->
     <select id="selectBrandArticleSell" resultType="BigDecimal">
         SELECT sum(t.final_price)sellIncome FROM
@@ -1281,7 +1275,7 @@
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
         o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
-       <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
         ) as t
     </select>
 
@@ -1291,8 +1285,8 @@
         SELECT
         SUM(oi.count)totalNum,
         o.shop_detail_id shop_id
-	     from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
-	     INNER JOIN tb_article ta on oi.article_id = ta.id and ta.article_type = 1
+        from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
+        INNER JOIN tb_article ta on oi.article_id = ta.id and ta.article_type = 1
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         GROUP BY o.shop_detail_id
@@ -1305,10 +1299,10 @@
         SUM(oi.final_price)sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
-       	IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
-		IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
+        IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
+        IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
         from tb_order_item oi INNER JOIN tb_order o
-        on o.id=oi.order_id 
+        on o.id=oi.order_id
         INNER JOIN tb_article ta ON oi.article_id = ta.id
         WHERE
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
@@ -1319,22 +1313,22 @@
 
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
-         SELECT
-	IFNULL(sum(oi.final_price),0.00) sellIncome,
-	IFNULL(sum(oi.refund_count),0)refundCount,
-	IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
-	IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
-FROM
-	tb_order o
-INNER JOIN tb_order_item oi ON o.id = oi.order_id
-INNER JOIN tb_article ta ON oi.article_id = ta.id
-WHERE
-	o.order_state IN (10, 2, 11, 12)
-AND o.production_status IN (2, 3)
-AND
+        SELECT
+        IFNULL(sum(oi.final_price),0.00) sellIncome,
+        IFNULL(sum(oi.refund_count),0)refundCount,
+        IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
+        IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
+        FROM
+        tb_order o
+        INNER JOIN tb_order_item oi ON o.id = oi.order_id
+        INNER JOIN tb_article ta ON oi.article_id = ta.id
+        WHERE
+        o.order_state IN (10, 2, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
     </select>
-    
+
     <!-- 品牌菜品销售 -->
     <select id="selectBrandArticleSellByDate" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
@@ -1392,7 +1386,7 @@ AND
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) shopSellNum,
         SUM(t.refund_count)refundCount,
-		SUM(t.refund_count*t.unit_price)refundTotal,
+        SUM(t.refund_count*t.unit_price)refundTotal,
         t.article_name,
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
@@ -1455,7 +1449,7 @@ AND
         SELECT
         t.order_id,
         sum(t.refund_count)refundCount,
-		SUM(t.unit_price*t.refund_count) as refundTotal,
+        SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) shopSellNum,
         t.article_name,
@@ -1632,14 +1626,14 @@ AND
         GROUP BY e.articleFamilyName
         order by ${sort}
 
-</select>
+    </select>
 
     <!--2016-11-3     品牌菜品销售详细 -->
     <select id="selectBrandArticleSellByDateAndId" resultType="com.resto.brand.web.dto.ArticleSellDto">
         SELECT
         t.order_id,
         sum(t.refund_count)refundCount,
-		SUM(t.unit_price*t.refund_count) as refundTotal,
+        SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
         SUM(t.count) brandSellNum,
         t.article_name,
@@ -1697,11 +1691,11 @@ AND
 
     <select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">
         SELECT
+        o.id,
         o.shop_detail_id,
         o.amount_with_children,
         o.order_money,
         o.order_mode,
-        o.id,
         o.parent_order_id,
         oi.payment_mode_id,
         oi.pay_value
@@ -1710,28 +1704,8 @@ AND
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
         o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and brand_id=#{brandId}
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>  and brand_id=#{brandId}
     </select>
-
-    <!--<select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">-->
-        <!--SELECT-->
-        <!--convert((@rowNo :=@rowNo +1),signed) as tag ,-->
-        <!--o.id,-->
-        <!--o.shop_detail_id,-->
-        <!--o.amount_with_children,-->
-        <!--o.order_money,-->
-        <!--o.order_mode,-->
-        <!--o.parent_order_id,-->
-        <!--oi.payment_mode_id,-->
-        <!--oi.pay_value-->
-        <!--FROM-->
-        <!--tb_order o-->
-        <!--INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id,-->
-        <!--(SELECT  @rowNo:=0) _rowNo-->
-        <!--WHERE-->
-        <!--o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND-->
-        <!--<![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>  and brand_id=#{brandId}-->
-    <!--</select>-->
 
     <select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
 
@@ -1810,7 +1784,7 @@ AND
         LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id,
         (SELECT  @rowNo:=0) _rowNo
         where  o.order_state IN (2,10, 11, 12)  AND o.production_status IN (2, 3)
-          AND  <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+        AND  <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
         <if test="search != null">
             ${search}
         </if>
@@ -2325,7 +2299,6 @@ GROUP BY r.table_number
         and #{time} > now() - create_time
         and table_number is not null
         and allow_continue_order = 1
-        and distribution_mode_id = 1
         order by create_time desc limit 1
 
     </select>
@@ -2577,16 +2550,4 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         </foreach>
     </select>
 
-
-    <select id="getCustomerLastOrder" resultType="Order">
-        select id,create_time from tb_order where customer_id = #{customerId}
-        order by create_time desc limit 1
-    </select>
-
-
-
-    <update id="confirmOrderPos">
-        update tb_order
-        set is_confirm = 1 where id = #{orderId}
-    </update>
 </mapper>

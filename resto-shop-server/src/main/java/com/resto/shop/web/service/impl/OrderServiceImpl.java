@@ -1086,6 +1086,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order orderWxPaySuccess(OrderPaymentItem item) {
 
         Order order = selectById(item.getOrderId());
+        order.setIsConfirm(1);
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if (historyItem == null) {
             orderPaymentItemService.insert(item);
