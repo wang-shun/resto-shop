@@ -608,7 +608,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         //判断是否是后付款模式或者稍后支付模式
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getPayType() == PayType.NOPAY) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
             order.setAllowContinueOrder(true);
