@@ -3949,7 +3949,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(!offLineOrderList.isEmpty()){
             for(OffLineOrder of : offLineOrderList){
-                List<Integer> getTime = getDay(of.getCreateTime());
+                List<Integer> getTime = DateUtil.getDayByToday(of.getCreateTime());
                 if(getTime.contains(2)){//本日中
                     todayEnterCount+=of.getEnterCount();
                     todayEnterTotal=todayEnterTotal.add(of.getEnterTotal());
@@ -3984,7 +3984,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Order> orders = orderMapper.selectListsmsByShopId(begin, end, shopDetail.getId());
         if(!orders.isEmpty()){
             for (Order order : orderHistoryList) {
-                List<Integer> getTime = getDay(order.getCreateTime());
+                List<Integer> getTime = DateUtil.getDayByToday(order.getCreateTime());
                 if (getTime.contains(1)) {
                     customerBeforeToday.add(order.getCustomerId());
                 }
@@ -4355,7 +4355,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //封装   1.resto订单总额    2.满意度  3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
                 //8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额
                 //本日 begin-----------------------
-                if(getDay(o.getCreateTime()).contains(2)){
+                if(DateUtil.getDayByToday(o.getCreateTime()).contains(2)){
                     //1.resto订单总额
                     if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                         todayRestoTotal = todayRestoTotal.add(o.getAmountWithChildren());
@@ -4438,7 +4438,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //本日end----------
 
                 //上旬begin------------------
-                if(getDay(o.getCreateTime()).contains(4)){
+                if(DateUtil.getDayByToday(o.getCreateTime()).contains(4)){
                     //1.resto订单总额
                     if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                         firstOfMonthRestoTotal = firstOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -4524,7 +4524,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //上旬end -------------------
 
                 //中旬begin------------------
-                if(getDay(o.getCreateTime()).contains(6)){
+                if(DateUtil.getDayByToday(o.getCreateTime()).contains(6)){
                     //1.resto订单总额
                     if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                         middleOfMonthRestoTotal = middleOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -4610,7 +4610,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //中旬end -------------------
 
                 //下旬begin------------------
-                if(getDay(o.getCreateTime()).contains(8)){
+                if(DateUtil.getDayByToday(o.getCreateTime()).contains(8)){
                     //1.resto订单总额
                     if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                         lastOfMonthRestoTotal = lastOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -4695,7 +4695,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //下旬end -------------------
 
                 //本月begin---------------
-                if(getDay(o.getCreateTime()).contains(10)){
+                if(DateUtil.getDayByToday(o.getCreateTime()).contains(10)){
                     //1.resto订单总额
                     if(o.getOrderMode()==ShopMode.HOUFU_ORDER&&o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
                         monthRestoTotal = monthRestoTotal.add(o.getAmountWithChildren());
@@ -4785,24 +4785,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId(beginMonth, endMonth, shopDetail.getName());
             if(!chargeOrderList.isEmpty()){
                 for (ChargeOrder c : chargeOrderList) {
+
                     //本日
-                    if(getDay(c.getCreateTime()).contains(2)){
+                    if(DateUtil.getDayByToday(c.getCreateTime()).contains(2)){
                         todayPayRestoTotal = todayRestoTotal.add(c.getChargeMoney());
                     }
                     //上旬
-                    if(getDay(c.getCreateTime()).contains(4)){
+                    if(DateUtil.getDayByToday(c.getCreateTime()).contains(4)){
                         firstOfMonthPayRestoTotal = firstOfMonthRestoTotal.add(c.getChargeMoney());
                     }
                     //中旬
-                    if(getDay(c.getCreateTime()).contains(6)){
+                    if(DateUtil.getDayByToday(c.getCreateTime()).contains(6)){
                         lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(c.getChargeMoney());
                     }
                     //下旬
-                    if(getDay(c.getCreateTime()).contains(8)){
+                    if(DateUtil.getDayByToday(c.getCreateTime()).contains(8)){
                         lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(c.getChargeMoney());
                     }
                     //本月
-                    if(getDay(c.getCreateTime()).contains(10)){
+                    if(DateUtil.getDayByToday(c.getCreateTime()).contains(10)){
                         monthPayRestoTotal = monthRestoTotal.add(c.getChargeMoney());
                     }
                 }
@@ -4998,60 +4999,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    //根据当前的订单时间来判断 是属于哪个时间段(可能是多属于：是今日之前 也是 本月之前)
-    // 1.今日之前 2.今日中 3.上旬之前 4.上旬中 5 中旬之前 6中旬中 7.下旬之前 8下旬中 9本月之前 10本月中
-    public static List<Integer> getDay(Date createTime){
-        //本月的开始时间 本月结束时间
-        String beginMonth = DateUtil.getMonthBegin();
-        Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));//当月开始
-        //本日开始时间戳
-        Long dayBefore = DateUtil.getDateBegin(new Date()).getTime();
-        //本日结束时间戳
-        Long dayAfter = DateUtil.getDateEnd(new Date()).getTime();
 
-        //本月上旬开始 也就是本月的第一天开始时间戳
-        Long firstBeginOfMonth = begin.getTime();
-        //本月上旬的结束时间戳
-        Long firstEndOfMonth = DateUtil.getDateEnd(DateUtil.getAfterDayDate(begin, 9)).getTime();
-        //本月中旬开始时间 -- 上旬结束时间
-        Long middleBeginOfMonth = DateUtil.getDateBegin(DateUtil.getAfterDayDate(begin, 10)).getTime();
-        //本月中旬结束时间
-        Long middelEndOfMonth = DateUtil.getDateEnd(DateUtil.getAfterDayDate(begin, 19)).getTime();
-        //本月下旬开始时间  -- 也就是中旬结束时间
-        Long lastBeginOfMonth = DateUtil.getDateBegin(DateUtil.getAfterDayDate(begin, 20)).getTime();
-        //本月下旬结束时间 -- 如果当天发送数据有下旬那么结束时间就是当天
-        Long lastEndOfMonth = dayAfter;
-        List<Integer> list = new ArrayList<>();
-        if (createTime.getTime() < dayBefore) {
-            list.add(1);//本日之前
-        }
-        if (createTime.getTime() < dayAfter && createTime.getTime() > dayBefore) {
-            list.add(2); //本日中
-        }
-        if (createTime.getTime() < firstBeginOfMonth) {
-            list.add(3); //上旬之前
-            list.add(9);//本月之前
-        }
-        if (createTime.getTime() > firstBeginOfMonth && createTime.getTime() < firstEndOfMonth) {
-            list.add(4); //上旬中
-        }
-        if (createTime.getTime() < middleBeginOfMonth) {
-            list.add(5);//中旬之前
-        }
-        if (createTime.getTime() > middleBeginOfMonth && createTime.getTime() < middelEndOfMonth) {
-            list.add(6);//中旬中
-        }
-        if (createTime.getTime() < lastBeginOfMonth) {
-            list.add(7);//下旬之前
-        }
-        if (createTime.getTime() > lastBeginOfMonth && createTime.getTime() < lastEndOfMonth) {
-            list.add(8);
-        }
-        if (createTime.getTime() > firstBeginOfMonth && createTime.getTime() < dayAfter) {
-            list.add(10);
-        }
-        return list;
-    }
 
 
 //    public static void main(String[] args){

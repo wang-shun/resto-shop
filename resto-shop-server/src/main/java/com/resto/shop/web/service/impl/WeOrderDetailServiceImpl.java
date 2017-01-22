@@ -20,7 +20,6 @@ import cn.restoplus.rpc.server.RpcService;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.resto.shop.web.service.impl.OrderServiceImpl.getDay;
 
 /**
  *
@@ -213,33 +212,56 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                                     case  PayMode.ACCOUNT_PAY:
                                         redNum++;
                                         redTotal=redTotal.add(redTotal);
-
-
-
+                                        break;
+                                    case PayMode.COUPON_PAY:
+                                        couponNum++;
+                                        couponTotal=couponTotal.add(oi.getPayValue());
+                                        break;
+                                    case  PayMode.REWARD_PAY:
+                                        chargeGifNum++;
+                                        chargeGifTotal=chargeGifTotal.add(chargeGifTotal);
+                                        break;
+                                    case  PayMode.WAIT_MONEY:
+                                        waitNum++;
+                                        waitTotal=waitTotal.add(oi.getPayValue());
+                                        break;
+                                    case  PayMode.ARTICLE_BACK_PAY:
+                                        articleReturnNum++;
+                                        articleReturnTotal=articleReturnTotal.add(oi.getPayValue());
+                                        break;
                                 }
                             }
 
                         }
 
                     }
-
             }
+            wo.setWechatCount(wechatNum);
+            wo.setWechatTotal(wechatTotal);//1.微信支付笔数 和金额
+            wo.setAlipayCount(alipayNum);
+            wo.setAlipayTotal(aliPayTotal);//2支付宝支付笔数 和金额
+            wo.setCashCount(cashNum);
+            wo.setCashTotal(cashTotal);//3现金
+            wo.setBankCount(bankNum);
+            wo.setBankTotal(bankTotal);//4.银行卡
+            wo.setBankTotal(bankTotal);
+            wo.setChargeCount(chargeNum);//5.充值
+            wo.setCashTotal(chargeTotal);
 
+            wo.setRedCount(redNum);
+            wo.setRedTotal(redTotal);//1.红包
+            wo.setCouponCount(couponNum);
+            wo.setCouponTotal(couponTotal);//优惠券
+            wo.setWaitCount(waitNum);
+            wo.setWaitTotal(waitTotal);//等位
+            wo.setReturnCount(articleReturnNum);
+            wo.setReturnTotal(articleReturnTotal);//退菜
 
-
-
-
-
-
-
-
-
-
-            //----1.定义时间--- 所有的本月上旬 下旬参照时间都是昨日
+            //----1.定义时间--- 所有的本月上旬 下旬参照时间都是昨日也就是说
 
             //本月的开始时间 本月结束时间
-            String beginMonth = DateUtil.getMonthBegin();
-            String endMonth = DateUtil.getMonthEnd();
+            String beginMonth = DateUtil.getMonthBeginByYesterDay();
+            String endMonth = DateUtil.getEndOfMonthEndByYesterDay();
             Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));
             Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endMonth));
             //2定义顾客id集合
@@ -495,7 +517,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
 
             if (!offLineOrderList.isEmpty()) {
                 for (OffLineOrder of : offLineOrderList) {
-                    List<Integer> getTime = getDay(of.getCreateTime());
+                    List<Integer> getTime = DateUtil.getDayByYesterDay(of.getCreateTime());
                     if (getTime.contains(2)) {//本日中
                         todayEnterCount += of.getEnterCount();
                         todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
@@ -530,7 +552,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             List<Order> orders = orderService.selectListsmsByShopId(begin, end, shopDetail.getId());
             if (!orders.isEmpty()) {
                 for (Order order : orderHistoryList) {
-                    List<Integer> getTime = getDay(order.getCreateTime());
+                    List<Integer> getTime = DateUtil.getDayByYesterDay(order.getCreateTime());
                     if (getTime.contains(1)) {
                         customerBeforeToday.add(order.getCustomerId());
                     }
@@ -900,7 +922,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                     //封装   1.resto订单总额    2.满意度  3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
                     //8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额
                     //本日 begin-----------------------
-                    if (getDay(o.getCreateTime()).contains(2)) {
+                    if (DateUtil.getDayByYesterDay(o.getCreateTime()).contains(2)) {
                         //1.resto订单总额
                         if (o.getOrderMode() == ShopMode.HOUFU_ORDER && o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
                             todayRestoTotal = todayRestoTotal.add(o.getAmountWithChildren());
@@ -983,7 +1005,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                     //本日end----------
 
                     //上旬begin------------------
-                    if (getDay(o.getCreateTime()).contains(4)) {
+                    if (DateUtil.getDayByYesterDay(o.getCreateTime()).contains(4)) {
                         //1.resto订单总额
                         if (o.getOrderMode() == ShopMode.HOUFU_ORDER && o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
                             firstOfMonthRestoTotal = firstOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -1069,7 +1091,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                     //上旬end -------------------
 
                     //中旬begin------------------
-                    if (getDay(o.getCreateTime()).contains(6)) {
+                    if (DateUtil.getDayByYesterDay(o.getCreateTime()).contains(6)) {
                         //1.resto订单总额
                         if (o.getOrderMode() == ShopMode.HOUFU_ORDER && o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
                             middleOfMonthRestoTotal = middleOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -1155,7 +1177,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                     //中旬end -------------------
 
                     //下旬begin------------------
-                    if (getDay(o.getCreateTime()).contains(8)) {
+                    if (DateUtil.getDayByYesterDay(o.getCreateTime()).contains(8)) {
                         //1.resto订单总额
                         if (o.getOrderMode() == ShopMode.HOUFU_ORDER && o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
                             lastOfMonthRestoTotal = lastOfMonthRestoTotal.add(o.getAmountWithChildren());
@@ -1240,7 +1262,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                     //下旬end -------------------
 
                     //本月begin---------------
-                    if (getDay(o.getCreateTime()).contains(10)) {
+                    if (DateUtil.getDayByYesterDay(o.getCreateTime()).contains(10)) {
                         //1.resto订单总额
                         if (o.getOrderMode() == ShopMode.HOUFU_ORDER && o.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
                             monthRestoTotal = monthRestoTotal.add(o.getAmountWithChildren());
@@ -1331,35 +1353,152 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                 if (!chargeOrderList.isEmpty()) {
                     for (ChargeOrder c : chargeOrderList) {
                         //本日
-                        if (getDay(c.getCreateTime()).contains(11)) {
+                        if (DateUtil.getDayByYesterDay(c.getCreateTime()).contains(11)) {
                             todayPayRestoTotal = todayRestoTotal.add(c.getChargeMoney());
                         }
                         //上旬
-                        if (getDay(c.getCreateTime()).contains(4)) {
+                        if (DateUtil.getDayByYesterDay(c.getCreateTime()).contains(4)) {
                             firstOfMonthPayRestoTotal = firstOfMonthRestoTotal.add(c.getChargeMoney());
                         }
                         //中旬
-                        if (getDay(c.getCreateTime()).contains(6)) {
+                        if (DateUtil.getDayByYesterDay(c.getCreateTime()).contains(6)) {
                             lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(c.getChargeMoney());
                         }
                         //下旬
-                        if (getDay(c.getCreateTime()).contains(8)) {
+                        if (DateUtil.getDayByYesterDay(c.getCreateTime()).contains(8)) {
                             lastOfMonthPayRestoTotal = lastOfMonthRestoTotal.add(c.getChargeMoney());
                         }
                         //本月
-                        if (getDay(c.getCreateTime()).contains(10)) {
+                        if (DateUtil.getDayByYesterDay(c.getCreateTime()).contains(10)) {
                             monthPayRestoTotal = monthRestoTotal.add(c.getChargeMoney());
                         }
                     }
                 }
 
-
-
-
-
-
-
             }
+            //4封装新增用户
+
+            wo.setNewCustomerCount(todayNewCutomer.size());//新增用户
+            wo.setNewCustomerTotal(todayNewCustomerRestoTotal);
+            wo.setNewNormalCustomerCount(todayNormalNewCustomer.size());//新增自然到店
+            wo.setNewNormalCustomerTotal(todayNewNormalCustomerRestoTotal);
+            wo.setNewShareCustomerCount(todayShareNewCutomer.size());//分享到店
+            wo.setNewShareCustomerTotal(todayNewShareCustomerRestoTotal);
+
+            //5.封装回头用户
+            wo.setBackCustomerCount(todayBackCustomer.size());
+            wo.setBackCustomerToatal(todayBackCustomerRestoTotal);//回头
+            wo.setBackTwoCustomerCount(todayBackTwoCustomer.size());
+            wo.setBackTwoCustomerTotal(todayBackTwoCustomerRestoTotal);//二次回头
+            wo.setBackTwoMoreCustomerCount(todayBackTwoMoreCustomer.size());
+            wo.setBackTwoCustomerTotal(todayBackTwoCustomerRestoTotal);
+
+            //封装上旬用户的数据
+
+            //上旬开始---
+            wo.setsAvgScore(firstOfMonthSatisfaction);//上旬满意度
+            wo.setsRestoTotal(firstOfMonthRestoTotal);
+            wo.setsEnterTotal(firstOfMonthEnterTotal);
+            wo.setsAllTotal(firstOfMonthRestoTotal.add(firstOfMonthEnterTotal));
+            //新增数据
+            wo.setsNewCustomr(firstOfMonthNewCustomer.size());
+            wo.setsNewCustomerTotal(firstOfMonthNewCustomerRestoTotal);
+            wo.setsNewNormalCustomer(firstOfMonthNormalCustomer.size());
+            wo.setsNewNormalCustomerTotal(firstOfMonthNewNormalCustomerRestoTotal);
+            wo.setsNewShareCustomer(firstOfMonthShareCustomer.size());
+            wo.setsNewShareCustomerTotal(firstOfMonthNewShareCustomerRestoTotal);
+            //回头数据
+            wo.setsBackCustomer(firstOfMonthBackCustomer.size());
+            wo.setsBackCustomerTotal(firstOfMonthBackCustomerRestoTotal);
+            wo.setsBackTwoCustomer(firstOfMonthBackTwoCustomer.size());
+            wo.setsBackCustomerTotal(firstOfMonthBackCustomerRestoTotal);
+            wo.setsBackTwoMoreCustomer(firstOfMonthBackTwoMoreCustomer.size());
+            wo.setsBackTwoMoreCustomerTotal(firstOfMonthBackTwoMoreCustomerRestoTotal);
+
+
+
+            //中旬开始-----------
+            wo.setzAvgScore(middleOfMonthSatisfaction);//中旬满意
+            wo.setzRestoTotal(middleOfMonthRestoTotal);
+            wo.setzEnterTotal(middleOfMonthEnterTotal);
+            wo.setzAllTotal(middleOfMonthRestoTotal.add(middleOfMonthEnterTotal));
+
+            wo.setzNewCustomerCount(middleOfMonthNewCustomer.size());
+            wo.setzNewCustomerTotal(middleOfMonthNewCustomerRestoTotal);
+            wo.setsNewNormalCustomer(middleOfMonthNormalCustomer.size());
+            wo.setsNewNormalCustomerTotal(middleOfMonthNewNormalCustomerRestoTotal);
+            wo.setsNewShareCustomer(middleOfMonthShareCustomer.size());
+            wo.setsNewShareCustomerTotal(middleOfMonthNewShareCustomerRestoTotal);
+
+            wo.setzBackCustomer(middleOfMonthBackCustomer.size());
+            wo.setzBackCustomerTotal(middleOfMonthBackCustomerRestoTotal);
+            wo.setzBackTwoCustomer(middleOfMonthBackTwoCustomer.size());
+            wo.setzBackCustomerTotal(middleOfMonthBackCustomerRestoTotal);
+            wo.setzBackTwoMoreCustomer(middleOfMonthBackTwoMoreCustomer.size());
+            wo.setzBackTwoMoreCustomerTotal(middleOfMonthBackTwoMoreCustomerRestoTotal);
+
+
+            //下旬开始----------------------
+            wo.setxAvgScore(lastOfMonthSatisfaction);//下旬满意
+            wo.setxRestoTotal(lastOfMonthRestoTotal);
+            wo.setxEnterTotal(lastOfMonthEnterTotal);
+            wo.setxAllTotal(lastOfMonthRestoTotal.add(lastOfMonthEnterTotal));
+
+            wo.setxNewCustomer(lastOfMonthNewCustomer.size());
+            wo.setxNewCustomerTotal(lastOfMonthNewCustomerRestoTotal);
+            wo.setxNewNormalCustomer(lastOfMonthNormalCustomer.size());
+            wo.setxNewNormalCustomerTotal(lastOfMonthNewNormalCustomerRestoTotal);
+            wo.setxNewShareCustomer(lastOfMonthShareCustomer.size());
+            wo.setxNewShareCustomerTotal(lastOfMonthNewShareCustomerRestoTotal);
+
+            wo.setxBackCustomer(lastOfMonthBackCustomer.size());
+            wo.setxBackCustomerTotal(lastOfMonthBackCustomerRestoTotal);
+            wo.setxBackTwoCustomer(lastOfMonthBackTwoCustomer.size());
+            wo.setxBackCustomerTotal(lastOfMonthBackCustomerRestoTotal);
+            wo.setxBackTwoMoreCustomer(lastOfMonthBackTwoMoreCustomer.size());
+            wo.setxBackTwoMoreCustomerTotal(lastOfMonthBackTwoMoreCustomerRestoTotal);
+
+
+
+            //本月开始---------------------------
+            wo.setmAvgScore(monthSatisfaction);//本月满意
+            wo.setmRestoTotal(monthRestoTotal);
+            wo.setmEnterTotal(monthEnterTotal);
+            wo.setmAllTotal(monthEnterTotal.add(monthEnterTotal));
+
+            wo.setmNewCustomr(monthNewCustomer.size());
+            wo.setmNewCustomerTotal(monthNewCustomerRestoTotal);
+            wo.setmNewNormalCustomer(monthNormalCustomer.size());
+            wo.setmNewNormalCustomerTotal(monthNewNormalCustomerRestoTotal);
+            wo.setmNewShareCustomer(monthShareCustomer.size());
+            wo.setmNewShareCustomerTotal(monthNewShareCustomerRestoTotal);
+
+            wo.setmBackCustomer(monthBackCustomer.size());
+            wo.setmBackCustomerTotal(monthBackCustomerRestoTotal);
+            wo.setmBackTwoCustomer(monthBackTwoCustomer.size());
+            wo.setmBackCustomerTotal(monthBackCustomerRestoTotal);
+            wo.setmBackTwoMoreCustomer(monthBackTwoMoreCustomer.size());
+            wo.setmBackTwoMoreCustomerTotal(monthBackTwoMoreCustomerRestoTotal);
+
+            weorderdetailMapper.insert(wo);
+
+            //5封装退菜统计
+
+
+
+
+            //6封装退菜用户
+
+
+
+
+
+
+
+
+
+
+
 
 
         }
