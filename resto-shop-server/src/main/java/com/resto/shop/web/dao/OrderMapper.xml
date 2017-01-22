@@ -979,6 +979,9 @@
         and closed=0 and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
+        <if test="shopMode == 6">
+            and ((pay_mode in (3,4) and is_confirm = 1) or (pay_mode not in (3,4) ))
+        </if>
         order by pay_type desc,create_time DESC
 
     </select>
@@ -1035,8 +1038,8 @@
         shop_detail_id=#{shopId}
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and((order_state = 2 and pay_type = 0 and production_status = 1) or
-        (order_state = 1 and pay_type = 1))
+        and order_state != 9
+        and ((order_state = 1) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
         and table_number is not null
         and parent_order_id is null
         order by create_time ASC;
