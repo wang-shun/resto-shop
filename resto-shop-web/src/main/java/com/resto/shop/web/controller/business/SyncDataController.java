@@ -1,17 +1,17 @@
 package com.resto.shop.web.controller.business;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 
 import com.resto.brand.web.model.OrderException;
+import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.model.WeShop;
+import com.resto.shop.web.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,9 +27,6 @@ import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderPaymentItemService;
-import com.resto.shop.web.service.OrderService;
 
 /**
  * 用于同步第三方数据库的Controller(以及用来查询不正常的订单存到品牌)
@@ -61,6 +58,12 @@ public class SyncDataController extends GenericController {
     @Resource
     CustomerService customerService;
 
+    @Resource
+    WeOrderDetailService weOrderDetailService;
+
+
+    @Resource
+    WeShopService weShopService;
 
     // 品牌总收入，旗下所有店铺收入总和
     @RequestMapping("syncBrandIncome")
@@ -458,6 +461,64 @@ public class SyncDataController extends GenericController {
 
         return getSuccessResult(customers);
     }
+
+
+    // 插入小程序需要的数据
+//    @RequestMapping("brand_score")
+//    @ResponseBody
+//    public Result getRecore(String createTime) {
+//        //更改打印的订单的生产状态(已支付但是生产状态未改变的)
+//        List<Order> orderList = orderService.selectHasPayNoChangeStatusByBrandId(getCurrentBrandId());
+//        if(!orderList.isEmpty()){
+//            for(Order o:orderList){
+//                if(o.getOrderMode()== ShopMode.CALL_NUMBER){
+//                    o.setProductionStatus(ProductionStatus.HAS_CALL);
+//                }else {
+//                    o.setProductionStatus(ProductionStatus.PRINTED);
+//                }
+//                orderService.update(o);
+//            }
+//        }
+//
+//        if(createTime==null){//前台没值说明是定时任务
+//
+//
+//        }
+//        //查询已付款且有支付项但是生产状态没有改变的订单
+//
+//
+//        return  null;
+//    }
+
+
+
+   //  插入小程序需要的数据
+    @RequestMapping("getWeAppInfo")
+    @ResponseBody
+    public Result getWeAppInfo(String createTime) {
+        //更改打印的订单的生产状态(已支付但是生产状态未改变的)
+        //查询已付款且有支付项但是生产状态没有改变的订单
+        List<Order> orderList = orderService.selectHasPayNoChangeStatusByBrandId(getCurrentBrandId());
+//        if(!orderList.isEmpty()){
+//            for(Order o:orderList){
+//                if(o.getOrderMode()== ShopMode.CALL_NUMBER){
+//                    o.setProductionStatus(ProductionStatus.HAS_CALL);
+//                }else {
+//                    o.setProductionStatus(ProductionStatus.PRINTED);
+//                }
+//                orderService.update(o);
+//            }
+//        }
+
+        if(createTime==null){//前台没值说明是定时任务
+
+            weOrderDetailService.insertDaydata(getCurrentBrandId(),getBrandName());
+
+        }
+
+        return  Result.getSuccess();
+    }
+
 
 
 

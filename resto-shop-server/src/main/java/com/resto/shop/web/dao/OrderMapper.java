@@ -469,9 +469,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
     Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-    
+
     brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-    
+
     /**
      * 手动取消订单
      * @param brandId
@@ -552,6 +552,35 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectHasPayNoChangeStatus(@Param("shopId") String shopId, @Param("beginDate") Date dateBegin,@Param("endDate") Date dateEnd);
+
+    /**
+     * 小程序定时任务是 查询品牌下生产状态未改变的订单
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
+    List<Order> selectHasPayNoChangeStatusByBrandId(@Param("brandId") String brandId,@Param("beginDate") Date  beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * 查询品牌的某个时间的分数
+     * @param brandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseBybrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * yz
+     * @param id
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    BigDecimal selectOrderMoneyByShopIdAndTime(@Param("shopId") String id,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
+
+    Double selectAppraiseSumByShopId(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
 
 	/**
 	 * 大boss模式下查询新增订单

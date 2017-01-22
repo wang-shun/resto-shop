@@ -356,6 +356,23 @@ public class SpringContextConfig {
         return proxy.create(OffLineOrderService.class);
     }
 
+    @Bean
+    public WeOrderDetailService weOrderDetailService() {
+        return proxy.create(WeOrderDetailService.class);
+    }
+
+    @Bean
+    public WeShopService weShopService() {
+        return proxy.create(WeShopService.class);
+    }
+
+    @Bean
+    public WeShopScoreService weShopScoreService() {
+        return proxy.create(WeShopScoreService.class);
+    }
+
+
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

@@ -16,18 +16,22 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public void beforeSend(RpcRequest request) {
-		String interfaceName = request.getInterfaceName();
-		if(interfaceName.matches("^com.resto.shop.web.service.*")){
-			HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest(); 
-			String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
-			request.setRequestHead(brandId);
-			if(log.isInfoEnabled()){
-				log.info(request.getInterfaceName()+" add head:"+request.getRequestHead());
-			}
-		}
-	}
-	
+    public void beforeSend(RpcRequest request) {
+        String interfaceName = request.getInterfaceName();
+        if(interfaceName.matches("^com.resto.shop.web.service.*")){
+            HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+            String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
+            request.setRequestHead(brandId);
+            if(log.isInfoEnabled()){
+                log.info(request.getInterfaceName()+" add head:"+request.getRequestHead());
+            }
+        }
+    }
+
+
+
+
+
 	public static void main(String[] args) {
 		boolean b = "com.resto.shop.web.service.AdvertService".matches("^com.resto.shop.web.service.*");
 					 

@@ -294,8 +294,8 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
 			String sort);
 
-	public List<Order> selectListByTime(String beginDate, String endDate, String shopId,int start,int length,String search);
-
+//	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
+public List<Order> selectListByTime(String beginDate, String endDate, String shopId,int start,int length,String search);
 
 	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
 
@@ -550,6 +550,39 @@ public interface OrderService extends GenericService<Order, String> {
 	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
 	
 	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
+
+    List<Order> selectHasPayNoChangeStatusByBrandId(String brandId);
+
+    /**
+     * 查询品牌时间端内的分数
+     * @param brandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseBybrandId(String brandId, Date beginDate, Date endDate);
+
+    /**
+     * 查询店铺时间段内的订单总额
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    BigDecimal selectOrderMoneyByShopIdAndTime(String shopId, Date beginDate, Date endDate);
+
+    /**
+     * 查询店铺时间段内的分数
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseByshopId(String shopId, Date beginDate, Date endDate);
+
+    List<Order> selectOrderHistoryList(String id, Date dateEnd);
+
+    List<Order> selectListsmsByShopId(Date begin, Date end, String id);
 
 	void refundItem(Order order);
 
