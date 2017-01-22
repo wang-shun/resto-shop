@@ -316,6 +316,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
+
+        if(StringUtils.isEmpty(order.getTableNumber())){ //如果存在桌号
+            int orderCount =  orderMapper.checkTableNumber(order.getShopDetailId(),order.getTableNumber());
+            if(orderCount > 0){
+                throw new AppException(AppException.TABLE_USED);
+            }
+        }
+
+
+
+
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
 
 

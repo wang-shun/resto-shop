@@ -135,6 +135,9 @@ public class OrderAspect {
                 case ShopMode.TABLE_MODE:
                     msg.append("桌号:" + order.getTableNumber() + "\n");
                     break;
+                case ShopMode.BOSS_ORDER:
+                    msg.append("桌号:" + order.getTableNumber() + "\n");
+                    break;
                 default:
                     msg.append("取餐码：" + order.getVerCode() + "\n");
                     break;
@@ -601,6 +604,9 @@ public class OrderAspect {
             if (order.getOrderMode() != null) {
                 switch (order.getOrderMode()) {
                     case ShopMode.TABLE_MODE:
+                        msg.append("桌号:" + order.getTableNumber() + "\n");
+                        break;
+                    case ShopMode.BOSS_ORDER:
                         msg.append("桌号:" + order.getTableNumber() + "\n");
                         break;
                     default:

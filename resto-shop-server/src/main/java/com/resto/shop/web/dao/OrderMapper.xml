@@ -2553,4 +2553,14 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         </foreach>
     </select>
 
+
+    <select id="checkTableNumber" resultType="java.lang.Integer">
+        select count(1) from tb_order
+        where shop_detail_id = #{shopId}
+        and table_number = #{tableNumber}
+        and pay_type = 1 and order_state = 1
+        and parent_order_id is null
+        and 6*60*60 >  now() - create_time
+    </select>
+
 </mapper>
