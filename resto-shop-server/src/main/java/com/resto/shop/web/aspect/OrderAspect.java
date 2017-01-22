@@ -439,7 +439,7 @@ public class OrderAspect {
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
         if (order != null
-                && (order.getOrderMode() == ShopMode.HOUFU_ORDER || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))
+                && (order.getOrderMode() == ShopMode.HOUFU_ORDER )
                 && order.getOrderState() == OrderState.SUBMIT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
