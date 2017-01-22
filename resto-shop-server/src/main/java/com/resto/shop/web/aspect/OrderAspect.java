@@ -93,12 +93,15 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            if(order.getOrderState() == OrderState.PAYMENT && order.getOrderMode() != ShopMode.HOUFU_ORDER){
+            if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-            if(order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER){
-                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
-            }
+//            if(order.getOrderState() == OrderState.PAYMENT && order.getOrderMode() != ShopMode.HOUFU_ORDER){
+//                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+//            }
+//            if(order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER){
+//                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+//            }
             //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
             log.info("当天24小时开启自动退款:" + order.getId());
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
@@ -113,7 +116,7 @@ public class OrderAspect {
 //                sendPaySuccessMsg(order);
 //            }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
-                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+//                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
             //出单时减少库存
