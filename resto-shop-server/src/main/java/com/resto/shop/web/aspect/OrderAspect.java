@@ -105,7 +105,7 @@ public class OrderAspect {
                 MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
             }
             //自动取消订单，不包含后付款模式
-            if (order.getOrderState().equals(OrderState.SUBMIT)&&(order.getOrderMode()!=ShopMode.HOUFU_ORDER||order.getOrderMode()!=ShopMode.BOSS_ORDER)) {//未支付和未完全支付的订单，不包括后付款模式
+            if (order.getOrderState().equals(OrderState.SUBMIT)&&order.getOrderMode()!=ShopMode.HOUFU_ORDER&&order.getOrderMode()!=ShopMode.BOSS_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
             	long delay = 1000*60*60*2;//两个小时后自动取消订单
                 MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
             }
