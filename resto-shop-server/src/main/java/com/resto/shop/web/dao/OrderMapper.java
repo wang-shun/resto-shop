@@ -567,5 +567,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	void confirmOrderPos(String orderId);
 
 
-	Integer checkTableNumber(@Param("shopId") String shopId,@Param("tableNumber") String tableNumber);
+	Integer checkTableNumber(@Param("shopId") String shopId,@Param("tableNumber") String tableNumber,@Param("customerId") String customerId);
 }
