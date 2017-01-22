@@ -178,7 +178,7 @@ public class OrderController extends GenericController{
 
 
 		for (Order o : list) {
-			if (o.getParentOrderId() == null) {
+//			if (o.getParentOrderId() == null) {
 
 				OrderDetailDto ot = new OrderDetailDto(o.getId(), o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "", false);
 				if (o.getCustomer() != null) {
@@ -311,7 +311,7 @@ public class OrderController extends GenericController{
 				//订单金额
 				ot.setOrderMoney(o.getOrderMoney());
 				listDto.add(ot);
-			}
+//			}
 			List<Order> la = orderService.selectListByTime(beginDate, endDate, shopId, -1, 0, search);
 			int sizeLenth=0;
 			/*for (Order  s:la) {

@@ -139,7 +139,7 @@ public class TotalIncomeController extends GenericController {
                                 break;
                         }
                         si.setOriginalAmount(oi.getOriginalAmount());
-                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay());
+                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay(),si.getMoneyPay(),si.getBackCartPay());
 
                     }
                 }

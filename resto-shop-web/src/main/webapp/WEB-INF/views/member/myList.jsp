@@ -159,10 +159,10 @@
     			title : "未知性别",
     			data : "notUser",
     		},
-            {
-                title : "复购率",
-                data : "pShoping",
-            }
+//            {
+//                title : "复购率",
+//                data : "pShoping",
+//            }
         ]
     	
     });

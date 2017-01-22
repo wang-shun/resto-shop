@@ -442,7 +442,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
-            originMoney = originMoney.add(item.getOriginalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            originMoney = originMoney.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount()))).setScale(2, BigDecimal.ROUND_HALF_UP);
             Result check = new Result();
             if (item.getType() == OrderItemType.ARTICLE) {
                 check = checkArticleList(item, item.getCount());
@@ -637,7 +637,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         jsonResult.setData(order);
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER ) {
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
@@ -649,7 +649,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
             }
-        }else if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER){
+        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
@@ -707,11 +707,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() == null && order.getPayType() == PayType.NOPAY){
+        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() == null && order.getPayType() == PayType.NOPAY) {
             updateChild(order);
         }
-
-
 
 
         if (order.getParentOrderId() != null) {  //子订单
@@ -752,7 +750,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = orderMapper.findCustomerNewOrder(beginDate, customerId, shopId, orderState, orderId);
         if (order != null) {
             if (order.getParentOrderId() != null && (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER
-             || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))) {
+                    || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
             List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
@@ -882,20 +880,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-
-
     }
 
     @Override
     public Result refundPaymentByUnfinishedOrder(String orderId) {
-        Result result =  new Result();
+        Result result = new Result();
         Order order = selectById(orderId);
         order.setIsPay(OrderPayState.NOT_PAY);
         update(order);
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED){
+        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrder(order);
             result.setSuccess(true);
-        }else{
+        } else {
             result.setSuccess(autoRefundOrder(orderId));
 
         }
@@ -1643,8 +1639,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
                 BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
                 BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
-                if(!CollectionUtils.isEmpty(childs)){
-                    for(String c : childs){
+                if (!CollectionUtils.isEmpty(childs)) {
+                    for (String c : childs) {
                         Order childOrder = selectById(c);
                         mealCount = mealCount.add(BigDecimal.valueOf(childOrder.getBaseMealAllCount()));
                         mealAllNumber = mealAllNumber.add(BigDecimal.valueOf(childOrder.getMealAllNumber()));
@@ -1726,7 +1722,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
-        data.put("PAYMENT_AMOUNT", order.getPaymentAmount());
+        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
@@ -1845,7 +1841,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {
-            return orderMapper.listHoufuFinishedOrder(currentShopId);
+        return orderMapper.listHoufuFinishedOrder(currentShopId, shopMode);
     }
 
     @Override
@@ -1906,15 +1902,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
 
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1){
+        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
 
             for (OrderItem orderItem : child) {
                 order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
             }
             List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
-            if(!CollectionUtils.isEmpty(childs)){
-                for(String c : childs){
+            if (!CollectionUtils.isEmpty(childs)) {
+                for (String c : childs) {
                     Order childOrder = selectById(c);
 //                    order.setCountWithChild(order.getCountWithChild() + childOrder.getArticleCount());
                     order.setOrderMoney(order.getOrderMoney().add(childOrder.getMealFeePrice().multiply(BigDecimal.valueOf(childOrder.getMealAllNumber()))));
@@ -2314,7 +2310,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
 
         for (ShopDetail shop : shopDetails) {
-            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%",0,BigDecimal.ZERO,BigDecimal.ZERO);
+            ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%", 0, BigDecimal.ZERO, BigDecimal.ZERO);
             listArticles.add(st);
         }
 
@@ -2483,7 +2479,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int number = 0;
         //品牌订单营销撬动率
         String marketPrize = "";
-        List<String> ids = new ArrayList<String>();
+        Set<String> ids = new HashSet<>();
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
@@ -2506,7 +2502,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (!o.getOrderPaymentItems().isEmpty()) {
                 for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                     //品牌实际支付  微信支付+
-                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11||oi.getPaymentModeId() == 12||oi.getPaymentModeId() ==5) {
+                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
                         d1 = d1.add(oi.getPayValue());
                     }
                     //品牌虚拟支付(加上等位红包支付)
@@ -2557,7 +2553,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //店铺订单数目初始值
             int snumber = 0;
 
-            List<String> sids = new ArrayList<>();
+            Set<String> sids = new HashSet<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
                     if (!os.getOrderPaymentItems().isEmpty()) {
@@ -2628,6 +2624,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         return map;
     }
+
 
     @Override
     public List<ArticleSellDto> selectShopArticleSellByDateAndFamilyId(String beginDate, String endDate, String shopId, String sort) {
@@ -2705,10 +2702,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectListByTime(String beginDate, String endDate, String shopId,int start,int length,String search) {
+    public List<Order> selectListByTime(String beginDate, String endDate, String shopId, int start, int length, String search) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTime(begin, end, shopId,start,length,search);
+        return orderMapper.selectListByTime(begin, end, shopId, start, length, search);
 
     }
 
@@ -2760,7 +2757,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
             order = orderMapper.getOrderAccountHoufu(shopId);
-        }else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER){
+        } else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER) {
             order = orderMapper.getOrderAccountBoss(shopId);
         } else {
             order = orderMapper.getOrderAccount(shopId);
@@ -5518,12 +5515,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     parent.setLastOrderTime(order.getCreateTime());
                 }
                 Double amountWithChildren = 0.0;
-                if(order.getOrderMode() == ShopMode.HOUFU_ORDER){
+                if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
                     articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
-                    amountWithChildren= orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
-                }else{
+                    amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+                } else {
                     articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
-                    amountWithChildren= orderMapper.selectParentAmountByBossOrder(parent.getId());
+                    amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
                 }
 
                 parent.setCountWithChild(articleCountWithChildren);
@@ -5732,7 +5729,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         BigDecimal totalMoney = order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren();
         try {
-            if(!StringUtils.isEmpty(couponId)){ //使用了优惠券
+            if (!StringUtils.isEmpty(couponId)) { //使用了优惠券
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
                 item.setId(ApplicationUtils.randomUUID());
@@ -5744,7 +5741,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setResultData(coupon.getId());
                 orderPaymentItemService.insert(item);
             }
-            if(waitMoney.doubleValue() > 0){ //等位红包支付
+            if (waitMoney.doubleValue() > 0) { //等位红包支付
                 OrderPaymentItem item = new OrderPaymentItem();
                 item.setId(ApplicationUtils.randomUUID());
                 item.setOrderId(orderId);
@@ -5760,15 +5757,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 getNumberService.update(getNumber);
             }
 
-            if(price.doubleValue() > 0){  //余额支付
+            if (price.doubleValue() > 0) {  //余额支付
                 accountService.payOrder(order, price, customer);
             }
             OrderPaymentItem item = new OrderPaymentItem();
-            if(pay.doubleValue() > 0){ //还需要支付
+            if (pay.doubleValue() > 0) { //还需要支付
 
                 order.setPayMode(payMode);
-                switch (payMode){
-                    case OrderPayMode.WX_PAY :
+                switch (payMode) {
+                    case OrderPayMode.WX_PAY:
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.ALI_PAY:
@@ -5806,7 +5803,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 update(order);
 
-            }else{ //支付完成
+            } else { //支付完成
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);
@@ -5816,7 +5813,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return order;
@@ -5824,7 +5821,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    private void updateChild(Order order){
+    private void updateChild(Order order) {
         List<Order> orders = orderMapper.selectByParentId(order.getId());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
@@ -6211,5 +6208,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public static void main(String[] args) {
         BigDecimal a = new BigDecimal(0.00);
         System.out.println(a.equals(BigDecimal.ZERO));
+    }
+
+    @Override
+    public Order getCustomerLastOrder(String customerId) {
+        return orderMapper.getCustomerLastOrder(customerId);
+    }
+
+    @Override
+    public void confirmOrderPos(String orderId) {
+        orderMapper.confirmOrderPos(orderId);
     }
 }
