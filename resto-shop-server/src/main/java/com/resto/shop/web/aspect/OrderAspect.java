@@ -4,10 +4,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
@@ -60,7 +57,8 @@ public class OrderAspect {
     LogBaseService logBaseService;
     @Resource
     NewCustomCouponService newcustomcouponService;
-
+    @Resource
+    BrandService brandService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -504,6 +502,7 @@ public class OrderAspect {
     //推送分享领红包，跳转到我的二维码界面
     public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order){
         StringBuffer str=new StringBuffer();
+        Brand brand = brandService.selectById(order.getBrandId());
         ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
         List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, order.getShopDetailId());
         BigDecimal money = new BigDecimal("0.00");
@@ -511,13 +510,13 @@ public class OrderAspect {
             money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
         }
         if(money.doubleValue() == 0.00 && shareSetting == null){
-            str.append("邀请朋友扫一扫,送他/她红包，他/她消费后，您将获得红包返利，");
+            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
         }else if(money.doubleValue() == 0.00){
-            str.append("邀请朋友扫一扫,送他/她红包，他/她消费后，您将获得"+shareSetting.getMinMoney()+"-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
         }else if(shareSetting == null){
-            str.append("邀请朋友扫一扫,送他/她"+money+"元红包，他/她消费后，您将获得红包返利，");
+            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
         }else{
-            str.append("邀请朋友扫一扫,送他/她"+money+"元红包，他/她消费后，您将获得"+shareSetting.getMinMoney()+"-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
         }
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
