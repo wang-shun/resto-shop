@@ -145,9 +145,8 @@ public class OrderMessageListener implements MessageListener {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     	StringBuffer str=new StringBuffer();
         String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
-    	str.append("到期提醒通知"+"\n");
-    	str.append(sdf.format(new Date())+"\n");
-    	str.append("<a href='"+jumpurl+"'>您的价值的"+pr+"元的"+name+""+pushDay+"天后即将到期，快来享受优惠吧</a>");
+        str.append("优惠券到期提醒"+"\n");
+        str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
         sendNote(shopName,pr,name,pushDay,customer.getId());
         return Action.CommitMessage;
