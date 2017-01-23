@@ -505,9 +505,10 @@ public class OrderAspect {
     //推送分享领红包，跳转到我的二维码界面
     public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order){
         StringBuffer str=new StringBuffer();
-        str.append("邀请好友扫一扫,");
+        ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
+        str.append("邀请朋友扫一扫,送他/她30元红包，他/她消费后，您将获得"+shareSetting.getMinMoney()+"-"+shareSetting.getMaxMoney()+"元红包返利，");
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
-        str.append("<a href='"+jumpurl+"'>领取奖励红包</a>");
+        str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 
@@ -551,7 +552,7 @@ public class OrderAspect {
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("您有一个红包未领取\n");
+            msg.append("您有一个红包未领取，红包来自简厨给您的消费返利，");
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
