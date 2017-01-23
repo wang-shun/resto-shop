@@ -560,10 +560,11 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+        Brand brand = brandService.selectById(customer.getBrandId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("您有一个红包未领取，红包来自简厨给您的消费返利，");
+            msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
