@@ -64,7 +64,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     @Resource
     private BrandSettingService brandSettingService;
 
-    @Value("#{configProperties['orderMsg']}")
+    @Value("#{propertyConfigurer['orderMsg']}")
 	public static String orderMsg;
     
     @Override
