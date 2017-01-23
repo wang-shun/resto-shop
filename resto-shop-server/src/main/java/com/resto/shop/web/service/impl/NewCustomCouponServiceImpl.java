@@ -224,7 +224,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
      
 	  //发送短信
 	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId){
-	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	        Customer customer=customerService.selectById(customerId);
 	        String day=pushDay+"";//将得到的int转换成String
 	    	Map param = new HashMap();
@@ -232,7 +231,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("price", price);
 			param.put("name", name);
 			param.put("day", day);
-            System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg));
+            SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg);
 	    }
 	    
 	    

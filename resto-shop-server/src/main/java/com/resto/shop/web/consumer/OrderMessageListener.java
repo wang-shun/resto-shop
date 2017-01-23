@@ -154,14 +154,13 @@ public class OrderMessageListener implements MessageListener {
     
   //发送短信
     private void sendNote(String shop,String price,String name,String pushDay,String customerId){
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Customer customer=customerService.selectById(customerId);
     	Map param = new HashMap();
         param.put("shop", shop);
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-        System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg));
+        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg);
     }
 
     private void noticeShareCustomer(Customer customer) {
