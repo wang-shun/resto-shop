@@ -232,7 +232,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("price", price);
 			param.put("name", name);
 			param.put("day", day);
-			SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg);
+            System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg));
 	    }
 	    
 	    

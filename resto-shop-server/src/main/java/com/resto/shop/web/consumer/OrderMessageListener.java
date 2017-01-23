@@ -161,7 +161,7 @@ public class OrderMessageListener implements MessageListener {
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-		SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg);
+        System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg));
     }
 
     private void noticeShareCustomer(Customer customer) {
