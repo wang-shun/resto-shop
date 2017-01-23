@@ -63,7 +63,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     
     @Resource
     private BrandSettingService brandSettingService;
-    
+
     @Value("#{configProperties['orderMsg']}")
 	public static String orderMsg;
     
@@ -191,13 +191,14 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 }
                 long begin=coupon.getBeginDate().getTime();
                 long end=coupon.getEndDate().getTime();
-                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail.getRecommendTime());
+                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
             }
         }
     }
 
 	  //得到优惠券的时间，然后做定时任务
-	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,Integer pushDay){
+	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail){
+            Integer pushDay = shopDetail.getRecommendTime();
 	    	Customer customer=customerService.selectById(customerId);
 	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 	        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
@@ -211,29 +212,28 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	            	str.append("<a href='"+jumpurl+"'>您的价值的"+price+"元的"+name+""+pushDay+"天后即将到期，快来享受优惠吧</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
 	                String pr=price+"";//将BigDecimal类型转换成String
-	                sendNote(pr,name,pushDay,customerId);//发送短信
+	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
 	    			calendar.setTime(new Date());
 	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
 	    			String pr=price+"";
-	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay);
+	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay,shopDetail.getName());
 	    		}
 	    	}
 	    }
      
 	  //发送短信
-	    private void sendNote(String price,String name,Integer pushDay,String customerId){
+	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId){
 	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	        Customer customer=customerService.selectById(customerId);
-	        System.out.println("电话"+customer.getTelephone());
-	        System.out.println("orderMsg"+orderMsg);
 	        String day=pushDay+"";//将得到的int转换成String
 	    	Map param = new HashMap();
+            param.put("shop", shop);
 			param.put("price", price);
 			param.put("name", name);
 			param.put("day", day);
-			System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_40860094"));
+			SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", orderMsg);
 	    }
 	    
 	    
@@ -269,6 +269,4 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     public List<NewCustomCoupon> selectListShopId(String shopId) {
         return newcustomcouponMapper.selectListByShopId(shopId);
     }
-
-
 }
