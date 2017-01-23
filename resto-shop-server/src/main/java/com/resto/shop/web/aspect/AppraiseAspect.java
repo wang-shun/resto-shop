@@ -61,7 +61,13 @@ public class AppraiseAspect {
                 WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
                 StringBuffer msg = new StringBuffer();
                 String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
-                msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "的评论点了赞，快去<a href='" + url+ "'>回复TA</a>吧~\n");
+                if(customer.getSex() == 1){
+                    msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "写的评论点了赞，\n<a href='\" + url+ \"'>快去回复他</a>吧~");
+                }else if(customer.getSex() == 2){
+                    msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "写的评论点了赞，\n<a href='\" + url+ \"'>快去回复她</a>吧~");
+                }else{
+                    msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "写的评论点了赞，\n<a href='\" + url+ \"'>快去回复TA</a>吧~");
+                }
                 WeChatUtils.sendCustomerMsg(msg.toString(), aCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
             }
         }
@@ -80,7 +86,13 @@ public class AppraiseAspect {
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         StringBuffer msg = new StringBuffer();
         String url = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/appraise?appraiseId=" + appraise.getId() + "&baseUrl=" + "http://" + brand.getBrandSign() + ".restoplus.cn";
-        msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "的评论，快去<a href='" + url+ "'>回复TA</a>吧~\n");
+        if(customer.getSex() == 1){
+            msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "写的评论，" + customer.getNickname() + "说：" + appraiseComment.getContent() + "\n<a href='" + url+ "'>快去回复他</a>吧~");
+        }else if(customer.getSex() == 2){
+            msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "写的评论，" + customer.getNickname() + "说：" + appraiseComment.getContent() + "\n<a href='" + url+ "'>快去回复她</a>吧~");
+        }else{
+            msg.append(customer.getNickname() + "回复了您在" + shopDetail.getName() + "写的评论，" + customer.getNickname() + "说：" + appraiseComment.getContent() + "\n<a href='" + url+ "'>快去回复TA</a>吧~");
+        }
         if(!appraise.getCustomerId().equals(appraiseComment.getCustomerId())){
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         }

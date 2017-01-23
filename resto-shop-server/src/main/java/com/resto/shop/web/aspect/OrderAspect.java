@@ -602,9 +602,10 @@ public class OrderAspect {
         if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
-                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
-                .append(rewardMoney).append("元红包返利").append("</a>");
+        msg.append("您邀请的好友"+customer.getNickname()+"已到店消费，您已获得"+rewardMoney+"元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
+//        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
+//                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
+//                .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
         log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
