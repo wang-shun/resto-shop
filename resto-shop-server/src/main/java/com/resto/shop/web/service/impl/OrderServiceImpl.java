@@ -455,7 +455,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
-            originMoney = originMoney.add(item.getOriginalPrice()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            originMoney = originMoney.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount()))).setScale(2, BigDecimal.ROUND_HALF_UP);
             Result check = new Result();
             if (item.getType() == OrderItemType.ARTICLE) {
                 check = checkArticleList(item, item.getCount());
