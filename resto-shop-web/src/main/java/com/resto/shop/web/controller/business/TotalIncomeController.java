@@ -127,10 +127,20 @@ public class TotalIncomeController extends GenericController {
                                 break;
                             case PayMode.ARTICLE_BACK_PAY:
                                 si.setArticleBackPay(oi.getPayValue());
+                                break;
+                            case PayMode.BANK_CART_PAY://银行卡
+                                si.setBackCartPay(oi.getPayValue());
+                                break;
+                            case PayMode.CRASH_PAY://现金支付
+                                si.setMoneyPay(oi.getPayValue());
+                                break;
+
                             default:
                                 break;
                         }
-                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay());
+                        si.setOriginalAmount(oi.getOriginalAmount());
+                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay(),si.getMoneyPay(),si.getBackCartPay());
+
                     }
                 }
             }
