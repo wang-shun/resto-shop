@@ -1037,7 +1037,7 @@
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
-        and ((order_state = 1) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
+        and ((order_state = 1 and pay_mode != 2) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
         and table_number is not null
         and parent_order_id is null
         order by create_time ASC;
@@ -1761,7 +1761,6 @@
 
     <select id="selectListByTime" resultMap="selectOrdersMap">
         SELECT
-        convert((@rowNo :=@rowNo +1),signed) as tag ,
         o.id,
         o.brand_id,
         o.parent_order_id,
@@ -1776,26 +1775,15 @@
         o.order_mode,
         c.telephone,
         a.level,
-        IF(oi.pay_value>0,oi.pay_value,0) pay_value,
+        oi.pay_value,
         oi.payment_mode_id
         FROM
         tb_order o
         LEFT JOIN tb_customer c ON o.customer_id = c.id
         LEFT JOIN tb_appraise a ON o.id = a.order_id
-        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id,
-        (SELECT  @rowNo:=0) _rowNo
-        where  o.order_state IN (2,10, 11, 12)  AND o.production_status IN (2, 3)
-        AND  <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
-        <if test="search != null">
-            ${search}
-        </if>
-        GROUP BY o.id
-        <if test="start >-1 and length !=0 ">
-            limit  #{start} , #{length}
-        </if>
-
-
-
+        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
+        where
+        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
 
 

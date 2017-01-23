@@ -20,6 +20,8 @@ import com.resto.brand.core.entity.DatatablesViewPage;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.constant.OrderState;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.OrderItem;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -141,189 +143,143 @@ public class OrderController extends GenericController{
 	}
 
 
-	@RequestMapping(value = "AllOrder",  method=RequestMethod.GET)
+	@RequestMapping("AllOrder")
 	@ResponseBody
-	public	DatatablesViewPage<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId,String start ,String length,String extra_search){
+	public List<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
 
-		return this.listResult(beginDate, endDate, shopId,start,length,extra_search);
+		return this.listResult(beginDate, endDate, shopId);
 	}
-	public DatatablesViewPage<OrderDetailDto> listResult(String beginDate, String endDate, String shopId,String start ,String length,String extra_search){
-		DatatablesViewPage<OrderDetailDto> view=new DatatablesViewPage<OrderDetailDto>();
-	/*	//获取分页控件的信息
-		String start = getRequest().getParameter("start");
-		String length = getRequest().getParameter("length");*/
 
-		//获取前台额外传递过来的查询条件
-
-		//定义过滤条件查询过滤后的记录数sql
-		String search;
-		if(StringUtils.isNotEmpty(extra_search)){
-			search=" and c.telephone  LIKE '%"+extra_search+"%'";
-		}else {
-			search=null;
-		}
-		int st=-1;
-		int len=0;
-		if(StringUtils.isNotEmpty(start)&&!start.equals("")){
-			st =Integer.parseInt(start);
-			len=Integer.parseInt(length);
-		}
-
+	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
+		//return orderService.selectListByTime(beginDate,endDate,shopId);
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
-
-
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,st,len,search);
-
-
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 		for (Order o : list) {
-//			if (o.getParentOrderId() == null) {
-
-				OrderDetailDto ot = new OrderDetailDto(o.getId(), o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", "", "", false);
-				if (o.getCustomer() != null) {
-					//手机号
-					if (o.getCustomer().getTelephone() != null && o.getCustomer().getTelephone() != "") {
-						ot.setTelephone(o.getCustomer().getTelephone());
-					}
+			OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
+			if(o.getCustomer()!=null){
+				//手机号
+				if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
+					ot.setTelephone(o.getCustomer().getTelephone());
 				}
-				//订单状态
-				if (o.getOrderState() != null) {
-					switch (o.getOrderState()) {
-						case 1:
-							ot.setOrderState("未支付");
-							break;
-						case 2:
-							if (o.getProductionStatus() == 0) {
-								ot.setOrderState("已付款");
-							} else if (o.getProductionStatus() == 2) {
-								ot.setOrderState("已消费");
-							} else if (o.getProductionStatus() == 5) {
-								ot.setOrderState("异常订单");
-							}
-							break;
-						case 9:
-							ot.setOrderState("已取消");
-							break;
-						case 10:
-							if (o.getProductionStatus() == 5) {
-								ot.setOrderState("异常订单");
-							} else {
-								ot.setOrderState("已消费");
-							}
-							break;
-						case 11:
-							ot.setOrderState("已评价");
-							break;
-						case 12:
-							ot.setOrderState("已分享");
-							break;
-						default:
-							break;
-					}
+			}
+			//订单状态
+			if(o.getOrderState()!=null){
+				switch (o.getOrderState()) {
+					case OrderState.SUBMIT:
+						ot.setOrderState("未支付");
+						break;
+					case OrderState.PAYMENT:
+						if(o.getProductionStatus()==0){
+							ot.setOrderState("已付款");
+						}else if(o.getProductionStatus()==2){
+							ot.setOrderState("已消费");
+						}else if(o.getProductionStatus()==5){
+							ot.setOrderState("异常订单");
+						}
+						break;
+					case OrderState.CANCEL:
+						ot.setOrderState("已取消");
+						break;
+					case OrderState.CONFIRM:
+						if(o.getProductionStatus()==5){
+							ot.setOrderState("异常订单");
+						}else {
+							ot.setOrderState("已消费");
+						}
+						break;
+					case OrderState.HASAPPRAISE:
+						ot.setOrderState("已评价");
+						break;
+					case OrderState.SHARED:
+						ot.setOrderState("已分享");
+						break;
+					default:
+						break;
 				}
-				//订单评价
-				//判断是否为空，不是所有订单都评价
+			}
+			//订单评价
+			//判断是否为空，不是所有订单都评价
 
-				if (null != o.getAppraise()) {
-					switch (o.getAppraise().getLevel()) {
-						case 1:
-							ot.setLevel("一星");
-							break;
-						case 2:
-							ot.setLevel("二星");
-							break;
-						case 3:
-							ot.setLevel("三星");
-							break;
-						case 4:
-							ot.setLevel("四星");
-							break;
-						case 5:
-							ot.setLevel("五星");
-							break;
-						default:
-							break;
-					}
+			if(null!=o.getAppraise()){
+				switch (o.getAppraise().getLevel()) {
+					case 1:
+						ot.setLevel("一星");
+						break;
+					case 2:
+						ot.setLevel("二星");
+						break;
+					case 3:
+						ot.setLevel("三星");
+						break;
+					case 4:
+						ot.setLevel("四星");
+						break;
+					case 5:
+						ot.setLevel("五星");
+						break;
+					default:
+						break;
 				}
-				//订单支付
-				if (o.getOrderPaymentItems() != null) {
-					if (!o.getOrderPaymentItems().isEmpty()) {
-						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-							if (null != oi.getPaymentModeId()) {
-								switch (oi.getPaymentModeId()) {
-									case 1:
-										ot.setWeChatPay(oi.getPayValue());
-										break;
-									case 2:
-										ot.setAccountPay(oi.getPayValue());
-										break;
-									case 3:
-										ot.setCouponPay(oi.getPayValue());
-										break;
-									case 4:
-										ot.setOtherPayment(oi.getPayValue());
-										break;
-									case 5:
-										ot.setBackCartPay(oi.getPayValue());
-										break;
-									case 6:
-										ot.setChargePay(oi.getPayValue());
-										break;
-									case 7:
-										ot.setRewardPay(oi.getPayValue());
-										break;
-
-									case 8:
-										ot.setWaitRedPay(oi.getPayValue());
-										break;
-									case 10:
-										ot.setAliPayment(oi.getPayValue());
-										break;
-									case 12:
-										ot.setMoneyPay(oi.getPayValue());
-										break;
-									default:
-										break;
-								}
+			}
+			//订单支付
+			if(o.getOrderPaymentItems()!=null){
+				if(!o.getOrderPaymentItems().isEmpty()){
+					for(OrderPaymentItem oi : o.getOrderPaymentItems()){
+						if(null!=oi.getPaymentModeId()){
+							switch (oi.getPaymentModeId()) {
+								case PayMode.WEIXIN_PAY:
+									ot.setWeChatPay(oi.getPayValue());
+									break;
+								case PayMode.ACCOUNT_PAY:
+									ot.setAccountPay(oi.getPayValue());
+									break;
+								case PayMode.COUPON_PAY:
+									ot.setCouponPay(oi.getPayValue());
+									break;
+								case PayMode.CHARGE_PAY:
+									ot.setChargePay(oi.getPayValue());
+									break;
+								case PayMode.REWARD_PAY:
+									ot.setRewardPay(oi.getPayValue());
+									break;
+								case PayMode.WAIT_MONEY:
+									ot.setWaitRedPay(oi.getPayValue());
+								case PayMode.ALI_PAY:
+									ot.setAliPayment(oi.getPayValue());
+									break;
+								case PayMode.ARTICLE_BACK_PAY:
+									ot.setArticleBackPay(oi.getPayValue());
+									break;
+								case PayMode.CRASH_PAY:
+									ot.setMoneyPay(oi.getPayValue());
+									break;
+								default:
+									break;
 							}
 						}
 					}
 				}
-				if (null != o.getParentOrderId()) {
-					//该订单是子订单
-					ot.setChildOrder(true);
-				}
-				ot.setOrderMode(o.getOrderMode());
-				//设置营销撬动率  实际（微信+充值+支付宝+现金+银联+其他)/虚拟（评论红包+分享+充值红包+优惠劵）
-				BigDecimal real = ot.getChargePay().add(ot.getWeChatPay())
-						.add(ot.getMoneyPay() == null ? new BigDecimal(0) : ot.getMoneyPay())
-						.add(ot.getBackCartPay() == null ? new BigDecimal(0) : ot.getBackCartPay())
-						.add(ot.getOtherPayment() == null ? new BigDecimal(0) : ot.getOtherPayment());
-				BigDecimal temp = o.getOrderMoney().subtract(real);
-				String incomPrize = "";
-				if (temp.compareTo(BigDecimal.ZERO) > 0) {
-					incomPrize = real.divide(temp, 2, BigDecimal.ROUND_HALF_UP) + "";
-				}
-
-
-				ot.setIncomePrize(incomPrize);
-				//订单金额
-				ot.setOrderMoney(o.getOrderMoney());
-				listDto.add(ot);
-//			}
-			List<Order> la = orderService.selectListByTime(beginDate, endDate, shopId, -1, 0, search);
-			int sizeLenth=0;
-			/*for (Order  s:la) {
-              //if(s.getParentOrderId()==null){
-				 // sizeLenth=sizeLenth+1;
-			 //// }
-			}*/
-			view.setAaData(listDto);
-			view.setiTotalDisplayRecords(la.size());
-			view.setiTotalRecords(la.size());
+			}
+			if(null!=o.getParentOrderId()){
+				//该订单是子订单
+				ot.setChildOrder(true);
+			}
+			ot.setOrderMode(o.getOrderMode());
+			//设置营销撬动率  实际/虚拟
+			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
+			BigDecimal temp = o.getOrderMoney().subtract(real);
+			String incomPrize = "";
+			if(temp.compareTo(BigDecimal.ZERO)>0){
+				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
+			}
+			ot.setIncomePrize(incomPrize);
+			//订单金额
+			ot.setOrderMoney(o.getOrderMoney());
+			listDto.add(ot);
 		}
-		return view;
+		return listDto;
 	}
 
 
@@ -344,23 +300,15 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("shop_excel")
 	@ResponseBody
-	public void reportOrder(String beginDate,String endDate,String shopId,String start,String length,String extra_search,HttpServletResponse response){
+	public void reportOrder(String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
 		String fileName = "店铺订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
-		String path = getRequest().getSession().getServletContext().getRealPath(fileName);
+		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","incomePrize","level","orderState"};
-		//获取前台额外传递过来的查询条件
-		//String search = getRequest().getParameter("extra_search");
 		//定义数据
-		if(extra_search.equals("")){
-			extra_search=null;
-		}
-
-		DatatablesViewPage<OrderDetailDto> view=this.listResult(beginDate, endDate, shopId,start,length,extra_search);
- 		System.out.println(view.getAaData().size());
-		List<OrderDetailDto> result=view.getAaData();
+		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
 		//获取店铺名称
 		ShopDetail s = shopDetailService.selectById(shopId);
 		Map<String,String> map = new HashMap<>();
