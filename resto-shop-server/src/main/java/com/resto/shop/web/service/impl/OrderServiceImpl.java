@@ -2736,10 +2736,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //    }
 
     @Override
-    public List<Order> selectListByTime(String beginDate, String endDate, String shopId, int start, int length, String search) {
+    public List<Order> selectListByTime(String beginDate, String endDate, String shopId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTime(begin, end, shopId, start, length, search);
+        return orderMapper.selectListByTime(begin, end, shopId);
 
     }
 
