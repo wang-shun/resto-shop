@@ -24,6 +24,7 @@ import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -66,7 +67,8 @@ public class OrderMessageListener implements MessageListener {
     ShopDetailService shopDetailService;
     @Resource
     LogBaseService logBaseService;
-
+    @Value("#{propertyConfigurer['orderMsg']}")
+    public static String orderMsg;
     @Override
     public Action consume(Message message, ConsumeContext context) {
         Logger log = LoggerFactory.getLogger(getClass());
@@ -137,29 +139,28 @@ public class OrderMessageListener implements MessageListener {
     	WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
         String pr = obj.getString("pr");
+        String shopName = obj.getString("shopName");
         String name = obj.getString("name");
         String pushDay = obj.getInteger("pushDay")+"";
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
     	StringBuffer str=new StringBuffer();
         String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
-    	str.append("到期提醒通知"+"\n");
-    	str.append(sdf.format(new Date())+"\n");
-    	str.append("<a href='"+jumpurl+"'>您的价值的"+pr+"元的"+name+""+pushDay+"天后即将到期，快来享受优惠吧</a>");
+        str.append("优惠券到期提醒"+"\n");
+        str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
-        sendNote(pr,name,pushDay,customer.getId());
+        sendNote(shopName,pr,name,pushDay,customer.getId());
         return Action.CommitMessage;
     }
     
   //发送短信
-    private void sendNote(String price,String name,String pushDay,String customerId){
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private void sendNote(String shop,String price,String name,String pushDay,String customerId){
         Customer customer=customerService.selectById(customerId);
-        System.out.println("电话"+customer.getTelephone());
     	Map param = new HashMap();
+        param.put("shop", shop);
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-		System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_40860094"));
+        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
     }
 
     private void noticeShareCustomer(Customer customer) {

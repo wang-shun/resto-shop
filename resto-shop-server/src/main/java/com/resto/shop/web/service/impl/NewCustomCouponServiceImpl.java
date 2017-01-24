@@ -63,8 +63,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     
     @Resource
     private BrandSettingService brandSettingService;
-    
-    @Value("#{configProperties['orderMsg']}")
+
+    @Value("#{propertyConfigurer['orderMsg']}")
 	public static String orderMsg;
     
     @Override
@@ -191,13 +191,14 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 }
                 long begin=coupon.getBeginDate().getTime();
                 long end=coupon.getEndDate().getTime();
-                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail.getRecommendTime());
+                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
             }
         }
     }
 
 	  //得到优惠券的时间，然后做定时任务
-	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,Integer pushDay){
+	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail){
+            Integer pushDay = shopDetail.getRecommendTime();
 	    	Customer customer=customerService.selectById(customerId);
 	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 	        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
@@ -206,34 +207,31 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    		if((EndDate-BeginDate)<=(1000*60*60*24*pushDay)){
 	    			StringBuffer str=new StringBuffer();
 	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
-	            	str.append("到期提醒通知"+"\n");
-	            	str.append(sdf.format(new Date())+"\n");
-	            	str.append("<a href='"+jumpurl+"'>您的价值的"+price+"元的"+name+""+pushDay+"天后即将到期，快来享受优惠吧</a>");
+	            	str.append("优惠券到期提醒\n");
+	            	str.append("<a href='"+jumpurl+"'>"+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
 	                String pr=price+"";//将BigDecimal类型转换成String
-	                sendNote(pr,name,pushDay,customerId);//发送短信
+	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
 	    			calendar.setTime(new Date());
 	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
 	    			String pr=price+"";
-	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay);
+	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay,shopDetail.getName());
 	    		}
 	    	}
 	    }
      
 	  //发送短信
-	    private void sendNote(String price,String name,Integer pushDay,String customerId){
-	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId){
 	        Customer customer=customerService.selectById(customerId);
-	        System.out.println("电话"+customer.getTelephone());
-	        System.out.println("orderMsg"+orderMsg);
 	        String day=pushDay+"";//将得到的int转换成String
 	    	Map param = new HashMap();
+            param.put("shop", shop);
 			param.put("price", price);
 			param.put("name", name);
 			param.put("day", day);
-			System.out.println(SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_40860094"));
+            SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
 	    }
 	    
 	    
@@ -269,6 +267,4 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     public List<NewCustomCoupon> selectListShopId(String shopId) {
         return newcustomcouponMapper.selectListByShopId(shopId);
     }
-
-
 }

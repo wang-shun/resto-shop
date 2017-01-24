@@ -403,6 +403,8 @@
 	</select>
 
     <select id="selectByShareCustomer" resultType="java.lang.Integer">
-      select count(1) from tb_customer t where t.share_customer = #{id}
+      select count(1) from tb_customer t LEFT JOIN tb_order t1
+      ON t.id = t1.customer_id
+      where t.share_customer = #{id} and t1.order_state>1 and t1.order_state != 9
     </select>
 </mapper>

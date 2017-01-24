@@ -55,9 +55,10 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 	
-	public static void autoSendRemmend(final String brandId,Calendar calendar, final String customerId,final String pr,final String name,final Integer pushDay){
+	public static void autoSendRemmend(final String brandId,Calendar calendar, final String customerId,final String pr,final String name,final Integer pushDay, final String shopName){
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", brandId);
+		obj.put("shopName", shopName);
 		obj.put("id",customerId);
 		obj.put("pr", pr);
 		obj.put("name", name);

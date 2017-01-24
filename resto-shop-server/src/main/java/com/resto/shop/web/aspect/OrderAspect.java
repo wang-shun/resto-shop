@@ -1,17 +1,14 @@
 package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.NewCustomCoupon;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -20,16 +17,13 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Aspect
@@ -61,7 +55,10 @@ public class OrderAspect {
     OrderPaymentItemService orderPaymentItemService;
     @Resource
     LogBaseService logBaseService;
-
+    @Resource
+    NewCustomCouponService newcustomcouponService;
+    @Resource
+    BrandService brandService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -505,9 +502,24 @@ public class OrderAspect {
     //推送分享领红包，跳转到我的二维码界面
     public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order){
         StringBuffer str=new StringBuffer();
-        str.append("邀请好友扫一扫,");
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
+        List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, order.getShopDetailId());
+        BigDecimal money = new BigDecimal("0.00");
+        for(NewCustomCoupon coupon : coupons){
+            money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
+        }
+        if(money.doubleValue() == 0.00 && shareSetting == null){
+            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+        }else if(money.doubleValue() == 0.00){
+            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+        }else if(shareSetting == null){
+            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+        }else{
+            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+        }
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
-        str.append("<a href='"+jumpurl+"'>领取奖励红包</a>");
+        str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 
@@ -548,10 +560,11 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+        Brand brand = brandService.selectById(customer.getBrandId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("您有一个红包未领取\n");
+            msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -590,9 +603,10 @@ public class OrderAspect {
         if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
-                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
-                .append(rewardMoney).append("元红包返利").append("</a>");
+        msg.append("您邀请的好友"+customer.getNickname()+"已到店消费，您已获得"+rewardMoney+"元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
+//        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
+//                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
+//                .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
         log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
