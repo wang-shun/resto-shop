@@ -1027,6 +1027,7 @@
         order_mode,
         order_state,
         pay_type,
+        pay_mode,
         amount_with_children,
         (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
@@ -2552,7 +2553,11 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
 
     <update id="confirmOrderPos">
         update tb_order
-        set is_confirm = 1 where id =  #{orderId}
+        set is_confirm = 1,
+        order_state = 2,
+        allow_continue_order = 1
+
+        where id =  #{orderId}
     </update>
 
     <select id="selectHasPayNoChangeStatusByBrandId" resultType="Order">

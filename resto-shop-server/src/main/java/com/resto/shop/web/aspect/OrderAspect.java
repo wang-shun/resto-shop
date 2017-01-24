@@ -93,12 +93,11 @@ public class OrderAspect {
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-//            if(order.getOrderState() == OrderState.PAYMENT && order.getOrderMode() != ShopMode.HOUFU_ORDER){
-//                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
-//            }
-//            if(order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER){
-//                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
-//            }
+//
+            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                MQMessageProducer.sendPlaceOrderMessage(order);
+            }
+
             //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
             log.info("当天24小时开启自动退款:" + order.getId());
             if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
@@ -254,9 +253,22 @@ public class OrderAspect {
     };
 
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmOrderPos(..))")
+    public void confirmOrderPos() {
+
+    };
+
+
+    @AfterReturning(value = "confirmOrderPos()", returning = "order")
+    public void confirmOrderPos(Order order) {
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+
+    }
+
     @AfterReturning(value = "afterPay()", returning = "order")
     public void afterPay(Order order) {
-        if(order.getOrderState() == OrderState.PAYMENT){ //已支付
+        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){ //已支付
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
     }
@@ -395,7 +407,9 @@ public class OrderAspect {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER){
-                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+                    if(order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY){
+                        MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+                    }
                     if(order.getOrderState() == OrderState.SUBMIT){
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
                     }else{

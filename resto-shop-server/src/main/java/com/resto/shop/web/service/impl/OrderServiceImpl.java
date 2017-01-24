@@ -560,6 +560,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayValue(payMoney);
             item.setRemark("银联支付:" + item.getPayValue());
             orderPaymentItemService.insert(item);
+            order.setAllowContinueOrder(false);
         }else if(payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
@@ -569,6 +570,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayValue(payMoney);
             item.setRemark("现金支付:" + item.getPayValue());
             orderPaymentItemService.insert(item);
+            order.setAllowContinueOrder(false);
         }
 
         if (payMoney.doubleValue() < 0) {
@@ -5757,9 +5759,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
-                        order.setPaymentAmount(BigDecimal.valueOf(0));
-                        order.setOrderState(OrderState.PAYMENT);
+                        order.setPaymentAmount(price);
+                        order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
+                        order.setAllowContinueOrder(false);
                         item.setId(ApplicationUtils.randomUUID());
                         item.setOrderId(orderId);
                         item.setPaymentModeId(PayMode.BANK_CART_PAY);
@@ -5767,12 +5770,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("银联支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
-                        updateChild(order);
+//                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
-                        order.setPaymentAmount(BigDecimal.valueOf(0));
-                        order.setOrderState(OrderState.PAYMENT);
+                        order.setPaymentAmount(price);
+                        order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
+                        order.setAllowContinueOrder(false);
                         item.setId(ApplicationUtils.randomUUID());
                         item.setOrderId(orderId);
                         item.setPaymentModeId(PayMode.CRASH_PAY);
@@ -5780,7 +5784,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("现金支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
-                        updateChild(order);
+//                        updateChild(order);
                         break;
                     default:
                         break;
@@ -6245,5 +6249,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void confirmOrderPos(String orderId) {
         orderMapper.confirmOrderPos(orderId);
+        Order order = selectById(orderId);
+        updateChild(order);
     }
 }
