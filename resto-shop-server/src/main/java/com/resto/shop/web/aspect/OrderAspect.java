@@ -162,7 +162,7 @@ public class OrderAspect {
             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() != PayMode.CRASH_PAY || order.getPayMode() != PayMode.BANK_CART_PAY)){
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != PayMode.CRASH_PAY && order.getPayMode() != PayMode.BANK_CART_PAY){
             String url = "";
             if(order.getParentOrderId() == null){
                 url = setting.getWechatWelcomeUrl()+"?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
@@ -499,7 +499,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + sum + "\n");
-            if(order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() != PayMode.CRASH_PAY || order.getPayMode() != PayMode.BANK_CART_PAY)){
+            if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != PayMode.CRASH_PAY && order.getPayMode() != PayMode.BANK_CART_PAY){
                 String url = "";
                 if(order.getParentOrderId() == null){
                     url = setting.getWechatWelcomeUrl()+"?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
