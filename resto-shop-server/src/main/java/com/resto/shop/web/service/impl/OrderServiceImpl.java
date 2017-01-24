@@ -560,7 +560,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayValue(payMoney);
             item.setRemark("银联支付:" + item.getPayValue());
             orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
         }else if(payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
@@ -570,7 +569,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayValue(payMoney);
             item.setRemark("现金支付:" + item.getPayValue());
             orderPaymentItemService.insert(item);
-            payMoney = BigDecimal.ZERO;
         }
 
         if (payMoney.doubleValue() < 0) {
