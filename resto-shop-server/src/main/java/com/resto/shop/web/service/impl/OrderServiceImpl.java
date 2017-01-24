@@ -1190,7 +1190,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
-            if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
+            if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY) {
                 order.setAllowContinueOrder(true);
             }
         } else {
