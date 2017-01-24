@@ -1350,7 +1350,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
-        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        if(order.getAmountWithChildren().doubleValue() > 0.0 && order.getPrintTimes() == 1 && order.getOrderMode() == ShopMode.HOUFU_ORDER){
+            data.put("ORIGINAL_AMOUNT", order.getAmountWithChildren());
+        }else{
+            data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        }
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getReductionAmount());
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
