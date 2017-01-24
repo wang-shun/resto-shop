@@ -84,61 +84,84 @@ public class TotalIncomeController extends GenericController {
         }
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
-        //给每个店铺的订单总额  红包支付总额 微信支付总额 ...附初始值
+        //给每个店铺赋初始值
         for(ShopDetail s : shopDetailList){
-            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,s.getName(), s.getId());
             shopIncomeDtos.add(sin);
         }
-
-        //1.订单总额  2.红包收入 3.优惠券收入 4.微信收入 5.充值账号收入 6.充值赠送账号收入 7.等位红包支付 7.店铺名字 8 店铺 ID
-        //   BigDecimal totalIncome, BigDecimal redIncome, BigDecimal couponIncome, BigDecimal wechatIncome,
-        //     BigDecimal chargeAccountIncome, BigDecimal chargeGifAccountIncome,  String shopName,
-        //     String shopDetailId
-        //查询订单支付
-        List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(beginDate,endDate,getCurrentBrandId());
-        if(!orderPaymentItemList.isEmpty()){
-            for(ShopIncomeDto si :shopIncomeDtos){
-                for(OrderPaymentItem oi : orderPaymentItemList){
-                    if(si.getShopDetailId().equals(oi.getShopDetailId())){
-                        switch (oi.getPaymentModeId()) {
-                            case PayMode.WEIXIN_PAY:
-                                si.setWechatIncome(oi.getPayValue());
-                                break;
-                            case PayMode.ACCOUNT_PAY:
-                                si.setRedIncome(oi.getPayValue());
-                                break;
-                            case PayMode.COUPON_PAY:
-                                si.setCouponIncome(oi.getPayValue());
-                                break;
-                            case PayMode.CHARGE_PAY:
-                                si.setChargeAccountIncome(oi.getPayValue());
-                                break;
-                            case PayMode.REWARD_PAY:
-                                si.setChargeGifAccountIncome(oi.getPayValue());
-                                break;
-                            case PayMode.WAIT_MONEY:
-                                si.setWaitNumberIncome(oi.getPayValue());
-                                break;
-                            case PayMode.MONEY_PAY:
-                                si.setOtherPayment(oi.getPayValue());
-                                break;
-                            case PayMode.ALI_PAY:
-                                si.setAliPayment(oi.getPayValue());
-                                break;
-                            case PayMode.ARTICLE_BACK_PAY:
-                                si.setArticleBackPay(oi.getPayValue());
-                            default:
-                                break;
-                        }
-                        si.setTotalIncome(si.getWechatIncome(),si.getRedIncome(),si.getCouponIncome(),si.getChargeAccountIncome(),si.getChargeGifAccountIncome(),si.getWaitNumberIncome(),si.getOtherPayment(),si.getAliPayment(),si.getArticleBackPay());
-                    }
+        Map<String, Object> selectMap = new HashMap<String, Object>();
+        selectMap.put("beginDate",beginDate);
+        selectMap.put("endDate",endDate);
+        List<Map<String, Object>> selectList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.WEIXIN_PAY);
+        payModeMap.put("payName","wechatIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.CHARGE_PAY);
+        payModeMap.put("payName","chargeAccountIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.ACCOUNT_PAY);
+        payModeMap.put("payName","redIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.COUPON_PAY);
+        payModeMap.put("payName","couponIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.REWARD_PAY);
+        payModeMap.put("payName","chargeGifAccountIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.WAIT_MONEY);
+        payModeMap.put("payName","waitNumberIncome");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.ALI_PAY);
+        payModeMap.put("payName","aliPayment");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.BANK_CART_PAY);
+        payModeMap.put("payName","bankCartPayment");
+        selectList.add(payModeMap);payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.CRASH_PAY);
+        payModeMap.put("payName","crashPayment");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.ARTICLE_BACK_PAY);
+        payModeMap.put("payName","articleBackPay");
+        selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode",PayMode.MONEY_PAY);
+        payModeMap.put("payName","otherPayment");
+        selectList.add(payModeMap);
+        selectMap.put("payModeList",selectList);
+        List<Map<String, Object>> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(selectMap);
+        //得到店铺营业信息
+        for(ShopIncomeDto shopIncomeDto : shopIncomeDtos){
+            for(Map shopIncomeMap : orderPaymentItemList){
+                if(shopIncomeDto.getShopDetailId().equals(shopIncomeMap.get("shopDetailId").toString())){
+                    shopIncomeDto.setOriginalAmount(new BigDecimal(shopIncomeMap.get("originalAmount").toString()));
+                    shopIncomeDto.setTotalIncome(new BigDecimal(shopIncomeMap.get("orderMoney").toString()));
+                    shopIncomeDto.setWechatIncome(new BigDecimal(shopIncomeMap.get("wechatIncome").toString()));
+                    shopIncomeDto.setChargeAccountIncome(new BigDecimal(shopIncomeMap.get("chargeAccountIncome").toString()));
+                    shopIncomeDto.setRedIncome(new BigDecimal(shopIncomeMap.get("redIncome").toString()));
+                    shopIncomeDto.setCouponIncome(new BigDecimal(shopIncomeMap.get("couponIncome").toString()));
+                    shopIncomeDto.setChargeGifAccountIncome(new BigDecimal(shopIncomeMap.get("chargeGifAccountIncome").toString()));
+                    shopIncomeDto.setWaitNumberIncome(new BigDecimal(shopIncomeMap.get("waitNumberIncome").toString()));
+                    shopIncomeDto.setAliPayment(new BigDecimal(shopIncomeMap.get("aliPayment").toString()));
+                    shopIncomeDto.setBackCartPay(new BigDecimal(shopIncomeMap.get("bankCartPayment").toString()));
+                    shopIncomeDto.setMoneyPay(new BigDecimal(shopIncomeMap.get("crashPayment").toString()));
+                    shopIncomeDto.setArticleBackPay(new BigDecimal(shopIncomeMap.get("articleBackPay").toString()));
+                    shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
                 }
             }
         }
-
-        List<BrandIncomeDto> brandIncomeDtos = new ArrayList<>();
         //封装品牌的数据
         // 初始化品牌的信息
+        BigDecimal originalAmount = BigDecimal.ZERO;
+        BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal wechatIncome = BigDecimal.ZERO;
         BigDecimal redIncome = BigDecimal.ZERO;
         BigDecimal couponIncome = BigDecimal.ZERO;
@@ -148,20 +171,29 @@ public class TotalIncomeController extends GenericController {
         BigDecimal otherPayment = BigDecimal.ZERO;
         BigDecimal aliPayment = BigDecimal.ZERO;
         BigDecimal articleBackPay = BigDecimal.ZERO;
+        BigDecimal bankCartPayment = BigDecimal.ZERO;
+        BigDecimal crashPayment = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
+                originalAmount = originalAmount.add(sdto.getOriginalAmount());
+                totalIncome = totalIncome.add(sdto.getTotalIncome());
                 wechatIncome = wechatIncome.add(sdto.getWechatIncome());
                 redIncome = redIncome.add(sdto.getRedIncome());
                 couponIncome = couponIncome.add(sdto.getCouponIncome());
                 chargeAccountIncome=chargeAccountIncome.add(sdto.getChargeAccountIncome());
                 chargeGifAccountIncome = chargeGifAccountIncome.add(sdto.getChargeGifAccountIncome());
                 waitNumberIncome = waitNumberIncome.add(sdto.getWaitNumberIncome());
-                otherPayment = otherPayment.add(sdto.getOtherPayment() == null? new BigDecimal(0) : sdto.getOtherPayment());
-                aliPayment = aliPayment.add(sdto.getAliPayment() == null ? new BigDecimal(0) : sdto.getAliPayment());
+                otherPayment = otherPayment.add(sdto.getOtherPayment());
+                aliPayment = aliPayment.add(sdto.getAliPayment());
+                bankCartPayment = bankCartPayment.add(sdto.getBackCartPay());
+                crashPayment = crashPayment.add(sdto.getMoneyPay());
                 articleBackPay = articleBackPay.add(sdto.getArticleBackPay());
             }
         }
+        List<BrandIncomeDto> brandIncomeDtos = new ArrayList<BrandIncomeDto>();
         BrandIncomeDto brandIncomeDto = new BrandIncomeDto();
+        brandIncomeDto.setOriginalAmount(originalAmount);
+        brandIncomeDto.setTotalIncome(totalIncome);
         brandIncomeDto.setWechatIncome(wechatIncome);
         brandIncomeDto.setRedIncome(redIncome);
         brandIncomeDto.setCouponIncome(couponIncome);
@@ -171,8 +203,9 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setWaitNumberIncome(waitNumberIncome);
         brandIncomeDto.setOtherPayment(otherPayment);
         brandIncomeDto.setAliPayment(aliPayment);
+        brandIncomeDto.setBackCartPay(bankCartPayment);
+        brandIncomeDto.setMoneyPay(crashPayment);
         brandIncomeDto.setArticleBackPay(articleBackPay);
-        brandIncomeDto.setTotalIncome(wechatIncome,redIncome,couponIncome,chargeAccountIncome,chargeGifAccountIncome,waitNumberIncome,otherPayment,aliPayment,articleBackPay);
         brandIncomeDtos.add(brandIncomeDto);
         Map<String, Object> map = new HashMap<>();
         map.put("shopIncome", shopIncomeDtos);
@@ -217,13 +250,13 @@ public class TotalIncomeController extends GenericController {
         map.put("beginDate", beginDate);
         map.put("reportType", "品牌营业额报表");// 表的头，第一行内容
         map.put("endDate", endDate);
-        map.put("num", "10");// 显示的位置
+        map.put("num", "13");// 显示的位置
         map.put("reportTitle", "品牌收入条目");// 表的名字
         map.put("timeType", "yyyy-MM-dd");
 
-        String[][] headers = { { "品牌", "20" },{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
+        String[][] headers = { { "品牌", "20" },{ "原价销售总额(元)", "20" },{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
                 { "充值赠送支付(元)", "23" },{"等位红包支付","23"},{"支付宝支付","23"},{"银联支付","23"},{"现金支付","23"},{"退菜支付","23"},{"其它支付","23"} };
-        String[] columns = { "name", "totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
+        String[] columns = { "name","originalAmount","totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
                 "chargeGifAccountIncome","waitNumberIncome","aliPayment","backCartPay","moneyPay","articleBackPay","otherPayment" };
 
         List<ReportIncomeDto> result = new LinkedList<>();
@@ -231,6 +264,7 @@ public class TotalIncomeController extends GenericController {
         List<ShopIncomeDto> shopresult = (List<ShopIncomeDto>) getIncomeReportList(beginDate, endDate).get("shopIncome");
         for (ShopIncomeDto shopIncomeDto : shopresult) {
             ReportIncomeDto rt = new ReportIncomeDto();
+            rt.setOriginalAmount(shopIncomeDto.getOriginalAmount());
             rt.setTotalIncome(shopIncomeDto.getTotalIncome());
             rt.setWechatIncome(shopIncomeDto.getWechatIncome());
             rt.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome());
@@ -248,6 +282,7 @@ public class TotalIncomeController extends GenericController {
         }
         for (BrandIncomeDto brandIncomeDto : brandresult) {
             ReportIncomeDto rt = new ReportIncomeDto();
+            rt.setOriginalAmount(brandIncomeDto.getOriginalAmount());
             rt.setTotalIncome(brandIncomeDto.getTotalIncome());
             rt.setWechatIncome(brandIncomeDto.getWechatIncome());
             rt.setChargeAccountIncome(brandIncomeDto.getChargeAccountIncome());
