@@ -90,6 +90,10 @@
                 data : "brandName",
             },
             {
+                title : "原价销售总额(元)",
+                data : "originalAmount"
+            },
+            {
                 title : "订单总额(元)",
                 data : "totalIncome",
             },
@@ -122,10 +126,13 @@
                 data : "aliPayment"
             },
             {
-                title : "退菜支付(元)",
-                data:"articleBackPay",
+                title : "刷卡支付(元)",
+                data : "backCartPay"
             },
-
+            {
+                title : "现金支付(元)",
+                data : "moneyPay"
+            },
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment",
@@ -142,11 +149,10 @@
                 title : "店铺名称",
                 data : "shopName",
             },
-//		{
-//			title : "营收总额(元)",
-//			data : "factIncome",
-//			defaultContent:'0'
-//		},
+            {
+                title : "原价销售总额(元)",
+                data : "originalAmount"
+            },
             {
                 title : "订单总额(元)",
                 data : "totalIncome",
@@ -181,12 +187,20 @@
                 data : "aliPayment",
             },
             {
+                title : "刷卡支付(元)",
+                data : "backCartPay"
+            },
+            {
+                title : "现金支付(元)",
+                data : "moneyPay"
+            },
+            {
                 title : "退菜支付(元)",
-                data:"articleBackPay",
+                data:"articleBackPay"
             },
             {
                 title : "其他方式支付(元)",
-                data : "otherPayment",
+                data : "otherPayment"
             }
         ]
 
