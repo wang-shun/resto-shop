@@ -152,21 +152,25 @@
     </select>
 
     <!-- 品牌收入报表 2016-10-29 -->
-    <select id="selectShopIncomeList" resultType="OrderPaymentItem">
-        SELECT
-        o.shop_detail_id,
-        sum(oi. pay_value)pay_value,
-        oi.payment_mode_id
-        FROM
-        tb_order_payment_item oi
-        INNER JOIN tb_order o ON o.id = oi.order_id
-        WHERE
-        o.order_state IN (10, 11, 2, 12)
-        AND o.production_status IN (2, 3)
-        AND o.brand_id=#{brandId}
-        AND
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-         GROUP BY o.shop_detail_id,oi.payment_mode_id
+    <select id="selectShopIncomeList" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        td.shop_detail_id shopDetailId,
+        SUM(td.original_amount) originalAmount,
+        SUM(td.order_money) orderMoney
+        <foreach collection="payModeList" item="payMode">
+            ,IFNULL((select SUM(pay_value) from tb_order tr inner join tb_order_payment_item top
+            on tr.id = top.order_id where tr.shop_detail_id = td.shop_detail_id and top.payment_mode_id = ${payMode.payMode}
+            and tr.order_state in (2,10,11,12)
+            and tr.production_status in (2,3)
+            and tr.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+            and tr.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) ${payMode.payName}
+        </foreach>
+        from tb_order td
+        where td.order_state in (2,10,11,12)
+        and td.production_status in (2,3)
+        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        GROUP BY td.shop_detail_id
     </select>
 
 
