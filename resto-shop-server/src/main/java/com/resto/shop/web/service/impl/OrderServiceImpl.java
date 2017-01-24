@@ -913,7 +913,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
 
-
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
             int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
@@ -924,6 +923,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             parent.setCountWithChild(articleCountWithChildren);
             parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
             update(parent);
+
+            //拒绝订单后还原库存
+            Boolean addStockSuccess = false;
+            addStockSuccess = addStock(getOrderInfo(orderId));
+            if (!addStockSuccess) {
+                log.info("库存还原失败:" + order.getId());
+            }
+            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
 
 
