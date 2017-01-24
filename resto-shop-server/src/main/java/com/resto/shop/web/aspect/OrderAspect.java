@@ -560,10 +560,11 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+        Brand brand = brandService.selectById(customer.getBrandId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
-            msg.append("您有一个红包未领取，红包来自简厨给您的消费返利，");
+            msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -602,9 +603,10 @@ public class OrderAspect {
         if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
-                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
-                .append(rewardMoney).append("元红包返利").append("</a>");
+        msg.append("您邀请的好友"+customer.getNickname()+"已到店消费，您已获得"+rewardMoney+"元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
+//        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
+//                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
+//                .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
         log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);

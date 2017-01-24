@@ -255,7 +255,7 @@ public class TotalIncomeController extends GenericController {
         map.put("timeType", "yyyy-MM-dd");
 
         String[][] headers = { { "品牌", "20" },{ "原价销售总额(元)", "20" },{ "订单总额(元)", "16" }, { "微信支付(元)", "16" },{ "充值账户支付(元)", "19" },{ "红包支付(元)", "16" }, { "优惠券支付(元)", "17" },
-                { "充值赠送支付(元)", "23" },{"等位红包支付","23"},{"支付宝支付","23"},{"银联支付","23"},{"现金支付","23"},{"退菜支付","23"},{"其它支付","23"} };
+                { "充值赠送支付(元)", "23" },{"等位红包支付","23"},{"支付宝支付","23"},{"银联支付","23"},{"现金支付","23"},{"退菜金额","23"},{"其它支付","23"} };
         String[] columns = { "name","originalAmount","totalIncome","wechatIncome", "chargeAccountIncome","redIncome", "couponIncome",
                 "chargeGifAccountIncome","waitNumberIncome","aliPayment","backCartPay","moneyPay","articleBackPay","otherPayment" };
 
