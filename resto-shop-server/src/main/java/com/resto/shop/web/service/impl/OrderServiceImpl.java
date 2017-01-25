@@ -926,12 +926,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //拒绝订单后还原库存
-        Boolean addStockSuccess = false;
-        addStockSuccess = addStock(getOrderInfo(orderId));
-        if (!addStockSuccess) {
-            log.info("库存还原失败:" + order.getId());
+        if(order.getPayType() != PayType.NOPAY){
+            Boolean addStockSuccess = false;
+            addStockSuccess = addStock(getOrderInfo(orderId));
+            if (!addStockSuccess) {
+                log.info("库存还原失败:" + order.getId());
+            }
+            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
-        orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         return result;
 //        Result result = new Result();
 //
