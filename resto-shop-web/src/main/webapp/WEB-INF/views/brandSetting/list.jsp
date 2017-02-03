@@ -242,6 +242,13 @@
 			methods:{
 				save:function(e){
 					var formDom = e.target;
+					var autoConfirmTime = $("input[name='autoConfirmTime']").val();
+					var closeContinueTime = $("input[name='closeContinueTime']").val();
+					if(parseInt(autoConfirmTime) < parseInt(closeContinueTime)){
+						toastr.clear();
+						toastr.error("红包提醒倒计时应该大于或者等于最迟加菜时间");
+						return;
+					}
 					$.ajax({
 						url:"brandSetting/modify",
 						data:$(formDom).serialize(),
