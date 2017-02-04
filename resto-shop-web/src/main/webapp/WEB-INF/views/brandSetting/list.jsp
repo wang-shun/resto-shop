@@ -249,7 +249,7 @@
 					var autoConfirmTime = $("input[name='autoConfirmTime']").val();
 					var closeContinueTime = $("input[name='closeContinueTime']").val();
 					if(parseInt(autoConfirmTime) <= parseInt(closeContinueTime)){
-						$("#timeTips").html("红包提醒倒计时应该大于最迟加菜时间");
+						$("#timeTips").html("* 红包提醒倒计时应该大于最迟加菜时间");
 					}else{
 						$("#timeTips").html("");
 					}
