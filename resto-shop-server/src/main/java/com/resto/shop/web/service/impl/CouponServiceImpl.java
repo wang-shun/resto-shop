@@ -14,6 +14,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.CouponMapper;
+import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
@@ -44,6 +45,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     private OrderService orderService;
 
     @Autowired
+    private NewCustomCouponMapper newCustomCouponMapper;
+
+    @Autowired
     OrderMapper orderMapper;
 
     @Override
@@ -52,6 +56,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         //查询出品牌的
         coupon.setBrandId(brandId);
         coupon.setShopDetailId(shopId);
+
         List<Coupon> brandList = couponMapper.listCouponByBrandId(coupon);
         //查询出店铺的专属优惠券
         List<Coupon> shopList = couponMapper.listCouponByShopId(coupon);
