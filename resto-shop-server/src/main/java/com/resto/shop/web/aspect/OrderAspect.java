@@ -268,7 +268,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "afterPay()", returning = "order")
     public void afterPay(Order order) {
-        if(order.getPayMode() == OrderPayMode.ALI_PAY ){ //已支付
+        if(order.getPayMode() != OrderPayMode.ALI_PAY ){ //已支付
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
