@@ -139,6 +139,16 @@
                             </div>
 
                             <div class="form-group">
+                                <label >邀请优惠券延迟使用时间：（小时）</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control"
+                                           name="recommendDelayTime" placeholder="(建议输入整数)"
+                                           v-model="m.recommendDelayTime" required="required" min="0">
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
                                 <label>优惠券所属：</label>
                                 <br/>
                                 <label class="radio-inline">
