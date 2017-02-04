@@ -83,6 +83,7 @@
 				<div class="form-group">
 				    <label>最迟加菜时间(秒)</label>
 				    <input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime" required="required">
+					<div style="color: red" id="timeTips"></div>
 				</div>
 				
 				<div class="form-group">
@@ -239,16 +240,22 @@
 			data:{
 				m:{},
 			},
+			watch: {
+				'm.autoConfirmTime': 'timeTips',
+				'm.closeContinueTime':'timeTips'
+			},
 			methods:{
-				save:function(e){
-					var formDom = e.target;
+				timeTips:function(){
 					var autoConfirmTime = $("input[name='autoConfirmTime']").val();
 					var closeContinueTime = $("input[name='closeContinueTime']").val();
-					if(parseInt(autoConfirmTime) < parseInt(closeContinueTime)){
-						toastr.clear();
-						toastr.error("红包提醒倒计时应该大于或者等于最迟加菜时间");
-						return;
+					if(parseInt(autoConfirmTime) <= parseInt(closeContinueTime)){
+						$("#timeTips").html("* 红包提醒倒计时应该大于最迟加菜时间");
+					}else{
+						$("#timeTips").html("");
 					}
+				},
+				save:function(e){
+					var formDom = e.target;
 					$.ajax({
 						url:"brandSetting/modify",
 						data:$(formDom).serialize(),
