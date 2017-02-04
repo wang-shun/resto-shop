@@ -525,14 +525,15 @@ public class OrderAspect {
         for(NewCustomCoupon coupon : coupons){
             money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
         }
+        str.append("邀请朋友扫一扫，");
         if(money.doubleValue() == 0.00 && shareSetting == null){
-            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+            str.append("送他/她红包，朋友到店消费后，您将获得红包返利\n");
         }else if(money.doubleValue() == 0.00){
-            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得红包返利\n");
         }else if(shareSetting == null){
-            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+            str.append("送他/她红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
         }else{
-            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
         }
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
