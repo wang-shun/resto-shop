@@ -1942,12 +1942,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printOrderAll(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
-        ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
+            if(!order.getPayMode().equals(OrderPayMode.XJ_PAY) && !order.getPayMode().equals(OrderPayMode.YL_PAY)
+                    && (setting.getIsPrintPayAfter().equals(Common.NO) || shopDetail.getIsPrintPayAfter().equals(Common.NO))){
+                return printTask;
+            }
+
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
@@ -1955,7 +1961,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, child, shop, printer);
+                Map<String, Object> ticket = printTicket(order, child, shopDetail, printer);
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -1969,8 +1975,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+
+
         if (setting.getAutoPrintTotal().intValue() == 0 && shopDetail.getAutoPrintTotal() == 0 &&
                 (order.getOrderMode() != ShopMode.HOUFU_ORDER || (order.getOrderState() == OrderState.SUBMIT && order.getOrderMode() == ShopMode.HOUFU_ORDER))) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
@@ -1980,7 +1986,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             child.addAll(items);
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, items, shop, printer);
+                Map<String, Object> ticket = printTicket(order, items, shopDetail, printer);
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -1988,7 +1994,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (order.getOrderMode().equals(ShopMode.HOUFU_ORDER) && order.getOrderState().equals(OrderState.PAYMENT)
+        if ((order.getOrderMode().equals(ShopMode.HOUFU_ORDER) || order.getOrderMode().equals(ShopMode.BOSS_ORDER)) && order.getOrderState().equals(OrderState.PAYMENT)
                 && setting.getIsPrintPayAfter().equals(Common.YES) && shopDetail.getIsPrintPayAfter().equals(Common.YES)) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
@@ -1998,7 +2004,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, child, shop, printer);
+                Map<String, Object> ticket = printTicket(order, child, shopDetail, printer);
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -2012,7 +2018,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
             for (Printer printer : packagePrinter) {
-                Map<String, Object> packageTicket = printTicket(order, items, shop, printer);
+                Map<String, Object> packageTicket = printTicket(order, items, shopDetail, printer);
                 if (packageTicket != null) {
                     printTask.add(packageTicket);
                 }
@@ -3940,6 +3946,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月r订单总数
         Set<String> monthRestoCount = new HashSet<>();
 
+        //微信支付 + 支付宝支付之和
+        BigDecimal realMoneyPay = offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),begin,end);
+
+        //本月订单总额
+        BigDecimal monthTotalMoney = offLineOrderMapper.selectTotalMoney(shopDetail.getId(),begin,end);
+
+
         //本日线下订单总数
         int todayEnterCount = 0;
         //上旬线下订单总数
@@ -4888,7 +4901,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上月总人数
                     .append("nowNewCustomerCount:").append("'").append(monthNewCustomer.size() + "/" + customerInMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("nowOnlinePercent:").append("'").append(monthRestoCount.size() + "/" + monthEnterCount+monthRestoCount.size()).append("'").append(",")
+                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + monthEnterCount+monthTotalMoney).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("nowerTotalPayment:").append("'").append(monthEnterTotal.add(monthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值

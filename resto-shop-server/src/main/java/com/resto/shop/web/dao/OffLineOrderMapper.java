@@ -4,6 +4,7 @@ import com.resto.shop.web.model.OffLineOrder;
 import com.resto.brand.core.generic.GenericDao;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -40,4 +41,20 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
     List<OffLineOrder> selectlistByTimeSourceAndShopId(@Param("shopId") String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate,@Param("source") Integer source);
 
     List<OffLineOrder> selectByShopIdAndTime(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
+
+    /**
+     * 查询这家店铺当月微信支付 + 支付宝支付之和
+     * @param shopId 店铺id
+     * @return 这家店铺当月微信支付 + 支付宝支付之和
+     */
+    BigDecimal selectSumRealMoney(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
+
+    /**
+     * 查询订单总额
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    BigDecimal selectTotalMoney(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
 }
