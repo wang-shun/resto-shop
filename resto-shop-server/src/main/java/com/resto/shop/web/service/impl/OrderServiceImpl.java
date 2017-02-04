@@ -5774,6 +5774,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 switch (payMode) {
                     case OrderPayMode.WX_PAY:
                         order.setPaymentAmount(pay);
+                        order.setPrintTimes(1);
                         break;
                     case OrderPayMode.ALI_PAY:
                         order.setPaymentAmount(pay);
@@ -5816,6 +5817,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);
+                    order.setPrintTimes(1);
                     order.setPaymentAmount(BigDecimal.valueOf(0));
                     update(order);
                     updateChild(order);
