@@ -415,8 +415,6 @@ public class OrderAspect {
                     }else{
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
-
-
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
