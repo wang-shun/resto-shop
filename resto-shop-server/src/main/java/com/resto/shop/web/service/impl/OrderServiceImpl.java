@@ -1200,7 +1200,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY) {
-                order.setAllowContinueOrder(true);
+                if(order.getPayType() != PayType.NOPAY && order.getOrderState() != OrderState.PAYMENT){
+                    order.setAllowContinueOrder(true);
+                }
             }
         } else {
             log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
