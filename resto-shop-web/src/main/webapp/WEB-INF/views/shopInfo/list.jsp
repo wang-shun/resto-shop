@@ -88,6 +88,19 @@
 						</div>
 
 						<div class="form-group">
+							<label class="col-sm-3 control-label">允许先付（仅混合支付模式有效）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="allowFirstPay"
+												   v-model="m.allowFirstPay" value="0"> 允许
+									</label> <label> <input type="radio" name="allowFirstPay"
+															v-model="m.allowFirstPay" value="1"> 不允许
+								</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
 							<label class="col-sm-3 control-label">允许后付（仅混合支付模式有效）：</label>
 							<div class="col-sm-9">
 								<div>
@@ -99,7 +112,6 @@
 								</div>
 							</div>
 						</div>
-
 
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
@@ -355,6 +367,13 @@
 						},
 						save : function(e) {
 							var formDom = e.target;
+							var allowAfterPay = $("input[name='allowAfterPay']:checked").val();
+							var allowFirstPay = $("input[name='allowFirstPay']:checked").val();
+							if(allowAfterPay == 1 && allowFirstPay == 1){
+								toastr.clear();
+								toastr.error("混合支付模式下不可以同时关闭2种支付方式！");
+								return;
+							}
 							$.ajax({
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
