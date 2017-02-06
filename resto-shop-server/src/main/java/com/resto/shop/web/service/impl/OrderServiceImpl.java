@@ -1635,7 +1635,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> refundItems = new ArrayList<>();
         for (OrderItem article : orderItems) {
             Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getUnitPrice().multiply(new BigDecimal(article.getOrginCount())));
+            item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
             item.put("ARTICLE_NAME", article.getArticleName());
             item.put("ARTICLE_COUNT", article.getOrginCount());
             items.add(item);
@@ -3954,12 +3954,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本月r订单总数
         Set<String> monthRestoCount = new HashSet<>();
 
-        //微信支付 + 支付宝支付之和
+        //微信支付 + 支付宝支付之和  本月
         BigDecimal realMoneyPay = offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),begin,end);
 
-        //本月订单总额
+        //本月订单总额     本月
         BigDecimal monthTotalMoney = offLineOrderMapper.selectTotalMoney(shopDetail.getId(),begin,end);
 
+        //微信支付 + 支付宝支付之和  本日
+        BigDecimal realMoneyToday =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
+
+        //本日订单总额 本日
+        BigDecimal todayTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
 
         //本日线下订单总数
         int todayEnterCount = 0;
@@ -4863,7 +4870,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("customerPayPercent:").append("'").append(todayRestoTotal).append("/").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("newCustomerPercent:").append("'").append(todayNewCutomer.size()).append("/").append((todayBackCustomer.size()+todayNewCutomer.size())).append("'").append(",")
                     //r订单总数/(r订单总数+线下订单总数)
-                    .append("payOnlinePercent:").append("'").append(todayRestoCount.size()).append("/").append(todayRestoCount.size()+todayEnterCount).append("'").append(",")
+                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(todayTotalMoney.doubleValue()+todayEnterCount).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
 

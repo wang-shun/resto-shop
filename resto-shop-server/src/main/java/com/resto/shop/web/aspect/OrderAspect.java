@@ -431,7 +431,7 @@ public class OrderAspect {
                     }
                 }
 
-                sendPaySuccessMsg(order);
+//                sendPaySuccessMsg(order);
 //                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
 //                    sendPaySuccessMsg(order);
 //                }

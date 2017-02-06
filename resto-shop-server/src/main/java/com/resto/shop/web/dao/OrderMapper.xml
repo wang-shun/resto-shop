@@ -1038,7 +1038,7 @@
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
-        and ((order_state = 1 and pay_mode != 2) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
+        and ((order_state = 1 and (pay_mode == 3 or pay_mode == 4 )) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
         and table_number is not null
         and parent_order_id is null
         order by create_time ASC;
