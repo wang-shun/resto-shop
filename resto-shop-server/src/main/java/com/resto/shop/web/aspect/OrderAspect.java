@@ -276,6 +276,7 @@ public class OrderAspect {
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
             if(order.getPayType() ==  PayType.NOPAY){
                 order.setPrintTimes(1);
+                orderService.update(order);
             }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }

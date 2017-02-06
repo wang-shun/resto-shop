@@ -150,6 +150,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Double selectParentAmountByBossOrder(String orderId);
 
+	BigDecimal selectPayBefore(String orderId);
+
 	void changeAllowContinue(String id, boolean b);
 
 	Integer selectArticleCountById(@Param("id")String id,@Param("shopMode")Integer shopMode);

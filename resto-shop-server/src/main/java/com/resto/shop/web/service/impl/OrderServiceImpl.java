@@ -6289,4 +6289,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         updateChild(order);
     }
+
+    @Override
+    public BigDecimal selectPayBefore(String orderId) {
+        return orderMapper.selectPayBefore(orderId);
+    }
 }
