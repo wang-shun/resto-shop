@@ -2002,7 +2002,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if ((order.getOrderMode().equals(ShopMode.HOUFU_ORDER) || order.getOrderMode().equals(ShopMode.BOSS_ORDER)) && order.getOrderState().equals(OrderState.PAYMENT)
+        if ((order.getOrderMode().equals(ShopMode.HOUFU_ORDER)) && order.getOrderState().equals(OrderState.PAYMENT)
                 && setting.getIsPrintPayAfter().equals(Common.YES) && shopDetail.getIsPrintPayAfter().equals(Common.YES)) {
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
