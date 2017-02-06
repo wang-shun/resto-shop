@@ -18,9 +18,10 @@
         <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
         <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
         <result column="recommend_delay_time" property="recommendDelayTime" />
+        <result column="distance_birthday_day" property="distanceBirthdayDay"></result>
     </resultMap>
     <sql id="Base_Column_List">id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id
-,recommend_delay_time</sql>
+,recommend_delay_time,distance_birthday_day</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
         <include refid="Base_Column_List"/> from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
     </select>
@@ -49,6 +50,7 @@
             <if test="shopDetailId != null">shop_detail_id,</if>
             <if test="isBrand != null">is_brand,</if>
             <if test="recommendDelayTime != null">recommend_delay_time,</if>
+            <if test="distanceBirthdayDay != null">distance_birthday_day</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
@@ -72,6 +74,7 @@
             <if test="shopDetailId != null">#{shopDetailId},</if>
             <if test="isBrand != null">#{isBrand},</if>
             <if test="recommendDelayTime != null">#{recommendDelayTime},</if>
+            <if test="distanceBirthdayDay != null">#{distanceBirthdayDay}</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon
@@ -95,12 +98,13 @@
             <if test="couponType != null">coupon_type = #{couponType},</if>
             <if test="isBrand != null">is_brand = #{isBrand},</if>
             <if test="recommendDelayTime != null">recommend_delay_time = #{recommendDelayTime},</if>
+            <if test="distanceBirthdayDay != null">distance_birthday_day = #{distanceBirthdayDay}</if>
             shop_detail_id = #{shopDetailId}
 
         </set> where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.NewCustomCoupon">
-        update tb_new_custom_coupon set name = #{name,jdbcType=VARCHAR}, coupon_value = #{couponValue,jdbcType=DECIMAL}, coupon_validay = #{couponValiday,jdbcType=INTEGER}, coupon_number = #{couponNumber,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP}, use_with_account = #{useWithAccount,jdbcType=BIT}, coupon_name = #{couponName,jdbcType=VARCHAR}, coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_activty = #{isActivty,jdbcType=BIT}, brand_id = #{brandId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER} where id = #{id,jdbcType=BIGINT}</update>
+        update tb_new_custom_coupon set name = #{name,jdbcType=VARCHAR}, coupon_value = #{couponValue,jdbcType=DECIMAL}, coupon_validay = #{couponValiday,jdbcType=INTEGER}, coupon_number = #{couponNumber,jdbcType=INTEGER}, create_time = #{createTime,jdbcType=TIMESTAMP}, use_with_account = #{useWithAccount,jdbcType=BIT}, coupon_name = #{couponName,jdbcType=VARCHAR}, coupon_min_money = #{couponMinMoney,jdbcType=DECIMAL}, begin_time = #{beginTime,jdbcType=TIME}, end_time = #{endTime,jdbcType=TIME}, is_activty = #{isActivty,jdbcType=BIT}, brand_id = #{brandId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, distance_birthday_day = #{distanceBirthdayDay} where id = #{id,jdbcType=BIGINT}</update>
     <select id="selectList" resultType="NewCustomCoupon">select * from tb_new_custom_coupon</select>
 
     <select id="selectListByBrandIdAndIsActive" resultType="NewCustomCoupon">
