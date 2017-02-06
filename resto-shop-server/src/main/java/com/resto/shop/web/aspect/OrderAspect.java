@@ -98,19 +98,6 @@ public class OrderAspect {
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
 
-            //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
-            log.info("当天24小时开启自动退款:" + order.getId());
-            if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
-                MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
-            }
-            //自动取消订单，不包含后付款模式
-            if (order.getOrderState().equals(OrderState.SUBMIT)&&order.getOrderMode()!=ShopMode.HOUFU_ORDER&&order.getOrderMode()!=ShopMode.BOSS_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
-            	long delay = 1000*60*60*2;//两个小时后自动取消订单
-                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            }
-//            else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode()!=ShopMode.TABLE_MODE && order.getOrderMode()!=ShopMode.BOSS_ORDER) { //坐下点餐模式不发送
-//                sendPaySuccessMsg(order);
-//            }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
