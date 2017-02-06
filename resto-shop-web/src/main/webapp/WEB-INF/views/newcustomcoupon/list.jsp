@@ -37,7 +37,7 @@
                                         <input type="radio" class="md-radiobtn" name="timeConsType" value="2" v-model="m.timeConsType" @click="showTime">按时间范围</label>
                                 </div>
                             </div>
-                            <div class="form-group" v-if="this.m.timeConsType==1">
+                            <div class="form-group" v-if="this.m.timeConsType==1 || this.m.timeConsType==3">
                                 <label>优惠券有效日期</label>
                                 <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" placeholder="请输入数字" required min="0">
                             </div>
