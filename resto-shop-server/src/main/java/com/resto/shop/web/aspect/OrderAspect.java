@@ -274,6 +274,9 @@ public class OrderAspect {
         if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
                 order.getOrderState().equals(OrderState.PAYMENT)
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
+            if(order.getPayType() ==  PayType.NOPAY){
+                order.setPrintTimes(1);
+            }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
@@ -292,6 +295,8 @@ public class OrderAspect {
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
+
+
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
 //            MQMessageProducer.sendPlaceOrderMessage(order);
