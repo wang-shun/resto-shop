@@ -19,6 +19,7 @@
             <result column="sort" property="sort"/>
             <result column="article_kitchen_id" property="kitchenId"/>
         </collection>
+        <result column="photo_small" property="imageUrl"/>
     </resultMap>
 
     <select id="getRecommendList" resultMap="RecommendResultMap">
@@ -88,7 +89,7 @@
     </delete>
 
     <select id="getRecommendByArticleId" resultMap="RecommendResultMap">
-        select t3.article_name,t3.price,t3.article_id,t3.max_count,t2.id,t2.count,t2.name, t3.kitchen_id as article_kitchen_id  from tb_article t
+        select t.photo_small as imageUrl, t3.article_name,t3.price,t3.article_id,t3.max_count,t2.id,t2.count,t2.name, t3.kitchen_id as article_kitchen_id  from tb_article t
       INNER JOIN tb_recommend t2 on t2.id = t.recommend_id
       INNER JOIN tb_recommend_article t3 on t3.recommend_id = t2.id
 where t2.shop_detail_id = #{shopId} and t.id = #{articleId}
