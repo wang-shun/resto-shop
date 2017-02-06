@@ -515,7 +515,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         payMoney = payMoney.subtract(order.getWaitMoney());
 
-        if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER ) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -530,7 +530,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
             // 使用余额
-            if (payMoney.doubleValue() > 0 && order.isUseAccount()) {
+            if (payMoney.doubleValue() > 0 && order.isUseAccount()  && order.getPayType() != PayType.NOPAY) {
                 BigDecimal payValue = accountService.payOrder(order, payMoney, customer);
 //			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
                 if (payValue.doubleValue() > 0) {
