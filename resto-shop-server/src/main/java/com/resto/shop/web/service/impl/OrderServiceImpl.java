@@ -5789,7 +5789,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 switch (payMode) {
                     case OrderPayMode.WX_PAY:
                         order.setPaymentAmount(pay);
-                        order.setPrintTimes(1);
+//                        order.setPrintTimes(1);
                         break;
                     case OrderPayMode.ALI_PAY:
                         order.setPaymentAmount(pay);
