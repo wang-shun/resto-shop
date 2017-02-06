@@ -395,7 +395,7 @@
 
 						},
 						cancel : function() {
-							initContent();
+							this.initContent();
 
 						},
 						uploadSuccess:function(url){
@@ -404,7 +404,18 @@
 						},
 						uploadError:function(msg){
 							toastr.error("上传失败");
-						}
+						},
+                        initContent:function(){
+						    var that = this;
+                            $.ajax({
+                                url:"shopInfo/list_one",
+                                type:"post",
+                                dataType:"json",
+                                success:function (resultData) {
+                                    that.m = resultData.data;
+                                }
+                            });
+                        }
 					}
 				});
 
