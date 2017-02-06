@@ -500,7 +500,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId);
 
 	BigDecimal getServicePrice(String shopId);
 

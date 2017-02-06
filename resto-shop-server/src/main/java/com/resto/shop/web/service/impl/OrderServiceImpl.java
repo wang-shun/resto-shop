@@ -5421,8 +5421,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order getLastOrderByTableNumber(String tableNumber) {
-        return orderMapper.getLastOrderByTableNumber(tableNumber);
+    public Order getLastOrderByTableNumber(String tableNumber,String shopId) {
+        return orderMapper.getLastOrderByTableNumber(tableNumber,shopId);
     }
 
     @Override

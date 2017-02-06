@@ -481,7 +481,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 * @param tableNumber
 	 * @return
 	 */
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(String tableNumber,String shopId);
 
 	/**
 	 * 返回子订单的菜品项
