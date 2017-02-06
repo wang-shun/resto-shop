@@ -1761,9 +1761,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if(order.getOrderState() == OrderState.SUBMIT){
-            data.put("RESTAURANT_NAME", shopDetail.getName() + " (未付款)");
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         }else{
-            data.put("RESTAURANT_NAME", shopDetail.getName());
+            if(order.getPayType() == PayType.PAY){
+                data.put("RESTAURANT_NAME", shopDetail.getName());
+            }else{
+                data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+            }
+
         }
 
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -1949,10 +1954,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
-            if(!order.getPayMode().equals(OrderPayMode.XJ_PAY) && !order.getPayMode().equals(OrderPayMode.YL_PAY)
-                    && (setting.getIsPrintPayAfter().equals(Common.NO) || shopDetail.getIsPrintPayAfter().equals(Common.NO))){
-                return printTask;
-            }
 
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
