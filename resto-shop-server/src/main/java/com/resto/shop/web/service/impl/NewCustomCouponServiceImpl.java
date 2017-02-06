@@ -79,8 +79,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     }
     
     @Override
-    public List<NewCustomCoupon> selectListByBrandId(String currentBrandId) {
-        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByBrandId(currentBrandId);
+    public List<NewCustomCoupon> selectListByBrandId(String currentBrandId,String shopId) {
+        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByBrandId(currentBrandId,shopId);
         //查询品牌下所有的店铺
         List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(currentBrandId);
 

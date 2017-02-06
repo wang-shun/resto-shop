@@ -20,7 +20,7 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
 
     int updateByPrimaryKey(NewCustomCoupon record);
 
-    List<NewCustomCoupon> selectListByBrandId(@Param("brandId")String brandId);
+    List<NewCustomCoupon> selectListByBrandId(@Param("brandId")String brandId,@Param("shopId") String shopId);
     
     List<NewCustomCoupon> selectListByCouponType(@Param("brandId")String brandId,@Param("couponType")Integer couponType);
 

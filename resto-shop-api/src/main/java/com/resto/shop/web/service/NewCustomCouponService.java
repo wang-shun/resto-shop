@@ -12,7 +12,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
 
     int insertNewCustomCoupon(NewCustomCoupon newCustomCoupon);
 
-    List<NewCustomCoupon> selectListByBrandId(String currentBrandId);
+    List<NewCustomCoupon> selectListByBrandId(String currentBrandId,String shopId);
 
 	void giftCoupon(Customer cus,Integer couponType,String shopId);
 

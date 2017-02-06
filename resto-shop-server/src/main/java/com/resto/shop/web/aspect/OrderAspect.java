@@ -430,11 +430,10 @@ public class OrderAspect {
                         }
                     }
                 }
+                if(order.getPrintTimes() == 0){
+                    sendPaySuccessMsg(order);
+                }
 
-                sendPaySuccessMsg(order);
-//                if(order.getOrderMode() == ShopMode.TABLE_MODE && order.getEmployeeId() == null && order.getParentOrderId() != null){
-//                    sendPaySuccessMsg(order);
-//                }
                 if (order.getOrderMode() != null) {
                     switch (order.getOrderMode()) {
                         case ShopMode.CALL_NUMBER:
