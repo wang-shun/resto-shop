@@ -65,6 +65,9 @@ public class OrderMessageListener implements MessageListener {
     OrderItemService orderItemService;
     @Resource
     ShopDetailService shopDetailService;
+
+    @Resource
+    NewCustomCouponService newcustomcouponService;
     @Resource
     LogBaseService logBaseService;
     @Value("#{propertyConfigurer['orderMsg']}")
@@ -271,12 +274,27 @@ public class OrderMessageListener implements MessageListener {
     }
 
     private void sendShareMsg(Appraise appraise) {
-        StringBuffer msg = new StringBuffer("感谢您的评价 ，分享好友\n");
+        StringBuffer msg = new StringBuffer("感谢您的评论，将");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());
+        ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
         log.info("分享人:" + customer.getNickname());
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
+        List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, appraise.getShopDetailId());
+        BigDecimal money = new BigDecimal("0.00");
+        for(NewCustomCoupon coupon : coupons){
+            money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
+        }
+        if(money.doubleValue() == 0.00 && shareSetting == null){
+            msg.append("红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得红包返利\n");
+        }else if(money.doubleValue() == 0.00){
+            msg.append(money+"元红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得红包返利\n");
+        }else if(shareSetting == null){
+            msg.append("红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+        }else{
+            msg.append(money +"元红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+        }
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>立即分享红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
         ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());

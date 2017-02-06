@@ -321,7 +321,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(!StringUtils.isEmpty(order.getTableNumber())){ //如果存在桌号
             int orderCount =  orderMapper.checkTableNumber(order.getShopDetailId(),order.getTableNumber(),order.getCustomerId());
             if(orderCount > 0){
-                throw new AppException(AppException.TABLE_USED);
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("不好意思，这桌有人了");
+                return jsonResult;
             }
         }
 
@@ -1198,7 +1200,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY) {
-                order.setAllowContinueOrder(true);
+                if(order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT){
+
+                }else{
+                    order.setAllowContinueOrder(true);
+                }
             }
         } else {
             log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
@@ -1958,6 +1964,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> child = orderItemService.listByParentId(orderId);
             for (OrderItem orderItem : child) {
                 order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
+                order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
             }
             child.addAll(items);
 
@@ -5775,6 +5782,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 switch (payMode) {
                     case OrderPayMode.WX_PAY:
                         order.setPaymentAmount(pay);
+                        order.setPrintTimes(1);
                         break;
                     case OrderPayMode.ALI_PAY:
                         order.setPaymentAmount(pay);
@@ -5817,6 +5825,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);
+                    order.setPrintTimes(1);
                     order.setPaymentAmount(BigDecimal.valueOf(0));
                     update(order);
                     updateChild(order);

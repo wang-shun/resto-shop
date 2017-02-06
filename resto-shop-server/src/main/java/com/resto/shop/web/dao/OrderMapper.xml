@@ -2617,14 +2617,4 @@ AND o.brand_id = #{brandId}
     AND o.shop_detail_id = #{shopId}
     and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]>
 </select>
-
-
-
-
-
-
-
-
-
-
 </mapper>

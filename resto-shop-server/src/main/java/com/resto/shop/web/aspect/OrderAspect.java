@@ -268,7 +268,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "afterPay()", returning = "order")
     public void afterPay(Order order) {
-        if(order.getPayMode() == OrderPayMode.ALI_PAY ){ //已支付
+        if(order.getPayMode() != OrderPayMode.ALI_PAY ){ //已支付
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
@@ -409,16 +409,12 @@ public class OrderAspect {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER){
-                    if(order.getPayType() == PayType.PAY){
-                        MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
-                    }
+                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
                     if(order.getOrderState() == OrderState.SUBMIT){
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
                     }else{
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
-
-
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
@@ -525,14 +521,15 @@ public class OrderAspect {
         for(NewCustomCoupon coupon : coupons){
             money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
         }
+        str.append("邀请朋友扫一扫，");
         if(money.doubleValue() == 0.00 && shareSetting == null){
-            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+            str.append("送他/她红包，朋友到店消费后，您将获得红包返利\n");
         }else if(money.doubleValue() == 0.00){
-            str.append("将红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得红包返利\n");
         }else if(shareSetting == null){
-            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得红包返利，");
+            str.append("送他/她红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
         }else{
-            str.append("将"+money+"元红包送给朋友/分享朋友圈成功邀请朋友来"+brand.getBrandName()+",首次消费后您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利，");
+            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
         }
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
