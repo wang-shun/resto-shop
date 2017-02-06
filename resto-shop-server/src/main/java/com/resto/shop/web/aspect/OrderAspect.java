@@ -285,6 +285,10 @@ public class OrderAspect {
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
                 && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
                 && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER )){
+            if(order.getPayType() == PayType.NOPAY){
+                order.setPrintTimes(1);
+                orderService.update(order);
+            }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
