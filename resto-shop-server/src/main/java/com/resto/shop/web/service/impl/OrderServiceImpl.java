@@ -1604,24 +1604,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
         List<OrderItem> child = orderItemService.listByParentId(orderId);
         for (OrderItem orderItem : child) {
-            orderItem.setArticleName(orderItem.getArticleName() + "(加)");
+            order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-            if (order.getOrderState() == OrderState.SUBMIT) {
-                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
-            }
+        }
+        child.addAll(orderItems);
 
-            }
-            orderItems.addAll(child);
-//        }
 
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
-                return printTicket(order, orderItems, shopDetail, printer.get(0));
+                return printTicket(order, child, shopDetail, printer.get(0));
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            return printTicket(order, orderItems, shopDetail, p);
+            return printTicket(order, child, shopDetail, p);
         }
         return null;
     }
