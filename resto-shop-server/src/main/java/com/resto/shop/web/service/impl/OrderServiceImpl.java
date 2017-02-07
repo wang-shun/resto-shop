@@ -3968,6 +3968,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal todayTotalMoney =
                 offLineOrderMapper.selectTotalMoney(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
 
+        Calendar beginDate = Calendar.getInstance();
+        beginDate.setTime(new Date());
+        beginDate.set(Calendar.DATE,1);
+
+        Calendar endDate = Calendar.getInstance();
+        endDate.setTime(new Date());
+        endDate.set(Calendar.DATE,10);
+
+
+        BigDecimal firstRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        BigDecimal firstTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        beginDate.set(Calendar.DATE,11);
+        endDate.set(Calendar.DATE,20);
+
+
+        BigDecimal middleRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        BigDecimal middleTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        beginDate.set(Calendar.DATE,21);
+
+
+        BigDecimal lastRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),DateUtil.getDateEnd(new Date()));
+
+        BigDecimal lastTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),DateUtil.getDateEnd(new Date()));
+
+
         if(realMoneyPay == null){
             realMoneyPay = BigDecimal.valueOf(0);
         }
@@ -3980,6 +4015,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(todayTotalMoney == null){
             todayTotalMoney = BigDecimal.valueOf(0);
         }
+        if(firstRealMoney == null){
+            firstRealMoney = BigDecimal.valueOf(0);
+        }
+        if(firstTotalMoney == null){
+            firstTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(middleRealMoney == null){
+            middleRealMoney = BigDecimal.valueOf(0);
+        }
+        if(middleTotalMoney == null){
+            middleTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(lastRealMoney == null){
+            lastRealMoney = BigDecimal.valueOf(0);
+        }
+        if(lastTotalMoney == null){
+            lastTotalMoney = BigDecimal.valueOf(0);
+        }
+
 
 
         //本日线下订单总数
@@ -4886,7 +4940,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("customerPayPercent:").append("'").append(todayRestoTotal).append("/").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("newCustomerPercent:").append("'").append(todayNewCutomer.size()).append("/").append((todayBackCustomer.size()+todayNewCutomer.size())).append("'").append(",")
                     //r订单总数/(r订单总数+线下订单总数)
-                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(df.format(todayTotalMoney.doubleValue())+todayEnterCount).append("'").append(",")
+                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(df.format(todayTotalMoney.doubleValue()+todayEnterCount)).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
 
@@ -4903,7 +4957,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("lastNewCustomerCount:").append("'").append(firstOfMonthNewCustomer.size() + "/" + customerInFirstOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("lastOnlinePercent:").append("'").append(firstOfMonthRestoCount.size() + "/" + firstOfMonthEnterCount+firstOfMonthRestoCount.size()).append("'").append(",")
+                    .append("lastOnlinePercent:").append("'").append(firstRealMoney + "/" + df.format(firstOfMonthEnterCount+firstTotalMoney.doubleValue())).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("lasterTotalPayment:").append("'").append(firstOfMonthEnterTotal.add(firstOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4934,7 +4988,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上月总人数
                     .append("nowNewCustomerCount:").append("'").append(monthNewCustomer.size() + "/" + customerInMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + monthEnterCount+df.format(monthTotalMoney.doubleValue())).append("'").append(",")
+                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + df.format(monthEnterCount+monthTotalMoney.doubleValue())).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("nowerTotalPayment:").append("'").append(monthEnterTotal.add(monthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4967,7 +5021,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("middleNewCustomerCount:").append("'").append(middleOfMonthNewCustomer.size() + "/" + customerInMiddleOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("middleOnlinePercent:").append("'").append(middleOfMonthRestoCount.size() + "/" + middleOfMonthEnterCount+middleOfMonthRestoCount.size()).append("'").append(",")
+                    .append("middleOnlinePercent:").append("'").append(middleRealMoney + "/" + df.format(middleOfMonthEnterCount+middleTotalMoney.doubleValue()) ).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("middleerTotalPayment:").append("'").append(middleOfMonthEnterTotal.add(middleOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4998,7 +5052,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("lastNewCustomerCount:").append("'").append(lastOfMonthNewCustomer.size() + "/" + customerInLastOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("lastOnlinePercent:").append("'").append(lastOfMonthRestoCount.size() + "/" + lastOfMonthEnterCount+lastOfMonthRestoCount.size()).append("'").append(",")
+                    .append("lastOnlinePercent:").append("'").append(lastRealMoney + "/" + df.format(lastOfMonthEnterCount+ lastTotalMoney.doubleValue()) ).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("lasterTotalPayment:").append("'").append(lastOfMonthEnterTotal.add(lastOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
