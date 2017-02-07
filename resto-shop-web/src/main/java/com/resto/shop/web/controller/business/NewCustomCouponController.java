@@ -72,22 +72,22 @@ public class NewCustomCouponController extends GenericController{
         if(TimeConsType.TYPENUM==newCustomCoupon.getTimeConsType()){
             if(newCustomCoupon.getCouponValiday()==null||"".equals(newCustomCoupon.getCouponValiday())){
                 log.debug("日期不能为空");
-                return new Result(false);
+                return new Result("日期不能为空",false);
             }
             //选择优惠券时间类型2时，开始和结束时间必须填
         }else if(TimeConsType.TYPETIME==newCustomCoupon.getTimeConsType()){
             if(newCustomCoupon.getBeginDateTime()==null||newCustomCoupon.getEndDateTime()==null){
                 log.debug("优惠券开始或者结束时间不能为空");
-                return new Result(false);
+                return new Result("优惠券开始或者结束时间不能为空",false);
             }
         }else {
             if((newCustomCoupon.getBeginTime()!=null&&newCustomCoupon.getEndTime()!=null)||(newCustomCoupon.getBeginDateTime()!=null&&newCustomCoupon.getEndDateTime()!=null)){
                 if(newCustomCoupon.getBeginTime().compareTo(newCustomCoupon.getEndTime())>0){
                     log.debug("开始时间大于结束时间");
-                    return new Result(false);
+                    return new Result("开始时间大于结束时间",false);
                 }else if(newCustomCoupon.getBeginDateTime().compareTo(newCustomCoupon.getEndDateTime())>0){
                     log.debug("优惠券的开始时间不能大于结束时间");
-                    return new Result(false);
+                    return new Result("优惠券的开始时间不能大于结束时间",false);
                 }
             }
         }
@@ -107,23 +107,23 @@ public class NewCustomCouponController extends GenericController{
         if(TimeConsType.TYPENUM==newCustomCoupon.getTimeConsType()){
             if(newCustomCoupon.getCouponValiday()==null){
                 log.info("日期不能为空");
-                return new Result(false);
+                return new Result("日期不能为空",false);
             }
 
         }else if(TimeConsType.TYPETIME==newCustomCoupon.getTimeConsType()){
             if(newCustomCoupon.getBeginDateTime()==null||newCustomCoupon.getEndDateTime()==null){
                 log.info("优惠券开始或者结束时间不能为空");
-                return new Result(false);
+                return new Result("优惠券开始或者结束时间不能为空",false);
             }
         }else {
 
             if((newCustomCoupon.getBeginTime()!=null&&newCustomCoupon.getEndTime()!=null)||(newCustomCoupon.getBeginDateTime()!=null&&newCustomCoupon.getEndDateTime()!=null)){
                 if(newCustomCoupon.getBeginTime().compareTo(newCustomCoupon.getEndTime())>0){
                     log.info("开始时间大于结束时间");
-                    return new Result(false);
+                    return new Result("开始时间大于结束时间",false);
                 }else if(newCustomCoupon.getBeginDateTime().compareTo(newCustomCoupon.getEndDateTime())>0){
                     log.info("优惠券的开始时间不能大于结束时间");
-                    return new Result(false);
+                    return new Result("优惠券的开始时间不能大于结束时间",false);
                 }
             }
         }
