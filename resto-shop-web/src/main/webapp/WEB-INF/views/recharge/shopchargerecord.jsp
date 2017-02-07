@@ -124,7 +124,7 @@ dt,dd{
 			data : "chargelog.customerPhone",
 			createdCell:function(td,tdData){
 				if(tdData=="" || tdData==null){
-					$(td).html("<span class='label label-danger'>没有填写</span>");
+					$(td).html("<span class='label label-danger'>没有注册</span>");
 				}
 			}
 		}, {
