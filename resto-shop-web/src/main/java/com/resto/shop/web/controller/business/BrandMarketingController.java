@@ -53,6 +53,7 @@ public class BrandMarketingController extends GenericController{
 			object.put("tcRedMoney", 0);
 			object.put("zcCouponMoney", 0);
 			object.put("yqCouponMoney", 0);
+            object.put("birthCouponMoney",0);
 			BigDecimal redMoneyAll = new BigDecimal(0);
 			BigDecimal couponAllMoney = new BigDecimal(0);
 			List<String> brandMarketings = accountLogService.selectBrandMarketing(selectMap);
@@ -79,7 +80,10 @@ public class BrandMarketingController extends GenericController{
 				}else if(results[0].equalsIgnoreCase("yqCouponMoney")){
 					object.put("yqCouponMoney", results[1]);
 					couponAllMoney = couponAllMoney.add(new BigDecimal(results[1]));
-				}
+				}else if(results[0].equalsIgnoreCase("birthCouponMoney")){
+				    object.put("birthCouponMoney",results[1]);
+                    couponAllMoney = couponAllMoney.add(new BigDecimal(results[1]));
+                }
 			}
 			object.put("redMoneyAll", redMoneyAll);
 			object.put("couponAllMoney", couponAllMoney);
@@ -104,7 +108,7 @@ public class BrandMarketingController extends GenericController{
 		List<BrandMarketing> result = new ArrayList<BrandMarketing>();
 		result.add(JSON.parseObject(brandJson, BrandMarketing.class));
 		//定义列
-		String[]columns={"brandName","redMoneyAll","plRedMoney","czRedMoney","fxRedMoney","dwRedMoney","tcRedMoney","couponAllMoney","zcCouponMoney","yqCouponMoney"};
+		String[]columns={"brandName","redMoneyAll","plRedMoney","czRedMoney","fxRedMoney","dwRedMoney","tcRedMoney","couponAllMoney","zcCouponMoney","yqCouponMoney","birthCouponMoney"};
 		//定义一个map用来存数据表格的前四项 1.报表类型,2.品牌名称,3.店铺名称4.日期
 		Map<String,String> map = new HashMap<>();
 		String shopName="";
@@ -118,11 +122,11 @@ public class BrandMarketingController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌营销报表");//表的头,第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "9");//显示的位置
+		map.put("num", "10");//显示的位置
 		map.put("reportTitle", "品牌营销报表");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		
-		String[][] headers = {{"品牌名称","25"},{"红包总额(元)","25"},{"评论红包(元)","25"},{"充值赠送红包(元)","25"},{"分享返利红包(元)","25"},{"等位红包(元)","25"},{"退菜红包(元)","25"},{"优惠券总额(元)","25"},{"注册优惠券(元)","25"},{"邀请优惠券(元)","25"}};
+		String[][] headers = {{"品牌名称","25"},{"红包总额(元)","25"},{"评论红包(元)","25"},{"充值赠送红包(元)","25"},{"分享返利红包(元)","25"},{"等位红包(元)","25"},{"退菜红包(元)","25"},{"优惠券总额(元)","25"},{"注册优惠券(元)","25"},{"邀请优惠券(元)","25"},{"生日优惠券(元)","25"}};
 		
 		//定义excel工具类对象
 		ExcelUtil<BrandMarketing> excelUtil=new ExcelUtil<BrandMarketing>();
