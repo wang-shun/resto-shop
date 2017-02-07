@@ -98,7 +98,7 @@
             <if test="couponType != null">coupon_type = #{couponType},</if>
             <if test="isBrand != null">is_brand = #{isBrand},</if>
             <if test="recommendDelayTime != null">recommend_delay_time = #{recommendDelayTime},</if>
-            <if test="distanceBirthdayDay != null">distance_birthday_day = #{distanceBirthdayDay}</if>
+            <if test="distanceBirthdayDay != null">distance_birthday_day = #{distanceBirthdayDay},</if>
             shop_detail_id = #{shopDetailId}
 
         </set> where id = #{id,jdbcType=BIGINT}
