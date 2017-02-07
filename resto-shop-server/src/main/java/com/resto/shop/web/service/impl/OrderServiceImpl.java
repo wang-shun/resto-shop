@@ -1775,10 +1775,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
-        articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
-                : order.getCustomerCount()));
-        articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
-                : order.getMealAllNumber()));
+        if(order.getParentOrderId() == null){
+            articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
+                    : order.getCustomerCount()));
+            articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
+                    : order.getMealAllNumber()));
+        }
+
         List<Order> childList = orderMapper.selectListByParentId(order.getId());
         for (Order child : childList) {
             articleCount = articleCount.add(BigDecimal.valueOf(child.getArticleCount()));
@@ -4379,7 +4382,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int lastOfMonthAppraiseNum = 0;//下旬所有评价的总分数
         int monthAppraiseNum = 0;//本月所有评价的总分数
 
-
+        DecimalFormat df = new DecimalFormat("#.00");
 
         if (!orders.isEmpty()) {
             for (Order o : orders) {
@@ -4400,7 +4403,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             dayAppraiseSum += o.getAppraise().getLevel() * 20;
                         }
                     }
-                    todaySatisfaction = String.valueOf(dayAppraiseNum != 0 ? dayAppraiseSum / dayAppraiseNum : "");
+                    Double satisf = Double.valueOf(dayAppraiseSum) / dayAppraiseNum;
+                    todaySatisfaction = String.valueOf(dayAppraiseNum != 0 ? df.format(satisf) : "");
                     //3.resto的订单总数
                     if (o.getParentOrderId() == null) {
                         todayRestoCount.add(o.getId());
@@ -4740,7 +4744,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             monthAppraiseSum += o.getAppraise().getLevel() * 20;
                         }
                     }
-                    monthSatisfaction = String.valueOf(dayAppraiseNum != 0 ? monthAppraiseSum / monthAppraiseNum : "");
+                    Double monthSatisf = Double.valueOf(monthAppraiseSum) / monthAppraiseNum;
+                    monthSatisfaction = String.valueOf(dayAppraiseNum != 0 ? df.format(monthSatisf) : "");
                     //3.resto的订单总数
                     if (o.getParentOrderId() == null) {
                         monthRestoCount.add(o.getId());
@@ -4875,6 +4880,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //发送上旬信息
             StringBuilder firstcontent = new StringBuilder();
             firstcontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("lastSatisfied:").append("'").append(firstOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4905,6 +4911,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //发送本月信息
             StringBuilder monthContent = new StringBuilder();
             monthContent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("nowSatisfied:").append("'").append(monthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4937,6 +4944,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             StringBuilder middlecontent = new StringBuilder();
             middlecontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("middleSatisfied:").append("'").append(middleOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4967,6 +4975,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //封装下旬文本
             StringBuilder lastcontent = new StringBuilder();
             lastcontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("lastSatisfied:").append("'").append(lastOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -5004,8 +5013,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 String[] telephones = shopDetail.getnoticeTelephone().split("，");
                 for(String tel :telephones){
                     SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
-                    SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_37030070");//推送上旬信息
-                    SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_37685377");//推本月消息
+                    SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_44340727");//推送上旬信息
+                    SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_44440605");//推本月消息
                 }
 
                 if (xun == 1) {
@@ -5014,14 +5023,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 } else if (xun == 2) {//代表是中旬
                     for(String tel:telephones){
                         //发送中旬信息
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_44395629");
                     }
 
                 } else if (xun == 3) {//代表是下旬
                     for(String tel:telephones){
                         //发送中旬和下旬信息
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_36965049");
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_44395629");
+                        SMSUtils.sendMessage(tel, lastcontent.toString(), "餐加", "SMS_44315642");
                     }
                 }
              }
