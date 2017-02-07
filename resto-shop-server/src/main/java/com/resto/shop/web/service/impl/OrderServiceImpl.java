@@ -3956,6 +3956,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //微信支付 + 支付宝支付之和  本月
         BigDecimal realMoneyPay = offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),begin,end);
 
+
         //本月订单总额     本月
         BigDecimal monthTotalMoney = offLineOrderMapper.selectTotalMoney(shopDetail.getId(),begin,end);
 
@@ -3966,6 +3967,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本日订单总额 本日
         BigDecimal todayTotalMoney =
                 offLineOrderMapper.selectTotalMoney(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
+
+        if(realMoneyPay == null){
+            realMoneyPay = BigDecimal.valueOf(0);
+        }
+        if(monthTotalMoney == null){
+            monthTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(realMoneyToday == null){
+            realMoneyToday = BigDecimal.valueOf(0);
+        }
+        if(todayTotalMoney == null){
+            todayTotalMoney = BigDecimal.valueOf(0);
+        }
+
 
         //本日线下订单总数
         int todayEnterCount = 0;
@@ -4871,7 +4886,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("customerPayPercent:").append("'").append(todayRestoTotal).append("/").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("newCustomerPercent:").append("'").append(todayNewCutomer.size()).append("/").append((todayBackCustomer.size()+todayNewCutomer.size())).append("'").append(",")
                     //r订单总数/(r订单总数+线下订单总数)
-                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(todayTotalMoney.doubleValue()+todayEnterCount).append("'").append(",")
+                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(df.format(todayTotalMoney.doubleValue())+todayEnterCount).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
 
@@ -4919,7 +4934,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上月总人数
                     .append("nowNewCustomerCount:").append("'").append(monthNewCustomer.size() + "/" + customerInMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + monthEnterCount+monthTotalMoney).append("'").append(",")
+                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + monthEnterCount+df.format(monthTotalMoney.doubleValue())).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("nowerTotalPayment:").append("'").append(monthEnterTotal.add(monthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
