@@ -5081,9 +5081,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //截取电话号码
                 String[] telephones = shopDetail.getnoticeTelephone().split("，");
                 for(String tel :telephones){
-                    SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
-                    SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_44340727");//推送上旬信息
-                    SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_44440605");//推本月消息
+                    try {
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                        Thread.sleep(3000);
+                        SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_44340727");//推送上旬信息
+                        Thread.sleep(3000);
+                        SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_44440605");//推本月消息
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
                 if (xun == 1) {
