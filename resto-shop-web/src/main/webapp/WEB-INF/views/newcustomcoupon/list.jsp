@@ -232,13 +232,13 @@
                     data : "couponType",
                     createdCell:function(td,tdData){
                         if(tdData == -1){
-                            $(td).html("<span class='label label-success'>通&nbsp;用</span>");
+                            $(td).html("<span class='label label-default'>通&nbsp;用</span>");
                         }else if(tdData == 0){
                             $(td).html("<span class='label label-primary'>新用户</span>");
                         }else if(tdData == 1){
                             $(td).html("<span class='label label-info'>邀&nbsp;请</span>");
                         }else if(tdData == 2){
-                            $(td).html("<span class='label label-default'>生&nbsp;日</span>");
+                            $(td).html("<span class='label label-success'>生&nbsp;日</span>");
                         }
                     }
                 },
