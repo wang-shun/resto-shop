@@ -228,7 +228,7 @@
   
   <!-- 根据订单ID查询订单项 -->
   <select id="listByOrderId" resultType="OrderItem">
-  	SELECT sum(count) as count,sum(orgin_count) as orgin_count, sum(original_price) as original_price,sum(unit_price) as unit_price,
+  	SELECT sum(count) as count,sum(orgin_count) as orgin_count, original_price,sum(unit_price) as unit_price,
   	 sum(final_price) as final_price,tb_order_item.*
   	 from tb_order_item where order_id = #{orderId}
   	 and type not in (3,4)
