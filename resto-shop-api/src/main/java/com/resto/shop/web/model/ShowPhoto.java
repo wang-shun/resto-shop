@@ -12,6 +12,8 @@ public class ShowPhoto {
     private String shopDetailId;
 
     private String photoSquare;
+    
+    private Integer showSort;
 
     public String getPhotoSquare() {
         return photoSquare;
@@ -60,4 +62,14 @@ public class ShowPhoto {
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
     }
+
+	public Integer getShowSort() {
+		return showSort;
+	}
+
+	public void setShowSort(Integer showSort) {
+		this.showSort = showSort;
+	}
+    
+    
 }

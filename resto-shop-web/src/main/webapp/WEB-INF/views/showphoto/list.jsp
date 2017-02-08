@@ -14,15 +14,45 @@
 	            	<form role="form" action="{{m.id?'showphoto/modify':'showphoto/create'}}" @submit.prevent="save">
 						<div class="form-body">
 						<div class="form-group">
-						    <label>显示的标题名称</label>
+						    <label>体验名称</label>
 						    <input type="text" class="form-control" name="title" required v-model="m.title"  >
 						</div>
-						
-						<div class="form-group">
+						<!-- <div class="form-group">
 						    <label>图片地址</label>
 							<input type="hidden" name="picUrl" v-model="m.picUrl">
 							<img-file-upload  class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
-							<img v-if="m.picUrl" :src="m.picUrl" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">				    
+							<img v-if="m.picUrl" :src="m.picUrl" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">				
+						</div> -->
+						<div class="form-group">
+						    <label>体验排序</label>
+						    <input type="text" class="form-control" name="showSort" required v-model="m.showSort">
+						</div>
+						<div>
+							 <label class="col-sm-1 control-label" style="padding-left:0px">体验类型</label>
+							 <div class="col-sm-9" v-if="m.showType !=null">
+								<div>
+									<label >
+										<input type="radio" name="showType" id="showType" required v-model="m.showType" value="2">
+										好评
+									</label>
+									<label>
+										<input type="radio" name="showType" id="showType" required v-model="m.showType" value="4">
+										差评
+									</label>
+								</div>
+							</div>
+							<div class="col-sm-9" v-if="m.showType ==null">
+								<div>
+									<label>
+										<input type="radio" name="showType" v-model="m.showType" value="2" checked="checked">
+										好评
+									</label>
+									<label>
+										<input type="radio" name="showType" v-model="m.showType" value="4">
+										差评
+									</label>
+								</div>
+							</div>
 						</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
@@ -59,22 +89,37 @@
 				dataSrc : ""
 			},
 			columns : [
-				{                 
-					title : "显示的标题名称",
-					data : "title",
-				},                 
-				{                 
-					title : "图片地址",
-					data : "picUrl",
-					defaultContent:'',
+				{
+					title : "体验类型",
+					data : "showType",
 					createdCell:function(td,tdData){
-						if(tdData !=null && tdData.substring(0,4)=="http"){
-							$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+						if(tdData == 2){
+							$(td).html("<td>好评</td>");
 						}else{
-							$(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+							$(td).html("<td>差评</td>");
 						}
 					}
-				},                 
+				},
+				{                 
+					title : "体验名称",
+					data : "title",
+				},  
+				{
+					title : "排序",
+					data : "showSort",
+				},
+// 				{                 
+// 					title : "图片地址",
+// 					data : "picUrl",
+// 					defaultContent:'',
+// 					createdCell:function(td,tdData){
+// 						if(tdData !=null && tdData.substring(0,4)=="http"){
+// 							$(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+// 						}else{
+// 							$(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:40px;width:80px;\"/>");
+// 						}
+// 					}
+// 				},                 
 				{
 					title : "操作",
 					data : "id",
@@ -101,8 +146,8 @@
 			mixins:[C.formVueMix],
 			methods:{
 				uploadSuccess:function(url){
-					$("[name='picUrl']").val(url).trigger("change");
-					C.simpleMsg("上传成功");
+					$("[name='showType']").val(url).trigger("change");
+					C.simpleMsg("提交成功");
 				},
 				uploadError:function(msg){
 					C.errorMsg(msg);
@@ -110,6 +155,7 @@
                 save:function(e){
                     var that = this;
                     var formDom = e.target;
+                    var showType = e.showType;
                     C.ajaxFormEx(formDom,function(){
                         that.cancel();
                         tb.ajax.reload();
