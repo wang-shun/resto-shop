@@ -20,6 +20,7 @@
             <result column="sort" property="sort"/>
             <result column="photo_small" property="imageUrl"/>
             <result column="article_kitchen_id" property="kitchenId"/>
+            <result column="imageUrl" property="imageUrl"/>
         </collection>
 
     </resultMap>

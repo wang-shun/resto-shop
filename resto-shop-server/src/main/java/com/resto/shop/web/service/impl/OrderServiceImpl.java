@@ -1604,24 +1604,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
         List<OrderItem> child = orderItemService.listByParentId(orderId);
         for (OrderItem orderItem : child) {
-            orderItem.setArticleName(orderItem.getArticleName() + "(加)");
+            order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-            if (order.getOrderState() == OrderState.SUBMIT) {
-                order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
-            }
+        }
+        child.addAll(orderItems);
 
-            }
-            orderItems.addAll(child);
-//        }
 
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
-                return printTicket(order, orderItems, shopDetail, printer.get(0));
+                return printTicket(order, child, shopDetail, printer.get(0));
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            return printTicket(order, orderItems, shopDetail, p);
+            return printTicket(order, child, shopDetail, p);
         }
         return null;
     }
@@ -1779,10 +1775,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
-        articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
-                : order.getCustomerCount()));
-        articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
-                : order.getMealAllNumber()));
+        if(order.getParentOrderId() == null){
+            articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
+                    : order.getCustomerCount()));
+            articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
+                    : order.getMealAllNumber()));
+        }
+
         List<Order> childList = orderMapper.selectListByParentId(order.getId());
         for (Order child : childList) {
             articleCount = articleCount.add(BigDecimal.valueOf(child.getArticleCount()));
@@ -3957,6 +3956,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //微信支付 + 支付宝支付之和  本月
         BigDecimal realMoneyPay = offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),begin,end);
 
+
         //本月订单总额     本月
         BigDecimal monthTotalMoney = offLineOrderMapper.selectTotalMoney(shopDetail.getId(),begin,end);
 
@@ -3967,6 +3967,74 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //本日订单总额 本日
         BigDecimal todayTotalMoney =
                 offLineOrderMapper.selectTotalMoney(shopDetail.getId(),DateUtil.getDateBegin(new Date()),DateUtil.getDateEnd(new Date()));
+
+        Calendar beginDate = Calendar.getInstance();
+        beginDate.setTime(new Date());
+        beginDate.set(Calendar.DATE,1);
+
+        Calendar endDate = Calendar.getInstance();
+        endDate.setTime(new Date());
+        endDate.set(Calendar.DATE,10);
+
+
+        BigDecimal firstRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        BigDecimal firstTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        beginDate.set(Calendar.DATE,11);
+        endDate.set(Calendar.DATE,20);
+
+
+        BigDecimal middleRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        BigDecimal middleTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),endDate.getTime());
+
+        beginDate.set(Calendar.DATE,21);
+
+
+        BigDecimal lastRealMoney =
+                offLineOrderMapper.selectSumRealMoney(shopDetail.getId(),beginDate.getTime(),DateUtil.getDateEnd(new Date()));
+
+        BigDecimal lastTotalMoney =
+                offLineOrderMapper.selectTotalMoney(shopDetail.getId(),beginDate.getTime(),DateUtil.getDateEnd(new Date()));
+
+
+        if(realMoneyPay == null){
+            realMoneyPay = BigDecimal.valueOf(0);
+        }
+        if(monthTotalMoney == null){
+            monthTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(realMoneyToday == null){
+            realMoneyToday = BigDecimal.valueOf(0);
+        }
+        if(todayTotalMoney == null){
+            todayTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(firstRealMoney == null){
+            firstRealMoney = BigDecimal.valueOf(0);
+        }
+        if(firstTotalMoney == null){
+            firstTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(middleRealMoney == null){
+            middleRealMoney = BigDecimal.valueOf(0);
+        }
+        if(middleTotalMoney == null){
+            middleTotalMoney = BigDecimal.valueOf(0);
+        }
+        if(lastRealMoney == null){
+            lastRealMoney = BigDecimal.valueOf(0);
+        }
+        if(lastTotalMoney == null){
+            lastTotalMoney = BigDecimal.valueOf(0);
+        }
+
+
 
         //本日线下订单总数
         int todayEnterCount = 0;
@@ -4383,7 +4451,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int lastOfMonthAppraiseNum = 0;//下旬所有评价的总分数
         int monthAppraiseNum = 0;//本月所有评价的总分数
 
-
+        DecimalFormat df = new DecimalFormat("#.00");
 
         if (!orders.isEmpty()) {
             for (Order o : orders) {
@@ -4404,7 +4472,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             dayAppraiseSum += o.getAppraise().getLevel() * 20;
                         }
                     }
-                    todaySatisfaction = String.valueOf(dayAppraiseNum != 0 ? dayAppraiseSum / dayAppraiseNum : "");
+                    Double satisf = Double.valueOf(dayAppraiseSum) / dayAppraiseNum;
+                    todaySatisfaction = String.valueOf(dayAppraiseNum != 0 ? df.format(satisf) : "");
                     //3.resto的订单总数
                     if (o.getParentOrderId() == null) {
                         todayRestoCount.add(o.getId());
@@ -4744,7 +4813,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             monthAppraiseSum += o.getAppraise().getLevel() * 20;
                         }
                     }
-                    monthSatisfaction = String.valueOf(dayAppraiseNum != 0 ? monthAppraiseSum / monthAppraiseNum : "");
+                    Double monthSatisf = Double.valueOf(monthAppraiseSum) / monthAppraiseNum;
+                    monthSatisfaction = String.valueOf(dayAppraiseNum != 0 ? df.format(monthSatisf) : "");
                     //3.resto的订单总数
                     if (o.getParentOrderId() == null) {
                         monthRestoCount.add(o.getId());
@@ -4870,7 +4940,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("customerPayPercent:").append("'").append(todayRestoTotal).append("/").append(todayRestoTotal.add(todayEnterTotal)).append("'").append(",")
                     .append("newCustomerPercent:").append("'").append(todayNewCutomer.size()).append("/").append((todayBackCustomer.size()+todayNewCutomer.size())).append("'").append(",")
                     //r订单总数/(r订单总数+线下订单总数)
-                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(todayTotalMoney.doubleValue()+todayEnterCount).append("'").append(",")
+                    .append("payOnlinePercent:").append("'").append(realMoneyToday).append("/").append(df.format(todayTotalMoney.doubleValue()+todayEnterCount)).append("'").append(",")
                     .append("satisfied:").append("'").append(todaySatisfaction).append("'")
                     .append("}");
 
@@ -4879,6 +4949,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //发送上旬信息
             StringBuilder firstcontent = new StringBuilder();
             firstcontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("lastSatisfied:").append("'").append(firstOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4886,7 +4957,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("lastNewCustomerCount:").append("'").append(firstOfMonthNewCustomer.size() + "/" + customerInFirstOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("lastOnlinePercent:").append("'").append(firstOfMonthRestoCount.size() + "/" + firstOfMonthEnterCount+firstOfMonthRestoCount.size()).append("'").append(",")
+                    .append("lastOnlinePercent:").append("'").append(firstRealMoney + "/" + df.format(firstOfMonthEnterCount+firstTotalMoney.doubleValue())).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("lasterTotalPayment:").append("'").append(firstOfMonthEnterTotal.add(firstOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4909,6 +4980,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //发送本月信息
             StringBuilder monthContent = new StringBuilder();
             monthContent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("nowSatisfied:").append("'").append(monthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4916,7 +4988,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上月总人数
                     .append("nowNewCustomerCount:").append("'").append(monthNewCustomer.size() + "/" + customerInMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + monthEnterCount+monthTotalMoney).append("'").append(",")
+                    .append("nowOnlinePercent:").append("'").append(realMoneyPay.toString() + "/" + df.format(monthEnterCount+monthTotalMoney.doubleValue())).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("nowerTotalPayment:").append("'").append(monthEnterTotal.add(monthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4941,6 +5013,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             StringBuilder middlecontent = new StringBuilder();
             middlecontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("middleSatisfied:").append("'").append(middleOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4948,7 +5021,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("middleNewCustomerCount:").append("'").append(middleOfMonthNewCustomer.size() + "/" + customerInMiddleOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("middleOnlinePercent:").append("'").append(middleOfMonthRestoCount.size() + "/" + middleOfMonthEnterCount+middleOfMonthRestoCount.size()).append("'").append(",")
+                    .append("middleOnlinePercent:").append("'").append(middleRealMoney + "/" + df.format(middleOfMonthEnterCount+middleTotalMoney.doubleValue()) ).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("middleerTotalPayment:").append("'").append(middleOfMonthEnterTotal.add(middleOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -4971,6 +5044,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //封装下旬文本
             StringBuilder lastcontent = new StringBuilder();
             lastcontent.append("{")
+                    .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                     //满意度 店铺评分
                     .append("lastSatisfied:").append("'").append(lastOfMonthSatisfaction).append("'").append(",")
                     //用户消费占比 r订单总额/(r订单总额+线下订单总额)
@@ -4978,7 +5052,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //新增用户占比  新增用户总数/上旬总人数
                     .append("lastNewCustomerCount:").append("'").append(lastOfMonthNewCustomer.size() + "/" + customerInLastOfMonth.size()).append("'").append(",")
                     //在线支付笔数占比 r订单总数/(r订单总数+线下订单总数)
-                    .append("lastOnlinePercent:").append("'").append(lastOfMonthRestoCount.size() + "/" + lastOfMonthEnterCount+lastOfMonthRestoCount.size()).append("'").append(",")
+                    .append("lastOnlinePercent:").append("'").append(lastRealMoney + "/" + df.format(lastOfMonthEnterCount+ lastTotalMoney.doubleValue()) ).append("'").append(",")
                     //总支付金额 微信+支付宝+其他+线下+（pos+微信）充值
                     .append("lasterTotalPayment:").append("'").append(lastOfMonthEnterTotal.add(lastOfMonthRestoTotal)).append("'").append(",")
                     //用户支付金额(微信+支付宝+其他)+(pos+微信)充值
@@ -5007,9 +5081,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //截取电话号码
                 String[] telephones = shopDetail.getnoticeTelephone().split("，");
                 for(String tel :telephones){
-                    SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
-                    SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_37030070");//推送上旬信息
-                    SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_37685377");//推本月消息
+                    try {
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                        Thread.sleep(3000);
+                        SMSUtils.sendMessage(tel, firstcontent.toString(), "餐加", "SMS_44340727");//推送上旬信息
+                        Thread.sleep(3000);
+                        SMSUtils.sendMessage(tel, monthContent.toString(), "餐加", "SMS_44440605");//推本月消息
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
                 if (xun == 1) {
@@ -5018,14 +5099,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 } else if (xun == 2) {//代表是中旬
                     for(String tel:telephones){
                         //发送中旬信息
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_44395629");
                     }
 
                 } else if (xun == 3) {//代表是下旬
                     for(String tel:telephones){
                         //发送中旬和下旬信息
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_37065121");
-                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_36965049");
+                        SMSUtils.sendMessage(tel, middlecontent.toString(), "餐加", "SMS_44395629");
+                        SMSUtils.sendMessage(tel, lastcontent.toString(), "餐加", "SMS_44315642");
                     }
                 }
              }
