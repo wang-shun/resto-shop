@@ -268,4 +268,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     public List<NewCustomCoupon> selectListShopId(String shopId) {
         return newcustomcouponMapper.selectListByShopId(shopId);
     }
+
+    @Override
+    public List<NewCustomCoupon> selectBirthCoupon() {
+        return newcustomcouponMapper.selectBirthCoupon();
+    }
 }

@@ -34,4 +34,5 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
 
     List<NewCustomCoupon> selectListByCouponTypeAndBrandId(@Param("brandId") String brandId,@Param("couponType") Integer couponType);
 
+    List<NewCustomCoupon> selectBirthCoupon();
 }

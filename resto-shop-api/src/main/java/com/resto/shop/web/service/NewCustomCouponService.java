@@ -31,4 +31,10 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
     
     
     void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail);
+
+    /**
+     * 查询生日优惠卷
+     * @return
+     */
+    List<NewCustomCoupon> selectBirthCoupon();
 }

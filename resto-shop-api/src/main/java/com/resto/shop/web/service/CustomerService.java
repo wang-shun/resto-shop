@@ -79,4 +79,6 @@ public interface CustomerService extends GenericService<Customer, String> {
     String selectBrandUser();
 
 	Integer selectByShareCustomer(String customerId);
+
+    List<Customer> selectBirthUser();
 }

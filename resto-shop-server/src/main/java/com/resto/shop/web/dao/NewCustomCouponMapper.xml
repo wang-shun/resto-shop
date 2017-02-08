@@ -154,5 +154,7 @@
         from tb_new_custom_coupon where brand_id=#{brandId} and coupon_type = #{couponType} and is_activty=1 and is_brand=1
     </select>
 
-
+    <select id="selectBirthCoupon" resultType="NewCustomCoupon">
+        select * from tb_new_custom_coupon where coupon_type = 2 and is_activty = 1
+    </select>
 </mapper>
