@@ -5778,7 +5778,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
                 getNumberService.update(getNumber);
             }
-
+            log.info("后付的情况下支付的余额为"+price);
             if (price.doubleValue() > 0) {  //余额支付
                 accountService.payOrder(order, price, customer);
             }
