@@ -910,15 +910,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Result result = new Result();
         Order order = selectById(orderId);
         order.setIsPay(OrderPayState.NOT_PAY);
-        update(order);
+
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrderHoufu(order);
             result.setSuccess(true);
+            BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
+            if(hasPay == null){
+                hasPay = BigDecimal.valueOf(0);
+            }
+            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
+
         } else {
             result.setSuccess(autoRefundOrder(orderId));
 
         }
-
+        update(order);
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
             int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
