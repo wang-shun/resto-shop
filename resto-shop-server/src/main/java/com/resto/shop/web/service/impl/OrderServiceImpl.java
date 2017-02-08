@@ -1126,103 +1126,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
-            int  refundTotal = 0;
-            BigDecimal aliRefund = new BigDecimal(0);
-            BigDecimal aliPay = new BigDecimal(0);
-            if(item.getPaymentModeId() == PayMode.WEIXIN_PAY){
-                BigDecimal sum = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.WEIXIN_PAY);
-                if(sum != null){
-                    refundTotal = sum.multiply(new BigDecimal(100)).intValue();
-                }
-
-            }else if (item.getPaymentModeId() == PayMode.ALI_PAY){
-                BigDecimal sum  = orderMapper.getRefundSumByOrderId(order.getId(),PayMode.ALI_PAY);
-                aliPay = orderMapper.getAliPayment(order.getId());
-                if(sum != null){
-                    aliRefund = sum;
-                }
-            }
-
-            if(item.getPaymentModeId() == PayMode.WEIXIN_PAY && item.getPayValue().doubleValue() < 0){
-                continue;
-            }
-            if(item.getPaymentModeId() == PayMode.ALI_PAY && item.getPayValue().doubleValue() < 0){
-                continue;
-            }
-
-
-            if(refundTotal != 0 &&  refundTotal == order.getPaymentAmount().multiply(new BigDecimal(-100)).intValue() ){ //如果已经全部退款完毕
-                continue;
-            }
-
-            if(aliRefund.doubleValue() < 0 &&  aliRefund.doubleValue() == aliPay.multiply(new BigDecimal(-1)).doubleValue() ){ //如果已经全部退款完毕
-                continue;
-            }
-
-
             switch (item.getPaymentModeId()) {
-
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
-                case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    break;
-                case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    break;
-                case PayMode.WEIXIN_PAY:
-                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
-                    JSONObject obj = new JSONObject(item.getResultData());
-                    int refund = obj.getInt("total_fee") + refundTotal;
-                    Map<String, String> result = null;
-                    if(shopDetail.getWxServerId() == null){
-                        result  = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-                                obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
-                                config.getMchkey(), config.getPayCertPath());
-                    }else{
-                        WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-
-                        result = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
-                                obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
-                                StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
-                    }
-
-
-                    item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(-1)));
-                    item.setResultData(new JSONObject(result).toString());
-
-                    break;
-
-                case PayMode.ALI_PAY: //如果是支付宝支付
-                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
-                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
-                    Map map = new HashMap();
-                    map.put("out_trade_no", order.getId());
-                    map.put("refund_amount", aliPay.add(aliRefund));
-                    map.put("out_request_no",newPayItemId);
-                    String resultJson = AliPayUtils.refundPay(map);
-                    item.setResultData(new JSONObject(resultJson).toString());
-                    item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
-                    break;
-                case PayMode.ARTICLE_BACK_PAY:
-                    Customer customer = customerService.selectById(order.getCustomerId());
-
-                    if(item.getPayValue().doubleValue() < 0){
-                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
-                    }
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    break;
-
-
             }
             item.setId(newPayItemId);
 
