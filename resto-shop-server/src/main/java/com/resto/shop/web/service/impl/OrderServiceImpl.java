@@ -357,6 +357,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal totalMoney = BigDecimal.ZERO;
         BigDecimal originMoney = BigDecimal.ZERO;
         int articleCount = 0;
+        BigDecimal extraMoney = BigDecimal.ZERO;
         for (OrderItem item : order.getOrderItems()) {
             Article a = null;
             BigDecimal org_price = null;
@@ -433,7 +434,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         child.setType(OrderItemType.MEALS_CHILDREN);
                         BigDecimal finalMoney = child.getUnitPrice().multiply(new BigDecimal(child.getCount())).setScale(2, BigDecimal.ROUND_HALF_UP);
                         if(finalMoney != null && finalMoney.doubleValue() > 0){
-                            org_price = org_price.add(finalMoney);
+                            extraMoney = extraMoney.add(finalMoney);
                         }
                         child.setFinalPrice(finalMoney);
                         child.setOrderId(orderId);
@@ -589,7 +590,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setArticleCount(articleCount); // 订单餐品总数
         order.setClosed(false); // 订单是否关闭 否
         order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-        order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()));// 原价
+        order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
         order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
         order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
         order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
