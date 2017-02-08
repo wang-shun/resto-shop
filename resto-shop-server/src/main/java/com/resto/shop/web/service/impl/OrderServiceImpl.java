@@ -1133,11 +1133,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setId(newPayItemId);
+                    orderPaymentItemService.insert(item);
                     break;
             }
-            item.setId(newPayItemId);
 
-            orderPaymentItemService.insert(item);
         }
     }
 
