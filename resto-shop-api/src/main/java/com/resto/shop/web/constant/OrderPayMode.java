@@ -12,4 +12,19 @@ public class OrderPayMode {
     public static final int YL_PAY = 3;
 
     public static final int XJ_PAY = 4;
+
+    public static String getPayModeName(int state){
+        switch (state) {
+            case WX_PAY:
+                return "微信支付";
+            case ALI_PAY:
+                return "支付宝支付";
+            case YL_PAY:
+                return "银联支付";
+            case XJ_PAY:
+                return "现金支付";
+            default:
+                return "余额支付";
+        }
+    }
 }

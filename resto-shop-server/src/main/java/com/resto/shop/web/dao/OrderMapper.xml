@@ -2630,4 +2630,11 @@ AND o.brand_id = #{brandId}
         select sum(pay_value) from tb_order_payment_item
         where order_id = #{orderId} and payment_mode_id in (2,3)
     </select>
+
+
+    <select id="getTodayFinishOrder" resultType="Order">
+        select * from tb_order where shop_detail_id = #{shopId}
+        and order_state in (2,10,11,12,13) and production_status in (2,3)
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+    </select>
 </mapper>

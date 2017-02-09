@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -6400,5 +6401,81 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public BigDecimal selectPayBefore(String orderId) {
         return orderMapper.selectPayBefore(orderId);
+    }
+
+    @Override
+    public List<Order> getTodayFinishOrder(String shopId) {
+        return orderMapper.getTodayFinishOrder(shopId);
+    }
+
+
+    @Override
+    public List<String []>  getThirdData(List<Order> orderList, int size, String brandSign) {
+        List<String []> result = new ArrayList<>();
+        for(Order o : orderList){
+            Order order = getOrderInfo(o.getId());
+            String [] data = new String[size];
+            switch (brandSign){
+                case "test":
+                    luroufanModel(data,o);
+                    result.add(data);
+                    for(OrderItem orderItem : order.getOrderItems()){
+                        result.add(luroufanArticleModel(orderItem,size));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
+
+        }
+        return result;
+    }
+
+    private String [] luroufanArticleModel(OrderItem orderItem,int size){
+        String [] data = new String[size];
+        data[LuroufanExcelModel.POSDATE] = "";
+        data[LuroufanExcelModel.ADDTIME] = "";
+        data[LuroufanExcelModel.ADDNAME] = "";
+        data[LuroufanExcelModel.POSID] = "";
+        data[LuroufanExcelModel.TABLENO] = "";
+        data[LuroufanExcelModel.PFNAME] = "";
+        data[LuroufanExcelModel.DEPARTMENT] = "";
+        data[LuroufanExcelModel.DEPUTY] = "";
+        data[LuroufanExcelModel.MENU_TYPE] = OrderItemType.getPayModeName(orderItem.getType());
+        data[LuroufanExcelModel.MENU_CODE] = orderItem.getArticleId();
+        data[LuroufanExcelModel.MENU_NAME] = orderItem.getArticleName();
+        data[LuroufanExcelModel.QUANTITY] = String.valueOf(orderItem.getCount());
+        data[LuroufanExcelModel.AMOUNT_1] = "";
+        data[LuroufanExcelModel.AMOUNT_2] = "";
+        data[LuroufanExcelModel.ACCOUNT_NAME] = "";
+        data[LuroufanExcelModel.PAY_METHOD] = "";
+        data[LuroufanExcelModel.REMARK] = "";
+        return data;
+    }
+
+
+
+
+    private void luroufanModel(String [] data,Order o){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        data[LuroufanExcelModel.POSDATE] = sdf.format(o.getCreateTime());
+        data[LuroufanExcelModel.ADDTIME] = sdf.format(o.getPrintOrderTime());
+        data[LuroufanExcelModel.ADDNAME] = "";
+        data[LuroufanExcelModel.POSID] = o.getShopDetailId();
+        data[LuroufanExcelModel.TABLENO] = o.getTableNumber();
+        data[LuroufanExcelModel.PFNAME] = o.getSerialNumber();
+        data[LuroufanExcelModel.DEPARTMENT] = "";
+        data[LuroufanExcelModel.DEPUTY] = "";
+        data[LuroufanExcelModel.MENU_TYPE] = "";
+        data[LuroufanExcelModel.MENU_CODE] = "";
+        data[LuroufanExcelModel.MENU_NAME] = "";
+        data[LuroufanExcelModel.QUANTITY] = String.valueOf(o.getArticleCount());
+        data[LuroufanExcelModel.AMOUNT_1] = String.valueOf(o.getPaymentAmount());
+        data[LuroufanExcelModel.AMOUNT_2] = String.valueOf(o.getOriginalAmount());
+        data[LuroufanExcelModel.ACCOUNT_NAME] = OrderPayMode.getPayModeName(o.getPayMode());
+        data[LuroufanExcelModel.PAY_METHOD] = OrderPayMode.getPayModeName(o.getPayMode());
+        data[LuroufanExcelModel.REMARK] = "";
     }
 }
