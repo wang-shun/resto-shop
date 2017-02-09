@@ -232,7 +232,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         coupon.setCouponSource("4");
         coupon.setCustomerId(customer.getId());
         coupon.setRecommendDelayTime(0);
-        couponService.insertCoupon(coupon);
+        for(int i = 0; i < customCoupon.getCouponNumber(); i++){
+            couponService.insertCoupon(coupon);
+        }
         String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+coupon.getShopDetailId();
         StringBuffer str=new StringBuffer();
         str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\"");
