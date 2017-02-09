@@ -6489,7 +6489,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data[LuroufanExcelModel.QUANTITY] = String.valueOf(o.getArticleCount());
         data[LuroufanExcelModel.AMOUNT_1] = String.valueOf(o.getPaymentAmount());
         data[LuroufanExcelModel.AMOUNT_2] = String.valueOf(o.getOriginalAmount());
-        data[LuroufanExcelModel.ACCOUNT_NAME] = OrderPayMode.getPayModeName(o.getPayMode());
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(o.getId());
+        StringBuilder accountName  = new StringBuilder("(");
+        for(OrderPaymentItem payment : payItemsList){
+            accountName.append(payment.getRemark()).append(" ");
+        }
+        accountName.append(")");
+        data[LuroufanExcelModel.ACCOUNT_NAME] =  accountName.toString();
         data[LuroufanExcelModel.PAY_METHOD] = OrderPayMode.getPayModeName(o.getPayMode());
         data[LuroufanExcelModel.REMARK] = "";
     }
