@@ -192,6 +192,17 @@ public class Order implements Serializable{
     //是否确认 0-未确认 1-已确认
     private Integer isConfirm;
 
+    //订单及他所有加菜订单的原价总和
+    private BigDecimal allOrderOriginalAmount;
+
+    public BigDecimal getAllOrderOriginalAmount() {
+        return allOrderOriginalAmount;
+    }
+
+    public void setAllOrderOriginalAmount(BigDecimal allOrderOriginalAmount) {
+        this.allOrderOriginalAmount = allOrderOriginalAmount;
+    }
+
     final public Integer getIsConfirm() {
         return isConfirm;
     }
