@@ -28,7 +28,7 @@
 		<property name="locations">
 			<list>
 				<value>file:${resources.config.path}/shop-rpc.properties</value>
-				<!--<value>classpath*:rpc.properties</value>-->
+				<value>classpath*:rpc.properties</value>
 				<!--<value>classpath:config.properties</value>-->
 			</list>
 		</property>
@@ -39,7 +39,7 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath*:rpc.properties</value>
+				<!--<value>classpath*:rpc.properties</value>-->
 				<value>classpath:config.properties</value>
 			</list>
 		</property>
