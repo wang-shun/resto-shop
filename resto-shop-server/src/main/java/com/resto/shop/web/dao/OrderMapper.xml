@@ -2635,6 +2635,6 @@ AND o.brand_id = #{brandId}
     <select id="getTodayFinishOrder" resultType="Order">
         select * from tb_order where shop_detail_id = #{shopId}
         and order_state in (2,10,11,12,13) and production_status in (2,3)
-        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and DATE_FORMAT(#{date},'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
     </select>
 </mapper>

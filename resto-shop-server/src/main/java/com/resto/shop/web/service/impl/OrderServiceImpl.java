@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -6412,8 +6413,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> getTodayFinishOrder(String shopId) {
-        return orderMapper.getTodayFinishOrder(shopId);
+    public List<Order> getTodayFinishOrder(String shopId,String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        try {
+            date = sdf.parse(time);
+        } catch (ParseException e) {
+            date = new Date();
+        }
+        return orderMapper.getTodayFinishOrder(shopId,date);
     }
 
 
