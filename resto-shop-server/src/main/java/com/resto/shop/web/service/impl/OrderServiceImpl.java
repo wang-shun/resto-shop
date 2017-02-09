@@ -6423,6 +6423,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         result.add(luroufanArticleModel(orderItem,size));
                     }
                     break;
+                case "luroufan":
+                    luroufanModel(data,o);
+                    result.add(data);
+                    for(OrderItem orderItem : order.getOrderItems()){
+                        result.add(luroufanArticleModel(orderItem,size));
+                    }
+                    break;
                 default:
                     break;
             }
