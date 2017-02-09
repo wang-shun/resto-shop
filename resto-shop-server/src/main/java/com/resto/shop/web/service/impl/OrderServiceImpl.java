@@ -910,6 +910,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Result result = new Result();
         Order order = selectById(orderId);
         order.setIsPay(OrderPayState.NOT_PAY);
+        if(order.getPayMode() == 2){
+            return new Result("支付宝订单更改为微信支付，支付时点击关闭不取消订单", false);
+        }
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrderHoufu(order);
