@@ -72,6 +72,11 @@ public class Appraise {
      */
     private List<AppraiseFile> appraiseFiles;
 
+    /**
+     * 消息体验
+     */
+    private List<AppraiseFile> appraiseMessage;
+
     private String shopName;
 
     private String sex;
@@ -259,4 +264,12 @@ public class Appraise {
 	public void setCanReward(Boolean canReward) {
 		this.canReward = canReward;
 	}
+
+    public List<AppraiseFile> getAppraiseMessage() {
+        return appraiseMessage;
+    }
+
+    public void setAppraiseMessage(List<AppraiseFile> appraiseMessage) {
+        this.appraiseMessage = appraiseMessage;
+    }
 }
