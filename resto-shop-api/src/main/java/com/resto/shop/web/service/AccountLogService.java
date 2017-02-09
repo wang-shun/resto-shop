@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -28,5 +29,5 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	 * @param accountId
 	 * @return
      */
-	Integer selectByShareMoney(String accountId);
+	BigDecimal selectByShareMoney(String accountId);
 }
