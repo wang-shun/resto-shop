@@ -29,26 +29,14 @@
 						</div>
 						<div>
 							 <label class="col-sm-1 control-label" style="padding-left:0px">体验类型</label>
-							 <div class="col-sm-9" v-if="m.showType !=null">
+							 <div class="col-sm-9" v-if="m.state !=null">
 								<div>
 									<label >
-										<input type="radio" name="showType" id="showType" required v-model="m.showType" value="2">
+										<input type="radio" name="state" required v-model="m.state" value="0">
 										好评
 									</label>
 									<label>
-										<input type="radio" name="showType" id="showType" required v-model="m.showType" value="4">
-										差评
-									</label>
-								</div>
-							</div>
-							<div class="col-sm-9" v-if="m.showType ==null">
-								<div>
-									<label>
-										<input type="radio" name="showType" v-model="m.showType" value="2" checked="checked">
-										好评
-									</label>
-									<label>
-										<input type="radio" name="showType" v-model="m.showType" value="4">
+										<input type="radio" name="state" required v-model="m.state" value="1">
 										差评
 									</label>
 								</div>

@@ -15,6 +15,8 @@ public class ShowPhoto {
     
     private Integer showSort;
 
+    private Integer state;
+
     public String getPhotoSquare() {
         return photoSquare;
     }
@@ -70,6 +72,12 @@ public class ShowPhoto {
 	public void setShowSort(Integer showSort) {
 		this.showSort = showSort;
 	}
-    
-    
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
 }
