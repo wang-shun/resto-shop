@@ -27,12 +27,9 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     /**
      * 2016-10-29
      * 用于查询品牌收入报表
-     * @param beginDate
-     * @param endDate
-     * @param currentBrandId
      * @return
      */
-    List<OrderPaymentItem> selectShopIncomeList(String beginDate, String endDate, String currentBrandId);
+    List<Map<String, Object>> selectShopIncomeList(Map<String, Object> map);
 
     /**
      * 2016-10-29
@@ -54,4 +51,10 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
+    
+    List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map);
+    
+    public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId);
+    
+    public OrderPaymentItem selectPayMentSumByrefundOrder(String orderId);
 }

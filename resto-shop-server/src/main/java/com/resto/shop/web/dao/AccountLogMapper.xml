@@ -11,9 +11,10 @@
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="account_id" property="accountId" jdbcType="VARCHAR" />
     <result column="source" property="source" jdbcType="INTEGER" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, money, create_time, payment_type, remain, remark, account_id, source
+    id, money, create_time, payment_type, remain, remark, account_id, source, shop_detail_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -28,10 +29,10 @@
   <insert id="insert" parameterType="com.resto.shop.web.model.AccountLog" >
     insert into tb_account_log (id, money, create_time, 
       payment_type, remain, remark, 
-      account_id, source)
+      account_id, source, shop_detail_id)
     values (#{id,jdbcType=VARCHAR}, #{money,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
       #{paymentType,jdbcType=INTEGER}, #{remain,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER})
+      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.AccountLog" >
     insert into tb_account_log
@@ -60,6 +61,9 @@
       <if test="source != null" >
         source,
       </if>
+      <if test="shopDetailId != null">
+      	shop_detail_id
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -85,6 +89,9 @@
       </if>
       <if test="source != null" >
         #{source,jdbcType=INTEGER},
+      </if>
+      <if test="shopDetailId != null" >
+        #{shopDetailId,jdbcType=VARCHAR}
       </if>
     </trim>
   </insert>
@@ -112,6 +119,9 @@
       <if test="source != null" >
         source = #{source,jdbcType=INTEGER},
       </if>
+      <if test="shopDetailId != null" >
+        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -123,7 +133,8 @@
       remain = #{remain,jdbcType=DECIMAL},
       remark = #{remark,jdbcType=VARCHAR},
       account_id = #{accountId,jdbcType=VARCHAR},
-      source = #{source,jdbcType=INTEGER}
+      source = #{source,jdbcType=INTEGER},
+      shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="AccountLog">select * from tb_account_log</select>
@@ -172,7 +183,7 @@
   </select>
 
   <!-- 根据 账户ID 查询 分享返利总额 -->
-  <select id="selectByShareMoney" resultType="java.lang.Integer">
+  <select id="selectByShareMoney" resultType="java.math.BigDecimal">
     SELECT sum(money) from tb_account_log where account_id = #{accountId} and source = 4
   </select>
 </mapper>

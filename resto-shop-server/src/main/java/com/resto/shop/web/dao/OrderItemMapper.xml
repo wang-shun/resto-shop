@@ -228,7 +228,7 @@
   
   <!-- 根据订单ID查询订单项 -->
   <select id="listByOrderId" resultType="OrderItem">
-  	SELECT sum(count) as count,sum(original_price) as original_price,sum(unit_price) as unit_price,
+  	SELECT sum(count) as count,sum(orgin_count) as orgin_count, original_price,sum(unit_price) as unit_price,
   	 sum(final_price) as final_price,tb_order_item.*
   	 from tb_order_item where order_id = #{orderId}
   	 and type not in (3,4)
@@ -300,7 +300,7 @@ order by t.print_sort asc
 
   <select id="listByParentId" resultType="OrderItem">
     select * from tb_order_item
-    where order_id in (select id from tb_order where parent_order_id = #{orderId})
+    where order_id in (select id from tb_order where parent_order_id = #{orderId} and order_state != 9)
   </select>
 
   <select id="getOrderItemByRecommendId" resultType="OrderItem">
@@ -316,4 +316,49 @@ order by t.print_sort asc
      final_price = unit_price * `count`
      where id = #{id}
   </update>
+  
+  <select id="selectOrderItemByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.OrderItem">
+  	select article_name articleName, SUM(refund_count) refundCount,SUM(count) count  from tb_order_item
+	where order_id in 
+	<foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+		#{orderId}
+	</foreach>
+	and `status` = 1 and ${count}
+	group by article_id
+  </select>
+  
+  <select id="selectOrderItemByOrderId" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select * from tb_order_item
+	where order_id = #{orderId}
+	and `status` = 1 and ${count}
+  </select>
+  
+  <select id="selectRefundOrderItem" parameterType="java.util.Map" resultMap="BaseResultMap">
+  	select refund_count as count,tb_order_item.*
+  	from tb_order_item where id in
+  	<foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
+  		#{orderItemId}
+  	</foreach>
+    or parent_id in
+    <foreach collection="orderItemIds" item="orderItemId" open="(" separator="," close=")">
+      #{orderItemId}
+    </foreach>
+
+  </select>
+
+  <update id="refundArticleChild">
+    update tb_order_item
+    set count = 0,
+    refund_count = 1
+    where parent_id = #{parentId}
+  </update>
+
+
+  <select id="getListByParentId" resultType="OrderItem">
+    select * from tb_order_item
+    where parent_id =  #{parentId}
+  </select>
+
+
+
 </mapper>

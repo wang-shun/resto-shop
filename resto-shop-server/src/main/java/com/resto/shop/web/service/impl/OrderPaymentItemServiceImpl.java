@@ -99,10 +99,8 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
 
     @Override
-    public List<OrderPaymentItem> selectShopIncomeList(String beginDate, String endDate, String brandId) {
-        Date begin = DateUtil.getformatBeginDate(beginDate);
-        Date end =  DateUtil.getformatEndDate(endDate);
-        return orderpaymentitemMapper.selectShopIncomeList(begin,end,brandId);
+    public List<Map<String, Object>> selectShopIncomeList(Map<String, Object> map) {
+        return orderpaymentitemMapper.selectShopIncomeList(map);
     }
 
     @Override
@@ -122,5 +120,20 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     @Override
     public OrderPaymentItem selectByOrderIdAndResultData(String orderId) {
         return orderpaymentitemMapper.selectByOrderIdAndResultData(orderId);
+    }
+    
+    @Override
+    public List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map) {
+    	return orderpaymentitemMapper.selectOrderPayMentItem(map);
+    }
+    
+    @Override
+    public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId) {
+    	return orderpaymentitemMapper.selectPaymentCountByOrderId(orderId);
+    }
+    
+    @Override
+    public OrderPaymentItem selectPayMentSumByrefundOrder(String orderId) {
+    	return null;
     }
 }

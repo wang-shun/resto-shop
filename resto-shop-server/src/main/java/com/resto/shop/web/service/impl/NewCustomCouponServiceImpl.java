@@ -1,23 +1,41 @@
 package com.resto.shop.web.service.impl;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.SMSUtils;
+import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.CouponSource;
 import com.resto.shop.web.constant.TimeCons;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewCustomCoupon;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CouponService;
+import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 
 import cn.restoplus.rpc.server.RpcService;
@@ -37,6 +55,18 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     @Resource
     private ShopDetailService shopDetailService;
 
+    @Resource
+	private CustomerService customerService;
+    
+    @Resource
+	private WechatConfigService wechatConfigService;
+    
+    @Resource
+    private BrandSettingService brandSettingService;
+
+    @Value("#{propertyConfigurer['orderMsg']}")
+	public static String orderMsg;
+    
     @Override
     public GenericDao<NewCustomCoupon, Long> getDao() {
         return newcustomcouponMapper;
@@ -49,8 +79,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     }
     
     @Override
-    public List<NewCustomCoupon> selectListByBrandId(String currentBrandId) {
-        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByBrandId(currentBrandId);
+    public List<NewCustomCoupon> selectListByBrandId(String currentBrandId,String shopId) {
+        List<NewCustomCoupon> list = newcustomcouponMapper.selectListByBrandId(currentBrandId,shopId);
         //查询品牌下所有的店铺
         List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(currentBrandId);
 
@@ -118,6 +148,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             couponType = -1;
             couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         }
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         //根据优惠卷配置，添加对应数量的优惠卷
         Date beginDate  = new Date();
         for(NewCustomCoupon cfg: couponConfigs){
@@ -134,6 +165,8 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setDistributionModeId(cfg.getDistributionModeId());
                 coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
                 coupon.setCustomerId(cus.getId());
+                coupon.setPushDay(cfg.getPushDay());
+                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 60 * 3600);
                 //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
                 if(cfg.getShopDetailId()!=null&&shopId.equals(cfg.getShopDetailId())){
                     coupon.setShopDetailId(cfg.getShopDetailId());
@@ -150,15 +183,60 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                     coupon.setBeginDate(cfg.getBeginDateTime());
                     coupon.setEndDate(cfg.getEndDateTime());
                 }
+                //如果没有设置优惠券推送时间，那么，默认为3天
+                if(cfg.getPushDay()==null){
+                	coupon.setPushDay(3);
+                }
                 for(int i=0;i<cfg.getCouponNumber();i++){
                     couponService.insertCoupon(coupon);
                 }
+                long begin=coupon.getBeginDate().getTime();
+                long end=coupon.getEndDate().getTime();
+                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
             }
         }
     }
 
-
-
+	  //得到优惠券的时间，然后做定时任务
+	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail){
+            Integer pushDay = shopDetail.getRecommendTime();
+	    	Customer customer=customerService.selectById(customerId);
+	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+	        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+	    	if(BeginDate !=0 && EndDate !=0){
+	    		if((EndDate-BeginDate)<=(1000*60*60*24*pushDay)){
+	    			StringBuffer str=new StringBuffer();
+	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
+	            	str.append("优惠券到期提醒\n");
+	            	str.append("<a href='"+jumpurl+"'>"+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
+	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+	                String pr=price+"";//将BigDecimal类型转换成String
+	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
+	    		}else{
+	    			Calendar calendar = Calendar.getInstance();
+	    			calendar.setTime(new Date());
+	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
+	    			String pr=price+"";
+	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay,shopDetail.getName());
+	    		}
+	    	}
+	    }
+     
+	  //发送短信
+	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId){
+	        Customer customer=customerService.selectById(customerId);
+	        String day=pushDay+"";//将得到的int转换成String
+	    	Map param = new HashMap();
+            param.put("shop", shop);
+			param.put("price", price);
+			param.put("name", name);
+			param.put("day", day);
+            SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
+	    }
+	    
+	    
+	    
 
     @Override
 	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {
@@ -190,6 +268,4 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     public List<NewCustomCoupon> selectListShopId(String shopId) {
         return newcustomcouponMapper.selectListByShopId(shopId);
     }
-
-
 }

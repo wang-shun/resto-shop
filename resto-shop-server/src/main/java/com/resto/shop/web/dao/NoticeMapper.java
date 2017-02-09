@@ -31,4 +31,10 @@ public interface NoticeMapper  extends GenericDao<Notice,String> {
     void addNoticeHistory(String customerId,String noticeId);
 
 	List<Notice> selectListAllByShopId(String currentShopId);
+
+	void clearSupportTime(String noticeId);
+
+	void insertSupportTime(@Param("noticeId") String noticeId,@Param("time") Integer time);
+
+	List<Integer> getSupportTime(String noticeId);
 }

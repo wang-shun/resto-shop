@@ -52,7 +52,11 @@
 				    <input type="text" class="form-control" name="wechatWelcomeContent" v-model="m.wechatWelcomeContent">
 				</div>
 				<div class="form-group">
-				    <label>微信首页名称</label>
+					<label>微信品牌名名称</label>
+					<input type="text" class="form-control" name="wechatBrandName" v-model="m.wechatBrandName">
+				</div>
+				<div class="form-group">
+				    <label>微信粉丝圈名称</label>
 				    <input type="text" class="form-control" name="wechatHomeName" v-model="m.wechatHomeName">
 				</div>
 				<div class="form-group">
@@ -79,6 +83,7 @@
 				<div class="form-group">
 				    <label>最迟加菜时间(秒)</label>
 				    <input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime" required="required">
+					<div style="color: red" id="timeTips"></div>
 				</div>
 				
 				<div class="form-group">
@@ -188,6 +193,11 @@
 				    <label>等位提示</label>
 				    <input type="text" class="form-control" name="queueNotice" v-model="m.queueNotice">
 				</div>
+				<div class="form-group">
+					<label>数据导出口令</label>
+					<input type="text" class="form-control" name="exportPassword" v-model="m.exportPassword">
+				</div>
+
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>
@@ -235,7 +245,20 @@
 			data:{
 				m:{},
 			},
+			watch: {
+				'm.autoConfirmTime': 'timeTips',
+				'm.closeContinueTime':'timeTips'
+			},
 			methods:{
+				timeTips:function(){
+					var autoConfirmTime = $("input[name='autoConfirmTime']").val();
+					var closeContinueTime = $("input[name='closeContinueTime']").val();
+					if(parseInt(autoConfirmTime) <= parseInt(closeContinueTime)){
+						$("#timeTips").html("* 红包提醒倒计时应该大于最迟加菜时间");
+					}else{
+						$("#timeTips").html("");
+					}
+				},
 				save:function(e){
 					var formDom = e.target;
 					$.ajax({

@@ -67,6 +67,18 @@ public class NewCustomCoupon {
 
     private String shopDetailId;
 
+    private Integer pushDay;//到期推送时间（默认为3天）
+
+    private Integer recommendDelayTime;
+
+    public Integer getRecommendDelayTime() {
+        return recommendDelayTime;
+    }
+
+    public void setRecommendDelayTime(Integer recommendDelayTime) {
+        this.recommendDelayTime = recommendDelayTime;
+    }
+
     public String getShopDetailId() {
         return shopDetailId;
     }
@@ -246,4 +258,13 @@ public class NewCustomCoupon {
     public void setIsBrand(Integer isBrand) {
         this.isBrand = isBrand;
     }
+
+	public Integer getPushDay() {
+		return pushDay;
+	}
+
+	public void setPushDay(Integer pushDay) {
+		this.pushDay = pushDay;
+	}
+    
 }

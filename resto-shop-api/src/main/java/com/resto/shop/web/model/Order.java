@@ -14,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Order implements Serializable{
+
+    private Integer tag;//不去重
+
     private String id;
 
     private String tableNumber;
@@ -107,8 +110,6 @@ public class Order implements Serializable{
 
     private Integer payMode;
 
-
-
     private Long employeeId;
 
     /**
@@ -123,9 +124,7 @@ public class Order implements Serializable{
 
     private Boolean timeOut;
 
-    //
     private String telephone;
-
 
     private BigDecimal payValue;
 
@@ -142,16 +141,21 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    //该订单是否使用优惠券
+    private Boolean ifUseCoupon;
+
+    //该订单的优惠券信息
+    private Coupon couponInfo;
+
     private  List<Order> childList; //子订单
 
-    public List<Order> getChildList() {
-        return childList;
+    public Integer getTag() {
+        return tag;
     }
 
-    public void setChildList(List<Order> childList) {
-        this.childList = childList;
+    public void setTag(Integer tag) {
+        this.tag = tag;
     }
-
 
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
@@ -165,7 +169,8 @@ public class Order implements Serializable{
     //订单原始金额（退菜前）
     private BigDecimal baseMoney;
 
-
+    //支付状态（0 未支付 1支付中 2已支付）
+    private Integer isPay;
 
     //子订单的菜品项 ，key为子订单id
     private Map<String,List<OrderItem>> childItems;
@@ -176,8 +181,56 @@ public class Order implements Serializable{
     private Integer baseCustomerCount;
 
     //是否需要扫码 0不需要 1需要
-
     private Integer needScan;
+
+    private Integer payType;
+
+
+    //是否是退菜订单 0 不是 1是
+    private Integer isRefund;
+
+    //是否确认 0-未确认 1-已确认
+    private Integer isConfirm;
+
+    final public Integer getIsConfirm() {
+        return isConfirm;
+    }
+
+    final public void setIsConfirm(Integer isConfirm) {
+        this.isConfirm = isConfirm;
+    }
+
+    final public Integer getIsRefund() {
+        return isRefund;
+    }
+
+    final public void setIsRefund(Integer isRefund) {
+        this.isRefund = isRefund;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
+    public List<Order> getChildList() {
+        return childList;
+    }
+
+    public void setChildList(List<Order> childList) {
+        this.childList = childList;
+    }
+
+    public Integer getIsPay() {
+        return isPay;
+    }
+
+    public void setIsPay(Integer isPay) {
+        this.isPay = isPay;
+    }
 
     public Integer getNeedScan() {
         return needScan;
@@ -186,8 +239,19 @@ public class Order implements Serializable{
     public void setNeedScan(Integer needScan) {
         this.needScan = needScan;
     }
+    
+    //原始餐盒总数（退菜前）
+    private Integer baseMealAllCount;
 
-    public Integer getBaseCustomerCount() {
+    public Integer getBaseMealAllCount() {
+		return baseMealAllCount;
+	}
+
+	public void setBaseMealAllCount(Integer baseMealAllCount) {
+		this.baseMealAllCount = baseMealAllCount;
+	}
+
+	public Integer getBaseCustomerCount() {
         return baseCustomerCount;
     }
 
@@ -739,5 +803,19 @@ public class Order implements Serializable{
 		this.aliPayDiscountMoney = aliPayDiscountMoney;
 	}
 
+    public Boolean getIfUseCoupon() {
+        return ifUseCoupon;
+    }
 
+    public void setIfUseCoupon(Boolean ifUseCoupon) {
+        this.ifUseCoupon = ifUseCoupon;
+    }
+
+    public Coupon getCouponInfo() {
+        return couponInfo;
+    }
+
+    public void setCouponInfo(Coupon couponInfo) {
+        this.couponInfo = couponInfo;
+    }
 }

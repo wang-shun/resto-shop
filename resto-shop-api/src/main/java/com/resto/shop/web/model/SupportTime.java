@@ -17,6 +17,11 @@ public class SupportTime {
 
     private String remark;
 
+    /**
+     * 折扣百分比
+     */
+    private int discount;
+
     private String shopDetailId;
     
     private String shopName;
@@ -83,5 +88,13 @@ public class SupportTime {
 
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 }

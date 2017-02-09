@@ -40,6 +40,18 @@ public class Coupon {
 
     private  String brandId;
 
+    private Integer pushDay;//推送天数(默认3天)
+
+    private Integer recommendDelayTime;
+
+    public Integer getRecommendDelayTime() {
+        return recommendDelayTime;
+    }
+
+    public void setRecommendDelayTime(Integer recommendDelayTime) {
+        this.recommendDelayTime = recommendDelayTime;
+    }
+
     public Boolean getUsed() {
         return isUsed;
     }
@@ -190,6 +202,14 @@ public class Coupon {
 
 	public void setCouponType(Integer couponType) {
 		this.couponType = couponType;
+	}
+
+	public Integer getPushDay() {
+		return pushDay;
+	}
+
+	public void setPushDay(Integer pushDay) {
+		this.pushDay = pushDay;
 	}
     
 }

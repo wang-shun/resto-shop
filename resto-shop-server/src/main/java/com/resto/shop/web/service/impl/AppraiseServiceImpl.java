@@ -213,4 +213,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public List<Appraise> selectByGoodAppraise() {
 		return appraiseMapper.selectByGoodAppraise();
 	}
+	
+	@Override
+	public Map<String, Object> selectCustomerAppraiseAvg(String customerId) {
+		return appraiseMapper.selectCustomerAppraiseAvg(customerId);
+	}
 }

@@ -11,6 +11,7 @@ import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.ArticleMapper;
+import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.dao.HungerOrderMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
@@ -28,7 +29,10 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by KONATA on 2016/10/28.
@@ -37,6 +41,11 @@ import java.util.*;
 @RpcService
 public class ThirdServiceImpl implements ThirdService {
 
+    //用来添加打印小票的序号
+    //添加两个Map 一个是订单纬度,一个是店铺纬度
+    private static final Map<String, Map<String, Integer>> NUMBER_ORDER_MAP = new ConcurrentHashMap<>();
+
+    private static final Map<String, Map<String, Integer>> NUMBER_SHOP_MAP = new ConcurrentHashMap<>();
 
     @Resource
     OrderPaymentItemService orderPaymentItemService;
@@ -61,6 +70,9 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Autowired
     private KitchenService kitchenService;
+    
+    @Autowired
+    private CustomerMapper customerMapper;
 
 
     @Override
@@ -106,15 +118,13 @@ public class ThirdServiceImpl implements ThirdService {
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        int sum = 0;
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(item.getName(),shopDetail.getId());
-            if(article == null){
+            Article article = articleMapper.selectByName(item.getName(), shopDetail.getId());
+            if (article == null) {
                 continue;
             }
             String articleId = article.getId();
-            sum += item.getQuantity();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
             for (Kitchen kitchen : kitchenList) {
                 String kitchenId = kitchen.getId().toString();
@@ -141,69 +151,32 @@ public class ThirdServiceImpl implements ThirdService {
             if (printer == null) {
                 continue;
             }
-
-
             //生成厨房小票
             for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
-                //保存 菜品的名称和数量
-                String articleName = article.getName();
-                if(article.getSpecs() != null){
-                    JSONArray jsonArray = new JSONArray(article.getSpecs());
-                    for(int i = 0;i< jsonArray.length();i++){
-                        articleName +=  ( "(" + jsonArray.get(i) + ")" );
-                    }
-                }
-                List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-                Map<String, Object> item = new HashMap<String, Object>();
-                item.put("SUBTOTAL", article.getQuantity() * article.getPrice().doubleValue());
-                item.put("ARTICLE_NAME", articleName);
-                item.put("ARTICLE_COUNT", article.getQuantity());
-                items.add(item);
-
-                //保存基本信息
-
-
-                Map<String, Object> print = new HashMap<String, Object>();
-                print.put("TABLE_NO", "");
-
-                print.put("KITCHEN_NAME", kitchen.getName());
+            	Map<String, Object> print = new HashMap<String, Object>();
                 print.put("PORT", printer.getPort());
-                print.put("ORDER_ID", order.getOrderId());
                 print.put("IP", printer.getIp());
                 String print_id = ApplicationUtils.randomUUID();
                 print.put("PRINT_TASK_ID", print_id);
-                print.put("ADD_TIME", new Date());
-
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("ORDER_ID", order.getOrderId());
+                data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                data.put("DISTRIBUTION_MODE", "外卖");
+                data.put("TABLE_NUMBER", "饿了么");
+                data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+                Map<String, Object> items = new HashMap<String, Object>();
+                items.put("ARTICLE_COUNT", article.getQuantity());
+                items.put("ARTICLE_NAME", article.getName());
                 data.put("ITEMS", items);
-                data.put("DISTRIBUTION_MODE", "饿了么订单");
-                data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
-                data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
-                data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
-                data.put("RESTAURANT_TEL", shopDetail.getPhone());
-                data.put("TABLE_NUMBER", "");
-                data.put("PAYMENT_AMOUNT", order.getTotalPrice());
-                data.put("RESTAURANT_NAME", shopDetail.getName());
-
-
-                data.put("DATETIME", DateUtil.formatDate(new Date(), "MM-dd HH:mm"));
-                data.put("ARTICLE_COUNT", sum);
+                data.put("CUSTOMER_SATISFACTION", "暂无信息");
+                data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                data.put("CUSTOMER_PROPERTY", "");
                 print.put("DATA", data);
-
-                print.put("STATUS", 0);
-
+                print.put("STATUS", "0");
                 print.put("TICKET_TYPE", TicketType.KITCHEN);
-
-
-//
-                //添加当天打印订单的序号
-                data.put("ORDER_NUMBER", "");
-
                 printTask.add(print);
             }
         }
-
         return printTask;
     }
 
@@ -215,10 +188,10 @@ public class ThirdServiceImpl implements ThirdService {
         List<Map<String, Object>> items = new ArrayList<>();
         for (HungerOrderDetail article : orderItems) {
             String articleName = article.getName();
-            if(article.getSpecs() != null){
+            if (article.getSpecs() != null) {
                 JSONArray jsonArray = new JSONArray(article.getSpecs());
-                for(int i = 0;i< jsonArray.length();i++){
-                    articleName +=  ( "(" + jsonArray.get(i) + ")" );
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    articleName += ("(" + jsonArray.get(i) + ")");
                 }
             }
             Map<String, Object> item = new HashMap<>();
@@ -229,36 +202,76 @@ public class ThirdServiceImpl implements ThirdService {
             items.add(item);
         }
 
+        List<HungerOrderExtra> extras = hungerOrderMapper.getExtra(order.getOrderId().toString());
+        for(HungerOrderExtra extra : extras){
+            Map<String, Object> item = new HashMap<>();
+            item.put("SUBTOTAL", extra.getPrice().doubleValue() * extra.getQuantity());
+            item.put("ARTICLE_NAME", extra.getName());
+            item.put("ARTICLE_COUNT", extra.getQuantity());
+            items.add(item);
+        }
+
 
         Map<String, Object> print = new HashMap<>();
-        print.put("TABLE_NO", "  "+order.getConsignee());
+        print.put("TABLE_NO", "");
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getOrderId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
-        print.put("ADD_TIME", new Date());
-
+        print.put("ADD_TIME", new Date().getTime());
+//
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getOrderId());
+        data.put("ORDER_NUMBER",nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
         data.put("ITEMS", items);
-
-        data.put("DISTRIBUTION_MODE", "饿了么订单");
+//
+        data.put("DISTRIBUTION_MODE", "外卖");
         data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", "  " +order.getConsignee());
+        data.put("TABLE_NUMBER", "");
+        data.put("CUSTOMER_COUNT",0);
         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", sum);
+//
+//
+        List<Map<String, Object>> paymentList = new ArrayList<>();
+        Map<String, Object> payment = new HashMap<>();
+        payment.put("PAYMENT_MODE", "222");
+        payment.put("SUBTOTAL", 0);
+        paymentList.add(payment);
+        data.put("PAYMENT_ITEMS",paymentList);
+        data.put("CUSTOMER_SATISFACTION_DEGREE",0);
+        data.put("CUSTOMER_SATISFACTION","");
+        data.put("CUSTOMER_PROPERTY","");
+        data.put("ALREADY_PAYED","已在线支付");
+        data.put("DELIVERY_SOURCE","饿了吗");
+        data.put("DELIVERY_ADDRESS",order.getAddress());
+//
+//
+
+        String phone = order.getPhoneList().replace("\"", "");
+        phone = phone.replace("[","");
+        phone = phone.replace("]","");
+
+        data.put("CONTACT_NAME", order.getConsignee());
+        data.put("CONTACT_TEL",phone);
+
+
+
+
+
+//
         print.put("DATA", data);
         print.put("STATUS", 0);
+//
+        print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
 
-        print.put("TICKET_TYPE", TicketType.RECEIPT);
-        data.put("ORDER_NUMBER", order.getConsignee());
 
         return print;
     }
@@ -290,7 +303,7 @@ public class ThirdServiceImpl implements ThirdService {
                     }
                     break;
                 default:
-                   break;
+                    break;
             }
         } catch (Exception e) {
             return false;
@@ -317,7 +330,7 @@ public class ThirdServiceImpl implements ThirdService {
 
         } else if (pushAction.equals(PushAction.ORDER_STATUS_UPDATGE)) { //订单状态更新
             updateHungerOrder(map.get("eleme_order_id").toString(), Integer.valueOf(map.get("new_status").toString()));
-            if( Integer.valueOf(map.get("new_status").toString()).equals(ProductionStatus.PRINTED)){
+            if (Integer.valueOf(map.get("new_status").toString()).equals(ProductionStatus.PRINTED)) {
                 HungerOrder order = hungerOrderMapper.selectByOrderId(map.get("eleme_order_id").toString());
                 String shopId = shopDetailService.selectByRestaurantId(order.getRestaurantId()).getId();
                 MQMessageProducer.sendPlatformOrderMessage(map.get("eleme_order_id").toString(), PlatformType.E_LE_ME, brandId, shopId);
@@ -362,7 +375,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     private HungerOrder getHungerOrderById(String orderId, BrandSetting brandSetting) throws Exception {
         JSONObject json = new JSONObject(HungerUtil.HungerConnection(new HashMap<String, String>(),
-                "/order/" + orderId + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(),RequestMethod.GET));
+                "/order/" + orderId + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(), RequestMethod.GET));
         if (json.optString("code").equals(CodeType.SUCCESS)) {
             JSONObject order = json.getJSONObject("data");
             HungerOrder hungerOrder = new HungerOrder(order);
@@ -379,7 +392,7 @@ public class ThirdServiceImpl implements ThirdService {
         String[] ids = orderIds.split(","); //得到饿了吗的新增订单列表
         for (String id : ids) {
             JSONObject json = new JSONObject(HungerUtil.HungerConnection(new HashMap<String, String>(),
-                    "/order/" + id + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(),RequestMethod.GET));
+                    "/order/" + id + "/", brandSetting.getConsumerKey(), brandSetting.getConsumerSecret(), RequestMethod.GET));
             if (json.optString("code").equals(CodeType.SUCCESS)) {
                 JSONObject order = json.getJSONObject("data");
                 HungerOrder hungerOrder = new HungerOrder(order);
@@ -444,7 +457,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     private Boolean updateStock(String name, String shopId, Integer count, String type) throws AppException {
         Article article = articleMapper.selectByName(name, shopId);
-        if(article == null){
+        if (article == null) {
             return null;
         }
         orderMapper.updateArticleStock(article.getId(), type, count);
@@ -466,11 +479,10 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Override
     public HungerOrder getOutFoodInfo(String id) {
-        HungerOrder order =  hungerOrderMapper.selectById(id);
+        HungerOrder order = hungerOrderMapper.selectById(id);
         order.setShopName(shopDetailService.selectByRestaurantId(order.getRestaurantId()).getName());
         return order;
     }
-
 
 
     public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
@@ -506,6 +518,51 @@ public class ThirdServiceImpl implements ThirdService {
         return printTask;
     }
 
+
+    //根据店铺id和订单id获取订单序号的方法
+    private String nextNumber(String sid, String oid) {
+        //定义number
+        int number;
+        //先从订单map中查找
+        String key = DateUtil.formatDate(new Date(), "yyyy-MM-dd");
+        //查看orderMap中是否有值
+        Map<String, Integer> ordermap = NUMBER_ORDER_MAP.get(key);
+        if (ordermap == null) {
+            NUMBER_ORDER_MAP.clear();
+            ordermap = new HashMap<>();
+            NUMBER_ORDER_MAP.put(key, ordermap);
+        }
+        Map<String, Integer> shopmap = NUMBER_SHOP_MAP.get(key);
+        if (shopmap == null) {
+            NUMBER_SHOP_MAP.clear();
+            shopmap = new HashMap<>();
+            NUMBER_SHOP_MAP.put(key, shopmap);
+        }
+        //从ordermap里面找有没有number，有就返回
+        //没有的话，找shopmap里面的数字是多少，如果没有就是1，如果有就+1 并分别存入shopmap和ordermap
+        Integer num1 = ordermap.get(oid);
+        if (num1 != null) {
+            number = num1.intValue();
+        } else {
+            Integer num2 = shopmap.get(sid);
+            if (num2 != null) {
+                number = num2.intValue() + 1;
+                ordermap.put(oid, number);
+                shopmap.put(sid, number);
+            } else {
+                shopmap.put(sid, 1);
+                ordermap.put(oid, 1);
+                number = 1;
+            }
+        }
+        return numberToString(number);
+    }
+
+    //int转String('001')
+    public String numberToString(int num) {
+        Format f = new DecimalFormat("000");
+        return f.format(num);
+    }
 
 
 }

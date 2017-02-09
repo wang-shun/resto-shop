@@ -16,6 +16,7 @@
         <result column="is_online_paid" property="isOnlinePaid"/>
         <result column="order_id" property="orderId"/>
         <result column="phone_list" property="phoneList"/>
+        <result column="phoneList" property="phoneList"/>
         <result column="restaurant_id" property="restaurantId"/>
         <result column="restaurant_name" property="restaurantName"/>
         <result column="restaurant_number" property="restaurantNumber"/>
@@ -27,6 +28,7 @@
         <result column="delivery_geo" property="deliveryGeo"/>
         <result column="article_sum" property="sum"/>
         <result column="delivery_poi_address" property="deliveryPoiAddress"/>
+        <result column="detail_count" property="detailCount"/>
         <collection property="details" javaType="List" ofType="HungerOrderDetail">
             <id column="detail_id" property="id"/>
             <result column="detail_name" property="name"/>
@@ -92,7 +94,7 @@
     </select>
 
     <select id="selectById" resultMap="BaseResultMap">
-        select t.*,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
+        select t.*,SUBSTR(t.phone_list,3,CHARACTER_LENGTH(t.phone_list)-4) phoneList,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
          t2.specs as detail_specs ,sum(t2.quantity) as article_sum  from tb_hunger_order t
           left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
 
@@ -101,10 +103,17 @@
     </select>
 
     <select id="getOutFoodList" resultMap="BaseResultMap">
-        select t.*,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
+        select t.*,SUBSTR(t.phone_list,3,CHARACTER_LENGTH(t.phone_list)-4) phoneList,
+        t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,COUNT(t2.order_id) detail_count,
          t2.specs as detail_specs ,sum(t2.quantity) as article_sum from tb_hunger_order t
         left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
         where t.restaurant_id = #{restaurantId}
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.created_at,'%d %b %y')
+        group by t.id
+    </select>
+
+    <select id="getExtra" resultType="HungerOrderExtra">
+        select * from tb_hunger_order_extra
+        where order_id = #{orderId}
     </select>
 </mapper>

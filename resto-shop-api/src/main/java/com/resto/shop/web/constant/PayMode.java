@@ -5,7 +5,7 @@ public class PayMode {
 	public static final int WEIXIN_PAY = 1;  //微信支付
 	public static final int ACCOUNT_PAY =2;  //红包支付
 	public static final int COUPON_PAY=3;    //优惠券支付
-	public static final int MONEY_PAY = 4;	//现金支付
+	public static final int MONEY_PAY = 4;	//其他方式支付
 	public static final int BANK_CART_PAY=5; //银行卡支付
 	public static final int CHARGE_PAY = 6; //充值金额支付
 	public static final int REWARD_PAY = 7; //充值赠送的金额支付
@@ -13,9 +13,9 @@ public class PayMode {
     public static final int HUNGER_MONEY = 9; //饿了吗
     public static final int ALI_PAY = 10; //支付宝
     public static final int ARTICLE_BACK_PAY = 11; //菜品退款支付
+    public static final int CRASH_PAY= 12; //现金支付
 
-	
-	public static String getPayModeName(int state){
+    public static String getPayModeName(int state){
 	    switch (state) {
             case WEIXIN_PAY:
                 return "微信支付";
@@ -24,7 +24,7 @@ public class PayMode {
             case COUPON_PAY:
                 return "优惠券支付";
             case MONEY_PAY:
-                return "现金支付";
+                return "其他方式支付";
             case BANK_CART_PAY:
                 return "银行卡支付";
             case CHARGE_PAY:
@@ -38,7 +38,9 @@ public class PayMode {
             case ALI_PAY:
                 return "支付宝支付";
             case ARTICLE_BACK_PAY:
-                return "菜品退款支付";
+                return "退菜返还金额";
+            case CRASH_PAY:
+                return "现金支付";
             default:
                 return "未知";
             }

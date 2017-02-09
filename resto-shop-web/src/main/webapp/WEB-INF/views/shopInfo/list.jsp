@@ -54,6 +54,9 @@
 							</div>
 						</div>
 
+
+
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">买单后出总单（后付款模式）：</label>
 							<div class="col-sm-9">
@@ -79,6 +82,32 @@
 												   v-model="m.isMealFee" value="1"> 是
 									</label> <label> <input type="radio" name="isMealFee"
 															v-model="m.isMealFee" value="0"> 否
+								</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">允许先付（仅混合支付模式有效）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="allowFirstPay"
+												   v-model="m.allowFirstPay" value="0"> 允许
+									</label> <label> <input type="radio" name="allowFirstPay"
+															v-model="m.allowFirstPay" value="1"> 不允许
+								</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">允许后付（仅混合支付模式有效）：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="allowAfterPay"
+												   v-model="m.allowAfterPay" value="0"> 允许
+									</label> <label> <input type="radio" name="allowAfterPay"
+															v-model="m.allowAfterPay" value="1"> 不允许
 								</label>
 								</div>
 							</div>
@@ -114,6 +143,17 @@
 															v-model="m.isPush" value="0"> 否
 								</label>
 								</div>
+							</div>
+						</div>
+
+
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">红包到期提醒时间：</label>
+							<div class="col-sm-9">
+								<input type="number" class="form-control"
+									   name="recommendTime" placeholder="(输入整数)"
+									   v-model="m.recommendTime" required="required" min="0">
 							</div>
 						</div>
 
@@ -198,6 +238,65 @@
 							</div>
 						</div>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">退菜打印订单：</label>
+							<div class="col-sm-9">
+								<div>
+									<label class="checkbox-inline">
+										<input type="checkbox" name="printReceipt" v-model="m.printReceipt" value = "1"> 打印总单
+									</label>
+									<label class="checkbox-inline">
+										<input type="checkbox" name="printKitchen" v-model="m.printKitchen" value = "1"> 打印厨打
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">日短信通知：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="isOpenSms"v-model="m.isOpenSms" value="1">是
+                                </label>
+                                <label> <input type="radio" name="isOpenSms" v-model="m.isOpenSms" value="0"> 否
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div  class="form-group" v-if="m.isOpenSms==1">
+                            <label class="col-sm-3 control-label">手机号：</label>
+                            <div class="col-sm-8">
+                                <input type="text"  name="noticeTelephone" placeholder="多个手机号码以逗号隔开" class="form-control"  v-model="m.noticeTelephone">
+                            </div>
+                    </div>
+
+					<div class="form-group" style="margin-left: 55px;">
+						<div class="control-label" style="text-align: inherit">是否启用服务费</div>
+						<label style="position: relative;left: 195px;bottom: 21px;">
+							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="0">
+							否
+						</label>
+						<label style="position: relative;left: 105px;bottom: 21px;">
+							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="1">
+							是
+						</label>
+					</div>
+					<div v-if="m.isUseServicePrices==1">
+					<div v-if="showp" >
+					<div class="form-group" id="serviceDivOne"  >
+						<label>名称</label>
+						<input type="test" class="form-control" name="serviceNames" v-if="!m.serviceNames" value="服务费" required="required">
+						<input type="test" class="form-control" name="serviceNames" v-if="m.serviceNames" v-model="m.serviceNames" required="required">
+					</div>
+						<div class="form-group" id="serviceDivTwo">
+							<label>服务费/每人</label>
+							<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required" min="0">
+						</div>
+					   </div>
 					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
@@ -228,18 +327,28 @@
 					"showMethod" : "fadeIn",
 					"hideMethod" : "fadeOut"
 				}
+
 				var temp;
 				var vueObj = new Vue({
 					el : "#control",
 					data : {
 						m : result.data,
 						showa:true,
-						showlate:true
+						showlate:true,
+						showp:true
 					},
 					watch: {
-						'm.consumeConfineUnit': 'hideShowa'
+						'm.consumeConfineUnit': 'hideShowa',
+						'm.isUseServicePrices':'hideServiceP'
 					},
 					methods : {
+						hideServiceP  :function (){
+						if(result.data.isUseServicePrices ==0){
+							this.showp = false;
+						}else{
+							this.showp = true;
+						}
+							},
 						hideShowa : function(){
 							if(this.m.consumeConfineUnit == 3){
 								this.showa = false;
@@ -258,10 +367,18 @@
 						},
 						save : function(e) {
 							var formDom = e.target;
+							var allowAfterPay = $("input[name='allowAfterPay']:checked").val();
+							var allowFirstPay = $("input[name='allowFirstPay']:checked").val();
+							if(allowAfterPay == 1 && allowFirstPay == 1){
+								toastr.clear();
+								toastr.error("混合支付模式下不可以同时关闭2种支付方式！");
+								return;
+							}
 							$.ajax({
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
 								success : function(result) {
+									console.log(result+"----");
 									if (result.success) {
 										toastr.clear();
 										toastr.success("保存成功！");
@@ -278,7 +395,7 @@
 
 						},
 						cancel : function() {
-							initContent();
+							this.initContent();
 
 						},
 						uploadSuccess:function(url){
@@ -287,7 +404,18 @@
 						},
 						uploadError:function(msg){
 							toastr.error("上传失败");
-						}
+						},
+                        initContent:function(){
+						    var that = this;
+                            $.ajax({
+                                url:"shopInfo/list_one",
+                                type:"post",
+                                dataType:"json",
+                                success:function (resultData) {
+                                    that.m = resultData.data;
+                                }
+                            });
+                        }
 					}
 				});
 

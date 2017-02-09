@@ -5,7 +5,13 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.dto.ArticleSellDto;
+import com.resto.brand.web.dto.ShopArticleReportDto;
+import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
@@ -65,6 +71,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Autowired
     private ArticleUnitService articleUnitService;
+    
+    @Autowired
+    private ShopDetailService shopDetailService;
 
 
     @Override
@@ -74,6 +83,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<Article> selectList(String currentShopId) {
+        Map<String, Article> discountMap = selectAllSupportArticle(currentShopId);
+        List<Article> articleList =  articleMapper.selectList(currentShopId);
+        for (Article article : articleList ) {
+            if(discountMap.containsKey(article.getId())){
+                article.setDiscount(discountMap.get(article.getId()).getDiscount());
+            }
+        }
         return articleMapper.selectList(currentShopId);
     }
 
@@ -125,21 +141,26 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
         Map<String, Article> articleMap = selectAllSupportArticle(currentShopId);
         for (Article a : articleList) {
-            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {
+            if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
                     a.setArticlePrices(prices);
                 }
-            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {
+            } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {//套餐
                 List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
                 a.setMealAttrs(mealAttrs);
             }
             if (!articleMap.containsKey(a.getId())) {
                 a.setIsEmpty(true);
+            }else{
+                //设置菜品的折扣百分比
+                a.setDiscount(articleMap.get(a.getId()).getDiscount());
             }
         }
         return articleList;
     }
+
+
 
     @Override
     public int delete(String id) {
@@ -434,5 +455,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectsingleItem(String shopId) {
     	return articleMapper.selectsingleItem(shopId);
+    }
+    
+    @Override
+    public List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap) {
+    	return articleMapper.queryOrderArtcile(selectMap);
+    }
+    
+    @Override
+    public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
+    	return articleMapper.queryArticleMealAttr(selectMap);
     }
 }

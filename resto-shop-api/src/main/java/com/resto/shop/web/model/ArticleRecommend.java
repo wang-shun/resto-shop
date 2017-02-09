@@ -23,6 +23,16 @@ public class ArticleRecommend {
 
     private String kitchenId;
 
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     private List<ArticleRecommendPrice> articles;
 
     public String getKitchenId() {

@@ -61,6 +61,8 @@ public class Customer implements Serializable{
 
     private Integer isShare;
 
+    private String registerShopId;
+
     /**
      * 个人信息详细
      */
@@ -273,6 +275,14 @@ public class Customer implements Serializable{
 
     public void setCustomerDetailId(String customerDetailId) {
         this.customerDetailId = customerDetailId;
+    }
+
+    public String getRegisterShopId() {
+        return registerShopId;
+    }
+
+    public void setRegisterShopId(String registerShopId) {
+        this.registerShopId = registerShopId;
     }
 
     @Override

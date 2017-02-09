@@ -31,4 +31,6 @@ public interface HungerOrderMapper {
 
     HungerOrder selectById(String id);
 
+    List<HungerOrderExtra> getExtra(String orderId);
+
 }

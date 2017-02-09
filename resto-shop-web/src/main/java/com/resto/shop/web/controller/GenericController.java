@@ -31,6 +31,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.feature.orm.mybatis.Page;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.shop.web.config.SessionKey;
+import org.springframework.web.context.request.ServletWebRequest;
 
 @Component
 public abstract class GenericController{
@@ -56,40 +57,26 @@ public abstract class GenericController{
 
 	@ExceptionHandler(value = {Exception.class})
 	public void throwExceptionHandler(HttpServletRequest request,HttpServletResponse response,Exception ex){
-		SysError sysError = new SysError();
-		sysError.setShopDetailId(getCurrentShopId() == null ? null : getCurrentShopId());
-		sysError.setBrandId(getCurrentBrandId() == null ? null : getCurrentBrandId());
-		sysError.setErrorMsg(ex.getMessage());
-		sysError.setErrorType(ex.toString());
-		sysError.setApiUrl(request.getRequestURL().toString());
-		sysErrorService.insert(sysError);
+		String shopDetailId = getCurrentShopId() == null ? null : getCurrentShopId();
+		String brandId = getCurrentBrandId() == null ? null : getCurrentBrandId();
+		log.error("店铺id:"+ shopDetailId+",品牌id:"+brandId+",ErrorType:"+ex.toString()+",请求url:"+request.getRequestURL().toString()
+				+",ErrorMsg:"+ex.getMessage());
 	}
 
 
-	@ExceptionHandler(BindException.class)
-	@ResponseBody
-	public Result bindException(BindException bindEx){
-		List<ObjectError> oe = bindEx.getAllErrors();
-		Result result = new Result();
-		result.setSuccess(false);
-		for (ObjectError objectError : oe) {
-			String message = objectError.getDefaultMessage();
-			result.setMessage("数据校验异常："+message);
-			return result;
-		}
-		result.setMessage("数据校验异常:"+bindEx.getMessage());
-		return result;
-	}
-	@ExceptionHandler(DataVailedException.class)
-	@ResponseBody
-	public Result dataVailedException(Exception ex){
-		Result result = new Result(false);
-		result.setMessage(ex.getMessage());
-		return result;
-	}
-	
+
 	public HttpServletRequest getRequest(){
 		return  ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest(); 
+	}
+
+	/**
+	 * name:yjuany
+	 * @return
+	 */
+	public HttpServletResponse getResponse(){
+
+
+		return ((ServletWebRequest)RequestContextHolder.getRequestAttributes()).getResponse();
 	}
 	
 	public HttpSession getSession(){

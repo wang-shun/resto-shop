@@ -14,7 +14,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -49,16 +48,14 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-   //@Scheduled(cron = "00  39 11 * * ?")   //每天12点执行
+   //@Scheduled(cron = "10  51 13 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
 
         //查询所有的品牌
         List<Brand> brandList = brandService.selectList();
         for (Brand brand : brandList) {
-            //!"测试专用品牌".equals(brand.getBrandName())&&!"餐加生态".equals(brand.getBrandName())&&!"简厨".equals(brand.getBrandName())
-
-          if(!"测试专用品牌".equals(brand.getBrandName())&&!"餐加".equals(brand.getBrandName())&&!"港都小排挡".equals(brand.getBrandName())&&!"夜狼音乐餐吧".equals(brand.getBrandName())&&!"座头市".equals(brand.getBrandName()) ){
+         if(!"测试专用品牌".equals(brand.getBrandName())&&!"餐加".equals(brand.getBrandName())&&!"港都小排挡".equals(brand.getBrandName())&&!"夜狼音乐餐吧".equals(brand.getBrandName())&&!"座头市".equals(brand.getBrandName()) ){
                     //获取品牌用户
                     BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brand.getId(), 8);
                     //创建 Client 对象
@@ -77,8 +74,8 @@ public class ReportExceptionTask {
                     if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
                         log.info("--------------HttpClient 登录成功！");
                         Map<String, String> requestMap = new HashMap<>();
-                        requestMap.put("beginDate", "2017-01-02");
-                        requestMap.put("endDate", "2017-01-03");
+                        requestMap.put("beginDate", "2017-01-01");
+                        requestMap.put("endDate", "2017-01-11");
                         requestMap.put("brandName",brand.getBrandName());
                         //循环执行 URLMap 中的链接
                         HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
@@ -96,7 +93,7 @@ public class ReportExceptionTask {
 
                 }
             }
-    }
+   }
 
 
     /**

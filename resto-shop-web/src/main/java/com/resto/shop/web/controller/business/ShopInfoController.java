@@ -1,7 +1,11 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.stereotype.Controller;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServlet;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -20,17 +25,26 @@ import java.util.List;
 public class ShopInfoController extends GenericController{
     @Resource
     ShopDetailService shopDetailService;
+    @Resource
+    BrandService brandService;
+    @Resource
+    BrandSettingService brandSettingService;
 
     @RequestMapping("/list")
     public void list(){
 
     }
-
+   /***
+    * name:yjunay
+    * 服务设置
+    *
+     **/
 
     @RequestMapping("list_one")
     @ResponseBody
     public Result list_one(){
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+
         return getSuccessResult(shopDetail);
     }
 
@@ -44,11 +58,7 @@ public class ShopInfoController extends GenericController{
     @ResponseBody
     public Result modify(ShopDetail shopDetail){
         shopDetail.setId(getCurrentShopId());
-        if(shopDetail.getIsUserIdentity()==0){
-            shopDetailService.update(shopDetail);
-            return Result.getSuccess();
-
-        }else {
+        if(shopDetail.getIsUserIdentity()!=0){
             switch (shopDetail.getConsumeConfineUnit()){
                 case 1 :
                     shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime());
@@ -60,12 +70,23 @@ public class ShopInfoController extends GenericController{
                     shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
                     break;
             }
-            shopDetailService.update(shopDetail);
-            return Result.getSuccess();
-
         }
-
+        if(shopDetail.getPrintReceipt() == null){
+            shopDetail.setPrintReceipt(0);
+        }
+        if(shopDetail.getPrintKitchen() == null){
+            shopDetail.setPrintKitchen(0);
+        }
+        if(shopDetail.getIsOpenSms()==0){//表示是关闭日短信通知
+            shopDetail.setnoticeTelephone("");
+        }else  if(shopDetail.getIsOpenSms()==1){
+            shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
+        }
+        shopDetailService.update(shopDetail);
+        return Result.getSuccess();
     }
+
+
 
 
     @RequestMapping("list_all")

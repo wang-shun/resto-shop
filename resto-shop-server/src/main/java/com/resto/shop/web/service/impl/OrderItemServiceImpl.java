@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -132,4 +133,18 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 		return orderitemMapper.selectOrderItems(begin, end);
 	}
 
+	@Override
+	public List<OrderItem> selectOrderItemByOrderIds(Map<String, Object> map) {
+		return orderitemMapper.selectOrderItemByOrderIds(map);
+	}
+	
+	@Override
+	public List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map) {
+		return orderitemMapper.selectOrderItemByOrderId(map);
+	}
+	
+	@Override
+	public List<OrderItem> selectRefundOrderItem(Map<String, Object> map) {
+		return orderitemMapper.selectRefundOrderItem(map);
+	}
 }

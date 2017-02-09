@@ -72,6 +72,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order getOrderAccount(String shopId);
 
 	Order getOrderAccountHoufu(String shopId);
+
+	Order getOrderAccountBoss(String shopId);
 	/**
 	 * 查询某天的历史订单
 	 * 根据店铺模式查询不同状态的历史订单。（2016-10-11，已取消此功能，改为所有模式的店铺的历史订单都不为取消状态和未支付状态）
@@ -83,7 +85,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<Order> selectHistoryOrderList(@Param("shopId") String currentShopId, @Param("dateBegin") Date dateBegin, @Param("dateEnd") Date dateEnd, @Param("shopMode") Integer shopMode);
 
-	List<Order>listHoufuFinishedOrder(String shopId);
+	List<Order>listHoufuFinishedOrder(@Param("shopId") String shopId,@Param("shopMode") Integer shopMode);
+
+
+
 
 	List<Order>listHoufuUnFinishedOrder(String shopId);
 
@@ -143,9 +148,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Double selectParentAmount(@Param("orderId")String orderId,@Param("shopMode") Integer shopMode);
 
+	Double selectParentAmountByBossOrder(String orderId);
+
+	BigDecimal selectPayBefore(String orderId);
+
 	void changeAllowContinue(String id, boolean b);
 
 	Integer selectArticleCountById(@Param("id")String id,@Param("shopMode")Integer shopMode);
+
+	Integer selectArticleCountByIdBossOrder(String id);
 
 	List<Order> selectByParentId(String parentOrderId);
 
@@ -489,7 +500,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId);
 
 	BigDecimal getServicePrice(String shopId);
 
@@ -514,7 +525,80 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
    List<Order> getCustomerOrderList(@Param("customerId") String customerId,@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
-	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineTime") int consumeConfineTime);
+	Integer selectByCustomerCount(@Param("customerId") String customerId,@Param("consumeConfineUnit")int consumeConfineUnit,@Param("consumeConfineTime") int consumeConfineTime);
+
+	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
+    /**
+     * 报表数据查询用于短信推送
+     * 短信推送
+     * @param begin
+     * @param end
+     * @param shopId
+     * @return
+     */
+    List<Order> selectListsmsByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("shopId") String shopId);
+
+    /**
+     * 查询该店铺历史的订单数据
+     * @param shopId
+     * @param dateEnd
+     * @return
+     */
+    List<Order> selectOrderHistoryList(@Param("shopId") String shopId, @Param("endDate") Date dateEnd);
+
+    /**
+     * 结店时查询生产状态未改变的订单
+     * @param shopId
+     * @param dateBegin
+     * @param dateEnd
+     * @return
+     */
+    List<Order> selectHasPayNoChangeStatus(@Param("shopId") String shopId, @Param("beginDate") Date dateBegin,@Param("endDate") Date dateEnd);
+
+    /**
+     * 小程序定时任务是 查询品牌下生产状态未改变的订单
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @return
+     */
+    List<Order> selectHasPayNoChangeStatusByBrandId(@Param("brandId") String brandId,@Param("beginDate") Date  beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * 查询品牌的某个时间的分数
+     * @param brandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseBybrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * yz
+     * @param id
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    BigDecimal selectOrderMoneyByShopIdAndTime(@Param("shopId") String id,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
+
+    Double selectAppraiseSumByShopId(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
+
+	/**
+	 * 大boss模式下查询新增订单
+	 */
+
+	List<Order> selectOrderByBoss(String shopId);
+
+	/**
+	 * 返回用户的最后一比订单时间
+	 */
+	Order getCustomerLastOrder(String customerId);
+
+	void confirmOrderPos(String orderId);
 
 
+	Integer checkTableNumber(@Param("shopId") String shopId,@Param("tableNumber") String tableNumber,@Param("customerId") String customerId);
+
+	BigDecimal getPayHoufu(String orderId);
 }

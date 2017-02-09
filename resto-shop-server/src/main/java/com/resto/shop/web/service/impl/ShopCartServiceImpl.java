@@ -77,7 +77,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             } else if (shopCart != null){
                 if(number <= 0 &&  shopCart.getId() != null){
                     shopcartMapper.delMealArticle(shopCart.getId().toString());
-                }else if(number <= 0 &&  shopCart.getId() == null && shopCartItem.getId() != null){
+                }else if(number <= 0 &&  shopCart.getId() == null &&  shopCartItem != null && shopCartItem.getId() != null){
                     shopcartMapper.delMealArticle(shopCartItem.getId().toString());
                 }
             }

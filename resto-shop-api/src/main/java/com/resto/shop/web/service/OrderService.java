@@ -11,6 +11,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.exception.AppException;
+import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -35,6 +36,8 @@ public interface OrderService extends GenericService<Order, String> {
 	public Order selectOrderStatesById(String orderId);
 
 	public JSONResult createOrder(Order order)throws AppException;
+
+	public JSONResult repayOrder(Order order)throws AppException;
 
 	public Order findCustomerNewOrder(String customerId,String shopId,String orderId);
 
@@ -291,7 +294,8 @@ public interface OrderService extends GenericService<Order, String> {
 	public List<ArticleSellDto> selectShopArticleSellByDateAndId(String beginDate, String endDate, String shopId,
 			String sort);
 
-	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
+//	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
+public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
 
 	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
 
@@ -436,7 +440,7 @@ public interface OrderService extends GenericService<Order, String> {
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(String shopId);
+    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder);
 
     public boolean cancelExceptionOrder(String orderId);
 
@@ -477,7 +481,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param tableNumber
 	 * @return
 	 */
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(String tableNumber,String shopId);
 
 	/**
 	 * 返回子订单的菜品项
@@ -534,5 +538,59 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param customerId
 	 * @return
      */
-	Integer selectByCustomerCount(String customerId,int consumeConfineTime);
+	Integer selectByCustomerCount(String customerId,int consumeConfineUnit,int consumeConfineTime);
+	
+	public List<Order> selectOrderByOrderIds(Map<String, Object> orderIds);
+
+	/**
+	 * 返回未支付的订单的支付项
+	 */
+	Result refundPaymentByUnfinishedOrder(String orderId);
+
+	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
+	
+	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
+
+    List<Order> selectHasPayNoChangeStatusByBrandId(String brandId);
+
+    /**
+     * 查询品牌时间端内的分数
+     * @param brandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseBybrandId(String brandId, Date beginDate, Date endDate);
+
+    /**
+     * 查询店铺时间段内的订单总额
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    BigDecimal selectOrderMoneyByShopIdAndTime(String shopId, Date beginDate, Date endDate);
+
+    /**
+     * 查询店铺时间段内的分数
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Double selectAppraiseByshopId(String shopId, Date beginDate, Date endDate);
+
+    List<Order> selectOrderHistoryList(String id, Date dateEnd);
+
+    List<Order> selectListsmsByShopId(Date begin, Date end, String id);
+
+	void refundItem(Order order);
+
+	Order afterPay(String orderId,String couponId,BigDecimal price,BigDecimal pay,BigDecimal waitMoney,Integer payMode);
+
+	Order getCustomerLastOrder(String customerId);
+
+	void confirmOrderPos(String orderId);
+
+	BigDecimal selectPayBefore(String orderId);
 }

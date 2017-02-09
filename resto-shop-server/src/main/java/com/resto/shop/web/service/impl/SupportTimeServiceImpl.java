@@ -95,14 +95,26 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 	} 
     
     public static void main(String[] args) {
-		for(int i=0;i<9;i++){
-			int bin = 1<<i;
-			System.out.println(bin);
-			System.out.println("1----"+(1&bin));
-			System.out.println("2----"+(2&bin));
-			System.out.println("128----"+(128&bin));
-			System.out.println("256----"+(256&bin));
-		}
+//		for(int i=0;i<9;i++){
+//			int bin = 1<<i;
+//			System.out.println(bin);
+//			System.out.println("1----"+(1&bin));
+//			System.out.println("2----"+(2&bin));
+//			System.out.println("128----"+(128&bin));
+//			System.out.println("256----"+(256&bin));
+//		}
+
+		System.out.println("31 -- 3 ---> " + (31&3));
+		System.out.println("96 -- 3 ---> " + (96&3));
+		System.out.println("511 -- 96 ---> " + (511&96));
+		System.out.println("511 -- 3 ---> " + (511&3));
+		System.out.println("25 -- 2 ---> " + (25&2));
+		System.out.println("25 -- 6 ---> " + (25&6));
+		System.out.println("25 -- 38 ---> " + (25&38));
+		System.out.println("38 -- 25 ---> " + (38&25));
+		System.out.println("27 -- 38 ---> " + (27&38));
+
+
 	}
 
 }

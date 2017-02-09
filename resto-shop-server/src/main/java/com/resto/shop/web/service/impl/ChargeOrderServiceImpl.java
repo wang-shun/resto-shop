@@ -4,34 +4,28 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.ChargeOrder;
-import com.resto.shop.web.model.ChargePayment;
-import com.resto.shop.web.model.ChargeSetting;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargePaymentService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.model.*;
+import com.resto.shop.web.service.*;
 
-import cn.restoplus.rpc.server.RpcService;
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  *
@@ -39,12 +33,13 @@ import cn.restoplus.rpc.server.RpcService;
 @RpcService
 public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, String> implements ChargeOrderService {
 
-  
+
     @Resource
     private ChargeSettingMapper chargeSettingMapper;
 
 	@Resource
 	private ChargeOrderMapper chargeorderMapper;
+
 	@Resource
 	private ChargePaymentService chargePaymentService;
 
@@ -56,6 +51,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     OrderPaymentItemService orderPaymentItemService;
 	@Resource
 	BrandService brandService;
+
+	@Resource
+	ChargeOrderMapper chargeOrderMapper;
+
 
 	@Override
 	public GenericDao<ChargeOrder, String> getDao() {
@@ -79,7 +78,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		chargeOrder.setType(1);
 		chargeorderMapper.insert(chargeOrder);
 		return chargeOrder;
-	} 
+	}
 
 	@Override
 	public void chargeorderWxPaySuccess(ChargePayment cp) {
@@ -116,7 +115,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public void useChargePay(BigDecimal remainPay,String customerId,Order order) {
 		BigDecimal[] result = new BigDecimal[]{BigDecimal.ZERO,BigDecimal.ZERO};
 		useBalance(result,remainPay,customerId,order);
-		
+
 	}
 
 	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order) {
@@ -137,7 +136,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayValue(useCharge);
 				item.setRemark("充值余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
-				orderPaymentItemService.insert(item); 
+				orderPaymentItemService.insert(item);
 			}
 			if(useReward.compareTo(BigDecimal.ZERO)>0){
 				OrderPaymentItem item = new OrderPaymentItem();
@@ -148,7 +147,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayValue(useReward);
 				item.setRemark("赠送余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
-				orderPaymentItemService.insert(item); 
+				orderPaymentItemService.insert(item);
 			}
 			if(remindPay.compareTo(totalPay)>0){
 				remindPay = remindPay.subtract(totalPay).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -201,10 +200,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
     @Override
     public List<ChargeOrder> selectByDateAndShopId(String beginDate, String endDate, String shopId) {
-        
+
        Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
         Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
-        
+
         return chargeorderMapper.selectByDateAndShopId(begin,end,shopId);
     }
 
@@ -216,6 +215,56 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
         return chargeorderMapper.selectByDateAndBrandId(begin,end,brandId);
     }
+
+    /**
+	 *
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 *
+	 */
+	@Override
+	public List<ChargeOrder> shopChargeCodes(String shopDetailId, Date beginDate, Date endDate) {
+		return chargeorderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
+	}
+
+	/**
+	 * 下载报表
+	 * @param shopDetailId
+	 * @param beginDate
+	 * @param endDate
+	 * @param
+	 * @return
+	 */
+
+
+	@Override
+	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+		Date end = DateUtil.getformatEndDate(endDate);
+		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,begin,end);
+		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
+		if(chargeList!=null&&chargeList.size()>0){
+	    for (ChargeOrder charge:chargeList) {
+		   ShopDetailDto ShopDetailDto=new ShopDetailDto(
+		   		   shopname
+				   ,null==charge.getChargeMoney()?BigDecimal.ZERO:charge.getChargeMoney()
+				   ,null==charge.getRewardMoney()?BigDecimal.ZERO:charge.getRewardMoney()
+				   ,null==charge.getFinishTime()?new Date():charge.getFinishTime()
+				   ,charge.getType()
+				   ,charge.getChargelog().getOperationPhone()
+				   ,charge.getChargelog().getCustomerPhone()
+		           );
+		   //	ShopDetailDto ShopDetailDto=new ShopDetailDto("ss",new BigDecimal(10),new BigDecimal(10),new Date(),1,"122333344","222");
+		   ShopDetailDtoList.add(ShopDetailDto);
+	   }
+
+     }
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("shopDetailMap", ShopDetailDtoList);
+		return map;
+	}
 
 	public void wxPush(ChargeOrder chargeOrder){
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
@@ -230,5 +279,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+	}
+	
+	@Override
+	public List<Map<String, Object>> selectByShopToDay(String shopId) {
+		return chargeorderMapper.selectByShopToDay(shopId);
 	}
 }

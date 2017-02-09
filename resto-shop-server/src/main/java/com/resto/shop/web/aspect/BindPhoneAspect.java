@@ -59,6 +59,9 @@ public class BindPhoneAspect {
 		Integer couponType = (Integer) pj.getArgs()[2];
         String shopId = (String) pj.getArgs()[3];
 		String shareCustomer = (String) pj.getArgs()[4];
+		if(customerId.equals(shareCustomer)){
+			shareCustomer = null;
+		}
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
@@ -85,9 +88,14 @@ public class BindPhoneAspect {
 					sum = sum.add(coupon.getValue());
 				}
 				StringBuffer msg = new StringBuffer("亲，感谢您的分享，您的好友");
-				msg.append(cus.getNickname()).append("已领取").append(sum).append("元红包，")
-						.append(cus.getNickname()).append("如到店消费您将获得").append(shareSetting.getMinMoney())
-						.append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
+				if(shareSetting == null){
+					msg.append(cus.getNickname()).append("已领取").append(sum).append("元红包，")
+							.append(cus.getNickname()).append("如到店消费您将获得红包返利");
+				}else{
+					msg.append(cus.getNickname()).append("已领取").append(sum).append("元红包，")
+							.append(cus.getNickname()).append("如到店消费您将获得").append(shareSetting.getMinMoney())
+							.append("-").append(shareSetting.getMaxMoney()).append("元红包返利");
+				}
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
 				log.info("异步发送分享注册微信通知ID:" + shareCustomer + " 内容:" + msg);
 				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());

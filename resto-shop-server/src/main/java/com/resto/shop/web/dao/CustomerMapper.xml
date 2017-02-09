@@ -22,6 +22,7 @@
     <result column="last_order_shop" property="lastOrderShop" jdbcType="VARCHAR" />
     <result column="new_notice_time" property="newNoticeTime" jdbcType="TIMESTAMP" />
     <result column="share_customer" property="shareCustomer" jdbcType="VARCHAR" />
+    <result column="register_shop_id" property="registerShopId" jdbcType="VARCHAR" />
     <result column="is_now_register" property="isNowRegister" />
     <result column="customer_detail_id" property="customerDetailId" />
   </resultMap>
@@ -319,12 +320,12 @@
 
   <select id="selectBrandUser" resultType="java.lang.String">
     select CONCAT_WS(',',(select count(1) from tb_customer),(select count(1) from tb_customer where is_bind_phone=1)
-	,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
-	,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
-	,(select count(1) from tb_customer where id in (select customer_id from tb_order where order_state in (2,10,11,12,13) 
-	and production_status in (2,3) GROUP BY customer_id having count(id) > 2))
-	,(select count(1) from tb_customer where id in (select customer_id from tb_order
-	where order_state in (2,10,11,12,13) and production_status in (2,3) group by customer_id))) count
+    ,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
+    ,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
+    ,(select count(1) from tb_customer where id in (select customer_id from tb_order where order_state in (2,10,11,12,13)
+    and production_status in (2,3) GROUP BY customer_id having count(id) > 2))
+    ,(select count(1) from tb_customer where id in (select customer_id from tb_order
+    where order_state in (2,10,11,12,13) and production_status in (2,3) group by customer_id))) count
   </select>
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
@@ -402,6 +403,20 @@
 	</select>
 
     <select id="selectByShareCustomer" resultType="java.lang.Integer">
-      select count(1) from tb_customer t where t.share_customer = #{id}
+        SELECT
+            count(r.customer_id)
+        FROM
+            (
+                SELECT
+                    customer_id
+                FROM
+                    tb_customer t
+                LEFT JOIN tb_order t1 ON t.id = t1.customer_id
+                WHERE
+                    t.share_customer = #{id}
+                AND t1.order_state IN (2, 10, 11, 12)
+                GROUP BY
+                    t1.customer_id
+            ) r;
     </select>
 </mapper>

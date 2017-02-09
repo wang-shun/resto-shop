@@ -1,8 +1,10 @@
 package com.resto.shop.web.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewCustomCoupon;
 
@@ -10,7 +12,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
 
     int insertNewCustomCoupon(NewCustomCoupon newCustomCoupon);
 
-    List<NewCustomCoupon> selectListByBrandId(String currentBrandId);
+    List<NewCustomCoupon> selectListByBrandId(String currentBrandId,String shopId);
 
 	void giftCoupon(Customer cus,Integer couponType,String shopId);
 
@@ -26,4 +28,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
      * @return
      */
     List<NewCustomCoupon> selectListShopId(String currentShopId);
+    
+    
+    void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail);
 }

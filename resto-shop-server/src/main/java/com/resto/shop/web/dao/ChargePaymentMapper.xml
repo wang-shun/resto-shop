@@ -65,4 +65,109 @@
 		where 
 		 <![CDATA[ cp.create_time>#{begin} AND cp.create_time<#{end}]]>
 		  </select>
+		  
+	<!-- 所有品牌充值记录 -->
+	<select id="selectRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
+		SELECT
+			COUNT(id) AS rechargeCount,
+			SUM(charge_money) AS rechargeNum,
+			SUM(reward_money) AS rechargeGaNum,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 1
+				AND
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND brand_id = #{brandId}
+			) AS rechargeWeChat,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 0
+				AND
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND brand_id = #{brandId}
+			) AS rechargePos,
+			SUM(charge_money) - SUM(charge_balance) AS rechargeCsNum,
+		
+			IF (
+				number_day_now > 0,
+				SUM(
+					reward_money - (number_day_now - 1) * arrival_amount + end_amount
+				),
+				SUM(
+					reward_money - reward_balance
+				)
+			) AS rechargeGaCsNum,
+			 SUM(charge_balance) AS rechargeSpNum,
+			 SUM(reward_balance) AS rechargeGaSpNum
+			 FROM
+				tb_charge_order
+			 WHERE
+				order_state = 1
+			 AND
+			 <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+			 AND brand_id = #{brandId}
+			 GROUP BY
+				brand_id = #{brandId}
+	</select>
+	
+	<!-- 得到品牌下所有店铺的充值记录 -->
+	<select id="selectShopRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
+		SELECT COUNT(1) AS shopCount,
+			SUM(charge_money) AS shopNum,
+			SUM(reward_money) AS shopGaNum,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 1
+				AND 
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND shop_detail_id = #{shopId}
+			) AS shopWeChat,
+			(
+				SELECT
+					SUM(charge_money)
+				FROM
+					tb_charge_order
+				WHERE
+					order_state = 1
+				AND type = 0
+				AND 
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND shop_detail_id = #{shopId}
+			) AS shopPos,
+			SUM(charge_money)-SUM(charge_balance) AS shopCsNum,
+			IF (
+				number_day_now > 0,
+				SUM(
+					reward_money - (number_day_now - 1) * arrival_amount + end_amount
+				),
+				SUM(
+					reward_money - reward_balance
+				)
+			) AS shopGaCsNum
+			FROM 
+					tb_charge_order 
+			WHERE
+				order_state = 1
+			AND 
+				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+				AND shop_detail_id = #{shopId} 
+		GROUP BY
+				shop_detail_id = #{shopId} 
+	</select>
+		  
 </mapper>

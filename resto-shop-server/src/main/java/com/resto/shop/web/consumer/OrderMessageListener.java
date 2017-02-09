@@ -7,8 +7,10 @@ import com.aliyun.openservices.ons.api.ConsumeContext;
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -22,13 +24,18 @@ import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class OrderMessageListener implements MessageListener {
@@ -41,7 +48,10 @@ public class OrderMessageListener implements MessageListener {
     WechatConfigService wechatConfigService;
     @Resource
     BrandSettingService brandSettingService;
-
+    
+    @Resource
+    BrandService brandService;
+    
     @Resource
     CustomerService customerService;
 
@@ -55,9 +65,13 @@ public class OrderMessageListener implements MessageListener {
     OrderItemService orderItemService;
     @Resource
     ShopDetailService shopDetailService;
+
+    @Resource
+    NewCustomCouponService newcustomcouponService;
     @Resource
     LogBaseService logBaseService;
-
+    @Value("#{propertyConfigurer['orderMsg']}")
+    public static String orderMsg;
     @Override
     public Action consume(Message message, ConsumeContext context) {
         Logger log = LoggerFactory.getLogger(getClass());
@@ -92,6 +106,8 @@ public class OrderMessageListener implements MessageListener {
             return executeSendCallMessage(message);
         }else if (tag.equals(MQSetting.TAG_REMIND_MSG)){
         	return executeRemindMsg(message);
+        }else if (tag.equals(MQSetting.TAG_AUTO_SEND_REMMEND)){
+        	return executeRecommendMsg(message);
         }
         return Action.CommitMessage;
     }
@@ -117,6 +133,38 @@ public class OrderMessageListener implements MessageListener {
         return Action.CommitMessage;
     }
     
+    
+    //优惠券过期提前推送消息队列
+    private Action executeRecommendMsg(Message message) throws UnsupportedEncodingException {
+    	String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+    	JSONObject obj = JSONObject.parseObject(msg);
+    	Customer customer = customerService.selectById(obj.getString("id"));
+    	WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+        String pr = obj.getString("pr");
+        String shopName = obj.getString("shopName");
+        String name = obj.getString("name");
+        String pushDay = obj.getInteger("pushDay")+"";
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+    	StringBuffer str=new StringBuffer();
+        String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
+        str.append("优惠券到期提醒"+"\n");
+        str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
+        WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+        sendNote(shopName,pr,name,pushDay,customer.getId());
+        return Action.CommitMessage;
+    }
+    
+  //发送短信
+    private void sendNote(String shop,String price,String name,String pushDay,String customerId){
+        Customer customer=customerService.selectById(customerId);
+    	Map param = new HashMap();
+        param.put("shop", shop);
+		param.put("price", price);
+		param.put("name", name);
+		param.put("day", pushDay);
+        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
+    }
 
     private void noticeShareCustomer(Customer customer) {
         Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
@@ -226,12 +274,27 @@ public class OrderMessageListener implements MessageListener {
     }
 
     private void sendShareMsg(Appraise appraise) {
-        StringBuffer msg = new StringBuffer("感谢您的评价 ，分享好友\n");
+        StringBuffer msg = new StringBuffer("感谢您的评论，将");
         BrandSetting setting = brandSettingService.selectByBrandId(appraise.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(appraise.getBrandId());
         Customer customer = customerService.selectById(appraise.getCustomerId());
+        ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
         log.info("分享人:" + customer.getNickname());
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>再次领取红包</a>");
+        List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, appraise.getShopDetailId());
+        BigDecimal money = new BigDecimal("0.00");
+        for(NewCustomCoupon coupon : coupons){
+            money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
+        }
+        if(money.doubleValue() == 0.00 && shareSetting == null){
+            msg.append("红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得红包返利\n");
+        }else if(money.doubleValue() == 0.00){
+            msg.append(money+"元红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得红包返利\n");
+        }else if(shareSetting == null){
+            msg.append("红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+        }else{
+            msg.append(money +"元红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+        }
+        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>立即分享红包</a>");
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
         ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());

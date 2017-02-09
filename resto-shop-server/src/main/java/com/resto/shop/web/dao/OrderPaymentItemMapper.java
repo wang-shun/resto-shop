@@ -71,12 +71,9 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     /**
      * 品牌收入报表查询
      * 2016-10-29
-     * @param begin
-     * @param end
-     * @param brandId
      * @return
      */
-    List<OrderPaymentItem> selectShopIncomeList(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+    List<Map<String, Object>> selectShopIncomeList(Map<String, Object> map);
 
     /**
      * pos端店铺收入报表查询
@@ -103,4 +100,10 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
      * @return
      */
     OrderPaymentItem selectByOrderIdAndResultData(String orderId);
+    
+    List<OrderPaymentItem> selectOrderPayMentItem(Map<String, String> map);
+    
+    List<OrderPaymentItem> selectPaymentCountByOrderId(@Param("orderId") String orderId);
+    
+    OrderPaymentItem selectPayMentSumByrefundOrder(@Param("orderId") String orderId);
 }

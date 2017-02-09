@@ -46,7 +46,6 @@
                  shopDetail.setTimeOut(Integer.MAX_VALUE);
                  break;
          }
-
          shopDetailService.update(shopDetail);
          return Result.getSuccess();
      }

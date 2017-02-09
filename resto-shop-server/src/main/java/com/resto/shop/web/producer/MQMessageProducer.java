@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,20 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(calendar.getTime().getTime());
 		sendMessageASync(message);
 	}
+	
+	public static void autoSendRemmend(final String brandId,Calendar calendar, final String customerId,final String pr,final String name,final Integer pushDay, final String shopName){
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("shopName", shopName);
+		obj.put("id",customerId);
+		obj.put("pr", pr);
+		obj.put("name", name);
+		obj.put("pushDay", pushDay);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_SEND_REMMEND, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(calendar.getTime().getTime());
+		sendMessageASync(message);
+	}
+	
 
 	public static void sendCallMessage(final String brandId,final String orderId,final String customerId){
 		JSONObject obj = new JSONObject();

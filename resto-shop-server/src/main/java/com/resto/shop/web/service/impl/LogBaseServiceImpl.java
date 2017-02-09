@@ -96,6 +96,8 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
             buyScanPayLog(shopDetail, customer, order);
         }else if(type == LogBaseState.BUY_ADD){
             buyAddLog(shopDetail, customer, order);
+        }else if(type == LogBaseState.NOT_PAYMENT_ORDER){
+            notPaymentOrderLog(shopDetail, customer, order);
         }
     }
 
@@ -256,7 +258,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void appraiseLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"评价了一份订单");
+        logBase.setRemark(customer.getNickname()+"评论了一份订单");
         logBase.setDesc("评论的AppraiseId为："+desc);
         insert(logBase);
     }
@@ -265,7 +267,7 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
     public void shareLog(ShopDetail shopDetail, Customer customer, String desc){
         LogBase logBase = new LogBase();
         GeneralRecord(logBase, shopDetail, customer);
-        logBase.setRemark(customer.getNickname()+"收到了评价分享的推送");
+        logBase.setRemark(customer.getNickname()+"收到了评论分享的推送");
         logBase.setDesc("AppraiseId为："+desc+" 的评论已推送");
         insert(logBase);
     }
@@ -330,6 +332,15 @@ public class LogBaseServiceImpl extends GenericServiceImpl<LogBase, String> impl
         GeneralRecord(logBase, shopDetail, customer);
         logBase.setRemark(customer.getNickname()+"的订单微信支付完成");
         logBase.setDesc(desc);
+        insert(logBase);
+    }
+
+    //用户未支付该订单时记录log
+    public void  notPaymentOrderLog(ShopDetail shopDetail, Customer customer, Order order){
+        LogBase logBase = new LogBase();
+        GeneralRecord(logBase, shopDetail, customer);
+        logBase.setRemark(customer.getNickname()+"未支付该订单");
+        logBase.setDesc(order.getId());
         insert(logBase);
     }
 

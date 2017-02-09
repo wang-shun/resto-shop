@@ -13,7 +13,7 @@
     <result column="notice_type" property="noticeType" jdbcType="TINYINT"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, title, content, create_date, sort, status, notice_image, notice_type, shop_detail_id</sql>
+  <sql id="Base_Column_List">id, title, content, create_date, sort, status, notice_image, notice_type, shop_detail_id,show_times</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_notice where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -29,7 +29,8 @@
       <if test="status != null">status,</if>  
       <if test="noticeImage != null">notice_image,</if>  
       <if test="noticeType != null">notice_type,</if>  
-      <if test="shopDetailId != null">shop_detail_id,</if> 
+      <if test="shopDetailId != null">shop_detail_id,</if>
+      <if test="showTimes != null">show_times,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -40,7 +41,8 @@
       <if test="status != null">#{status,jdbcType=TINYINT},</if>  
       <if test="noticeImage != null">#{noticeImage,jdbcType=VARCHAR},</if>  
       <if test="noticeType != null">#{noticeType,jdbcType=TINYINT},</if>  
-      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
+      <if test="showTimes != null">#{showTimes},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Notice">update tb_notice 
@@ -52,7 +54,8 @@
       <if test="status != null">status = #{status,jdbcType=TINYINT},</if>  
       <if test="noticeImage != null">notice_image = #{noticeImage,jdbcType=VARCHAR},</if>  
       <if test="noticeType != null">notice_type = #{noticeType,jdbcType=TINYINT},</if>  
-      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>
+      <if test="showTimes != null">show_times = #{showTimes},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Notice">update tb_notice set title = #{title,jdbcType=VARCHAR}, content = #{content,jdbcType=VARCHAR}, create_date = #{createDate,jdbcType=TIMESTAMP}, sort = #{sort,jdbcType=INTEGER}, status = #{status,jdbcType=TINYINT}, notice_image = #{noticeImage,jdbcType=VARCHAR}, notice_type = #{noticeType,jdbcType=TINYINT}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
@@ -63,7 +66,7 @@
   <!-- 根据店铺ID查询信息 -->
   <select id="selectListByShopId" resultType="Notice">
   	select *,
-  	CASE WHEN id IN (SELECT id FROM tb_notice WHERE id IN (SELECT notice_id FROM tb_customer_notice_history WHERE customer_id=#{customerId})) THEN 1 ELSE 0 END  is_read
+    CASE WHEN show_times  >  (SELECT count(1) FROM tb_customer_notice_history WHERE customer_id= #{customerId} and notice_id = tb_notice.id) THEN 0 ELSE 1 END  is_read
   	 from tb_notice
 	where shop_detail_id = #{shopId}
 	<if test="noticeType!=null and noticeType!=''">
@@ -80,4 +83,18 @@
   <update id="addNoticeHistory">
   	insert into tb_customer_notice_history (customer_id,notice_id)values(#{0},#{1})
   </update>
+
+  <delete id="clearSupportTime">
+    delete from tb_notice_support_time where notice_id = #{noticeId}
+  </delete>
+
+  <insert id="insertSupportTime">
+    insert into tb_notice_support_time
+    (notice_id,support_time_id) values(#{noticeId},#{time})
+  </insert>
+
+
+  <select id="getSupportTime" resultType="Integer">
+    select  support_time_id from tb_notice_support_time where notice_id=#{noticeId}
+  </select>
 </mapper>
