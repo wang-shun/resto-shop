@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
