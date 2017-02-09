@@ -28,8 +28,7 @@
 		<property name="locations">
 			<list>
 				<value>file:${resources.config.path}/shop-rpc.properties</value>
-				<value>classpath*:rpc.properties</value>
-				<!--<value>classpath:config.properties</value>-->
+				<value>file:${resources.config.path}/shop.properties</value>
 			</list>
 		</property>
 	</bean>
