@@ -149,7 +149,7 @@
 
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label">红包到期提醒时间：</label>
+							<label class="col-sm-3 control-label">优惠券到期提醒时间：</label>
 							<div class="col-sm-9">
 								<input type="number" class="form-control"
 									   name="recommendTime" placeholder="(输入整数)"
