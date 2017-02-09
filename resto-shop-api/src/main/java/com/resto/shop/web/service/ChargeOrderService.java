@@ -37,10 +37,10 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	void useChargePay(BigDecimal remainPay, String customerId, Order order);
 
 
-	void refundCharge(BigDecimal payValue, String id);
+	void refundCharge(BigDecimal payValue, String id,String shopDetailId);
 
 
-	void refundReward(BigDecimal payValue, String id);
+	void refundReward(BigDecimal payValue, String id,String shopDetailId);
 
     /**
      * 查询店铺某个时间段的充值记录

@@ -89,8 +89,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			BigDecimal chargeMoney = chargeOrder.getChargeMoney();
 			BigDecimal reward = chargeOrder.getRewardMoney();
 			// 开始充值余额
-			accountService.addAccount(chargeMoney, customer.getAccountId(), "自助充值",AccountLog.SOURCE_CHARGE);
-			accountService.addAccount(chargeOrder.getArrivalAmount(), customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+			accountService.addAccount(chargeMoney, customer.getAccountId(), "自助充值",AccountLog.SOURCE_CHARGE,cp.getShopDetailId());
+			accountService.addAccount(chargeOrder.getArrivalAmount(), customer.getAccountId(), "充值赠送",AccountLog.SOURCE_CHARGE_REWARD,cp.getShopDetailId());
 			// 添加充值记录
 			chargeOrder.setOrderState((byte) 1);
 			chargeOrder.setFinishTime(new Date());
@@ -179,22 +179,22 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	}
 
 	@Override
-	public void refundCharge(BigDecimal payValue, String id) {
+	public void refundCharge(BigDecimal payValue, String id,String shopDetailId) {
 		ChargeOrder chargeOrder= selectById(id);
 		if(chargeOrder!=null){
 			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 			chargeorderMapper.refundCharge(payValue,id);
-			accountService.addAccount(payValue, customer.getAccountId(), "退还充值金额", AccountLog.CHARGE_PAY_REFUND);
+			accountService.addAccount(payValue, customer.getAccountId(), "退还充值金额", AccountLog.CHARGE_PAY_REFUND,shopDetailId);
 		}
 	}
 
 	@Override
-	public void refundReward(BigDecimal payValue, String id) {
+	public void refundReward(BigDecimal payValue, String id,String shopDetailId) {
 		ChargeOrder chargeOrder= selectById(id);
 		if(chargeOrder!=null){
 			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 			chargeorderMapper.refundReward(payValue,id);
-			accountService.addAccount(payValue, customer.getAccountId(), "退还充值赠送金额", AccountLog.REWARD_PAY_REFUND);
+			accountService.addAccount(payValue, customer.getAccountId(), "退还充值赠送金额", AccountLog.REWARD_PAY_REFUND,shopDetailId);
 		}
 	}
 

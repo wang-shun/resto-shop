@@ -138,7 +138,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.SOURCE_RED_PACKAGE);
+			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.SOURCE_RED_PACKAGE,order.getShopDetailId());
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 		}
 		return money;

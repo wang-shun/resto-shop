@@ -155,7 +155,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		}else if(rewardMoney.compareTo(shareSetting.getMaxMoney())>0){
 			rewardMoney = shareSetting.getMaxMoney();
 		}
-		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD);
+		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD,customer.getRegisterShopId());
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 		return rewardMoney;
 	}

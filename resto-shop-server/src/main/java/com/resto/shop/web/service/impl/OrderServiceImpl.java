@@ -1054,15 +1054,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ACCOUNT_PAY:
-                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER,order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(),order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(),order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.WEIXIN_PAY:
@@ -1108,7 +1108,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Customer customer = customerService.selectById(order.getCustomerId());
 
                     if(item.getPayValue().doubleValue() < 0){
-                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
+                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1,order.getShopDetailId());
                     }
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
@@ -5657,7 +5657,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
                             }
 
                         }
@@ -5692,7 +5692,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
                             }
 
                         }
@@ -5712,7 +5712,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             back.setResultData("总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
-            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
         }
 
 
