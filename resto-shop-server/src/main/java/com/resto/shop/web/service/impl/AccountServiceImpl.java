@@ -162,15 +162,15 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
-//			OrderPaymentItem item = new OrderPaymentItem();
-//			item.setId(ApplicationUtils.randomUUID());
-//			item.setOrderId(order.getId());
-//			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
-//			item.setPayTime(new Date());
-//			item.setPayValue(redPay);
-//			item.setRemark("余额(红包)支付:" + item.getPayValue());
-//			item.setResultData(account.getId());
-//			orderPaymentItemService.insert(item);
+			OrderPaymentItem item = new OrderPaymentItem();
+			item.setId(ApplicationUtils.randomUUID());
+			item.setOrderId(order.getId());
+			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
+			item.setPayTime(new Date());
+			item.setPayValue(redPay);
+			item.setRemark("余额(红包)支付:" + item.getPayValue());
+			item.setResultData(account.getId());
+			orderPaymentItemService.insert(item);
 		}
 		return realPay;
 	}
@@ -197,15 +197,15 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
-//			OrderPaymentItem item = new OrderPaymentItem();
-//			item.setId(ApplicationUtils.randomUUID());
-//			item.setOrderId(order.getId());
-//			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
-//			item.setPayTime(new Date());
-//			item.setPayValue(redPay);
-//			item.setRemark("余额(红包)支付:" + item.getPayValue());
-//			item.setResultData(account.getId());
-//			orderPaymentItemService.insert(item);
+			OrderPaymentItem item = new OrderPaymentItem();
+			item.setId(ApplicationUtils.randomUUID());
+			item.setOrderId(order.getId());
+			item.setPaymentModeId(PayMode.ACCOUNT_PAY);
+			item.setPayTime(new Date());
+			item.setPayValue(redPay);
+			item.setRemark("余额(红包)支付:" + item.getPayValue());
+			item.setResultData(account.getId());
+			orderPaymentItemService.insert(item);
 		}
 		return realPay;
 	}
