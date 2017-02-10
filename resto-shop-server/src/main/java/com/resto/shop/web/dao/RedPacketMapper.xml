@@ -69,7 +69,7 @@
       where id = #{id,jdbcType=VARCHAR}
   </update>
 
-  <select id="selectList" resultType="BaseResultMap">
+  <select id="selectList" resultMap="BaseResultMap">
       select * from tb_red_packet
   </select>
 
