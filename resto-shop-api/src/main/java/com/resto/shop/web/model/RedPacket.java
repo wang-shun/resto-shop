@@ -1,0 +1,89 @@
+package com.resto.shop.web.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class RedPacket {
+
+    private String id;
+    private BigDecimal redMoney;
+    private Date createTime;
+    private Date finishTime;
+    private String customerId;
+    private String brandId;
+    private String shopDetailId;
+    private String redRemainderMoney;
+    private Integer redType;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public BigDecimal getRedMoney() {
+        return redMoney;
+    }
+
+    public void setRedMoney(BigDecimal redMoney) {
+        this.redMoney = redMoney;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
+    public String getRedRemainderMoney() {
+        return redRemainderMoney;
+    }
+
+    public void setRedRemainderMoney(String redRemainderMoney) {
+        this.redRemainderMoney = redRemainderMoney;
+    }
+
+    public Integer getRedType() {
+        return redType;
+    }
+
+    public void setRedType(Integer redType) {
+        this.redType = redType;
+    }
+}
