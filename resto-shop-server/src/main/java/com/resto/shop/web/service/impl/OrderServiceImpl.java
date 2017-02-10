@@ -5660,7 +5660,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
                                 RedPacket redPacket = new RedPacket();
                                 redPacket.setId(ApplicationUtils.randomUUID());
                                 redPacket.setRedMoney(backMoney);
@@ -5705,7 +5705,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
                                 RedPacket redPacket = new RedPacket();
                                 redPacket.setId(ApplicationUtils.randomUUID());
                                 redPacket.setRedMoney(backMoney);
@@ -5735,7 +5735,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             back.setResultData("总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
-            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
             RedPacket redPacket = new RedPacket();
             redPacket.setId(ApplicationUtils.randomUUID());
             redPacket.setRedMoney(order.getRefundMoney());

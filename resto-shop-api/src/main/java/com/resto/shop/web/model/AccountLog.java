@@ -5,13 +5,14 @@ import java.util.Date;
 
 public class AccountLog {
 	public static final Integer SOURCE_PAYMENT = -1;  //支付订 单
-	public static final Integer SOURCE_RED_PACKAGE=1; //红包奖励余额
+	public static final Integer APPRAISE_RED_PACKAGE=1; //评论红包奖励余额
 	public static final Integer SOURCE_CHARGE=2;	  //充值余额
 	public static final Integer SOURCE_CHARGE_REWARD=3; //充值赠送余额
 	public static final Integer SOURCE_SHARE_REWARD=4;  //分享返利余额
 	public static final Integer SOURCE_CANCEL_ORDER = 5; //取消订单返还余额
 	public static final Integer CHARGE_PAY_REFUND = 6;  //取消订单返回充值的金额
 	public static final Integer REWARD_PAY_REFUND = 7;  //取消订单返回充值赠送的金额
+    public static final Integer REFUND_ARTICLE_RED_PACKAGE = 7;  //退菜红包返回余额
 	
     private String id;
 
