@@ -52,6 +52,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private OrderItemMapper orderitemMapper;
 
+    @Resource
+    private RedPacketService redPacketService;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Resource
@@ -5658,6 +5661,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
                                 accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+                                RedPacket redPacket = new RedPacket();
+                                redPacket.setId(ApplicationUtils.randomUUID());
+                                redPacket.setRedMoney(backMoney);
+                                redPacket.setCreateTime(new Date());
+                                redPacket.setCustomerId(customer.getId());
+                                redPacket.setBrandId(order.getBrandId());
+                                redPacket.setShopDetailId(order.getShopDetailId());
+                                redPacket.setRedRemainderMoney(backMoney);
+                                redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacketService.insert(redPacket);
                             }
 
                         }
@@ -5693,6 +5706,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
                                 accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+                                RedPacket redPacket = new RedPacket();
+                                redPacket.setId(ApplicationUtils.randomUUID());
+                                redPacket.setRedMoney(backMoney);
+                                redPacket.setCreateTime(new Date());
+                                redPacket.setCustomerId(customer.getId());
+                                redPacket.setBrandId(order.getBrandId());
+                                redPacket.setShopDetailId(order.getShopDetailId());
+                                redPacket.setRedRemainderMoney(backMoney);
+                                redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacketService.insert(redPacket);
                             }
 
                         }
@@ -5713,6 +5736,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             back.setResultData("总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
             accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY,order.getShopDetailId());
+            RedPacket redPacket = new RedPacket();
+            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setRedMoney(order.getRefundMoney());
+            redPacket.setCreateTime(new Date());
+            redPacket.setCustomerId(customer.getId());
+            redPacket.setBrandId(order.getBrandId());
+            redPacket.setShopDetailId(order.getShopDetailId());
+            redPacket.setRedRemainderMoney(order.getRefundMoney());
+            redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacketService.insert(redPacket);
         }
 
 

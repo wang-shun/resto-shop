@@ -73,4 +73,7 @@
       select * from tb_red_packet
   </select>
 
+    <select id="selectFirstRedPacket" resultType="com.resto.shop.web.model.RedPacket">
+        select * from tb_red_packet where customer_id = #{customerId} and red_remainder_money > 0 ORDER BY create_time asc LIMIT 0,1
+    </select>
 </mapper>

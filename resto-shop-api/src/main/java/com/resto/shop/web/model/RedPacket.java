@@ -12,7 +12,7 @@ public class RedPacket {
     private String customerId;
     private String brandId;
     private String shopDetailId;
-    private String redRemainderMoney;
+    private BigDecimal redRemainderMoney;
     private Integer redType;
 
     public String getId() {
@@ -71,11 +71,11 @@ public class RedPacket {
         this.shopDetailId = shopDetailId;
     }
 
-    public String getRedRemainderMoney() {
+    public BigDecimal getRedRemainderMoney() {
         return redRemainderMoney;
     }
 
-    public void setRedRemainderMoney(String redRemainderMoney) {
+    public void setRedRemainderMoney(BigDecimal redRemainderMoney) {
         this.redRemainderMoney = redRemainderMoney;
     }
 

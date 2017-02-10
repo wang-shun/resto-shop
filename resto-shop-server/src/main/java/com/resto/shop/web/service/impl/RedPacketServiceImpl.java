@@ -4,10 +4,12 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.RedPacketMapper;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.RedPacket;
 import com.resto.shop.web.service.RedPacketService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 /**
  *
@@ -23,4 +25,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
         return redPacketMapper;
     }
 
+    @Override
+    public void userRedPacketPay(BigDecimal redPay, String customerId, Order order) {
+
+    }
 }

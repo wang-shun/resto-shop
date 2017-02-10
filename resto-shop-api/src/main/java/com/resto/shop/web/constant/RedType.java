@@ -6,15 +6,15 @@ import java.util.Map;
 public class RedType {
 
     //评论红包
-    private static final int APPRAISE_RED = 0;
+    public static final int APPRAISE_RED = 0;
 
     //分享返利红包
-    private static final int SHARE_RED = 1;
+    public static final int SHARE_RED = 1;
 
     //退菜红包
-    private static final int REFUND_ARTICLE_RED = 2;
+    public static final int REFUND_ARTICLE_RED = 2;
 
-    private static final Map<Integer, String> GETREDTYPE = new HashMap<Integer, String>(){
+    public static final Map<Integer, String> GETREDTYPE = new HashMap<Integer, String>(){
         {
             put(APPRAISE_RED,"评论红包");
             put(SHARE_RED,"分享返利红包");

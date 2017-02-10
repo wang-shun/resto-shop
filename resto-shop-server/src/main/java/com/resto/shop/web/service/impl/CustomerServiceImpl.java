@@ -13,16 +13,15 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.brand.web.model.ShareSetting;
+import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.Account;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.CustomerService;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.shop.web.service.RedPacketService;
 
 /**
  *
@@ -34,6 +33,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     private CustomerMapper customerMapper;
     @Resource
     private AccountService accountService;
+    @Resource
+    private RedPacketService redPacketService;
 
     @Override
     public GenericDao<Customer, String> getDao() {
@@ -156,6 +157,16 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			rewardMoney = shareSetting.getMaxMoney();
 		}
 		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD,customer.getRegisterShopId());
+        RedPacket redPacket = new RedPacket();
+        redPacket.setId(ApplicationUtils.randomUUID());
+        redPacket.setRedMoney(rewardMoney);
+        redPacket.setCreateTime(new Date());
+        redPacket.setCustomerId(shareCustomer.getId());
+        redPacket.setBrandId(customer.getBrandId());
+        redPacket.setShopDetailId(customer.getRegisterShopId());
+        redPacket.setRedRemainderMoney(rewardMoney);
+        redPacket.setRedType(RedType.SHARE_RED);
+        redPacketService.insert(redPacket);
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 		return rewardMoney;
 	}

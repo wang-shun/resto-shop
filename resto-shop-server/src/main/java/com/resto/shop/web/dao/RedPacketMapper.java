@@ -10,4 +10,5 @@ import java.util.Map;
 
 public interface RedPacketMapper extends GenericDao<RedPacket,String> {
 
+    RedPacket selectFirstRedPacket(@Param("customerId") String customerId);
 }
