@@ -69,6 +69,10 @@ public class Customer implements Serializable{
     private CustomerDetail customerDetail;
     private String customerDetailId;
 
+    private Date bindPhoneTime;
+
+    private String bindPhoneShop;
+
     public Integer getIsShare() {
         return isShare;
     }
@@ -283,6 +287,22 @@ public class Customer implements Serializable{
 
     public void setRegisterShopId(String registerShopId) {
         this.registerShopId = registerShopId;
+    }
+
+    public Date getBindPhoneTime() {
+        return bindPhoneTime;
+    }
+
+    public void setBindPhoneTime(Date bindPhoneTime) {
+        this.bindPhoneTime = bindPhoneTime;
+    }
+
+    public String getBindPhoneShop() {
+        return bindPhoneShop;
+    }
+
+    public void setBindPhoneShop(String bindPhoneShop) {
+        this.bindPhoneShop = bindPhoneShop;
     }
 
     @Override
