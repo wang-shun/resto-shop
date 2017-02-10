@@ -25,13 +25,7 @@ import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.AccountLogService;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.ChargeLogService;
-import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargeSettingService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -67,6 +61,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     
     @Resource
     BrandService brandService;
+
+    @Resource
+    RedPacketService redPacketService;
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -162,6 +159,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
@@ -197,6 +195,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
