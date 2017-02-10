@@ -15,5 +15,5 @@ public interface RedPacketService extends GenericService<RedPacket, String> {
      * @param customerId
      * @param order
      */
-    void userRedPacketPay(BigDecimal redPay, String customerId, Order order);
+    void useRedPacketPay(BigDecimal redPay, String customerId, Order order);
 }

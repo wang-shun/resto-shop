@@ -26,7 +26,15 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     }
 
     @Override
-    public void userRedPacketPay(BigDecimal redPay, String customerId, Order order) {
+    public void useRedPacketPay(BigDecimal redPay, String customerId, Order order) {
+        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包
+        Integer[] redType = {0,1,2};
+        for(Integer type : redType){
+            useRedPacket(type,redPay,customerId,order);
+        }
+    }
+
+    private void useRedPacket(Integer redType, BigDecimal redPay, String customerId, Order order){
 
     }
 }
