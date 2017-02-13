@@ -224,7 +224,7 @@
             searchInfo : function() {
                 var that = this;
                 try{
-                    $.post("brandMarketing/selectRedList",that.getData(),function(result){
+                    $.post("brandMarketing/selectRedList",that.getDate(),function(result){
                         if (result.success){
                             //清空表格
                             that.shopRedInfoTable.clear().draw();
