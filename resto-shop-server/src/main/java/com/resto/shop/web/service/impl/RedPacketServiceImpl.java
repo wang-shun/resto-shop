@@ -4,6 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
@@ -16,6 +17,8 @@ import com.resto.shop.web.service.RedPacketService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @RpcService
 public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> implements RedPacketService {
@@ -91,5 +94,10 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             orderPaymentItemService.insert(item);
         }
         return true;
+    }
+
+    @Override
+    public List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap) {
+        return redPacketMapper.selectRedPacketLog(selectMap);
     }
 }
