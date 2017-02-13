@@ -83,8 +83,8 @@
 
     <select id="selectRedPacketLog" resultType="com.resto.brand.web.dto.RedPacketDto">
         select
-        COUNT(1) redCount,SUM(red_money) redMoney,trp.shop_detail_id shopDetailId,
-        (select COUNT(1)
+        IFNULL(COUNT(1),0) redCount,IFNULL(SUM(red_money),0) redMoney,trp.shop_detail_id shopDetailId,
+        IFNULL((select COUNT(1)
         from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id
@@ -95,8 +95,8 @@
         and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
         GROUP BY top.result_data
-        ) useRedCount,
-        (select SUM(top.pay_value)
+        ),0) useRedCount,
+        IFNULL((select SUM(top.pay_value)
         from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id
@@ -106,8 +106,8 @@
         and top.pay_time &lt; =  CONCAT(#{useEndDate},' 23:59:59')
         and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
-        ) useRedMoney,
-        (select COUNT(1)
+        ),0) useRedMoney,
+        IFNULL((select COUNT(1)
         from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id
@@ -118,8 +118,8 @@
         and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
         and td.parent_order_id is null
-        GROUP BY td.id) useRedOrderCount,
-        (select COUNT(1)
+        GROUP BY td.id),0) useRedOrderCount,
+        IFNULL((select COUNT(1)
         from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id
@@ -129,7 +129,7 @@
         and top.pay_time &lt; =  CONCAT(#{useEndDate},' 23:59:59')
         and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
-        GROUP BY td.id) useRedOrderMoney
+        GROUP BY td.id),0) useRedOrderMoney
         from tb_red_packet trp
         where trp.red_type = ${redType}
         and trp.create_time &gt; =  CONCAT(#{grantBeginDate},' 00:00:00')

@@ -2,14 +2,31 @@ package com.resto.shop.web.controller.business;
 
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.dto.RedPacketDto;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.service.RedPacketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.resto.shop.web.controller.GenericController;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/brandMarketing")
 public class BrandMarketingController extends GenericController{
 
+    @Resource
+    private ShopDetailService shopDetailService;
+
+    @Resource
+    private RedPacketService redPacketService;
 //	@Resource
 //	private AccountLogService accountLogService;
 
@@ -128,10 +145,66 @@ public class BrandMarketingController extends GenericController{
     public void redList(){}
 
     @RequestMapping("/selectRedList")
+    @ResponseBody
     public Result selectRedList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, Integer redType){
         JSONObject object = new JSONObject();
         try{
-
+            String shopName = null;
+            BigDecimal redCount = new BigDecimal(0);
+            BigDecimal redMoney = new BigDecimal(0);
+            BigDecimal useRedCount = new BigDecimal(0);
+            BigDecimal useRedMoney = new BigDecimal(0);
+            BigDecimal useRedOrderCount = new BigDecimal(0);
+            BigDecimal useRedOrderMoney = new BigDecimal(0);
+            List<RedPacketDto> redPacketDtoList = new ArrayList<RedPacketDto>();
+            List<ShopDetail> shopDetailList = getCurrentShopDetails();
+            if(getCurrentShopDetails() == null){
+                shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+            }
+            for(ShopDetail shopDetail : shopDetailList){
+                RedPacketDto redPacketDto = new RedPacketDto(shopDetail.getId(),shopDetail.getName(),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),"0.00%","0.00%",new BigDecimal(0),new BigDecimal(0));
+                redPacketDtoList.add(redPacketDto);
+            }
+            Map<String, Object> selectMap = new HashMap<String, Object>();
+            selectMap.put("grantBeginDate",grantBeginDate);
+            selectMap.put("grantEndDate",grantEndDate);
+            selectMap.put("useBeginDate",useBeginDate);
+            selectMap.put("useEndDate",useEndDate);
+            selectMap.put("redType",redType);
+            List<RedPacketDto> redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+            if(redPacketDtos == null){
+                object.put("shopRedInfoList",redPacketDtoList);
+            }else{
+                for(RedPacketDto redPacket : redPacketDtoList){
+                    for(RedPacketDto redPacketDto : redPacketDtos){
+                        if (redPacket.getShopDetailId().equalsIgnoreCase(redPacketDto.getShopDetailId())){
+                            shopName = redPacket.getShopName();
+                            redPacket = redPacketDto;
+                            redPacket.setShopName(shopName);
+                            redPacket.setUseRedCountRatio((redPacket.getUseRedCount().divide(redPacket.getRedCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%"));
+                            redPacket.setUseRedMoneyRatio((redPacket.getUseRedMoney().divide(redPacket.getRedMoney(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%"));
+                            redCount = redCount.add(redPacket.getRedCount());
+                            redMoney = redMoney.add(redPacket.getRedMoney());
+                            useRedCount = useRedCount.add(redPacket.getUseRedCount());
+                            useRedMoney = useRedMoney.add(redPacket.getUseRedMoney());
+                            useRedOrderCount = useRedOrderCount.add(redPacket.getUseRedOrderCount());
+                            useRedOrderMoney = useRedOrderMoney.add(redPacket.getUseRedOrderMoney());
+                        }
+                    }
+                }
+                object.put("shopRedInfoList",redPacketDtoList);
+            }
+            JSONObject brandRedInfo = new JSONObject();
+            brandRedInfo.put("brandName",getBrandName());
+            brandRedInfo.put("redCount",redCount);
+            brandRedInfo.put("redMoney",redMoney);
+            brandRedInfo.put("useRedCount",useRedCount);
+            brandRedInfo.put("useRedMoney",useRedMoney);
+            brandRedInfo.put("useRedCountRatio",useRedCount.divide(redCount).multiply(new BigDecimal(100)) + "%");
+            brandRedInfo.put("useRedMoneyRatio",useRedMoney.divide(redMoney).multiply(new BigDecimal(100)) + "%");
+            brandRedInfo.put("useRedOrderCount",useRedOrderCount);
+            brandRedInfo.put("useRedOrderMoney",useRedOrderMoney);
+            object.put("brandRedInfo",brandRedInfo);
         }catch (Exception e){
             return new Result(false);
         }

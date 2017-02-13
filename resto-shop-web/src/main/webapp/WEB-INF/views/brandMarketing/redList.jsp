@@ -230,7 +230,7 @@
                             that.shopRedInfoTable.clear().draw();
                             //重绘表格
                             that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
-                            that.brandInfo = result.data.brandRedInfo;
+                            that.brandRedInfo = result.data.brandRedInfo;
                         }else {
                             toastr.error("查询红包报表失败!");
                             toastr.clear();
