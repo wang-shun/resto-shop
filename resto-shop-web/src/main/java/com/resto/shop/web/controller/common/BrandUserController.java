@@ -58,7 +58,7 @@ public class BrandUserController extends GenericController{
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect,@RequestParam(defaultValue="false")boolean isMD5) {
+    public String login(@Valid BrandUser brandUser, BindingResult result, Model model, HttpServletRequest request,String redirect) {
         try {
         	if(redirect == null){
         		redirect = "";
@@ -73,14 +73,9 @@ public class BrandUserController extends GenericController{
                 model.addAttribute("error", "参数错误！");
                 return "login";
             }
-            
-            String pwd = brandUser.getPassword();
-            if(!isMD5){//如果是正常登录，则需进行MD5加密后验证，默认为正常登录（用于给HttpClient 开后门）
-            	pwd = ApplicationUtils.pwd( brandUser.getPassword());
 
-            }
         	// 身份验证
-            subject.login(new UsernamePasswordToken(brandUser.getUsername(),pwd));
+            subject.login(new UsernamePasswordToken(brandUser.getUsername(),ApplicationUtils.pwd( brandUser.getPassword())));
 
             // 验证成功在Session中保存用户信息
             final BrandUser authUserInfo = brandUserService.selectByUsername(brandUser.getUsername());

@@ -1,71 +1,85 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@include file="../tag-head.jsp" %>
-<form id="share-form" role="form" action="modulelist/edit_share">
+<form id="share-form" role="form" class="form-horizontal" action="modulelist/edit_share">
 	<div class="form-body">
 		<div class="form-group">
-		    <label>分享标题</label>
-		    <input type="text" class="form-control" name="shareTitle" v-model="m.shareTitle">
+			<label  class="col-sm-3 control-label">分享标题</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="shareTitle" v-model="m.shareTitle">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>分享图标</label>
-		    <input type="hidden" class="form-control" name="shareIcon" v-model="m.shareIcon">
-		    <img-file-upload class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+			<label  class="col-sm-3 control-label">分享图标</label>
+			<div class="col-sm-8">
+				<input type="hidden" class="form-control" name="shareIcon" v-model="m.shareIcon">
+				<img-file-upload class="form-control" @success="uploadSuccess" @error="uploadError"></img-file-upload>
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>最低分享分数</label>
-		    <input type="number" min="1" max="5" class="form-control" name="minLevel" v-model="m.minLevel">
+			<label  class="col-sm-3 control-label">最低分享分数</label>
+			<div class="col-sm-8">
+				<input type="number" min="1" max="5" class="form-control" name="minLevel" v-model="m.minLevel">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>最少分享字数</label>
-		    <input type="number" class="form-control" name="minLength" v-model="m.minLength">
+			<label  class="col-sm-3 control-label">最少分享字数</label>
+			<div class="col-sm-8">
+				<input type="number" class="form-control" name="minLength" v-model="m.minLength">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>返利(%)</label>
-		    <input type="text" class="form-control" name="rebate" v-model="m.rebate">
+			<label  class="col-sm-3 control-label">返利(%)</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="rebate" v-model="m.rebate">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>最小金额</label>
-		    <input type="text" class="form-control" name="minMoney" v-model="m.minMoney">
+			<label  class="col-sm-3 control-label">最小金额</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="minMoney" v-model="m.minMoney">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>最大金额</label>
-		    <input type="text" class="form-control" name="maxMoney" v-model="m.maxMoney">
+			<label  class="col-sm-3 control-label">最大金额</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="maxMoney" v-model="m.maxMoney">
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>注册按钮文字</label>
-		    <input type="text" class="form-control" name=registerButton v-model="m.registerButton">
+			<label  class="col-sm-3 control-label">注册按钮文字</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name=registerButton v-model="m.registerButton">
+			</div>
 		</div>
 		<div class="form-group">
-			<label>延迟提醒时间(秒)</label>
-			<input type="text" class="form-control" name="delayTime" v-model="m.delayTime">
+			<label  class="col-sm-3 control-label">延迟提醒时间(秒)</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="delayTime" v-model="m.delayTime">
+			</div>
 		</div>
 		<div class="form-group">
-			<label for="">是否启用</label>
-		    <div class="radio-list">
-				<label class="radio-inline">
-				  <input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 启用
-				</label>
-				<label class="radio-inline">
-				  <input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 不启用
-				</label>
-		    </div>
+			<label  class="col-sm-3 control-label">是否启用</label>
+			<div class="col-sm-8">
+				<div class="radio-list">
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 启用
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 不启用
+					</label>
+				</div>
+			</div>
 		</div>
 		<div class="form-group">
-		    <label>分享弹窗文本</label>
-		    <textarea class="ueditor-textarea"  name="dialogText">{{m.dialogText}}</textarea>
+			<label  class="col-sm-3 control-label">分享弹窗文本</label>
+			<div class="col-sm-8">
+				<textarea id="dialogText" name="dialogText" style="height:300px;" v-model="m.dialogText">
+				</textarea>
+			</div>
 		</div>
 	</div>
 </form>
 <script>
-	UEDITOR_CONFIG.zIndex=11005;
-	UEDITOR_CONFIG.toolbars=[[
-        'source', '|', 'undo', 'redo', '|',
-        'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
-        'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
-        'customstyle', 'paragraph', 'fontfamily', 'fontsize', '|',
-        'directionalityltr', 'directionalityrtl', 'indent', '|',
-        'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
-        'link', 'unlink', 'anchor',  ]]
 	var obj = new Vue({
 		el:"#share-form",
 		data:{
@@ -75,6 +89,15 @@
 				maxMoney:100,
 			},
 		},
+		created:function(){
+			var that = this;
+			$.post("modulelist/data_share",null,function(result){
+				if(result.data){
+					that.m = result.data;
+					that.initEditor();
+				}
+			});
+		},
 		methods:{
 			uploadSuccess:function(url){
 				this.m.shareIcon = url;
@@ -82,20 +105,30 @@
 			},
 			uploadError:function(){
 				toastr.error("上传失败");
-			}
-		},
-		created:function(){
-			var that = this;
-			$.post("modulelist/data_share",null,function(result){
-				if(result.data){
-					that.m = result.data;
-				}
+			},
+			initEditor : function () {
 				Vue.nextTick(function(){
-					var randomId = "ueditor_id_"+new Date().getTime();
-					$(".ueditor-textarea").attr("id",randomId);
-					var ue = UE.getEditor(randomId);
+					var editor = new wangEditor('dialogText');
+					editor.config.menus = [
+						'bold',
+						'underline',
+						'italic',
+						'strikethrough',
+						'eraser',
+						'forecolor',
+						'bgcolor',
+						'|',
+						'fontsize',
+						'alignleft',
+						'aligncenter',
+						'alignright',
+						'|',
+						'undo',
+						'redo'
+					];
+					editor.create();
 				});
-			});
+			}
 		}
 	});
 </script>
