@@ -200,8 +200,15 @@ public class BrandMarketingController extends GenericController{
             brandRedInfo.put("redMoney",redMoney);
             brandRedInfo.put("useRedCount",useRedCount);
             brandRedInfo.put("useRedMoney",useRedMoney);
-            brandRedInfo.put("useRedCountRatio",useRedCount.divide(redCount).multiply(new BigDecimal(100)) + "%");
-            brandRedInfo.put("useRedMoneyRatio",useRedMoney.divide(redMoney).multiply(new BigDecimal(100)) + "%");
+            if(redCount.equals(BigDecimal.ZERO)){
+                brandRedInfo.put("useRedCountRatio","0.00%");
+            }else{
+                brandRedInfo.put("useRedCountRatio",useRedCount.divide(redCount).multiply(new BigDecimal(100)) + "%");
+            }
+            if(redMoney.equals(BigDecimal.ZERO)){
+                brandRedInfo.put("useRedMoneyRatio","0.00%");
+            }else{
+                brandRedInfo.put("useRedMoneyRatio",useRedMoney.divide(redMoney).multiply(new BigDecimal(100)) + "%");}
             brandRedInfo.put("useRedOrderCount",useRedOrderCount);
             brandRedInfo.put("useRedOrderMoney",useRedOrderMoney);
             object.put("brandRedInfo",brandRedInfo);

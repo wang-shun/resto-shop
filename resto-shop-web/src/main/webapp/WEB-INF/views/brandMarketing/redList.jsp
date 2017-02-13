@@ -231,6 +231,8 @@
                             //重绘表格
                             that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
                             that.brandRedInfo = result.data.brandRedInfo;
+                            toastr.success("查询成功");
+                            toastr.clear();
                         }else {
                             toastr.error("查询红包报表失败!");
                             toastr.clear();
@@ -242,8 +244,6 @@
                     toastr.clear();
                     return;
                 }
-                toastr.success("查询成功");
-                toastr.clear();
             },
             getDate : function(){
                 var data = {
