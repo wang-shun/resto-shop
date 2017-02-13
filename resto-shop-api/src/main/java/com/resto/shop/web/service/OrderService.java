@@ -598,4 +598,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	List<Order> getTodayFinishOrder(String shopId,String time);
 
 	List<String []>  getThirdData(List<Order> orderList,int size,String brandSign);
+
+	void fixedRefund(String brandId,String shopId,int total,int refund,String transaction_id,String mchid);
 }

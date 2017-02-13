@@ -1137,6 +1137,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
     }
 
+
+    @Override
+    public void fixedRefund(String brandId,String shopId,
+                            int total,int refund,String transaction_id, String mchid) {
+        WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        Map<String, String> result = null;
+        String newPayItemId = ApplicationUtils.randomUUID();
+        if(shopDetail.getWxServerId() == null){
+            result  = WeChatPayUtils.refund(newPayItemId,transaction_id,
+                    total,refund , config.getAppid(), config.getMchid(),
+                    config.getMchkey(), config.getPayCertPath());
+        }else{
+            WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+
+            result = WeChatPayUtils.refundNew(newPayItemId, transaction_id,
+                    total,refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+        }
+        OrderPaymentItem orderPaymentItem = orderPaymentItemService.selectById(transaction_id);
+        orderPaymentItem.setResultData(new JSONObject(result).toString());
+        orderPaymentItemService.update(orderPaymentItem);
+
+    }
+
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
