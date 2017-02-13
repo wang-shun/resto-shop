@@ -342,7 +342,7 @@
             parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
-        ,(select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ,ifnull(count_with_child,article_count) as
         totalCount
         from tb_order
         where id = #{id,jdbcType=VARCHAR}
@@ -965,13 +965,11 @@
         order_mode,
         pay_type,
         amount_with_children,
-        (select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ifnull(count_with_child,article_count) as
         totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
-
-
         WHERE
         shop_detail_id=#{shopId}
         AND
@@ -997,7 +995,7 @@
         order_money,
         order_mode,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
@@ -1029,7 +1027,7 @@
         pay_type,
         pay_mode,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
@@ -1084,7 +1082,7 @@
         order_money,
         order_mode,
         amount_with_children,
-        (select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ifnull(count_with_child,article_count) as
         totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
@@ -2247,7 +2245,7 @@ GROUP BY r.table_number
     <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
         SELECT tb_order.*,
-        (select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ifnull(count_with_child,article_count) as
         totalCount
         from tb_order where shop_detail_id = #{shopId}
         <if test="orderStates != null and orderStates != '' ">
