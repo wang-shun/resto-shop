@@ -161,7 +161,8 @@
                 {typeName:"充值赠送红包",typeValue:"4"},
                 {typeName:"等位红包",typeValue:"5"}
             ],
-            redType:0
+            redType:0,
+            shopRedInfoTable:{}
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -176,7 +177,7 @@
             initDataTables:function () {
                 //that代表 vue对象
                 var that = this;
-                $("#shopRedList").DataTable({
+                that.shopRedInfoTable = $("#shopRedList").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
                     data:that.shopRedInfoList,
                     columns : [
@@ -220,9 +221,22 @@
                     ]
                 });
             },
-            searchInfo : function(isInit) {
+            searchInfo : function() {
+                var that = this;
                 try{
-
+                    $.post("brandMarketing/selectRedList",that.getData(),function(result){
+                        if (result.success){
+                            //清空表格
+                            that.shopRedInfoTable.clear().draw();
+                            //重绘表格
+                            that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
+                            that.brandInfo = result.data.brandRedInfo;
+                        }else {
+                            toastr.error("查询红包报表失败!");
+                            toastr.clear();
+                            return;
+                        }
+                    });
                 }catch(e){
                     toastr.error("查询红包报表失败!");
                     toastr.clear();

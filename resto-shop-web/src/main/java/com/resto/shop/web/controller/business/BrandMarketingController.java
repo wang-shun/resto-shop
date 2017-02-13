@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.business;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,9 +128,14 @@ public class BrandMarketingController extends GenericController{
     public void redList(){}
 
     @RequestMapping("/selectRedList")
-    public Result selectRedList(){
-        Result result = new Result();
-        return result;
+    public Result selectRedList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, Integer redType){
+        JSONObject object = new JSONObject();
+        try{
+
+        }catch (Exception e){
+            return new Result(false);
+        }
+        return getSuccessResult(object);
     }
 
     @RequestMapping("/couponList")
