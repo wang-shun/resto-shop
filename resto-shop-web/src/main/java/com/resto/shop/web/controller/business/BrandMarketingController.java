@@ -5,6 +5,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.model.RedPacket;
 import com.resto.shop.web.service.RedPacketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -171,7 +172,22 @@ public class BrandMarketingController extends GenericController{
             selectMap.put("useBeginDate",useBeginDate);
             selectMap.put("useEndDate",useEndDate);
             selectMap.put("redType",redType);
-            List<RedPacketDto> redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+            List<RedPacketDto> redPacketDtos = null;
+            switch (redType){
+                case 0:
+                    break;
+                case 1:
+                    redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    break;
+                case 2:
+                    redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    break;
+                case 3:
+                    redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    break;
+                default:
+                    break;
+            }
             if(redPacketDtos == null){
                 object.put("shopRedInfoList",redPacketDtoList);
             }else{
@@ -213,6 +229,7 @@ public class BrandMarketingController extends GenericController{
             brandRedInfo.put("useRedOrderMoney",useRedOrderMoney);
             object.put("brandRedInfo",brandRedInfo);
         }catch (Exception e){
+            log.info("查看红包报表出错！"+e.getMessage());
             return new Result(false);
         }
         return getSuccessResult(object);

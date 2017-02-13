@@ -92,7 +92,6 @@
         and td.production_status in (2,3)
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
         GROUP BY top.result_data
         ),0) useRedCount,
@@ -104,7 +103,6 @@
         and td.production_status in (2,3)
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and td.shop_detail_id = trp.shop_detail_id
         and top.result_data = trp.id
         ),0) useRedMoney,
         IFNULL((select COUNT(1)
