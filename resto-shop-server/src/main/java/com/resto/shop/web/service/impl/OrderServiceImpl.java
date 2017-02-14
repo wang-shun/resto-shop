@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -64,6 +65,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private ArticlePriceService articlePriceService;
+
+    @Value("#{propertyConfigurer['logPath']}")
+    public static String logPath;
 
     @Resource
     private CouponService couponService;
@@ -5609,6 +5613,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result updateOrderItem(String orderId, Integer count, String orderItemId, Integer type) {
         Result result = new Result();
         Order order = orderMapper.selectByPrimaryKey(orderId);
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (type == 0) { //如果要修改的是服务费
             order.setCustomerCount(count);
@@ -5627,6 +5633,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
 
             update(order);
+            UserActionUtils.write(logPath+"posAction",brand.getBrandName()
+                    ,shopDetail.getName(),shopDetail.getName()+"修改了"+setting.getServiceName()+"，数量修改为"+count);
+
+
+
         } else { //修改的是菜品
 
 
@@ -5669,6 +5680,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             update(order);
+
+            UserActionUtils.write(logPath+"posAction",brand.getBrandName()
+                    ,shopDetail.getName(),shopDetail.getName()+"修改了菜品"+orderItem.getArticleName()+"，数量修改为"+count);
+
 
         }
 
