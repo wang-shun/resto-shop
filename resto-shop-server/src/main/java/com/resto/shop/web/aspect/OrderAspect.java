@@ -406,7 +406,7 @@ public class OrderAspect {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER){
-//                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+//                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
 //                    if(order.getOrderState() == OrderState.SUBMIT){
 //                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
 //                    }else{
@@ -415,10 +415,11 @@ public class OrderAspect {
                     if(setting.getAutoConfirmTime() < setting.getCloseContinueTime()){
                         MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
                     }else{
-                        MQMessageProducer.sendBossOrder(order, setting.getAutoConfirmTime() * 1000 - 10000);
+                        MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
+                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
-                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                 }else {
