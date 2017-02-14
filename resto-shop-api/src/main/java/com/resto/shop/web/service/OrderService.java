@@ -86,6 +86,8 @@ public interface OrderService extends GenericService<Order, String> {
 	 
 	public Order confirmOrder(Order order);
 
+	public Order confirmBossOrder(Order order);
+
 	public Order getOrderInfo(String orderId);
 
 	public List<Order> selectHistoryOrderList(String currentShopId, Date date,Integer shopMode);

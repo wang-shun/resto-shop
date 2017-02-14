@@ -1949,6 +1949,34 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         return null;
     }
+    @Override
+    public Order confirmBossOrder(Order order) {
+        order = selectById(order.getId());
+        if(order.getOrderState() != OrderState.PAYMENT){
+            return null;
+        }
+        log.info("开始确认订单:" + order.getId());
+        if (order.getConfirmTime() == null && !order.getClosed()) {
+            order.setOrderState(OrderState.CONFIRM);
+            order.setConfirmTime(new Date());
+            order.setAllowCancel(false);
+            order.setAllowContinueOrder(false);
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            if (order.getParentOrderId() == null) {
+                log.info("如果订单金额大于 评论金额 则允许评论" + order.getId());
+                if (setting.getAppraiseMinMoney().compareTo(order.getOrderMoney()) <= 0 || setting.getAppraiseMinMoney().compareTo(order.getAmountWithChildren()) <= 0) {
+                    order.setAllowAppraise(true);
+                }
+            } else {
+                log.info("最小评论金额为:" + setting.getAppraiseMinMoney() + ", oid:" + order.getId());
+                order.setAllowAppraise(false);
+            }
+            update(order);
+            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
+            return order;
+        }
+        return null;
+    }
 
     @Override
     public Order getOrderInfo(String orderId) {
