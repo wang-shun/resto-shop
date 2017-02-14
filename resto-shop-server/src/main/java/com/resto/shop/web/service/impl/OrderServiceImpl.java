@@ -5634,7 +5634,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             update(order);
             UserActionUtils.write(logPath+"posAction",brand.getBrandName()
-                    ,shopDetail.getName(),shopDetail.getName()+"修改了"+setting.getServiceName()+"，数量修改为"+count);
+                    ,shopDetail.getName(),
+                    shopDetail.getName()+"修改了"+setting.getServiceName()+"，数量修改为"+count+",订单号为:"+order.getId());
 
 
 
@@ -5682,7 +5683,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
 
             UserActionUtils.write(logPath+"posAction",brand.getBrandName()
-                    ,shopDetail.getName(),shopDetail.getName()+"修改了菜品"+orderItem.getArticleName()+"，数量修改为"+count);
+                    ,shopDetail.getName(),shopDetail.getName()+"修改了菜品"+orderItem.getArticleName()+"，数量修改为"+count+",订单号为:"+order.getId());
 
 
         }
