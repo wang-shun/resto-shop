@@ -413,9 +413,9 @@ public class OrderAspect {
 //                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
 //                    }
                     if(setting.getAutoConfirmTime() < setting.getCloseContinueTime()){
-                        MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000);
+                        MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
                     }else{
-                        MQMessageProducer.sendBossOrder(order, setting.getAutoConfirmTime() * 1000);
+                        MQMessageProducer.sendBossOrder(order, setting.getAutoConfirmTime() * 1000 - 10000);
                     }
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
