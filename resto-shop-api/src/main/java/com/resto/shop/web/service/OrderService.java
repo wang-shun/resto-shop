@@ -595,7 +595,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	BigDecimal selectPayBefore(String orderId);
 
-	List<Order> getTodayFinishOrder(String shopId,String time);
+	List<Order> getTodayFinishOrder(String shopId,String beginTime,String endTime);
 
 	List<String []>  getThirdData(List<Order> orderList,int size,String brandSign);
 

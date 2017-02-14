@@ -602,5 +602,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	BigDecimal getPayHoufu(String orderId);
 
-	List<Order> getTodayFinishOrder(@Param("shopId") String shopId,@Param("date") Date date);
+	List<Order> getTodayFinishOrder(@Param("shopId") String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 }

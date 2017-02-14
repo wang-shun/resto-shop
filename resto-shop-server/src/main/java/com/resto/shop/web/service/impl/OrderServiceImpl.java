@@ -6459,36 +6459,42 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> getTodayFinishOrder(String shopId,String time) {
+    public List<Order> getTodayFinishOrder(String shopId,String beginTime,String endTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date;
+        Date beginDate;
+        Date endDate;
         try {
-            date = sdf.parse(time);
+            beginDate = DateUtil.getDateBegin(sdf.parse(beginTime));
+            endDate = DateUtil.getDateEnd(sdf.parse(endTime));
         } catch (ParseException e) {
-            date = new Date();
+            beginDate = DateUtil.getDateBegin(new Date());
+            endDate = DateUtil.getDateEnd(new Date());
         }
-        return orderMapper.getTodayFinishOrder(shopId,date);
+        return orderMapper.getTodayFinishOrder(shopId,beginDate,endDate);
     }
 
 
     @Override
     public List<String []>  getThirdData(List<Order> orderList, int size, String brandSign) {
         List<String []> result = new ArrayList<>();
+
         for(Order o : orderList){
-            Order order = getOrderInfo(o.getId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(o.getId());
+//            Order order = getOrderInfo(o.getId());
             String [] data = new String[size];
             switch (brandSign){
                 case "test":
                     luroufanModel(data,o);
                     result.add(data);
-                    for(OrderItem orderItem : order.getOrderItems()){
+
+                    for(OrderItem orderItem : orderItems){
                         result.add(luroufanArticleModel(orderItem,size));
                     }
                     break;
                 case "luroufan":
                     luroufanModel(data,o);
                     result.add(data);
-                    for(OrderItem orderItem : order.getOrderItems()){
+                    for(OrderItem orderItem : orderItems){
                         result.add(luroufanArticleModel(orderItem,size));
                     }
                     break;
@@ -6530,7 +6536,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private void luroufanModel(String [] data,Order o){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         data[LuroufanExcelModel.POSDATE] = sdf.format(o.getCreateTime());
-        data[LuroufanExcelModel.ADDTIME] = sdf.format(o.getPrintOrderTime());
+        data[LuroufanExcelModel.ADDTIME] = o.getPrintOrderTime() == null ? "" : sdf.format(o.getPrintOrderTime());
         data[LuroufanExcelModel.ADDNAME] = "";
         data[LuroufanExcelModel.POSID] = o.getShopDetailId();
         data[LuroufanExcelModel.TABLENO] = o.getTableNumber();
@@ -6553,4 +6559,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data[LuroufanExcelModel.PAY_METHOD] = OrderPayMode.getPayModeName(o.getPayMode());
         data[LuroufanExcelModel.REMARK] = "";
     }
+
+
+
 }
