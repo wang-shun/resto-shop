@@ -66,7 +66,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticlePriceService articlePriceService;
 
-    @Value("#{propertyConfigurer['logPath']}")
+    @Value("#{configProperties2['logPath']}")
     public static String logPath;
 
     @Resource

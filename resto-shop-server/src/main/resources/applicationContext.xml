@@ -33,16 +33,27 @@
 		</property>
 	</bean>
 
-	<!--&lt;!&ndash; 引入配置文件 &ndash;&gt;-->
-	<bean id="propertyConfigurer"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<!-- 引入配置文件 -->
+	<bean id="configProperties2" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="locations">
 			<list>
-				<!--<value>classpath*:rpc.properties</value>-->
+
 				<value>classpath:config.properties</value>
+
 			</list>
 		</property>
 	</bean>
+
+	<!--&lt;!&ndash;&lt;!&ndash; 引入配置文件 &ndash;&gt;&ndash;&gt;-->
+	<!--<bean id="propertyConfigurer"-->
+		<!--class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+		<!--<property name="locations">-->
+			<!--<list>-->
+				<!--&lt;!&ndash;<value>classpath*:rpc.properties</value>&ndash;&gt;-->
+				<!--<value>classpath:config.properties</value>-->
+			<!--</list>-->
+		<!--</property>-->
+	<!--</bean>-->
 
 	<!-- Rpc 配置 -->
 	<bean id="serviceRegistry"	class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
