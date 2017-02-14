@@ -171,18 +171,20 @@ public class BrandMarketingController extends GenericController{
             selectMap.put("grantEndDate",grantEndDate);
             selectMap.put("useBeginDate",useBeginDate);
             selectMap.put("useEndDate",useEndDate);
-            selectMap.put("redType",redType);
             List<RedPacketDto> redPacketDtos = null;
             switch (redType){
                 case 0:
                     break;
                 case 1:
+                    selectMap.put("redType",0);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
                     break;
                 case 2:
+                    selectMap.put("redType",1);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
                     break;
                 case 3:
+                    selectMap.put("redType",2);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
                     break;
                 default:
