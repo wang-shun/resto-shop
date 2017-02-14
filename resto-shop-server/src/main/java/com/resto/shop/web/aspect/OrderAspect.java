@@ -412,8 +412,13 @@ public class OrderAspect {
 //                    }else{
 //                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
 //                    }
-                    if(setting.getAutoConfirmTime() < setting.getCloseContinueTime()){
-                        MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
+                    if(setting.getAutoConfirmTime() < setting.getCloseContinueTime()){    //加菜时间跟领取红包时间对比
+                        if(order.getOrderState() == OrderState.SUBMIT){   //是否买单
+                            MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
+                            MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
+                        }else if(order.getOrderState() == OrderState.PAYMENT){
+                            MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
+                        }
                     }else{
                         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
