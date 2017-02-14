@@ -2149,8 +2149,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void updateAllowContinue(String id, boolean b) {
-        UserActionUtils.write("/logs/posAction","121"
-                ,"111",id+"订单不能加菜");
         orderMapper.changeAllowContinue(id, b);
     }
 
