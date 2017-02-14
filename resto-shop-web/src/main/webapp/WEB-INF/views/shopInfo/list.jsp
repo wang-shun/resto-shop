@@ -113,6 +113,19 @@
 							</div>
 						</div>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">点餐页面滑动效果：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="rollingSwitch"
+												   v-model="m.rollingSwitch" value="0"> 不滑动
+									</label> <label> <input type="radio" name="rollingSwitch"
+															v-model="m.rollingSwitch" value="1"> 滑动
+								</label>
+								</div>
+							</div>
+						</div>
+
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
 							<div class="col-sm-9">
