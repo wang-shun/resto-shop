@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.ChargePayment;
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.RedPacket;
 
 
 public interface ChargeOrderService extends GenericService<ChargeOrder, String> {
@@ -74,7 +76,7 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	public Map<String,Object>  shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate,String shopname);
 
 
-
+    public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
 
 
 

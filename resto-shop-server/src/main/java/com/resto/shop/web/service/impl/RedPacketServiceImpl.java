@@ -100,4 +100,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     public List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap) {
         return redPacketMapper.selectRedPacketLog(selectMap);
     }
+
+    @Override
+    public Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap) {
+        return redPacketMapper.selectUseRedOrder(selectMap);
+    }
 }

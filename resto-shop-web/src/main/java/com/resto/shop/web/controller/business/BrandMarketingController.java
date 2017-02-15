@@ -6,6 +6,7 @@ import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.model.RedPacket;
+import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.RedPacketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,10 @@ public class BrandMarketingController extends GenericController{
 
     @Resource
     private RedPacketService redPacketService;
+
+    @Resource
+    private ChargeOrderService chargeOrderService;
+
 //	@Resource
 //	private AccountLogService accountLogService;
 
@@ -186,6 +191,24 @@ public class BrandMarketingController extends GenericController{
                 case 3:
                     selectMap.put("redType",2);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    break;
+                case 4:
+                    redPacketDtos = chargeOrderService.selectChargeRedPacket(selectMap);
+                    selectMap.clear();
+                    selectMap.put("useBeginDate",useBeginDate);
+                    selectMap.put("useEndDate",useEndDate);
+                    for(RedPacketDto redPacketDto : redPacketDtos){
+                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+                        if(useOrder == null){
+                            redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
+                            redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
+                        }else{
+                            String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                            redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                            redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                        }
+                    }
                     break;
                 default:
                     break;

@@ -17,4 +17,6 @@ public interface RedPacketMapper extends GenericDao<RedPacket,String> {
     void updateRedRemainderMoney(@Param("id") String id,@Param("redRemainderMoney") BigDecimal redRemainderMoney);
 
     List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap);
+
+    Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap);
 }

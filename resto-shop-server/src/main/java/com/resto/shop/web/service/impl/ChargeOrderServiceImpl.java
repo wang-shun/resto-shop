@@ -14,6 +14,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.service.BrandService;
@@ -285,4 +286,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public List<Map<String, Object>> selectByShopToDay(String shopId) {
 		return chargeorderMapper.selectByShopToDay(shopId);
 	}
+
+    @Override
+    public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap) {
+        return chargeorderMapper.selectChargeRedPacket(selectMap);
+    }
 }
