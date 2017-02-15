@@ -184,14 +184,59 @@ public class BrandMarketingController extends GenericController{
                 case 1:
                     selectMap.put("redType",0);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    selectMap.clear();
+                    selectMap.put("useBeginDate",useBeginDate);
+                    selectMap.put("useEndDate",useEndDate);
+                    for(RedPacketDto redPacketDto : redPacketDtos){
+                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+                        if(useOrder == null){
+                            redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
+                            redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
+                        }else{
+                            String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                            redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                            redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                        }
+                    }
                     break;
                 case 2:
                     selectMap.put("redType",1);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    selectMap.clear();
+                    selectMap.put("useBeginDate",useBeginDate);
+                    selectMap.put("useEndDate",useEndDate);
+                    for(RedPacketDto redPacketDto : redPacketDtos){
+                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+                        if(useOrder == null){
+                            redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
+                            redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
+                        }else{
+                            String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                            redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                            redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                        }
+                    }
                     break;
                 case 3:
                     selectMap.put("redType",2);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
+                    selectMap.clear();
+                    selectMap.put("useBeginDate",useBeginDate);
+                    selectMap.put("useEndDate",useEndDate);
+                    for(RedPacketDto redPacketDto : redPacketDtos){
+                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+                        if(useOrder == null){
+                            redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
+                            redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
+                        }else{
+                            String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                            redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                            redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                        }
+                    }
                     break;
                 case 4:
                     redPacketDtos = chargeOrderService.selectChargeRedPacket(selectMap);
