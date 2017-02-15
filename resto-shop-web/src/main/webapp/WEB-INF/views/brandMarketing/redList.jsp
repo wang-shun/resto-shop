@@ -37,7 +37,7 @@
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
              <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
-             <button type="button" class="btn btn-primary" @click="download">下载报表</button>
+             <button type="button" class="btn btn-primary" @click="downloadExcel">下载报表</button>
              <br/>
           </div>
 		</form>
@@ -230,6 +230,7 @@
                             that.shopRedInfoTable.clear().draw();
                             //重绘表格
                             that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
+                            that.shopRedInfoList = result.data.shopRedInfoList;
                             that.brandRedInfo = result.data.brandRedInfo;
                             toastr.success("查询成功");
                             toastr.clear();
@@ -244,6 +245,11 @@
                     toastr.clear();
                     return;
                 }
+            },
+            downloadExcel : function(){
+                $.post("brandMarketing/downloadExcel",{"brandRedInfo":this.brandRedInfo,"shopRedInfoList" : this.shopRedInfoList},function(result){
+
+                });
             },
             getDate : function(){
                 var data = {

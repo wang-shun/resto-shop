@@ -11,6 +11,7 @@ import com.resto.shop.web.service.RedPacketService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.resto.shop.web.controller.GenericController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -260,6 +261,12 @@ public class BrandMarketingController extends GenericController{
             return new Result(false);
         }
         return getSuccessResult(object);
+    }
+
+    @RequestMapping("/downloadExcel")
+    @ResponseBody
+    public Result downloadExcel(RedPacketDto redPacketDto){
+        return getSuccessResult();
     }
 
     @RequestMapping("/couponList")
