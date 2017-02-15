@@ -91,7 +91,7 @@
         on td.id = top.order_id
         where td.order_state in (2,10,11,12)
         and td.production_status in (2,3)
-        and top.payment_mode_id in (${redType})
+        and top.payment_mode_id in (${payMode})
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
         GROUP BY top.result_data
@@ -102,7 +102,7 @@
         on td.id = top.order_id
         where td.order_state in (2,10,11,12)
         and td.production_status in (2,3)
-        and top.payment_mode_id in (${redType})
+        and top.payment_mode_id in (${payMode})
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
         GROUP BY top.result_data
@@ -123,13 +123,26 @@
         on td.id = top.order_id
         where td.order_state in (2,10,11,12)
         and td.production_status in (2,3)
-        and top.payment_mode_id = 7
+        and top.payment_mode_id in (${payMode})
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and top.result_data in
-        <foreach collection="redPacketIds" item="redPacketId" open="(" separator="," close=")">
-            #{redPacketId}
-        </foreach>
+        and top.result_data in (
+        <if test="chargeOrder != null">
+            select tco.id from tb_charge_order tco
+            where tco.order_state = 1
+            and tco.reward_money > 0
+            and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
+            and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
+            and tco.shop_detail_id = #{shopDetailId}
+        </if>
+        <if test="redPacket != null">
+            select trp.id from tb_red_packet trp
+            where trp.red_type in (${redType})
+            and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
+            and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
+            and trp.shop_detail_id = #{shopDetailId}
+        </if>
+        )
         and td.parent_order_id is null
         GROUP BY td.id) r),0)),(
         IFNULL((select SUM(r.orderMoney) from (
@@ -138,13 +151,26 @@
         on td.id = top.order_id
         where td.order_state in (2,10,11,12)
         and td.production_status in (2,3)
-        and top.payment_mode_id = 7
+        and top.payment_mode_id in (${payMode})
         and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
         and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and top.result_data in
-        <foreach collection="redPacketIds" item="redPacketId" open="(" separator="," close=")">
-            #{redPacketId}
-        </foreach>
+        and top.result_data in (
+          <if test="chargeOrder != null">
+              select tco.id from tb_charge_order tco
+              where tco.order_state = 1
+              and tco.reward_money > 0
+              and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
+              and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
+              and tco.shop_detail_id = #{shopDetailId}
+          </if>
+          <if test="redPacket != null">
+              select trp.id from tb_red_packet trp
+              where trp.red_type in (${redType})
+              and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
+              and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
+              and trp.shop_detail_id = #{shopDetailId}
+          </if>
+        )
         GROUP BY td.id) r),0))) useOrder;
     </select>
 </mapper>
