@@ -466,6 +466,12 @@ public class OrderAspect {
 
     ;
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmBossOrder(..))")
+    public void confirmBossOrder() {
+    }
+
+    ;
+
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
         if (order != null
@@ -573,7 +579,7 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()", returning = "order")
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
         log.info("确认订单成功后回调:" + order.getId());
         Customer customer = customerService.selectById(order.getCustomerId());
