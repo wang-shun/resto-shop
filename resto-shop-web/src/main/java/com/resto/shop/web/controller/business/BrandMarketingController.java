@@ -216,6 +216,7 @@ public class BrandMarketingController extends GenericController{
             if(redPacketDtos == null){
                 object.put("shopRedInfoList",redPacketDtoList);
             }else{
+                List<RedPacketDto> shopRedInfoList = new ArrayList<>();
                 for(RedPacketDto redPacket : redPacketDtoList){
                     for(RedPacketDto redPacketDto : redPacketDtos){
                         if (redPacket.getShopDetailId().equalsIgnoreCase(redPacketDto.getShopDetailId())){
@@ -232,8 +233,9 @@ public class BrandMarketingController extends GenericController{
                             useRedOrderMoney = useRedOrderMoney.add(redPacket.getUseRedOrderMoney());
                         }
                     }
+                    shopRedInfoList.add(redPacket);
                 }
-                object.put("shopRedInfoList",redPacketDtoList);
+                object.put("shopRedInfoList",shopRedInfoList);
             }
             JSONObject brandRedInfo = new JSONObject();
             brandRedInfo.put("brandName",getBrandName());
@@ -244,12 +246,12 @@ public class BrandMarketingController extends GenericController{
             if(redCount.equals(BigDecimal.ZERO)){
                 brandRedInfo.put("useRedCountRatio","0.00%");
             }else{
-                brandRedInfo.put("useRedCountRatio",useRedCount.divide(redCount).multiply(new BigDecimal(100)) + "%");
+                brandRedInfo.put("useRedCountRatio",useRedCount.divide(redCount,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
             }
             if(redMoney.equals(BigDecimal.ZERO)){
                 brandRedInfo.put("useRedMoneyRatio","0.00%");
             }else{
-                brandRedInfo.put("useRedMoneyRatio",useRedMoney.divide(redMoney).multiply(new BigDecimal(100)) + "%");}
+                brandRedInfo.put("useRedMoneyRatio",useRedMoney.divide(redMoney,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");}
             brandRedInfo.put("useRedOrderCount",useRedOrderCount);
             brandRedInfo.put("useRedOrderMoney",useRedOrderMoney);
             object.put("brandRedInfo",brandRedInfo);

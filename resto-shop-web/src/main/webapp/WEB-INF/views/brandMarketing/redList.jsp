@@ -63,7 +63,7 @@
 								<th>使用总数</th>
 		                        <th>使用总额</th>
 		                        <th>红包使用数占比</th>
-                                <th>红包使用额占比</th>
+                                <%--<th>红包使用额占比</th>--%>
                                 <th>拉动订单总数</th>
                                 <th>拉动订单总额</th>
 							</tr>
@@ -76,7 +76,7 @@
 		                        <td>{{brandRedInfo.useRedCount}}</td>
 		                        <td>{{brandRedInfo.useRedMoney}}</td>
 		                        <td>{{brandRedInfo.useRedCountRatio}}</td>
-                                <td>{{brandRedInfo.useRedMoneyRatio}}</td>
+                                <%--<td>{{brandRedInfo.useRedMoneyRatio}}</td>--%>
                                 <td>{{brandRedInfo.useRedOrderCount}}</td>
                                 <td>{{brandRedInfo.useRedOrderMoney}}</td>
 							</tr>
@@ -206,10 +206,10 @@
                             title : "红包使用数占比",
                             data : "useRedCountRatio"
                         },
-                        {
+                        /*{
                             title : "红包使用额占比",
                             data : "useRedMoneyRatio"
-                        },
+                        },*/
                         {
                             title : "拉动订单总数",
                             data : "useRedOrderCount"
