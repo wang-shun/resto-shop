@@ -85,29 +85,29 @@
         select
         trp.shop_detail_id shopDetailId,IFNULL(COUNT(1),0) redCount,IFNULL(SUM(red_money),0) redMoney,
         IFNULL((SUM((select COUNT(1) from (
-				select top.result_data
-                from tb_order td
-                inner join tb_order_payment_item top
-                on td.id = top.order_id
-                where td.order_state in (2,10,11,12)
-                and td.production_status in (2,3)
-                and top.payment_mode_id in (${redType})
-                and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-                and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-                GROUP BY top.result_data
+        select top.result_data
+        from tb_order td
+        inner join tb_order_payment_item top
+        on td.id = top.order_id
+        where td.order_state in (2,10,11,12)
+        and td.production_status in (2,3)
+        and top.payment_mode_id in (${redType})
+        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+        GROUP BY top.result_data
         ) r where r.result_data = trp.id))),0) useRedCount,
         IFNULL((SUM((select SUM(r.payValue) from (
-				select top.result_data, SUM(top.pay_value) payValue from tb_order td
-				inner join tb_order_payment_item top
-				on td.id = top.order_id
-				where td.order_state in (2,10,11,12)
-				and td.production_status in (2,3)
-				and top.payment_mode_id in (${redType})
-				and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-                and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-				GROUP BY top.result_data
-				) r where r.result_data = trp.id))),0) useRedMoney,
-				GROUP_CONCAT(trp.id) redPacketId
+        select top.result_data, SUM(top.pay_value) payValue from tb_order td
+        inner join tb_order_payment_item top
+        on td.id = top.order_id
+        where td.order_state in (2,10,11,12)
+        and td.production_status in (2,3)
+        and top.payment_mode_id in (${redType})
+        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+        GROUP BY top.result_data
+        ) r where r.result_data = trp.id))),0) useRedMoney,
+        GROUP_CONCAT(trp.id) redPacketId
         from tb_red_packet trp
 		where trp.red_type in (${redType})
         and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
