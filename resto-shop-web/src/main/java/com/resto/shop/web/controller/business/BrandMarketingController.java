@@ -5,6 +5,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.RedPacket;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.RedPacketService;
@@ -183,12 +184,11 @@ public class BrandMarketingController extends GenericController{
                     break;
                 case 1:
                     selectMap.put("redType",0);
+                    selectMap.put("payMode", PayMode.APPRAISE_RED_PAY);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
-                    selectMap.clear();
-                    selectMap.put("useBeginDate",useBeginDate);
-                    selectMap.put("useEndDate",useEndDate);
+                    selectMap.put("redPacket","redPacket");
                     for(RedPacketDto redPacketDto : redPacketDtos){
-                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
                         Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
                         if(useOrder == null){
                             redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
@@ -202,12 +202,11 @@ public class BrandMarketingController extends GenericController{
                     break;
                 case 2:
                     selectMap.put("redType",1);
+                    selectMap.put("payMode", PayMode.SHARE_RED_PAY);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
-                    selectMap.clear();
-                    selectMap.put("useBeginDate",useBeginDate);
-                    selectMap.put("useEndDate",useEndDate);
+                    selectMap.put("redPacket","redPacket");
                     for(RedPacketDto redPacketDto : redPacketDtos){
-                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
                         Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
                         if(useOrder == null){
                             redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
@@ -221,12 +220,11 @@ public class BrandMarketingController extends GenericController{
                     break;
                 case 3:
                     selectMap.put("redType",2);
+                    selectMap.put("payMode", PayMode.REFUND_ARTICLE_RED_PAY);
                     redPacketDtos = redPacketService.selectRedPacketLog(selectMap);
-                    selectMap.clear();
-                    selectMap.put("useBeginDate",useBeginDate);
-                    selectMap.put("useEndDate",useEndDate);
+                    selectMap.put("redPacket","redPacket");
                     for(RedPacketDto redPacketDto : redPacketDtos){
-                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
                         Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
                         if(useOrder == null){
                             redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
@@ -240,11 +238,10 @@ public class BrandMarketingController extends GenericController{
                     break;
                 case 4:
                     redPacketDtos = chargeOrderService.selectChargeRedPacket(selectMap);
-                    selectMap.clear();
-                    selectMap.put("useBeginDate",useBeginDate);
-                    selectMap.put("useEndDate",useEndDate);
+                    selectMap.put("payMode", PayMode.REWARD_PAY);
+                    selectMap.put("chargeOrder","chargeOrder");
                     for(RedPacketDto redPacketDto : redPacketDtos){
-                        selectMap.put("redPacketIds",redPacketDto.getRedPacketId().split(","));
+                        selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
                         Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
                         if(useOrder == null){
                             redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
