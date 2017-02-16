@@ -247,12 +247,17 @@
                 }
             },
             downloadExcel : function(){
-                $.post("brandMarketing/downloadExcel",{"grantBeginDate":this.grantSearchDate.beginDate,
+                $.post("brandMarketing/createExcel",{"grantBeginDate":this.grantSearchDate.beginDate,
                     "grantEndDate" : this.grantSearchDate.endDate,
                     "useBeginDate" : this.useSearchDate.beginDate,
                     "useEndDate" : this.useSearchDate.endDate,
                     "brandRedInfo":this.brandRedInfo,"shopRedInfoList" : this.shopRedInfoList},function(result){
-
+                    if (result.success){
+                        window.location.href = "brandMarketing/downloadExcel?path="+result.data+"";
+                    }else {
+                        toastr.error("下载红包报表失败！");
+                        toastr.clear();
+                    }
                 });
             },
             getDate : function(){

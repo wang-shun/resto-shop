@@ -415,10 +415,10 @@ public class BrandMarketingController extends GenericController{
      * @param response
      * @return
      */
-    @RequestMapping("/downloadExcel")
+    @RequestMapping("/createExcel")
     @ResponseBody
-    public void downloadExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, RedPacketDto redPacketDto,
-                                HttpServletRequest request, HttpServletResponse response){
+    public Result createExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, RedPacketDto redPacketDto,
+                                HttpServletRequest request){
         //导出文件名
         String fileName = "红包报表"+grantBeginDate+"至"+grantEndDate+".xls";
         //定义读取文件的路径
@@ -426,7 +426,7 @@ public class BrandMarketingController extends GenericController{
         //定义列
         String[]columns={"shopName","redCount","redMoney","useRedCount","useRedMoney","useRedCountRatio","useRedOrderCount","useRedOrderMoney"};
         //定义数据
-        List<RedPacketDto> result = null;
+        List<RedPacketDto> result = new ArrayList<>();
         RedPacketDto brandRedInfo = new RedPacketDto();
         brandRedInfo.setShopName(redPacketDto.getBrandRedInfo().get("brandName").toString());
         brandRedInfo.setRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("redCount").toString()));
@@ -439,7 +439,7 @@ public class BrandMarketingController extends GenericController{
         result.add(brandRedInfo);
         for (Map redMap : redPacketDto.getShopRedInfoList()){
             RedPacketDto redInfo = new RedPacketDto();
-            redInfo.setShopName(redMap.get("brandName").toString());
+            redInfo.setShopName(redMap.get("shopName").toString());
             redInfo.setRedCount(new BigDecimal(redMap.get("redCount").toString()));
             redInfo.setRedMoney(new BigDecimal(redMap.get("redMoney").toString()));
             redInfo.setUseRedCount(new BigDecimal(redMap.get("useRedCount").toString()));
@@ -464,7 +464,7 @@ public class BrandMarketingController extends GenericController{
         map.put("useBeginDate", useBeginDate);
         map.put("useEndDate", useEndDate);
         map.put("reportType", "红包报表");//表的头，第一行内容
-        map.put("num", "9");//显示的位置
+        map.put("num", "7");//显示的位置
         map.put("reportTitle", "红包报表");//表的名字
         map.put("timeType", "yyyy-MM-dd");
 
@@ -475,14 +475,25 @@ public class BrandMarketingController extends GenericController{
             OutputStream out = new FileOutputStream(path);
             excelUtil.ExportRedPacketDtoExcel(headers, columns, result, out, map);
             out.close();
+        }catch(Exception e){
+            e.printStackTrace();
+            return new Result("创建execl失败",false);
+        }
+        return getSuccessResult(path);
+    }
+
+    @RequestMapping("/downloadExcel")
+    public void downloadExcel(String path, HttpServletResponse response){
+        try {
+            //定义excel工具类对象
+            ExcelUtil<RedPacketDto> excelUtil=new ExcelUtil<>();
             excelUtil.download(path, response);
             JOptionPane.showMessageDialog(null, "导出成功！");
             log.info("excel导出成功");
-        }catch(Exception e){
-            e.printStackTrace();
+        }catch (Exception e){
+            log.error(e.getMessage()+"下载报表出错！");
         }
     }
-
     @RequestMapping("/couponList")
     public void couponList(){}
 }
