@@ -158,12 +158,18 @@
         SUM(td.original_amount) originalAmount,
         SUM(td.order_money) orderMoney
         <foreach collection="payModeList" item="payMode">
-            ,IFNULL((select SUM(pay_value) from tb_order tr inner join tb_order_payment_item top
+            ,IFNULL((select <if test="payMode.payMode == 11">
+                ABS(SUM(pay_value))
+            </if>
+            <if test="payMode.payMode != 11">
+                SUM(pay_value)
+            </if>
+            from tb_order tr inner join tb_order_payment_item top
             on tr.id = top.order_id where tr.shop_detail_id = td.shop_detail_id and top.payment_mode_id = ${payMode.payMode}
             and tr.order_state in (2,10,11,12)
             and tr.production_status in (2,3)
-            and tr.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-            and tr.create_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) ${payMode.payName}
+            and top.pay_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+            and top.pay_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) ${payMode.payName}
         </foreach>
         from tb_order td
         where td.order_state in (2,10,11,12)
