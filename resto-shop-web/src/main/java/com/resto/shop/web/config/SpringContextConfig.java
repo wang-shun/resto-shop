@@ -372,6 +372,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public GetNumberService getNumberService() {
+        return proxy.create(GetNumberService.class);
+    }
+
+    @Bean
     public RedPacketService redPacketService() {
         return proxy.create(RedPacketService.class);
     }
