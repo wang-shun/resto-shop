@@ -247,7 +247,11 @@
                 }
             },
             downloadExcel : function(){
-                $.post("brandMarketing/downloadExcel",{"brandRedInfo":this.brandRedInfo,"shopRedInfoList" : this.shopRedInfoList},function(result){
+                $.post("brandMarketing/downloadExcel",{"grantBeginDate":this.grantSearchDate.beginDate,
+                    "grantEndDate" : this.grantSearchDate.endDate,
+                    "useBeginDate" : this.useSearchDate.beginDate,
+                    "useEndDate" : this.useSearchDate.endDate,
+                    "brandRedInfo":this.brandRedInfo,"shopRedInfoList" : this.shopRedInfoList},function(result){
 
                 });
             },

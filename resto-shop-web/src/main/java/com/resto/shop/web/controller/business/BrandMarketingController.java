@@ -2,6 +2,8 @@ package com.resto.shop.web.controller.business;
 
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
@@ -19,6 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,6 +165,15 @@ public class BrandMarketingController extends GenericController{
     @RequestMapping("/redList")
     public void redList(){}
 
+    /**
+     * 查询红包报表
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @param redType
+     * @return
+     */
     @RequestMapping("/selectRedList")
     @ResponseBody
     public Result selectRedList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, Integer redType){
@@ -260,6 +276,16 @@ public class BrandMarketingController extends GenericController{
         return getSuccessResult(object);
     }
 
+    /**
+     * 查询评论红包、分享返利红包、退菜红包
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @param redType
+     * @param payMode
+     * @return
+     */
     private List<RedPacketDto> selectRedPacketLog(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate,
                                                   String redType, String payMode){
         Map<String, Object> selectMap = new HashMap<>();
@@ -286,6 +312,14 @@ public class BrandMarketingController extends GenericController{
         return redPacketDtos;
     }
 
+    /**
+     * 查询充值赠送红包
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @return
+     */
     private List<RedPacketDto> selectChargeRedPacket(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate){
         Map<String, Object> selectMap = new HashMap<>();
         selectMap.put("grantBeginDate",grantBeginDate);
@@ -310,6 +344,14 @@ public class BrandMarketingController extends GenericController{
         return redPacketDtos;
     }
 
+    /**
+     * 查询等位红包
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @return
+     */
     private List<RedPacketDto> selectGetNumberRed(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate){
         Map<String, Object> selectMap = new HashMap<>();
         selectMap.put("grantBeginDate",grantBeginDate);
@@ -334,6 +376,12 @@ public class BrandMarketingController extends GenericController{
         return redPacketDtos;
     }
 
+    /**
+     * 查询全部红包
+     * @param selectRedPackets
+     * @param redPacketDtos
+     * @return
+     */
     private List<RedPacketDto> selectRedPackets(List<RedPacketDto> selectRedPackets,List<RedPacketDto> redPacketDtos){
         if(selectRedPackets.isEmpty()){
             return redPacketDtos;
@@ -360,10 +408,79 @@ public class BrandMarketingController extends GenericController{
         return redPacketDtos;
     }
 
+    /**
+     * 下载红包报表
+     * @param redPacketDto
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/downloadExcel")
     @ResponseBody
-    public Result downloadExcel(RedPacketDto redPacketDto){
-        return getSuccessResult();
+    public void downloadExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, RedPacketDto redPacketDto,
+                                HttpServletRequest request, HttpServletResponse response){
+        //导出文件名
+        String fileName = "红包报表"+grantBeginDate+"至"+grantEndDate+".xls";
+        //定义读取文件的路径
+        String path = request.getSession().getServletContext().getRealPath(fileName);
+        //定义列
+        String[]columns={"shopName","redCount","redMoney","useRedCount","useRedMoney","useRedCountRatio","useRedOrderCount","useRedOrderMoney"};
+        //定义数据
+        List<RedPacketDto> result = null;
+        RedPacketDto brandRedInfo = new RedPacketDto();
+        brandRedInfo.setShopName(redPacketDto.getBrandRedInfo().get("brandName").toString());
+        brandRedInfo.setRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("redCount").toString()));
+        brandRedInfo.setRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("redMoney").toString()));
+        brandRedInfo.setUseRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedCount").toString()));
+        brandRedInfo.setUseRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedMoney").toString()));
+        brandRedInfo.setUseRedCountRatio(redPacketDto.getBrandRedInfo().get("useRedCountRatio").toString());
+        brandRedInfo.setUseRedOrderCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderCount").toString()));
+        brandRedInfo.setUseRedOrderMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderMoney").toString()));
+        result.add(brandRedInfo);
+        for (Map redMap : redPacketDto.getShopRedInfoList()){
+            RedPacketDto redInfo = new RedPacketDto();
+            redInfo.setShopName(redMap.get("brandName").toString());
+            redInfo.setRedCount(new BigDecimal(redMap.get("redCount").toString()));
+            redInfo.setRedMoney(new BigDecimal(redMap.get("redMoney").toString()));
+            redInfo.setUseRedCount(new BigDecimal(redMap.get("useRedCount").toString()));
+            redInfo.setUseRedMoney(new BigDecimal(redMap.get("useRedMoney").toString()));
+            redInfo.setUseRedCountRatio(redMap.get("useRedCountRatio").toString());
+            redInfo.setUseRedOrderCount(new BigDecimal(redMap.get("useRedOrderCount").toString()));
+            redInfo.setUseRedOrderMoney(new BigDecimal(redMap.get("useRedOrderMoney").toString()));
+            result.add(redInfo);
+        }
+        //获取店铺名称
+        String shopName="";
+		for (ShopDetail shopDetail : getCurrentShopDetails()) {
+			shopName += shopDetail.getName()+",";
+		}
+		//去掉最后一个逗号
+		shopName.substring(0, shopName.length()-1);
+        Map<String,String> map = new HashMap<>();
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("grantBeginDate", grantBeginDate);
+        map.put("grantEndDate", grantEndDate);
+        map.put("useBeginDate", useBeginDate);
+        map.put("useEndDate", useEndDate);
+        map.put("reportType", "红包报表");//表的头，第一行内容
+        map.put("num", "9");//显示的位置
+        map.put("reportTitle", "红包报表");//表的名字
+        map.put("timeType", "yyyy-MM-dd");
+
+        String[][] headers = {{"品牌/店铺名称","35"},{"发放总数","35"},{"发放总额","35"},{"使用总数","35"},{"使用总额","35"},{"红包使用数占比","35"},{"拉动订单总数","35"},{"拉动订单总额","35"}};
+        //定义excel工具类对象
+        ExcelUtil<RedPacketDto> excelUtil=new ExcelUtil<RedPacketDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportRedPacketDtoExcel(headers, columns, result, out, map);
+            out.close();
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @RequestMapping("/couponList")
