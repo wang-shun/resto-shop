@@ -44,13 +44,13 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
             <if test="redMoney != null">#{redMoney,jdbcType=DECIMAL},</if>
-            <if test="createTime != null">#{createTime,jdbcType=DATETIME},</if>
-            <if test="finishTime != null">#{finishTime,jdbcType=DATETIME},</if>
+            <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="finishTime != null">#{finishTime,jdbcType=TIMESTAMP},</if>
             <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if>
             <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>
             <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
             <if test="redRemainderMoney != null">#{redRemainderMoney,jdbcType=DECIMAL},</if>
-            <if test="redType != null">#{redType,jdbcType=INT},</if>
+            <if test="redType != null">#{redType,jdbcType=INTEGER},</if>
         </trim>
   </insert>
 
@@ -58,13 +58,13 @@
       update tb_red_packet
         <set>
             <if test="redMoney != null">red_money = #{redMoney,jdbcType=DECIMAL},</if>
-            <if test="createTime != null">create_time = #{createTime,jdbcType=DATETIME},</if>
-            <if test="finishTime != null">finish_time = #{finishTime,jdbcType=DATETIME},</if>
+            <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="finishTime != null">finish_time = #{finishTime,jdbcType=TIMESTAMP},</if>
             <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if>
             <if test="brandId != null">brand_id = #{brandId,jdbcType=VARCHAR},</if>
             <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>
             <if test="redRemainderMoney != null">red_remainder_money = #{redRemainderMoney,jdbcType=DECIMAL},</if>
-            <if test="redType != null">red_type = #{redType,jdbcType=INT},</if>
+            <if test="redType != null">red_type = #{redType,jdbcType=INTEGER},</if>
         </set>
       where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -80,7 +80,7 @@
     <update id="updateRedRemainderMoney" parameterType="java.util.Map">
         update tb_red_packet set red_remainder_money = ${redRemainderMoney}
         <if test="finishTime != null">
-            ,finish_time = #{finishTime,jdbcType=DATETIME}
+            ,finish_time = #{finishTime,jdbcType=TIMESTAMP}
         </if>
         where id = #{id}
     </update>
