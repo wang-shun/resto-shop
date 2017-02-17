@@ -160,14 +160,14 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		}else if(rewardMoney.compareTo(shareSetting.getMaxMoney())>0){
 			rewardMoney = shareSetting.getMaxMoney();
 		}
-		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD,customer.getRegisterShopId());
+		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD,customer.getBindPhoneShop());
         RedPacket redPacket = new RedPacket();
         redPacket.setId(ApplicationUtils.randomUUID());
         redPacket.setRedMoney(rewardMoney);
         redPacket.setCreateTime(new Date());
         redPacket.setCustomerId(shareCustomer.getId());
         redPacket.setBrandId(customer.getBrandId());
-        redPacket.setShopDetailId(customer.getRegisterShopId());
+        redPacket.setShopDetailId(customer.getBindPhoneShop());
         redPacket.setRedRemainderMoney(rewardMoney);
         redPacket.setRedType(RedType.SHARE_RED);
         redPacketService.insert(redPacket);
