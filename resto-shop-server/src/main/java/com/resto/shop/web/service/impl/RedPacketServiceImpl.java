@@ -17,6 +17,7 @@ import com.resto.shop.web.service.RedPacketService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +53,12 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
         if (redPacket == null && redPay.compareTo(BigDecimal.ZERO) > 0){
             return false;
         }
+        Map<String, Object> param = new HashMap<>();
         if(redPay.compareTo(redPacket.getRedRemainderMoney()) >= 0){
-            redPacketMapper.updateRedRemainderMoney(redPacket.getId(),BigDecimal.ZERO);
+            param.put("id",redPacket.getId());
+            param.put("redRemainderMoney",BigDecimal.ZERO);
+            param.put("finishTime",new Date());
+            redPacketMapper.updateRedRemainderMoney(param);
             OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
@@ -75,7 +80,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 return useRedPacket(redType, redPay, customerId, order);
             }
         }else{
-            redPacketMapper.updateRedRemainderMoney(redPacket.getId(),redPacket.getRedRemainderMoney().subtract(redPay));
+            param.put("id",redPacket.getId());
+            param.put("redRemainderMoney",redPacket.getRedRemainderMoney().subtract(redPay));
+            redPacketMapper.updateRedRemainderMoney(param);
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(order.getId());

@@ -77,8 +77,12 @@
         select * from tb_red_packet where customer_id = #{customerId} and red_remainder_money > 0 and red_type = ${redType} ORDER BY create_time asc LIMIT 0,1
     </select>
 
-    <update id="updateRedRemainderMoney">
-        update tb_red_packet set red_remainder_money = ${redRemainderMoney} where id = #{id}
+    <update id="updateRedRemainderMoney" parameterType="java.util.Map">
+        update tb_red_packet set red_remainder_money = ${redRemainderMoney}
+        <if test="finishTime != null">
+            ,finish_time = #{finishTime,jdbcType=DATETIME}
+        </if>
+        where id = #{id}
     </update>
 
     <select id="selectRedPacketLog" resultType="com.resto.brand.web.dto.RedPacketDto">
