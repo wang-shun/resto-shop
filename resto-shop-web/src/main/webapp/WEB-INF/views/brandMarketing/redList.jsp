@@ -253,7 +253,7 @@
                     "useEndDate" : this.useSearchDate.endDate,
                     "brandRedInfo":this.brandRedInfo,"shopRedInfoList" : this.shopRedInfoList},function(result){
                     if (result.success){
-                        window.location.href = "brandMarketing/downloadExcel?path="+result.data+"";
+                        window.location.href = "brandMarketing/downloadRedPacketDto?path="+result.data+"";
                     }else {
                         toastr.error("下载红包报表失败！");
                         toastr.clear();

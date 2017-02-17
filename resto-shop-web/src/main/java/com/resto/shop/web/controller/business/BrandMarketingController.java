@@ -464,7 +464,7 @@ public class BrandMarketingController extends GenericController{
         ExcelUtil<RedPacketDto> excelUtil=new ExcelUtil<RedPacketDto>();
         try{
             OutputStream out = new FileOutputStream(path);
-            excelUtil.ExportRedPacketDtoExcel(headers, columns, result, out, map);
+            excelUtil.ExportMarktingDtoExcel(headers, columns, result, out, map);
             out.close();
         }catch(Exception e){
             e.printStackTrace();
@@ -473,8 +473,8 @@ public class BrandMarketingController extends GenericController{
         return getSuccessResult(path);
     }
 
-    @RequestMapping("/downloadExcel")
-    public void downloadExcel(String path, HttpServletResponse response){
+    @RequestMapping("/downloadRedPacketDto")
+    public void downloadRedPacketDto(String path, HttpServletResponse response){
         try {
             //定义excel工具类对象
             ExcelUtil<RedPacketDto> excelUtil=new ExcelUtil<>();
