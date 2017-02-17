@@ -1180,7 +1180,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
-                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER,order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
