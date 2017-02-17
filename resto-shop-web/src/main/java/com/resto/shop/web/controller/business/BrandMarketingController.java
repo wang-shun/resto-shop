@@ -230,8 +230,16 @@ public class BrandMarketingController extends GenericController{
                     break;
             }
             for(RedPacketDto redPacket : redPacketDtoList){
-                redPacket.setUseRedCountRatio((redPacket.getUseRedCount().divide(redPacket.getRedCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%"));
-                redPacket.setUseRedMoneyRatio((redPacket.getUseRedMoney().divide(redPacket.getRedMoney(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%"));
+                if(redPacket.getRedCount().equals(BigDecimal.ZERO)){
+                    redPacket.setUseRedCountRatio("0.00%");
+                }else {
+                    redPacket.setUseRedCountRatio((redPacket.getUseRedCount().divide(redPacket.getRedCount(), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%"));
+                }
+                if(redPacket.getRedMoney().equals(BigDecimal.ZERO)) {
+                    redPacket.setUseRedMoneyRatio("0.00%");
+                }else{
+                    redPacket.setUseRedMoneyRatio((redPacket.getUseRedMoney().divide(redPacket.getRedMoney(), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%"));
+                }
                 redCount = redCount.add(redPacket.getRedCount());
                 redMoney = redMoney.add(redPacket.getRedMoney());
                 useRedCount = useRedCount.add(redPacket.getUseRedCount());
