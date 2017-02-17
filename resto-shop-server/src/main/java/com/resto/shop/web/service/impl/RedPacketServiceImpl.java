@@ -65,10 +65,13 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             switch (redType){
                 case RedType.APPRAISE_RED:
                     item.setPaymentModeId(PayMode.APPRAISE_RED_PAY);
+                    break;
                 case RedType.SHARE_RED:
                     item.setPaymentModeId(PayMode.SHARE_RED_PAY);
+                    break;
                 case RedType.REFUND_ARTICLE_RED:
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
+                    break;
             }
 			item.setPayTime(new Date());
 			item.setPayValue(redPacket.getRedRemainderMoney());
@@ -89,10 +92,13 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             switch (redType){
                 case RedType.APPRAISE_RED:
                     item.setPaymentModeId(PayMode.APPRAISE_RED_PAY);
+                    break;
                 case RedType.SHARE_RED:
                     item.setPaymentModeId(PayMode.SHARE_RED_PAY);
+                    break;
                 case RedType.REFUND_ARTICLE_RED:
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
+                    break;
             }
             item.setPayTime(new Date());
             item.setPayValue(redPay);
