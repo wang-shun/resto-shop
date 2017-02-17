@@ -137,8 +137,8 @@ public class OrderAspect {
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if(setting.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1){
-            msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+        if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1){
+            msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
         }
         if(setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
             msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
@@ -492,8 +492,8 @@ public class OrderAspect {
             msg.append("就餐店铺：" + shopDetail.getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if(setting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
-                msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+            if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
+                msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
             if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
                 msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
@@ -672,8 +672,8 @@ public class OrderAspect {
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
-            if(setting.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
-                msg.append(setting.getServiceName()+"：" + order.getServicePrice() + "\n");
+            if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
+                msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
             }
             if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
                 msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");

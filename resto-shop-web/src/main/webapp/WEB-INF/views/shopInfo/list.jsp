@@ -302,24 +302,24 @@
 					<div class="form-group" style="margin-left: 55px;">
 						<div class="control-label" style="text-align: inherit">是否启用服务费</div>
 						<label style="position: relative;left: 195px;bottom: 21px;">
-							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="0">
+							<input type="radio" name="isUseServicePrice"  v-model="m.isUseServicePrice" value="0">
 							否
 						</label>
 						<label style="position: relative;left: 105px;bottom: 21px;">
-							<input type="radio" name="isUseServicePrices"  v-model="m.isUseServicePrices" value="1">
+							<input type="radio" name="isUseServicePrice"  v-model="m.isUseServicePrice" value="1">
 							是
 						</label>
 					</div>
-					<div v-if="m.isUseServicePrices==1">
+					<div v-if="m.isUseServicePrice==1">
 					<div v-if="showp" >
 					<div class="form-group" id="serviceDivOne"  >
 						<label>名称</label>
-						<input type="test" class="form-control" name="serviceNames" v-if="!m.serviceNames" value="服务费" required="required">
-						<input type="test" class="form-control" name="serviceNames" v-if="m.serviceNames" v-model="m.serviceNames" required="required">
+						<input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
+						<input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
 					</div>
 						<div class="form-group" id="serviceDivTwo">
 							<label>服务费/每人</label>
-							<input type="number" class="form-control" name="servicePrices" v-model="m.servicePrices" required="required" min="0">
+							<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required" min="0">
 						</div>
 					   </div>
 					</div>
@@ -364,11 +364,11 @@
 					},
 					watch: {
 						'm.consumeConfineUnit': 'hideShowa',
-						'm.isUseServicePrices':'hideServiceP'
+						'm.isUseServicePrice':'hideServiceP'
 					},
 					methods : {
 						hideServiceP  :function (){
-						if(result.data.isUseServicePrices ==0){
+						if(result.data.isUseServicePrice ==0){
 							this.showp = false;
 						}else{
 							this.showp = true;
