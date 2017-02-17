@@ -179,7 +179,6 @@ public class BrandMarketingController extends GenericController{
     public Result selectRedList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, Integer redType){
         JSONObject object = new JSONObject();
         try{
-            String shopName = null;
             BigDecimal redCount = new BigDecimal(0);
             BigDecimal redMoney = new BigDecimal(0);
             BigDecimal useRedCount = new BigDecimal(0);
@@ -195,62 +194,52 @@ public class BrandMarketingController extends GenericController{
                 RedPacketDto redPacketDto = new RedPacketDto(shopDetail.getId(),shopDetail.getName(),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),"0.00%","0.00%",new BigDecimal(0),new BigDecimal(0));
                 redPacketDtoList.add(redPacketDto);
             }
-            List<RedPacketDto> redPacketDtos = null;
+            List<RedPacketDto> selectRedPackets = null;
             switch (redType){
                 case 0:
-                    List<RedPacketDto> selectRedPackets = null;
                     selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,
                         RedType.APPRAISE_RED+","+RedType.SHARE_RED+","+RedType.REFUND_ARTICLE_RED ,
                         PayMode.APPRAISE_RED_PAY+","+PayMode.SHARE_RED_PAY+","+PayMode.REFUND_ARTICLE_RED_PAY);
-                    redPacketDtos = selectRedPackets(selectRedPackets,redPacketDtos);
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     selectRedPackets = selectChargeRedPacket(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
-                    redPacketDtos = selectRedPackets(selectRedPackets,redPacketDtos);
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     selectRedPackets = selectGetNumberRed(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
-                    redPacketDtos = selectRedPackets(selectRedPackets,redPacketDtos);
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 case 1:
-                    redPacketDtos = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate, String.valueOf(RedType.APPRAISE_RED) ,String.valueOf(PayMode.APPRAISE_RED_PAY));
+                    selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate, String.valueOf(RedType.APPRAISE_RED) ,String.valueOf(PayMode.APPRAISE_RED_PAY));
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 case 2:
-                    redPacketDtos = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.SHARE_RED),String.valueOf(PayMode.SHARE_RED_PAY));
+                    selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.SHARE_RED),String.valueOf(PayMode.SHARE_RED_PAY));
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 case 3:
-                    redPacketDtos = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.REFUND_ARTICLE_RED),String.valueOf(PayMode.REFUND_ARTICLE_RED_PAY));
+                    selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.REFUND_ARTICLE_RED),String.valueOf(PayMode.REFUND_ARTICLE_RED_PAY));
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 case 4:
-                    redPacketDtos = selectChargeRedPacket(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
+                    selectRedPackets = selectChargeRedPacket(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 case 5:
-                    redPacketDtos = selectGetNumberRed(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
+                    selectRedPackets = selectGetNumberRed(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
+                    redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
                 default:
                     break;
             }
-            if(redPacketDtos == null){
-                object.put("shopRedInfoList",redPacketDtoList);
-            }else{
-                List<RedPacketDto> shopRedInfoList = new ArrayList<>();
-                for(RedPacketDto redPacket : redPacketDtoList){
-                    for(RedPacketDto redPacketDto : redPacketDtos){
-                        if (redPacket.getShopDetailId().equalsIgnoreCase(redPacketDto.getShopDetailId())){
-                            shopName = redPacket.getShopName();
-                            redPacket = redPacketDto;
-                            redPacket.setShopName(shopName);
-                            redPacket.setUseRedCountRatio((redPacket.getUseRedCount().divide(redPacket.getRedCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%"));
-                            redPacket.setUseRedMoneyRatio((redPacket.getUseRedMoney().divide(redPacket.getRedMoney(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%"));
-                            redCount = redCount.add(redPacket.getRedCount());
-                            redMoney = redMoney.add(redPacket.getRedMoney());
-                            useRedCount = useRedCount.add(redPacket.getUseRedCount());
-                            useRedMoney = useRedMoney.add(redPacket.getUseRedMoney());
-                            useRedOrderCount = useRedOrderCount.add(redPacket.getUseRedOrderCount());
-                            useRedOrderMoney = useRedOrderMoney.add(redPacket.getUseRedOrderMoney());
-                            continue;
-                        }
-                    }
-                    shopRedInfoList.add(redPacket);
-                }
-                object.put("shopRedInfoList",shopRedInfoList);
+            for(RedPacketDto redPacket : redPacketDtoList){
+                redPacket.setUseRedCountRatio((redPacket.getUseRedCount().divide(redPacket.getRedCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%"));
+                redPacket.setUseRedMoneyRatio((redPacket.getUseRedMoney().divide(redPacket.getRedMoney(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%"));
+                redCount = redCount.add(redPacket.getRedCount());
+                redMoney = redMoney.add(redPacket.getRedMoney());
+                useRedCount = useRedCount.add(redPacket.getUseRedCount());
+                useRedMoney = useRedMoney.add(redPacket.getUseRedMoney());
+                useRedOrderCount = useRedOrderCount.add(redPacket.getUseRedOrderCount());
+                useRedOrderMoney = useRedOrderMoney.add(redPacket.getUseRedOrderMoney());
             }
+            object.put("shopRedInfoList",redPacketDtoList);
             JSONObject brandRedInfo = new JSONObject();
             brandRedInfo.put("brandName",getBrandName());
             brandRedInfo.put("redCount",redCount);
@@ -382,30 +371,24 @@ public class BrandMarketingController extends GenericController{
      * @param redPacketDtos
      * @return
      */
-    private List<RedPacketDto> selectRedPackets(List<RedPacketDto> selectRedPackets,List<RedPacketDto> redPacketDtos){
+    private List<RedPacketDto> selectRedPackets(List<RedPacketDto> selectRedPackets,List<RedPacketDto> redPacketDtoList){
         if(selectRedPackets.isEmpty()){
-            return redPacketDtos;
+            return redPacketDtoList;
         }
-        if(redPacketDtos == null){
-            redPacketDtos = selectRedPackets;
-            return redPacketDtos;
-        }
-        if(redPacketDtos != null){
-            for(RedPacketDto redPacketDto : redPacketDtos){
-                for(RedPacketDto redPacket : selectRedPackets){
-                    if(redPacketDto.getShopDetailId().equalsIgnoreCase(redPacket.getShopDetailId())){
-                        redPacketDto.setRedCount(redPacketDto.getRedCount().add(redPacket.getRedCount()));
-                        redPacketDto.setRedMoney(redPacketDto.getRedMoney().add(redPacket.getRedMoney()));
-                        redPacketDto.setUseRedCount(redPacketDto.getUseRedCount().add(redPacket.getUseRedCount()));
-                        redPacketDto.setUseRedMoney(redPacketDto.getUseRedMoney().add(redPacket.getUseRedMoney()));
-                        redPacketDto.setUseRedOrderCount(redPacketDto.getUseRedOrderCount().add(redPacket.getUseRedOrderCount()));
-                        redPacketDto.setUseRedOrderMoney(redPacketDto.getUseRedOrderMoney().add(redPacket.getUseRedOrderMoney()));
-                        continue;
-                    }
+        for(RedPacketDto redPacketDto : redPacketDtoList){
+            for(RedPacketDto redPacket : selectRedPackets){
+                if(redPacketDto.getShopDetailId().equalsIgnoreCase(redPacket.getShopDetailId())){
+                    redPacketDto.setRedCount(redPacketDto.getRedCount().add(redPacket.getRedCount()));
+                    redPacketDto.setRedMoney(redPacketDto.getRedMoney().add(redPacket.getRedMoney()));
+                    redPacketDto.setUseRedCount(redPacketDto.getUseRedCount().add(redPacket.getUseRedCount()));
+                    redPacketDto.setUseRedMoney(redPacketDto.getUseRedMoney().add(redPacket.getUseRedMoney()));
+                    redPacketDto.setUseRedOrderCount(redPacketDto.getUseRedOrderCount().add(redPacket.getUseRedOrderCount()));
+                    redPacketDto.setUseRedOrderMoney(redPacketDto.getUseRedOrderMoney().add(redPacket.getUseRedOrderMoney()));
+                    break;
                 }
             }
         }
-        return redPacketDtos;
+        return redPacketDtoList;
     }
 
     /**

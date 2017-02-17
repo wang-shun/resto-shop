@@ -52,7 +52,7 @@
   <select id="selectListByShopId" resultType="ShowPhoto">
   	select * from tb_show_photo where shop_detail_id = #{shopId}
   	GROUP BY title
-  	order by show_sort desc
+  	order by show_type,show_sort
   </select>
 
   <update id="updatePhotoSquare" parameterType="com.resto.shop.web.model.ShowPhoto">

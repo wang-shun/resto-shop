@@ -166,7 +166,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
                 coupon.setCustomerId(cus.getId());
                 coupon.setPushDay(cfg.getPushDay());
-                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 60 * 3600);
+                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
                 //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
                 if(cfg.getShopDetailId()!=null&&shopId.equals(cfg.getShopDetailId())){
                     coupon.setShopDetailId(cfg.getShopDetailId());
