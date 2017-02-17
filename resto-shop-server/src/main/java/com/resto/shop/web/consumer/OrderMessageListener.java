@@ -108,6 +108,8 @@ public class OrderMessageListener implements MessageListener {
         	return executeRemindMsg(message);
         }else if (tag.equals(MQSetting.TAG_AUTO_SEND_REMMEND)){
         	return executeRecommendMsg(message);
+        }else if(tag.equals(MQSetting.TAG_BOSS_ORDER)){
+            return executeBossOrderMsg(message);
         }
         return Action.CommitMessage;
     }
@@ -164,6 +166,16 @@ public class OrderMessageListener implements MessageListener {
 		param.put("name", name);
 		param.put("day", pushDay);
         SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
+    }
+
+    //
+    private Action executeBossOrderMsg(Message message) throws UnsupportedEncodingException {
+        String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+        Order order = JSON.parseObject(msg, Order.class);
+        DataSourceContextHolder.setDataSourceName(order.getBrandId());
+        log.info("执行自动确认逻辑" + order.getId());
+        orderService.confirmBossOrder(order);
+        return Action.CommitMessage;
     }
 
     private void noticeShareCustomer(Customer customer) {

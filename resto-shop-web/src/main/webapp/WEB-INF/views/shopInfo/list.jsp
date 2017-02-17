@@ -113,6 +113,19 @@
 							</div>
 						</div>
 
+						<div class="form-group">
+							<label class="col-sm-3 control-label">点餐页面滑动效果：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="rollingSwitch"
+												   v-model="m.rollingSwitch" value="0"> 不滑动
+									</label> <label> <input type="radio" name="rollingSwitch"
+															v-model="m.rollingSwitch" value="1"> 滑动
+								</label>
+								</div>
+							</div>
+						</div>
+
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-sm-3 control-label">名称：</label>
 							<div class="col-sm-9">
@@ -149,7 +162,7 @@
 
 
 						<div class="form-group">
-							<label class="col-sm-3 control-label">红包到期提醒时间：</label>
+							<label class="col-sm-3 control-label">优惠券到期提醒时间：</label>
 							<div class="col-sm-9">
 								<input type="number" class="form-control"
 									   name="recommendTime" placeholder="(输入整数)"
@@ -207,7 +220,6 @@
 							</div>
 						</div>
 
-
 						<div class="form-group">
 							<label class="col-sm-3 control-label">外带是否需要扫码：</label>
 							<div class="col-sm-9">
@@ -216,6 +228,19 @@
 												   v-model="m.continueOrderScan" value="0"> 不需要
 									</label> <label> <input type="radio" name="continueOrderScan"
 															v-model="m.continueOrderScan" value="1"> 需要
+								</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label">扫码进是否堂食：</label>
+							<div class="col-sm-9">
+								<div>
+									<label> <input type="radio" name="sweepMode"
+												   v-model="m.sweepMode" value="0"> 默认堂食
+									</label> <label> <input type="radio" name="sweepMode"
+															v-model="m.sweepMode" value="1"> 需选择就餐模式
 								</label>
 								</div>
 							</div>

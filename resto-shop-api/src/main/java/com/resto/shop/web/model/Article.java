@@ -137,6 +137,16 @@ public class Article {
 
     private Integer mealFeeNumber;
 
+    private Integer isMainFood;
+
+    public Integer getIsMainFood() {
+        return isMainFood;
+    }
+
+    public void setIsMainFood(Integer isMainFood) {
+        this.isMainFood = isMainFood;
+    }
+
     public Integer getMealFeeNumber() {
         return mealFeeNumber;
     }

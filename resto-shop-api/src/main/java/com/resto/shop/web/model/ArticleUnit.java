@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 
 public class ArticleUnit {
@@ -21,7 +23,11 @@ public class ArticleUnit {
     //构造方法
     public ArticleUnit(String id, String name, BigDecimal sort, Integer tbArticleAttrId) {
 		super();
-		this.id = (("").equals(id.trim()) || id == null) ? null : Integer.parseInt(id);
+        if(StringUtils.isEmpty(id)){
+            this.id = null;
+        }else{
+            this.id = Integer.valueOf(id);
+        }
 		this.name = name;
 		this.sort = sort;
 		this.tbArticleAttrId = tbArticleAttrId;

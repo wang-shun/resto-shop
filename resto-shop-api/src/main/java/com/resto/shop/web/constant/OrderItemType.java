@@ -10,5 +10,24 @@ public class OrderItemType {
 
 	public static final int RECOMMEND = 6; //推荐餐包
 
+	public static String getPayModeName(int state){
+		switch (state) {
+			case ARTICLE:
+				return "单品";
+			case UNITPRICE:
+				return "多规格单品";
+			case SETMEALS:
+				return "套餐";
+			case MEALS_CHILDREN:
+				return "套餐子品";
+			case UNIT_NEW:
+				return "新规格单品";
+			case RECOMMEND:
+				return "推荐餐品";
+			default:
+				return "未知";
+		}
+	}
+
 
 }

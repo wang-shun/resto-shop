@@ -108,7 +108,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setIsBindPhone(true);
 		customer.setTelephone(phone);
 		customer.setId(currentCustomerId);
-		customer.setShareCustomer(shareCustomer);
+		customer.setBindPhoneTime(new Date());
+		customer.setBindPhoneShop(shopId);
+		if(!currentCustomerId.equals(shareCustomer)){
+			customer.setShareCustomer(shareCustomer);
+		}
 		customer.setRegisterShopId(shopId);
 		update(customer);
 		return customer;

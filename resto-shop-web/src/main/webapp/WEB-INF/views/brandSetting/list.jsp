@@ -193,6 +193,11 @@
 				    <label>等位提示</label>
 				    <input type="text" class="form-control" name="queueNotice" v-model="m.queueNotice">
 				</div>
+				<div class="form-group">
+					<label>数据导出口令</label>
+					<input type="text" class="form-control" name="exportPassword" v-model="m.exportPassword">
+				</div>
+
 			</div>
 				<input type="hidden" name="id" v-model="m.id" />
 				<input class="btn green"  type="submit"  value="保存"/>

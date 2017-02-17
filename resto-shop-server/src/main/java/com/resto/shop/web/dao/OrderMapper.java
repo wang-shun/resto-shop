@@ -150,6 +150,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Double selectParentAmountByBossOrder(String orderId);
 
+	BigDecimal selectPayBefore(String orderId);
+
 	void changeAllowContinue(String id, boolean b);
 
 	Integer selectArticleCountById(@Param("id")String id,@Param("shopMode")Integer shopMode);
@@ -498,7 +500,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order getLastOrderByCustomer(@Param("customerId")String customerId,@Param("shopId") String shopId,@Param("time") Integer time);
 
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId);
 
 	BigDecimal getServicePrice(String shopId);
 
@@ -597,4 +599,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 	Integer checkTableNumber(@Param("shopId") String shopId,@Param("tableNumber") String tableNumber,@Param("customerId") String customerId);
+
+	BigDecimal getPayHoufu(String orderId);
+
+	List<Order> getTodayFinishOrder(@Param("shopId") String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 }

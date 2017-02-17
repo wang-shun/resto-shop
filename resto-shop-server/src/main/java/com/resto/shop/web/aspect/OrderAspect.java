@@ -98,19 +98,6 @@ public class OrderAspect {
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
 
-            //订单在每天0点未被消费系统自动取消订单（款项自动退还到相应账户）
-            log.info("当天24小时开启自动退款:" + order.getId());
-            if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
-                MQMessageProducer.sendAutoRefundMsg(order.getBrandId(), order.getId(), order.getCustomerId());
-            }
-            //自动取消订单，不包含后付款模式
-            if (order.getOrderState().equals(OrderState.SUBMIT)&&order.getOrderMode()!=ShopMode.HOUFU_ORDER&&order.getOrderMode()!=ShopMode.BOSS_ORDER) {//未支付和未完全支付的订单，不包括后付款模式
-            	long delay = 1000*60*60*2;//两个小时后自动取消订单
-                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            }
-//            else if (order.getOrderState().equals((OrderState.PAYMENT)) && order.getOrderMode()!=ShopMode.TABLE_MODE && order.getOrderMode()!=ShopMode.BOSS_ORDER) { //坐下点餐模式不发送
-//                sendPaySuccessMsg(order);
-//            }
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
@@ -287,6 +274,10 @@ public class OrderAspect {
         if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
                 order.getOrderState().equals(OrderState.PAYMENT)
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
+            if(order.getPayType() ==  PayType.NOPAY){
+                order.setPrintTimes(1);
+                orderService.update(order);
+            }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
@@ -294,6 +285,10 @@ public class OrderAspect {
         if(order != null  && order.getOrderState() == OrderState.PAYMENT
                 && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
                 && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER )){
+            if(order.getPayType() == PayType.NOPAY){
+                order.setPrintTimes(1);
+                orderService.update(order);
+            }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
@@ -305,6 +300,8 @@ public class OrderAspect {
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
+
+
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
 //            MQMessageProducer.sendPlaceOrderMessage(order);
@@ -409,14 +406,24 @@ public class OrderAspect {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER){
-                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
-                    if(order.getOrderState() == OrderState.SUBMIT){
-                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
+//                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
+//                    if(order.getOrderState() == OrderState.SUBMIT){
+//                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
+//                    }else{
+//                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
+//                    }
+                    if(setting.getAutoConfirmTime() <= setting.getCloseContinueTime()){    //加菜时间跟领取红包时间对比
+                        if(order.getOrderState() == OrderState.SUBMIT){   //是否买单
+                            MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
+                        }else if(order.getOrderState() == OrderState.PAYMENT){
+                            MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
+                        }
                     }else{
+                        MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
-                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                 }else {
@@ -455,6 +462,12 @@ public class OrderAspect {
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmOrder(..))")
     public void confirmOrder() {
+    }
+
+    ;
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmBossOrder(..))")
+    public void confirmBossOrder() {
     }
 
     ;
@@ -566,7 +579,7 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()", returning = "order")
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
         log.info("确认订单成功后回调:" + order.getId());
         Customer customer = customerService.selectById(order.getCustomerId());

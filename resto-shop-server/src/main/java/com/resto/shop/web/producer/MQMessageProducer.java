@@ -91,6 +91,17 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendBossOrder(final Order order, final long delayTime) {
+		JSONObject obj = new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		obj.put("orderMode",order.getOrderMode());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_BOSS_ORDER,obj.toJSONString().getBytes());
+		long delay = System.currentTimeMillis()+delayTime;
+		message.setStartDeliverTime(delay);
+		sendMessageASync(message);
+	}
+
 	public static void sendNotPrintedMessage(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());

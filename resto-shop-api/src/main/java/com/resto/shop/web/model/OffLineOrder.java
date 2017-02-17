@@ -16,6 +16,9 @@ public class OffLineOrder {
 
     private Integer enterCount;
 
+    private Integer deliveryOrders;
+    
+    private BigDecimal orderBooks;
 
     private Integer numGuest;
 
@@ -80,8 +83,24 @@ public class OffLineOrder {
     public void setEnterCount(Integer enterCount) {
         this.enterCount = enterCount;
     }
+    
+    public Integer getDeliveryOrders() {
+		return deliveryOrders;
+	}
 
-    public Integer getNumGuest() {
+	public void setDeliveryOrders(Integer deliveryOrders) {
+		this.deliveryOrders = deliveryOrders;
+	}
+
+	public BigDecimal getOrderBooks() {
+		return orderBooks;
+	}
+
+	public void setOrderBooks(BigDecimal orderBooks) {
+		this.orderBooks = orderBooks;
+	}
+
+	public Integer getNumGuest() {
         return numGuest;
     }
 
@@ -96,4 +115,6 @@ public class OffLineOrder {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+    
+    
 }

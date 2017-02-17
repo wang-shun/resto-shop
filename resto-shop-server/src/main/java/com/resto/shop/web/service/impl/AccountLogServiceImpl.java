@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
 	}
 
     @Override
-    public Integer selectByShareMoney(String accountId) {
+    public BigDecimal selectByShareMoney(String accountId) {
         return accountlogMapper.selectByShareMoney(accountId);
     }
 }

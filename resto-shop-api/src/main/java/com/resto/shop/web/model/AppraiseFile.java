@@ -21,6 +21,10 @@ public class AppraiseFile {
 
     private String photoSquare;
 
+    private String fileName;
+
+    private Integer state;
+
     public String getId() {
         return id;
     }
@@ -75,5 +79,21 @@ public class AppraiseFile {
 
     public void setPhotoSquare(String photoSquare) {
         this.photoSquare = photoSquare;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

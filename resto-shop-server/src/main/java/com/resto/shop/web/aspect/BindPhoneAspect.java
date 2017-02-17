@@ -59,6 +59,9 @@ public class BindPhoneAspect {
 		Integer couponType = (Integer) pj.getArgs()[2];
         String shopId = (String) pj.getArgs()[3];
 		String shareCustomer = (String) pj.getArgs()[4];
+		if(customerId.equals(shareCustomer)){
+			shareCustomer = null;
+		}
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();

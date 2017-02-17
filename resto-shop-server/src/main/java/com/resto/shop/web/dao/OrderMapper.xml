@@ -37,12 +37,12 @@
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="parent_order_id" property="parentOrderId" />
-        <result column="count_with_child" property="countWithChild" />
-        <result column="order_mode" property="orderMode" />
-        <result column="create_time" property="createTime" />
-        <result column="amount_with_children" property="amountWithChildren" />
-        <result column="customer_id" property="customerId" />
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="count_with_child" property="countWithChild"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="customer_id" property="customerId"/>
 
         <!-- 用户 -->
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
@@ -72,11 +72,11 @@
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="parent_order_id" property="parentOrderId" />
-        <result column="count_with_child" property="countWithChild" />
-        <result column="order_mode" property="orderMode" />
-        <result column="create_time" property="createTime" />
-        <result column="customer_id" property="customerId" />
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="count_with_child" property="countWithChild"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="customer_id" property="customerId"/>
         <!-- 用户 -->
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customerId" property="id"/>
@@ -342,7 +342,7 @@
             parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
-        ,(select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ,ifnull(count_with_child,article_count) as
         totalCount
         from tb_order
         where id = #{id,jdbcType=VARCHAR}
@@ -952,7 +952,6 @@
     </select>
 
 
-
     <select id="listHoufuFinishedOrder" resultType="Order">
         SELECT
         push_order_time,
@@ -966,17 +965,16 @@
         order_mode,
         pay_type,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as
+        totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
-
-
         WHERE
         shop_detail_id=#{shopId}
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and closed=0 and order_state in (2,10,11,12)
+        and order_state in (2,10,11,12)
         and production_status in (2,3)
         and parent_order_id is null
         <if test="shopMode == 6">
@@ -997,7 +995,7 @@
         order_money,
         order_mode,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
@@ -1029,7 +1027,7 @@
         pay_type,
         pay_mode,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
@@ -1038,7 +1036,7 @@
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
-        and ((order_state = 1 and (pay_mode == 3 or pay_mode == 4 )) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
+        and (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
         and table_number is not null
         and parent_order_id is null
         order by create_time ASC;
@@ -1084,7 +1082,8 @@
         order_money,
         order_mode,
         amount_with_children,
-        (select sum(t.article_count)  from tb_order as t where t.id =  tb_order.id or parent_order_id = tb_order.id) as totalCount,
+        ifnull(count_with_child,article_count) as
+        totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
@@ -1102,7 +1101,7 @@
                  item="productionStatus">
             #{productionStatus}
         </foreach>
-        and parent_order_id is  null
+        and parent_order_id is null
         order by create_time DESC;
     </select>
 
@@ -1784,7 +1783,7 @@
         LEFT JOIN tb_appraise a ON o.id = a.order_id
         LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
         where
-        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
+        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId} and (o.order_state != 1 or o.production_status != 0)
     </select>
 
 
@@ -1875,7 +1874,6 @@
           if(t.parent_order_id
 			is null,t.customer_count,0) customer_count 
           from tb_order t
-        INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
@@ -2119,7 +2117,6 @@ and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.product
     </select>
 
 
-
     <select id="selectShopArticleSellList" resultType="java.util.HashMap">
         select r.articleId as article_id,r.type, r.article_name,sum(r.count) as salles,r.articleFamilyName as article_family_name,r.order_id,sum(r.final_price) as sell,r.shopId as shop_id from (	SELECT
         DISTINCT(t.order_id),
@@ -2248,7 +2245,7 @@ GROUP BY r.table_number
     <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
         SELECT tb_order.*,
-        (select sum(t.article_count) from tb_order as t where t.id = tb_order.id or parent_order_id = tb_order.id) as
+        ifnull(count_with_child,article_count) as
         totalCount
         from tb_order where shop_detail_id = #{shopId}
         <if test="orderStates != null and orderStates != '' ">
@@ -2285,12 +2282,12 @@ GROUP BY r.table_number
     <select id="getLastOrderByCustomer" resultType="Order">
         select * from tb_order where customer_id = #{customerId}
         and shop_detail_id = #{shopId}
-        and ((order_mode = 5 and order_state = 1) or (order_mode != 5) )
-        and #{time} > now() - create_time
+        and ((order_mode = 5 and order_state = 1  and #{time} > now() - create_time)
+          or (order_mode != 5 and order_mode != 6 and #{time} > now() - create_time)
+          or(order_mode = 6 ))
         and table_number is not null
         and allow_continue_order = 1
         order by create_time desc limit 1
-
     </select>
 
 
@@ -2328,6 +2325,7 @@ GROUP BY r.table_number
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
+
         ]]>
     </select>
 
@@ -2338,12 +2336,13 @@ GROUP BY r.table_number
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state =1 AND o.production_status=0
         and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}
+
         ]]>
     </select>
 
     <select id="getLastOrderByTableNumber" resultType="Order">
         select * from tb_order where table_number = #{tableNumber} and order_state = 1
-         and pay_mode = 2
+         and pay_mode = 2 and shop_detail_id = #{shopId}
          order by create_time desc limit 1
     </select>
 
@@ -2444,12 +2443,12 @@ AND o.production_status IN (2, 3)
         and pay_value > 0 and payment_mode_id = 10
     </select>
 
-    <select id="selectByCustomerCount" resultType="java.lang.Integer" >
+    <select id="selectByCustomerCount" resultType="java.lang.Integer">
         select count(1) from tb_order where customer_id = #{customerId}
         and parent_order_id is null
         and order_state in (2,10,11) and production_status in (2,3)
         <if test="consumeConfineTime != null and consumeConfineTime !=0">
-            and  #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
+            and #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
         </if>
 
     </select>
@@ -2487,7 +2486,6 @@ WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
     AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
 </select>
-
 
 
     <!-- 每日短信报表数据 用户总数 -->
@@ -2547,7 +2545,8 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and table_number = #{tableNumber}
         and pay_type = 1 and order_state = 1
         and parent_order_id is null
-        and 6*60*60 >  now() - create_time
+        and pay_type = 1
+        and 2*60*60 >  now() - create_time
         and customer_id != #{customerId}
     </select>
 
@@ -2585,12 +2584,13 @@ WHERE
 	o.order_state IN (2, 10, 11, 12)
 AND o.production_status IN (2, 3)
 AND o.brand_id = #{brandId}
- and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]>
+ and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate}
+        ]]>
     </select>
 
     <!--2017-01-21 查询店铺订单总额-->
 
-<select id="selectOrderMoneyByShopIdAndTime" resultType="BigDecimal">
+    <select id="selectOrderMoneyByShopIdAndTime" resultType="BigDecimal">
     SELECT IFNULL(sum(b.order_money),0) FROM
     (SELECT
     DISTINCT(o.id),
@@ -2605,7 +2605,7 @@ AND o.brand_id = #{brandId}
 </select>
 
     <!-- 查询店铺分数 -->
-<select id="selectAppraiseSumByShopId" resultType="Double">
+    <select id="selectAppraiseSumByShopId" resultType="Double">
         SELECT
         IFNULL(sum(level*20)/COUNT(*),0)
     FROM
@@ -2615,6 +2615,26 @@ AND o.brand_id = #{brandId}
     o.order_state IN (2, 10, 11, 12)
     AND o.production_status IN (2, 3)
     AND o.shop_detail_id = #{shopId}
-    and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]>
+    and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate}
+        ]]>
+    </select>
+
+    <select id="selectPayBefore" resultType="java.math.BigDecimal">
+    select sum(pay_value) from tb_order_payment_item
+    where order_id = #{orderId} and payment_mode_id in (3,8)
 </select>
+
+    <select id="getPayHoufu" resultType="java.math.BigDecimal">
+        select sum(pay_value) from tb_order_payment_item
+        where order_id = #{orderId} and payment_mode_id in (2,3)
+    </select>
+
+
+    <select id="getTodayFinishOrder" resultType="Order">
+        select * from tb_order where shop_detail_id = #{shopId}
+        and order_state in (2,10,11,12,13) and production_status in (2,3)
+        and  <![CDATA[ create_time <= #{endDate} and create_time>=#{beginDate}
+        ]]>
+        order by create_time asc
+    </select>
 </mapper>

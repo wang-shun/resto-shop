@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,5 +33,5 @@ public interface AccountLogMapper  extends GenericDao<AccountLog,String> {
     
     List<String> selectBrandMarketing(Map<String, String> selectMap);
 
-    Integer selectByShareMoney(String accountId);
+    BigDecimal selectByShareMoney(String accountId);
 }

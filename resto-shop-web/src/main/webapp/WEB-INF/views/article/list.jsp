@@ -167,6 +167,7 @@
                                     <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
                                 </div>
                             </div>
+
                             <div class="form-group col-md-5">
                                 <label class="col-md-3 control-label">描述</label>
                                 <div class="col-md-7">
@@ -223,7 +224,15 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="col-md-5 control-label">标记为主菜</label>
+                                    <div class="col-md-7 radio-list">
+                                        <label class="radio-inline">
+                                            <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                                   v-model="m.isMainFood">是
+                                        </label>
                                     </div>
                                 </div>
                             </div>

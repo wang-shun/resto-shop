@@ -15,6 +15,7 @@ import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 public interface OrderService extends GenericService<Order, String> {
     
@@ -84,6 +85,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	 
 	public Order confirmOrder(Order order);
+
+	public Order confirmBossOrder(Order order);
 
 	public Order getOrderInfo(String orderId);
 
@@ -481,7 +484,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 * @param tableNumber
 	 * @return
 	 */
-	Order getLastOrderByTableNumber(String tableNumber);
+	Order getLastOrderByTableNumber(String tableNumber,String shopId);
 
 	/**
 	 * 返回子订单的菜品项
@@ -591,4 +594,12 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order getCustomerLastOrder(String customerId);
 
 	void confirmOrderPos(String orderId);
+
+	BigDecimal selectPayBefore(String orderId);
+
+	List<Order> getTodayFinishOrder(String shopId,String beginTime,String endTime);
+
+	List<String []>  getThirdData(List<Order> orderList,int size,String brandSign);
+
+	void fixedRefund(String brandId,String shopId,int total,int refund,String transaction_id,String mchid,String id);
 }
