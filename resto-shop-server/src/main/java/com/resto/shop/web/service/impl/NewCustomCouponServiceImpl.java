@@ -210,12 +210,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             coupon.setBeginDate(customCoupon.getBeginDateTime());
             coupon.setEndDate(customCoupon.getEndDateTime());
         }
-        //判断优惠卷所属
-        if(customCoupon.getIsBrand().equals(1)){
-            coupon.setBrandId(customCoupon.getBrandId());
-        }else if (customCoupon.getIsBrand().equals(0)){
-            coupon.setShopDetailId(customCoupon.getShopDetailId());
-        }
+        //判断优惠卷所属 : 品牌优惠卷
+        coupon.setBrandId(customCoupon.getBrandId());
+        coupon.setShopDetailId(shopDetail.getId());
         if(customCoupon.getPushDay() != null){
             coupon.setPushDay(customCoupon.getPushDay());
         }else{
@@ -235,7 +232,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         for(int i = 0; i < customCoupon.getCouponNumber(); i++){
             couponService.insertCoupon(coupon);
         }
-        String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+coupon.getShopDetailId();
+        String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
         str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\"");
         str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
@@ -257,7 +254,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    			StringBuffer str=new StringBuffer();
 	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId()+"";
 	            	str.append("优惠券到期提醒\n");
-	            	str.append("<a href='"+jumpurl+"'>"+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
+	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
 	                String pr=price+"";//将BigDecimal类型转换成String
 	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信

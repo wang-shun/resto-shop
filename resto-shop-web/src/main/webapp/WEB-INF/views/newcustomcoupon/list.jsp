@@ -175,7 +175,7 @@
                                     <input type="radio" name="isBrand"  value="1"  v-model="m.isBrand">品牌优惠券
                                 </label>
 
-                                <label class="radio-inline">
+                                <label class="radio-inline" v-if = "m.couponType != 2">
                                     <input type="radio" name="isBrand"  value="0" v-model="m.isBrand">店铺优惠券
                                 </label>
 
