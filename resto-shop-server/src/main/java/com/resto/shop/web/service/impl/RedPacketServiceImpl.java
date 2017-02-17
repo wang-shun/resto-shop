@@ -95,7 +95,7 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
             }
             item.setPayTime(new Date());
-            item.setPayValue(redPacket.getRedRemainderMoney().subtract(redPay));
+            item.setPayValue(redPay);
             item.setRemark(""+ RedType.GETREDTYPE.get(redType)+"支付:" + item.getPayValue());
             item.setResultData(redPacket.getId());
             orderPaymentItemService.insert(item);
