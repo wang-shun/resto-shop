@@ -398,6 +398,7 @@ public class BrandMarketingController extends GenericController{
             selectMap.put("useEndDate",useEndDate);
             List<CouponDto> couponDtos = couponService.selectCouponDto(selectMap);
             selectMap.put("payMode",PayMode.COUPON_PAY);
+            selectMap.put("coupon","coupon");
             for(CouponDto couponDto : couponDtos){
                 if(couponDto.getCouponSoure().equalsIgnoreCase("店铺")){
                     for(ShopDetail shopDetail : getCurrentShopDetails()){
