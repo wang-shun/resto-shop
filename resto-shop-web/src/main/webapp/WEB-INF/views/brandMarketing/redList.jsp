@@ -247,7 +247,7 @@
                 }
             },
             downloadExcel : function(){
-                $.post("brandMarketing/createExcel",{"grantBeginDate":this.grantSearchDate.beginDate,
+                $.post("brandMarketing/createRedPacketExcel",{"grantBeginDate":this.grantSearchDate.beginDate,
                     "grantEndDate" : this.grantSearchDate.endDate,
                     "useBeginDate" : this.useSearchDate.beginDate,
                     "useEndDate" : this.useSearchDate.endDate,

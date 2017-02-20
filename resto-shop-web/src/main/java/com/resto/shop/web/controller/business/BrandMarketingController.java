@@ -10,6 +10,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
+import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.RedPacket;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.CouponService;
@@ -295,9 +296,9 @@ public class BrandMarketingController extends GenericController{
      * @param request
      * @return
      */
-    @RequestMapping("/createExcel")
+    @RequestMapping("/createRedPacketExcel")
     @ResponseBody
-    public Result createExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, RedPacketDto redPacketDto,
+    public Result createRedPacketExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, RedPacketDto redPacketDto,
                                 HttpServletRequest request){
         //导出文件名
         String fileName = "红包报表"+grantBeginDate+"至"+grantEndDate+".xls";
@@ -335,7 +336,7 @@ public class BrandMarketingController extends GenericController{
 			shopName += shopDetail.getName()+",";
 		}
 		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
+        shopName = shopName.substring(0, shopName.length()-1);
         Map<String,String> map = new HashMap<>();
         map.put("brandName", getBrandName());
         map.put("shops", shopName);
@@ -378,6 +379,14 @@ public class BrandMarketingController extends GenericController{
     @RequestMapping("/couponList")
     public void couponList(){}
 
+    /**
+     * 查看优惠卷报表
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @return
+     */
     @RequestMapping("/selectCouponList")
     @ResponseBody
     public Result selectCouponList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate){
@@ -413,6 +422,8 @@ public class BrandMarketingController extends GenericController{
                 if(couponDto.getUseCouponCount() != null) {
                     couponDto.setUseCouponCountRatio(couponDto.getUseCouponCount().divide(couponDto.getCouponCount(), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
                 }else {
+                    couponDto.setUseCouponCount(new BigDecimal(0));
+                    couponDto.setUseCouponMoney(new BigDecimal(0));
                     couponDto.setUseCouponCountRatio("0.00%");
                 }
                 selectMap.put("couponTypeInt",couponDto.getCouponTypeInt());
@@ -453,5 +464,112 @@ public class BrandMarketingController extends GenericController{
             return new Result("查看优惠卷报表出错！",false);
         }
         return getSuccessResult(object);
+    }
+
+    /**
+     * 生成优惠卷报表
+     * @param grantBeginDate
+     * @param grantEndDate
+     * @param useBeginDate
+     * @param useEndDate
+     * @param couponDto
+     * @param request
+     * @return
+     */
+    @RequestMapping("/createCouponExcel")
+    @ResponseBody
+    public Result createCouponExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, CouponDto couponDto,
+                                       HttpServletRequest request){
+        //导出文件名
+        String fileName = "优惠卷报表"+grantBeginDate+"至"+grantEndDate+".xls";
+        //定义读取文件的路径
+        String path = request.getSession().getServletContext().getRealPath(fileName);
+        //定义列
+        String[]columns={"brandName","couponType","couponSoure","couponShopName","couponName","couponCount","couponMoney","useCouponCount","useCouponMoney",
+                "useCouponCountRatio","useCouponOrderCount","useCouponOrderMoney","customerCount"};
+        //定义数据
+        List<CouponDto> result = new ArrayList<>();
+        CouponDto brandCouponInfo = new CouponDto();
+        brandCouponInfo.setBrandName(getBrandName());
+        brandCouponInfo.setCouponType("--");
+        brandCouponInfo.setCouponSoure("--");
+        brandCouponInfo.setCouponShopName("--");
+        brandCouponInfo.setCouponName("--");
+        brandCouponInfo.setCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("couponCount").toString()));
+        brandCouponInfo.setCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("couponMoney").toString()));
+        brandCouponInfo.setUseCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponCount").toString()));
+        brandCouponInfo.setUseCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponMoney").toString()));
+        brandCouponInfo.setUseCouponCountRatio(couponDto.getBrandCouponInfo().get("useCouponCountRatio").toString());
+        brandCouponInfo.setUseCouponOrderCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderCount").toString()));
+        brandCouponInfo.setUseCouponOrderMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderMoney").toString()));
+        brandCouponInfo.setCustomerCount(new BigDecimal(couponDto.getBrandCouponInfo().get("customerCount").toString()));
+        result.add(brandCouponInfo);
+        for (Map map : couponDto.getShopCouponInfoList()){
+            CouponDto shopCouponInfo = new CouponDto();
+            shopCouponInfo.setBrandName(getBrandName());
+            shopCouponInfo.setCouponType(map.get("couponType").toString());
+            shopCouponInfo.setCouponSoure(map.get("couponSoure").toString());
+            shopCouponInfo.setCouponShopName(map.get("couponShopName").toString());
+            shopCouponInfo.setCouponName(map.get("couponName").toString());
+            shopCouponInfo.setCouponCount(new BigDecimal(map.get("couponCount").toString()));
+            shopCouponInfo.setCouponMoney(new BigDecimal(map.get("couponMoney").toString()));
+            shopCouponInfo.setUseCouponCount(new BigDecimal(map.get("useCouponCount").toString()));
+            shopCouponInfo.setUseCouponMoney(new BigDecimal(map.get("useCouponMoney").toString()));
+            shopCouponInfo.setUseCouponCountRatio(map.get("useCouponCountRatio").toString());
+            shopCouponInfo.setUseCouponOrderCount(new BigDecimal(map.get("useCouponOrderCount").toString()));
+            shopCouponInfo.setUseCouponOrderMoney(new BigDecimal(map.get("useCouponOrderMoney").toString()));
+            shopCouponInfo.setCustomerCount(new BigDecimal(map.get("customerCount").toString()));
+            result.add(shopCouponInfo);
+        }
+        //获取店铺名称
+        String shopName="";
+        for (ShopDetail shopDetail : getCurrentShopDetails()) {
+            shopName += shopDetail.getName()+",";
+        }
+        //去掉最后一个逗号
+        shopName = shopName.substring(0, shopName.length()-1);
+        Map<String,String> map = new HashMap<>();
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("grantBeginDate", grantBeginDate);
+        map.put("grantEndDate", grantEndDate);
+        map.put("useBeginDate", useBeginDate);
+        map.put("useEndDate", useEndDate);
+        map.put("reportType", "优惠卷报表");//表的头，第一行内容
+        map.put("num", "12");//显示的位置
+        map.put("reportTitle", "优惠卷报表");//表的名字
+        map.put("timeType", "yyyy-MM-dd");
+
+        String[][] headers = {{"品牌名称","35"},{"优惠卷类型","35"},{"优惠卷所属","35"},{"所属店铺","35"},{"优惠卷名称","35"},{"发放总数","35"},{"发放总额","35"},{"使用总数","35"},
+                {"使用总额","35"},{"优惠卷使用占比","35"},{"拉动订单总数","35"},{"拉动订单总额","35"},{"拉动注册用户数","35"}};
+        //定义excel工具类对象
+        ExcelUtil<CouponDto> excelUtil=new ExcelUtil<CouponDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportMarktingDtoExcel(headers, columns, result, out, map);
+            out.close();
+        }catch(Exception e){
+            e.printStackTrace();
+            return new Result("创建execl失败",false);
+        }
+        return getSuccessResult(path);
+    }
+
+    /**
+     * 下载优惠卷报表
+     * @param path
+     * @param response
+     */
+    @RequestMapping("/downloadCouponDto")
+    public void downloadCouponDto(String path, HttpServletResponse response){
+        try {
+            //定义excel工具类对象
+            ExcelUtil<CouponDto> excelUtil=new ExcelUtil<>();
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch (Exception e){
+            log.error(e.getMessage()+"下载报表出错！");
+        }
     }
 }
