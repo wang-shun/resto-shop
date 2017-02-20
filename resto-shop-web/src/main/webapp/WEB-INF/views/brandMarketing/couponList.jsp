@@ -224,7 +224,7 @@
             searchInfo : function() {
                 var that = this;
                 try{
-                    $.post("brandMarketing/selectCouponList",that.getDate(),function(result){
+                    /*$.post("brandMarketing/selectCouponList",that.getDate(),function(result){
                         if (result.success){
                             //清空表格
                             that.shopCouponInfoTable.clear().draw();
@@ -239,7 +239,7 @@
                             toastr.clear();
                             return;
                         }
-                    });
+                    });*/
                 }catch(e){
                     toastr.error("查询优惠卷报表失败!");
                     toastr.clear();
