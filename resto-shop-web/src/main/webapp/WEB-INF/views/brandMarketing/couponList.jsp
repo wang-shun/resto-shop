@@ -127,7 +127,7 @@
             },
             shopCouponInfoList : [{
                 couponTypeName : "--",
-                couponFrom : "--",
+                couponSoure : "--",
                 couponShopName : "--",
                 couponName : "--",
                 couponCount : 0,
@@ -173,7 +173,7 @@
                         },
                         {
                             title : "优惠卷所属",
-                            data : "couponFrom",
+                            data : "couponSoure",
                             orderable : false
                         },
                         {
@@ -223,28 +223,28 @@
             },
             searchInfo : function() {
                 var that = this;
-                /*try{
-                    $.post("brandMarketing/selectRedList",that.getDate(),function(result){
-                        if (result.success){
+                try{
+                    $.post("brandMarketing/selectCouponList",that.getDate(),function(result){
+                        /*if (result.success){
                             //清空表格
-                            that.shopRedInfoTable.clear().draw();
+                            that.shopCouponInfoTable.clear().draw();
                             //重绘表格
-                            that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
-                            that.shopRedInfoList = result.data.shopRedInfoList;
-                            that.brandRedInfo = result.data.brandRedInfo;
+                            that.shopCouponInfoTable.rows.add(result.data.shopCouponInfoList).draw();
+                            that.shopCouponInfoList = result.data.shopCouponInfoList;
+                            that.brandCouponInfo = result.data.brandCouponInfo;
                             toastr.success("查询成功");
                             toastr.clear();
                         }else {
-                            toastr.error("查询红包报表失败!");
+                            toastr.error("查询优惠卷报表失败!");
                             toastr.clear();
                             return;
-                        }
+                        }*/
                     });
                 }catch(e){
-                    toastr.error("查询红包报表失败!");
+                    toastr.error("查询优惠卷报表失败!");
                     toastr.clear();
                     return;
-                }*/
+                }
             },
             downloadExcel : function(){
                 /*$.post("brandMarketing/createExcel",{"grantBeginDate":this.grantSearchDate.beginDate,

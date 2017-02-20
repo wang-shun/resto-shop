@@ -153,6 +153,13 @@
             and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
             and tgn.shop_detail_id = #{shopDetailId}
         </if>
+        <if test="coupon != null">
+            select id from tb_coupon
+            where using_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+            and using_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+            and is_used = 1
+            and coupon_type = ${couponTypeInt}
+        </if>
         )
         and td.parent_order_id is null
         GROUP BY td.id) r),0)),(
@@ -188,6 +195,13 @@
               and tgn.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
               and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
               and tgn.shop_detail_id = #{shopDetailId}
+          </if>
+          <if test="coupon != null">
+              select id from tb_coupon
+              where using_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+              and using_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+              and is_used = 1
+              and coupon_type = ${couponTypeInt}
           </if>
         )
         GROUP BY td.id) r),0))) useOrder;
