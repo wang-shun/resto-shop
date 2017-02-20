@@ -224,8 +224,8 @@
             searchInfo : function() {
                 var that = this;
                 try{
-                    /*$.post("brandMarketing/selectCouponList",that.getDate(),function(result){
-                        if (result.success){
+                    $.post("brandMarketing/selectCouponList",that.getDate(),function(result){
+                        /*if (result.success){
                             //清空表格
                             that.shopCouponInfoTable.clear().draw();
                             //重绘表格
@@ -238,8 +238,8 @@
                             toastr.error("查询优惠卷报表失败!");
                             toastr.clear();
                             return;
-                        }
-                    });*/
+                        }*/
+                    });
                 }catch(e){
                     toastr.error("查询优惠卷报表失败!");
                     toastr.clear();
