@@ -410,7 +410,11 @@ public class BrandMarketingController extends GenericController{
                 }else{
                     couponDto.setCouponShopName("--");
                 }
-                couponDto.setUseCouponCountRatio(couponDto.getUseCouponCount().divide(couponDto.getCouponCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%");
+                if(couponDto.getUseCouponCount() != null) {
+                    couponDto.setUseCouponCountRatio(couponDto.getUseCouponCount().divide(couponDto.getCouponCount(), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+                }else {
+                    couponDto.setUseCouponCountRatio("0.00%");
+                }
                 selectMap.put("couponTypeInt",couponDto.getCouponTypeInt());
                 Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
                 if(useOrder == null){
@@ -421,6 +425,13 @@ public class BrandMarketingController extends GenericController{
                     couponDto.setUseCouponOrderCount(new BigDecimal(useRedOrder[0]));
                     couponDto.setUseCouponOrderMoney(new BigDecimal(useRedOrder[1]));
                 }
+                couponCount = couponCount.add(couponDto.getCouponCount());
+                couponMoney = couponMoney.add(couponDto.getCouponMoney());
+                useCouponCount = useCouponCount.add(couponDto.getUseCouponCount() == null ? BigDecimal.ZERO : couponDto.getUseCouponCount());
+                useCouponMoney = useCouponMoney.add(couponDto.getUseCouponMoney() == null ? BigDecimal.ZERO : couponDto.getUseCouponMoney());
+                useCouponOrderCount = useCouponOrderCount.add(couponDto.getUseCouponOrderCount());
+                useCouponOrderMoney = useCouponOrderMoney.add(couponDto.getUseCouponOrderMoney());
+                customerCount = customerCount.add(couponDto.getCustomerCount());
             }
             object.put("shopCouponInfoList",couponDtos);
             JSONObject brandCouponInfo = new JSONObject();
