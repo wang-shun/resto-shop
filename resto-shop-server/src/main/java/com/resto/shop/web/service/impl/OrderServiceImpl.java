@@ -643,7 +643,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            order.setAllowContinueOrder(true);
+            if(order.getDistributionModeId() != 3){
+                order.setAllowContinueOrder(true);
+            }
         } else {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
@@ -1272,7 +1274,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if(order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT){
 
                 }else{
-                    order.setAllowContinueOrder(true);
+                    if(order.getDistributionModeId() != 3){
+                        order.setAllowContinueOrder(true);
+                    }
                 }
             }
         } else {
