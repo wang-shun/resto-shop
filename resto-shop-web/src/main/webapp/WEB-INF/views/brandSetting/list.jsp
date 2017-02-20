@@ -166,17 +166,6 @@
 							</label>
 						</div>
 						<div class="form-group">
-							<div class="control-label">是否启用服务费</div>
-							<label >
-								<input type="radio" name="isUseServicePrice"  v-model="m.isUseServicePrice" value="0">
-								否
-							</label>
-							<label>
-								<input type="radio" name="isUseServicePrice" v-model="m.isUseServicePrice" value="1">
-								是
-							</label>
-						</div>
-						<div class="form-group">
 							<label>品牌标语</label>
 							<input type="text" class="form-control" name="slogan" v-model="m.slogan">
 						</div>

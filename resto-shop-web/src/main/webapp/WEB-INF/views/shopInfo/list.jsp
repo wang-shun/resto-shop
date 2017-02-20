@@ -291,7 +291,6 @@
                         </div>
                     </div>
 
-
                     <div  class="form-group" v-if="m.isOpenSms==1">
                             <label class="col-sm-3 control-label">手机号：</label>
                             <div class="col-sm-8">
@@ -311,16 +310,20 @@
 						</label>
 					</div>
 					<div v-if="m.isUseServicePrice==1">
-					<div v-if="showp" >
-					<div class="form-group" id="serviceDivOne"  >
-						<label>名称</label>
-						<input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
-						<input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
-					</div>
-						<div class="form-group" id="serviceDivTwo">
-							<label>服务费/每人</label>
-							<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required" min="0">
-						</div>
+						<div v-if="showp" >
+							<div class="form-group">
+								<label  class="col-sm-3 control-label">名称</label>
+								<div class="col-sm-9">
+									<input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
+									<input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
+								</div>
+							</div>
+							<div class="form-group">
+								<label  class="col-sm-3 control-label">服务费/每人</label>
+								<div class="col-sm-9">
+									<input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required" min="0">
+								</div>
+							</div>
 					   </div>
 					</div>
 					<div class="text-center">
