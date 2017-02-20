@@ -12,6 +12,7 @@ import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.RedPacket;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.GetNumberService;
 import com.resto.shop.web.service.RedPacketService;
 import org.apache.commons.collections.map.HashedMap;
@@ -48,6 +49,9 @@ public class BrandMarketingController extends GenericController{
 
     @Resource
     private GetNumberService getNumberService;
+
+    @Resource
+    private CouponService couponService;
 
     @RequestMapping("/redList")
     public void redList(){}
@@ -392,7 +396,7 @@ public class BrandMarketingController extends GenericController{
             selectMap.put("grantEndDate",grantEndDate);
             selectMap.put("useBeginDate",useBeginDate);
             selectMap.put("useEndDate",useEndDate);
-            List<CouponDto> couponDtos = redPacketService.selectCouponDto(selectMap);
+            List<CouponDto> couponDtos = couponService.selectCouponDto(selectMap);
             selectMap.put("payMode",PayMode.COUPON_PAY);
             for(CouponDto couponDto : couponDtos){
                 if(couponDto.getCouponSoure().equalsIgnoreCase("店铺")){
