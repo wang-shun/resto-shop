@@ -12,6 +12,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.dto.CouponDto;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
@@ -181,5 +182,10 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     @Override
     public List<Coupon> getListByCustomerId(String customerId) {
         return couponMapper.getListByCustomerId(customerId);
+    }
+
+    @Override
+    public List<CouponDto> selectCouponDto(Map<String, Object> selectMap) {
+        return couponMapper.selectCouponDto(selectMap);
     }
 }

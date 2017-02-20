@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.CouponDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Order;
@@ -29,4 +30,6 @@ public interface CouponService extends GenericService<Coupon, String> {
 	void useCouponById(String orderId,String id);
 
 	List<Coupon> getListByCustomerId(String customerId);
+
+    List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
 }
