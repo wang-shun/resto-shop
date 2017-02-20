@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.CouponDto;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
@@ -262,7 +263,6 @@ public class BrandMarketingController extends GenericController{
     /**
      * 查询全部红包
      * @param selectRedPackets
-     * @param redPacketDtos
      * @return
      */
     private List<RedPacketDto> selectRedPackets(List<RedPacketDto> selectRedPackets,List<RedPacketDto> redPacketDtoList){
@@ -289,7 +289,6 @@ public class BrandMarketingController extends GenericController{
      * 下载红包报表
      * @param redPacketDto
      * @param request
-     * @param response
      * @return
      */
     @RequestMapping("/createExcel")
@@ -371,6 +370,72 @@ public class BrandMarketingController extends GenericController{
             log.error(e.getMessage()+"下载报表出错！");
         }
     }
+
     @RequestMapping("/couponList")
     public void couponList(){}
+
+    @RequestMapping("/selectCouponList")
+    @ResponseBody
+    public Result selectCouponList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate){
+        JSONObject object = new JSONObject();
+        try {
+            BigDecimal couponCount = new BigDecimal(0);
+            BigDecimal couponMoney = new BigDecimal(0);
+            BigDecimal useCouponCount = new BigDecimal(0);
+            BigDecimal useCouponMoney = new BigDecimal(0);
+            BigDecimal useCouponOrderCount = new BigDecimal(0);
+            BigDecimal useCouponOrderMoney = new BigDecimal(0);
+            BigDecimal customerCount = new BigDecimal(0);
+            String useCouponCountRatio = "0.00%";
+            Map<String, Object> selectMap = new HashMap<>();
+            selectMap.put("grantBeginDate",grantBeginDate);
+            selectMap.put("grantEndDate",grantEndDate);
+            selectMap.put("useBeginDate",useBeginDate);
+            selectMap.put("useEndDate",useEndDate);
+            List<CouponDto> couponDtos = redPacketService.selectCouponDto(selectMap);
+            selectMap.put("payMode",PayMode.COUPON_PAY);
+            for(CouponDto couponDto : couponDtos){
+                if(couponDto.getCouponSoure().equalsIgnoreCase("店铺")){
+                    for(ShopDetail shopDetail : getCurrentShopDetails()){
+                        if(couponDto.getShopDetailId().equalsIgnoreCase(shopDetail.getId())){
+                            couponDto.setCouponShopName(shopDetail.getName());
+                            break;
+                        }
+                    }
+                }else{
+                    couponDto.setCouponShopName("--");
+                }
+                couponDto.setUseCouponCountRatio(couponDto.getUseCouponCount().divide(couponDto.getCouponCount(),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+ "%");
+                selectMap.put("couponTypeInt",couponDto.getCouponTypeInt());
+                Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+                if(useOrder == null){
+                    couponDto.setUseCouponOrderCount(BigDecimal.ZERO);
+                    couponDto.setUseCouponOrderMoney(BigDecimal.ZERO);
+                }else{
+                    String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                    couponDto.setUseCouponOrderCount(new BigDecimal(useRedOrder[0]));
+                    couponDto.setUseCouponOrderMoney(new BigDecimal(useRedOrder[1]));
+                }
+            }
+            object.put("shopCouponInfoList",couponDtos);
+            JSONObject brandCouponInfo = new JSONObject();
+            brandCouponInfo.put("brandName",getBrandName());
+            brandCouponInfo.put("couponCount",couponCount);
+            brandCouponInfo.put("couponMoney",couponMoney);
+            brandCouponInfo.put("useCouponCount",useCouponCount);
+            brandCouponInfo.put("useCouponMoney",useCouponMoney);
+            brandCouponInfo.put("useCouponOrderCount",useCouponOrderCount);
+            brandCouponInfo.put("useCouponOrderMoney",useCouponOrderMoney);
+            brandCouponInfo.put("customerCount",customerCount);
+            if (!couponCount.equals(BigDecimal.ZERO)){
+                useCouponCountRatio = useCouponCount.divide(couponCount,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%";
+            }
+            brandCouponInfo.put("useCouponCountRatio",useCouponCountRatio);
+            object.put("brandCouponInfo",brandCouponInfo);
+        }catch (Exception e){
+            log.error(e.getMessage()+"查看优惠卷报表出错！");
+            return new Result("查看优惠卷报表出错！",false);
+        }
+        return getSuccessResult(object);
+    }
 }

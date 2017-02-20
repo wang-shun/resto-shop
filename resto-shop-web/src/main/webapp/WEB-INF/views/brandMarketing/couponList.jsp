@@ -126,7 +126,7 @@
                 customerCount:0
             },
             shopCouponInfoList : [{
-                couponTypeName : "--",
+                couponType : "--",
                 couponSoure : "--",
                 couponShopName : "--",
                 couponName : "--",
@@ -168,7 +168,7 @@
                     columns : [
                         {
                             title : "优惠卷类型",
-                            data : "couponTypeName",
+                            data : "couponType",
                             orderable : false
                         },
                         {
