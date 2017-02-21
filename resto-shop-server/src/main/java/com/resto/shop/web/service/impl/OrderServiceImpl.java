@@ -1888,25 +1888,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (!map.isEmpty()) {
             for (Integer key : map.keySet()) {
-                Map<String, Object> patMentItem = new HashMap<String, Object>();
-                if(key.equals(PayMode.ACCOUNT_PAY) || key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
+                if((key.equals(PayMode.APPRAISE_RED_PAY)) || (key.equals(PayMode.SHARE_RED_PAY)) || (key.equals(PayMode.REFUND_ARTICLE_RED_PAY))){
                     continue;
                 }
+                Map<String, Object> patMentItem = new HashMap<String, Object>();
                 patMentItem.put("SUBTOTAL", map.get(key));
                 patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
                 patMentItems.add(patMentItem);
-            }
-            for (Integer key : map.keySet()) {
-                Map<String, Object> patMentItem = new HashMap<String, Object>();
-                if(key.equals(PayMode.ACCOUNT_PAY) || key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
-                    patMentItem.put("SUBTOTAL", map.get(key));
-                    if(key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
-                        patMentItem.put("PAYMENT_MODE", "|__"+PayMode.getPayModeName(key));
-                    }else {
-                        patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
-                    }
-                    patMentItems.add(patMentItem);
-                }
             }
         } else {
             Map<String, Object> patMentItem = new HashMap<String, Object>();
