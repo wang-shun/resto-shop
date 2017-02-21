@@ -25,13 +25,7 @@ import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.AccountLogService;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.ChargeLogService;
-import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargeSettingService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
+import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -67,6 +61,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     
     @Resource
     BrandService brandService;
+
+    @Resource
+    RedPacketService redPacketService;
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -74,7 +71,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     }
 
 	@Override
-	public BigDecimal useAccount(BigDecimal payMoney, Account account,Integer source) {
+	public BigDecimal useAccount(BigDecimal payMoney, Account account,Integer source,String shopDetailId) {
 		if(account.getRemain().equals(BigDecimal.ZERO)||payMoney.equals(BigDecimal.ZERO)){
 			return BigDecimal.ZERO;
 		}
@@ -87,25 +84,25 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		}
 		account.setRemain(account.getRemain().subtract(useAccountValue));
 		String remark= "使用余额:"+useAccountValue+"元";
-		addLog(useAccountValue, account, remark, AccountLogType.PAY,source);
+		addLog(useAccountValue, account, remark, AccountLogType.PAY,source,shopDetailId);
 		update(account);
 		return useAccountValue;
 	}
 
 	@Override
-	public void addAccount(BigDecimal value, String accountId, String remark,Integer source) {
+	public void addAccount(BigDecimal value, String accountId, String remark,Integer source,String shopDetailId) {
 		Account account = selectById(accountId);
 		account.setRemain(account.getRemain().add(value));
 		if(value.doubleValue() > 0){
-			addLog(value, account, remark, AccountLogType.INCOME,source);
+			addLog(value, account, remark, AccountLogType.INCOME,source,shopDetailId);
 		}else{
-			addLog(new BigDecimal(-1).multiply(value), account, remark, AccountLogType.PAY,source);
+			addLog(new BigDecimal(-1).multiply(value), account, remark, AccountLogType.PAY,source,shopDetailId);
 		}
 
 		update(account);
 	}
 
-	private void addLog(BigDecimal money,Account account,String remark,int type,int source){
+	private void addLog(BigDecimal money,Account account,String remark,int type,int source,String shopDetailId){
 		AccountLog acclog = new AccountLog();
 		acclog.setCreateTime(new Date());
 		acclog.setId(ApplicationUtils.randomUUID());
@@ -115,6 +112,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		acclog.setRemark(remark);
 		acclog.setAccountId(account.getId());
 		acclog.setSource(source);
+        acclog.setShopDetailId(shopDetailId);
 		accountLogService.insert(acclog);
 	}
 
@@ -148,7 +146,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		}
 		//计算剩余红包金额
 		BigDecimal redPackageMoney = account.getRemain().subtract(balance);
-		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT);  //得出真实支付的值
+		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT,order.getShopDetailId());  //得出真实支付的值
 		//算出 支付比例
 		BigDecimal redPay = BigDecimal.ZERO;
 		if(realPay.compareTo(BigDecimal.ZERO)>0){ //如果支付金额大于0
@@ -161,6 +159,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
@@ -169,7 +168,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setPayValue(redPay);
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
 			item.setResultData(account.getId());
-			orderPaymentItemService.insert(item); 
+			orderPaymentItemService.insert(item);
 		}
 		return realPay;
 	}
@@ -183,7 +182,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		}
 		//计算剩余红包金额
 		BigDecimal redPackageMoney = account.getRemain().subtract(balance);
-		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT);  //得出真实支付的值
+		BigDecimal realPay = useAccount(payMoney,account,AccountLog.SOURCE_PAYMENT,order.getShopDetailId());  //得出真实支付的值
 		//算出 支付比例
 		BigDecimal redPay = BigDecimal.ZERO;
 		if(realPay.compareTo(BigDecimal.ZERO)>0){ //如果支付金额大于0
@@ -196,6 +195,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
@@ -233,8 +233,8 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			chargeOrder.setEndAmount(endAmount);
 	    	chargeOrderMapper.insert(chargeOrder);
 	    	chargeLogService.insertChargeLogService(operationPhone, customerPhone, chargeOrder.getChargeBalance(), shopDetail,chargeOrder.getId());
-	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE);
-	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD);
+	    	addAccount(chargeOrder.getChargeBalance(), accountId, "自助充值",AccountLog.SOURCE_CHARGE,shopDetail.getId());
+	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD,shopDetail.getId());
 	    	//微信推送
 			wxPush(chargeOrder);
     	}catch (Exception e) {

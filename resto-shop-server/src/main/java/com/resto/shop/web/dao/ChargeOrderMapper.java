@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.dto.RedPacketDto;
+import com.resto.shop.web.model.RedPacket;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -42,4 +44,6 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
 
 
     List<Map<String, Object>> selectByShopToDay(@Param("shopId") String shopId);
+
+    List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
 }

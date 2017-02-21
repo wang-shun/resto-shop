@@ -176,9 +176,10 @@
 		case 
 			when coupon_type = 0 then concat_ws(':','zcCouponMoney',SUM(`value`))
 			when coupon_type = 1 then concat_ws(':','yqCouponMoney',SUM(`value`))
+			when coupon_type = 2 then CONCAT_WS(':','birthCouponMoney',SUM(`value`))
 		end
 			from tb_coupon
-			where coupon_type in (0,1) and add_time between #{beginDate} and date_add(#{endDate},interval 1 day)
+			where coupon_type in (0,1,2) and add_time between #{beginDate} and date_add(#{endDate},interval 1 day)
 			group by coupon_type)
   </select>
 

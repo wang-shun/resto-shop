@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.constant.RedType;
+import com.resto.shop.web.model.*;
+import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -15,21 +18,6 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.dao.AppraiseMapper;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderItem;
-import com.resto.shop.web.model.ShowPhoto;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.AppraiseService;
-import com.resto.shop.web.service.ArticleService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderService;
-import com.resto.shop.web.service.RedConfigService;
-import com.resto.shop.web.service.ShowPhotoService;
 
 import cn.restoplus.rpc.server.RpcService;
 
@@ -62,6 +50,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
     
     @Resource
     OrderItemService orderItemService;
+
+    @Resource
+    RedPacketService redPacketService;
     
     @Override
     public GenericDao<Appraise, String> getDao() {
@@ -138,7 +129,17 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.SOURCE_RED_PACKAGE);
+			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+            RedPacket redPacket = new RedPacket();
+            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setRedMoney(money);
+            redPacket.setCreateTime(new Date());
+            redPacket.setCustomerId(cus.getId());
+            redPacket.setBrandId(order.getBrandId());
+            redPacket.setShopDetailId(order.getShopDetailId());
+            redPacket.setRedRemainderMoney(money);
+            redPacket.setRedType(RedType.APPRAISE_RED);
+            redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 		}
 		return money;

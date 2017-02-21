@@ -4,6 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.PayMode;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by carl on 2016/10/14.
@@ -134,5 +136,10 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
 
 
+    }
+
+    @Override
+    public List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap) {
+        return getNumberMapper.selectGetNumberRed(selectMap);
     }
 }

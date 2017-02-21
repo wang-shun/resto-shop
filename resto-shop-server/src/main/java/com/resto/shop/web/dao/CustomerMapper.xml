@@ -27,6 +27,17 @@
     <result column="customer_detail_id" property="customerDetailId" />
     <result column="bind_phone_time" property="bindPhoneTime" />
     <result column="bind_phone_shop" property="bindPhoneShop" />
+     <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
+         <id column="id" property="id"/>
+         <result column="birth_date" property="birthDate"/>
+         <result column="age" property="age"/>
+         <result column="constellation" property="constellation"/>
+         <result column="vocation" property="vocation"/>
+         <result column="company" property="company"/>
+         <result column="school" property="school"/>
+         <result column="personal_note" property="personalNote"/>
+         <result column="shop_detail_id" property="shopDetailId"/>
+     </association>
   </resultMap>
   <sql id="Base_Column_List" >
     id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone, 
@@ -441,5 +452,12 @@
                 GROUP BY
                     t1.customer_id
             ) r;
+    </select>
+
+    <select id="selectBirthUser" resultMap="BaseResultMap">
+        select * from tb_customer tc
+        inner join tb_customer_detail tcd
+        on tc.customer_detail_id = tcd.id
+        where tcd.birth_date is not null
     </select>
 </mapper>

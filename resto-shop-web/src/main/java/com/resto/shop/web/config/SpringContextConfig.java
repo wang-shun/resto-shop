@@ -371,6 +371,15 @@ public class SpringContextConfig {
         return proxy.create(WeShopScoreService.class);
     }
 
+    @Bean
+    public GetNumberService getNumberService() {
+        return proxy.create(GetNumberService.class);
+    }
+
+    @Bean
+    public RedPacketService redPacketService() {
+        return proxy.create(RedPacketService.class);
+    }
 
 
     public <T> T getProxy(Class<T> clazz) {

@@ -23,6 +23,8 @@ public class CustomerDetail {
 
     private String personalNote;      //个人说明
 
+    private String shopDetailId;    //录入生日信息时所在店铺
+
 
     public String getId() {
         return id;
@@ -86,5 +88,13 @@ public class CustomerDetail {
 
     public void setPersonalNote(String personalNote) {
         this.personalNote = personalNote;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
     }
 }

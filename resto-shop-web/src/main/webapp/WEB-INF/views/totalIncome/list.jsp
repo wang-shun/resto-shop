@@ -134,6 +134,10 @@
                 data : "moneyPay"
             },
             {
+                title : "退菜金额(元)",
+                data:"articleBackPay"
+            },
+            {
                 title : "其他方式支付(元)",
                 data : "otherPayment",
             }
@@ -143,7 +147,6 @@
 
     var tb2 = $("#shopReportTable").DataTable({
         data:dataSource.shopIncome,
-        bSort:false,
         columns : [
             {
                 title : "店铺名称",
@@ -195,7 +198,7 @@
                 data : "moneyPay"
             },
             {
-                title : "退菜支付(元)",
+                title : "退菜金额(元)",
                 data:"articleBackPay"
             },
             {

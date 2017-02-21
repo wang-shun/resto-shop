@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewCustomCoupon;
 
@@ -31,4 +34,12 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
     
     
     void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail);
+
+    /**
+     * 查询生日优惠卷
+     * @return
+     */
+    List<NewCustomCoupon> selectBirthCoupon();
+
+    void insertBirthCoupon(NewCustomCoupon customCoupon, Customer customer, Brand brand, WechatConfig config, BrandSetting setting);
 }

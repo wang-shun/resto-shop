@@ -71,6 +71,16 @@ public class NewCustomCoupon {
 
     private Integer recommendDelayTime;
 
+    private Integer distanceBirthdayDay;
+
+    public Integer getDistanceBirthdayDay() {
+        return distanceBirthdayDay;
+    }
+
+    public void setDistanceBirthdayDay(Integer distanceBirthdayDay) {
+        this.distanceBirthdayDay = distanceBirthdayDay;
+    }
+
     public Integer getRecommendDelayTime() {
         return recommendDelayTime;
     }

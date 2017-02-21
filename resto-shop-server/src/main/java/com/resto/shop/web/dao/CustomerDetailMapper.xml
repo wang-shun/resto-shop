@@ -10,9 +10,10 @@
         <result column="company" property="company" />
         <result column="school" property="school" />
         <result column="personal_note" property="personalNote" />
+        <result column="shop_detail_id" property="shopDetailId"/>
     </resultMap>
     <sql id="Base_Column_List" >
-        id, birth_date, age, constellation, vocation, company, school, personal_note
+        id, birth_date, age, constellation, vocation, company, school, personal_note, shop_detail_id
     </sql>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -28,8 +29,8 @@
     </delete>
 
     <insert id="insert" parameterType="com.resto.shop.web.model.CustomerDetail" >
-        insert into tb_customer_detail (id, birth_date, age, constellation, vocation, company, school, personal_note)
-        values (#{id,jdbcType=VARCHAR},  #{birthDate}, #{age}, #{constellation}, #{vocation}, #{company}, #{school}, #{personalNote})
+        insert into tb_customer_detail (id, birth_date, age, constellation, vocation, company, school, personal_note, shop_detail_id)
+        values (#{id,jdbcType=VARCHAR},  #{birthDate}, #{age}, #{constellation}, #{vocation}, #{company}, #{school}, #{personalNote}, #{shopDetailId})
     </insert>
 
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.CustomerDetail" >
@@ -43,6 +44,7 @@
             <if test="company != null" >company,</if>
             <if test="school != null" >school,</if>
             <if test="personalNote != null" >personal_note,</if>
+            <if test="shopDetailId != null">shop_detail_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="id != null" >#{id,jdbcType=VARCHAR},</if>
@@ -53,6 +55,7 @@
             <if test="company != null" >#{company},</if>
             <if test="school != null" >#{school},</if>
             <if test="personalNote != null" >#{personalNote},</if>
+            <if test="shopDetailId != null" >#{shopDetailId},</if>
         </trim>
     </insert>
 
@@ -66,13 +69,15 @@
             <if test="company != null" >company = #{company},</if>
             <if test="school != null" >school = #{school},</if>
             <if test="personalNote != null" >personal_note = #{personalNote},</if>
+            <if test="shopDetailId != null" >shop_detail_id = #{shopDetailId},</if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.CustomerDetail" >
         update tb_customer_detail
         set birth_date = #{birthDate},age = #{age},constellation = #{constellation},
-        vocation = #{vocation},company = #{company},school = #{school},personal_note = #{personalNote}
+        vocation = #{vocation},company = #{company},school = #{school},personal_note = #{personalNote},
+        shop_detail_id = #{shopDetailId}
         where id = #{id,jdbcType=VARCHAR}
     </update>
 

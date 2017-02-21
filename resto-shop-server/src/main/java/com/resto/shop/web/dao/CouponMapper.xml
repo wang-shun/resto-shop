@@ -177,4 +177,35 @@
     select * from tb_coupon
     where customer_id = #{customerId}
   </select>
+
+    <select id="selectCouponDto" resultType="com.resto.brand.web.dto.CouponDto" parameterType="java.util.Map">
+        select
+        CASE tc.coupon_type
+        WHEN -1 THEN '通用优惠卷'
+        WHEN 0 THEN '注册优惠间'
+        WHEN 1 THEN '邀请优惠卷'
+        WHEN 2 THEN '生日优惠卷'
+        END couponType,
+        IF(tc.brand_id is not null,'品牌','店铺') couponSoure,
+        tc.`name` couponName,
+        COUNT(1) couponCount,
+        SUM(tc.`value`) couponMoney,
+        IFNULL((select r.useCount from (select COUNT(1) useCount,coupon_type from tb_coupon
+        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
+        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponCount,
+        IFNULL((select r.useMoney from (select SUM(`value`) useMoney,coupon_type from tb_coupon
+        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
+        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponMoney,
+        CASE tc.coupon_type
+        WHEN 0 THEN COUNT(1)
+        WHEN 1 THEN COUNT(1)
+        ELSE 0
+        END customerCount,
+        tc.shop_detail_id shopDetailId,
+        tc.coupon_type couponTypeInt
+        from tb_coupon tc
+        where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
+        and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
+        GROUP BY tc.coupon_type
+    </select>
 </mapper>

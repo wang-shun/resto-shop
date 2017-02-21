@@ -34,7 +34,7 @@ public class Coupon {
 
     private String customerId;
     
-    private Integer couponType;//优惠券类型(-1:通用,0:新用户注册,1:邀请注册)
+    private Integer couponType;//优惠券类型(-1:通用,0:新用户注册,1:邀请注册,2:生日)
 
     private  String shopDetailId;
 

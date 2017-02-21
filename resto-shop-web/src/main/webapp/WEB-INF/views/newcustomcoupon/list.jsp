@@ -31,17 +31,25 @@
                             <div class="form-group">
                                 <label class="control-label">优惠券有效日期类型</label>
                                 <div class="radio-list" style="margin-left: 20px;">
-                                    <label class="radio-inline">
-                                        <input type="radio" class="md-radiobtn" name="timeConsType" value="1" v-model="m.timeConsType" @click="showNum">按天</label>
-                                    <label class="radio-inline">
+                                    <template v-if="m.couponType==2 || m.timeConsType==1">
+                                        <label class="radio-inline">
+                                            <input  type="radio" class="md-radiobtn" name="timeConsType" checked="checked" value="1" v-model="m.timeConsType" @click="showNum">按天
+                                        </label>
+                                    </template>
+                                    <template v-else>
+                                        <label class="radio-inline">
+                                            <input  type="radio" class="md-radiobtn" name="timeConsType" value="1" v-model="m.timeConsType" @click="showNum">按天
+                                        </label>
+                                    </template>
+                                    <label class="radio-inline" v-if="m.couponType!=2">
                                         <input type="radio" class="md-radiobtn" name="timeConsType" value="2" v-model="m.timeConsType" @click="showTime">按时间范围</label>
                                 </div>
                             </div>
-                            <div class="form-group" v-if="this.m.timeConsType==1">
+                            <div class="form-group" v-if="this.m.timeConsType==1 || m.couponType==2">
                                 <label>优惠券有效日期</label>
                                 <input type="number" class="form-control" name="couponValiday" v-model="m.couponValiday" placeholder="请输入数字" required min="0">
                             </div>
-                            <div class="form-group" v-if="this.m.timeConsType==2">
+                            <div class="form-group" v-if="this.m.timeConsType==2 && m.couponType!=2">
                                 <div class="row">
                                     <label class="control-label col-md-2">开始日期</label>
                                     <div class="col-md-4">
@@ -136,16 +144,28 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio3" value="1" v-model="m.couponType">邀&nbsp;请
                                 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio4" value="2" v-model="m.couponType">生&nbsp;日
+                                </label>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" v-if="m.couponType == 1">
                                 <label >邀请优惠券延迟使用时间：（小时）</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control"
                                            name="recommendDelayTime" placeholder="(建议输入整数)"
                                            v-model="m.recommendDelayTime" required="required" min="0">
                                 </div>
+                            </div>
 
+                            <div class="form-group" v-if="m.couponType == 2">
+                                <label >生日优惠卷发放时间：（日）</label>
+                                <div class="input-group">
+                                    距用户生日前
+                                    <input type="number"
+                                           name="distanceBirthdayDay" placeholder="(建议输入整数)"
+                                           v-model="m.distanceBirthdayDay" required="required" min="0"> 日
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -155,7 +175,7 @@
                                     <input type="radio" name="isBrand"  value="1"  v-model="m.isBrand">品牌优惠券
                                 </label>
 
-                                <label class="radio-inline">
+                                <label class="radio-inline" v-if = "m.couponType != 2">
                                     <input type="radio" name="isBrand"  value="0" v-model="m.isBrand">店铺优惠券
                                 </label>
 
@@ -212,11 +232,13 @@
                     data : "couponType",
                     createdCell:function(td,tdData){
                         if(tdData == -1){
-                            $(td).html("<span class='label label-success'>通&nbsp;用</span>");
+                            $(td).html("<span class='label label-default'>通&nbsp;用</span>");
                         }else if(tdData == 0){
                             $(td).html("<span class='label label-primary'>新用户</span>");
                         }else if(tdData == 1){
                             $(td).html("<span class='label label-info'>邀&nbsp;请</span>");
+                        }else if(tdData == 2){
+                            $(td).html("<span class='label label-success'>生&nbsp;日</span>");
                         }
                     }
                 },

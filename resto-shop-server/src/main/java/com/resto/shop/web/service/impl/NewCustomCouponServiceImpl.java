@@ -166,7 +166,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
                 coupon.setCustomerId(cus.getId());
                 coupon.setPushDay(cfg.getPushDay());
-                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 60 * 3600);
+                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
                 //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
                 if(cfg.getShopDetailId()!=null&&shopId.equals(cfg.getShopDetailId())){
                     coupon.setShopDetailId(cfg.getShopDetailId());
@@ -197,7 +197,52 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         }
     }
 
-	  //得到优惠券的时间，然后做定时任务
+    @Override
+    public void insertBirthCoupon(NewCustomCoupon customCoupon, Customer customer, Brand brand, WechatConfig config, BrandSetting setting) {
+        ShopDetail shopDetail = shopDetailService.selectById(customer.getCustomerDetail().getShopDetailId());
+        Coupon coupon = new Coupon();
+        Date beginDate = new Date();
+        //判断优惠卷有效日期类型
+        if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)){
+            coupon.setBeginDate(beginDate);
+            coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,customCoupon.getCouponValiday()));
+        }else if (customCoupon.getTimeConsType()==TimeCons.MODELB){
+            coupon.setBeginDate(customCoupon.getBeginDateTime());
+            coupon.setEndDate(customCoupon.getEndDateTime());
+        }
+        //判断优惠卷所属 : 品牌优惠卷
+        coupon.setBrandId(customCoupon.getBrandId());
+        coupon.setShopDetailId(shopDetail.getId());
+        if(customCoupon.getPushDay() != null){
+            coupon.setPushDay(customCoupon.getPushDay());
+        }else{
+            coupon.setPushDay(3);
+        }
+        coupon.setName(customCoupon.getCouponName());
+        coupon.setValue(customCoupon.getCouponValue());
+        coupon.setMinAmount(customCoupon.getCouponMinMoney());
+        coupon.setCouponType(2);
+        coupon.setBeginTime(customCoupon.getBeginTime());
+        coupon.setEndTime(customCoupon.getEndTime());
+        coupon.setUseWithAccount(customCoupon.getUseWithAccount());
+        coupon.setDistributionModeId(customCoupon.getDistributionModeId());
+        coupon.setCouponSource("4");
+        coupon.setCustomerId(customer.getId());
+        coupon.setRecommendDelayTime(0);
+        for(int i = 0; i < customCoupon.getCouponNumber(); i++){
+            couponService.insertCoupon(coupon);
+        }
+        String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId();
+        StringBuffer str=new StringBuffer();
+        str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\"");
+        str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
+        WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+        long begin=coupon.getBeginDate().getTime();
+        long end=coupon.getEndDate().getTime();
+        timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
+    }
+
+    //得到优惠券的时间，然后做定时任务
 	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail){
             Integer pushDay = shopDetail.getRecommendTime();
 	    	Customer customer=customerService.selectById(customerId);
@@ -207,9 +252,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    	if(BeginDate !=0 && EndDate !=0){
 	    		if((EndDate-BeginDate)<=(1000*60*60*24*pushDay)){
 	    			StringBuffer str=new StringBuffer();
-	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
+	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId()+"";
 	            	str.append("优惠券到期提醒\n");
-	            	str.append("<a href='"+jumpurl+"'>"+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
+	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
 	                String pr=price+"";//将BigDecimal类型转换成String
 	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
@@ -267,5 +312,10 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     @Override
     public List<NewCustomCoupon> selectListShopId(String shopId) {
         return newcustomcouponMapper.selectListByShopId(shopId);
+    }
+
+    @Override
+    public List<NewCustomCoupon> selectBirthCoupon() {
+        return newcustomcouponMapper.selectBirthCoupon();
     }
 }

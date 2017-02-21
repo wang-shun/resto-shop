@@ -63,9 +63,9 @@ var tb1 = $("#shopBill").DataTable({
 			title : "优惠券所属",
 			data : "brandId",
 			createdCell:function(td,tdData){
-				if(tdData!=null || tdData!=""){
+				if(tdData!=null && tdData!=""){
 					$(td).html("品牌");
-				}else if(tdData==null || tdData==""){
+				}else{
 					$(td).html("店铺");
 				}
 			}
@@ -73,11 +73,13 @@ var tb1 = $("#shopBill").DataTable({
 			title : "优惠券类型",
 			data : "couponType",
 			createdCell:function(td,tdData){
-				if(tdData==true){
+				if(tdData==1){
 					$(td).html("邀请注册");
-				}else{
+				}else if(tdData == 0){
 					$(td).html("新用户注册");
-				}
+				}else if(tdData == 2){
+                    $(td).html("生日赠送");
+                }
 			}
 		}, {
 			title : "所属门店",

@@ -55,6 +55,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private OrderItemMapper orderitemMapper;
 
+    @Resource
+    private RedPacketService redPacketService;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Resource
@@ -640,7 +643,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            order.setAllowContinueOrder(true);
+            if(order.getDistributionModeId() != 3){
+                order.setAllowContinueOrder(true);
+            }
         } else {
             order.setOrderState(OrderState.SUBMIT);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
@@ -1079,15 +1084,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.ACCOUNT_PAY:
-                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER,order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(),order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(),order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.WEIXIN_PAY:
@@ -1133,7 +1138,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Customer customer = customerService.selectById(order.getCustomerId());
 
                     if(item.getPayValue().doubleValue() < 0){
-                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1);
+                        accountService.addAccount(item.getPayValue(),customer.getAccountId(),"取消订单扣除",-1,order.getShopDetailId());
                     }
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
@@ -1177,7 +1182,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
-                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER,order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
@@ -1269,7 +1274,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if(order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT){
 
                 }else{
-                    order.setAllowContinueOrder(true);
+                    if(order.getDistributionModeId() != 3){
+                        order.setAllowContinueOrder(true);
+                    }
                 }
             }
         } else {
@@ -1879,13 +1886,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
         if (!map.isEmpty()) {
             for (Integer key : map.keySet()) {
                 Map<String, Object> patMentItem = new HashMap<String, Object>();
+                if(key.equals(PayMode.ACCOUNT_PAY) || key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
+                    continue;
+                }
                 patMentItem.put("SUBTOTAL", map.get(key));
                 patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
                 patMentItems.add(patMentItem);
+            }
+            for (Integer key : map.keySet()) {
+                Map<String, Object> patMentItem = new HashMap<String, Object>();
+                if(key.equals(PayMode.ACCOUNT_PAY) || key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
+                    patMentItem.put("SUBTOTAL", map.get(key));
+                    if(key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
+                        patMentItem.put("PAYMENT_MODE", "|__"+PayMode.getPayModeName(key));
+                    }else {
+                        patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
+                    }
+                    patMentItems.add(patMentItem);
+                }
             }
         } else {
             Map<String, Object> patMentItem = new HashMap<String, Object>();
@@ -4970,7 +4991,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
+                                RedPacket redPacket = new RedPacket();
+                                redPacket.setId(ApplicationUtils.randomUUID());
+                                redPacket.setRedMoney(backMoney);
+                                redPacket.setCreateTime(new Date());
+                                redPacket.setCustomerId(customer.getId());
+                                redPacket.setBrandId(order.getBrandId());
+                                redPacket.setShopDetailId(order.getShopDetailId());
+                                redPacket.setRedRemainderMoney(backMoney);
+                                redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacketService.insert(redPacket);
                             }
 
                         }
@@ -5005,7 +5036,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
-                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+                                accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
+                                RedPacket redPacket = new RedPacket();
+                                redPacket.setId(ApplicationUtils.randomUUID());
+                                redPacket.setRedMoney(backMoney);
+                                redPacket.setCreateTime(new Date());
+                                redPacket.setCustomerId(customer.getId());
+                                redPacket.setBrandId(order.getBrandId());
+                                redPacket.setShopDetailId(order.getShopDetailId());
+                                redPacket.setRedRemainderMoney(backMoney);
+                                redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacketService.insert(redPacket);
                             }
 
                         }
@@ -5025,7 +5066,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             back.setResultData("总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
-            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", PayMode.ACCOUNT_PAY);
+            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
+            RedPacket redPacket = new RedPacket();
+            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setRedMoney(order.getRefundMoney());
+            redPacket.setCreateTime(new Date());
+            redPacket.setCustomerId(customer.getId());
+            redPacket.setBrandId(order.getBrandId());
+            redPacket.setShopDetailId(order.getShopDetailId());
+            redPacket.setRedRemainderMoney(order.getRefundMoney());
+            redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacketService.insert(redPacket);
         }
 
 

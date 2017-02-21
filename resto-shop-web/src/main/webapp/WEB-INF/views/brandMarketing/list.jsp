@@ -59,6 +59,7 @@
 								<th>优惠券总额(元)</th>
 		                        <th>注册优惠券(元)</th>
 		                        <th>邀请优惠券(元)</th>
+                                <th>生日优惠券(元)</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -73,9 +74,10 @@
 								<td>{{brandInfo.couponAllMoney}}</td>
 		                        <td>{{brandInfo.zcCouponMoney}}</td>
 		                        <td>{{brandInfo.yqCouponMoney}}</td>
+                                <td>{{brandInfo.birthCouponMoney}}</td>
 							</tr>
 							<tr v-else>
-								<td align="center" colspan="10"><strong>加载中...</strong></td>
+								<td align="center" colspan="11"><strong>加载中...</strong></td>
 							</tr>
 						</tbody>
 				  	</table>
