@@ -405,22 +405,15 @@
 			else '未知'
 		end sex,
 		a.remain,
-		((select IFNULL(SUM(tal1.money),0) from tb_account_log tal1 where tal1.account_id = a.id and tal1.source = 2)
-		-(select IFNULL(SUM(topi1.pay_value),0) from tb_order_payment_item topi1 
-						 inner join tb_order td1 on topi1.order_id = td1.id and topi1.payment_mode_id = 6 where td1.customer_id = c.id)) chargeRemain,
-		((select IFNULL(SUM(tal1.money),0) from tb_account_log tal1 where tal1.account_id = a.id and tal1.source = 3)
-		-(select IFNULL(SUM(topi2.pay_value),0) from tb_order_payment_item topi2 
-						 inner join tb_order td2 on topi2.order_id = td2.id and topi2.payment_mode_id = 7 where td2.customer_id = c.id)) presentRemain,
-		(a.remain - ((select IFNULL(SUM(tal3.money),0) from tb_account_log tal3 where tal3.account_id = a.id and tal3.source = 2)
-		-(select IFNULL(SUM(topi3.pay_value),0) from tb_order_payment_item topi3 
-			inner join tb_order td3 on topi3.order_id = td3.id and topi3.payment_mode_id = 6 where td3.customer_id = c.id))
-		- ((select IFNULL(SUM(tal4.money),0) from tb_account_log tal4 where tal4.account_id = a.id and tal4.source = 3)
-		-(select IFNULL(SUM(topi4.pay_value),0) from tb_order_payment_item topi4 
-			inner join tb_order td4 on topi4.order_id = td4.id and topi4.payment_mode_id = 7 where td4.customer_id = c.id))
-		) redRemain,
-		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11)) amount,
-		(select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11)) sumMoney,
-		(select ROUND(AVG(order_money),2) from tb_order where customer_id = c.id and order_state in (2,10,11)) money
+		(select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id) chargeRemain,
+		(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id) presentRemain,
+		(a.remain - (select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)
+		-(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)) redRemain,
+		(select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3)) sumMoney,
+		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null) amount,
+		ROUND(((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3))/
+		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null)
+		),2) money
 	from
 		tb_customer c
 		left join tb_account a on c.account_id = a.id
