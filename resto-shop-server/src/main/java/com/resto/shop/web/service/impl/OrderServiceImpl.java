@@ -1888,9 +1888,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (!map.isEmpty()) {
             for (Integer key : map.keySet()) {
-                if((key.equals(PayMode.APPRAISE_RED_PAY)) || (key.equals(PayMode.SHARE_RED_PAY)) || (key.equals(PayMode.REFUND_ARTICLE_RED_PAY))){
-                    continue;
-                }
                 Map<String, Object> patMentItem = new HashMap<String, Object>();
                 patMentItem.put("SUBTOTAL", map.get(key));
                 patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
