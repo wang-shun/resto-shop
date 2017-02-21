@@ -1902,6 +1902,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     patMentItem.put("SUBTOTAL", map.get(key));
                     if(key.equals(PayMode.APPRAISE_RED_PAY) || key.equals(PayMode.SHARE_RED_PAY) || key.equals(PayMode.REFUND_ARTICLE_RED_PAY)){
                         patMentItem.put("PAYMENT_MODE", "|__"+PayMode.getPayModeName(key));
+                    }else {
+                        patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
                     }
                     patMentItems.add(patMentItem);
                 }
