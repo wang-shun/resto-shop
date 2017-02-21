@@ -65,7 +65,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<!-- END LOGIN FORM -->
 		</div>
 		<div class="copyright">
-			&copy;  上海餐加企业管理咨询有限公司　v3.0.4
+			&copy;  上海餐加企业管理咨询有限公司　v3.1.0
 		</div>
 		<!-- END LOGIN -->
 		<script src="assets/global/plugins/jquery.min.js" type="text/javascript"></script>
