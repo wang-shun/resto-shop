@@ -312,9 +312,9 @@
                     data : "id",
                     createdCell:function(td,tdData,rowData,row){
                         var operator=[
-                            <s:hasPermission name="newcustomcoupon/delete">
+                            <%--<s:hasPermission name="newcustomcoupon/delete">
                             C.createDelBtn(tdData,"newcustomcoupon/delete"),
-                            </s:hasPermission>
+                            </s:hasPermission>--%>
                             <s:hasPermission name="newcustomcoupon/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
