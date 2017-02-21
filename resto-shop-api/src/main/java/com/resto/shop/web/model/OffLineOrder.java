@@ -26,7 +26,6 @@ public class OffLineOrder {
 
     private Integer state;
 
-
     public Integer getState() {
         return state;
     }
