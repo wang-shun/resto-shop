@@ -4252,19 +4252,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
                     .append("}");
 
-//            if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
-//                //截取电话号码
-//                String[] telephones = shopDetail.getnoticeTelephone().split("，");
-//                for (String tel : telephones) {
-//                    try {
-//                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }
-            SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+            if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
+                //截取电话号码
+                String[] telephones = shopDetail.getnoticeTelephone().split("，");
+                for (String tel : telephones) {
+                    try {
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+      //      SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
 
         }
 
