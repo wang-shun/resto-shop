@@ -4049,11 +4049,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
 
-            //回头消费比率
-            todayBackCustomerRatio=formatDouble ((double)todayBackCustomer.size()/customerInToday.size()*100);
 
-            //新增用户比率
-            todayNewCustomerRatio =formatDouble((double)todayNewCutomer.size()/customerInToday.size()*100);
+            if(customerInToday.size() == 0){
+                todayBackCustomerRatio = "";
+                todayNewCustomerRatio = "";
+            }else{
+                //回头消费比率
+                todayBackCustomerRatio=formatDouble ((double)todayBackCustomer.size()/customerInToday.size()*100);
+                //新增用户比率
+                todayNewCustomerRatio =formatDouble((double)todayNewCutomer.size()/customerInToday.size()*100);
+            }
+
             int dayAppraiseNum = 0;//当日评价的总单数
             int xunAppraiseNum = 0;//本旬评价的总单数
             int monthAppraiseSum = 0;//本月评价的单数
