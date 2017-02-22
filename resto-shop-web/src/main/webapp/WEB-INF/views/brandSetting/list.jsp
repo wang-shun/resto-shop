@@ -166,6 +166,18 @@
 							</label>
 						</div>
 						<div class="form-group">
+							<div class="control-label">发送优惠券到期提醒短信</div>
+							<label>
+								<input type="radio" name="isSendCouponMsg" v-model="m.isSendCouponMsg" value="0">
+								否
+							</label>
+							<label>
+								<input type="radio" name="isSendCouponMsg"
+									   v-model="m.isSendCouponMsg" value="1">
+								是
+							</label>
+						</div>
+						<div class="form-group">
 							<label>品牌标语</label>
 							<input type="text" class="form-control" name="slogan" v-model="m.slogan">
 						</div>
