@@ -15,6 +15,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.LogBaseState;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.ProductionStatus;
@@ -153,7 +154,10 @@ public class OrderMessageListener implements MessageListener {
         str.append("优惠券到期提醒"+"\n");
         str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
-        sendNote(shopName,pr,name,pushDay,customer.getId());
+        if(setting.getIsSendCouponMsg() == Common.YES){
+            sendNote(shopName,pr,name,pushDay,customer.getId());
+        }
+
         return Action.CommitMessage;
     }
     
