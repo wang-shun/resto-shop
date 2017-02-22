@@ -113,7 +113,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		if(!currentCustomerId.equals(shareCustomer)){
 			customer.setShareCustomer(shareCustomer);
 		}
-		customer.setRegisterShopId(shopId);
+//		customer.setRegisterShopId(shopId);
 		update(customer);
 		return customer;
 	}
