@@ -246,6 +246,9 @@
             <if test="regiestTime != null">
                 regiest_time = #{regiestTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="registerShopId != null" >
+                register_shop_id = #{registerShopId,jdbcType=VARCHAR},
+            </if>
             <if test="firstOrderTime != null">
                 first_order_time = #{firstOrderTime,jdbcType=TIMESTAMP},
             </if>
