@@ -118,4 +118,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     public Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap) {
         return redPacketMapper.selectUseRedOrder(selectMap);
     }
+
+    @Override
+    public void refundRedPacket(BigDecimal payValue, String Id) {
+        redPacketMapper.refundRedPacket(payValue,Id);
+    }
 }

@@ -85,6 +85,11 @@
         where id = #{id}
     </update>
 
+    <update id="refundRedPacket">
+      update tb_red_packet set red_remainder_money = red_remainder_money + ${payValue}, finish_time = null
+      where id = #{Id}
+    </update>
+
     <select id="selectRedPacketLog" resultType="com.resto.brand.web.dto.RedPacketDto">
         select
         trp.shop_detail_id shopDetailId,IFNULL(COUNT(1),0) redCount,IFNULL(SUM(red_money),0) redMoney,

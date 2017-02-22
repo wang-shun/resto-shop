@@ -23,4 +23,6 @@ public interface RedPacketService extends GenericService<RedPacket, String> {
     List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap);
 
     Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap);
+
+    void refundRedPacket(BigDecimal payValue, String Id);
 }

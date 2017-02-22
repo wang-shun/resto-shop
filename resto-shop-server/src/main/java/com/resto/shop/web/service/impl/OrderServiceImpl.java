@@ -1088,6 +1088,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER,order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
+                case PayMode.APPRAISE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(),item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.SHARE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(),item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(),item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
                 case PayMode.CHARGE_PAY:
                     chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(),order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
