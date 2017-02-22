@@ -129,6 +129,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
+	public List<String> selectTelephoneList() {
+		return customerMapper.selectCustomerList();
+	}
+
+	@Override
 	public void changeLastOrderShop(String shopDetailId, String customerId) {
 		customerMapper.changeLastOrderShop(shopDetailId,customerId);
 	}
