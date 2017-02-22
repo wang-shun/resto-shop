@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper>
+    <resultMap id="BaseResultMap" type="com.resto.shop.web.model.VirtualProducts">
+        <id column="id" property="id" jdbcType="BIGINT"></id>
+        <result column="name" property="name" jdbcType="VARCHAR"></result>
+        <result column="is_used" property="isUsed" jdbcType="INTEGER"></result>
+        <result column="create_time" property="createTime" jdbcType="DATE"></result>
+    </resultMap>
+
+    <sql id="Virtual_Products_List">id,name</sql>
+    <select id="getVirtualProductsById" resultMap="BaseResultMap" parameterType="com.resto.shop.web.model.VirtualProducts">
+
+    </select>
+
+
+
+</mapper>
