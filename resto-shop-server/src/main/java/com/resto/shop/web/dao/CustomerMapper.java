@@ -66,4 +66,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 	Integer selectByShareCustomer(String customerId);
 
     List<Customer> selectBirthUser();
+
+    List<String>  selectCustomerList();
 }

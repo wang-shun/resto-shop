@@ -1,109 +1,109 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <div id="control">
-<h2 class="text-center"><strong>红包报表</strong></h2><br/>
-<div class="row" id="searchTools">
-	<div class="col-md-12">
-		<form class="form-inline">
-          <div>
-            <label>
-                <span>红包类型：</span>
-                <select id="redType" class="form-control" style="width: 173px;"
-                        :value="redType" v-model="redType">
-                    <option v-for="type in redTypeList" value="{{type.typeValue}}">{{type.typeName}}</option>
-                </select>
-            </label>
-          </div>
-		  <div class="form-group" style="margin-right: 50px;">
-		    <label>发放周期：
-                <input type="text" class="form-control form_datetime" :value="grantSearchDate.beginDate" v-model="grantSearchDate.beginDate" readonly="readonly">
-            </label>
-            &nbsp;至&nbsp;
-            <label>
-                <input type="text" class="form-control form_datetime" :value="grantSearchDate.endDate" v-model="grantSearchDate.endDate" readonly="readonly">
-            </label>
-		  </div>
-          <div class="form-group" style="margin-right: 50px;">
-            <label>使用周期：
-                <input type="text" class="form-control form_datetime" :value="useSearchDate.beginDate" v-model="useSearchDate.beginDate" readonly="readonly">
-            </label>
-            &nbsp;至&nbsp;
-            <label>
-                <input type="text" class="form-control form_datetime" :value="useSearchDate.endDate" v-model="useSearchDate.endDate" readonly="readonly">
-            </label>
-          </div>
-		  <div class="form-group" style="margin-right: 50px;">
-		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
-             <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
-             <button type="button" class="btn btn-primary" @click="week">本周</button>
-             <button type="button" class="btn btn-primary" @click="month">本月</button>
-             <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
-             <button type="button" class="btn btn-primary" @click="downloadExcel">下载报表</button>
-             <br/>
-          </div>
-		</form>
-	<div>
-<br/>
-<br/>
-<div>
-	<div class="tab-content">
-		    <div role="tabpanel" class="tab-pane active">
-				<div class="panel panel-success">
-				  <div class="panel-heading text-center">
-				  	<strong style="margin-right:100px;font-size:22px">
-				  		品牌红包报表
-				  	</strong>
-				  </div>
-				  <div class="panel-body">
-				  	<table id="brandRedList" class="table table-striped table-bordered table-hover" style="width: 100%">
-				  		<thead> 
-							<tr>
-								<th>品牌名称</th>
-								<th>发放总数</th>
-								<th>发放总额</th>
-								<th>使用总数</th>
-		                        <th>使用总额</th>
-		                        <th>红包使用数占比</th>
-                                <%--<th>红包使用额占比</th>--%>
-                                <th>拉动订单总数</th>
-                                <th>拉动订单总额</th>
-							</tr>
-						</thead>
-						<tbody>
-                            <tr>
-								<td><strong>{{brandRedInfo.brandName}}</strong></td>
-								<td>{{brandRedInfo.redCount}}</td>
-								<td>{{brandRedInfo.redMoney}}</td>
-		                        <td>{{brandRedInfo.useRedCount}}</td>
-		                        <td>{{brandRedInfo.useRedMoney}}</td>
-		                        <td>{{brandRedInfo.useRedCountRatio}}</td>
-                                <%--<td>{{brandRedInfo.useRedMoneyRatio}}</td>--%>
-                                <td>{{brandRedInfo.useRedOrderCount}}</td>
-                                <td>{{brandRedInfo.useRedOrderMoney}}</td>
-							</tr>
-						</tbody>
-				  	</table>
-				  </div>
-				</div>
-		    </div>
-		</div>
-	  <div class="tab-content">
-	    <div role="tabpanel" class="tab-pane active">
-	    	<div class="panel panel-success">
-			  <div class="panel-heading text-center">
-			  	   <strong style="margin-right:100px;font-size:22px">店铺红包报表</strong>
-			  </div>
-			  <div class="panel-body">
-			  	<table id="shopRedList" class="table table-striped table-bordered table-hover"
-			  		style="width: 100%;">
-			  	</table>
-			  </div>
-			</div>
-	    </div>
+    <h2 class="text-center"><strong>红包报表</strong></h2><br/>
+    <div class="row" id="searchTools">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div>
+                    <label>
+                        <span>红包类型：</span>
+                        <select id="redType" class="form-control" style="width: 173px;"
+                                :value="redType" v-model="redType" @change="selectRedType">
+                            <option v-for="type in redTypeList" value="{{type.typeValue}}">{{type.typeName}}</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-group" style="margin-right: 50px;">
+                    <label>发放周期：
+                        <input type="text" class="form-control form_datetime" :disabled="redType == 1 || redType == 2 || redType == 3" :value="grantSearchDate.beginDate" v-model="grantSearchDate.beginDate" readonly="readonly">
+                    </label>
+                    &nbsp;至&nbsp;
+                    <label>
+                        <input type="text" class="form-control form_datetime" :value="grantSearchDate.endDate" v-model="grantSearchDate.endDate" readonly="readonly">
+                    </label>
+                </div>
+                <div class="form-group" style="margin-right: 50px;">
+                    <label>使用周期：
+                        <input type="text" class="form-control form_datetime" :disabled="redType == 1 || redType == 2 || redType == 3" :value="useSearchDate.beginDate" v-model="useSearchDate.beginDate" readonly="readonly">
+                    </label>
+                    &nbsp;至&nbsp;
+                    <label>
+                        <input type="text" class="form-control form_datetime" :value="useSearchDate.endDate" v-model="useSearchDate.endDate" readonly="readonly">
+                    </label>
+                </div>
+                <div class="form-group" style="margin-right: 50px;">
+                    <button type="button" class="btn btn-primary" @click="today"> 今日</button>
+                    <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
+                    <button type="button" class="btn btn-primary" @click="week">本周</button>
+                    <button type="button" class="btn btn-primary" @click="month">本月</button>
+                    <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
+                    <button type="button" class="btn btn-primary" @click="downloadExcel">下载报表</button>
+                    <br/>
+                </div>
+            </form>
+            <div>
+                <br/>
+                <br/>
+                <div>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active">
+                            <div class="panel panel-success">
+                                <div class="panel-heading text-center">
+                                    <strong style="margin-right:100px;font-size:22px">
+                                        品牌红包报表
+                                    </strong>
+                                </div>
+                                <div class="panel-body">
+                                    <table id="brandRedList" class="table table-striped table-bordered table-hover" style="width: 100%">
+                                        <thead>
+                                        <tr>
+                                            <th>品牌名称</th>
+                                            <th>发放总数</th>
+                                            <th>发放总额</th>
+                                            <th>使用总数</th>
+                                            <th>使用总额</th>
+                                            <th>红包使用数占比</th>
+                                            <%--<th>红包使用额占比</th>--%>
+                                            <th>拉动订单总数</th>
+                                            <th>拉动订单总额</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td><strong>{{brandRedInfo.brandName}}</strong></td>
+                                            <td>{{brandRedInfo.redCount}}</td>
+                                            <td>{{brandRedInfo.redMoney}}</td>
+                                            <td>{{brandRedInfo.useRedCount}}</td>
+                                            <td>{{brandRedInfo.useRedMoney}}</td>
+                                            <td>{{brandRedInfo.useRedCountRatio}}</td>
+                                            <%--<td>{{brandRedInfo.useRedMoneyRatio}}</td>--%>
+                                            <td>{{brandRedInfo.useRedOrderCount}}</td>
+                                            <td>{{brandRedInfo.useRedOrderMoney}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active">
+                            <div class="panel panel-success">
+                                <div class="panel-heading text-center">
+                                    <strong style="margin-right:100px;font-size:22px">店铺红包报表</strong>
+                                </div>
+                                <div class="panel-body">
+                                    <table id="shopRedList" class="table table-striped table-bordered table-hover"
+                                           style="width: 100%;">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-</div>
-</div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
@@ -207,9 +207,9 @@
                             data : "useRedCountRatio"
                         },
                         /*{
-                            title : "红包使用额占比",
-                            data : "useRedMoneyRatio"
-                        },*/
+                         title : "红包使用额占比",
+                         data : "useRedMoneyRatio"
+                         },*/
                         {
                             title : "拉动订单总数",
                             data : "useRedOrderCount"
@@ -298,6 +298,13 @@
                 this.grantSearchDate.beginDate  = getMonthStartDate();
                 this.grantSearchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
+            },
+            selectRedType : function(){
+                var redType = this.redType;
+                if (redType == 1 || redType == 2 || redType == 3){
+                    this.useSearchDate.beginDate  = "2017-02-22";
+                    this.grantSearchDate.beginDate  = "2017-02-22";
+                }
             }
         }
     });

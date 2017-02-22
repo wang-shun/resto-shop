@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.constant.Common;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -257,7 +258,11 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
 	                String pr=price+"";//将BigDecimal类型转换成String
-	                sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
+
+                    if(setting.getIsSendCouponMsg() == Common.YES){
+                        sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
+                    }
+
 	    		}else{
 	    			Calendar calendar = Calendar.getInstance();
 	    			calendar.setTime(new Date());
