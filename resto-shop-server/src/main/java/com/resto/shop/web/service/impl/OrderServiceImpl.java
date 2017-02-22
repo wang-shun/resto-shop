@@ -4277,7 +4277,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 String[] telephones = shopDetail.getnoticeTelephone().split("，");
                 for (String tel : telephones) {
                     try {
-                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
