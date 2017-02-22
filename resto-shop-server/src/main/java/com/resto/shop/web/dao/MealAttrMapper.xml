@@ -61,7 +61,7 @@
   <delete id="deleteByIds">
   	delete from tb_meal_attr where id in 
   	<foreach collection="ids" open="(" separator="," close=")" item="id">#{id}</foreach>
-  </delete>
+</delete>
 
 
 </mapper>

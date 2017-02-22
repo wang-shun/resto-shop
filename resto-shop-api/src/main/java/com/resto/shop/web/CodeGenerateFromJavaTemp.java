@@ -46,7 +46,7 @@ public class CodeGenerateFromJavaTemp {
 		 * 实体类型 主键  和  表名
 		 */
 		String [][]  classPrimay = new String[][]{
-		new String[]{"WeOrderDetail","Integer","we_order_detail"},
+		new String[]{"WeItem","Long","we_item"},
 		};
 
 
@@ -60,20 +60,20 @@ public class CodeGenerateFromJavaTemp {
 			String mapperDir = DaoMapperPath+modelName+"Mapper.xml";
 			
 			Class<?> className = Class.forName(ModelClassPackage+"."+modelName);
-			generaterJspFile(className);
+			//generaterJspFile(className);
 			
 			generaterControllerFile(modelName,primaryKey);
 //			
-			generaterSelectListSqlMapper(mapperDir,tableName,modelName);
+	//		generaterSelectListSqlMapper(mapperDir,tableName,modelName);
 //			/**
 //			 * 生成 service 和 impl
 //			 */
-			generaterServiceAndImpl(modelName,primaryKey);
+		//	generaterServiceAndImpl(modelName,primaryKey);
 //			
 //			/**
 //			 * 让所有的Mapper 继承 GenericDao
 //			 */
-			extendGenericDao(modelName,primaryKey);
+		//	extendGenericDao(modelName,primaryKey);
 		}
 	}
 	

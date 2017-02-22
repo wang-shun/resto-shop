@@ -54,8 +54,8 @@
 //    //小程序需要的数据
 //    String weUrl = urlBase+"/shop/syncData/getWeAppInfo";
 //
-//    @Scheduled(cron = "00 53 13 * * ?")   //每天12点执行
-//   //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
+//    //@Scheduled(cron = "00 51 14 * * ?")   //每天12点执行
+//   @Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
 //    public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
 //        System.out.println("开始");
 //        //查询所有的品牌

@@ -1176,6 +1176,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
+    @Override
+    public List<OrderItem> selectListByShopIdAndTime(String zuoriDay, String id) {
+        Date beginTime = DateUtil.getformatBeginDate(zuoriDay);
+        Date endTime = DateUtil.getformatEndDate(zuoriDay);
+        return orderMapper.selectListByShopIdAndTime(beginTime,endTime,id) ;
+    }
+
+    @Override
+    public List<OrderItem> selectCustomerListByShopIdAndTime(String zuoriDay, String id) {
+        Date beginTime = DateUtil.getformatBeginDate(zuoriDay);
+        Date endTime = DateUtil.getformatEndDate(zuoriDay);
+        return orderMapper.selectCustomerListByShopIdAndTime(beginTime,endTime,id) ;
+    }
+
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {

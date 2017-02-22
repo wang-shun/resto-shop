@@ -2631,4 +2631,46 @@ AND o.brand_id = #{brandId}
         ]]>
         order by create_time asc
     </select>
+
+    <select id="selectListByShopIdAndTime" resultType="com.resto.shop.web.model.OrderItem">
+SELECT
+	o.shop_detail_id shopId,
+	oi.article_name,
+	sum(oi.count)count,
+	sum(oi.unit_price)unit_price,
+	sum(oi.refund_count)refund_count,
+	IFNULL(c.telephone,'--')
+FROM
+	tb_order o
+INNER JOIN tb_order_item oi ON o.id = oi.order_id
+INNER JOIN tb_customer c on  c.id = o.customer_id
+WHERE o.order_state in(2,10,11,12) AND o.production_status in(2,3)
+AND  o.shop_detail_id = #{shopId} AND
+<![CDATA[ o.create_time >= #{beginTime} and o.create_time<=#{endTime}
+        ]]>
+GROUP BY oi.article_name
+
+    </select>
+
+
+    <select id="selectCustomerListByShopIdAndTime" resultType="com.resto.shop.web.model.OrderItem">
+        SELECT
+        o.shop_detail_id shopId,
+        oi.article_name,
+        sum(oi.count)count,
+        sum(oi.unit_price)unit_price,
+        sum(oi.refund_count)refund_count,
+        IFNULL(c.telephone,'--')
+        FROM
+        tb_order o
+        INNER JOIN tb_order_item oi ON o.id = oi.order_id
+        INNER JOIN tb_customer c on  c.id = o.customer_id
+        WHERE o.order_state in(2,10,11,12) AND o.production_status in(2,3)
+        AND oi.refund_count>0
+        AND  o.shop_detail_id = #{shopId} AND
+        <![CDATA[ o.create_time >= #{beginTime} and o.create_time<=#{endTime}
+        ]]>
+        GROUP BY c.telephone
+    </select>
+
 </mapper>

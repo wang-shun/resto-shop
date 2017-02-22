@@ -36,11 +36,6 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
     @Resource
     OrderService orderService;
 
-
-    @Resource
-    ChargeOrderService chargeOrderService;
-
-
     @Resource
     WeBrandScoreService weBrandScoreService;
 
@@ -54,6 +49,20 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
     @Resource
     OffLineOrderService offLineOrderService;
 
+    @Resource
+    ChargeOrderService chargeOrderService;
+
+    @Resource
+    WeChargeLogService weChargeLogService;
+
+    @Resource
+    WeItemService weItemService;
+
+    @Resource
+    WeReturnItemService weReturnItemService;
+
+    @Resource
+    WeReturnCustomerService weReturnCustomerService;
 
     @Override
     public GenericDao<WeOrderDetail, Integer> getDao() {
@@ -72,7 +81,8 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
         //前日
         Date bDay = DateUtil.getAfterDayDate(new Date(), -2);
 
-        String zuoriDay = DateUtil.getAfterDayDate("-1");
+        String zuoriDay = DateUtil.getAfterDayDateStr("-1");
+
         //格式化
         Date yesterDay = DateUtil.fomatDate(DateUtil.formatDate(yDay, "yyyy-MM-dd"));
         Date beforeYesterDay = DateUtil.fomatDate(DateUtil.formatDate(bDay, "yyyy-MM-dd"));
@@ -89,7 +99,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             weBrandScoreService.delete(scoreYesterDay.getId());
         }
 
-        //1.查询当前品牌前日是否有值
+        //1.查询当前品牌前日是否有值  分数后面默认是上升 如果前日有分数且比昨日的分数高则为下降的箭头
         WeBrandScore scoreBeforeYesterDay = weBrandScoreService.selectByBrandIdAndCreateTime(brandId, beforeYesterDay);
         WeBrandScore wbs = new WeBrandScore();
         wbs.setCreateTime(yesterDay);
@@ -147,6 +157,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             wo.setShopId(shopDetail.getId());
             wo.setCreateTime(yesterDay);
             wo.setBrandName(brandName);
+            wo.setShopName(shopDetail.getName());
             //2.昨日订单的数据
 
             //1.订单数据 放在下面封装
@@ -154,7 +165,12 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             //2.来客人数
             /**
              * todo
+             * 目前先写死
+             *
              */
+            wo.setCustomerCount(10);
+            wo.setAvgCustomerTotal(new BigDecimal(100));
+
             //3.封装实收金额/折扣金额   微信 支付宝 现金 刷卡 充值
             int wechatNum =0;
             int alipayNum = 0;
@@ -251,11 +267,68 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             wo.setRedCount(redNum);
             wo.setRedTotal(redTotal);//1.红包
             wo.setCouponCount(couponNum);
-            wo.setCouponTotal(couponTotal);//优惠券
+            wo.setCouponTotal(couponTotal);//2优惠券
+            wo.setChargeReturnCount(chargeGifNum);//3.充值赠送
+            wo.setChargeReturnTotal(chargeGifTotal);
             wo.setWaitCount(waitNum);
-            wo.setWaitTotal(waitTotal);//等位
-            wo.setReturnCount(articleReturnNum);
-            wo.setReturnTotal(articleReturnTotal);//退菜
+            wo.setWaitTotal(waitTotal);//4等位红包
+            wo.setReturnCount(articleReturnNum);//5退菜红包
+            wo.setReturnTotal(articleReturnTotal);//
+
+            List<ChargeOrder> chargeList = chargeOrderService.selectListByDateAndShopId(zuoriDay,zuoriDay,shopDetail.getId());
+            if(!chargeList.isEmpty()){
+                    for(ChargeOrder chargeOrder:chargeList){
+                        WeChargeLog wg = new WeChargeLog();
+                            wg.setCreateTime(chargeOrder.getCreateTime());
+                            wg.setChargeTelephone(chargeOrder.getTelephone());
+                            wg.setChargeMoney(chargeOrder.getChargeMoney());
+                            wg.setChargeType(chargeOrder.getType());
+                            wg.setShopId(chargeOrder.getShopDetailId());
+                            weChargeLogService.insert(wg);
+                    }
+            }
+
+            //封装菜品销量的的 //封装退菜统计 //封装退菜用户
+            //查询是否有数据
+
+
+            //查询菜品 group by oi.article_name 用来封装每道菜的具体销售信息
+            List<OrderItem> orderItemList = orderService.selectListByShopIdAndTime(zuoriDay,shopDetail.getId());
+            if(!orderItemList.isEmpty()){
+                for(OrderItem oi:orderItemList){
+                    WeItem wi = new WeItem();//封装菜品销售
+                    wi.setCreateTime(yesterDay);
+                    wi.setItemCount(oi.getCount());
+                    wi.setItemName(oi.getArticleName());
+                    wi.setItemTotal(oi.getFinalPrice());
+                    wi.setShopId(oi.getShopId());
+                    weItemService.insert(wi);
+                    //封装退菜信息
+                    if(oi.getRefundCount()>0){//说明有退菜信息
+                        WeReturnItem wr  =  new WeReturnItem();
+                        wr.setCreateTime(yesterDay);
+                        wr.setReturnItemCount(oi.getRefundCount());
+                        wr.setShopId(oi.getShopId());
+                        wr.setReturnItemName(oi.getArticleName());
+                        wr.setReturnItemTotal(oi.getUnitPrice().multiply(new BigDecimal(oi.getRefundCount())));
+                        weReturnItemService.insert(wr);
+                    }
+                }
+            }
+
+            //封装退菜用户 group by oi.article_name 用来封装退菜用户的信息
+            List<OrderItem> orderCustomerList = orderService.selectCustomerListByShopIdAndTime(zuoriDay,shopDetail.getId());
+            if(!orderCustomerList.isEmpty()){
+                for(OrderItem oi:orderCustomerList){
+                    WeReturnCustomer wc = new WeReturnCustomer();
+                    wc.setCreateTime(yesterDay);
+                    wc.setShopId(oi.getShopId());
+                    wc.setTelephone(oi.getTelephone());
+                    wc.setMoney(oi.getUnitPrice().multiply(new BigDecimal(oi.getRefundCount())));
+                    weReturnCustomerService.insert(wc);
+                }
+
+            }
 
             //----1.定义时间--- 所有的本月上旬 下旬参照时间都是昨日也就是说
 
@@ -929,6 +1002,8 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                         } else {
                             todayRestoTotal = todayRestoTotal.add(o.getOrderMoney());
                         }
+                        wo.setRestoTotal(todayRestoTotal);
+
                         //2.满意度
                         if (null != o.getAppraise()) {
                             if (o.getAppraise().getLevel() != null) {
@@ -941,6 +1016,7 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                         if (o.getParentOrderId() == null) {
                             todayRestoCount.add(o.getId());
                         }
+                        wo.setRedCount(todayRestoCount.size());
                         //4.订单中实收总额
                         if (o.getOrderPaymentItems() != null) {
                             for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
@@ -1479,28 +1555,62 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
             wo.setmBackCustomerTotal(monthBackCustomerRestoTotal);
             wo.setmBackTwoMoreCustomer(monthBackTwoMoreCustomer.size());
             wo.setmBackTwoMoreCustomerTotal(monthBackTwoMoreCustomerRestoTotal);
-
             weorderdetailMapper.insert(wo);
+        }
+    }
 
-            //5封装退菜统计
+    @Override
+    public void deleteYesterDayData(String currentBrandId) {
+        String zuoriDay = DateUtil.getAfterDayDateStr("-1");
+        List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(currentBrandId);
+        for (ShopDetail shopDetail : shopDetails) {
+            //充值详情
+            //1/查看昨日是否有数据
+            List<WeChargeLog> weChargeLogList = weChargeLogService.selectByShopIdAndTime(shopDetail.getId(),zuoriDay);
+            if(!weChargeLogList.isEmpty()){
+                //删除已经有的数据 使用批量删除的方法
+                List<Long> ids = new ArrayList<>();
+                for(WeChargeLog weChargeLog:weChargeLogList){
+                    ids.add(weChargeLog.getId());
+                }
+                if(ids.size()>0){
+                    weChargeLogService.deleteByIds(ids);
+                }
 
+            }
+            List<WeItem> weItemList = weItemService.selectByShopIdAndTime(zuoriDay,shopDetail.getId());
+            List<WeReturnCustomer> weReturnCustomerList = weReturnCustomerService.selectByShopIdAndTime(zuoriDay,shopDetail.getId());
+            List<WeReturnItem> weReturnItemList = weReturnItemService.selectByShopIdAndTime(zuoriDay,shopDetail.getId());
+            if(!weItemList.isEmpty()){
+                List<Long> ids = new ArrayList<>();
+                for(WeItem weItem:weItemList){
+                    ids.add(weItem.getId());
+                }
+                if(ids.size()>0){
+                    weItemService.deleteByIds(ids);
+                }
 
+            }
+            if(!weReturnCustomerList.isEmpty()){
+                List<Long> ids = new ArrayList<>();
+                for(WeReturnCustomer weReturnCustomer :weReturnCustomerList){
+                    ids.add(weReturnCustomer.getId());
+                }
+                if(ids.size()>0){
+                    weReturnCustomerService.deleteByIds(ids);
+                }
 
+            }
+            if(!weReturnItemList.isEmpty()){
+                List<Long> ids = new ArrayList<>();
+                for(WeReturnItem weReturnItem:weReturnItemList){
+                    ids.add(weReturnItem.getId());
+                }
+                if(ids.size()>0){
+                    weReturnItemService.deleteByIds(ids);
+                }
 
-            //6封装退菜用户
-
-
-
-
-
-
-
-
-
-
-
-
-
+            }
         }
     }
 }

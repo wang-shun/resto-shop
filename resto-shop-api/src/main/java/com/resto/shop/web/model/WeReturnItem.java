@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -14,6 +16,7 @@ public class WeReturnItem {
 
     private BigDecimal returnItemTotal;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     public Long getId() {

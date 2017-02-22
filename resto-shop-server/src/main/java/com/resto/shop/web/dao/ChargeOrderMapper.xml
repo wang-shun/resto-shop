@@ -388,4 +388,26 @@
         GROUP BY tco.shop_detail_id
     </select>
 
+    <select id="selectListByDateAndShopId" resultType="ChargeOrder">
+ SELECT
+	c.id,
+	c.charge_money,
+	c.create_time,
+	c.brand_id,
+	c.shop_detail_id,
+	c.type,
+	u.telephone
+FROM
+	tb_charge_order c
+LEFT JOIN tb_customer u ON c.customer_id = u.id
+WHERE
+	c.order_state = 1
+	AND c.shop_detail_id=#{shopId}
+	AND
+   <![CDATA[
+        c.create_time>#{beginDate} and c.create_time<#{endDate}
+       ]]>
+
+    </select>
+
 </mapper>
