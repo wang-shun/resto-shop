@@ -288,6 +288,14 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	}
 
     @Override
+    public List<ChargeOrder> selectListByDateAndShopId(String zuoriDay, String zuoriDay1, String id) {
+        Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(zuoriDay));
+        Date end = DateUtil.getDateEnd(DateUtil.fomatDate(zuoriDay1));
+
+        return chargeorderMapper.selectListByDateAndShopId(begin,end,id);
+    }
+
+    @Override
     public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap) {
         return chargeorderMapper.selectChargeRedPacket(selectMap);
     }

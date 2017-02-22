@@ -23,6 +23,8 @@ import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.WeItem;
+import com.resto.shop.web.service.WeItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,6 +55,8 @@ public class OrderController extends GenericController{
 	@Resource
 	private ShopDetailService shopDetailService;
 
+   @Resource
+	private WeItemService weItemService;
 
 	@Resource
 	private OrderExceptionService orderExceptionService;
@@ -400,6 +404,5 @@ public class OrderController extends GenericController{
 		return  getSuccessResult();
 
 	}
-
 
 }

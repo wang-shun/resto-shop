@@ -511,7 +511,7 @@ public class SyncDataController extends GenericController {
 //        }
 
         if(createTime==null){//前台没值说明是定时任务
-
+            weOrderDetailService.deleteYesterDayData(getCurrentBrandId());
             weOrderDetailService.insertDaydata(getCurrentBrandId(),getBrandName());
 
         }

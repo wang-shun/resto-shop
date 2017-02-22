@@ -10,4 +10,5 @@ public interface WeOrderDetailService extends GenericService<WeOrderDetail, Inte
 
     void insertDaydata(String currentBrandId,String brandName);
 
+    void deleteYesterDayData(String currentBrandId);
 }

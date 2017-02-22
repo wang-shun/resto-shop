@@ -1176,6 +1176,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
+    @Override
+    public List<OrderItem> selectListByShopIdAndTime(String zuoriDay, String id) {
+        Date beginTime = DateUtil.getformatBeginDate(zuoriDay);
+        Date endTime = DateUtil.getformatEndDate(zuoriDay);
+        return orderMapper.selectListByShopIdAndTime(beginTime,endTime,id) ;
+    }
+
+    @Override
+    public List<OrderItem> selectCustomerListByShopIdAndTime(String zuoriDay, String id) {
+        Date beginTime = DateUtil.getformatBeginDate(zuoriDay);
+        Date endTime = DateUtil.getformatEndDate(zuoriDay);
+        return orderMapper.selectCustomerListByShopIdAndTime(beginTime,endTime,id) ;
+    }
+
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
@@ -4035,11 +4049,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
 
-            //回头消费比率
-            todayBackCustomerRatio=formatDouble ((double)todayBackCustomer.size()/customerInToday.size()*100);
 
-            //新增用户比率
-            todayNewCustomerRatio =formatDouble((double)todayNewCutomer.size()/customerInToday.size()*100);
+            if(customerInToday.size() == 0){
+                todayBackCustomerRatio = "";
+                todayNewCustomerRatio = "";
+            }else{
+                //回头消费比率
+                todayBackCustomerRatio=formatDouble ((double)todayBackCustomer.size()/customerInToday.size()*100);
+                //新增用户比率
+                todayNewCustomerRatio =formatDouble((double)todayNewCutomer.size()/customerInToday.size()*100);
+            }
+
             int dayAppraiseNum = 0;//当日评价的总单数
             int xunAppraiseNum = 0;//本旬评价的总单数
             int monthAppraiseSum = 0;//本月评价的单数
@@ -4263,7 +4283,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 String[] telephones = shopDetail.getnoticeTelephone().split("，");
                 for (String tel : telephones) {
                     try {
-                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_37160073");//推送本日信息
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

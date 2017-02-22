@@ -327,6 +327,13 @@ public class SpringContextConfig {
     public SysErrorService sysErrorService() { return  proxy.create(SysErrorService.class); }
 
     @Bean
+    public WeItemService weItemService() { return  proxy.create(WeItemService.class); }
+
+    @Bean
+    public WeChargeLogService weChargeLogService() { return  proxy.create(WeChargeLogService.class); }
+
+
+    @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {
         return proxy.create(com.resto.brand.web.service.EmployeeService.class);
     }

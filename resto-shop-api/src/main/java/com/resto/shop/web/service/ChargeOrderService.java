@@ -79,10 +79,7 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
     public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
 
 
-
-
-
-
-    
     List<Map<String, Object>> selectByShopToDay(String shopId);
+
+    List<ChargeOrder> selectListByDateAndShopId(String zuoriDay, String zuoriDay1, String id);
 }

@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -8,6 +10,7 @@ public class WeItem {
 
     private String shopId;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     private Integer itemCount;

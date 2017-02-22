@@ -113,7 +113,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		if(!currentCustomerId.equals(shareCustomer)){
 			customer.setShareCustomer(shareCustomer);
 		}
-		customer.setRegisterShopId(shopId);
+//		customer.setRegisterShopId(shopId);
 		update(customer);
 		return customer;
 	}
@@ -126,6 +126,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public List<Customer> selectListByBrandId(String currentBrandId) {
 		return customerMapper.selectListByBrandId(currentBrandId);
+	}
+
+	@Override
+	public List<String> selectTelephoneList() {
+		return customerMapper.selectCustomerList();
 	}
 
 	@Override

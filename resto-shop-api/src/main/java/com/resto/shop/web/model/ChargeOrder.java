@@ -38,7 +38,15 @@ public class ChargeOrder {
      //充值详细
     private ChargeLog chargelog;
 
+    private String telephone;
 
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
     public ChargeLog getChargelog() {
         return chargelog;
