@@ -19,4 +19,11 @@ public interface RedPacketMapper extends GenericDao<RedPacket,String> {
     List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap);
 
     Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap);
+
+    /**
+     * 取消订单返还红包
+     * @param payValue
+     * @param Id
+     */
+    void refundRedPacket(@Param("payValue")BigDecimal payValue, @Param("Id") String Id);
 }
