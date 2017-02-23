@@ -1,7 +1,6 @@
 package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.VirtualProducts;
 import com.resto.shop.web.model.VirtualProductsAndKitchen;
 
@@ -13,7 +12,7 @@ import java.util.List;
 public interface VirtualProductsMapper extends GenericDao<VirtualProducts, String> {
     VirtualProducts getVirtualProductsById(int id);
 
-    VirtualProductsAndKitchen getVirtualProductsAndKitchenById(int virtualId);
+    List<VirtualProductsAndKitchen> getVirtualProductsAndKitchenById(int virtualId);
 
-    Kitchen getKichenById(int kiChenId);
+    List<VirtualProducts> selectAll(String shopId);
 }

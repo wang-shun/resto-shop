@@ -32,12 +32,12 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     }
 
     @Override
-    public VirtualProductsAndKitchen getVirtualProductsAndKitchenById(int virtualId) {
+    public List<VirtualProductsAndKitchen> getVirtualProductsAndKitchenById(int virtualId) {
         return virtualProductsMapper.getVirtualProductsAndKitchenById(virtualId);
     }
 
     @Override
-    public Kitchen getKitchenById(int kitChenId) {
-        return virtualProductsMapper.getKichenById(kitChenId);
+    public List<VirtualProducts> selectAll(String shopId) {
+        return virtualProductsMapper.selectAll(shopId);
     }
 }
