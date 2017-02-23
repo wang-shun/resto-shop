@@ -1,7 +1,6 @@
 package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
-import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.VirtualProducts;
 import com.resto.shop.web.model.VirtualProductsAndKitchen;
 
@@ -13,7 +12,7 @@ import java.util.List;
 public interface VirtualProductsService extends GenericService<VirtualProducts, String> {
     VirtualProducts getVirtualProductsById(int id);
 
-    VirtualProductsAndKitchen getVirtualProductsAndKitchenById(int virtualId);
+    List<VirtualProductsAndKitchen> getVirtualProductsAndKitchenById(int virtualId);
 
-    Kitchen getKitchenById(int kitChenId);
+    List<VirtualProducts> selectAll(String shopId);
 }

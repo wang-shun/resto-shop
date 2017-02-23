@@ -153,7 +153,7 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setAliPayment(new BigDecimal(shopIncomeMap.get("aliPayment").toString()));
                     shopIncomeDto.setBackCartPay(new BigDecimal(shopIncomeMap.get("bankCartPayment").toString()));
                     shopIncomeDto.setMoneyPay(new BigDecimal(shopIncomeMap.get("crashPayment").toString()));
-                    shopIncomeDto.setArticleBackPay(new BigDecimal(shopIncomeMap.get("articleBackPay").toString()));
+                    shopIncomeDto.setArticleBackPay(new BigDecimal(shopIncomeMap.get("articleBackPay").toString()).abs());
                     shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
                 }
             }
