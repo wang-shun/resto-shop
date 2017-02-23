@@ -1203,6 +1203,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectCustomerListByShopIdAndTime(beginTime,endTime,id) ;
     }
 
+    @Override
+    public void alipayRefund(String orderId,BigDecimal refundTotal) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        String newPayItemId = ApplicationUtils.randomUUID();
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
+                StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+        Map map = new HashMap();
+        map.put("out_trade_no", order.getId());
+        map.put("refund_amount", refundTotal);
+        map.put("out_request_no", newPayItemId);
+        String resultJson = AliPayUtils.refundPay(map);
+
+        OrderPaymentItem back = new OrderPaymentItem();
+        back.setId(ApplicationUtils.randomUUID());
+        back.setOrderId(order.getId());
+        back.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
+        back.setPayTime(new Date());
+        back.setPayValue(new BigDecimal(-1).multiply(refundTotal));
+        back.setRemark("退菜红包:" + refundTotal);
+
+        back.setResultData( "支付宝支付返回" + refundTotal + "金额");
+        orderPaymentItemService.insert(back);
+    }
+
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
