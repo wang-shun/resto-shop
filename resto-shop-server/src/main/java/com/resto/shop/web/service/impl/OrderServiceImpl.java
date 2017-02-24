@@ -5166,7 +5166,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
                 UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
-                        "订单退了"+orderItem.getCount()+"份"+orderItem.getArticleName());
+                        "订单退了"+orderItem.getCount()+"份"+item.getArticleName());
                 if (item.getType() == OrderItemType.SETMEALS) {
                     //如果退了套餐，清空子品
                     orderitemMapper.refundArticleChild(orderItem.getId());
