@@ -388,6 +388,11 @@ public class SpringContextConfig {
         return proxy.create(RedPacketService.class);
     }
 
+    @Bean
+    public VirtualProductsService virtualProductsService(){
+        return proxy.create(VirtualProductsService.class);
+    }
+
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
