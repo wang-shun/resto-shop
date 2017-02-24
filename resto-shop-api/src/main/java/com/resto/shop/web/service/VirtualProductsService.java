@@ -14,5 +14,9 @@ public interface VirtualProductsService extends GenericService<VirtualProducts, 
 
     List<VirtualProductsAndKitchen> getVirtualProductsAndKitchenById(int virtualId);
 
-    List<VirtualProducts> selectAll(String shopId);
+    List<VirtualProducts> getAllProducuts(String shopId);
+
+    void insertVirtualProducts(VirtualProducts virtualProducts);
+
+    void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen);
 }

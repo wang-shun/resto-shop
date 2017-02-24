@@ -10,9 +10,13 @@ import java.util.List;
  * Created by yangwei on 2017/2/22.
  */
 public interface VirtualProductsMapper extends GenericDao<VirtualProducts, String> {
+    List<VirtualProducts> getAllProducuts(String shopId);
+
     VirtualProducts getVirtualProductsById(int id);
 
-    List<VirtualProductsAndKitchen> getVirtualProductsAndKitchenById(int virtualId);
+    List<VirtualProductsAndKitchen>getVirtualProductsAndKitchenById(int virtualId);
 
-    List<VirtualProducts> selectAll(String shopId);
+    void insertVirtualProducts(VirtualProducts virtualProducts);
+
+    void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen);
 }

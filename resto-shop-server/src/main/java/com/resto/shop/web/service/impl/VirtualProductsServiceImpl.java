@@ -20,7 +20,6 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     @Autowired
     private VirtualProductsMapper virtualProductsMapper;
 
-
     @Override
     public GenericDao<VirtualProducts, String> getDao() {
         return virtualProductsMapper;
@@ -37,7 +36,17 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     }
 
     @Override
-    public List<VirtualProducts> selectAll(String shopId) {
-        return virtualProductsMapper.selectAll(shopId);
+    public List<VirtualProducts> getAllProducuts(String shopId) {
+        return virtualProductsMapper.getAllProducuts(shopId);
+    }
+
+    @Override
+    public void insertVirtualProducts(VirtualProducts virtualProducts) {
+//        return virtualProductsMapper.insertVirtualProducts(virtualProducts);
+    }
+
+    @Override
+    public void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen) {
+//        return virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
     }
 }

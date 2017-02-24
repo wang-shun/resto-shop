@@ -6,25 +6,24 @@
         <result column="name" property="name" jdbcType="VARCHAR"></result>
         <result column="is_used" property="isUsed" jdbcType="TINYINT"></result>
         <result column="create_time" property="createTime" jdbcType="DATE"></result>
-        <!--<association property="virtualProductsAndKitchen" javaType="com.resto.shop.web.model.VirtualProductsAndKitchen">
-            <id column="cid" property="id" jdbcType="INTEGER" />
-            <result column="virtual_id" property="virtualId" jdbcType="INTEGER" />
-            <result column="kitchen_id"  property="kitChenId" jdbcType="INTEGER" />
-        </association>-->
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <sql id="Base_Column_List">id,name,is_used,create_time,shop_detail_id</sql>
 
     <!--查询所有的虚拟餐品-->
-    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.resto.shop.web.model.VirtualProducts">
-        <include refid="Base_Column_List"/> from tb_virtual_products WHERE shop_datil_id = #{shopId,jdbcType=VARCHER}
+    <select id="getAllProducuts"  resultMap="BaseResultMap" parameterType="java.lang.String">
+      SELECT * from tb_virtual_products WHERE shop_detail_id = #{shopId,jdbcType=VARCHAR}
     </select>
 
     <!--根据id查询虚拟餐品-->
-    <select id="getVirtualProductsById" resultMap="BaseResultMap" parameterType="com.resto.shop.web.model.VirtualProducts">
-        <include refid="Base_Column_List"/> from tb_virtual_products where id = #{id,jdbcType=INTEGER}
+    <select id="getVirtualProductsById" resultMap="BaseResultMap">
+      SELECT * from tb_virtual_products where id = #{id,jdbcType=INTEGER}
     </select>
 
+    <select id="getVirtualProductsAndKitchenById" resultType="com.resto.shop.web.model.VirtualProductsAndKitchen" >
+        SELECT  * from tb_virtual_products_kitchen where virtual_id = #{virtualId,jdbcType=INTEGER}
+    </select>
     <!--&lt;!&ndash;删除虚拟餐品表&ndash;&gt;
     <delete id="deleteVirtualProducts" parameterType="java.lang.Integer">DELETE from tb_virtual_products where id = #{id,jdbcType=INTEGER}</delete>
 
