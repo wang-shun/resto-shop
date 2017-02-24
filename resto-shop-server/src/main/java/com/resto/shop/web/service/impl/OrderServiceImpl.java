@@ -1342,9 +1342,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
         update(order);
-//            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-//            Customer customer = customerService.selectById(order.getCustomerId());
-//            logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
+        //ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        //Customer customer = customerService.selectById(order.getCustomerId());
+        //logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
         return order;
     }
 
@@ -1699,7 +1699,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         JSONArray json = new JSONArray(printTask);
         UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
                 , "订单:"+order.getId()+"返回打印厨打模版"+json.toString());
-//        logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
+        //logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
         return printTask;
     }
 
