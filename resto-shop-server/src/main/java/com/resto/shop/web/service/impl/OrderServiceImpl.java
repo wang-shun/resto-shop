@@ -3798,6 +3798,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order != null && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getOrderState() == OrderState.PAYMENT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
+            Brand brand = brandService.selectById(order.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
             String money = "(";
@@ -3817,6 +3819,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         }
     }
 
@@ -4512,6 +4516,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("款项自动退还到相应账户:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+            Brand brand = brandService.selectById(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             StringBuilder sb = null;
             if (order.getOrderState().equals(OrderState.SUBMIT)) {//未支付和未完成支付
                 sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
@@ -4541,6 +4547,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             sb.append("订单金额：" + order.getOrderMoney() + "\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + sb.toString());
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -4983,6 +4991,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("订单金额：" + sum + "\n");
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单发送推送：" + msg.toString());
         return result;
     }
 
@@ -4991,6 +5001,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
+        Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
@@ -5050,6 +5061,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
+                                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                                        "总退款金额" + order.getRefundMoney() + ",微信支付返回" + wxBack + ",余额返回" + backMoney);
                                 accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
                                 RedPacket redPacket = new RedPacket();
                                 redPacket.setId(ApplicationUtils.randomUUID());
@@ -5095,6 +5108,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                                 back.setResultData("总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 orderPaymentItemService.insert(back);
+                                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                                        "总退款金额" + order.getRefundMoney() + ",支付宝支付返回" + refundTotal + ",余额返回" + backMoney);
                                 accountService.addAccount(backMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
                                 RedPacket redPacket = new RedPacket();
                                 redPacket.setId(ApplicationUtils.randomUUID());
@@ -5123,6 +5138,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             back.setResultData("总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                    "总退款金额" + order.getRefundMoney() + "余额返回" + order.getRefundMoney());
             accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE,order.getShopDetailId());
             RedPacket redPacket = new RedPacket();
             redPacket.setId(ApplicationUtils.randomUUID());
@@ -5135,8 +5152,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
             redPacketService.insert(redPacket);
         }
-
-
     }
 
     @Override
@@ -5144,20 +5159,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order o = getOrderInfo(order.getId());
         int customerCount = 0;
         BigDecimal servicePrice = new BigDecimal(0);
+        Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         for (OrderItem orderItem : order.getOrderItems()) {
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
+                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                        "订单退了"+orderItem.getCount()+"份"+orderItem.getArticleName());
                 if (item.getType() == OrderItemType.SETMEALS) {
                     //如果退了套餐，清空子品
                     orderitemMapper.refundArticleChild(orderItem.getId());
+                    UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                            "订单中套餐"+orderItem.getArticleName()+"的子品被清空");
                 }
 
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                 customerCount = o.getCustomerCount() - orderItem.getCount();
                 servicePrice = shopDetail.getServicePrice().multiply(new BigDecimal(customerCount));
                 orderMapper.refundServicePrice(o.getId(), servicePrice, customerCount);
+                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                        "订单退了"+customerCount+"份服务费");
             }
         }
 
@@ -5365,6 +5387,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order o = getOrderInfo(order.getId());
 
         Customer customer = customerService.selectById(o.getCustomerId());
+        Brand brand = brandService.selectById(o.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         StringBuilder msg = new StringBuilder("亲，您");
@@ -5426,6 +5449,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                "订单发送推送：" + msg.toString());
     }
 
     @Override

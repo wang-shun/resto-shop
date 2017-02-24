@@ -219,6 +219,8 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
         String customerId = obj.getString("customerId");
         if (orderService.checkRefundLimit(order)) {
             orderService.autoRefundOrder(obj.getString("orderId"));
@@ -249,6 +251,8 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -348,6 +352,8 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
         if (order.getOrderState() == OrderState.SUBMIT) {
             log.info("自动取消订单:" + obj.getString("orderId"));
             orderService.cancelOrder(obj.getString("orderId"));
@@ -378,6 +384,8 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }
