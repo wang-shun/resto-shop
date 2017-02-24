@@ -8,7 +8,9 @@ import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.SMSUtils;
+import com.resto.brand.core.util.UserActionUtils;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
@@ -274,8 +276,12 @@ public class OrderMessageListener implements MessageListener {
     private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
         Order order = JSON.parseObject(msg, Order.class);
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         DataSourceContextHolder.setDataSourceName(order.getBrandId());
         orderService.updateAllowContinue(order.getId(), false);
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单加菜时间已过期，不允许继续加菜！");
         return Action.CommitMessage;
     }
 
