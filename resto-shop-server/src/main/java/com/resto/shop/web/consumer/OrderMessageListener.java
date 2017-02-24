@@ -315,7 +315,7 @@ public class OrderMessageListener implements MessageListener {
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
         ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
         WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
+        //logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
         log.info("分享完毕:" );
     }
 
