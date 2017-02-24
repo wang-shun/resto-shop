@@ -4,12 +4,7 @@ package com.resto.shop.web.controller.business;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -161,7 +156,8 @@ public class OrderController extends GenericController{
 		List<OrderDetailDto> listDto = new ArrayList<>();
 		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 		for (Order o : list) {
-			OrderDetailDto ot = new OrderDetailDto(o.getId(),o.getShopDetailId(), shop.getName(), o.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "",false);
+			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
+            ,"",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"","","","");
 			if(o.getCustomer()!=null){
 				//手机号
 				if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
@@ -234,30 +230,30 @@ public class OrderController extends GenericController{
 						if(null!=oi.getPaymentModeId()){
 							switch (oi.getPaymentModeId()) {
 								case PayMode.WEIXIN_PAY:
-									ot.setWeChatPay(oi.getPayValue());
+									ot.setWeChatPay(ot.getWeChatPay().add(oi.getPayValue()));
 									break;
 								case PayMode.ACCOUNT_PAY:
-									ot.setAccountPay(oi.getPayValue());
+									ot.setAccountPay(ot.getAccountPay().add(oi.getPayValue()));
 									break;
 								case PayMode.COUPON_PAY:
-									ot.setCouponPay(oi.getPayValue());
+									ot.setCouponPay(ot.getCouponPay().add(oi.getPayValue()));
 									break;
 								case PayMode.CHARGE_PAY:
-									ot.setChargePay(oi.getPayValue());
+									ot.setChargePay(ot.getChargePay().add(oi.getPayValue()));
 									break;
 								case PayMode.REWARD_PAY:
-									ot.setRewardPay(oi.getPayValue());
+									ot.setRewardPay(ot.getRewardPay().add(oi.getPayValue()));
 									break;
 								case PayMode.WAIT_MONEY:
-									ot.setWaitRedPay(oi.getPayValue());
+									ot.setWaitRedPay(ot.getWaitRedPay().add(oi.getPayValue()));
 								case PayMode.ALI_PAY:
-									ot.setAliPayment(oi.getPayValue());
+									ot.setAliPayment(ot.getAliPayment().add(oi.getPayValue()));
 									break;
 								case PayMode.ARTICLE_BACK_PAY:
-									ot.setArticleBackPay(oi.getPayValue());
+									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue()).abs());
 									break;
 								case PayMode.CRASH_PAY:
-									ot.setMoneyPay(oi.getPayValue());
+									ot.setMoneyPay(ot.getMoneyPay().add(oi.getPayValue()));
 									break;
 								default:
 									break;
@@ -310,7 +306,7 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","incomePrize","level","orderState"};
+		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","aliPayment","backCartPay","moneyPay","articleBackPay","incomePrize","level","orderState"};
 		//定义数据
 		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
 		//获取店铺名称
@@ -321,11 +317,11 @@ public class OrderController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "11");//显示的位置
+		map.put("num", "16");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
+		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},{"现金支付(元)","25"},{"银联支付(元)","25"},{"退菜金额(元)","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{

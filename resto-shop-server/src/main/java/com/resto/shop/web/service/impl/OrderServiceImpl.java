@@ -4834,10 +4834,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Result updateOrderItem(String orderId, Integer count, String orderItemId, Integer type) {
+
         Result result = new Result();
         Order order = orderMapper.selectByPrimaryKey(orderId);
+
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
+                "接收到修改菜品的请求,订单号为 " + order.getId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (type == 0) { //如果要修改的是服务费
             order.setCustomerCount(count);
@@ -4856,11 +4860,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
 
             update(order);
-            UserActionUtils.write("/logs/posAction",brand.getBrandName()
-                    ,shopDetail.getName(),
+            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
                     shopDetail.getName()+"修改了"+shopDetail.getServiceName()+"，数量修改为"+count+",订单号为:"+order.getId());
-
-
 
         } else { //修改的是菜品
 
@@ -4904,11 +4905,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             update(order);
-
-            UserActionUtils.write("/logs/posAction",brand.getBrandName()
-                    ,shopDetail.getName(),shopDetail.getName()+"修改了菜品"+orderItem.getArticleName()+"，数量修改为"+count+",订单号为:"+order.getId());
-
-
+            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
+                    shopDetail.getName()+"修改了菜品"+orderItem.getArticleName()+"，数量修改为"+count+",订单号为:"+order.getId());
         }
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getOrderMode() == ShopMode.BOSS_ORDER) {

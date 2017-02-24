@@ -242,7 +242,7 @@
                     }
                 }
             },{
-                title : "等位支付",
+                title : "等位红包支付",
                 data : "waitRedPay",
                 createdCell:function (td,tdData,row) {
                     if(row.childOrder==true&&row.orderMode==5){
@@ -266,7 +266,7 @@
                 defaultContent: '0'
             },
             {
-                title : "退菜红包支付",
+                title : "退菜金额",
                 data : "articleBackPay",
                 defaultContent: '0'
             },
