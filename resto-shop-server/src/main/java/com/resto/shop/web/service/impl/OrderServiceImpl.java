@@ -942,7 +942,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
 
         } else {
-            result.setSuccess(autoRefundOrder(orderId));
+            if(order.getOperatorId() != "sb"){
+                result.setSuccess(autoRefundOrder(orderId));
+            }
+
 
         }
         update(order);
