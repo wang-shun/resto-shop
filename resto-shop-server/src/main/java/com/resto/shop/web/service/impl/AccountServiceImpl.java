@@ -172,7 +172,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setResultData(account.getId());
 			orderPaymentItemService.insert(item);
 			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-					"订单使用余额(红包)支付了：" + order.getWaitMoney());
+					"订单使用余额(红包)支付了：" + item.getPayValue());
 		}
 		return realPay;
 	}
