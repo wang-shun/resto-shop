@@ -4981,7 +4981,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void refundArticle(Order order) {
+    public void refundArticle(Order order){
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
@@ -5024,7 +5024,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                         total, maxWxPay > refundMoney ? refundMoney : maxWxPay, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                                         StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                             }
-
+                            if(result.containsKey("ERROR")){
+                                throw new RuntimeException("微信退款失败！失败信息："+ new JSONObject(result).toString());
+                            }
                             BigDecimal realBack = maxWxRefund.doubleValue() > order.getRefundMoney().doubleValue() ? order.getRefundMoney() : maxWxRefund;
                             item.setResultData(new JSONObject(result).toString());
                             item.setId(newPayItemId);
@@ -5073,6 +5075,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("refund_amount", refundTotal);
                             map.put("out_request_no", newPayItemId);
                             String resultJson = AliPayUtils.refundPay(map);
+                            if (resultJson.indexOf("ERROR") != -1){
+                                throw new RuntimeException("支付宝退款失败！失败信息："+ resultJson);
+                            }
                             item.setId(newPayItemId);
                             item.setResultData(new JSONObject(resultJson).toString());
                             item.setPayValue(refundTotal.multiply(new BigDecimal(-1)));
@@ -5136,12 +5141,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void refundItem(Order order) {
-        Order o = getOrderInfo(order.getId());
+    public void refundItem(Order refundOrder) {
+        //修改菜品数量
+        Order order = getOrderInfo(refundOrder.getId());
         int customerCount = 0;
         BigDecimal servicePrice = new BigDecimal(0);
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-        for (OrderItem orderItem : order.getOrderItems()) {
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        for (OrderItem orderItem : refundOrder.getOrderItems()) {
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
@@ -5151,13 +5157,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
 
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
-                customerCount = o.getCustomerCount() - orderItem.getCount();
+                customerCount = order.getCustomerCount() - orderItem.getCount();
                 servicePrice = shopDetail.getServicePrice().multiply(new BigDecimal(customerCount));
-                orderMapper.refundServicePrice(o.getId(), servicePrice, customerCount);
+                orderMapper.refundServicePrice(order.getId(), servicePrice, customerCount);
             }
         }
 
-
+        //修改支付项
+        Map<String, BigDecimal> orders = new HashMap<>();
+        List<OrderItem> orderItems = refundOrder.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
+            if (orders.containsKey(orderItem.getOrderId())) {
+                orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
+            } else {
+                orders.put(orderItem.getOrderId(), itemValue);
+            }
+        }
+        for (String id : orders.keySet()) {
+            Order o = new Order();
+            o.setId(id);
+            o.setRefundMoney(orders.get(id));
+            o.setOrderItems(refundOrder.getOrderItems());
+            refundArticle(o);
+            updateArticle(o);
+        }
 
     }
 
