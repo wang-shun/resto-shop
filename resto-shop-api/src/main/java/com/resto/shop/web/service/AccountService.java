@@ -31,9 +31,9 @@ public interface AccountService extends GenericService<Account, String> {
 
 	Account createCustomerAccount(Customer cus);
 
-	BigDecimal payOrder(Order order, BigDecimal payMoney, Customer customer);
+	BigDecimal payOrder(Order order, BigDecimal payMoney, Customer customer, Brand brand, ShopDetail shopDetail);
 
-	BigDecimal houFuPayOrder(Order order, BigDecimal payMoney, Customer customer);
+	BigDecimal houFuPayOrder(Order order, BigDecimal payMoney, Customer customer, Brand brand, ShopDetail shopDetail);
 
 	/**
 	 * pos端账户充值时,修改用户额度 新增充值记录

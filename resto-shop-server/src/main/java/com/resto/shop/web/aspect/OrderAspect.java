@@ -2,15 +2,14 @@ package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.UserActionUtils;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.NewCustomCoupon;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -129,6 +128,7 @@ public class OrderAspect {
                     break;
             }
         }
+        Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (order.getShopName() == null || "".equals(order.getShopName())) {
             order.setShopName(shopDetail.getName());
@@ -161,7 +161,9 @@ public class OrderAspect {
         }
         try {
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
+//            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
         }
@@ -361,10 +363,14 @@ public class OrderAspect {
     public void createCallMessage(Order order) throws Throwable {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId()); ;//根据订单找到对应的店铺
         WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId()); //根据订单找到对应的店铺
+
         if(shopDetail.getIsPush() == Common.YES){ //开启就餐提醒
         	MQMessageProducer.sendRemindMsg(order,shopDetail.getPushTime() * 1000);	
         }
@@ -481,6 +487,7 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Brand brand = brandService.selectById(order.getBrandId());
             StringBuffer msg = new StringBuffer();
             if (order.getParentOrderId() == null) {
                 msg.append("下单成功!" + "\n");
@@ -520,6 +527,8 @@ public class OrderAspect {
                 msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
             }
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         }
     }
 
@@ -528,6 +537,7 @@ public class OrderAspect {
         StringBuffer str=new StringBuffer();
         Brand brand = brandService.selectById(order.getBrandId());
         ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, order.getShopDetailId());
         BigDecimal money = new BigDecimal("0.00");
         for(NewCustomCoupon coupon : coupons){
@@ -546,6 +556,8 @@ public class OrderAspect {
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单发送推送：" + str.toString());
     }
 
 //    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
@@ -586,6 +598,7 @@ public class OrderAspect {
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
         Brand brand = brandService.selectById(customer.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
         if (order.getAllowAppraise()) {
             StringBuffer msg = new StringBuffer();
@@ -593,7 +606,9 @@ public class OrderAspect {
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            log.info("发送评论通知成功:" + msg + result);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
+//            log.info("发送评论通知成功:" + msg + result);
             scanaQRcode(config, customer, setting, order);
         }
         try {
@@ -625,6 +640,8 @@ public class OrderAspect {
     private void sendRewardShareMsg(Customer shareCustomer, Customer customer, WechatConfig config,
                                     BrandSetting setting, BigDecimal rewardMoney, Order order) {
         StringBuffer msg = new StringBuffer();
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
@@ -634,7 +651,9 @@ public class OrderAspect {
 //                .append(rewardMoney).append("元红包返利").append("</a>");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         //logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
-        log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
+//        log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单发送推送：" + msg.toString());
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
@@ -649,6 +668,7 @@ public class OrderAspect {
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Brand brand = brandService.selectById(order.getBrandId());
             StringBuffer msg = new StringBuffer();
             msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
             msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
@@ -688,8 +708,9 @@ public class OrderAspect {
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            log.info("发送订单取消通知成功:" + msg + result);
-
+//            log.info("发送订单取消通知成功:" + msg + result);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
             MQMessageProducer.sendNoticeOrderMessage(order);
 
             if (order.getParentOrderId() != null) {  //子订单
@@ -707,10 +728,14 @@ public class OrderAspect {
     private void sendVerCodeMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
         StringBuffer msg = new StringBuffer();
         msg.append("交易码:" + order.getVerCode() + "\n");
         msg.append("请留意餐厅叫号信息");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        log.info("发送取餐信息成功:" + result);
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单发送推送：" + msg.toString());
+//        log.info("发送取餐信息成功:" + result);
     }
 }

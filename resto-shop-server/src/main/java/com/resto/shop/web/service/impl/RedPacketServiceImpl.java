@@ -4,7 +4,11 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.UserActionUtils;
+import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.dto.RedPacketDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
@@ -36,11 +40,11 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     }
 
     @Override
-    public void useRedPacketPay(BigDecimal redPay, String customerId, Order order) {
+    public void useRedPacketPay(BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail) {
         //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包
         Integer[] redType = {0,1,2};
         for(Integer type : redType){
-            boolean flg = useRedPacket(type,redPay,customerId,order);
+            boolean flg = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
             //如果已扣完则不再扣除
             if(flg){
                 break;
@@ -48,7 +52,7 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
         }
     }
 
-    private boolean useRedPacket(Integer redType, BigDecimal redPay, String customerId, Order order){
+    private boolean useRedPacket(Integer redType, BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail){
         RedPacket redPacket = redPacketMapper.selectFirstRedPacket(customerId,redType);
         if (redPacket == null && redPay.compareTo(BigDecimal.ZERO) > 0){
             return false;
@@ -75,12 +79,14 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             }
 			item.setPayTime(new Date());
 			item.setPayValue(redPacket.getRedRemainderMoney());
-			item.setRemark(""+ RedType.GETREDTYPE.get(redType)+"支付:" + item.getPayValue());
+			item.setRemark(RedType.GETREDTYPE.get(redType)+"支付:" + item.getPayValue());
 			item.setResultData(redPacket.getId());
 			orderPaymentItemService.insert(item);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单使用"+RedType.GETREDTYPE.get(redType)+"支付了：" + item.getPayValue());
             redPay = redPay.subtract(redPacket.getRedRemainderMoney());
             if(redPay.compareTo(BigDecimal.ZERO) > 0) {
-                return useRedPacket(redType, redPay, customerId, order);
+                return useRedPacket(redType, redPay, customerId, order, brand, shopDetail);
             }
         }else{
             param.put("id",redPacket.getId());
@@ -102,9 +108,11 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             }
             item.setPayTime(new Date());
             item.setPayValue(redPay);
-            item.setRemark(""+ RedType.GETREDTYPE.get(redType)+"支付:" + item.getPayValue());
+            item.setRemark(RedType.GETREDTYPE.get(redType)+"支付:" + item.getPayValue());
             item.setResultData(redPacket.getId());
             orderPaymentItemService.insert(item);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单使用"+RedType.GETREDTYPE.get(redType)+"支付了：" + item.getPayValue());
         }
         return true;
     }

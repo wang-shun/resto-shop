@@ -8,7 +8,9 @@ import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.SMSUtils;
+import com.resto.brand.core.util.UserActionUtils;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
@@ -217,6 +219,8 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
         String customerId = obj.getString("customerId");
         if (orderService.checkRefundLimit(order)) {
             orderService.autoRefundOrder(obj.getString("orderId"));
@@ -247,6 +251,8 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -274,8 +280,12 @@ public class OrderMessageListener implements MessageListener {
     private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
         Order order = JSON.parseObject(msg, Order.class);
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         DataSourceContextHolder.setDataSourceName(order.getBrandId());
         orderService.updateAllowContinue(order.getId(), false);
+        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                "订单加菜时间已过期，不允许继续加菜！");
         return Action.CommitMessage;
     }
 
@@ -342,6 +352,8 @@ public class OrderMessageListener implements MessageListener {
         String brandId = obj.getString("brandId");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
         if (order.getOrderState() == OrderState.SUBMIT) {
             log.info("自动取消订单:" + obj.getString("orderId"));
             orderService.cancelOrder(obj.getString("orderId"));
@@ -372,6 +384,8 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单发送推送：" + msg.toString());
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }

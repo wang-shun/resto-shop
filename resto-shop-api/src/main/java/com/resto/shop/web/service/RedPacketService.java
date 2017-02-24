@@ -2,6 +2,8 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.RedPacketDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.RedPacket;
 
@@ -18,7 +20,7 @@ public interface RedPacketService extends GenericService<RedPacket, String> {
      * @param customerId
      * @param order
      */
-    void useRedPacketPay(BigDecimal redPay, String customerId, Order order);
+    void useRedPacketPay(BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail);
 
     List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap);
 

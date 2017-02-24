@@ -10,7 +10,9 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.UserActionUtils;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -138,7 +140,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	}
 
 	@Override
-	public BigDecimal payOrder(Order order,BigDecimal payMoney, Customer customer) {
+	public BigDecimal payOrder(Order order, BigDecimal payMoney, Customer customer, Brand brand, ShopDetail shopDetail) {
 		Account account = selectById(customer.getAccountId());  //找到用户帐户
 		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
 		if(balance==null){
@@ -159,7 +161,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
-            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order,brand,shopDetail);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
@@ -169,12 +171,14 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
 			item.setResultData(account.getId());
 			orderPaymentItemService.insert(item);
+			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+					"订单使用余额(红包)支付了：" + item.getPayValue());
 		}
 		return realPay;
 	}
 
 	@Override
-	public BigDecimal houFuPayOrder(Order order,BigDecimal payMoney, Customer customer) {
+	public BigDecimal houFuPayOrder(Order order,BigDecimal payMoney, Customer customer, Brand brand, ShopDetail shopDetail) {
 		Account account = selectById(customer.getAccountId());  //找到用户帐户
 		BigDecimal balance = chargeOrderService.selectTotalBalance(customer.getId()); //获取所有剩余充值金额
 		if(balance==null){
@@ -195,7 +199,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
-            redPacketService.useRedPacketPay(redPay,customer.getId(),order);
+            redPacketService.useRedPacketPay(redPay,customer.getId(),order,brand,shopDetail);
 			OrderPaymentItem item = new OrderPaymentItem();
 			item.setId(ApplicationUtils.randomUUID());
 			item.setOrderId(order.getId());
