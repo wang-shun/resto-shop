@@ -19,4 +19,11 @@ public interface VirtualProductsMapper extends GenericDao<VirtualProducts, Strin
     void insertVirtualProducts(VirtualProducts virtualProducts);
 
     void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen);
+
+    void deleteById(Integer id);
+
+    void deleteVirtualById(Integer virtualId);
+
+    void updateVirtual(VirtualProducts virtualProducts);
+
 }

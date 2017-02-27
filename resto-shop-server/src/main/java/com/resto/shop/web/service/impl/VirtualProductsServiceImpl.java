@@ -42,11 +42,31 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
 
     @Override
     public void insertVirtualProducts(VirtualProducts virtualProducts) {
-//        return virtualProductsMapper.insertVirtualProducts(virtualProducts);
+        virtualProductsMapper.insertVirtualProducts(virtualProducts);
     }
 
     @Override
     public void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen) {
-//        return virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+        virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+    }
+
+    @Override
+    public void insertVirtualProductsAndKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen) {
+        virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        virtualProductsMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteVirtualById(Integer virtualId) {
+        virtualProductsMapper.deleteVirtualById(virtualId);
+    }
+
+    @Override
+    public void updateVirtual(VirtualProducts virtualProducts) {
+        virtualProductsMapper.updateVirtual(virtualProducts);
     }
 }

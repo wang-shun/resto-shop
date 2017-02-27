@@ -19,4 +19,12 @@ public interface VirtualProductsService extends GenericService<VirtualProducts, 
     void insertVirtualProducts(VirtualProducts virtualProducts);
 
     void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen);
+
+    void insertVirtualProductsAndKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen);
+
+    void deleteById(Integer id);
+
+    void deleteVirtualById(Integer virtualId);
+
+    void updateVirtual(VirtualProducts virtualProducts);
 }
