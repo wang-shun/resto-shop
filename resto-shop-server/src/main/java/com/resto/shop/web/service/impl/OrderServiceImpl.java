@@ -1124,7 +1124,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                                 StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                     }
-
+                    if(result.containsKey("ERROR")){
+                        throw new RuntimeException("微信退款异常！");
+                    }
                     item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
 
@@ -1143,6 +1145,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("refund_amount", aliPay.add(aliRefund));
                     map.put("out_request_no",newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
+                    if(new JSONObject(resultJson).toString().indexOf("ERROR") != -1){
+                        throw new RuntimeException("支付宝退款异常！");
+                    }
                     item.setResultData(new JSONObject(resultJson).toString());
                     item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
                     break;
@@ -2703,31 +2708,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            //判断是否是后付款模式
-            if(o.getOrderMode()==5){
-                if(o.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                    d=d.add(o.getAmountWithChildren());
-                }else {
-                    d = d.add(o.getOrderMoney());
-                }
-            }else {
-                d = d.add(o.getOrderMoney());
-            }
+            d = d.add(o.getOrderMoney());
             //品牌订单数目 加菜订单和父订单算一个订单
 
             if(o.getParentOrderId()==null){
                 ids.add(o.getId());
             }
-
-            if (!o.getOrderPaymentItems().isEmpty()) {
-                for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-                    //品牌实际支付  微信支付+
-                    if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
-                        d1 = d1.add(oi.getPayValue());
-                    }
-                    //品牌虚拟支付(加上等位红包支付)
-                    if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
-                        d2 = d2.add(oi.getPayValue());
+            if (o.getOrderPaymentItems() != null) {
+                if (!o.getOrderPaymentItems().isEmpty()) {
+                    for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+                        //品牌实际支付  微信支付+
+                        if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                            d1 = d1.add(oi.getPayValue());
+                        }
+                        //品牌虚拟支付(加上等位红包支付)
+                        if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
+                            d2 = d2.add(oi.getPayValue());
+                        }
                     }
                 }
             }
@@ -2776,15 +2773,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Set<String> sids = new HashSet<>();
             for (Order os : list) {
                 if (sd.getShopDetailId().equals(os.getShopDetailId())) {
-                    if (!os.getOrderPaymentItems().isEmpty()) {
-                        for (OrderPaymentItem oi : os.getOrderPaymentItems()) {
-                            //店铺实际支付
-                            if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
-                                ds2 = ds2.add(oi.getPayValue());
-                            }
-                            //店铺虚拟支付
-                            if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
-                                ds3 = ds3.add(oi.getPayValue());
+                    if (os.getOrderPaymentItems() != null) {
+                        if (!os.getOrderPaymentItems().isEmpty()) {
+                            for (OrderPaymentItem oi : os.getOrderPaymentItems()) {
+                                //店铺实际支付
+                                if (oi.getPaymentModeId() == 1 || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                                    ds2 = ds2.add(oi.getPayValue());
+                                }
+                                //店铺虚拟支付
+                                if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
+                                    ds3 = ds3.add(oi.getPayValue());
+                                }
                             }
                         }
                     }
@@ -2796,17 +2795,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        ds1 = ds1.add(os.getOrderMoney());
 //                    }
 
-                    //判断是否是后付款模式
-                    if (os.getOrderMode() == 5) {
-                        if (os.getAmountWithChildren().compareTo(BigDecimal.ZERO) != 0) {
-                            ds1 = ds1.add(os.getAmountWithChildren());
-                        } else {
-                            ds1 = ds1.add(os.getOrderMoney());
-                        }
-                    } else {
-                        ds1 = ds1.add(os.getOrderMoney());
-                    }
-
+                    //计算店铺订单金额
+                    ds1 = ds1.add(os.getOrderMoney());
                     //计算店铺的订单数目
                     if (os.getParentOrderId() == null) {
                         sids.add(os.getId());
