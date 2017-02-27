@@ -134,7 +134,7 @@
                 data : "moneyPay"
             },
             {
-                title : "退菜金额(元)",
+                title : "退菜返还红包(元)",
                 data:"articleBackPay"
             },
             {
@@ -198,7 +198,7 @@
                 data : "moneyPay"
             },
             {
-                title : "退菜金额(元)",
+                title : "退菜返还红包(元)",
                 data:"articleBackPay"
             },
             {

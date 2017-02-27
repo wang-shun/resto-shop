@@ -266,7 +266,7 @@
                 defaultContent: '0'
             },
             {
-                title : "退菜金额",
+                title : "退菜返还红包",
                 data : "articleBackPay",
                 defaultContent: '0'
             },
