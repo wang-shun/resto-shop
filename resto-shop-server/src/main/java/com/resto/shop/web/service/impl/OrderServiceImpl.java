@@ -1166,7 +1166,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void fixedRefund(String brandId,String shopId,
+    public String fixedRefund(String brandId,String shopId,
                             int total,int refund,String transaction_id, String mchid,String id) {
         WechatConfig config = wechatConfigService.selectByBrandId(brandId);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
@@ -1183,10 +1183,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     total,refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
         }
-        OrderPaymentItem orderPaymentItem = orderPaymentItemService.selectById(id);
-        orderPaymentItem.setResultData(new JSONObject(result).toString());
-        orderPaymentItemService.update(orderPaymentItem);
-
+//        OrderPaymentItem orderPaymentItem = orderPaymentItemService.selectById(id);
+//        orderPaymentItem.setResultData(new JSONObject(result).toString());
+//        orderPaymentItemService.update(orderPaymentItem);
+        return new JSONObject(result).toString();
     }
 
     @Override
