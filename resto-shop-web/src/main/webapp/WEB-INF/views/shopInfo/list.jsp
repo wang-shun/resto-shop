@@ -280,7 +280,7 @@
 
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">日短信通知：</label>
+                        <label class="col-sm-3 control-label">日结短信通知：</label>
                         <div class="col-sm-9">
                             <div>
                                 <label> <input type="radio" name="isOpenSms"v-model="m.isOpenSms" value="1">是
