@@ -18,7 +18,10 @@
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-             <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="createBrnadArticleTotal" v-if="state == 1">下载报表</button>
+             <button type="button" class="btn btn-default" v-if="state == 2">下载数据过多，正在生成中！</button>
+             <button type="button" class="btn btn-success" v-if="state == 3">点击下载</button>
              <br/>
           </div>
 		</form>
@@ -33,7 +36,6 @@
 				  	<strong style="margin-right:100px;font-size:22px">
 				  		品牌菜品销售表
 				  	</strong>
-				  	<button type="button" class="btn btn-primary" @click="downloadBrnadArticleTotal" style="float: right;">下载报表</button>
 				  </div>
 				  <div class="panel-body">
 				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" style="width: 100%">
@@ -48,17 +50,21 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-if="brandReport.brandName != null">
-								<td><strong>{{brandReport.brandName}}</strong></td>
-								<td>{{brandReport.totalNum}}</td>
-								<td>{{brandReport.sellIncome}}</td>
-		                        <td>{{brandReport.discountTotal}}</td>
-		                        <td>{{brandReport.refundCount}}</td>
-		                        <td>{{brandReport.refundTotal}}</td>
-							</tr>
-							<tr v-else>
-								<td align="center" colspan="5">载入中...</td>
-							</tr>
+                            <template v-if="brandReport.brandName != ''">
+                                <tr>
+                                    <td><strong>{{brandReport.brandName}}</strong></td>
+                                    <td>{{brandReport.totalNum}}</td>
+                                    <td>{{brandReport.sellIncome}}</td>
+                                    <td>{{brandReport.discountTotal}}</td>
+                                    <td>{{brandReport.refundCount}}</td>
+                                    <td>{{brandReport.refundTotal}}</td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td align="center" colspan="5">暂时没有数据...</td>
+                                </tr>
+                            </template>
 						</tbody>
 				  	</table>
 				  </div>
@@ -87,7 +93,6 @@
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
 			  	   <strong style="margin-right:100px;font-size:22px">品牌菜品销售表(单品)</strong>
-			  	   <button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleUnitTable" class="table table-striped table-bordered table-hover"
@@ -104,7 +109,6 @@
 	    	<div class="panel panel-info">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表(套餐)</strong>
-			  	<button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleFamilyTable" class="table table-striped table-bordered table-hover"
@@ -158,12 +162,7 @@ var vueObj = new Vue({
     el : "#control",
     data : {
         brandReport : {
-            brandName : "",
-            totalNum : 0,
-            sellIncome:0,
-            discountTotal:0,
-            refundTotal:0,
-            refundCount:0,
+            brandName : ""
         },
         searchDate : {
             beginDate : "",
@@ -173,7 +172,8 @@ var vueObj = new Vue({
         brandArticleUnitTable:{},//单品dataTables对象
         brandArticleFamilyTable:{},//套餐datatables对象
         api:{},
-        resultData:[]
+        resultData:[],
+        state : 1
     },
     created : function() {
         var date = new Date().format("yyyy-MM-dd");
@@ -324,79 +324,46 @@ var vueObj = new Vue({
         //切换单品、套餐 type 1:单品 2:套餐
         chooseType:function (type) {
           this.currentType= type;
-          this.searchInfo();
         },
-        searchInfo : function(isInit) {
+        searchInfo : function() {
+            toastr.success("查询中...");
         	try{
 	            var that = this;
 	            var api1 = brandUnitAPI;
 	            var api2 = brandFamilyAPI;
-	            //判断 时间范围是否合法
-	            if (that.searchDate.beginDate > that.searchDate.endDate) {
-	                toastr.error("开始时间不能大于结束时间");
-	                toastr.clear();
-	                return false;
-	            }
-	            that.selectBrandArticleToatl();
-	            switch (that.currentType)
-	            {
-	                case 1:
-	                	//清空datatable的column搜索条件
-	                	api1.search('');
-	                	var column1 = api1.column(1);
-	                	column1.search('', true, false);
-	                	//清空表格
-	                	that.brandArticleUnitTable.clear().draw();
-	                    that.brandUnitTable();
-	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
-		                	if(result.success == true){
-			                    that.brandArticleUnitTable.rows.add(result.data).draw();
-			                  	//重绘搜索列
-			                    that.brandUnitTable();
-		            		}
-	                    });
-	                	break;
-	                case 2:
-                		//清空datatable的column搜索条件
+                $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
+                    if(result.success == true){
+                        that.brandReport = result.data.brandReport;
+                        //清空brandUnitDatatable的column搜索条件
+                        api1.search('');
+                        var column1 = api1.column(1);
+                        column1.search('', true, false);
+                        //清空brandFamilyDatatable的column搜索条件
                         api2.search('');
-                    	var column1 = api2.column(1);
-                    	column1.search('', true, false);
-                    	//清空表格
-                    	that.brandArticleFamilyTable.clear().draw();
+                        var column2 = api2.column(1);
+                        column2.search('', true, false);
+                        that.brandArticleUnitTable.clear().draw();
+                        that.brandArticleUnitTable.rows.add(result.data.brandArticleUnit).draw();
+                        //重绘搜索列
+                        that.brandUnitTable();
+                        that.brandArticleFamilyTable.clear().draw();
+                        that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
+                        //重绘搜索列
                         that.brandFamilyTable();
-	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
-		                	if(result.success == true){
-		                        that.brandArticleFamilyTable.rows.add(result.data).draw();
-		                        //重绘搜索列
-		                        that.brandFamilyTable();
-		            		}
-	                    });
-	                   break;
-	            }
+                        toastr.success("查询成功");
+                    }else{
+                        toastr.error("查询失败");
+                    }
+                });
         	}catch(e){
         		toastr.error("查询品牌菜品销售表失败!");
-	            toastr.clear();
 	            return;
         	}
-            toastr.success("查询成功");
-            toastr.clear(); 
-        },
-        selectBrandArticleToatl : function(){
-        	var that = this;
-        	$.post("articleSell/list_brand", this.getDate(), function(result) {
-                that.brandReport.brandName = result.brandName;
-                that.brandReport.totalNum = result.totalNum;
-                that.brandReport.sellIncome=result.sellIncome;
-                that.brandReport.discountTotal=result.discountTotal;
-                that.brandReport.refundCount=result.refundCount;
-                that.brandReport.refundTotal=result.refundTotal;
-            });
         },
         getDate : function(){
             var data = {
                 beginDate : this.searchDate.beginDate,
                 endDate : this.searchDate.endDate,
-                type : this.currentType
             };
             return data;
         },
@@ -413,12 +380,6 @@ var vueObj = new Vue({
                     break;
             }
         },
-        downloadBrnadArticleTotal : function(){
-        	var that = this;
-            var beginDate = that.searchDate.beginDate;
-            var endDate = that.searchDate.endDate;
-            location.href="articleSell/downloadBrnadArticleTotal?beginDate="+beginDate+"&&endDate="+endDate+"";
-        },
         today : function(){
             date = new Date().format("yyyy-MM-dd");
             this.searchDate.beginDate = date
@@ -430,7 +391,6 @@ var vueObj = new Vue({
             this.searchDate.endDate  = GetDateStr(-1);
             this.searchInfo();
         },
-
         week : function(){
             this.searchDate.beginDate  = getWeekStartDate();
             this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
@@ -489,11 +449,6 @@ var vueObj = new Vue({
         }
     }
 });
-
-function Trim(str)
-{ 
-    return str.replace(/(^\s*)|(\s*$)/g, ""); 
-}
 
 function openModal(articleId) {
 	var beginDate = $("#beginDate").val();

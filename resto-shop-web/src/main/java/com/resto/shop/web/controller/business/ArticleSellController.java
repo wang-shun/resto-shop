@@ -2,7 +2,6 @@
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,32 +83,29 @@ public class ArticleSellController extends GenericController{
 		}
 		return "articleSell/"+type;
 	}
-	
-//	@RequestMapping("/list_all")
-//	@ResponseBody
-//	public List<SaleReportDto>  list_all(String beginDate,String endDate){
-//		List<SaleReportDto> list = new ArrayList<>();
-//		SaleReportDto saleReportDto = orderService.selectArticleSumCountByData(beginDate, endDate,getCurrentBrandId());
-//		list.add(saleReportDto);
-//		return list;
-//	}
-
 
 	@RequestMapping("/queryOrderArtcile")
 	@ResponseBody
 	public Result queryOrderArtcile(String beginDate, String endDate, Integer type){
-		Map<String, Object> selectMap = new HashMap<String, Object>();
-		selectMap.put("beginDate", beginDate);
-		selectMap.put("endDate", endDate);
-		selectMap.put("type", type);
-		List<ArticleSellDto> articleSellDtos = articleService.queryOrderArtcile(selectMap);
-		return getSuccessResult(articleSellDtos);
-	}
-	
-	@RequestMapping("/list_brand")
-	@ResponseBody
-	public brandArticleReportDto list_brand(String beginDate,String endDate){
-		return orderService.selectBrandArticleNum(beginDate,endDate,getCurrentBrandId(),getBrandName());
+        JSONObject object = new JSONObject();
+	    try {
+            Map<String, Object> selectMap = new HashMap<String, Object>();
+            selectMap.put("beginDate", beginDate);
+            selectMap.put("endDate", endDate);
+            selectMap.put("type", ArticleType.SIMPLE_ARTICLE);
+            brandArticleReportDto brandCount = orderService.selectBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
+            object.put("brandReport", brandCount);
+            List<ArticleSellDto> articleUnitSellDtos = articleService.queryOrderArtcile(selectMap);
+            object.put("brandArticleUnit", articleUnitSellDtos);
+            selectMap.put("type", ArticleType.TOTAL_ARTICLE);
+            List<ArticleSellDto> articleFamilySellDtos = articleService.queryOrderArtcile(selectMap);
+            object.put("brandArticleFamily", articleFamilySellDtos);
+        }catch (Exception e){
+            log.error("查询菜品销售报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 	
 	@RequestMapping("/showMealAttr")

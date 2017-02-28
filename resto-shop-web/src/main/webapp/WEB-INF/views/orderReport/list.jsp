@@ -150,6 +150,7 @@ var vueObj =  new Vue({
 	},
 	methods:{
 		searchInfo : function(beginDate, endDate) {
+        toastr.success("查询中...");
 		var that = this;
 		//判断 时间范围是否合法
 		if(beginDate>endDate){

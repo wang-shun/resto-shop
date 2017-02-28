@@ -66,6 +66,7 @@
     var beginDate = $("#beginDate").val();
     var endDate = $("#endDate").val();
     var dataSource;
+    toastr.success('查询中...');
     $.ajax( {
         url:'totalIncome/reportIncome',
         async:false,
@@ -75,6 +76,7 @@
         },
         success:function(data) {
             dataSource=data;
+            toastr.success('查询成功');
         },
         error : function() {
             toastr.error("系统异常请重新刷新");
@@ -269,6 +271,7 @@
 
 
     function searchInfo(beginDate,endDate){
+        toastr.success('查询中...');
         //更新数据源
         $.ajax( {
             url:'totalIncome/reportIncome',
