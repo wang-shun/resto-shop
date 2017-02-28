@@ -20,8 +20,8 @@
              <button type="button" class="btn btn-primary" @click="month">本月</button>
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
              <button type="button" class="btn btn-primary" @click="createBrnadArticleTotal" v-if="state == 1">下载报表</button>
-             <button type="button" class="btn btn-default" v-if="state == 2">下载数据过多，正在生成中！</button>
-             <button type="button" class="btn btn-success" v-if="state == 3">点击下载</button>
+             <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中</button>
+             <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
              <br/>
           </div>
 		</form>
@@ -173,7 +173,10 @@ var vueObj = new Vue({
         brandArticleFamilyTable:{},//套餐datatables对象
         api:{},
         resultData:[],
-        state : 1
+        state : 1,
+        brandArticleUnit :[],
+        brandArticleFamily　:[],
+        path : null
     },
     created : function() {
         var date = new Date().format("yyyy-MM-dd");
@@ -342,10 +345,12 @@ var vueObj = new Vue({
                         api2.search('');
                         var column2 = api2.column(1);
                         column2.search('', true, false);
+                        that.brandArticleUnit = result.data.brandArticleUnit;
                         that.brandArticleUnitTable.clear().draw();
                         that.brandArticleUnitTable.rows.add(result.data.brandArticleUnit).draw();
                         //重绘搜索列
                         that.brandUnitTable();
+                        that.brandArticleFamily = result.data.brandArticleFamily;
                         that.brandArticleFamilyTable.clear().draw();
                         that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
                         //重绘搜索列
@@ -357,8 +362,11 @@ var vueObj = new Vue({
                 });
         	}catch(e){
         		toastr.error("查询品牌菜品销售表失败!");
-	            return;
         	}
+        },
+        download : function(){
+            window.location.href = "articleSell/downloadBrnadArticle?path="+this.path+"";
+            this.state = 1;
         },
         getDate : function(){
             var data = {
@@ -367,17 +375,169 @@ var vueObj = new Vue({
             };
             return data;
         },
-        brandreportExcel : function(){
-            var that = this;
-            var beginDate = that.searchDate.beginDate;
-            var endDate = that.searchDate.endDate;
-            switch(that.currentType){
-                case 1:
-                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
-                    break;
-                case 2:
-                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
-                    break;
+        createBrnadArticleTotal : function(){
+            try {
+                var that = this;
+                var object = {
+                    beginDate : that.searchDate.beginDate,
+                    endDate : that.searchDate.endDate,
+                    type : that.currentType,
+                    brandReport : that.brandReport
+                }
+                switch (that.currentType) {
+                    case 1:
+                        var articleUnit = that.brandArticleUnit;
+                        if (articleUnit.length <= 200) {
+                            object.brandArticleUnit = articleUnit;
+                            $.post("articleSell/createBrnadArticle",object,function(result){
+                                if(result.success){
+                                    window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
+                                }else{
+                                    toastr.error("下载报表出错!");
+                                }
+                            });
+                        }else{
+                            that.state = 2;
+                            var length = Math.ceil(articleUnit.length/20);
+                            var start = 0;
+                            var end = 20;
+                            var startPosition = 26;
+                            var path = null;
+                            for(var i = 1;i <= length;i++){
+                                if (i != length){
+                                    object.brandArticleUnit = articleUnit.slice(start,end);
+                                }else{
+                                    object.brandArticleUnit = articleUnit.slice(start);
+                                }
+                                object.startPosition = startPosition;
+                                object.path = that.path;
+                                if(i == 1){
+                                    $.ajax({
+                                        url:"articleSell/createBrnadArticle",
+                                        type:"POST",
+                                        async: false,
+                                        data:object,
+                                        dataType:"json",
+                                        success:function(result){
+                                            if(result.success){
+                                                that.path = result.data;
+                                                start = end;
+                                                end = start + 20;
+                                            }else{
+                                                toastr.error("生成报表出错!");
+                                                return;
+                                            }
+                                        }
+                                    });
+                                }else if(i == length){
+                                    $.post("articleSell/appendToExcel",object,function(result){
+                                        if(result.success){
+                                            that.state = 3;
+                                        }else{
+                                            toastr.error("生成报表出错!");
+                                            return;
+                                        }
+                                    });
+                                }else{
+                                    $.ajax({
+                                        url:"articleSell/appendToExcel",
+                                        type:"POST",
+                                        async: false,
+                                        data:object,
+                                        dataType:"json",
+                                        success:function(result){
+                                            if(result.success){
+                                                start = end;
+                                                end = start + 20;
+                                                startPosition = startPosition + 20;
+                                            }else{
+                                                toastr.error("生成报表出错!");
+                                                return;
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                    case 2:
+                        var articleFamily = that.brandArticleFamily;
+                        if (articleFamily.length <= 200) {
+                            object.brandArticleFamily = articleFamily;
+                            $.post("articleSell/createBrnadArticle",object,function(result){
+                                if(result.success){
+                                    window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
+                                }else{
+                                    toastr.error("下载报表出错!");
+                                }
+                            });
+                        }else{
+                            that.state = 2;
+                            var length = Math.ceil(articleFamily.length/20);
+                            var start = 0;
+                            var end = 20;
+                            var startPosition = 26;
+                            var path = null;
+                            for(var i = 1;i <= length;i++){
+                                if (i != length){
+                                    object.brandArticleFamily = articleFamily.slice(start,end);
+                                }else{
+                                    object.brandArticleFamily = articleFamily.slice(start);
+                                }
+                                object.startPosition = startPosition;
+                                object.path = that.path;
+                                if(i == 1){
+                                    $.ajax({
+                                        url:"articleSell/createBrnadArticle",
+                                        type:"POST",
+                                        async: false,
+                                        data:object,
+                                        dataType:"json",
+                                        success:function(result){
+                                            if(result.success){
+                                                that.path = result.data;;
+                                                start = end;
+                                                end = start + 20;
+                                            }else{
+                                                toastr.error("生成报表出错!");
+                                                return;
+                                            }
+                                        }
+                                    });
+                                }else if(i == length){
+                                    $.post("articleSell/appendToExcel",object,function(result){
+                                        if(result.success){
+                                            that.state = 3;
+                                        }else{
+                                            toastr.error("生成报表出错!");
+                                            return;
+                                        }
+                                    });
+                                }else{
+                                    $.ajax({
+                                        url:"articleSell/appendToExcel",
+                                        type:"POST",
+                                        async: false,
+                                        data:object,
+                                        dataType:"json",
+                                        success:function(result){
+                                            if(result.success){
+                                                start = end;
+                                                end = start + 20;
+                                                startPosition = startPosition + 20;
+                                            }else{
+                                                toastr.error("生成报表出错!");
+                                                return;
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                }
+            }catch (e){
+                toastr.error("下载报表出错!");
             }
         },
         today : function(){
