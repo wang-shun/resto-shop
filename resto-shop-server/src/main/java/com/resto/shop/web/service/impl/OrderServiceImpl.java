@@ -1399,21 +1399,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             Article article = articleService.selectById(articleId);
             if(article.getVirtualId() != null){
-                List<VirtualProductsAndKitchen> virtualProductsAndKitchens =
-                        virtualProductsService.getVirtualProductsAndKitchenById(article.getVirtualId());
-                for (VirtualProductsAndKitchen virtual : virtualProductsAndKitchens) {
+                VirtualProducts virtualProducts = virtualProductsService.selectById(String.valueOf(article.getVirtualId()));
+                if(virtualProducts.getIsUsed() == Common.NO){
+                    //启用
+                    List<VirtualProductsAndKitchen> virtualProductsAndKitchens =
+                            virtualProductsService.getVirtualProductsAndKitchenById(article.getVirtualId());
+                    for (VirtualProductsAndKitchen virtual : virtualProductsAndKitchens) {
 
-                    String kitchenId = String.valueOf(virtual.getKitchenId());
-                    Kitchen kitchen = kitchenService.selectById(virtual.getKitchenId());
-                    kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-                    //判断 厨房集合中 是否已经包含当前厨房信息
-                    if (!kitchenArticleMap.containsKey(kitchenId)) {
-                        //如果没有 则新建
-                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                        String kitchenId = String.valueOf(virtual.getKitchenId());
+                        Kitchen kitchen = kitchenService.selectById(virtual.getKitchenId());
+                        kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                        //判断 厨房集合中 是否已经包含当前厨房信息
+                        if (!kitchenArticleMap.containsKey(kitchenId)) {
+                            //如果没有 则新建
+                            kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                        }
+                        kitchenArticleMap.get(kitchenId).add(item);
                     }
-                    kitchenArticleMap.get(kitchenId).add(item);
+                    continue;
                 }
-                continue;
+
             }
 
 
