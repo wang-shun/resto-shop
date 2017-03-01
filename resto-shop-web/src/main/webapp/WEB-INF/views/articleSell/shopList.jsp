@@ -133,7 +133,7 @@
 		            $.post("articleSell/list_shop", this.getDate(), function(result) {
 		                if(result.success) {
                             that.shopArticleTable.clear().draw();
-                            that.shopArticleTable.rows.add(result).draw();
+                            that.shopArticleTable.rows.add(result.data.list).draw();
                         }else{
                             toastr.error("查询店铺菜品销售表失败!");
                         }

@@ -477,16 +477,24 @@ public class ArticleSellController extends GenericController{
 	}
 
     /**
-     * 查询菜品销售报表
+     * 查询店铺菜品销售报表
      * @param beginDate
      * @param endDate
      * @return
      */
 	@RequestMapping("/list_shop")
 	@ResponseBody
-	public List<ShopArticleReportDto> list_shop(String beginDate,String endDate){
-		List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId(),getCurrentShopDetails());
-		return list;
+	public Result list_shop(String beginDate,String endDate){
+	    JSONObject object = new JSONObject();
+        try {
+            List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate, endDate, getCurrentBrandId(), getCurrentShopDetails());
+            object.put("list",list);
+        }catch (Exception e){
+            log.error("查询店铺菜品销售报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 	
 	
