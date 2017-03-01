@@ -130,23 +130,19 @@
 	    	searchInfo : function(isInit) {
 	        	try{
 		            var that = this;
-		            //判断 时间范围是否合法
-		            if (that.searchDate.beginDate > that.searchDate.endDate) {
-		                toastr.error("开始时间不能大于结束时间");
-		                toastr.clear();
-		                return false;
-		            }
-		            that.shopArticleTable.clear().draw();
 		            $.post("articleSell/list_shop", this.getDate(), function(result) {
-		                that.shopArticleTable.rows.add(result).draw();
+		                if(result.success) {
+                            that.shopArticleTable.clear().draw();
+                            that.shopArticleTable.rows.add(result).draw();
+                        }else{
+                            toastr.error("查询店铺菜品销售表失败!");
+                        }
 		            });
 	        	}catch(e){
-	        		toastr.error("查询店铺菜品销售表失败!");
-		            toastr.clear();
+                    toastr.error("查询店铺菜品销售表失败!");
 		            return;
 	        	}
 	            toastr.success("查询成功");
-	            toastr.clear(); 
 	        },
 	        getDate : function(){
 	            var data = {

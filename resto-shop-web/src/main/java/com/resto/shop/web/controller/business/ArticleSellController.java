@@ -86,6 +86,13 @@ public class ArticleSellController extends GenericController{
 		return "articleSell/"+type;
 	}
 
+    /**
+     * 查询品牌销售报表
+     * @param beginDate
+     * @param endDate
+     * @param type
+     * @return
+     */
 	@RequestMapping("/queryOrderArtcile")
 	@ResponseBody
 	public Result queryOrderArtcile(String beginDate, String endDate, Integer type){
@@ -190,7 +197,15 @@ public class ArticleSellController extends GenericController{
 		request.setAttribute("shopId", shopId);
 		return "articleSell/shopArticle";
 	}
-	
+
+    /**
+     * 查询套餐子项销量
+     * @param articleId
+     * @param beginDate
+     * @param endDate
+     * @param shopId
+     * @return
+     */
 	@RequestMapping("/queryArticleMealAttr")
 	@ResponseBody
 	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate, String shopId){
@@ -198,9 +213,6 @@ public class ArticleSellController extends GenericController{
 		selectMap.put("articleId", articleId);
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
-		if(StringUtils.isNotBlank(shopId)){
-			selectMap.put("shopDetailId", shopId);
-		}
 		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
@@ -312,6 +324,14 @@ public class ArticleSellController extends GenericController{
 		return getSuccessResult(path);
 	}
 
+    /**
+     * 向报表追加记录
+     * @param path
+     * @param startPosition
+     * @param type
+     * @param articleSellDto
+     * @return
+     */
 	@RequestMapping("/appendToExcel")
     @ResponseBody
 	public Result appendToExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
@@ -455,7 +475,13 @@ public class ArticleSellController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
+
+    /**
+     * 查询菜品销售报表
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
 	@RequestMapping("/list_shop")
 	@ResponseBody
 	public List<ShopArticleReportDto> list_shop(String beginDate,String endDate){
@@ -685,8 +711,16 @@ public class ArticleSellController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
+    /**
+     * 生成店铺销售报表
+     * @param beginDate
+     * @param endDate
+     * @param sort
+     * @param request
+     * @param response
+     */
 	@RequestMapping("/shop_articleId_excel")
 	@ResponseBody
 	public void reportShopSumArticleIdExcel(String beginDate,String endDate,String sort,HttpServletRequest request, HttpServletResponse response){
@@ -715,20 +749,9 @@ public class ArticleSellController extends GenericController{
 		map.put("num", "5");//显示的位置
 		map.put("reportTitle", "店铺菜品销售");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义excel表格的表头
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-//		}else{
-//			//根据菜品分类的名称获取菜品分类的id
-//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-//		}
 		//暂时查全部
 		result = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId(),getCurrentShopDetails());
 		String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"},{"退菜总数","25"},{"退菜金额","25"}};
-		
 		//定义excel工具类对象
 		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
 		try{

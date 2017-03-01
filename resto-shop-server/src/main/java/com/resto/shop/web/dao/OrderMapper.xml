@@ -1282,9 +1282,11 @@
         SELECT
         SUM(oi.count)totalNum,
         o.shop_detail_id shop_id
-        from tb_order_item oi INNER JOIN tb_order o on o.id = oi.order_id
-        INNER JOIN tb_article ta on oi.article_id = ta.id and ta.article_type = 1
-        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND
+        from tb_article ta
+        LEFT JOIN tb_article_price tap on ta.id = tap.article_id
+        INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
+        INNER JOIN  tb_order o ON o.id=oi.order_id
+        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND ta.article_type = 1 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         GROUP BY o.shop_detail_id
     </select>
@@ -1293,14 +1295,15 @@
     <!--查询品牌下每个店铺所有菜品卖的钱的和-->
     <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
         SELECT
-        SUM(oi.final_price)sellIncome,
+        IFNULL(SUM(oi.final_price),0.00) sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
-        from tb_order_item oi INNER JOIN tb_order o
-        on o.id=oi.order_id
-        INNER JOIN tb_article ta ON oi.article_id = ta.id
+        from tb_article ta
+        LEFT JOIN tb_article_price tap on ta.id = tap.article_id
+        INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
+        INNER JOIN  tb_order o ON o.id=oi.order_id
         WHERE
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
         AND
