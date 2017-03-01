@@ -45,6 +45,7 @@
         <result column="photo_square" property="photoSquare"/>
         <result column="meal_fee_number" property="mealFeeNumber"/>
         <result column="is_main_food" property="isMainFood"/>
+        <result column="virtual_id" property="virtualId"></result>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
@@ -52,7 +53,7 @@
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
     is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
-    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food
+    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -76,7 +77,7 @@
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
       is_remind,article_type,stock_working_day,stock_weekend,
-      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,is_main_food)
+      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -89,7 +90,7 @@
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
       #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
-      #{photoSquare},#{mealFeeNumber},#{isMainFood})
+      #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -214,6 +215,9 @@
             <if test="isMainFood != null">
                 is_main_food,
             </if>
+            <if test="virtualId != null">
+                virtual_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -336,6 +340,9 @@
             <if test="isMainFood != null">
                 #{isMainFood},
             </if>
+            <if test="virtualId != null">
+                #{virtualId,jdbcType=INTEGER}
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -454,6 +461,9 @@
             <if test="isMainFood != null">
                 is_main_food = #{isMainFood},
             </if>
+            <if test="virtualId != null">
+                virtual_id = #{virtualId},
+            </if>
             photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -498,6 +508,7 @@
       is_hidden = #{isHidden,isRemind,jdbcType=BIT},
       meal_fee_number = #{mealFeeNumber},
       is_main_food = #{isMainFood},
+      virtual_id = #{virtualId},
       photo_square = null
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -520,10 +531,10 @@
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
   	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
   	a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
-  	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,
+  	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
   	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
   	(select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
-  	if(a.recommend_id is not null,1,0) as recommendCount,recommend_id
+  	if(a.recommend_id is not null,1,0) as recommendCount
 	 FROM tb_article a,tb_article_family f
 	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
 	AND a.shop_detail_id=#{0}
@@ -717,6 +728,12 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         update tb_article
         set recommend_id = null
         where recommend_id = #{recommendId}
+    </update>
+
+    <update id="deleteVirtualId">
+        UPDATE tb_article
+        SET virtual_id = null
+        where virtual_id = #{virtualId}
     </update>
 
     <insert id="saveLog">

@@ -139,6 +139,17 @@ public class Article {
 
     private Integer isMainFood;
 
+    //虚拟餐品包id
+    private Integer virtualId;
+
+    public Integer getVirtualId() {
+        return virtualId;
+    }
+
+    public void setVirtualId(Integer virtualId) {
+        this.virtualId = virtualId;
+    }
+
     public Integer getIsMainFood() {
         return isMainFood;
     }

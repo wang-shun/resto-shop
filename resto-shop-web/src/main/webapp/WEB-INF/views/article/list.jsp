@@ -250,6 +250,18 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="form-group col-md-10" v-if="m.articleType==1">
+                                <label class="col-md-2 text-right">虚拟餐品包</label>
+                                <div class="col-md-10">
+                                    <select name="virtualId" v-model="m.virtualId">
+                                        <option value="">未选择餐品包</option>
+                                        <option :value="v.id" v-for="v in virtualList">
+                                            {{v.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                             <%--<div class="form-group col-md-10" v-if="m.articleType==1">--%>
                             <%--<label class="col-md-2 text-right">选择规格包<label style="color: red">(将会覆盖原有规格)</label></label>--%>
                             <%--<div class="col-md-10">--%>
@@ -799,6 +811,7 @@
                         recommendList: [],
                         supportTimes: [],
                         kitchenList: [],
+                        virtualList : [],
                         checkedUnit: [],
                         articleattrs: [],
                         unitList: [],
@@ -995,8 +1008,10 @@
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
 //                                recommendId:this.recommendList[0].id,
+//                                virtualId:this.virtualList[0].id,
                                 supportTimes: [],
                                 kitchenList: [],
+                                virtualList:[],
                                 mealAttrs: [],
                                 isRemind: false,
                                 activated: true,
@@ -1345,6 +1360,9 @@
                         });
                         $.post("mealtemp/list_all", null, function (data) {
                             that.mealtempList = data;
+                        });
+                        $.post("virtual/listAll", null, function (data) {
+                            that.virtualList = data;
                         });
                         $.post("articleattr/list_all", null, function (data) {
                             var article_units = {};

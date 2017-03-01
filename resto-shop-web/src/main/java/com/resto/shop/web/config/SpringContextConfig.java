@@ -157,6 +157,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public VirtualProductsService virtualProductsService() {
+        return getProxy(VirtualProductsService.class);
+    }
+
+    @Bean
     public NewCustomCouponService newCustomCouponService() {
         return getProxy(NewCustomCouponService.class);
     }
@@ -388,10 +393,6 @@ public class SpringContextConfig {
         return proxy.create(RedPacketService.class);
     }
 
-    @Bean
-    public VirtualProductsService virtualProductsService(){
-        return proxy.create(VirtualProductsService.class);
-    }
 
 
     public <T> T getProxy(Class<T> clazz) {

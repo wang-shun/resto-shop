@@ -11,48 +11,47 @@
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <form role="form" action="{{m.id?'showphoto/modify':'showphoto/create'}}" @submit.prevent="save">
+                    <form role="form" action="{{m.id?'virtual/modify':'virtual/create'}}" @submit.prevent="save">
                         <div class="form-body">
                             <div class="form-group">
-                                <label>体验名称</label>
-                                <input type="text" class="form-control" name="title" required v-model="m.title"  >
+                                <label>虚拟餐品名称</label>
+                                <input type="text" class="form-control" name="name" required v-model="m.name"  >
                             </div>
                             <div class="form-group">
-                                <label>体验排序</label>
-                                <div>
-                                    <span class="article-units">
-                                        <input type="checkbox" value="0">荤菜厨房
-                                    </span>
-                                    <span class="article-units">
-                                        <input type="checkbox" value="1">素菜厨房
-                                    </span>
-                                    <span class="article-units">
-                                        <input type="checkbox" value="2">
-                                    <span class="article-units">
+                                <label>出餐厨房</label>
+                                <div class="form-group" v-if="m.kitchens !=null">
+                                    <label v-for="kitchen in kitchenList">
+                                         <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model="m.kitchens"> {{kitchen.name}} &nbsp;&nbsp;
+                                    </label>
+                                </div>
+                                <div class="form-group" v-if="m.kitchens ==null">
+                                    <label v-for="kitchen in kitchenList">
+                                        <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model=""> {{kitchen.name}} &nbsp;&nbsp;
+                                    </label>
                                 </div>
                             </div>
                             <div>
-                                <label class="col-sm-1 control-label" style="padding-left:0px">体验类型</label>
-                                <div class="col-sm-9" v-if="m.showType !=null">
+                                <label class="col-sm-1 control-label" style="padding-left:0px">是否启用</label>
+                                <div class="col-sm-9" v-if="m.isUsed !=null">
                                     <div>
-                                        <label >
-                                            <input type="radio" name="showType" required v-model="m.showType" value="2">
+                                        <label>
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="0">
                                             启用
                                         </label>
                                         <label>
-                                            <input type="radio" name="showType" required v-model="m.showType" value="4">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="1">
                                             不启用
                                         </label>
                                     </div>
                                 </div>
-                                <div class="col-sm-9" v-if="m.showType ==null">
+                                <div class="col-sm-9" v-if="m.isUsed ==null">
                                     <div>
                                         <label>
-                                            <input type="radio" name="showType" v-model="m.showType" value="2" checked="checked">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="0" checked="checked">
                                             启用
                                         </label>
                                         <label>
-                                            <input type="radio" name="showType" v-model="m.showType" value="4">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="1">
                                             不启用
                                         </label>
                                     </div>
@@ -70,7 +69,7 @@
 
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="showphoto/add">
+            <s:hasPermission name="virtual/add">
                 <button class="btn green pull-right" @click="create">新建</button>
             </s:hasPermission>
         </div>
@@ -87,36 +86,52 @@
     (function(){
         var cid="#control";
         var $table = $(".table-body>table");
+        //var kitchenList = [];
         var tb = $table.DataTable({
             ajax : {
-                url : "showphoto/list_all",
+                url : "virtual/listAll",
                 dataSrc : ""
             },
             columns : [
                 {
-                    title : "体验类型",
-                    data : "showType",
-                    createdCell:function(td,tdData){
-                        if(tdData == 2){
-                            $(td).html("<td>好评</td>");
-                        }else{
-                            $(td).html("<td>差评</td>");
+                    title : "虚拟餐品名称",
+                    data : "name",
+                },
+                {
+                    title: "出餐厨房",
+                    data: "kitchens",
+                    defaultContent: "",
+                    createdCell: function (td, tdData) {
+                        $(td).html('');
+                        for (var i in tdData) {
+                            if (tdData[i].name) {
+                                var span = $("<span class='btn blue btn-xs'></span>");
+                                $(td).append(span.html(tdData[i].name));
+                            }
+
                         }
                     }
                 },
                 {
-                    title : "体验名称",
-                    data : "title",
+                    title : "是否启用",
+                    data : "isUsed",
+                    createdCell:function(td,tdData){
+                        if(tdData == 0){
+                            $(td).html("<td>启用</td>");
+                        }else{
+                            $(td).html("<td>不启用</td>");
+                        }
+                    }
                 },
                 {
                     title : "操作",
                     data : "id",
                     createdCell:function(td,tdData,rowData,row){
                         var operator=[
-                            <s:hasPermission name="showphoto/delete">
-                            C.createDelBtn(tdData,"showphoto/delete"),
+                            <s:hasPermission name="virtual/delete">
+                            C.createDelBtn(tdData,"virtual/delete"),
                             </s:hasPermission>
-                            <s:hasPermission name="showphoto/edit">
+                            <s:hasPermission name="virtual/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                         ];
@@ -129,12 +144,13 @@
         var vueObj = new Vue({
             el:"#control",
             data:{
-                typeNames:[{"id":"1","value":"餐品图片"},{"id":"2","value":"展示的图片"},{"id":"4","value":"差评"}],
+                typeNames:[{"id":"1","value":"启用"},{"id":"2","value":"不启用"}],
+                kitchenList: [],
             },
             mixins:[C.formVueMix],
             methods:{
                 uploadSuccess:function(url){
-                    $("[name='showType']").val(url).trigger("change");
+                    $("[name='isUsed']").val(url).trigger("change");
                     C.simpleMsg("提交成功");
                 },
                 uploadError:function(msg){
@@ -143,12 +159,45 @@
                 save:function(e){
                     var that = this;
                     var formDom = e.target;
-                    var showType = e.showType;
+                    var isUsed = e.isUsed;
                     C.ajaxFormEx(formDom,function(){
                         that.cancel();
                         tb.ajax.reload();
                     });
                 },
+            },
+            created: function () {
+                tb.search("").draw();
+                var that = this;
+                this.$watch("showform", function () {
+                    if (this.showform) {
+                        $("#article-dialog").modal("show");
+                        var n = $('.color-mini').minicolors({
+                            change: function (hex, opacity) {
+                                if (!hex) return;
+                                if (typeof console === 'object') {
+                                    $(this).attr("value", hex);
+                                }
+                            },
+                            theme: 'bootstrap'
+                        });
+                        $("#article-dialog").on("hidden.bs.modal", function () {
+                            that.showform = false;
+                        });
+                    } else {
+                        $("#article-dialog").modal("hide");
+                        $(".modal-backdrop.fade.in").remove();
+                    }
+                });
+                this.$watch("m", function () {
+                    if (this.m.id) {
+                        $('.color-mini').minicolors("value", this.m.controlColor);
+                    }
+                });
+
+                $.post("kitchen/list_all", null, function (data) {
+                    that.kitchenList = data;
+                });
             }
         });
         C.vue=vueObj;

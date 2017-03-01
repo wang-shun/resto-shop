@@ -20,7 +20,6 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     @Autowired
     private VirtualProductsMapper virtualProductsMapper;
 
-
     @Override
     public GenericDao<VirtualProducts, String> getDao() {
         return virtualProductsMapper;
@@ -37,7 +36,42 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     }
 
     @Override
-    public List<VirtualProducts> selectAll(String shopId) {
-        return virtualProductsMapper.selectAll(shopId);
+    public List<VirtualProducts> getAllProducuts(String shopId) {
+        return virtualProductsMapper.getAllProducuts(shopId);
+    }
+
+    @Override
+    public void insertVirtualProducts(VirtualProducts virtualProducts) {
+        virtualProductsMapper.insertVirtualProducts(virtualProducts);
+    }
+
+    @Override
+    public void insertVirtualProductsKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen) {
+        virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+    }
+
+    @Override
+    public void insertVirtualProductsAndKitchen(VirtualProductsAndKitchen virtualProductsAndKitchen) {
+        virtualProductsMapper.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        virtualProductsMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteVirtualById(Integer virtualId) {
+        virtualProductsMapper.deleteVirtualById(virtualId);
+    }
+
+    @Override
+    public void updateVirtual(VirtualProducts virtualProducts) {
+        virtualProductsMapper.updateVirtual(virtualProducts);
+    }
+
+    @Override
+    public Integer selectMaxId() {
+        return virtualProductsMapper.selectMaxId();
     }
 }
