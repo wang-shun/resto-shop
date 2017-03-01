@@ -387,7 +387,7 @@ var vueObj = new Vue({
                 switch (that.currentType) {
                     case 1:
                         var articleUnit = that.brandArticleUnit;
-                        if (articleUnit.length <= 200) {
+                        if (articleUnit.length <= 1000) {
                             object.brandArticleUnit = articleUnit;
                             $.post("articleSell/createBrnadArticle",object,function(result){
                                 if(result.success){
@@ -398,10 +398,10 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleUnit.length/20);
+                            var length = Math.ceil(articleUnit.length/1000);
                             var start = 0;
-                            var end = 20;
-                            var startPosition = 26;
+                            var end = 1000;
+                            var startPosition = 1006;
                             var path = null;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
@@ -422,7 +422,7 @@ var vueObj = new Vue({
                                             if(result.success){
                                                 that.path = result.data;
                                                 start = end;
-                                                end = start + 20;
+                                                end = start + 1000;
                                             }else{
                                                 toastr.error("生成报表出错!");
                                                 return;
@@ -448,8 +448,8 @@ var vueObj = new Vue({
                                         success:function(result){
                                             if(result.success){
                                                 start = end;
-                                                end = start + 20;
-                                                startPosition = startPosition + 20;
+                                                end = start + 1000;
+                                                startPosition = startPosition + 1000;
                                             }else{
                                                 toastr.error("生成报表出错!");
                                                 return;
@@ -462,7 +462,7 @@ var vueObj = new Vue({
                         break;
                     case 2:
                         var articleFamily = that.brandArticleFamily;
-                        if (articleFamily.length <= 200) {
+                        if (articleFamily.length <= 1000) {
                             object.brandArticleFamily = articleFamily;
                             $.post("articleSell/createBrnadArticle",object,function(result){
                                 if(result.success){
@@ -473,10 +473,10 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleFamily.length/20);
+                            var length = Math.ceil(articleFamily.length/1000);
                             var start = 0;
-                            var end = 20;
-                            var startPosition = 26;
+                            var end = 1000;
+                            var startPosition = 1006;
                             var path = null;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
@@ -497,7 +497,7 @@ var vueObj = new Vue({
                                             if(result.success){
                                                 that.path = result.data;;
                                                 start = end;
-                                                end = start + 20;
+                                                end = start + 1000;
                                             }else{
                                                 toastr.error("生成报表出错!");
                                                 return;
@@ -523,8 +523,8 @@ var vueObj = new Vue({
                                         success:function(result){
                                             if(result.success){
                                                 start = end;
-                                                end = start + 20;
-                                                startPosition = startPosition + 20;
+                                                end = start + 1000;
+                                                startPosition = startPosition + 1000;
                                             }else{
                                                 toastr.error("生成报表出错!");
                                                 return;

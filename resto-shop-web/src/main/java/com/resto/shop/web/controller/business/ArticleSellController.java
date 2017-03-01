@@ -165,15 +165,17 @@ public class ArticleSellController extends GenericController{
         shopName = shopName.substring(0, shopName.length()-1);
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
-        ArticleSellDto brandReport = new ArticleSellDto();
-        Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
-        brandReport.setTypeName(brandReportMap.get("brandName").toString());
-        brandReport.setBrandSellNum(Integer.valueOf(brandReportMap.get("totalNum").toString()));
-        brandReport.setSalles(new BigDecimal(brandReportMap.get("sellIncome").toString()));
-        brandReport.setRefundCount(Integer.valueOf(brandReportMap.get("refundCount").toString()));
-        brandReport.setRefundTotal(new BigDecimal(brandReportMap.get("refundTotal").toString()));
-        brandReport.setDiscountMoney(new BigDecimal(brandReportMap.get("discountTotal").toString()));
-        result.add(brandReport);
+        if (StringUtils.isNotBlank(articleSellDto.getBrandReport().toString())) {
+            ArticleSellDto brandReport = new ArticleSellDto();
+            Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
+            brandReport.setTypeName(brandReportMap.get("brandName").toString());
+            brandReport.setBrandSellNum(Integer.valueOf(brandReportMap.get("totalNum").toString()));
+            brandReport.setSalles(new BigDecimal(brandReportMap.get("sellIncome").toString()));
+            brandReport.setRefundCount(Integer.valueOf(brandReportMap.get("refundCount").toString()));
+            brandReport.setRefundTotal(new BigDecimal(brandReportMap.get("refundTotal").toString()));
+            brandReport.setDiscountMoney(new BigDecimal(brandReportMap.get("discountTotal").toString()));
+            result.add(brandReport);
+        }
 		Map<String,String> map = new HashMap<>();
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
 		map.put("brandName", brand.getBrandName());
@@ -190,20 +192,22 @@ public class ArticleSellController extends GenericController{
 			map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
 			map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
 			//定义数据
-            for(Map articleMap : articleSellDto.getBrandArticleUnit()){
-                ArticleSellDto article = new ArticleSellDto();
-                article.setTypeName(articleMap.get("typeName").toString());
-                article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
-                article.setArticleName(articleMap.get("articleName").toString());
-                article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
-                article.setNumRatio(articleMap.get("numRatio").toString());
-                article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
-                article.setSalesRatio(articleMap.get("salesRatio").toString());
-                article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
-                article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
-                article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
-                article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
-                result.add(article);
+            if(articleSellDto.getBrandArticleUnit() != null) {
+                for (Map articleMap : articleSellDto.getBrandArticleUnit()) {
+                    ArticleSellDto article = new ArticleSellDto();
+                    article.setTypeName(articleMap.get("typeName").toString());
+                    article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
+                    article.setArticleName(articleMap.get("articleName").toString());
+                    article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
+                    article.setNumRatio(articleMap.get("numRatio").toString());
+                    article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
+                    article.setSalesRatio(articleMap.get("salesRatio").toString());
+                    article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
+                    article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
+                    article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
+                    article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
+                    result.add(article);
+                }
             }
 		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
 			//导出文件名
@@ -212,20 +216,22 @@ public class ArticleSellController extends GenericController{
 			map.put("reportType", "品牌菜品销售报表(套餐)");//表的头，第一行内容
 			map.put("reportTitle", "品牌菜品销售报表(套餐)");//表的名字
 			//定义数据
-            for(Map articleMap : articleSellDto.getBrandArticleFamily()){
-                ArticleSellDto article = new ArticleSellDto();
-                article.setTypeName(articleMap.get("typeName").toString());
-                article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
-                article.setArticleName(articleMap.get("articleName").toString());
-                article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
-                article.setNumRatio(articleMap.get("numRatio").toString());
-                article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
-                article.setSalesRatio(articleMap.get("salesRatio").toString());
-                article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
-                article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
-                article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
-                article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
-                result.add(article);
+            if(articleSellDto.getBrandArticleFamily() != null) {
+                for (Map articleMap : articleSellDto.getBrandArticleFamily()) {
+                    ArticleSellDto article = new ArticleSellDto();
+                    article.setTypeName(articleMap.get("typeName").toString());
+                    article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
+                    article.setArticleName(articleMap.get("articleName").toString());
+                    article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
+                    article.setNumRatio(articleMap.get("numRatio").toString());
+                    article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
+                    article.setSalesRatio(articleMap.get("salesRatio").toString());
+                    article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
+                    article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
+                    article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
+                    article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
+                    result.add(article);
+                }
             }
 		}
 		//定义excel工具类对象
