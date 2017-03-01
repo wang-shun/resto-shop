@@ -16,6 +16,11 @@
       SELECT * from tb_virtual_products WHERE shop_detail_id = #{shopId,jdbcType=VARCHAR}
     </select>
 
+    <!--根据虚拟餐品id查询到关系表中的厨房id-->
+    <select id="getAllKitchenIdById" resultType="java.lang.Integer">
+       select kitchen_id FROM tb_virtual_products_kitchen where virtual_id = #{virtualId,jdbcType=INTEGER}
+    </select>
+
     <!--根据id查询虚拟餐品-->
     <select id="getVirtualProductsById" resultMap="BaseResultMap">
       SELECT * from tb_virtual_products where id = #{id,jdbcType=INTEGER}

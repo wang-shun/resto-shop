@@ -19,14 +19,9 @@
                             </div>
                             <div class="form-group">
                                 <label>出餐厨房</label>
-                                <div class="form-group" v-if="m.kitchens !=null">
+                                <div class="form-group" >
                                     <label v-for="kitchen in kitchenList">
-                                         <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model="m.kitchens"> {{kitchen.name}} &nbsp;&nbsp;
-                                    </label>
-                                </div>
-                                <div class="form-group" v-if="m.kitchens ==null">
-                                    <label v-for="kitchen in kitchenList">
-                                        <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model=""> {{kitchen.name}} &nbsp;&nbsp;
+                                         <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model="m.kitchenList"> {{kitchen.name}} &nbsp;&nbsp;
                                     </label>
                                 </div>
                             </div>
@@ -86,7 +81,6 @@
     (function(){
         var cid="#control";
         var $table = $(".table-body>table");
-        //var kitchenList = [];
         var tb = $table.DataTable({
             ajax : {
                 url : "virtual/listAll",
@@ -156,13 +150,43 @@
                 uploadError:function(msg){
                     C.errorMsg(msg);
                 },
+                create:function(){
+                    this.m={
+                        kitchenList:[]
+                    };
+                    this.openForm();
+                },
+                checkNull: function () {
+                    if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+                        if(!confirm("是否不选择出餐厨房！")){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
                 save:function(e){
                     var that = this;
                     var formDom = e.target;
                     var isUsed = e.isUsed;
+
+                    if (this.checkNull()) {//验证必选项(出参厨房)
+                        return;
+                    }
                     C.ajaxFormEx(formDom,function(){
                         that.cancel();
                         tb.ajax.reload();
+                    });
+                },
+                edit: function (model) {
+                    var that = this;
+                    action = "edit";
+                    $.post("virtual/getVirtualById", {id: model.id}, function (result) {
+                        var virtual = result.data;
+                        that.showform = true;
+                        that.m = virtual;
+                        if (!virtual.kitchenList) {
+                            virtual.kitchenList = [];
+                        }
                     });
                 },
             },

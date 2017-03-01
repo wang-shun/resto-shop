@@ -64,15 +64,18 @@ public class VirtualProductsController extends GenericController {
     public Result create(@Valid VirtualProducts virtualProducts){
         virtualProducts.setShopDetailId(getCurrentShopId());
         virtualProducts.setCreateTime(new Date());
-        virtualProductsService.insert(virtualProducts);
-        VirtualProductsAndKitchen virtualProductsAndKitchen=new VirtualProductsAndKitchen();
-        Integer i=virtualProductsService.selectMaxId();
-        System.out.println("我的到了---------"+i);
-        virtualProductsAndKitchen.setVirtualId(virtualProductsService.selectMaxId());
-        for (Integer kitchenId:virtualProducts.getKitchenList()) {
-            virtualProductsAndKitchen.setKitchenId(kitchenId);
-            virtualProductsService.insertVirtualProductsKitchen(virtualProductsAndKitchen);
-        }
+            virtualProductsService.insert(virtualProducts);
+            if(virtualProducts.getKitchenList()!=null){
+                VirtualProductsAndKitchen virtualProductsAndKitchen=new VirtualProductsAndKitchen();
+                Integer i=virtualProductsService.selectMaxId();
+                virtualProductsAndKitchen.setVirtualId(virtualProductsService.selectMaxId());
+                for (Integer kitchenId:virtualProducts.getKitchenList()) {
+                    virtualProductsAndKitchen.setKitchenId(kitchenId);
+                    virtualProductsService.insertVirtualProductsKitchen(virtualProductsAndKitchen);
+                }
+            }else{
+                return Result.getSuccess();
+            }
         return Result.getSuccess();
     }
 
@@ -107,20 +110,10 @@ public class VirtualProductsController extends GenericController {
 
     @RequestMapping("/getVirtualById")
     @ResponseBody
-    public VirtualProducts getVirtualById(Integer id) {
+    public Result getVirtualById(Integer id) {
         VirtualProducts virtualProducts=virtualProductsService.getVirtualProductsById(id);
-        List<Kitchen> kitchens = new ArrayList<>();
-        List<VirtualProductsAndKitchen> VirtualProductsAndKitchens=virtualProductsService.getVirtualProductsAndKitchenById(virtualProducts.getId());
-        if(VirtualProductsAndKitchens.size()>0){
-            for (VirtualProductsAndKitchen virtualProductsAndKitchen:VirtualProductsAndKitchens) {
-                Kitchen kitchen=kitchenService.selectById(virtualProductsAndKitchen.getKitchenId());
-                if(kitchen != null){
-                    kitchens.add(kitchen);
-                }
-                virtualProducts.setKitchens(kitchens);
-            }
-        }
-        return virtualProducts;
+        virtualProducts.setKitchenList(virtualProductsService.getAllKitchenIdById(id));
+        return getSuccessResult(virtualProducts);
     }
 
 }
