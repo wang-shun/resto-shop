@@ -1398,7 +1398,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             Article article = articleService.selectById(articleId);
-            if(article.getVirtualId() != null){
+            if(article.getVirtualId() != null && item.getType() != OrderItemType.MEALS_CHILDREN){
                 VirtualProducts virtualProducts = virtualProductsService.selectById(String.valueOf(article.getVirtualId()));
                 if(virtualProducts.getIsUsed() == Common.NO){
                     //启用
@@ -1413,8 +1413,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         if (!kitchenArticleMap.containsKey(kitchenId)) {
                             //如果没有 则新建
                             kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                            kitchenArticleMap.get(kitchenId).add(item);
+                        }else{
+                            if(CollectionUtils.isEmpty(kitchenArticleMap.get(kitchenId).get(0).getChildren())){
+                                List<OrderItem> child = new ArrayList<>();
+                                child.add(item);
+                                kitchenArticleMap.get(kitchenId).get(0).setChildren(child);
+                            }else{
+                                List<OrderItem> child = kitchenArticleMap.get(kitchenId).get(0).getChildren();
+                                child.add(item);
+                                kitchenArticleMap.get(kitchenId).get(0).setChildren(child);
+                            }
+
                         }
-                        kitchenArticleMap.get(kitchenId).add(item);
+
                     }
                     continue;
                 }
@@ -1527,10 +1539,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.put("ARTICLE_NAME", article.getArticleName());
                 item.put("ARTICLE_COUNT", article.getCount());
                 items.add(item);
+
+
+
+
                 if (article.getType() == OrderItemType.SETMEALS) {
                     if (article.getChildren() != null && !article.getChildren().isEmpty()) {
                         List<OrderItem> list = orderitemMapper.getListBySort(article.getId(), article.getArticleId());
                         for (OrderItem obj : list) {
+                            Map<String, Object> child_item = new HashMap<String, Object>();
+                            child_item.put("ARTICLE_NAME", obj.getArticleName());
+                            if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
+                                child_item.put("ARTICLE_COUNT", obj.getRefundCount());
+                            } else {
+                                child_item.put("ARTICLE_COUNT", obj.getCount());
+                            }
+
+                            items.add(child_item);
+                        }
+                    }
+                }else{
+                    if(!CollectionUtils.isEmpty(article.getChildren())){
+                        for(OrderItem obj : article.getChildren()){
                             Map<String, Object> child_item = new HashMap<String, Object>();
                             child_item.put("ARTICLE_NAME", obj.getArticleName());
                             if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
