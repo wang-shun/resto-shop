@@ -157,6 +157,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public VirtualProductsService virtualProductsService() {
+        return getProxy(VirtualProductsService.class);
+    }
+
+    @Bean
     public NewCustomCouponService newCustomCouponService() {
         return getProxy(NewCustomCouponService.class);
     }
