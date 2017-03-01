@@ -229,7 +229,7 @@ public class ArticleSellController extends GenericController{
         shopName = shopName.substring(0, shopName.length()-1);
 		//定义数据
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
-        if (StringUtils.isNotBlank(articleSellDto.getBrandReport().toString())) {
+        if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
             Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
             brandReport.setTypeName(brandReportMap.get("brandName").toString());

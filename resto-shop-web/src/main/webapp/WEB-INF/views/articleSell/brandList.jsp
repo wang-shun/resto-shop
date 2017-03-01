@@ -50,7 +50,7 @@
 							</tr>
 						</thead>
 						<tbody>
-                            <template v-if="brandReport.brandName != ''">
+                            <template v-if="brandReport.brandName != null">
                                 <tr>
                                     <td><strong>{{brandReport.brandName}}</strong></td>
                                     <td>{{brandReport.totalNum}}</td>
@@ -62,7 +62,7 @@
                             </template>
                             <template v-else>
                                 <tr>
-                                    <td align="center" colspan="5">暂时没有数据...</td>
+                                    <td align="center" colspan="6">暂时没有数据...</td>
                                 </tr>
                             </template>
 						</tbody>
@@ -161,9 +161,7 @@ var brandFamilyAPI = null;
 var vueObj = new Vue({
     el : "#control",
     data : {
-        brandReport : {
-            brandName : ""
-        },
+        brandReport : {},
         searchDate : {
             beginDate : "",
             endDate : "",
