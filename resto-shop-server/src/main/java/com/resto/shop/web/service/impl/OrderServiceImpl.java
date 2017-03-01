@@ -1399,7 +1399,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             Article article = articleService.selectById(articleId);
             if(article.getVirtualId() != null && item.getType() != OrderItemType.MEALS_CHILDREN){
-                VirtualProducts virtualProducts = virtualProductsService.selectById(String.valueOf(article.getVirtualId()));
+                VirtualProducts virtualProducts = virtualProductsService.getVirtualProductsById(article.getVirtualId());
                 if(virtualProducts.getIsUsed() == Common.NO){
                     //启用
                     List<VirtualProductsAndKitchen> virtualProductsAndKitchens =
