@@ -12,7 +12,8 @@ public class VirtualProducts {
     private Integer isUsed;//虚拟餐品是否启用
     private Date createTime;//虚拟餐品创建时间
     private String shopDetailId;//店铺ID
-    private List<Kitchen> kitchen;//厨房集合
+//    private List<VirtualProductsAndKitchen> virtualProductsAndKitchens;//关系表集合
+    private List<Kitchen> kitchens;//厨房集合
 
     public int getId() {
         return id;
@@ -54,11 +55,19 @@ public class VirtualProducts {
         this.shopDetailId = shopDetailId;
     }
 
-    public List<Kitchen> getKitchen() {
-        return kitchen;
+//    public List<VirtualProductsAndKitchen> getVirtualProductsAndKitchens() {
+//        return virtualProductsAndKitchens;
+//    }
+//
+//    public void setVirtualProductsAndKitchens(List<VirtualProductsAndKitchen> virtualProductsAndKitchens) {
+//        this.virtualProductsAndKitchens = virtualProductsAndKitchens;
+//    }
+
+    public List<Kitchen> getKitchens() {
+        return kitchens;
     }
 
-    public void setKitchen(List<Kitchen> kitchen) {
-        this.kitchen = kitchen;
+    public void setKitchens(List<Kitchen> kitchens) {
+        this.kitchens = kitchens;
     }
 }

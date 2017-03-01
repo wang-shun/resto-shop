@@ -6,33 +6,33 @@
         <result column="name" property="name" jdbcType="VARCHAR"></result>
         <result column="is_used" property="isUsed" jdbcType="TINYINT"></result>
         <result column="create_time" property="createTime" jdbcType="DATE"></result>
-        <!--<association property="virtualProductsAndKitchen" javaType="com.resto.shop.web.model.VirtualProductsAndKitchen">
-            <id column="cid" property="id" jdbcType="INTEGER" />
-            <result column="virtual_id" property="virtualId" jdbcType="INTEGER" />
-            <result column="kitchen_id"  property="kitChenId" jdbcType="INTEGER" />
-        </association>-->
+        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <sql id="Base_Column_List">id,name,is_used,create_time,shop_detail_id</sql>
 
     <!--查询所有的虚拟餐品-->
-    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.resto.shop.web.model.VirtualProducts">
-        <include refid="Base_Column_List"/> from tb_virtual_products WHERE shop_datil_id = #{shopId,jdbcType=VARCHER}
+    <select id="getAllProducuts"  resultMap="BaseResultMap" parameterType="java.lang.String">
+      SELECT * from tb_virtual_products WHERE shop_detail_id = #{shopId,jdbcType=VARCHAR}
     </select>
 
     <!--根据id查询虚拟餐品-->
-    <select id="getVirtualProductsById" resultMap="BaseResultMap" parameterType="com.resto.shop.web.model.VirtualProducts">
-        <include refid="Base_Column_List"/> from tb_virtual_products where id = #{id,jdbcType=INTEGER}
+    <select id="getVirtualProductsById" resultMap="BaseResultMap">
+      SELECT * from tb_virtual_products where id = #{id,jdbcType=INTEGER}
     </select>
 
-    <!--&lt;!&ndash;删除虚拟餐品表&ndash;&gt;
+    <select id="getVirtualProductsAndKitchenById" resultType="com.resto.shop.web.model.VirtualProductsAndKitchen" >
+        SELECT  * from tb_virtual_products_kitchen where virtual_id = #{virtualId,jdbcType=INTEGER}
+    </select>
+
+    <!--删除虚拟餐品表-->
     <delete id="deleteVirtualProducts" parameterType="java.lang.Integer">DELETE from tb_virtual_products where id = #{id,jdbcType=INTEGER}</delete>
 
-    &lt;!&ndash;添加虚拟餐品表&ndash;&gt;
-    <insert id="insert" parameterType="com.resto.shop.web.model.VirtualProducts">INSERT INTO tb_virtual_products(id,name,is_used,create_time) VALUES (#{id,jdbcType=INTEGER},#{name,jdbcType=VARCHER},#{isUsed,jdbcType=TINYINT},#{reacteTime,jdbcType=DATE})</insert>
+    <!--添加虚拟餐品表-->
+    <insert id="insertSelective" parameterType="com.resto.shop.web.model.VirtualProducts">INSERT INTO tb_virtual_products(id,name,is_used,create_time,shop_detail_id) VALUES (#{id,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},#{isUsed,jdbcType=TINYINT},#{createTime,jdbcType=DATE},#{shopDetailId,jdbcType=VARCHAR})</insert>
 
-    &lt;!&ndash;添加虚拟餐品和厨房关系表&ndash;&gt;
-    <insert id="insertVirtualProductsAndKitchen" parameterType="com.resto.shop.web.model.VirtualProductsAndKitchen">INSERT INTO tb_virtual_products_kitchen (id,virtual_id,kichen_id) VALUES (#{id,jdbcType=INTEGER},#{virtualId,jdbcType=INTEGER},#{kichenId,jdbcType=INTEGER})</insert>
+    <!--添加虚拟餐品和厨房关系表-->
+    <insert id="insertVirtualProductsKitchen" parameterType="com.resto.shop.web.model.VirtualProductsAndKitchen">INSERT INTO tb_virtual_products_kitchen (id,virtual_id,kichen_id) VALUES (#{id,jdbcType=INTEGER},#{virtualId,jdbcType=INTEGER},#{kichenId,jdbcType=INTEGER})</insert>
 
     <insert id="insertVirtualProducts" parameterType="com.resto.shop.web.model.VirtualProducts">
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -45,18 +45,25 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
             <if test="name != null">#{name,jdbcType=VARCHAR},</if>
-            <if test="isUsed != null">#{isUsed,jdbcType=VARCHAR},</if>
+            <if test="isUsed != null">#{isUsed,jdbcType=INTEGER},</if>
             <if test="createTime != null">#{createTime,jdbcType=DATE},</if>
-            <if test="shopDetailId !=null">#{shopDetailId,jdbcType=DATE},</if>
+            <if test="shopDetailId !=null">#{shopDetailId,jdbcType=vA},</if>
         </trim>
     </insert>
 
-    <update id="update" parameterType="com.resto.shop.web.model.VirtualProducts">
-        UPDATE from tb_virtual_products SET(#{name,jdbcType=VARCHER},#{isUsed,jabcType=INTEGER},#{createTime,jdbcType=DATE}) where id=#{id,jdbcType=INTEGER}
+    <!--修改虚拟餐品-->
+    <update id="updateVirtual" parameterType="com.resto.shop.web.model.VirtualProducts">
+        UPDATE tb_virtual_products SET name=#{name,jdbcType=VARCHAR},is_used=#{isUsed,jdbcType=INTEGER},create_time=#{createTime,jdbcType=DATE},shop_detail_id=#{shopDetailId,jdbcType=VARCHAR} where id=#{id,jdbcType=INTEGER}
     </update>
 
-    <delete id="deleteByIds" parameterType="java.util.List">
-        delete from tb_virtual_products_kiachen where id in
-        <foreach collection="ids" open="(" separator="," close=")" item="id">#{id}</foreach>
-    </delete>-->
+    <!--删除虚拟餐品-->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from tb_virtual_products where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!--删除虚拟餐品关系表-->
+    <delete id="deleteVirtualById" parameterType="java.lang.Integer">
+        delete from tb_virtual_products_kitchen where virtual_id = #{virtualId,jdbcType=INTEGER}
+    </delete>
+
 </mapper>
