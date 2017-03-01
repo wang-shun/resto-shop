@@ -27,4 +27,6 @@ public interface VirtualProductsService extends GenericService<VirtualProducts, 
     void deleteVirtualById(Integer virtualId);
 
     void updateVirtual(VirtualProducts virtualProducts);
+
+    Integer selectMaxId();
 }

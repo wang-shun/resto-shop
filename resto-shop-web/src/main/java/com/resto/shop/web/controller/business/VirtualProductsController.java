@@ -8,6 +8,7 @@ import com.resto.shop.web.model.VirtualProductsAndKitchen;
 import com.resto.shop.web.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,14 +41,16 @@ public class VirtualProductsController extends GenericController {
     @ResponseBody
     public List<VirtualProducts> getVirtuals(){
         List<VirtualProducts> result=virtualProductsService.getAllProducuts(getCurrentShopId());
-        List<Kitchen> kitchens = new ArrayList<>();
         for (VirtualProducts virtualProducts:result) {
-           List<VirtualProductsAndKitchen> VirtualProductsAndKitchens=virtualProductsService.getVirtualProductsAndKitchenById(virtualProducts.getId());
+            List<Kitchen> kitchens = new ArrayList<>();
+            List<VirtualProductsAndKitchen> VirtualProductsAndKitchens=virtualProductsService.getVirtualProductsAndKitchenById(virtualProducts.getId());
             if(VirtualProductsAndKitchens.size()>0){
                 for (VirtualProductsAndKitchen virtualProductsAndKitchen:VirtualProductsAndKitchens) {
                     Kitchen kitchen=kitchenService.selectById(virtualProductsAndKitchen.getKitchenId());
                     if(kitchen != null){
-                        kitchens.add(kitchen);
+                        for (int i = 0; i < 1; i++) {
+                            kitchens.add(kitchen);
+                        }
                     }
                 }
             }
@@ -62,14 +65,14 @@ public class VirtualProductsController extends GenericController {
         virtualProducts.setShopDetailId(getCurrentShopId());
         virtualProducts.setCreateTime(new Date());
         virtualProductsService.insert(virtualProducts);
-        System.out.println("==============我已经保存好了");
         VirtualProductsAndKitchen virtualProductsAndKitchen=new VirtualProductsAndKitchen();
-        virtualProductsAndKitchen.setKitchenId(virtualProducts.getId());
-        for (Kitchen k:virtualProducts.getKitchens()) {
-            virtualProductsAndKitchen.setVirtualId(k.getId());
+        Integer i=virtualProductsService.selectMaxId();
+        System.out.println("我的到了---------"+i);
+        virtualProductsAndKitchen.setVirtualId(virtualProductsService.selectMaxId());
+        for (Integer kitchenId:virtualProducts.getKitchenList()) {
+            virtualProductsAndKitchen.setKitchenId(kitchenId);
+            virtualProductsService.insertVirtualProductsKitchen(virtualProductsAndKitchen);
         }
-        virtualProductsService.insertVirtualProductsKitchen(virtualProductsAndKitchen);
-        System.out.println("---------保存完成");
         return Result.getSuccess();
     }
 
@@ -79,15 +82,18 @@ public class VirtualProductsController extends GenericController {
         virtualProducts.setShopDetailId(getCurrentShopId());
         virtualProducts.setCreateTime(new Date());
         virtualProductsService.updateVirtual(virtualProducts);
-        //修改关系表时，先删除当前条，然后在添加
         virtualProductsService.deleteVirtualById(virtualProducts.getId());
         VirtualProductsAndKitchen virtualProductsAndKitchen=new VirtualProductsAndKitchen();
-        virtualProductsAndKitchen.setKitchenId(virtualProducts.getId());
-        for (Kitchen k:virtualProducts.getKitchens()) {
-            virtualProductsAndKitchen.setVirtualId(k.getId());
+        if(virtualProducts.getKitchenList()!=null){
+            for (Integer kitchenId:virtualProducts.getKitchenList()) {
+                //修改关系表时，先删除当前条，然后在添加
+                virtualProductsAndKitchen.setKitchenId(kitchenId);
+                virtualProductsAndKitchen.setVirtualId(virtualProducts.getId());
+                virtualProductsService.insertVirtualProductsAndKitchen(virtualProductsAndKitchen);
+            }
+        }else{
+            virtualProductsService.deleteVirtualById(virtualProducts.getId());
         }
-        virtualProductsService.insertVirtualProductsAndKitchen(virtualProductsAndKitchen);
-
         return Result.getSuccess();
     }
 
@@ -111,9 +117,9 @@ public class VirtualProductsController extends GenericController {
                 if(kitchen != null){
                     kitchens.add(kitchen);
                 }
+                virtualProducts.setKitchens(kitchens);
             }
         }
-        virtualProducts.setKitchens(kitchens);
         return virtualProducts;
     }
 

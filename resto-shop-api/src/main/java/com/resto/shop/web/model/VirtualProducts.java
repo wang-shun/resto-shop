@@ -7,19 +7,19 @@ import java.util.List;
  * Created by yangwei on 2017/2/22.
  */
 public class VirtualProducts {
-    private int id;
+    private Integer id;
     private String name;//虚拟餐品名称
     private Integer isUsed;//虚拟餐品是否启用
     private Date createTime;//虚拟餐品创建时间
     private String shopDetailId;//店铺ID
-//    private List<VirtualProductsAndKitchen> virtualProductsAndKitchens;//关系表集合
     private List<Kitchen> kitchens;//厨房集合
+    private Integer[] kitchenList;//id集合
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -55,19 +55,19 @@ public class VirtualProducts {
         this.shopDetailId = shopDetailId;
     }
 
-//    public List<VirtualProductsAndKitchen> getVirtualProductsAndKitchens() {
-//        return virtualProductsAndKitchens;
-//    }
-//
-//    public void setVirtualProductsAndKitchens(List<VirtualProductsAndKitchen> virtualProductsAndKitchens) {
-//        this.virtualProductsAndKitchens = virtualProductsAndKitchens;
-//    }
-
     public List<Kitchen> getKitchens() {
         return kitchens;
     }
 
     public void setKitchens(List<Kitchen> kitchens) {
         this.kitchens = kitchens;
+    }
+
+    public Integer[] getKitchenList() {
+        return kitchenList;
+    }
+
+    public void setKitchenList(Integer[] kitchenList) {
+        this.kitchenList = kitchenList;
     }
 }

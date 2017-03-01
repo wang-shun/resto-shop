@@ -26,4 +26,6 @@ public interface VirtualProductsMapper extends GenericDao<VirtualProducts, Strin
 
     void updateVirtual(VirtualProducts virtualProducts);
 
+    Integer selectMaxId();
+
 }
