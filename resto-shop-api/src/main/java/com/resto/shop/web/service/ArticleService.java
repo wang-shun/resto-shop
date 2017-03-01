@@ -94,4 +94,18 @@ public interface ArticleService extends GenericService<Article, String> {
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
 	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
+    /**
+     * 根据菜品类型查询菜品
+     * @param selectMap
+     * @return
+     */
+    List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap);
+
+    /**
+     * 根据菜品类型查询菜品总销量和总销售额
+     * @param selectMap
+     * @return
+     */
+    Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 }

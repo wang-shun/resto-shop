@@ -92,15 +92,79 @@ public class ArticleSellController extends GenericController{
         JSONObject object = new JSONObject();
 	    try {
             Map<String, Object> selectMap = new HashMap<String, Object>();
+            brandArticleReportDto brandCount = orderService.selectBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
+            object.put("brandReport", brandCount);
             selectMap.put("beginDate", beginDate);
             selectMap.put("endDate", endDate);
             selectMap.put("type", ArticleType.SIMPLE_ARTICLE);
-            brandArticleReportDto brandCount = orderService.selectBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
-            object.put("brandReport", brandCount);
             List<ArticleSellDto> articleUnitSellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
+            Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
+            for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos){
+                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")){
+                    articleUnitSellDto.setNumRatio("0.00%");
+                }else{
+                    articleUnitSellDto.setNumRatio(new BigDecimal(articleUnitSellDto.getBrandSellNum()).divide(new BigDecimal(
+                            unitMap.get("sellNum").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                }
+                if (unitMap.get("salles").toString().equalsIgnoreCase("0")){
+                    articleUnitSellDto.setSalesRatio("0.00%");
+                }else{
+                    articleUnitSellDto.setSalesRatio(articleUnitSellDto.getSalles().divide(new BigDecimal(
+                            unitMap.get("salles").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                }
+                for (ArticleSellDto articleSellDto : articleUnitSell){
+                    if (articleSellDto.getArticleId().equalsIgnoreCase(articleUnitSellDto.getArticleId())){
+                        articleUnitSell.remove(articleSellDto);
+                        break;
+                    }
+                }
+            }
+            for (ArticleSellDto articleSellDto : articleUnitSell){
+                articleSellDto.setBrandSellNum(0);
+                articleSellDto.setNumRatio("0.00%");
+                articleSellDto.setSalles(BigDecimal.ZERO);
+                articleSellDto.setSalesRatio("0.00%");
+                articleSellDto.setDiscountMoney(BigDecimal.ZERO);
+                articleSellDto.setRefundCount(0);
+                articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleUnitSellDtos.add(articleSellDto);
+            }
             object.put("brandArticleUnit", articleUnitSellDtos);
             selectMap.put("type", ArticleType.TOTAL_ARTICLE);
             List<ArticleSellDto> articleFamilySellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
+            Map<String, Object> familyMap = articleService.selectArticleOrderCount(selectMap);
+            for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos){
+                if (familyMap.get("sellNum").toString().equalsIgnoreCase("0")){
+                    articleFamilySellDto.setNumRatio("0.00%");
+                }else{
+                    articleFamilySellDto.setNumRatio(new BigDecimal(articleFamilySellDto.getBrandSellNum()).divide(new BigDecimal(
+                            familyMap.get("sellNum").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                }
+                if (familyMap.get("salles").toString().equalsIgnoreCase("0")){
+                    articleFamilySellDto.setSalesRatio("0.00%");
+                }else{
+                    articleFamilySellDto.setSalesRatio(articleFamilySellDto.getSalles().divide(new BigDecimal(
+                            familyMap.get("salles").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                }
+                for (ArticleSellDto articleSellDto : articleFamilySell){
+                    if (articleSellDto.getArticleId().equalsIgnoreCase(articleFamilySellDto.getArticleId())){
+                        articleFamilySell.remove(articleSellDto);
+                        break;
+                    }
+                }
+            }
+            for (ArticleSellDto articleSellDto : articleFamilySell){
+                articleSellDto.setBrandSellNum(0);
+                articleSellDto.setNumRatio("0.00%");
+                articleSellDto.setSalles(BigDecimal.ZERO);
+                articleSellDto.setSalesRatio("0.00%");
+                articleSellDto.setDiscountMoney(BigDecimal.ZERO);
+                articleSellDto.setRefundCount(0);
+                articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleFamilySellDtos.add(articleSellDto);
+            }
             object.put("brandArticleFamily", articleFamilySellDtos);
         }catch (Exception e){
             log.error("查询菜品销售报表出错！");

@@ -1251,8 +1251,10 @@
 
     <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="integer">
-        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_order o INNER JOIN tb_order_item oi on o.id=oi.order_id
-        INNER JOIN tb_article ta ON oi.article_id = ta.id
+        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_article ta
+        LEFT JOIN tb_article_price tap on ta.id = tap.article_id
+        INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
+        INNER JOIN  tb_order o ON o.id=oi.order_id
         WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
@@ -1314,9 +1316,10 @@
         IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
         FROM
-        tb_order o
-        INNER JOIN tb_order_item oi ON o.id = oi.order_id
-        INNER JOIN tb_article ta ON oi.article_id = ta.id
+        tb_article ta
+        LEFT JOIN tb_article_price tap on ta.id = tap.article_id
+        INNER JOIN tb_order_item oi ON oi.article_id = ta.id or oi.article_id = tap.id
+        INNER JOIN tb_order o  ON o.id = oi.order_id
         WHERE
         o.order_state IN (10, 2, 11, 12)
         AND o.production_status IN (2, 3)
