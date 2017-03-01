@@ -2493,6 +2493,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         Integer totalNum = 0;
+        BigDecimal sellIncome  = new BigDecimal(0);
+        BigDecimal refundTotal  = new BigDecimal(0);
+        BigDecimal discountTotal  = new BigDecimal(0);
+        Integer refundCount  = 0;
         //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         /**
@@ -2501,7 +2505,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = orderMapper.selectConfirmMoney(begin, end, brandId);
-        bo.setTotalNum(totalNum);
+        if(bo == null){
+            bo.setSellIncome(sellIncome);
+            bo.setRefundCount(refundCount);
+            bo.setDiscountTotal(discountTotal);
+            bo.setRefundTotal(refundTotal);
+        }
+        bo.setTotalNum(totalNum == null ? 0 : totalNum);
         bo.setBrandName(brandName);
         return bo;
     }
