@@ -68,7 +68,8 @@
 	            beginDate : "",
 	            endDate : "",
 	        },
-	        shopArticleTable : {}
+	        shopArticleTable : {},
+            shopArticleReportDtos : []
 	    },
 	    created : function() {
 	        var date = new Date().format("yyyy-MM-dd");
@@ -135,13 +136,14 @@
 		                if(result.success) {
                             that.shopArticleTable.clear().draw();
                             that.shopArticleTable.rows.add(result.data.list).draw();
+                            that.shopArticleReportDtos = result.data.list;
                             toastr.success("查询成功");
                         }else{
-                            toastr.error("查询店铺菜品销售表失败!");
+                            toastr.error("查询店铺菜品销售表失败");
                         }
 		            });
 	        	}catch(e){
-                    toastr.error("查询店铺菜品销售表失败!");
+                    toastr.error("查询店铺菜品销售表失败");
 	        	}
 	        },
 	        getDate : function(){
@@ -174,9 +176,22 @@
 	        },
 	        shopReportExcel : function(){
 	            var that = this;
-	            var beginDate = that.searchDate.beginDate;
-	            var endDate = that.searchDate.endDate;
-                location.href="articleSell/shop_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+                try {
+                    var object = {
+                        beginDate: that.searchDate.beginDate,
+                        endDate: that.searchDate.endDate,
+                        shopArticleReportDtos: that.shopArticleReportDtos
+                    }
+                    $.post("articleSell/create_shop_article_excel", object, function (result) {
+                        if (result.success){
+                            window.location.href = "articleSell/downloadShopArticleExcel?path="+result.data+"";
+                        }else{
+                            toastr.error("下载报表出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.error("下载报表出错");
+                }
 	        }
 	    }
 	});

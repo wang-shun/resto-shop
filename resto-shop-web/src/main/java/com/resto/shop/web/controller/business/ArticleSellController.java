@@ -13,7 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -75,16 +78,6 @@ public class ArticleSellController extends GenericController{
 	@RequestMapping("/shopList")
     public void shopList(){
     }
-	
-	@RequestMapping("/show/{type}")
-	public String showModal(@PathVariable("type")String type,String beginDate,String endDate,String shopId,HttpServletRequest request){
-		request.setAttribute("beginDate", beginDate);
-		request.setAttribute("endDate", endDate);
-		if(shopId!=null){
-			request.setAttribute("shopId", shopId);
-		}
-		return "articleSell/"+type;
-	}
 
     /**
      * 查询品牌销售报表
@@ -180,16 +173,31 @@ public class ArticleSellController extends GenericController{
         }
 		return getSuccessResult(object);
 	}
-	
+
+    /**
+     * 进入套餐子项详情页面
+     * @param request
+     * @param articleId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
 	@RequestMapping("/showMealAttr")
-	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate, String shopId){
+	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate){
 		request.setAttribute("articleId", articleId);
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
-		request.setAttribute("shopId", shopId);
 		return "articleSell/mealAttr";
 	}
-	
+
+    /**
+     * 进入店铺菜品销售表详情页面
+     * @param request
+     * @param beginDate
+     * @param endDate
+     * @param shopId
+     * @return
+     */
 	@RequestMapping("/showShopArticle")
 	public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId){
 		request.setAttribute("beginDate", beginDate);
@@ -203,12 +211,11 @@ public class ArticleSellController extends GenericController{
      * @param articleId
      * @param beginDate
      * @param endDate
-     * @param shopId
      * @return
      */
 	@RequestMapping("/queryArticleMealAttr")
 	@ResponseBody
-	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate, String shopId){
+	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate){
 		Map<String, Object> selectMap = new HashMap<String, Object>();
 		selectMap.put("articleId", articleId);
 		selectMap.put("beginDate", beginDate);
@@ -399,18 +406,99 @@ public class ArticleSellController extends GenericController{
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+    /**
+     * 查询当前店铺下的菜品销售详情
+     * @param beginDate
+     * @param endDate
+     * @param shopId
+     * @return
+     */
 	@RequestMapping("/queryShopOrderArtcile")
 	@ResponseBody
-	public Result queryShopOrderArtcile(String beginDate, String endDate, Integer type, String shopId){
-		Map<String, Object> selectMap = new HashMap<String, Object>();
-		selectMap.put("beginDate", beginDate);
-		selectMap.put("endDate", endDate);
-		selectMap.put("type", type);
-		selectMap.put("shopDetailId", shopId);
-		List<ArticleSellDto> articleSellDtos = articleService.queryOrderArtcile(selectMap);
-		return getSuccessResult(articleSellDtos);
+	public Result queryShopOrderArtcile(String beginDate, String endDate, String shopId){
+	    JSONObject object = new JSONObject();
+	    try {
+            Map<String, Object> selectMap = new HashMap<String, Object>();
+            selectMap.put("beginDate", beginDate);
+            selectMap.put("endDate", endDate);
+            selectMap.put("type", ArticleType.SIMPLE_ARTICLE);
+            selectMap.put("shopDetailId", shopId);
+            List<ArticleSellDto> articleUnitSellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
+            Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
+            for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos) {
+                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")) {
+                    articleUnitSellDto.setNumRatio("0.00%");
+                } else {
+                    articleUnitSellDto.setNumRatio(new BigDecimal(articleUnitSellDto.getShopSellNum()).divide(new BigDecimal(
+                            unitMap.get("sellNum").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+                }
+                if (unitMap.get("salles").toString().equalsIgnoreCase("0")) {
+                    articleUnitSellDto.setSalesRatio("0.00%");
+                } else {
+                    articleUnitSellDto.setSalesRatio(articleUnitSellDto.getSalles().divide(new BigDecimal(
+                            unitMap.get("salles").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+                }
+                for (ArticleSellDto articleSellDto : articleUnitSell) {
+                    if (articleSellDto.getArticleId().equalsIgnoreCase(articleUnitSellDto.getArticleId())) {
+                        articleUnitSell.remove(articleSellDto);
+                        break;
+                    }
+                }
+            }
+            for (ArticleSellDto articleSellDto : articleUnitSell) {
+                articleSellDto.setShopSellNum(0);
+                articleSellDto.setNumRatio("0.00%");
+                articleSellDto.setSalles(BigDecimal.ZERO);
+                articleSellDto.setSalesRatio("0.00%");
+                articleSellDto.setDiscountMoney(BigDecimal.ZERO);
+                articleSellDto.setRefundCount(0);
+                articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleUnitSellDtos.add(articleSellDto);
+            }
+            object.put("shopArticleUnitDtos", articleUnitSellDtos);
+            selectMap.put("type", ArticleType.TOTAL_ARTICLE);
+            List<ArticleSellDto> articleFamilySellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
+            Map<String, Object> familyMap = articleService.selectArticleOrderCount(selectMap);
+            for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos) {
+                if (familyMap.get("sellNum").toString().equalsIgnoreCase("0")) {
+                    articleFamilySellDto.setNumRatio("0.00%");
+                } else {
+                    articleFamilySellDto.setNumRatio(new BigDecimal(articleFamilySellDto.getShopSellNum()).divide(new BigDecimal(
+                            familyMap.get("sellNum").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+                }
+                if (familyMap.get("salles").toString().equalsIgnoreCase("0")) {
+                    articleFamilySellDto.setSalesRatio("0.00%");
+                } else {
+                    articleFamilySellDto.setSalesRatio(articleFamilySellDto.getSalles().divide(new BigDecimal(
+                            familyMap.get("salles").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
+                }
+                for (ArticleSellDto articleSellDto : articleFamilySell) {
+                    if (articleSellDto.getArticleId().equalsIgnoreCase(articleFamilySellDto.getArticleId())) {
+                        articleFamilySell.remove(articleSellDto);
+                        break;
+                    }
+                }
+            }
+            for (ArticleSellDto articleSellDto : articleFamilySell) {
+                articleSellDto.setShopSellNum(0);
+                articleSellDto.setNumRatio("0.00%");
+                articleSellDto.setSalles(BigDecimal.ZERO);
+                articleSellDto.setSalesRatio("0.00%");
+                articleSellDto.setDiscountMoney(BigDecimal.ZERO);
+                articleSellDto.setRefundCount(0);
+                articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleFamilySellDtos.add(articleSellDto);
+            }
+            object.put("shopArticleFamilyDtos", articleFamilySellDtos);
+        }catch (Exception e){
+            log.error("查询店铺菜品销售报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 	
 	/**
@@ -496,250 +584,23 @@ public class ArticleSellController extends GenericController{
         }
 		return getSuccessResult(object);
 	}
-	
-	
-	@RequestMapping("/shop_data")
-	@ResponseBody
-	public Result shop_data(String beginDate,String endDate,String shopId){
-		List<ArticleSellDto> list = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,"0asc");
-		return getSuccessResult(list);
-	
-	}
-	
-//	@RequestMapping("/shop_familyId_data")
-//	@ResponseBody
-//	public Result shop_family_data(String beginDate,String endDate,String shopId){
-//		List<ArticleSellDto> list = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,"0asc");
-//		return getSuccessResult(list);
-//		
-//	}
-//	@RequestMapping("/shop_id_data")
-//	@ResponseBody
-//	public Result shop_id_data(String beginDate,String endDate,String shopId){
-//		List<ArticleSellDto> list = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId,"0asc");
-//		return getSuccessResult(list);
-//	}
-//	
-//	@RequestMapping("/shop_familyId_data")
-//	@ResponseBody
-//	public Result shop_family_data(String beginDate,String endDate,String shopId,String sort){
-//		List<ArticleSellDto> list = orderService.selectShopArticleSellByDateAndFamilyId(beginDate, endDate, shopId,sort);
-//		return getSuccessResult(list);
-//		
-//	}
-	@RequestMapping("/shop_id_data")
-	@ResponseBody
-	public Result shop_id_data(String beginDate,String endDate,String shopId,String sort){
-		List<ArticleSellDto> list = orderService.selectShopArticleSellByDateAndId(beginDate, endDate, shopId,sort);
-		return getSuccessResult(list);
-	}
-	
-	@RequestMapping("/brand_id_data")
-	@ResponseBody
-	
-	public Result brand_id_data(String beginDate,String endDate,String sort){
-		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(),beginDate, endDate,sort);
-		return getSuccessResult(list);
-	}
-	
-//	@RequestMapping("/brand_familyId_data")
-//	@ResponseBody
-//	
-//	public Result brand_familyId_data(String beginDate,String endDate,String sort){
-//		List<ArticleSellDto> list = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(),beginDate, endDate, sort);
-//		return getSuccessResult(list);
-//	}
-//	
-	
-	
-	@RequestMapping("/brand_excel")
-	@ResponseBody
-	public void reportBrandExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
-		//导出文件名
-		String fileName = "菜品销售报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"articleFamilyName","articleName","brandSellNum","","",""};
-		//定义数据
-		List<ArticleSellDto> result = null;
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		String shopName="";
-		for (ShopDetail shopDetail : getCurrentShopDetails()) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "2");//显示的位置
-		map.put("reportTitle", "品牌菜品销售");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义excel表格的表头
-		if(selectValue==null||"".equals(selectValue)){
-			selectValue="全部";
-			//result = orderService.selectBrandArticleSellByDate(beginDate, endDate,sort);
-		}else{
-			//根据菜品分类的名称获取菜品分类的id
-			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-			result = orderService.selectBrandArticleSellByDateAndArticleFamilyId(beginDate, endDate,articleFamilyId,sort);
-		}
-		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"}};
-		
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-	}
-	@RequestMapping("/brand_articlefamily_excel")
-	@ResponseBody
-	public void reportBrandArticleExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
-		//导出文件名
-		String fileName = "菜品分类销售报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"articleFamilyName","brandSellNum","salles","salesRatio","totalMoney"};
-		//定义数据
-		List<ArticleSellDto> result = null;
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-		String shopName="";
-		for (ShopDetail shopDetail : shops) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "2");//显示的位置
-		map.put("reportTitle", "品牌菜品销售");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义excel表格的表头
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(), beginDate, endDate, sort);
-//		}else{
-//			result = orderService.selectArticleFamilyByBrandAndFamilyName(getCurrentBrandId(),beginDate, endDate,selectValue);
-//		}
-		
-		//暂时先做下载全部
-		result = orderService.selectBrandArticleSellByDateAndFamilyId(getCurrentBrandId(), beginDate, endDate, sort);
-		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
-		
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	@RequestMapping("/brand_articleId_excel")
-	@ResponseBody
-	public void reportBrandArticleIdExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
-		//导出文件名
-		String fileName = "品牌菜品销售记录详情报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"articleFamilyName","articleName","typeName","brandSellNum","numRatio","salles","salesRatio","refundCount","refundTotal"};
-		//定义数据
-		List<ArticleSellDto> result = null;
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-		String shopName="";
-		for (ShopDetail shopDetail : shops) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "品牌菜品销售详情报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "8");//显示的位置
-		map.put("reportTitle", "品牌菜品销售详情");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		//定义excel表格的表头
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-//		}else{
-//			//根据菜品分类的名称获取菜品分类的id
-//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-//			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-//		}
-		//暂时查全部
-		result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-		String[][] headers = {{"分类","25"},{"菜名","25"},{"菜品类型","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"销售占比","25"},{"退菜数量","25"},{"退菜金额","25"}};
-
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-
 
     /**
      * 生成店铺销售报表
      * @param beginDate
      * @param endDate
-     * @param sort
      * @param request
-     * @param response
      */
-	@RequestMapping("/shop_articleId_excel")
+	@RequestMapping("/create_shop_article_excel")
 	@ResponseBody
-	public void reportShopSumArticleIdExcel(String beginDate,String endDate,String sort,HttpServletRequest request, HttpServletResponse response){
+	public Result createShopArticleExcel(String beginDate,String endDate,ShopArticleReportDto shopArticleReportDto,
+                                       HttpServletRequest request){
 		//导出文件名
 		String fileName = "店铺菜品销售记录报表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","totalNum","sellIncome","occupy","refundCount","refundTotal"};
-		//定义数据
-		List<ShopArticleReportDto> result = null;
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
 		Map<String,String> map = new HashMap<>();
 		//获取店铺名称
@@ -748,7 +609,7 @@ public class ArticleSellController extends GenericController{
 			shopName += shopDetail.getName()+",";
 		}
 		//去掉最后一个逗号
-		shopName.substring(0, shopName.length()-1);
+        shopName = shopName.substring(0, shopName.length()-1);
 		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
@@ -757,8 +618,11 @@ public class ArticleSellController extends GenericController{
 		map.put("num", "5");//显示的位置
 		map.put("reportTitle", "店铺菜品销售");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
-		//暂时查全部
-		result = orderService.selectShopArticleDetails(beginDate,endDate,getCurrentBrandId(),getCurrentShopDetails());
+        //定义数据
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("shopArticleReportDtos");
+        String json = JSON.toJSONString(shopArticleReportDto.getShopArticleReportDtos(), filter);
+        List<ShopArticleReportDto> result = JSON.parseObject(json, new TypeReference<List<ShopArticleReportDto>>(){});
 		String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"},{"退菜总数","25"},{"退菜金额","25"}};
 		//定义excel工具类对象
 		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
@@ -766,202 +630,30 @@ public class ArticleSellController extends GenericController{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
+		}catch(Exception e){
+		    log.error("生成菜品销售报表出错！");
+			e.printStackTrace();
+            return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
+
+    /**
+     * 下载店铺菜品销售报表
+     * @param path
+     * @param response
+     */
+	@RequestMapping("/downloadShopArticleExcel")
+	public void downloadShopArticleExcel(String path, HttpServletResponse response){
+	    ExcelUtil<Object> excelUtil = new ExcelUtil<>();
+	    try{
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	
-	
-	
-	@RequestMapping("/shop_excel")
-	@ResponseBody
-	public void reportShopArticleExcel(String beginDate,String endDate,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
-		//获取店铺名称
-		ShopDetail shopDetail = shopDetailService.selectById(shopId);
-		//导出文件名
-		String fileName = shopDetail.getName()+"菜品销售报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"articleFamilyName","articleName","typeName","shopSellNum","numRatio","salles","salesRatio","refundCount","refundTotal"};
-		//定义数据
-		List<ArticleSellDto> result = new ArrayList<>();
-		Brand brand = brandServie.selectById(getCurrentBrandId());
-		Map<String,String> map = new HashMap<>();
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopDetail.getName());
-		map.put("beginDate", beginDate);
-		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "7");//显示的位置
-		map.put("reportTitle", "店铺菜品销售");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		
-		
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
-//		}else{
-//			//根据菜品分类的名称获取菜品分类的id
-//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-//			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
-//		}
-		//暂时先查全部
-		result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
-		
-//		for (ArticleSellDto articleSellDto : result) {
-//			articleSellDto.setSalesRatio( Double.parseDouble(articleSellDto.getSalesRatio())*100+"%");
-//		}
-		
-		
-		//String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-		String[][] headers = {{"分类","22"},{"菜名","20"},{"菜品类型","20"},{"销量(份)","20"},{"销量占比","20"},{"销售额","20"},{"销售额占比","20"},{"退菜总数","20"},{"退菜金额","20"}};
-		
-		
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-	}
-	
-//	@RequestMapping("/shop_articleId_excel")
-//	@ResponseBody
-//	public void reportShopArticleIdExcel(String beginDate,String endDate,String selectValue,String sort,HttpServletRequest request, HttpServletResponse response){
-//		//导出文件名
-//		String fileName = "菜品销售记录报表"+beginDate+"至"+endDate+".xls";
-//		//定义读取文件的路径
-//		String path = request.getSession().getServletContext().getRealPath(fileName);
-//		//定义列
-//		String[]columns={"articleFamilyName","articleName","shopSellNum","salles","salesRatio"};
-//		//定义数据
-//		List<ArticleSellDto> result = null;
-//		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-//		Map<String,String> map = new HashMap<>();
-//		Brand brand = brandServie.selectById(getCurrentBrandId());
-//		//获取店铺名称
-//		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-//		String shopName="";
-//		for (ShopDetail shopDetail : shops) {
-//			shopName += shopDetail.getName()+",";
-//		}
-//		//去掉最后一个逗号
-//		shopName.substring(0, shopName.length()-1);
-//		map.put("brandName", brand.getBrandName());
-//		map.put("shops", shopName);
-//		map.put("beginDate", beginDate);
-//		map.put("reportType", "品牌菜品销售报表");//表的头，第一行内容
-//		map.put("endDate", endDate);
-//		map.put("num", "2");//显示的位置
-//		map.put("reportTitle", "品牌菜品销售");//表的名字
-//		map.put("timeType", "yyyy-MM-dd");
-//		
-//		//定义excel表格的表头
-////		if(selectValue==null||"".equals(selectValue)){
-////			selectValue="全部";
-////			result = orderService.selectBrandArticleSellByDateAndId(getCurrentBrandId(), beginDate, endDate, sort);
-////		}else{
-////			//根据菜品分类的名称获取菜品分类的id
-////			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-////			result = orderService.selectBrandFamilyArticleSellByDateAndArticleFamilyId(getCurrentBrandId(),beginDate, endDate,articleFamilyId,sort);
-////		}
-////		String[][] headers = {{"菜品分类("+selectValue+")","25"},{"菜品名称","25"},{"菜品销量(份)","25"},{"菜品销售额(元)","25"},{"菜品销售占比","25"}};
-////		
-//		//定义excel工具类对象
-//		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-//		try{
-//			OutputStream out = new FileOutputStream(path);
-//			//excelUtil.ExportExcel(headers, columns, result, out, map);
-//			out.close();
-//			excelUtil.download(path, response);
-//			JOptionPane.showMessageDialog(null, "导出成功！");
-//			log.info("excel导出成功");
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//	@RequestMapping("/shop_excel")
-//	@ResponseBody
-//	public void reportShopExcel(String beginDate,String endDate,String selectValue,String shopId,String sort,HttpServletRequest request, HttpServletResponse response){
-//		//获取店铺名称
-//		ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
-//		//导出文件名
-//		String fileName = shopDetail.getName()+"菜品销售报表"+beginDate+"至"+endDate+".xls";
-//		//定义读取文件的路径
-//		String path = request.getSession().getServletContext().getRealPath(fileName);
-//		//定义列
-//		String[]columns={"articleFamilyName","articleName","shopSellNum","brandSellNum","salesRatio"};
-//		//定义数据
-//		List<ArticleSellDto> result = new ArrayList<>();
-//		Brand brand = brandServie.selectById(getCurrentBrandId());
-//		Map<String,String> map = new HashMap<>();
-//		map.put("brandName", brand.getBrandName());
-//		map.put("shops", shopDetail.getName());
-//		map.put("beginDate", beginDate);
-//		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
-//		map.put("endDate", endDate);
-//		map.put("num", "4");//显示的位置
-//		map.put("reportTitle", "店铺菜品销售");//表的名字
-//		map.put("timeType", "yyyy-MM-dd");
-//		
-//		if(selectValue==null||"".equals(selectValue)){
-//			selectValue="全部";
-//			result = orderService.selectShopArticleSellByDate(beginDate, endDate, shopId, sort);
-//		}else{
-//			//根据菜品分类的名称获取菜品分类的id
-//			String articleFamilyId = articleFamilyService.selectByName(selectValue);
-//			result = orderService.selectShopArticleSellByDateAndArticleFamilyId(beginDate, endDate,shopId,articleFamilyId,sort);
-//		}
-//		for (ArticleSellDto articleSellDto : result) {
-//			articleSellDto.setSalesRatio( Double.parseDouble(articleSellDto.getSalesRatio())*100+"%");
-//		}
-//		String[][] headers = {{"菜品分类("+selectValue+")","22"},{"菜品名称","20"},{"菜品销量(份)","20"},{"品牌菜品销量(份)","20"},{"销售占比(%)","20"}};
-//		//定义excel工具类对象
-//		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-//		try{
-//			OutputStream out = new FileOutputStream(path);
-//			excelUtil.ExportExcel(headers, columns, result, out, map);
-//			out.close();
-//			excelUtil.download(path, response);
-//			JOptionPane.showMessageDialog(null, "导出成功！");
-//			log.info("excel导出成功");
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//		
-//	}
-//	
-	
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(null, "导出失败！");
+            log.error("下载菜品销售报表出错！");
+            e.printStackTrace();
+        }
+    }
+
 }

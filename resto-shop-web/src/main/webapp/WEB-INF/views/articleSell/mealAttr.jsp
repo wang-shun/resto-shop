@@ -19,15 +19,13 @@
 	var articleId = "${articleId}";
 	var beginDate = "${beginDate}";
 	var endDate = "${endDate}";
-	var shopId = "${shopId}";
 	$.ajax( {  
 	    url:'articleSell/queryArticleMealAttr',
 	    async:false,
 	    data:{  
 	    	'articleId':articleId,
 	    	'beginDate':beginDate,
-	    	'endDate':endDate,
-	    	'shopId':shopId
+	    	'endDate':endDate
 	    },  
 	    success:function(result) { 
 	    	if(result.success == true){
