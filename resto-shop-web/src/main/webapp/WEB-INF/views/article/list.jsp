@@ -243,7 +243,7 @@
                                 <label class="col-md-2 text-right">推荐餐品包</label>
                                 <div class="col-md-10">
                                     <select name="recommendId" v-model="m.recommendId">
-                                        <option value="">未选择餐品包</option>
+                                        <option value="-1">未选择餐品包</option>
                                         <option :value="f.id" v-for="f in recommendList">
                                             {{f.name}}
                                         </option>
