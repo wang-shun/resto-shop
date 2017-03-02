@@ -60,17 +60,26 @@
 							</tr>
 						</thead>
 						<tbody>
-                            <tr>
-								<td><strong>{{brandCouponInfo.brandName}}</strong></td>
-								<td>{{brandCouponInfo.couponCount}}</td>
-								<td>{{brandCouponInfo.couponMoney}}</td>
-		                        <td>{{brandCouponInfo.useCouponCount}}</td>
-		                        <td>{{brandCouponInfo.useCouponMoney}}</td>
-		                        <td>{{brandCouponInfo.useCouponCountRatio}}</td>
-                                <td>{{brandCouponInfo.useCouponOrderCount}}</td>
-                                <td>{{brandCouponInfo.useCouponOrderMoney}}</td>
-                                <td>{{brandCouponInfo.customerCount}}</td>
-							</tr>
+                            <template v-if="brandCouponInfo.brandName != null">
+                                <tr>
+                                    <td><strong>{{brandCouponInfo.brandName}}</strong></td>
+                                    <td>{{brandCouponInfo.couponCount}}</td>
+                                    <td>{{brandCouponInfo.couponMoney}}</td>
+                                    <td>{{brandCouponInfo.useCouponCount}}</td>
+                                    <td>{{brandCouponInfo.useCouponMoney}}</td>
+                                    <td>{{brandCouponInfo.useCouponCountRatio}}</td>
+                                    <td>{{brandCouponInfo.useCouponOrderCount}}</td>
+                                    <td>{{brandCouponInfo.useCouponOrderMoney}}</td>
+                                    <td>{{brandCouponInfo.customerCount}}</td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td align="center" colspan="9">
+                                        暂时没有数据...
+                                    </td>
+                                </tr>
+                            </template>
 						</tbody>
 				  	</table>
 				  </div>
@@ -114,31 +123,8 @@
     var vueObj = new Vue({
         el : "#control",
         data : {
-            brandCouponInfo : {
-                brandName : "--",
-                couponCount : 0,
-                couponMoney:0,
-                useCouponCount:0,
-                useCouponMoney:0,
-                useCouponCountRatio:"--",
-                useCouponOrderCount:0,
-                useCouponOrderMoney:0,
-                customerCount:0
-            },
-            shopCouponInfoList : [{
-                couponType : "--",
-                couponSoure : "--",
-                couponShopName : "--",
-                couponName : "--",
-                couponCount : 0,
-                couponMoney:0,
-                useCouponCount:0,
-                useCouponMoney:0,
-                useCouponCountRatio:"--",
-                useCouponOrderCount:0,
-                useCouponOrderMoney:0,
-                customerCount:0
-            }],
+            brandCouponInfo : {},
+            shopCouponInfoList : [],
             grantSearchDate : {
                 beginDate : "",
                 endDate : "",
@@ -164,7 +150,6 @@
                 var that = this;
                 that.shopCouponInfoTable = $("#shopCouponList").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
-                    data:that.shopCouponInfoList,
                     columns : [
                         {
                             title : "优惠卷类型",
@@ -222,6 +207,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.success("查询中...");
                 var that = this;
                 try{
                     $.post("brandMarketing/selectCouponList",that.getDate(),function(result){
@@ -233,17 +219,12 @@
                             that.shopCouponInfoList = result.data.shopCouponInfoList;
                             that.brandCouponInfo = result.data.brandCouponInfo;
                             toastr.success("查询成功");
-                            toastr.clear();
                         }else {
-                            toastr.error("查询优惠卷报表失败!");
-                            toastr.clear();
-                            return;
+                            toastr.error("查询报表出错");
                         }
                     });
                 }catch(e){
-                    toastr.error("查询优惠卷报表失败!");
-                    toastr.clear();
-                    return;
+                    toastr.error("查询报表出错");
                 }
             },
             downloadExcel : function(){

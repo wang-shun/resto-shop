@@ -69,17 +69,26 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr>
-                                            <td><strong>{{brandRedInfo.brandName}}</strong></td>
-                                            <td>{{brandRedInfo.redCount}}</td>
-                                            <td>{{brandRedInfo.redMoney}}</td>
-                                            <td>{{brandRedInfo.useRedCount}}</td>
-                                            <td>{{brandRedInfo.useRedMoney}}</td>
-                                            <td>{{brandRedInfo.useRedCountRatio}}</td>
-                                            <%--<td>{{brandRedInfo.useRedMoneyRatio}}</td>--%>
-                                            <td>{{brandRedInfo.useRedOrderCount}}</td>
-                                            <td>{{brandRedInfo.useRedOrderMoney}}</td>
-                                        </tr>
+                                        <template v-if="brandRedInfo.brandName != null">
+                                            <tr>
+                                                <td><strong>{{brandRedInfo.brandName}}</strong></td>
+                                                <td>{{brandRedInfo.redCount}}</td>
+                                                <td>{{brandRedInfo.redMoney}}</td>
+                                                <td>{{brandRedInfo.useRedCount}}</td>
+                                                <td>{{brandRedInfo.useRedMoney}}</td>
+                                                <td>{{brandRedInfo.useRedCountRatio}}</td>
+                                                <%--<td>{{brandRedInfo.useRedMoneyRatio}}</td>--%>
+                                                <td>{{brandRedInfo.useRedOrderCount}}</td>
+                                                <td>{{brandRedInfo.useRedOrderMoney}}</td>
+                                            </tr>
+                                        </template>
+                                        <template v-else>
+                                            <tr>
+                                                <td align="center" colspan="8">
+                                                    暂时没有数据...
+                                                </td>
+                                            </tr>
+                                        </template>
                                         </tbody>
                                     </table>
                                 </div>
@@ -123,28 +132,8 @@
     var vueObj = new Vue({
         el : "#control",
         data : {
-            brandRedInfo : {
-                brandName : "--",
-                redCount : 0,
-                redMoney:0,
-                useRedCount:0,
-                useRedMoney:0,
-                useRedCountRatio:"--",
-                useRedMoneyRatio:"--",
-                useRedOrderCount:0,
-                useRedOrderMoney:0
-            },
-            shopRedInfoList : [{
-                shopName : "--",
-                redCount : 0,
-                redMoney:0,
-                useRedCount:0,
-                useRedMoney:0,
-                useRedCountRatio:"--",
-                useRedMoneyRatio:"--",
-                useRedOrderCount:0,
-                useRedOrderMoney:0
-            }],
+            brandRedInfo : {},
+            shopRedInfoList : [],
             grantSearchDate : {
                 beginDate : "",
                 endDate : "",
@@ -179,7 +168,6 @@
                 var that = this;
                 that.shopRedInfoTable = $("#shopRedList").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
-                    data:that.shopRedInfoList,
                     columns : [
                         {
                             title : "店铺名称",
@@ -222,6 +210,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.success("查询中...");
                 var that = this;
                 try{
                     $.post("brandMarketing/selectRedList",that.getDate(),function(result){
@@ -233,17 +222,12 @@
                             that.shopRedInfoList = result.data.shopRedInfoList;
                             that.brandRedInfo = result.data.brandRedInfo;
                             toastr.success("查询成功");
-                            toastr.clear();
                         }else {
-                            toastr.error("查询红包报表失败!");
-                            toastr.clear();
-                            return;
+                            toastr.error("查询报表出错");
                         }
                     });
                 }catch(e){
-                    toastr.error("查询红包报表失败!");
-                    toastr.clear();
-                    return;
+                    toastr.error("查询报表出错");
                 }
             },
             downloadExcel : function(){
