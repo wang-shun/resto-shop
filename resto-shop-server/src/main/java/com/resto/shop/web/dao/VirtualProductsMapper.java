@@ -28,4 +28,5 @@ public interface VirtualProductsMapper extends GenericDao<VirtualProducts, Strin
 
     Integer selectMaxId();
 
+    Integer[] getAllKitchenIdById(Integer virtualId);
 }

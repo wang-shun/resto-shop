@@ -74,4 +74,9 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     public Integer selectMaxId() {
         return virtualProductsMapper.selectMaxId();
     }
+
+    @Override
+    public Integer[] getAllKitchenIdById(Integer virtualId) {
+        return virtualProductsMapper.getAllKitchenIdById(virtualId);
+    }
 }

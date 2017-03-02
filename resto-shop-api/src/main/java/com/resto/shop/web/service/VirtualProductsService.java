@@ -29,4 +29,6 @@ public interface VirtualProductsService extends GenericService<VirtualProducts, 
     void updateVirtual(VirtualProducts virtualProducts);
 
     Integer selectMaxId();
+
+    Integer[] getAllKitchenIdById(Integer virtualId);
 }
