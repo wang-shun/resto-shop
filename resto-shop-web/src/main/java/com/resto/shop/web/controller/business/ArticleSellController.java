@@ -347,6 +347,7 @@ public class ArticleSellController extends GenericController{
             }else if(type.equals(ArticleType.TOTAL_ARTICLE)){
                 //定义数据
                 for(Map articleMap : articleSellDto.getBrandArticleFamily()){
+                    items[i] = new String[11];
                     items[i][0] = articleMap.get("typeName").toString();
                     items[i][1] = articleMap.get("articleFamilyName").toString();
                     items[i][2] = articleMap.get("articleName").toString();
