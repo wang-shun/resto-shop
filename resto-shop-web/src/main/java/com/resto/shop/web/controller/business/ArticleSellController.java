@@ -319,9 +319,9 @@ public class ArticleSellController extends GenericController{
      * @param articleSellDto
      * @return
      */
-	@RequestMapping("/appendToExcel")
+	@RequestMapping("/appendToBrandExcel")
     @ResponseBody
-	public Result appendToExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
+	public Result appendToBrandExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
 	    try{
             String[][] items;
             items =new String[articleSellDto.getBrandArticleUnit().size()][];
