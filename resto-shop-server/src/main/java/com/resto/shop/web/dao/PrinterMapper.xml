@@ -9,8 +9,9 @@
     <result column="port" property="port" jdbcType="VARCHAR"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
     <result column="print_type" property="printType" jdbcType="INTEGER"/>
+    <result column="ticket_type" property="ticketType" />
   </resultMap>
-  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type</sql>
+  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type,ticket_type</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_printer where id = #{id,jdbcType=INTEGER}
   </select>
@@ -23,7 +24,8 @@
       <if test="ip != null">ip,</if>  
       <if test="port != null">port,</if>  
       <if test="shopDetailId != null">shop_detail_id,</if> 
-      <if test="printType != null">print_type,</if> 
+      <if test="printType != null">print_type,</if>
+      <if test="ticketType != null">ticket_type,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
@@ -31,7 +33,8 @@
       <if test="ip != null">#{ip,jdbcType=VARCHAR},</if>  
       <if test="port != null">#{port,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
-      <if test="printType != null">#{printType,jdbcType=INTEGER},</if> 
+      <if test="printType != null">#{printType,jdbcType=INTEGER},</if>
+      <if test="ticketType != null">#{ticketType},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Printer">update tb_printer 
@@ -40,7 +43,8 @@
       <if test="ip != null">ip = #{ip,jdbcType=VARCHAR},</if>  
       <if test="port != null">port = #{port,jdbcType=VARCHAR},</if>  
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
-      <if test="printType != null">print_type = #{printType,jdbcType=INTEGER},</if> 
+      <if test="printType != null">print_type = #{printType,jdbcType=INTEGER},</if>
+      <if test="ticketType != null">ticket_type = #{ticketType},</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Printer">

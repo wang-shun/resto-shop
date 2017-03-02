@@ -17,7 +17,18 @@ public class Printer {
     private String shopDetailId;
     
     private Integer printType;
-    
+
+    //小票类型 0小票 1贴纸
+    private Integer ticketType;
+
+    public Integer getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(Integer ticketType) {
+        this.ticketType = ticketType;
+    }
+
     public Integer getPrintType() {
 		return printType;
 	}

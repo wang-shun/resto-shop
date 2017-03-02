@@ -188,7 +188,7 @@ public class ThirdServiceImpl implements ThirdService {
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         JSONArray json = new JSONArray(printTask);
         UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:"+order.getId()+"返回打印厨打模版"+json.toString());
+                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
         return printTask;
     }
 
@@ -275,9 +275,9 @@ public class ThirdServiceImpl implements ThirdService {
 //
         print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
-        JSONArray json = new JSONArray(print);
+        JSONObject json = new JSONObject(print);
         UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:"+order.getId()+"返回打印总单模版"+json.toString());
+                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
         return print;
     }
 

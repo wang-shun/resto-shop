@@ -46,6 +46,17 @@
 								    	打包</label>
 								</div>
 							</div>
+							<div class="form-group">
+								<div class="col-sm-3 control-label">小票类型：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="radio"  name="ticketType" required v-model="m.ticketType" value="1">
+										贴纸</label>
+									<label class="radio-inline">
+										<input type="radio"  name="ticketType" v-model="m.ticketType" value="0">
+										小票</label>
+								</div>
+							</div>
 						</div>
 						<div class="text-center">
 							<input type="hidden" name="id" v-model="m.id" />
