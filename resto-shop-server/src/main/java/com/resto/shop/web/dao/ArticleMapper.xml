@@ -919,4 +919,8 @@ GROUP BY article_id
 		where tma.article_id = #{articleId}
 		order by tma.sort asc
     </select>
+
+    <select id="getArticleListByFamily" resultType="Article">
+        SELECT * from tb_article where activated = 1 and state = 1 and shop_detail_id = #{shopId} and article_family_id = #{articleFamilyId}
+    </select>
 </mapper>
