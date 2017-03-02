@@ -247,6 +247,10 @@ public class ArticleSellController extends GenericController{
 		//去掉最后一个逗号
         shopName = shopName.substring(0, shopName.length()-1);
 		//定义数据
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("brandReport");
+        filter.getExcludes().add("brandArticleUnit");
+        filter.getExcludes().add("brandArticleFamily");
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
@@ -276,21 +280,9 @@ public class ArticleSellController extends GenericController{
 			map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
 			//定义数据
             if(articleSellDto.getBrandArticleUnit() != null) {
-                for (Map articleMap : articleSellDto.getBrandArticleUnit()) {
-                    ArticleSellDto article = new ArticleSellDto();
-                    article.setTypeName(articleMap.get("typeName").toString());
-                    article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
-                    article.setArticleName(articleMap.get("articleName").toString());
-                    article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
-                    article.setNumRatio(articleMap.get("numRatio").toString());
-                    article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
-                    article.setSalesRatio(articleMap.get("salesRatio").toString());
-                    article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
-                    article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
-                    article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
-                    article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
-                    result.add(article);
-                }
+                String json = JSON.toJSONString(articleSellDto.getBrandArticleUnit(), filter);
+                List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+                result.addAll(articleSellDtos);
             }
 		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
 			//导出文件名
@@ -300,21 +292,9 @@ public class ArticleSellController extends GenericController{
 			map.put("reportTitle", "品牌菜品销售报表(套餐)");//表的名字
 			//定义数据
             if(articleSellDto.getBrandArticleFamily() != null) {
-                for (Map articleMap : articleSellDto.getBrandArticleFamily()) {
-                    ArticleSellDto article = new ArticleSellDto();
-                    article.setTypeName(articleMap.get("typeName").toString());
-                    article.setArticleFamilyName(articleMap.get("articleFamilyName").toString());
-                    article.setArticleName(articleMap.get("articleName").toString());
-                    article.setBrandSellNum(Integer.valueOf(articleMap.get("brandSellNum").toString()));
-                    article.setNumRatio(articleMap.get("numRatio").toString());
-                    article.setSalles(new BigDecimal(articleMap.get("salles").toString()));
-                    article.setSalesRatio(articleMap.get("salesRatio").toString());
-                    article.setDiscountMoney(new BigDecimal(articleMap.get("discountMoney").toString()));
-                    article.setRefundCount(Integer.valueOf(articleMap.get("refundCount").toString()));
-                    article.setRefundTotal(new BigDecimal(articleMap.get("refundTotal").toString()));
-                    article.setLikes(Integer.valueOf(articleMap.get("likes").toString()));
-                    result.add(article);
-                }
+                String json = JSON.toJSONString(articleSellDto.getBrandArticleFamily(), filter);
+                List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+                result.addAll(articleSellDtos);
             }
 		}
 		//定义excel工具类对象
