@@ -4,9 +4,13 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.HungerUtil;
+import com.resto.brand.core.util.UserActionUtils;
+import com.resto.brand.web.dto.LogType;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.Platform;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
@@ -74,6 +78,9 @@ public class ThirdServiceImpl implements ThirdService {
     @Autowired
     private CustomerMapper customerMapper;
 
+    @Autowired
+    private BrandService brandService;
+
 
     @Override
     public List<Map<String, Object>> printOrderByPlatform(String platformId, Integer type) {
@@ -94,6 +101,9 @@ public class ThirdServiceImpl implements ThirdService {
         HungerOrder hungerOrder = hungerOrderMapper.selectByOrderId(orderId);
         List<HungerOrderDetail> details = hungerOrderMapper.selectDetailsById(hungerOrder.getOrderId());
         ShopDetail shopDetail = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId());
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+                , "订单:"+orderId+"接收到饿了么订单！");
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
             Map<String, Object> ticket = printTicket(hungerOrder, details, shopDetail, printer);
@@ -139,10 +149,8 @@ public class ThirdServiceImpl implements ThirdService {
 
         }
 
-
         //打印线程集合
         List<Map<String, Object>> printTask = new ArrayList<Map<String, Object>>();
-
 
         //编列 厨房菜品 集合
         for (String kitchenId : kitchenArticleMap.keySet()) {
@@ -177,6 +185,10 @@ public class ThirdServiceImpl implements ThirdService {
                 printTask.add(print);
             }
         }
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+                , "订单:"+order.getId()+"返回打印厨打模版"+json.toString());
         return printTask;
     }
 
@@ -211,7 +223,6 @@ public class ThirdServiceImpl implements ThirdService {
             items.add(item);
         }
 
-
         Map<String, Object> print = new HashMap<>();
         print.put("TABLE_NO", "");
         print.put("KITCHEN_NAME", printer.getName());
@@ -239,7 +250,6 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", sum);
 //
-//
         List<Map<String, Object>> paymentList = new ArrayList<>();
         Map<String, Object> payment = new HashMap<>();
         payment.put("PAYMENT_MODE", "222");
@@ -252,8 +262,6 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ALREADY_PAYED","已在线支付");
         data.put("DELIVERY_SOURCE","饿了吗");
         data.put("DELIVERY_ADDRESS",order.getAddress());
-//
-//
 
         String phone = order.getPhoneList().replace("\"", "");
         phone = phone.replace("[","");
@@ -261,18 +269,15 @@ public class ThirdServiceImpl implements ThirdService {
 
         data.put("CONTACT_NAME", order.getConsignee());
         data.put("CONTACT_TEL",phone);
-
-
-
-
-
 //
         print.put("DATA", data);
         print.put("STATUS", 0);
 //
         print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
-
-
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONArray json = new JSONArray(print);
+        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+                , "订单:"+order.getId()+"返回打印总单模版"+json.toString());
         return print;
     }
 

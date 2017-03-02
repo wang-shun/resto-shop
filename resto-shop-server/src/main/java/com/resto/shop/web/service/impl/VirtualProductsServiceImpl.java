@@ -69,4 +69,9 @@ public class VirtualProductsServiceImpl extends GenericServiceImpl<VirtualProduc
     public void updateVirtual(VirtualProducts virtualProducts) {
         virtualProductsMapper.updateVirtual(virtualProducts);
     }
+
+    @Override
+    public Integer selectMaxId() {
+        return virtualProductsMapper.selectMaxId();
+    }
 }

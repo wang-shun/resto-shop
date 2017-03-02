@@ -19,20 +19,27 @@
                             </div>
                             <div class="form-group">
                                 <label>出餐厨房</label>
-                                <td v-for="k in kitchenList"></td>
-                                <input type="checkbox" name="kitchenList" required v-model="m.kitchenList">
-                                </td>
+                                <div class="form-group" v-if="m.kitchens !=null">
+                                    <label v-for="kitchen in kitchenList">
+                                         <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model="m.kitchens"> {{kitchen.name}} &nbsp;&nbsp;
+                                    </label>
+                                </div>
+                                <div class="form-group" v-if="m.kitchens ==null">
+                                    <label v-for="kitchen in kitchenList">
+                                        <input type="checkbox" name="kitchenList" :value="kitchen.id" v-model=""> {{kitchen.name}} &nbsp;&nbsp;
+                                    </label>
+                                </div>
                             </div>
                             <div>
                                 <label class="col-sm-1 control-label" style="padding-left:0px">是否启用</label>
                                 <div class="col-sm-9" v-if="m.isUsed !=null">
                                     <div>
                                         <label>
-                                            <input type="radio" name="isUsed" id="isUsed" required v-model="m.isUsed" value="1">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="0">
                                             启用
                                         </label>
                                         <label>
-                                            <input type="radio" name="isUsed" id="isUsed" required v-model="m.isUsed" value="2">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="1">
                                             不启用
                                         </label>
                                     </div>
@@ -40,11 +47,11 @@
                                 <div class="col-sm-9" v-if="m.isUsed ==null">
                                     <div>
                                         <label>
-                                            <input type="radio" name="isUsed" v-model="m.isUsed" value="1" checked="checked">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="0" checked="checked">
                                             启用
                                         </label>
                                         <label>
-                                            <input type="radio" name="isUsed" v-model="m.isUsed" value="2">
+                                            <input type="radio" name="isUsed" required v-model="m.isUsed" value="1">
                                             不启用
                                         </label>
                                     </div>
@@ -79,7 +86,7 @@
     (function(){
         var cid="#control";
         var $table = $(".table-body>table");
-        var kitchenList = [];
+        //var kitchenList = [];
         var tb = $table.DataTable({
             ajax : {
                 url : "virtual/listAll",
@@ -96,7 +103,6 @@
                     defaultContent: "",
                     createdCell: function (td, tdData) {
                         $(td).html('');
-
                         for (var i in tdData) {
                             if (tdData[i].name) {
                                 var span = $("<span class='btn blue btn-xs'></span>");
@@ -110,7 +116,7 @@
                     title : "是否启用",
                     data : "isUsed",
                     createdCell:function(td,tdData){
-                        if(tdData == 1){
+                        if(tdData == 0){
                             $(td).html("<td>启用</td>");
                         }else{
                             $(td).html("<td>不启用</td>");
@@ -153,7 +159,7 @@
                 save:function(e){
                     var that = this;
                     var formDom = e.target;
-                    var showType = e.showType;
+                    var isUsed = e.isUsed;
                     C.ajaxFormEx(formDom,function(){
                         that.cancel();
                         tb.ajax.reload();
@@ -191,7 +197,6 @@
 
                 $.post("kitchen/list_all", null, function (data) {
                     that.kitchenList = data;
-                    console.log(that.kitchenList);
                 });
             }
         });
