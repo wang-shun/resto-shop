@@ -89,7 +89,7 @@
         columns : [
             {
                 title : "品牌",
-                data : "brandName",
+                data : "shopName",
             },
             {
                 title : "原价销售总额(元)",
@@ -238,7 +238,6 @@
 
     });
 
-
     //本周
     $("#week").click(function(){
         beginDate = getWeekStartDate();
@@ -249,15 +248,6 @@
 
     });
 
-
-    //本旬
-    $("#benxun").click(function(){
-
-
-
-    });
-
-
     //本月
     $("#month").click(function(){
         beginDate = getMonthStartDate();
@@ -267,8 +257,6 @@
         searchInfo(beginDate,endDate);
 
     });
-
-
 
     function searchInfo(beginDate,endDate){
         toastr.success('查询中...');
@@ -293,21 +281,27 @@
         });
     }
 
-
     //导出品牌数据
     $("#brandreportExcel").click(function(){
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
-        location.href="totalIncome/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+        var object = {
+            beginDate : beginDate,
+            endDate : endDate,
+            brandIncomeDtos : dataSource.brandIncome,
+            shopIncomeDtos : dataSource.shopIncome
+        }
+        try {
+            $.post("totalIncome/brandExprotExcel",object,function (result) {
+                if (result.success){
+                    location.href="totalIncome/downloadExcel?path="+result.data+"";
+                }else{
+                    toastr.error("下载报表出错");
+                }
+            });
+        }catch (e){
+            toastr.error("系统异常请刷新重试");
+        }
 
     })
-
-    //导出店铺数据
-
-    $("#shopreportExcel").click(function(){
-        beginDate=$("#beginDate").val();
-        endDate = $("#endDate").val();
-        location.href="totalIncome/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
-    })
-
 </script>
