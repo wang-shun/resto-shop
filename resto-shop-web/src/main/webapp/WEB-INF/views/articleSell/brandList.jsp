@@ -359,7 +359,7 @@ var vueObj = new Vue({
                     }
                 });
         	}catch(e){
-        		toastr.error("查询品牌菜品销售表失败!");
+                toastr.error("系统异常，请刷新重试");
         	}
         },
         download : function(){
@@ -535,7 +535,7 @@ var vueObj = new Vue({
                         break;
                 }
             }catch (e){
-                toastr.error("下载报表出错!");
+                toastr.error("系统异常，请刷新重试");
             }
         },
         today : function(){
@@ -624,7 +624,7 @@ function openModal(articleId) {
             modal.modal()
         },
         error: function () {
-            toastr.error("系统异常请重新刷新");
+            toastr.error("系统异常，请刷新重试");
         }
     });
 }

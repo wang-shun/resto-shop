@@ -276,7 +276,7 @@
                 toastr.success('查询成功');
             },
             error : function() {
-                toastr.error("系统异常请重新刷新");
+                toastr.error("系统异常，请刷新重试");
             }
         });
     }
@@ -300,7 +300,7 @@
                 }
             });
         }catch (e){
-            toastr.error("系统异常请刷新重试");
+            toastr.error("系统异常，请刷新重试");
         }
 
     })

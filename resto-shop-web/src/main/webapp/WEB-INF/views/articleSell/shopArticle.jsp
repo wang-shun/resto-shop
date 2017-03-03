@@ -316,7 +316,7 @@
                         }
                     });
 	        	}catch(e){
-	        		toastr.error("查询报表出错");
+                    toastr.error("系统异常，请刷新重试");
 	        	}
 	        },
 	        getDate : function(){
@@ -359,7 +359,7 @@
                             break;
                     }
                 }catch (e){
-                    toastr.error("下载报表出错");
+                    toastr.error("系统异常，请刷新重试");
                 }
 	        },
 	        today : function(){
@@ -454,7 +454,7 @@
 	            modal.modal()
 	        },
 	        error: function () {
-	            toastr.error("系统异常请重新刷新");
+                toastr.error("系统异常，请刷新重试");
 	        }
 	    });
 	}

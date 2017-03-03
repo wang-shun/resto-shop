@@ -2701,7 +2701,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
 
         //封装品牌的数据
-        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
         //品牌订单总额初始值
         BigDecimal d = BigDecimal.ZERO;
         //品牌实际支付初始值
@@ -2713,7 +2713,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //品牌订单数目初始值
         int number = 0;
         //品牌订单营销撬动率
-        String marketPrize = "";
+        String marketPrize = "0";
         Set<String> ids = new HashSet<>();
         for (Order o : list) {
             //封装品牌的数据
@@ -2763,7 +2763,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //封装店铺的数据
         List<OrderPayDto> shopPayDto = new ArrayList<>();
         for (ShopDetail shopDetail : shopDetailList) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
             shopPayDto.add(ot);
         }
 

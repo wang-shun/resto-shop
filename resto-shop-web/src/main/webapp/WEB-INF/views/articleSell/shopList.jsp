@@ -139,11 +139,11 @@
                             that.shopArticleReportDtos = result.data.list;
                             toastr.success("查询成功");
                         }else{
-                            toastr.error("查询店铺菜品销售表失败");
+                            toastr.error("查询报表出错");
                         }
 		            });
 	        	}catch(e){
-                    toastr.error("查询店铺菜品销售表失败");
+                    toastr.error("系统异常，请刷新重试");
 	        	}
 	        },
 	        getDate : function(){
@@ -190,7 +190,7 @@
                         }
                     });
                 }catch (e){
-                    toastr.error("下载报表出错");
+                    toastr.error("系统异常，请刷新重试");
                 }
 	        }
 	    }

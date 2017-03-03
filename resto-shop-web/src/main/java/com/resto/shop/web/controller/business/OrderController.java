@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.entity.DatatablesViewPage;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.OrderException;
@@ -63,23 +67,29 @@ public class OrderController extends GenericController{
 	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
 	@RequestMapping("brand_data")
-	public Map<String,Object> selectMoneyAndNumByDate(String beginDate,String endDate){
-
-		return this.getResult(beginDate, endDate);
+	public Result selectMoneyAndNumByDate(String beginDate,String endDate){
+        JSONObject object = new JSONObject();
+        try {
+            Map<String,Object> resultMap = this.getResult(beginDate, endDate);
+            object.put("result",resultMap);
+        }catch (Exception e){
+            log.error("查看订单报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 
 	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
-
 	}
 
 
-	//下载品牌订单报表
-
+	//生成品牌订单报表
 	@SuppressWarnings("unchecked")
-	@RequestMapping("brand_excel")
+	@RequestMapping("create_brand_excel")
 	@ResponseBody
-	public void reportIncome(String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+	public Result create_brand_excel(String beginDate,String endDate,OrderPayDto orderPayDto,HttpServletRequest request){
 
 		List<ShopDetail> shopDetailList = getCurrentShopDetails();
 		if(shopDetailList==null){
@@ -92,17 +102,21 @@ public class OrderController extends GenericController{
 		//定义列
 		String[]columns={"name","number","orderMoney","average","marketPrize"};
 		//定义数据
-		//List<OrderPayDto> result = this.getResult(beginDate, endDate);
-		List<OrderPayDto>  result = new LinkedList<>();
-
-		Map<String,Object>  resultMap = this.getResult(beginDate, endDate);
-		result.addAll((Collection<? extends OrderPayDto>) resultMap.get("shopId"));
-		result.add((OrderPayDto) resultMap.get("brandId"));
-
+		List<OrderPayDto>  result = new ArrayList<>();
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("brandOrderDto");
+        filter.getExcludes().add("shopOrderDtos");
+        String json = JSON.toJSONString(orderPayDto.getBrandOrderDto(), filter);
+        OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
+        result.add(brandOrderDto);
+        json = JSON.toJSONString(orderPayDto.getShopOrderDtos(), filter);
+        List<OrderPayDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<OrderPayDto>>(){});
+        result.addAll(shopOrderDtos);
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
 			shopName += shopDetail.getName()+",";
 		}
+        shopName = shopName.substring(0, shopName.length() - 1);
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
@@ -113,31 +127,46 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
+		String[][] headers = {{"品牌名称/店铺名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
+		}catch(Exception e){
+		    log.error("生成品牌订单报表出错！");
+			e.printStackTrace();
+            return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
+
+    /**
+     * 下载品牌订单报表
+     * @param path
+     * @param response
+     */
+	@RequestMapping("/downloadBrandOrderExcel")
+	public void downloadBrandOrderExcel(String path, HttpServletResponse response){
+        //定义excel工具类对象
+        ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
+	    try {
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+        }catch (Exception e){
+            log.error("下载品牌订单报表出错！");
+            e.printStackTrace();
+        }
+    }
 
-	//
+	//进入店铺订单报表页面
 	@RequestMapping("/show/shopReport")
 	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
-		ShopDetail shop = shopDetailService.selectById(shopId);
-		if(shopId!=null){
-			request.setAttribute("shopId", shopId);
-			request.setAttribute("shopName", shop.getName());
-		}
+        request.setAttribute("shopId", shopId);
 		return "orderReport/shopReport";
 	}
 
