@@ -179,7 +179,6 @@ public class OrderController extends GenericController{
 	}
 
 	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
-		//return orderService.selectListByTime(beginDate,endDate,shopId);
 		//查询店铺名称
 		ShopDetail shop = shopDetailService.selectById(shopId);
 		List<OrderDetailDto> listDto = new ArrayList<>();
