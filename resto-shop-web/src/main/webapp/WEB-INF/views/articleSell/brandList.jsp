@@ -503,7 +503,7 @@ var vueObj = new Vue({
                                         }
                                     });
                                 }else if(i == length){
-                                    $.post("articleSell/appendToExcel",object,function(result){
+                                    $.post("articleSell/appendToBrandExcel",object,function(result){
                                         if(result.success){
                                             that.state = 3;
                                         }else{
@@ -513,7 +513,7 @@ var vueObj = new Vue({
                                     });
                                 }else{
                                     $.ajax({
-                                        url:"articleSell/appendToExcel",
+                                        url:"articleSell/appendToBrandExcel",
                                         type:"POST",
                                         async: false,
                                         data:object,

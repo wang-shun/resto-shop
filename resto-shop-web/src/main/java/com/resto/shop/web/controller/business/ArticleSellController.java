@@ -251,6 +251,8 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("brandReport");
         filter.getExcludes().add("brandArticleUnit");
         filter.getExcludes().add("brandArticleFamily");
+        filter.getExcludes().add("shopArticleUnit");
+        filter.getExcludes().add("shopArticleFamily");
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
@@ -323,8 +325,7 @@ public class ArticleSellController extends GenericController{
     @ResponseBody
 	public Result appendToBrandExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
 	    try{
-            String[][] items;
-            items =new String[articleSellDto.getBrandArticleUnit().size()][];
+            String[][] items = new String[articleSellDto.getBrandArticleUnit().size()][];
             int i = 0;
             //如果是单品
             if(type.equals(ArticleType.SIMPLE_ARTICLE)){
@@ -483,31 +484,31 @@ public class ArticleSellController extends GenericController{
 	}
 	
 	/**
-	 * 下载店铺菜品销售表(单品/套餐)
+	 * 生成店铺菜品销售表(单品/套餐)
 	 */
-	@RequestMapping("/downloadShopArticle")
+	@RequestMapping("/createShopArticle")
 	@ResponseBody
-	public void downloadShopArticle(HttpServletRequest request, HttpServletResponse response,
+	public Result createShopArticle(HttpServletRequest request, ArticleSellDto articleSellDto,
 			String beginDate, String endDate, Integer type, String shopId){
-		//查询条件
-		Map<String, Object> selectMap = new HashMap<String, Object>();
-		selectMap.put("beginDate", beginDate);
-		selectMap.put("endDate", endDate);
-		selectMap.put("type", type);
-		selectMap.put("shopDetailId", shopId);
 		//导出文件名
 		String fileName = null;
 		//定义读取文件的路径
 		String path = null;
-		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
+		//定义列
 		String[]columns={"typeName","articleFamilyName","articleName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
 		String[][] headers = {{"菜品类型","25"},{"菜名类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
 		String shopName= shopDetailService.selectById(shopId).getName();
 		//定义数据
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("brandReport");
+        filter.getExcludes().add("brandArticleUnit");
+        filter.getExcludes().add("brandArticleFamily");
+        filter.getExcludes().add("shopArticleUnit");
+        filter.getExcludes().add("shopArticleFamily");
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
 		Map<String,String> map = new HashMap<>();
 		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		map.put("brandName", brand.getBrandName());
+		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
 		map.put("endDate", endDate);
@@ -521,7 +522,10 @@ public class ArticleSellController extends GenericController{
 			map.put("reportType", "店铺菜品销售报表(单品)");//表的头，第一行内容
 			map.put("reportTitle", "店铺菜品销售报表(单品)");//表的名字
 			//定义数据
-			result = articleService.queryOrderArtcile(selectMap);
+            if (articleSellDto.getShopArticleUnit() != null){
+                String json = JSON.toJSONString(articleSellDto.getShopArticleUnit(), filter);
+                result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+            }
 		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
 			//导出文件名
 			fileName = "店铺菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
@@ -529,7 +533,10 @@ public class ArticleSellController extends GenericController{
 			map.put("reportType", "店铺菜品销售报表(套餐)");//表的头，第一行内容
 			map.put("reportTitle", "店铺菜品销售报表(套餐)");//表的名字
 			//定义数据
-			result = articleService.queryOrderArtcile(selectMap);
+            if (articleSellDto.getShopArticleFamily() != null){
+                String json = JSON.toJSONString(articleSellDto.getShopArticleFamily(), filter);
+                result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+            }
 		}
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -537,13 +544,32 @@ public class ArticleSellController extends GenericController{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
+		}catch(Exception e){
+		    log.error("生成店铺菜品销售报表出错！");
+			e.printStackTrace();
+            return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
+
+    /**
+     * 下载具体店铺菜品销售报表
+     * @param path
+     * @param response
+     */
+    @RequestMapping("/downloadShopArticle")
+	public void downloadShopArticle(String path, HttpServletResponse response){
+        ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+	    try{
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(null, "导出失败！");
+            log.error("下载店铺菜品销售报表出错！");
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 查询店铺菜品销售报表
@@ -600,11 +626,14 @@ public class ArticleSellController extends GenericController{
 		map.put("reportTitle", "店铺菜品销售");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
         //定义数据
-        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-        filter.getExcludes().add("shopArticleReportDtos");
-        String json = JSON.toJSONString(shopArticleReportDto.getShopArticleReportDtos(), filter);
-        List<ShopArticleReportDto> result = JSON.parseObject(json, new TypeReference<List<ShopArticleReportDto>>(){});
-		String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"},{"退菜总数","25"},{"退菜金额","25"}};
+        List<ShopArticleReportDto> result = new ArrayList<>();
+        if (shopArticleReportDto.getShopArticleReportDtos() != null) {
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("shopArticleReportDtos");
+            String json = JSON.toJSONString(shopArticleReportDto.getShopArticleReportDtos(), filter);
+            result = JSON.parseObject(json, new TypeReference<List<ShopArticleReportDto>>() {});
+        }
+        String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"},{"退菜总数","25"},{"退菜金额","25"}};
 		//定义excel工具类对象
 		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
 		try{

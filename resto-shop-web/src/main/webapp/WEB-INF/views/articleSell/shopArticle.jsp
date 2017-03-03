@@ -328,17 +328,39 @@
 	            return data;
 	        },
 	        shopreportExcel : function(){
-	            var that = this;
-	            var beginDate = that.searchDate.beginDate;
-	            var endDate = that.searchDate.endDate;
-	            switch(that.currentType){
-	                case 1:
-	                    location.href="articleSell/downloadShopArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType+"&&shopId="+shopId;
-	                    break;
-	                case 2:
-	                    location.href="articleSell/downloadShopArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType+"&&shopId="+shopId;
-	                    break;
-	            }
+	            try {
+                    var that = this;
+                    var object = {
+                        beginDate : that.searchDate.beginDate,
+                        endDate : that.searchDate.endDate,
+                        type : that.currentType,
+                        shopId : shopId
+                    }
+                    switch (that.currentType) {
+                        case 1:
+                            object.shopArticleUnit = that.shopArticleUnitDtos;
+                            $.post("articleSell/createShopArticle",object,function (result) {
+                                if(result.success){
+	                                window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+                                }else{
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                            break;
+                        case 2:
+                            object.shopArticleFamily = that.shopArticleFamilyDtos;
+                            $.post("articleSell/createShopArticle",object,function (result) {
+                                if(result.success){
+                                    window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+                                }else{
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                            break;
+                    }
+                }catch (e){
+                    toastr.error("下载报表出错");
+                }
 	        },
 	        today : function(){
 	            date = new Date().format("yyyy-MM-dd");
