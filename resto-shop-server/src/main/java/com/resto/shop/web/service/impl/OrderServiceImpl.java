@@ -326,6 +326,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         if (customer == null) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
         } else if (order.getOrderItems().isEmpty()) {
@@ -333,7 +334,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if(!StringUtils.isEmpty(order.getTableNumber())){ //如果存在桌号
-            int orderCount =  orderMapper.checkTableNumber(order.getShopDetailId(),order.getTableNumber(),order.getCustomerId());
+            int orderCount =  orderMapper.checkTableNumber(order.getShopDetailId(),order.getTableNumber(),order.getCustomerId(),brandSetting.getCloseContinueTime());
             if(orderCount > 0){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("不好意思，这桌有人了");
@@ -618,7 +619,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setVerCode(parentOrder.getVerCode());
                 order.setCustomerCount(parentOrder.getCustomerCount());
             } else {
-                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                 Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(), brandSetting.getCloseContinueTime());
                 if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                     Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
