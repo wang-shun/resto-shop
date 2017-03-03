@@ -461,8 +461,11 @@
             <if test="isMainFood != null">
                 is_main_food = #{isMainFood},
             </if>
-            <if test="virtualId != null">
+            <if test="virtualId != null and virtualId != -1">
                 virtual_id = #{virtualId},
+            </if>
+            <if test="virtualId == -1">
+                virtual_id = null,
             </if>
             photo_square = null
         </set>
