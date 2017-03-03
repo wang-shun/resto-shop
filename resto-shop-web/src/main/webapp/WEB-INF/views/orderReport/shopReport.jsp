@@ -202,15 +202,7 @@
                         {
                             title : "营销撬动率",
                             data : 'incomePrize'
-                        }, {
-                            title : "评价",
-                            data : "level",
-                            orderable : false
-                        }, {
-                            title : "订单状态",
-                            data : "orderState",
-                            orderable : false
-                        }, {
+                        },{
                             title : "操作",
                             data : "orderId",
                             orderable : false,
