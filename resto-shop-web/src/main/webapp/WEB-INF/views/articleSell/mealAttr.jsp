@@ -35,6 +35,7 @@
 	    	}
 	     },  
 	     error : function() {
+			 toastr.clear();
              toastr.error("系统异常，请刷新重试");
 	     }   
 	});

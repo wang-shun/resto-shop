@@ -353,12 +353,15 @@ var vueObj = new Vue({
                         that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
                         //重绘搜索列
                         that.brandFamilyTable();
+						toastr.clear();
                         toastr.success("查询成功");
                     }else{
+						toastr.clear();
                         toastr.error("查询失败");
                     }
                 });
         	}catch(e){
+				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
         	}
         },
@@ -391,6 +394,7 @@ var vueObj = new Vue({
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
+									toastr.clear();
                                     toastr.error("下载报表出错!");
                                 }
                             });
@@ -422,6 +426,7 @@ var vueObj = new Vue({
                                                 start = end;
                                                 end = start + 1000;
                                             }else{
+												toastr.clear();
                                                 toastr.error("生成报表出错!");
                                                 return;
                                             }
@@ -432,6 +437,7 @@ var vueObj = new Vue({
                                         if(result.success){
                                             that.state = 3;
                                         }else{
+											toastr.clear();
                                             toastr.error("生成报表出错!");
                                             return;
                                         }
@@ -449,6 +455,7 @@ var vueObj = new Vue({
                                                 end = start + 1000;
                                                 startPosition = startPosition + 1000;
                                             }else{
+												toastr.clear();
                                                 toastr.error("生成报表出错!");
                                                 return;
                                             }
@@ -466,6 +473,7 @@ var vueObj = new Vue({
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
+									toastr.clear();
                                     toastr.error("下载报表出错!");
                                 }
                             });
@@ -497,6 +505,7 @@ var vueObj = new Vue({
                                                 start = end;
                                                 end = start + 1000;
                                             }else{
+												toastr.clear();
                                                 toastr.error("生成报表出错!");
                                                 return;
                                             }
@@ -507,6 +516,7 @@ var vueObj = new Vue({
                                         if(result.success){
                                             that.state = 3;
                                         }else{
+											toastr.clear();
                                             toastr.error("生成报表出错!");
                                             return;
                                         }
@@ -524,6 +534,7 @@ var vueObj = new Vue({
                                                 end = start + 1000;
                                                 startPosition = startPosition + 1000;
                                             }else{
+												toastr.clear();
                                                 toastr.error("生成报表出错!");
                                                 return;
                                             }
@@ -535,6 +546,7 @@ var vueObj = new Vue({
                         break;
                 }
             }catch (e){
+				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
             }
         },
@@ -624,6 +636,7 @@ function openModal(articleId) {
             modal.modal()
         },
         error: function () {
+			toastr.clear();
             toastr.error("系统异常，请刷新重试");
         }
     });

@@ -137,12 +137,15 @@
                             that.shopArticleTable.clear().draw();
                             that.shopArticleTable.rows.add(result.data.list).draw();
                             that.shopArticleReportDtos = result.data.list;
+							toastr.clear();
                             toastr.success("查询成功");
                         }else{
+							toastr.clear();
                             toastr.error("查询报表出错");
                         }
 		            });
 	        	}catch(e){
+					toastr.clear();
                     toastr.error("系统异常，请刷新重试");
 	        	}
 	        },
@@ -186,10 +189,12 @@
                         if (result.success){
                             window.location.href = "articleSell/downloadShopArticleExcel?path="+result.data+"";
                         }else{
+							toastr.clear();
                             toastr.error("下载报表出错");
                         }
                     });
                 }catch (e){
+					toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
 	        }

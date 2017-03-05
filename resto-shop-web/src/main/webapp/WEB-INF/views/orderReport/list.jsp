@@ -166,12 +166,15 @@
                             that.shopOrderTable.rows.add(result.data.result.shopId).draw();
                             that.shopOrderList = result.data.result.shopId;
                             that.brandOrder = result.data.result.brandId;
+                            toastr.clear();
                             toastr.success("查询成功");
                         }else{
+                            toastr.clear();
                             toastr.error("查询出错");
                         }
                     });
                 }catch (e){
+                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },
@@ -194,10 +197,12 @@
                         if(result.success){
                             window.location.href = "orderReport/downloadBrandOrderExcel?path="+result.data+"";
                         }else{
+                            toastr.clear();
                             toastr.error("生成报表出错");
                         }
                     });
                 }catch (e){
+                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },

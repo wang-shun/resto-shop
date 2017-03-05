@@ -76,10 +76,12 @@
         },
         success:function(data) {
             dataSource=data;
+            toastr.clear();
             toastr.success('查询成功');
         },
         error : function() {
-            toastr.error("系统异常请重新刷新");
+            toastr.clear();
+            toastr.error("系统异常,请刷新重试");
         }
     });
 
@@ -273,9 +275,11 @@
                 tb2.clear().draw();
                 tb1.rows.add(result.brandIncome).draw();
                 tb2.rows.add(result.shopIncome).draw();
+                toastr.clear();
                 toastr.success('查询成功');
             },
             error : function() {
+                toastr.clear();
                 toastr.error("系统异常，请刷新重试");
             }
         });
@@ -296,10 +300,12 @@
                 if (result.success){
                     location.href="totalIncome/downloadExcel?path="+result.data+"";
                 }else{
-                    toastr.error("下载报表出错");
+                    toastr.clear();
+                    toastr.error("生成报表出错");
                 }
             });
         }catch (e){
+            toastr.clear();
             toastr.error("系统异常，请刷新重试");
         }
 

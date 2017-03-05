@@ -310,12 +310,15 @@
                             that.shopArticleFamilyTable.rows.add(result.data.shopArticleFamilyDtos).draw();
                             //重绘搜索列
                             that.shopFamilyTable();
+							toastr.clear();
                             toastr.success("查询成功");
                         }else{
+							toastr.clear();
                             toastr.error("查询报表出错");
                         }
                     });
 	        	}catch(e){
+					toastr.clear();
                     toastr.error("系统异常，请刷新重试");
 	        	}
 	        },
@@ -343,6 +346,7 @@
                                 if(result.success){
 	                                window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
                                 }else{
+									toastr.clear();
                                     toastr.error("下载报表出错");
                                 }
                             });
@@ -353,12 +357,14 @@
                                 if(result.success){
                                     window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
                                 }else{
+									toastr.clear();
                                     toastr.error("下载报表出错");
                                 }
                             });
                             break;
                     }
                 }catch (e){
+					toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
 	        },
@@ -454,6 +460,7 @@
 	            modal.modal()
 	        },
 	        error: function () {
+				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
 	        }
 	    });
