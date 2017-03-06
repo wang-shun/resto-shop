@@ -468,7 +468,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<Article> getArticleListByFamily(String shopId, String articleFamilyId) {
-        return articleMapper.getArticleListByFamily(shopId, articleFamilyId);
+    public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
+        return articleMapper.getArticleListByFamily(shopId, articleFamilyId, currentPage, showCount);
     }
 }

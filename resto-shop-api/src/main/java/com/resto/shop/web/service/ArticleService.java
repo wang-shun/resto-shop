@@ -98,5 +98,5 @@ public interface ArticleService extends GenericService<Article, String> {
 	/**
 	 * 根据分类查询分类下的所有菜品
 	 */
-	List<Article> getArticleListByFamily(String shopId, String articleFamilyId);
+	List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount);
 }
