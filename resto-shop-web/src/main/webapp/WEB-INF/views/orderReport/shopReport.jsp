@@ -26,7 +26,9 @@
                 <button type="button" class="btn btn-primary" @click="week">本周</button>
                 <button type="button" class="btn btn-primary" @click="month">本月</button>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-                <button type="button" class="btn btn-primary" @click="downloadShopOrder">下载报表</button><br/>
+                <button type="button" class="btn btn-primary" @click="downloadShopOrder" v-if="state == 1">下载报表</button>
+                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中</button>
+                <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button><br/>
             </form>
         </div>
     </div>
@@ -144,7 +146,9 @@
             },
             shopOrderTable:{},
             shopOrderDetails:[],
-            orderDetail:{}
+            orderDetail:{},
+            state:1,
+            path : null
         },
         created : function() {
             this.searchDate.beginDate = beginDate;
@@ -236,7 +240,7 @@
                         if(result.success) {
                             that.shopOrderTable.clear();
                             that.shopOrderTable.rows.add(result.data.result).draw()
-                            that.shopOrderList = result.data.result;
+                            that.shopOrderDetails = result.data.result;
                             toastr.clear();
                             toastr.success("查询成功");
                         }else{
@@ -264,6 +268,108 @@
                 }catch (e){
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
+                }
+            },
+            downloadShopOrder : function(){
+                var that = this;
+                try {
+                    var object = {
+                        beginDate : that.searchDate.beginDate,
+                        endDate : that.searchDate.endDate,
+                        shopId : shopId
+                    };
+                    var shopOrderList = that.shopOrderDetails.sort(this.keysert('printTime'));
+                    if (shopOrderList.length <= 200){
+                        object.shopOrderList = shopOrderList;
+                        console.log(object.shopOrderList);
+                        $.post("orderReport/create_shop_excel",object,function (result) {
+                            if (result.success){
+                                window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        })
+                    }else{
+                        that.state = 2;
+                        var length = Math.ceil(shopOrderList.length/200);
+                        var start = 0;
+                        var end = 200;
+                        var startPosition = 206;
+                        for(var i = 1;i <= length;i++){
+                            if (i != length){
+                                object.shopOrderList = shopOrderList.slice(start,end);
+                            }else{
+                                object.shopOrderList = shopOrderList.slice(start);
+                            }
+                            object.startPosition = startPosition;
+                            object.path = that.path;
+                            if(i == 1){
+                                $.ajax({
+                                    url:"orderReport/create_shop_excel",
+                                    type:"POST",
+                                    async: false,
+                                    data:object,
+                                    dataType:"json",
+                                    success:function(result){
+                                        if(result.success){
+                                            that.path = result.data;
+                                            start = end;
+                                            end = start + 200;
+                                        }else{
+                                            toastr.clear();
+                                            toastr.error("生成报表出错");
+                                            return;
+                                        }
+                                    }
+                                });
+                            }else if(i == length){
+                                $.post("orderReport/appendShopOrderExcel",object,function(result){
+                                    if(result.success){
+                                        alert(result.success);
+                                        that.state = 3;
+                                    }else{
+                                        toastr.clear();
+                                        toastr.error("生成报表出错");
+                                        return;
+                                    }
+                                });
+                            }else{
+                                $.ajax({
+                                    url:"orderReport/appendShopOrderExcel",
+                                    type:"POST",
+                                    async: false,
+                                    data:object,
+                                    dataType:"json",
+                                    success:function(result){
+                                        if(result.success){
+                                            start = end;
+                                            end = start + 200;
+                                            startPosition = startPosition + 200;
+                                        }else{
+                                            toastr.clear();
+                                            toastr.error("生成报表出错");
+                                            return;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }catch (e) {
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            download : function(){
+                window.location.href = "orderReport/downShopOrderExcel?path="+this.path+"";
+                this.state = 1;
+            },
+            keysert: function (key) {
+                return function(a,b){
+                    var value1 = a[key];
+                    var value2 = b[key];
+                    return value1 - value2;
                 }
             },
             getDate : function(){

@@ -396,7 +396,7 @@ var vueObj = new Vue({
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
 									toastr.clear();
-                                    toastr.error("下载报表出错!");
+                                    toastr.error("下载报表出错");
                                 }
                             });
                         }else{
@@ -405,7 +405,6 @@ var vueObj = new Vue({
                             var start = 0;
                             var end = 1000;
                             var startPosition = 1006;
-                            var path = null;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
                                     object.brandArticleUnit = articleUnit.slice(start,end);
@@ -428,7 +427,7 @@ var vueObj = new Vue({
                                                 end = start + 1000;
                                             }else{
 												toastr.clear();
-                                                toastr.error("生成报表出错!");
+                                                toastr.error("生成报表出错");
                                                 return;
                                             }
                                         }
@@ -439,7 +438,7 @@ var vueObj = new Vue({
                                             that.state = 3;
                                         }else{
 											toastr.clear();
-                                            toastr.error("生成报表出错!");
+                                            toastr.error("生成报表出错");
                                             return;
                                         }
                                     });
@@ -457,7 +456,7 @@ var vueObj = new Vue({
                                                 startPosition = startPosition + 1000;
                                             }else{
 												toastr.clear();
-                                                toastr.error("生成报表出错!");
+                                                toastr.error("生成报表出错");
                                                 return;
                                             }
                                         }
@@ -475,7 +474,7 @@ var vueObj = new Vue({
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
 									toastr.clear();
-                                    toastr.error("下载报表出错!");
+                                    toastr.error("下载报表出错");
                                 }
                             });
                         }else{
@@ -484,7 +483,6 @@ var vueObj = new Vue({
                             var start = 0;
                             var end = 1000;
                             var startPosition = 1006;
-                            var path = null;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
                                     object.brandArticleFamily = articleFamily.slice(start,end);
@@ -502,12 +500,12 @@ var vueObj = new Vue({
                                         dataType:"json",
                                         success:function(result){
                                             if(result.success){
-                                                that.path = result.data;;
+                                                that.path = result.data;
                                                 start = end;
                                                 end = start + 1000;
                                             }else{
 												toastr.clear();
-                                                toastr.error("生成报表出错!");
+                                                toastr.error("生成报表出错");
                                                 return;
                                             }
                                         }
@@ -518,7 +516,7 @@ var vueObj = new Vue({
                                             that.state = 3;
                                         }else{
 											toastr.clear();
-                                            toastr.error("生成报表出错!");
+                                            toastr.error("生成报表出错");
                                             return;
                                         }
                                     });
@@ -536,7 +534,7 @@ var vueObj = new Vue({
                                                 startPosition = startPosition + 1000;
                                             }else{
 												toastr.clear();
-                                                toastr.error("生成报表出错!");
+                                                toastr.error("生成报表出错");
                                                 return;
                                             }
                                         }

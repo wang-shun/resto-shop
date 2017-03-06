@@ -15,8 +15,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.constant.DistributionType;
@@ -195,6 +195,7 @@ public class OrderController extends GenericController{
 			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
             ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--");
             ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+            ot.setPrintTime(o.getCreateTime().getTime());
 			if(o.getCustomer()!=null){
 				//手机号
 				if(StringUtils.isNotBlank(o.getCustomer().getTelephone())){
@@ -304,43 +305,100 @@ public class OrderController extends GenericController{
 
 	//下载店铺订单列表
 
-	@RequestMapping("shop_excel")
+	@RequestMapping("create_shop_excel")
 	@ResponseBody
-	public void reportOrder(String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
+	public Result reportOrder(String beginDate,String endDate,String shopId,OrderDetailDto orderDetailDto,HttpServletRequest request){
 		//导出文件名
 		String fileName = "店铺订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","begin","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay","aliPayment","backCartPay","moneyPay","articleBackPay","incomePrize","level","orderState"};
+		String[]columns={"shopName","createTime","telephone","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay",
+                "aliPayment","moneyPay","backCartPay","articleBackPay","incomePrize"};
 		//定义数据
-		List<OrderDetailDto> result = this.listResult(beginDate, endDate, shopId);
+		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
 		ShopDetail s = shopDetailService.selectById(shopId);
+        if (orderDetailDto.getShopOrderList() != null){
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("shopOrderList");
+            String json = JSON.toJSONString(orderDetailDto.getShopOrderList(), filter);
+            result = JSON.parseObject(json, new TypeReference<List<OrderDetailDto>>(){});
+        }
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", getBrandName());
 		map.put("shops", s.getName());
 		map.put("beginDate", beginDate);
 		map.put("reportType", "店铺订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "16");//显示的位置
+		map.put("num", "14");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},{"现金支付(元)","25"},{"银联支付(元)","25"},{"退菜金额(元)","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
+		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
+                {"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},
+                {"现金支付(元)","25"},{"银联支付(元)","25"},{"退菜返还红包(元)","25"},{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
+		}catch(Exception e){
+		    log.error("生成店铺订单报表出错！");
+			e.printStackTrace();
+            return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
+
+	@RequestMapping("/downShopOrderExcel")
+	public void downShopOrderExcel(String path, HttpServletResponse response){
+        //定义excel工具类对象
+        ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
+	    try{
 			excelUtil.download(path, response);
 			JOptionPane.showMessageDialog(null, "导出成功！");
 			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+        }catch (Exception e){
+            log.error("下载店铺订单报表出错！");
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping("/appendShopOrderExcel")
+    @ResponseBody
+    public Result appendShopOrderExcel(String path, Integer startPosition, OrderDetailDto orderDetailDto){
+        try{
+            String[][] items = new String[orderDetailDto.getShopOrderList().size()][];
+            int i = 0;
+            for (Map map : orderDetailDto.getShopOrderList()){
+                items[i] = new String[15];
+                items[i][0] = map.get("shopName").toString();
+                items[i][1] = map.get("createTime").toString();
+                items[i][2] = map.get("telephone").toString();
+                items[i][3] = map.get("orderMoney").toString();
+                items[i][4] = map.get("weChatPay").toString();
+                items[i][5] = map.get("accountPay").toString();
+                items[i][6] = map.get("couponPay").toString();
+                items[i][7] = map.get("chargePay").toString();
+                items[i][8] = map.get("rewardPay").toString();
+                items[i][9] = map.get("waitRedPay").toString();
+                items[i][10] = map.get("aliPayment").toString();
+                items[i][11] = map.get("moneyPay").toString();
+                items[i][12] = map.get("backCartPay").toString();
+                items[i][13] = map.get("articleBackPay").toString();
+                items[i][14] = map.get("incomePrize").toString();
+                i++;
+            }
+            AppendToExcelUtil.insertRows(path,startPosition,items);
+        }catch (Exception e){
+            log.error("追加店铺订单报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult();
+    }
 
 	@RequestMapping("/refund")
 	public void refund(String orderId){
