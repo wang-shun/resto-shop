@@ -157,7 +157,7 @@
                         },
                         {
                             title : "下单时间",
-                            data : "beginTime"
+                            data : "createTime"
                         }, {
                             title : "手机号",
                             data : "telephone",
@@ -242,7 +242,8 @@
             getDate : function(){
                 var data = {
                     beginDate : this.searchDate.beginDate,
-                    endDate : this.searchDate.endDate
+                    endDate : this.searchDate.endDate,
+                    shopId : shopId
                 };
                 return data;
             },

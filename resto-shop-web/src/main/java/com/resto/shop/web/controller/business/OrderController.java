@@ -15,9 +15,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
-import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.WeItemService;
@@ -190,9 +190,10 @@ public class OrderController extends GenericController{
 		for (Order o : list) {
 			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
             ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--");
+            ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 			if(o.getCustomer()!=null){
 				//手机号
-				if(StringUtils.isNotBlank(o.getTelephone())){
+				if(StringUtils.isNotBlank(o.getCustomer().getTelephone())){
 					ot.setTelephone(o.getCustomer().getTelephone());
 				}
 			}
@@ -241,11 +242,9 @@ public class OrderController extends GenericController{
 			//设置营销撬动率  实际/虚拟
 			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getAliPayment()).add(ot.getMoneyPay()).add(ot.getBackCartPay());
 			BigDecimal temp = o.getOrderMoney().subtract(real);
-			String incomPrize = "";
 			if(temp.compareTo(BigDecimal.ZERO)>0){
-				incomPrize = real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"";
+                ot.setIncomePrize(real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"");
 			}
-			ot.setIncomePrize(incomPrize);
 			//订单金额
 			ot.setOrderMoney(o.getOrderMoney());
 			listDto.add(ot);
