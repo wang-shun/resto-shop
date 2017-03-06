@@ -219,7 +219,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             freeDay = 1;
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
-        log.error("-------  " + activated);
+//        log.error("-------  " + activated);
         return result;
     }
 
