@@ -135,7 +135,8 @@
                 beginDate : "",
                 endDate : "",
             },
-            shopOrderTable:{}
+            shopOrderTable:{},
+            shopOrderDetails:[]
         },
         created : function() {
             this.searchDate.beginDate = beginDate;
@@ -189,11 +190,11 @@
                         }
                         ,{
                             title : "现金支付",
-                            data : "backCartPay"
+                            data : "moneyPay"
                         },
                         {
                             title : "银联支付",
-                            data : "moneyPay"
+                            data : "backCartPay"
                         },
                         {
                             title : "退菜返还红包",
@@ -218,14 +219,20 @@
                 toastr.success("查询中...");
                 var that = this;
                 try {
-//                    $.post("", this.getDate(), function (result) {
-//                        if(result.success) {
-//                            toastr.success("查询成功");
-//                        }else{
-//                            toastr.error("查询出错");
-//                        }
-//                    });
+                    $.post("orderReport/AllOrder", this.getDate(), function (result) {
+                        if(result.success) {
+                            that.shopOrderTable.clear();
+                            that.shopOrderTable.rows.add(result.data.result).draw()
+                            that.shopOrderList = result.data.result;
+                            toastr.clear();
+                            toastr.success("查询成功");
+                        }else{
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
+                    });
                 }catch (e){
+                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },

@@ -15,25 +15,21 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.resto.brand.core.entity.DatatablesViewPage;
-import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.OrderItem;
-import com.resto.shop.web.model.WeItem;
 import com.resto.shop.web.service.WeItemService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
@@ -173,9 +169,17 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("AllOrder")
 	@ResponseBody
-	public List<OrderDetailDto> selectAllOrder(String beginDate,String endDate,String shopId){
-
-		return this.listResult(beginDate, endDate, shopId);
+	public Result selectAllOrder(String beginDate,String endDate,String shopId){
+	    JSONObject object = new JSONObject();
+        try {
+            List<OrderDetailDto> orderDetailDtos = this.listResult(beginDate, endDate, shopId);
+            object.put("result",orderDetailDtos);
+        }catch (Exception e){
+            log.error("查询店铺订单明细出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult(object);
 	}
 
 	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
@@ -184,71 +188,12 @@ public class OrderController extends GenericController{
 		List<OrderDetailDto> listDto = new ArrayList<>();
 		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
 		for (Order o : list) {
-			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
-            ,"",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"","","","");
+			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
+            ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--");
 			if(o.getCustomer()!=null){
 				//手机号
-				if(o.getCustomer().getTelephone()!=null&&o.getCustomer().getTelephone()!=""){
+				if(StringUtils.isNotBlank(o.getTelephone())){
 					ot.setTelephone(o.getCustomer().getTelephone());
-				}
-			}
-			//订单状态
-			if(o.getOrderState()!=null){
-				switch (o.getOrderState()) {
-					case OrderState.SUBMIT:
-						ot.setOrderState("未支付");
-						break;
-					case OrderState.PAYMENT:
-						if(o.getProductionStatus()==0){
-							ot.setOrderState("已付款");
-						}else if(o.getProductionStatus()==2){
-							ot.setOrderState("已消费");
-						}else if(o.getProductionStatus()==5){
-							ot.setOrderState("异常订单");
-						}
-						break;
-					case OrderState.CANCEL:
-						ot.setOrderState("已取消");
-						break;
-					case OrderState.CONFIRM:
-						if(o.getProductionStatus()==5){
-							ot.setOrderState("异常订单");
-						}else {
-							ot.setOrderState("已消费");
-						}
-						break;
-					case OrderState.HASAPPRAISE:
-						ot.setOrderState("已评价");
-						break;
-					case OrderState.SHARED:
-						ot.setOrderState("已分享");
-						break;
-					default:
-						break;
-				}
-			}
-			//订单评价
-			//判断是否为空，不是所有订单都评价
-
-			if(null!=o.getAppraise()){
-				switch (o.getAppraise().getLevel()) {
-					case 1:
-						ot.setLevel("一星");
-						break;
-					case 2:
-						ot.setLevel("二星");
-						break;
-					case 3:
-						ot.setLevel("三星");
-						break;
-					case 4:
-						ot.setLevel("四星");
-						break;
-					case 5:
-						ot.setLevel("五星");
-						break;
-					default:
-						break;
 				}
 			}
 			//订单支付
@@ -277,11 +222,14 @@ public class OrderController extends GenericController{
 								case PayMode.ALI_PAY:
 									ot.setAliPayment(ot.getAliPayment().add(oi.getPayValue()));
 									break;
+                                case PayMode.CRASH_PAY:
+                                    ot.setMoneyPay(ot.getMoneyPay().add(oi.getPayValue()));
+                                    break;
+                                case PayMode.BANK_CART_PAY:
+                                    ot.setBackCartPay(ot.getBackCartPay().add(oi.getPayValue()));
+                                    break;
 								case PayMode.ARTICLE_BACK_PAY:
 									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue()).abs());
-									break;
-								case PayMode.CRASH_PAY:
-									ot.setMoneyPay(ot.getMoneyPay().add(oi.getPayValue()));
 									break;
 								default:
 									break;
@@ -290,13 +238,8 @@ public class OrderController extends GenericController{
 					}
 				}
 			}
-			if(null!=o.getParentOrderId()){
-				//该订单是子订单
-				ot.setChildOrder(true);
-			}
-			ot.setOrderMode(o.getOrderMode());
 			//设置营销撬动率  实际/虚拟
-			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay());
+			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getAliPayment()).add(ot.getMoneyPay()).add(ot.getBackCartPay());
 			BigDecimal temp = o.getOrderMoney().subtract(real);
 			String incomPrize = "";
 			if(temp.compareTo(BigDecimal.ZERO)>0){

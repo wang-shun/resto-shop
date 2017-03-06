@@ -2728,11 +2728,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (!o.getOrderPaymentItems().isEmpty()) {
                     for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                         //品牌实际支付  微信支付+
-                        if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                        if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == PayMode.CHARGE_PAY || oi.getPaymentModeId() == PayMode.ALI_PAY
+                                || oi.getPaymentModeId() == PayMode.BANK_CART_PAY || oi.getPaymentModeId() == PayMode.CRASH_PAY) {
                             d1 = d1.add(oi.getPayValue());
                         }
                         //品牌虚拟支付(加上等位红包支付)
-                        if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
+                        else {
                             d2 = d2.add(oi.getPayValue());
                         }
                     }

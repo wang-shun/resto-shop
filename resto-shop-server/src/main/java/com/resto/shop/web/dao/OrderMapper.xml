@@ -1785,7 +1785,7 @@
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and o.shop_detail_id=#{shopId}
-        and (o.order_state != 1 or o.production_status != 0)
+        and o.order_state in (2,10,11,12) and o.production_status in (2,3)
     </select>
 
 
