@@ -8,6 +8,8 @@ import com.resto.shop.web.model.ArticleFamily;
 public interface ArticleFamilyService extends GenericService<ArticleFamily, String> {
 
 	List<ArticleFamily> selectList(String currentShopId);
+
+	List<ArticleFamily> selectListBySort(String currentShopId, Integer currentPage, Integer showCount);
     
 	List<ArticleFamily> selectListByDistributionModeId(String currentShopId,Integer distributionModeId);
 

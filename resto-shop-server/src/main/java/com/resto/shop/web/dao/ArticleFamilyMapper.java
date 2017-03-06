@@ -21,6 +21,8 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
     int updateByPrimaryKey(ArticleFamily record);
 
 	List<ArticleFamily> selectList(@Param("shopId") String shopId);
+
+    List<ArticleFamily> selectListBySort(@Param("shopId") String shopId, @Param("currentPage") Integer currentPage, @Param("showCount") Integer showCount);
 	
 	List<ArticleFamily> selectListByDistributionModeId(@Param("currentShopId") String currentShopId,@Param("distributionModeId") Integer distributionModeId);
 
