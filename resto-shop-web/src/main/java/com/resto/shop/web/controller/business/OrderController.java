@@ -16,8 +16,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.WeItemService;
@@ -257,13 +259,26 @@ public class OrderController extends GenericController{
 	@RequestMapping("detailInfo")
 	@ResponseBody
 	public Result showDetail(String orderId){
-		Order o = orderService.selectOrderDetails(orderId);
-		List<Order> childList = orderService.selectListByParentId(orderId);
-		if(!childList.isEmpty()){
-			o.setChildList(childList);
-		}
-
-		return getSuccessResult(o);
+	    JSONObject object = new JSONObject();
+        try{
+            Order o = orderService.selectOrderDetails(orderId);
+            object.put("shopName",o.getShopName());
+            object.put("orderId",o.getId());
+            for (OrderPaymentItem paymentItem : o.getOrderPaymentItems()){
+                if (paymentItem.getPaymentModeId().equals(PayMode.WEIXIN_PAY)){
+                    object.put("wechatPayId",paymentItem.getId());
+                }
+            }
+            object.put("orderTime",DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+            object.put("modeText", DistributionType.getModeText(o.getDistributionModeId()));
+            object.put("varCode",o.getVerCode());
+            object.put("")
+        }catch (Exception e){
+            log.error("查询订单明细出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 
 	//下载店铺订单列表

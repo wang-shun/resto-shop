@@ -284,6 +284,7 @@
 	          this.currentType= type;
 	        },
 	        searchInfo : function() {
+                toastr.clear();
                 toastr.success("查询中...");
 	        	try{
 		            var that = this;

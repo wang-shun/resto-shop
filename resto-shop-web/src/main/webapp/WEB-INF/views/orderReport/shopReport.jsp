@@ -59,31 +59,31 @@
                 <div class="modal-body">
                     <dl class="dl-horizontal">
                         <dt>店铺名称：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.shopName}}</dd>
                         <dt>订单编号：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.orderId}}</dd>
                         <dt>微信支付单号：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.wechatPayId}}</dd>
                         <dt>订单时间：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.orderTime}}</dd>
                         <dt>就餐模式：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.modeText}}</dd>
                         <dt>验 证 码：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.varCode}}</dd>
                         <dt>手 机 号：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.telePhone}}</dd>
                         <dt>订单金额：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.orderMoney}}</dd>
                         <dt>评&nbsp;&nbsp;价：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.level}}</dd>
                         <dt>评价内容：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.levelValue}}</dd>
                         <dt>状&nbsp;&nbsp;态：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.orderState}}</dd>
                         <dt>菜品总价：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.articleMoney}}</dd>
                         <dt>服&nbsp;务&nbsp;费：</dt>
-                        <dd></dd>
+                        <dd>{{orderDetail.servicePrice}}</dd>
                     </dl>
                 </div>
                 <div class="table-scrollable">
@@ -98,6 +98,13 @@
                             </tr>
                         </thead>
                         <tbody style="height: 300px;">
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -136,7 +143,8 @@
                 endDate : "",
             },
             shopOrderTable:{},
-            shopOrderDetails:[]
+            shopOrderDetails:[],
+            orderDetail:{}
         },
         created : function() {
             this.searchDate.beginDate = beginDate;
@@ -146,6 +154,7 @@
         },
         methods:{
             createShopOrderTable : function(){
+                var that = this;
                 this.shopOrderTable = $("#shopOrder").DataTable({
                     lengthMenu : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
                     order: [[ 1, 'desc' ]],
@@ -208,7 +217,10 @@
                             data : "orderId",
                             orderable : false,
                             createdCell : function(td, tdData) {
-                                var button = $("<button @click='openOrderDetailModal("+tdData+")' class='btn green'>查看详情</button>");
+                                var button = $("<button class='btn green'>查看详情</button>");
+                                button.click(function(){
+                                    that.openOrderDetailModal(tdData);
+                                });
                                 $(td).html(button);
                             }
                         }
@@ -216,6 +228,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.clear();
                 toastr.success("查询中...");
                 var that = this;
                 try {
@@ -237,7 +250,21 @@
                 }
             },
             openOrderDetailModal : function (orderId) {
-                alert(orderId);
+                var that = this;
+                try {
+                    $.post("",{orderId: orderId},function (result) {
+                        if(result.success){
+                            that.orderDetail = result.data;
+                            $("#orderDetail").modal();
+                        }else{
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
             },
             getDate : function(){
                 var data = {

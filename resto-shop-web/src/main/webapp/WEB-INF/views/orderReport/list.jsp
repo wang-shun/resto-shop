@@ -157,6 +157,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.clear();
                 toastr.success("查询中...");
                 var that = this;
                 try {
@@ -218,7 +219,6 @@
                 this.searchDate.endDate  = GetDateStr(-1);
                 this.searchInfo();
             },
-
             week : function(){
                 this.searchDate.beginDate  = getWeekStartDate();
                 this.searchDate.endDate  = new Date().format("yyyy-MM-dd")

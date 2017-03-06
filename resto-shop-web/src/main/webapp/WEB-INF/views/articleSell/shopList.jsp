@@ -129,6 +129,7 @@
 	            });
 	        },
 	    	searchInfo : function(isInit) {
+                toastr.clear();
                 toastr.success("查询中...");
 	        	try{
 		            var that = this;

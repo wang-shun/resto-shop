@@ -261,6 +261,7 @@
     });
 
     function searchInfo(beginDate,endDate){
+        toastr.clear();
         toastr.success('查询中...');
         //更新数据源
         $.ajax( {
