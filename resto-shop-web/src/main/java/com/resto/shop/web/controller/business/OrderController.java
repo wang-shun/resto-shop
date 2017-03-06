@@ -20,7 +20,9 @@ import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.constant.DistributionType;
+import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.WeItemService;
 import org.apache.commons.lang3.StringUtils;
@@ -264,15 +266,34 @@ public class OrderController extends GenericController{
             Order o = orderService.selectOrderDetails(orderId);
             object.put("shopName",o.getShopName());
             object.put("orderId",o.getId());
-            for (OrderPaymentItem paymentItem : o.getOrderPaymentItems()){
-                if (paymentItem.getPaymentModeId().equals(PayMode.WEIXIN_PAY)){
-                    object.put("wechatPayId",paymentItem.getId());
+            if (o.getOrderPaymentItems() != null) {
+                for (OrderPaymentItem paymentItem : o.getOrderPaymentItems()) {
+                    if (paymentItem.getPaymentModeId().equals(PayMode.WEIXIN_PAY)) {
+                        object.put("wechatPayId", paymentItem.getId());
+                    }
                 }
             }
             object.put("orderTime",DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
             object.put("modeText", DistributionType.getModeText(o.getDistributionModeId()));
             object.put("varCode",o.getVerCode());
-            object.put("")
+            if (o.getCustomer() != null){
+                if (StringUtils.isNotBlank(o.getCustomer().getTelephone())){
+                    object.put("telePhone",o.getCustomer().getTelephone());
+                }
+            }
+            object.put("orderMoney",o.getOrderMoney());
+            if(o.getAppraise() != null){
+                object.put("level",Appraise.getLevel(o.getAppraise().getLevel()));
+                object.put("levelValue",o.getAppraise().getContent());
+            }
+            object.put("orderState", OrderState.getStateName(o.getOrderState()));
+            BigDecimal articleMoney = BigDecimal.ZERO;
+            for (OrderItem item : o.getOrderItems()){
+                articleMoney = articleMoney.add(item.getFinalPrice());
+            }
+            object.put("articleMoney",articleMoney);
+            object.put("servicePrice",o.getServicePrice());
+            object.put("orderItems",o.getOrderItems());
         }catch (Exception e){
             log.error("查询订单明细出错！");
             e.printStackTrace();

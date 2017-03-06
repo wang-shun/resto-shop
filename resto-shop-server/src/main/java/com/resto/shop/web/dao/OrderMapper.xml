@@ -201,6 +201,11 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </association>
 
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem">
+            <id column="orderPaymentItem_id" property="id"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
         <collection property="orderItems" javaType="List" ofType="orderItem">
             <id column="orderItem_id" property="id"/>
             <result column="article_name" property="articleName" jdbcType="VARCHAR"/>
@@ -1813,7 +1818,8 @@
         ap.content,
         f.id articleFamily_id,
         f.name articleFamilyName,
-        opi.id as orderPaymentItem_id
+        opi.id as orderPaymentItem_id,
+        opi.payment_mode_id
         FROM
         tb_order o
         LEFT JOIN tb_order_item oi ON o.id = oi.order_id

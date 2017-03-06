@@ -98,12 +98,12 @@
                             </tr>
                         </thead>
                         <tbody style="height: 300px;">
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                            <tr v-for="orderItem in orderDetail.orderItems">
+                                <td>{{orderItem.articleFamily.name}}</td>
+                                <td>{{orderItem.articleName}}</td>
+                                <td>{{orderItem.unitPrice}}</td>
+                                <td>{{orderItem.count}}</td>
+                                <td>{{orderItem.finalPrice}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -252,7 +252,7 @@
             openOrderDetailModal : function (orderId) {
                 var that = this;
                 try {
-                    $.post("",{orderId: orderId},function (result) {
+                    $.post("orderReport/detailInfo",{orderId: orderId},function (result) {
                         if(result.success){
                             that.orderDetail = result.data;
                             $("#orderDetail").modal();
