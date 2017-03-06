@@ -136,6 +136,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
             String articleId = article.getId();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+
             for (Kitchen kitchen : kitchenList) {
                 String kitchenId = kitchen.getId().toString();
                 kitchenMap.put(kitchenId, kitchen);//保存厨房信息
@@ -160,30 +161,67 @@ public class ThirdServiceImpl implements ThirdService {
                 continue;
             }
             //生成厨房小票
-            for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
-            	Map<String, Object> print = new HashMap<String, Object>();
-                print.put("PORT", printer.getPort());
-                print.put("IP", printer.getIp());
-                String print_id = ApplicationUtils.randomUUID();
-                print.put("PRINT_TASK_ID", print_id);
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("ORDER_ID", order.getOrderId());
-                data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
-                data.put("DISTRIBUTION_MODE", "外卖");
-                data.put("TABLE_NUMBER", "饿了么");
-                data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
-                Map<String, Object> items = new HashMap<String, Object>();
-                items.put("ARTICLE_COUNT", article.getQuantity());
-                items.put("ARTICLE_NAME", article.getName());
-                data.put("ITEMS", items);
-                data.put("CUSTOMER_SATISFACTION", "暂无信息");
-                data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
-                data.put("CUSTOMER_PROPERTY", "");
-                print.put("DATA", data);
-                print.put("STATUS", "0");
-                print.put("TICKET_TYPE", TicketType.KITCHEN);
-                printTask.add(print);
+            if(printer.getTicketType() == TicketType.PRINT_TICKET){
+                for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
+                    Map<String, Object> print = new HashMap<String, Object>();
+                    print.put("PORT", printer.getPort());
+                    print.put("IP", printer.getIp());
+                    String print_id = ApplicationUtils.randomUUID();
+                    print.put("PRINT_TASK_ID", print_id);
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("ORDER_ID", order.getOrderId());
+                    data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                    data.put("DISTRIBUTION_MODE", "外卖");
+                    data.put("TABLE_NUMBER", "饿了么");
+                    data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+                    Map<String, Object> items = new HashMap<String, Object>();
+                    items.put("ARTICLE_COUNT", article.getQuantity());
+                    items.put("ARTICLE_NAME", article.getName());
+                    data.put("ITEMS", items);
+                    data.put("CUSTOMER_SATISFACTION", "暂无信息");
+                    data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                    data.put("CUSTOMER_PROPERTY", "");
+                    print.put("DATA", data);
+                    print.put("STATUS", "0");
+                    print.put("TICKET_TYPE", TicketType.KITCHEN);
+                    printTask.add(print);
+                }
+            }else{
+                for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
+                    for(int i = 0;i < article.getQuantity();i++){
+                        Map<String, Object> print = new HashMap<String, Object>();
+                        print.put("TABLE_NO", "");
+                        print.put("KITCHEN_NAME", printer.getName());
+                        print.put("PORT", printer.getPort());
+                        print.put("ORDER_ID", order.getOrderId());
+                        print.put("IP", printer.getIp());
+                        String print_id = ApplicationUtils.randomUUID();
+                        print.put("PRINT_TASK_ID", print_id);
+                        print.put("ADD_TIME", new Date());
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("ORDER_ID", order.getOrderId());
+                        data.put("ARTICLE_NAME", article.getName());
+                        data.put("ARTICLE_NUMBER", i+"/"+article.getQuantity());
+                        data.put("DISTRIBUTION_MODE", "饿了吗外卖");
+                        data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
+                        data.put("CUSTOMER_ADDRESS", order.getAddress());
+                        data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
+                        data.put("CUSTOMER_TEL", order.getPhoneList());
+                        data.put("TABLE_NUMBER", "");
+                        data.put("PAYMENT_AMOUNT", order.getTotalPrice());
+                        data.put("RESTAURANT_NAME", shopDetail.getName());
+                        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                        data.put("ARTICLE_COUNT",1);
+                        print.put("DATA",data);
+                        print.put("STATUS", 0);
+                        print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
+                        printTask.add(print);
+                    }
+
+                }
+
             }
+
         }
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         JSONArray json = new JSONArray(printTask);
