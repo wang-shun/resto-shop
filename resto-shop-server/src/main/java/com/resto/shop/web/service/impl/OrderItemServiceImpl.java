@@ -91,6 +91,18 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 
     @Override
     public void insertItems(List<OrderItem> orderItems) {
+        //合并相同新规格的餐品
+        for(int i = 0; i < orderItems.size(); i++){
+            if(orderItems.get(i).getType() == OrderItemType.UNIT_NEW){
+                for(int j = 0; j < orderItems.size(); j++){
+                    if(orderItems.get(i).getName().equals(orderItems.get(j).getName()) && !orderItems.get(i).getId().equals(orderItems.get(j).getId())){
+                        orderItems.get(i).setCount(orderItems.get(i).getCount() + orderItems.get(j).getCount());
+                        orderItems.get(i).setFinalPrice(orderItems.get(i).getFinalPrice().add(orderItems.get(j).getFinalPrice()));
+                        orderItems.remove(orderItems.get(j));
+                    }
+                }
+            }
+        }
         orderitemMapper.insertBatch(orderItems);
         List<OrderItem> allChildren = new ArrayList<>();
         for (OrderItem orderItem : orderItems) {
