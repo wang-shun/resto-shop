@@ -350,7 +350,7 @@ var vueObj = new Vue({
                         //重绘搜索列
                         that.brandUnitTable();
                         that.brandArticleFamily = result.data.brandArticleFamily;
-                        that.brandArticleFamilyTable.clear().draw();
+                        that.brandArticleFamilyTable.clear();
                         that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
                         //重绘搜索列
                         that.brandFamilyTable();
@@ -579,15 +579,11 @@ var vueObj = new Vue({
         },
         brandUnitTable : function(){
          	var api = brandUnitAPI;
-            api.search('');
-            var data = api.data();
             var columnsSetting = api.settings()[0].oInit.columns;
             $(columnsSetting).each(function (i) {
                 if (this.s_filter) {
                     var column = api.column(i);
-                    var title = this.title;
                     var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                    var that = this;
                     column.data().unique().each(function (d) {
                         select.append('<option value="' + d + '">' + d + '</option>')
                     });
@@ -602,15 +598,11 @@ var vueObj = new Vue({
         },
         brandFamilyTable : function(){
        		var api = brandFamilyAPI;
-           	api.search('');
-           	var data = api.data();
            	var columnsSetting = api.settings()[0].oInit.columns;
            	$(columnsSetting).each(function (i) {
                if (this.s_filter) {
                    var column = api.column(i);
-                   var title = this.title;
                    var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                   var that = this;
                    column.data().unique().each(function (d) {
                        select.append('<option value="' + d + '">' + d + '</option>')
                    });

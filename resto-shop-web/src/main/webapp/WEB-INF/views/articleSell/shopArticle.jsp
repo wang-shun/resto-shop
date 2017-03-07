@@ -297,7 +297,7 @@
                             column1.search('', true, false);
                             //清空表格
                             that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
-                            that.shopArticleUnitTable.clear().draw();
+                            that.shopArticleUnitTable.clear();
                             that.shopArticleUnitTable.rows.add(result.data.shopArticleUnitDtos).draw();
                             //重绘搜索列
                             that.shopUnitTable();
@@ -307,7 +307,7 @@
                             column2.search('', true, false);
                             //清空表格
                             that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
-                            that.shopArticleFamilyTable.clear().draw();
+                            that.shopArticleFamilyTable.clear();
                             that.shopArticleFamilyTable.rows.add(result.data.shopArticleFamilyDtos).draw();
                             //重绘搜索列
                             that.shopFamilyTable();
@@ -394,14 +394,11 @@
 	        shopUnitTable : function(){
 	         	var api = shopUnitAPI;
 	            api.search('');
-	            var data = api.data();
 	            var columnsSetting = api.settings()[0].oInit.columns;
 	            $(columnsSetting).each(function (i) {
 	                if (this.s_filter) {
 	                    var column = api.column(i);
-	                    var title = this.title;
 	                    var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-	                    var that = this;
 	                    column.data().unique().each(function (d) {
 	                        select.append('<option value="' + d + '">' + d + '</option>')
 	                    });
@@ -417,14 +414,11 @@
 	        shopFamilyTable : function(){
 	       		var api = shopFamilyAPI;
 	           	api.search('');
-	           	var data = api.data();
 	           	var columnsSetting = api.settings()[0].oInit.columns;
 	           	$(columnsSetting).each(function (i) {
 	               if (this.s_filter) {
 	                   var column = api.column(i);
-	                   var title = this.title;
 	                   var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-	                   var that = this;
 	                   column.data().unique().each(function (d) {
 	                       select.append('<option value="' + d + '">' + d + '</option>')
 	                   });
