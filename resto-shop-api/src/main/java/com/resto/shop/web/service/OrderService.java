@@ -1,9 +1,5 @@
 package com.resto.shop.web.service;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
@@ -15,7 +11,11 @@ import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
-import com.sun.org.apache.xpath.internal.operations.Or;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public interface OrderService extends GenericService<Order, String> {
     
@@ -27,7 +27,7 @@ public interface OrderService extends GenericService<Order, String> {
      * @param customerId
      * @return
      */
-	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId,String ORDER_STATE);
+	public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE);
 	
 	/**
 	 * 根据订单ID查询订单状态和生产状态
@@ -90,7 +90,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order getOrderInfo(String orderId);
 
-	public List<Order> selectHistoryOrderList(String currentShopId, Date date,Integer shopMode);
+	public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode);
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);
 
@@ -425,7 +425,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	Order payOrderWXModeFive(String orderId);
 
-	Order payPrice(BigDecimal factMoney,String orderId);
+	Order payPrice(BigDecimal factMoney, String orderId);
 
 	void useRedPrice(BigDecimal factMoney,String orderId);
 

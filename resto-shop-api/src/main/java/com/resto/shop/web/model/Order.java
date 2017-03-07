@@ -141,6 +141,8 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
+    private  String shareCustomer;
+
     //该订单是否使用优惠券
     private Boolean ifUseCoupon;
 
@@ -827,5 +829,13 @@ public class Order implements Serializable{
 
     public void setCouponInfo(Coupon couponInfo) {
         this.couponInfo = couponInfo;
+    }
+
+    public String getShareCustomer() {
+        return shareCustomer;
+    }
+
+    public void setShareCustomer(String shareCustomer) {
+        this.shareCustomer = shareCustomer;
     }
 }

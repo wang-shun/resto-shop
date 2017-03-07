@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,4 +58,13 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 * @return
 	 */
 	Map<String, Object> selectCustomerAppraiseAvg(String customerId);
+
+    /**
+     * 查询时间段内的评论
+     * @param begin
+     * @param end
+     * @param id
+     * @return
+     */
+    List<Appraise> selectByTimeAndShopId(String  id, Date begin, Date end);
 }

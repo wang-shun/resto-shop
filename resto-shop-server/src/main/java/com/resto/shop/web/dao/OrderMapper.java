@@ -607,4 +607,32 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<OrderItem> selectListByShopIdAndTime(@Param("beginTime") Date beginTime,@Param("endTime") Date endTime, @Param("shopId") String id);
 
     List<OrderItem> selectCustomerListByShopIdAndTime(@Param("beginTime") Date beginTime,@Param("endTime") Date endTime, @Param("shopId") String id);
+
+    /**
+     * 2017-03-07新增用户的订单
+     * @param id
+     * @param todayBegin
+     * @param todayEnd
+     * @return
+     */
+    List<Order> selectNewCustomerOrderByShopIdAndTime(@Param("shopId") String id, @Param("beginDate") Date todayBegin,@Param("endDate") Date todayEnd);
+
+    /**
+     * 回头用户
+     * 2017-03-07
+     * @param id
+     * @param todayBegin
+     * @param todayEnd
+     * @return
+     */
+    List<BackCustomerDto> selectBackCustomerByShopIdAndTime(@Param("shopId")String id, @Param("beginDate")Date todayBegin, @Param("endDate")Date todayEnd);
+
+    /**
+     * 2017-03-07
+     * @param id
+     * @param todayBegin
+     * @param todayEnd
+     * @return
+     */
+    List<Order> selectCompleteByShopIdAndTime(@Param("shopId")String id, @Param("beginDate")Date todayBegin,@Param("endDate") Date todayEnd);
 }

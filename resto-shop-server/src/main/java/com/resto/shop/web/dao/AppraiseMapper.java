@@ -1,5 +1,6 @@
 package com.resto.shop.web.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,4 +41,7 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     List<Appraise> selectByGoodAppraise();
     
     Map<String, Object> selectCustomerAppraiseAvg(@Param("customerId") String customerId);
+
+
+    List<Appraise> selectByTimeAndShopId(@Param("shopId") String shopId,@Param("beginDate") Date begin, @Param("endDate") Date end);
 }

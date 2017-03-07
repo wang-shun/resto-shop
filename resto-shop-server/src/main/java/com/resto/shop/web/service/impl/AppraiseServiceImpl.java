@@ -219,4 +219,11 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public Map<String, Object> selectCustomerAppraiseAvg(String customerId) {
 		return appraiseMapper.selectCustomerAppraiseAvg(customerId);
 	}
+
+
+
+    @Override
+    public List<Appraise> selectByTimeAndShopId(String shopId,Date begin, Date end) {
+        return  appraiseMapper.selectByTimeAndShopId(shopId,begin,end);
+    }
 }

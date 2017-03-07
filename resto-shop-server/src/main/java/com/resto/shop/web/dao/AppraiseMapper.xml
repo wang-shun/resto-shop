@@ -131,4 +131,12 @@
   <select id="selectCustomerAppraiseAvg" parameterType="java.lang.String" resultType="java.util.Map">
   	select count(1) count,sum(`level`) sum from tb_appraise where customer_id = #{customerId}
   </select>
+
+ <select id="selectByTimeAndShopId" resultType="Appraise">
+     select <include refid="Base_Column_List"/> from tb_appraise
+     WHERE
+     shop_detail_id =#{shopId} AND
+     <![CDATA[ create_time >= #{beginDate} AND create_time <= #{endDate}]]>
+ </select>
+
 </mapper>

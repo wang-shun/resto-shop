@@ -52,11 +52,7 @@
             <result column="is_share" property="isShare"/>
             <result column="share_customer" property="shareCustomer"/>
         </association>
-        <!-- 评论 -->
-        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-            <id column="appraise_id" property="id"/>
-            <result column="level" property="level"/>
-        </association>
+
         <!-- 支付方式的id -->
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="pay_value" property="payValue"/>
@@ -2467,15 +2463,11 @@ AND o.production_status IN (2, 3)
 	c.nickname,
 	c.regiest_time,
 	c.share_customer,
-	c.is_share,
-	a.id appraise,
-	a.level,
-	a.feedback
+	c.is_share
 FROM
 	tb_order o
-INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
-LEFT JOIN tb_appraise a on o.id = a.order_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
     AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
@@ -2671,6 +2663,86 @@ GROUP BY oi.article_name
         <![CDATA[ o.create_time >= #{beginTime} and o.create_time<=#{endTime}
         ]]>
         GROUP BY c.telephone
+    </select>
+
+    <select id="selectNewCustomerOrderByShopIdAndTime" resultType="order">
+        SELECT
+        o.customer_id,
+        c.share_customer,
+        o.order_money,
+        o.amount_with_children
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi
+        ON o.id = oi.order_id
+        LEFT JOIN tb_customer c
+        ON o.customer_id = c.id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.shop_detail_id = #{shopId}
+        <![CDATA[
+          AND o.create_time>#{beginDate}
+           AND o.create_time < #{endDate}
+         ]]>
+        AND o.customer_id NOT IN (
+        SELECT
+        customer_id
+        FROM
+        tb_order
+        WHERE
+        order_state IN (2, 10, 11, 12)
+        AND production_status IN (2, 3)
+        AND shop_detail_id = #{shopId}
+        AND
+        <![CDATA[
+           create_time<#{beginDate}
+        ]]>
+        )
+    </select>
+
+    <select id="selectBackCustomerByShopIdAndTime" resultType="com.resto.brand.web.dto.BackCustomerDto">
+        SELECT
+        customer_id,
+        COUNT(*)num
+        FROM
+        tb_order o
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND
+        <![CDATA[
+        o.create_time <#{beginDate}
+       ]]>
+        AND o.shop_detail_id = #{shopId}
+        AND customer_id in (
+        SELECT customer_id FROM tb_order
+        WHERE order_state in(2,10,11,12)
+        AND production_status in(2,3)
+        AND
+        <![CDATA[
+            create_time>#{beginDate} AND create_time<#{endDate}
+        ]]>
+        AND o.shop_detail_id=#{shopId}
+        )
+        GROUP BY customer_id
+    </select>
+
+    <select id="selectCompleteByShopIdAndTime" resultType="order">
+        SELECT
+        o.customer_id,
+        o.order_money,
+        o.amount_with_children FROM tb_order o
+        INNER JOIN tb_order_payment_item oi
+        on o.id = oi.order_id
+        WHERE o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.shop_detail_id = #{shopId}
+        AND
+        <![CDATA[
+          o.create_time > #{beginDate}
+        AND o.create_time < #{endDate}
+        ]]>
     </select>
 
 </mapper>
