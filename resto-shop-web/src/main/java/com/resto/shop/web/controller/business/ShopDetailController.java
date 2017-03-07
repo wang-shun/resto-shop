@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.util.MemcachedUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +39,7 @@ public class ShopDetailController extends GenericController{
 	public Result modify(ShopDetail shopDetail){
 	    shopDetail.setId(getCurrentShopId());
 	    shopDetailService.update(shopDetail);
+		MemcachedUtils.put(shopDetail.getId()+"info",shopDetail);
 	    return Result.getSuccess();
 	}
 	

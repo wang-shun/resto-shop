@@ -2,6 +2,7 @@ package com.resto.shop.web.controller.business;
 
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.PlatformService;
@@ -136,6 +137,8 @@ public class ArticleController extends GenericController {
             unitService.updateArticleRelation(id, article.getUnits());
         }
         articleService.initStock();
+//        List<Article> articles = (List<Article>) MemcachedUtils.get(getCurrentShopId()+"articles");
+        MemcachedUtils.delete(getCurrentShopId()+"articles");
         return Result.getSuccess();
     }
 
@@ -161,6 +164,8 @@ public class ArticleController extends GenericController {
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
+        MemcachedUtils.delete(getCurrentShopId()+"articles");
+
         return Result.getSuccess();
     }
 

@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.resto.brand.core.util.MemcachedUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,6 +47,7 @@ public class ArticleAttrController extends GenericController{
 	public Result create(@Valid ArticleAttr articleAttr){
 		articleAttr.setShopDetailId(getCurrentShopId());
 		articleattrService.create(articleAttr);
+		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
 		return Result.getSuccess();
 	}
 	
@@ -53,6 +55,7 @@ public class ArticleAttrController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleAttr brand){
 		articleattrService.updateInfo(brand);
+		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
 		return Result.getSuccess();
 	}
 	
@@ -60,6 +63,7 @@ public class ArticleAttrController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		articleattrService.deleteInfo(id);
+		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
 		return Result.getSuccess();
 	}
 }
