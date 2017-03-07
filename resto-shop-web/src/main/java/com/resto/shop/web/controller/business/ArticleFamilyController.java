@@ -52,7 +52,10 @@ public class ArticleFamilyController extends GenericController{
 		articleFamily.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
 		articleFamily.setId(ApplicationUtils.randomUUID());
 		articlefamilyService.insert(articleFamily);
-		MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		}
+
 		return Result.getSuccess();
 	}
 	
@@ -60,7 +63,9 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleFamily articleFamily){
 		articlefamilyService.update(articleFamily);
-		MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		}
 		return Result.getSuccess();
 	}
 	
@@ -68,7 +73,9 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result delete(String id){
 		articlefamilyService.delete(id);
-		MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+		}
 		return Result.getSuccess();
 	}
 	

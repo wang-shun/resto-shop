@@ -138,7 +138,10 @@ public class ArticleController extends GenericController {
         }
         articleService.initStock();
 //        List<Article> articles = (List<Article>) MemcachedUtils.get(getCurrentShopId()+"articles");
-        MemcachedUtils.delete(getCurrentShopId()+"articles");
+        if(MemcachedUtils.get(getCurrentShopId()+"articles") != null){
+            MemcachedUtils.delete(getCurrentShopId()+"articles");
+        }
+
         return Result.getSuccess();
     }
 
@@ -164,7 +167,9 @@ public class ArticleController extends GenericController {
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
-        MemcachedUtils.delete(getCurrentShopId()+"articles");
+        if(MemcachedUtils.get(getCurrentShopId()+"articles") != null){
+            MemcachedUtils.delete(getCurrentShopId()+"articles");
+        }
 
         return Result.getSuccess();
     }

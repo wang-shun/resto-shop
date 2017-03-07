@@ -39,7 +39,10 @@ public class ShopDetailController extends GenericController{
 	public Result modify(ShopDetail shopDetail){
 	    shopDetail.setId(getCurrentShopId());
 	    shopDetailService.update(shopDetail);
-		MemcachedUtils.put(shopDetail.getId()+"info",shopDetail);
+	    if(MemcachedUtils.get(shopDetail.getId()+"info") != null){
+			MemcachedUtils.delete(shopDetail.getId()+"info");
+		}
+
 	    return Result.getSuccess();
 	}
 	

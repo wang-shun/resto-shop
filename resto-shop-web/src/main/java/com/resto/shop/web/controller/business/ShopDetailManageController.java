@@ -48,7 +48,10 @@
                  break;
          }
          shopDetailService.update(shopDetail);
-         MemcachedUtils.put(shopDetail.getId()+"info",shopDetail);
+         if(MemcachedUtils.get(getCurrentShopId()+"info") != null){
+             MemcachedUtils.delete(getCurrentShopId()+"info");
+         }
+
          return Result.getSuccess();
      }
 

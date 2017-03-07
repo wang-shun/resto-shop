@@ -99,7 +99,10 @@ public class NewCustomCouponController extends GenericController{
         }
         newCustomCoupon.setCreateTime(new Date());
         newcustomcouponService.insertNewCustomCoupon(newCustomCoupon);
-        MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
+
         return Result.getSuccess();
     }
 
@@ -137,7 +140,9 @@ public class NewCustomCouponController extends GenericController{
         }
 
         newcustomcouponService.update(newCustomCoupon);
-        MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
         return Result.getSuccess();
     }
 
@@ -145,7 +150,9 @@ public class NewCustomCouponController extends GenericController{
     @ResponseBody
     public Result delete(Long id){
         newcustomcouponService.delete(id);
-        MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
         return Result.getSuccess();
     }
 

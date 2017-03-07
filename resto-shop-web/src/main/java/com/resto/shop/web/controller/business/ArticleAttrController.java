@@ -47,7 +47,10 @@ public class ArticleAttrController extends GenericController{
 	public Result create(@Valid ArticleAttr articleAttr){
 		articleAttr.setShopDetailId(getCurrentShopId());
 		articleattrService.create(articleAttr);
-		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleAttr") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		}
+
 		return Result.getSuccess();
 	}
 	
@@ -55,7 +58,9 @@ public class ArticleAttrController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleAttr brand){
 		articleattrService.updateInfo(brand);
-		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleAttr") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		}
 		return Result.getSuccess();
 	}
 	
@@ -63,7 +68,9 @@ public class ArticleAttrController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		articleattrService.deleteInfo(id);
-		MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		if(MemcachedUtils.get(getCurrentShopId()+"articleAttr") != null){
+			MemcachedUtils.delete(getCurrentShopId()+"articleAttr");
+		}
 		return Result.getSuccess();
 	}
 }

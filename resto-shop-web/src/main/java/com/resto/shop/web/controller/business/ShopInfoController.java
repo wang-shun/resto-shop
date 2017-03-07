@@ -84,7 +84,11 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
         shopDetailService.update(shopDetail);
-        MemcachedUtils.put(shopDetail.getId()+"info",shopDetail);
+        ShopDetail shopDetail1 =(ShopDetail) MemcachedUtils.get(getCurrentShopId()+"info");
+        if(shopDetail != null){
+            MemcachedUtils.delete(getCurrentShopId()+"info");
+        }
+
         return Result.getSuccess();
     }
 

@@ -50,7 +50,10 @@ public class ChargeSettingController extends GenericController{
 	    brand.setCreateTime(new Date());
 	    brand.setId(UUID.randomUUID().toString());
 	    chargesettingService.insert(brand);
-		MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+	    if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
+			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		}
+
 		return Result.getSuccess();
 	}
 	
@@ -59,7 +62,9 @@ public class ChargeSettingController extends GenericController{
 	public Result modify(@Valid ChargeSetting brand){
 		brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 		chargesettingService.update(brand);
-		MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
+			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		}
 		return Result.getSuccess();
 	}
 	
@@ -67,7 +72,9 @@ public class ChargeSettingController extends GenericController{
 	@ResponseBody
 	public Result delete(String id){
 		chargesettingService.delete(id);
-		MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
+			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		}
 		return Result.getSuccess();
 	}
 }

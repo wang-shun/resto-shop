@@ -58,7 +58,10 @@ public class UnitController extends GenericController {
         unitService.insert(unit);
         //创建属性
         unitService.insertDetail(unit);
-        MemcachedUtils.delete(getCurrentShopId()+"unit");
+        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+            MemcachedUtils.delete(getCurrentShopId()+"unit");
+        }
+
         return new Result(true);
     }
 
@@ -72,7 +75,9 @@ public class UnitController extends GenericController {
 
         //同步更新 使用该规格包的菜品信息
         unitService.modifyUnit(u);
-        MemcachedUtils.delete(getCurrentShopId()+"unit");
+        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+            MemcachedUtils.delete(getCurrentShopId()+"unit");
+        }
         return new Result(true);
     }
 
@@ -81,7 +86,9 @@ public class UnitController extends GenericController {
     public Result delete(String id) {
         unitService.delete(id);
         unitService.deleteUnit(id);
-        MemcachedUtils.delete(getCurrentShopId()+"unit");
+        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+            MemcachedUtils.delete(getCurrentShopId()+"unit");
+        }
         return Result.getSuccess();
     }
 

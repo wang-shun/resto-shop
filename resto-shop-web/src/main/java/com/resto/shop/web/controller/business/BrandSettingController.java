@@ -45,7 +45,10 @@ public class BrandSettingController extends GenericController{
 	public Result modify(@Valid BrandSetting brandSetting){
 		
 		brandSettingService.update(brandSetting);
-		MemcachedUtils.delete(getCurrentBrandId()+"setting");
+		if(MemcachedUtils.get(getCurrentBrandId()+"setting") != null){
+			MemcachedUtils.delete(getCurrentBrandId()+"setting");
+		}
+
 		return Result.getSuccess();
 	}
 	
