@@ -175,6 +175,11 @@
                             title : "手机号",
                             data : "telephone",
                             orderable : false
+                        },
+                        {
+                            title : "订单状态",
+                            data : "orderState",
+                            orderable : false
                         }, {
                             title : "订单金额",
                             data : "orderMoney"
