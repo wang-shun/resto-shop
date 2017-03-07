@@ -361,13 +361,9 @@
   </select>
 
     <select id="selectBrandUser" resultType="java.lang.String">
-    select CONCAT_WS(',',(select count(1) from tb_customer),(select count(1) from tb_customer where is_bind_phone=1)
-    ,(select count(1) from tb_customer where is_bind_phone=0),(select count(1) from tb_customer where sex=1)
-    ,(select count(1) from tb_customer where sex=2),(select count(id) from tb_customer where sex=0)
-    ,(select count(1) from tb_customer where id in (select customer_id from tb_order where order_state in (2,10,11,12,13)
-    and production_status in (2,3) GROUP BY customer_id having count(id) > 2))
-    ,(select count(1) from tb_customer where id in (select customer_id from tb_order
-    where order_state in (2,10,11,12,13) and production_status in (2,3) group by customer_id))) count
+    select CONCAT_WS(',',(select count(1) from tb_customer),(select IFNULL(count(1),0) from tb_customer where is_bind_phone=1)
+    ,(select IFNULL(count(1),0) from tb_customer where is_bind_phone=0),(select IFNULL(count(1),0) from tb_customer where sex=1)
+    ,(select IFNULL(count(1),0) from tb_customer where sex=2),(select IFNULL(count(1),0) from tb_customer where sex=0)) count
   </select>
 
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
@@ -402,7 +398,7 @@
 		c.nickname,
 		c.telephone,
 		c.head_photo photo,
-		(if(ISNULL(c.birthday),'',DATE_FORMAT(c.birthday,'%Y-%m-%d'))) birthday,
+		(if(ISNULL(c.birthday),'--',DATE_FORMAT(c.birthday,'%Y-%m-%d'))) birthday,
 		if(c.is_bind_phone=1,'注册','未注册') isBindPhone,
 		if((select count(1) from tb_charge_order tco where tco.customer_id = c.id) > 0,'是','否') isCharge,
 		c.province,

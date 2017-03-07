@@ -1,15 +1,12 @@
  package com.resto.shop.web.controller.business;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.ExcelUtil;
- import com.resto.brand.core.util.JdbcUtils;
  import com.resto.brand.core.util.UserOrderExcelUtil;
-import com.resto.brand.web.dto.CountUserDto;
 import com.resto.brand.web.dto.MemberUserDto;
  import com.resto.brand.web.dto.OrderDetailDto;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.DatabaseConfig;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.DatabaseConfigService;
@@ -24,8 +21,7 @@ import com.resto.brand.web.model.DatabaseConfig;
  import com.resto.shop.web.service.CustomerService;
  import com.resto.shop.web.service.OrderService;
 
-import org.apache.ibatis.annotations.Param;
-import org.springframework.asm.TypeReference;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  import java.io.FileOutputStream;
  import java.io.OutputStream;
  import java.math.BigDecimal;
- import java.sql.SQLException;
  import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
  import java.util.List;
  import java.util.Map;
@@ -77,56 +71,64 @@ public class MemberController extends GenericController{
 	//查询当前店铺的所有用户
 	@RequestMapping("/myConList")
 	@ResponseBody
-	public Map<String, Object> selectAllMath(String beginDate,String endDate){
-		//得到品牌用户信息
-		String count = customerService.selectBrandUser();
-		String[] counts = count.split(",");
-		List<CountUserDto> countUserDtos=new ArrayList<>();
-		CountUserDto countUserDto=new CountUserDto();
-		countUserDto.setUserBrandName(getBrandName());
-		Integer i = 0;
-		for(String str : counts){
-			switch (i) {
-			case 0:
-				countUserDto.setUserAll(Integer.valueOf(str));
-				break;
-			case 1:
-				countUserDto.setUserYe(Integer.valueOf(str));
-				break;
-			case 2:
-				countUserDto.setUserNot(Integer.valueOf(str));
-				break;
-			case 3:
-				countUserDto.setUserBoy(Integer.valueOf(str));
-				break;
-			case 4:
-				countUserDto.setUserGir(Integer.valueOf(str));
-				break;
-			case 5:
-				countUserDto.setNotUser(Integer.valueOf(str));
-				break;
-			case 6:
-				BigDecimal userAll = new BigDecimal(0);
-				userAll = userAll.add(new BigDecimal(counts[7]));
-				double a=userAll.doubleValue();
-				double b=Double.valueOf(str);
-				double c=(b/a)*100;
-				BigDecimal d=new BigDecimal(c);
-				double f1 = d.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-				String pulShopping=f1+"%";
-				countUserDto.setpShoping(pulShopping);
-				break;
-			default:
-				break;
-			}
-			i++;
-		}
-		countUserDtos.add(countUserDto);
-		List<MemberUserDto>  memberUserDtos = customerService.selectListMemberUser(beginDate,endDate);
-		Map<String, Object> map=new HashMap<>();
-		map.put("countUserDtos", countUserDtos);
-		map.put("memberUserDtos", memberUserDtos);
-		return map;
+	public Result selectAllMath(String beginDate,String endDate){
+	    JSONObject object = new JSONObject();
+	    try {
+            //得到品牌用户信息
+            String count = customerService.selectBrandUser();
+            String[] counts = new String[0];
+            if (StringUtils.isNotBlank(count)) {
+                counts = count.split(",");
+            }
+            Integer customerCount = 0;
+            Integer registeredCustomerCount = 0;
+            Integer unregisteredCustomerCount = 0;
+            Integer maleCustomerCount = 0;
+            Integer femaleCustomerCount = 0;
+            Integer unknownCustomerCount = 0;
+            Integer i = 0;
+            for (String str : counts) {
+                switch (i) {
+                    case 0:
+                        customerCount = Integer.valueOf(str);
+                        break;
+                    case 1:
+                        registeredCustomerCount = Integer.valueOf(str);
+                        break;
+                    case 2:
+                        unregisteredCustomerCount = Integer.valueOf(str);
+                        break;
+                    case 3:
+                        maleCustomerCount = Integer.valueOf(str);
+                        break;
+                    case 4:
+                        femaleCustomerCount = Integer.valueOf(str);
+                        break;
+                    case 5:
+                        unknownCustomerCount = Integer.valueOf(str);
+                        break;
+                    default:
+                        break;
+                }
+                i++;
+            }
+            JSONObject brandCustomerCount = new JSONObject();
+            brandCustomerCount.put("brandName", getBrandName());
+            brandCustomerCount.put("customerCount", customerCount);
+            brandCustomerCount.put("registeredCustomerCount", registeredCustomerCount);
+            brandCustomerCount.put("unregisteredCustomerCount", unregisteredCustomerCount);
+            brandCustomerCount.put("maleCustomerCount", maleCustomerCount);
+            brandCustomerCount.put("femaleCustomerCount", femaleCustomerCount);
+            brandCustomerCount.put("unknownCustomerCount", unknownCustomerCount);
+            List<MemberUserDto> memberUserDtos = customerService.selectListMemberUser(beginDate, endDate);
+            object.put("brandCustomerCount", brandCustomerCount);
+            object.put("memberUserDtos", memberUserDtos);
+        }catch (Exception e){
+            log.error("查询会员信息报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 	
 	 /**
@@ -145,12 +147,18 @@ public class MemberController extends GenericController{
 	@RequestMapping("/list_all_shopId")
     @ResponseBody
 	public Result list_all_shopId(String customerId){
-		List<Coupon> list =  couponService.getListByCustomerId(customerId);
-		List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
-		CouponDto couponDto = new CouponDto();
-		couponDto.setCoupons(list);
-		couponDto.setShopDetails(shopDetails);
-		return getSuccessResult(couponDto);
+	    JSONObject object = new JSONObject();
+	    try {
+            List<Coupon> list =  couponService.getListByCustomerId(customerId);
+            List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+            object.put("coupons",list);
+            object.put("shopDetails",shopDetails);
+        }catch (Exception e){
+            log.error("查看会员优惠卷信息");
+            e.printStackTrace();
+            return new Result(false);
+        }
+		return getSuccessResult(object);
 	}
 
 
@@ -206,49 +214,49 @@ public class MemberController extends GenericController{
 		request.setAttribute("customerId", customerId);
 		return "member/orderReport";
 	}
-	
+
 	/**
 	 * yjuany 一个用户有多个订单
 	 */
 	@RequestMapping("orderReport")
 	@ResponseBody
 	public  List<OrderDetailDto> showUserOrder(String beginDate,String endDate,String customerId,HttpServletRequest request){
-		
+
 		beginDate += " 00:00:00";
 		endDate += "23:59:59";
 		//#
 		//订单状态
-	   List<OrderDetailDto> listDto = new ArrayList<>(); 
-	   
+	   List<OrderDetailDto> listDto = new ArrayList<>();
+
 	   //从session中获取该品牌的信息（这里只需要店铺名称）
        List<ShopDetail> shopDetailList = getCurrentShopDetails();//放到session中的
        if(shopDetailList==null){
     	   shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
        }
-       
-     
+
+
       // 用户id='f81d4fe246614796be302fa7593bef1b' and  o.create_time BETWEEN  "2016-12-06"   and "2016-12-12"
 	   List<Order> orderList = orderService.getCustomerOrderList(customerId,beginDate,endDate);
 	    if(orderList.size()>0){
 		 for (Order order : orderList) {
 			 OrderDetailDto ot = new OrderDetailDto(order.getId(), order.getShopName(), order.getCreateTime(), "", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"", "", "","","");
 		    //查询店铺名称
-			 
+
 	               for (ShopDetail shopDetail : shopDetailList) {///////看下session有
 	  				 if(order.getShopDetailId().equals(shopDetail.getId())){
 	  					 ot.setShopDetailId(order.getShopDetailId());
 	  					 ot.setShopName(shopDetail.getName());
 	  				 }
 	  			  }
-			  
-			  
+
+
 			 if(order.getCustomer()!=null){//判断是否有这个用户
 				//手机号
 				if(order.getCustomer().getTelephone()!=null&&order.getCustomer().getTelephone()!=""){
 					ot.setTelephone(order.getCustomer().getTelephone());
 				}
 			}
-			  
+
 			if(order.getOrderState()!=null){
 				switch (order.getOrderState()) {
 				case 1:
@@ -285,7 +293,7 @@ public class MemberController extends GenericController{
 			}
 			//订单评价
 			//判断是否为空，不是所有订单都评价
-			
+
 			if(null!=order.getAppraise()){
 				switch (order.getAppraise().getLevel()) {
 				case 1:
@@ -351,11 +359,11 @@ public class MemberController extends GenericController{
 			//店铺名字
 			 listDto.add(ot);
 		 }
-		
+
 	    }
 		return listDto;
     }
-	
+
 	 /**
 	  * 下载用户订单列表
 	  * @param beginDate
@@ -364,7 +372,7 @@ public class MemberController extends GenericController{
 	  * @param request
 	  * @param response
 	  */
-	
+
 		@RequestMapping("usershop_excel")
 		@ResponseBody
 		public void reportUserOrder(String beginDate,String endDate,String customerId,HttpServletRequest request, HttpServletResponse response){
@@ -388,8 +396,8 @@ public class MemberController extends GenericController{
 			map.put("reportTitle", "用户订单");//表的名字
 			map.put("timeType", "yyyy-MM-dd");
 			String[][] headers = {{"店铺名","25"},{"下单时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},{"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付","25"},{"营销撬动率","25"},{"评价","25"},{"订单状态","25"}};
-			
-			
+
+
 			//定义excel工具类对象
 			UserOrderExcelUtil<OrderDetailDto> excelUtil=new UserOrderExcelUtil<OrderDetailDto>();//OrderDetailDto订单扩展类（showUserOrder）
 			try{
@@ -403,11 +411,11 @@ public class MemberController extends GenericController{
 				e.printStackTrace();
 			}
 		}
-	
-	
+
+
 
        /**
-        * 
+        *
         * 订单详情
         * @param orderId
         * @return
@@ -422,6 +430,6 @@ public class MemberController extends GenericController{
 	        }
 			return getSuccessResult(o);
 		}
-		
+
 
 }

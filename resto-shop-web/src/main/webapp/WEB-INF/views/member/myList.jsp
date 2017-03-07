@@ -123,6 +123,7 @@
         language: "zh-CN"
     });
 
+    var customerTableAPI = null;
     var vueObj = new Vue({
         el : "#control",
         data : {
@@ -132,7 +133,9 @@
             },
             state : 1,
             path : null,
-            brandCustomerCount : {}
+            brandCustomerCount : {},
+            customerInfoTable : {},
+            memberUserDtos : []
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -145,14 +148,143 @@
             initDataTables:function () {
                 //that代表 vue对象
                 var that = this;
+                that.customerInfoTable = $("#customerInfoTable").DataTable({
+                    lengthMenu: [[50, 75, 100, 150], [50, 75, 100, "All"]],
+                    order: [[ 9, 'desc' ]],
+                    columns: [
+                        {
+                            title: "用户类型",
+                            data: "isBindPhone",
+                            s_filter: true,
+                            orderable : false
+                        },
+                        {
+                            title: "储值",
+                            data: "isCharge",
+                            s_filter: true,
+                            orderable : false
+                        },
+                        {
+                            title: "昵称",
+                            data: "nickname",
+                            orderable : false
+                        },
+                        {
+                            title: "头像",
+                            data: "photo",
+                            defaultContent: "",
+                            orderable : false,
+                            createdCell: function (td, tdData) {
+                                if (tdData != null && tdData.substring(0, 4) == "http") {
+                                    $(td).html("<img src=\"" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:60px;width:60px;\"/>");
+                                } else {
+                                    $(td).html("<img src=\"/" + tdData + "\" class=\"img-rounded\" onerror=\"this.src='assets/pages/img/defaultImg.png'\" style=\"height:60px;width:60px;\"/>");
+                                }
+                            }
+                        },
+                        {
+                            title: "性别",
+                            data: "sex",
+                            s_filter: true,
+                            orderable : false
+                        },
+                        {
+                            title: "手机号码",
+                            data: "telephone",
+                            orderable : false
+                        },
+                        {
+                            title: "生日",
+                            data: "birthday",
+                            orderable : false
+                        },
+                        {
+                            title: "省/市",
+                            data: "province",
+                            orderable : false
+                        },
+                        {
+                            title: "城/区",
+                            data: "city",
+                            orderable : false
+                        },
+                        {
+                            title: "账户余额",
+                            data: "remain"
+                        },
+                        {
+                            title: "充值金额",
+                            data: "chargeRemain"
+                        },
+                        {
+                            title: "充值赠送金额",
+                            data: "presentRemain"
+                        },
+                        {
+                            title: "红包金额",
+                            data: "redRemain"
+                        },
+                        {
+                            title: "优惠券",
+                            data: "customerId",
+                            createdCell: function (td, tdData) {
+                                var button = $("<button class='btn green'>查看详情</button>");
+                                button.click(function () {
+                                    that.openCouponModal(tdData);
+                                })
+                                $(td).html(button);
+                            }
+                        },
+                        {
+                            title: "订单总额",
+                            data: "sumMoney"
+                        },
+                        {
+                            title: "订单总数",
+                            data: "amount"
+                        },
+                        {
+                            title: "订单平均金额",
+                            data: "money"
+                        },
+                        {
+                            title: "订单记录",
+                            data: "customerId",
+                            createdCell: function (td, tdData) {
+                                var button = $("<button class='btn green'>查看详情</button>");
+                                button.click(function () {
+                                    that.openOrderModal(tdData);
+                                })
+                                $(td).html(button);
+                            }
+                        },
+                    ],
+                    initComplete: function () {
+                        customerTableAPI = this.api();
+                        that.customerTableColumn();
+                    }
+                });
             },
             searchInfo : function() {
                 toastr.clear();
                 toastr.success("查询中...");
                 try{
                     var that = this;
-                    $.post("", this.getDate(), function(result) {
+                    var API = customerTableAPI;
+                    $.post("member/myConList", this.getDate(), function(result) {
                         if(result.success == true){
+                            API.search('');
+                            var isBindPhone = API.column(0);
+                            var isCharge = API.column(1);
+                            var sex = API.column(4);
+                            isBindPhone.search('',true,false);
+                            isCharge.search('',true,false);
+                            sex.search('',true,false);
+                            that.brandCustomerCount = result.data.brandCustomerCount;
+                            that.memberUserDtos = result.data.memberUserDtos
+                            that.customerInfoTable.clear();
+                            that.customerInfoTable.rows.add(result.data.memberUserDtos).draw();
+                            that.customerTableColumn();
                             toastr.clear();
                             toastr.success("查询成功");
                         }else{
@@ -192,6 +324,51 @@
                 this.searchDate.beginDate  = getMonthStartDate();
                 this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
+            },
+            openCouponModal : function (customerId) {
+                try {
+                    $.post("member/show/billReport",{customerId : customerId},function (result) {
+                        var modal = $("#couponModal");
+                        modal.find(".modal-body").html(result);
+                        modal.modal()
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            openOrderModal : function (customerId) {
+                try {
+                    var object = this.getDate();
+                    object.customerId = customerId;
+                    $.post("member/show/orderReport",object,function (result) {
+                        var modal = $("#orderModal");
+                        modal.find(".modal-body").html(result);
+                        modal.modal()
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            customerTableColumn : function () {
+                var api = customerTableAPI;
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
             }
         }
     });
