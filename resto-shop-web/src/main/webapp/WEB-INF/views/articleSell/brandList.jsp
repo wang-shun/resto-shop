@@ -389,7 +389,7 @@ var vueObj = new Vue({
                 switch (that.currentType) {
                     case 1:
                         var articleUnit = that.brandArticleUnit;
-                        if (articleUnit.length <= 400) {
+                        if (articleUnit.length <= 1000) {
                             object.brandArticleUnit = articleUnit;
                             $.post("articleSell/createBrnadArticle",object,function(result){
                                 if(result.success){
@@ -401,10 +401,10 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleUnit.length/400);
+                            var length = Math.ceil(articleUnit.length/1000);
                             var start = 0;
-                            var end = 400;
-                            var startPosition = 406;
+                            var end = 1000;
+                            var startPosition = 1006;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
                                     object.brandArticleUnit = articleUnit.slice(start,end);
@@ -424,7 +424,7 @@ var vueObj = new Vue({
                                             if(result.success){
                                                 that.path = result.data;
                                                 start = end;
-                                                end = start + 400;
+                                                end = start + 1000;
                                             }else{
                                                 that.state = 1;
 												toastr.clear();
@@ -454,8 +454,8 @@ var vueObj = new Vue({
                                         success:function(result){
                                             if(result.success){
                                                 start = end;
-                                                end = start + 400;
-                                                startPosition = startPosition + 400;
+                                                end = start + 1000;
+                                                startPosition = startPosition + 1000;
                                             }else{
                                                 that.state = 1;
 												toastr.clear();

@@ -279,7 +279,7 @@
                         shopId : shopId
                     };
                     var shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
-                    if (shopOrderList.length <= 380){
+                    if (shopOrderList.length <= 1000){
                         object.shopOrderList = shopOrderList;
                         console.log(object.shopOrderList);
                         $.post("orderReport/create_shop_excel",object,function (result) {
@@ -292,10 +292,10 @@
                         })
                     }else{
                         that.state = 2;
-                        var length = Math.ceil(shopOrderList.length/380);
+                        var length = Math.ceil(shopOrderList.length/1000);
                         var start = 0;
-                        var end = 380;
-                        var startPosition = 386;
+                        var end = 1000;
+                        var startPosition = 1005;
                         for(var i = 1;i <= length;i++){
                             if (i != length){
                                 object.shopOrderList = shopOrderList.slice(start,end);
@@ -315,7 +315,7 @@
                                         if(result.success){
                                             that.path = result.data;
                                             start = end;
-                                            end = start + 380;
+                                            end = start + 1000;
                                         }else{
                                             that.state = 1;
                                             toastr.clear();
@@ -345,8 +345,8 @@
                                     success:function(result){
                                         if(result.success){
                                             start = end;
-                                            end = start + 380;
-                                            startPosition = startPosition + 380;
+                                            end = start + 1000;
+                                            startPosition = startPosition + 1000;
                                         }else{
                                             that.state = 1;
                                             toastr.clear();
