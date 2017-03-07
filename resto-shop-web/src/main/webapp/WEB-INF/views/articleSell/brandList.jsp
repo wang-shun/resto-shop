@@ -20,7 +20,7 @@
              <button type="button" class="btn btn-primary" @click="month">本月</button>
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
              <button type="button" class="btn btn-primary" @click="createBrnadArticleTotal" v-if="state == 1">下载报表</button>
-             <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中</button>
+             <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
              <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
              <br/>
           </div>
@@ -389,7 +389,7 @@ var vueObj = new Vue({
                 switch (that.currentType) {
                     case 1:
                         var articleUnit = that.brandArticleUnit;
-                        if (articleUnit.length <= 1000) {
+                        if (articleUnit.length <= 400) {
                             object.brandArticleUnit = articleUnit;
                             $.post("articleSell/createBrnadArticle",object,function(result){
                                 if(result.success){
@@ -401,10 +401,10 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleUnit.length/1000);
+                            var length = Math.ceil(articleUnit.length/400);
                             var start = 0;
-                            var end = 1000;
-                            var startPosition = 1006;
+                            var end = 400;
+                            var startPosition = 406;
                             for(var i = 1;i <= length;i++){
                                 if (i != length){
                                     object.brandArticleUnit = articleUnit.slice(start,end);
@@ -424,8 +424,9 @@ var vueObj = new Vue({
                                             if(result.success){
                                                 that.path = result.data;
                                                 start = end;
-                                                end = start + 1000;
+                                                end = start + 400;
                                             }else{
+                                                that.state = 1;
 												toastr.clear();
                                                 toastr.error("生成报表出错");
                                                 return;
@@ -437,6 +438,7 @@ var vueObj = new Vue({
                                         if(result.success){
                                             that.state = 3;
                                         }else{
+                                            that.state = 1;
 											toastr.clear();
                                             toastr.error("生成报表出错");
                                             return;
@@ -452,9 +454,10 @@ var vueObj = new Vue({
                                         success:function(result){
                                             if(result.success){
                                                 start = end;
-                                                end = start + 1000;
-                                                startPosition = startPosition + 1000;
+                                                end = start + 400;
+                                                startPosition = startPosition + 400;
                                             }else{
+                                                that.state = 1;
 												toastr.clear();
                                                 toastr.error("生成报表出错");
                                                 return;
@@ -504,6 +507,7 @@ var vueObj = new Vue({
                                                 start = end;
                                                 end = start + 1000;
                                             }else{
+                                                that.state = 1;
 												toastr.clear();
                                                 toastr.error("生成报表出错");
                                                 return;
@@ -515,6 +519,7 @@ var vueObj = new Vue({
                                         if(result.success){
                                             that.state = 3;
                                         }else{
+                                            that.state = 1;
 											toastr.clear();
                                             toastr.error("生成报表出错");
                                             return;
@@ -533,6 +538,7 @@ var vueObj = new Vue({
                                                 end = start + 1000;
                                                 startPosition = startPosition + 1000;
                                             }else{
+                                                that.state = 1;
 												toastr.clear();
                                                 toastr.error("生成报表出错");
                                                 return;
@@ -545,6 +551,7 @@ var vueObj = new Vue({
                         break;
                 }
             }catch (e){
+                that.state = 1;
 				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
             }

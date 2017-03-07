@@ -27,7 +27,7 @@
                 <button type="button" class="btn btn-primary" @click="month">本月</button>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" @click="downloadShopOrder" v-if="state == 1">下载报表</button>
-                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中</button>
+                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
                 <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button><br/>
             </form>
         </div>
@@ -278,8 +278,8 @@
                         endDate : that.searchDate.endDate,
                         shopId : shopId
                     };
-                    var shopOrderList = that.shopOrderDetails.sort(this.keysert('printTime'));
-                    if (shopOrderList.length <= 200){
+                    var shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
+                    if (shopOrderList.length <= 380){
                         object.shopOrderList = shopOrderList;
                         console.log(object.shopOrderList);
                         $.post("orderReport/create_shop_excel",object,function (result) {
@@ -292,10 +292,10 @@
                         })
                     }else{
                         that.state = 2;
-                        var length = Math.ceil(shopOrderList.length/200);
+                        var length = Math.ceil(shopOrderList.length/380);
                         var start = 0;
-                        var end = 200;
-                        var startPosition = 206;
+                        var end = 380;
+                        var startPosition = 386;
                         for(var i = 1;i <= length;i++){
                             if (i != length){
                                 object.shopOrderList = shopOrderList.slice(start,end);
@@ -315,8 +315,9 @@
                                         if(result.success){
                                             that.path = result.data;
                                             start = end;
-                                            end = start + 200;
+                                            end = start + 380;
                                         }else{
+                                            that.state = 1;
                                             toastr.clear();
                                             toastr.error("生成报表出错");
                                             return;
@@ -326,9 +327,9 @@
                             }else if(i == length){
                                 $.post("orderReport/appendShopOrderExcel",object,function(result){
                                     if(result.success){
-                                        alert(result.success);
                                         that.state = 3;
                                     }else{
+                                        that.state = 1;
                                         toastr.clear();
                                         toastr.error("生成报表出错");
                                         return;
@@ -344,9 +345,10 @@
                                     success:function(result){
                                         if(result.success){
                                             start = end;
-                                            end = start + 200;
-                                            startPosition = startPosition + 200;
+                                            end = start + 380;
+                                            startPosition = startPosition + 380;
                                         }else{
+                                            that.state = 1;
                                             toastr.clear();
                                             toastr.error("生成报表出错");
                                             return;
@@ -357,6 +359,7 @@
                         }
                     }
                 }catch (e) {
+                    that.state = 1;
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }

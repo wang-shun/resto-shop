@@ -195,7 +195,6 @@ public class OrderController extends GenericController{
 			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
             ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--");
             ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
-            ot.setPrintTime(o.getCreateTime().getTime());
 			if(o.getCustomer()!=null){
 				//手机号
 				if(StringUtils.isNotBlank(o.getCustomer().getTelephone())){
