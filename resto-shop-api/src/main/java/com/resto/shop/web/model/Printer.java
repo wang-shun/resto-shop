@@ -2,7 +2,9 @@ package com.resto.shop.web.model;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class Printer {
+import java.io.Serializable;
+
+public class Printer implements Serializable {
     private Integer id;
 
     @NotBlank(message="{打印机名称 不能为空}")

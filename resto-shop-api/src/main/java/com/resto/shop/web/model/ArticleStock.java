@@ -1,9 +1,11 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
+
 /**
  * Created by KONATA on 2016/8/1.
  */
-public class ArticleStock {
+public class ArticleStock implements Serializable {
 
     private String name;
 

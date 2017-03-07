@@ -2,7 +2,9 @@ package com.resto.shop.web.model;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class DeliveryPoint {
+import java.io.Serializable;
+
+public class DeliveryPoint implements Serializable {
     private Integer id;
     
     @NotBlank(message="自提点名称不能为空")

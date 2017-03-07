@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
-public class MealTempAttr {
+import java.io.Serializable;
+
+public class MealTempAttr implements Serializable {
     private Integer id;
 
     private String name;

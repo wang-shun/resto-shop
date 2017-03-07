@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * Created by KONATA on 2016/9/8.
  */
-public class ArticleRecommendPrice {
+public class ArticleRecommendPrice implements Serializable {
 
     private String id;
 

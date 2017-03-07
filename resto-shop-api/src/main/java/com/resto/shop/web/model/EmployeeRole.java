@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
-public class EmployeeRole {
+import java.io.Serializable;
+
+public class EmployeeRole implements Serializable {
     private Long id;
 
     private Long employeeId;

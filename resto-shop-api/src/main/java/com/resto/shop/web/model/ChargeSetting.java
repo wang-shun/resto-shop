@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-public class ChargeSetting {
+public class ChargeSetting implements Serializable{
     private String id;
     
     @NotNull(message="充值金额不能为空")

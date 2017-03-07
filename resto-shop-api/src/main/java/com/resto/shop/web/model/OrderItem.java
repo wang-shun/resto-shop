@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.resto.brand.core.util.DateUtil;
 
 @JsonInclude(Include.NON_EMPTY)
-public class OrderItem {
+public class OrderItem implements Serializable {
     private String id;
 
     private String articleName;

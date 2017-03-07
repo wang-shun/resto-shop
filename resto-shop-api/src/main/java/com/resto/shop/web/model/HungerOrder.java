@@ -1,10 +1,9 @@
 package com.resto.shop.web.model;
 
-import com.resto.brand.core.util.DateUtil;
 import org.json.JSONObject;
-import org.omg.CORBA.OBJ_ADAPTER;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,7 +14,7 @@ import java.util.List;
  * Created by KONATA on 2016/10/31.
  * 饿了吗订单
  */
-public class HungerOrder {
+public class HungerOrder implements Serializable {
 
     //主键
     private Long id;

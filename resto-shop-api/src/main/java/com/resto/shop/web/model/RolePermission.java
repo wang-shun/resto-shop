@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
-public class RolePermission {
+import java.io.Serializable;
+
+public class RolePermission implements Serializable {
     private Long id;
 
     private Long roleId;

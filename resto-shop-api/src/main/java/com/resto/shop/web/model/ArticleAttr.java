@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ArticleAttr {
+public class ArticleAttr implements Serializable{
     private Integer id;
 
     private String name;

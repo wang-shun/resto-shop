@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
-public class PictureSlider {
+import java.io.Serializable;
+
+public class PictureSlider implements Serializable {
     private Integer id;
 
     private String title;

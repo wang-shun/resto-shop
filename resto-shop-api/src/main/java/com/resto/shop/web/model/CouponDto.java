@@ -2,12 +2,13 @@ package com.resto.shop.web.model;
 
 import com.resto.brand.web.model.ShopDetail;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by KONATA on 2016/12/21.
  */
-public class CouponDto {
+public class CouponDto implements Serializable {
     List<ShopDetail> shopDetails;
 
     List<Coupon> coupons;

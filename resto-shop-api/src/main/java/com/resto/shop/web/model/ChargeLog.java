@@ -1,9 +1,10 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class ChargeLog {
+public class ChargeLog implements Serializable {
 
 	private String id;
 

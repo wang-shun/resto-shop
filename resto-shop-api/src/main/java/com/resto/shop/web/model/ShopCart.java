@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ShopCart {
+public class ShopCart implements Serializable {
     private Integer id;
 
     private Integer number;

@@ -1,9 +1,10 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AccountLog {
+public class AccountLog implements Serializable {
 	public static final Integer SOURCE_PAYMENT = -1;  //支付订 单
 	public static final Integer APPRAISE_RED_PACKAGE=1; //评论红包奖励余额
 	public static final Integer SOURCE_CHARGE=2;	  //充值余额

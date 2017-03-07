@@ -1,10 +1,11 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class FreeDay {
+public class FreeDay implements Serializable {
     private String id;
     
     @DateTimeFormat(pattern="yy-MM-dd")

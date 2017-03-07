@@ -2,13 +2,14 @@ package com.resto.shop.web.model;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Created by KONATA on 2016/10/31.
  * 饿了吗订单额外字段
  */
-public class HungerOrderExtra {
+public class HungerOrderExtra implements Serializable {
     //主键
     private Long id;
     //订单项的名称

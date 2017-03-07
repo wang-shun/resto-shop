@@ -1,6 +1,8 @@
 package com.resto.shop.web.model;
 
-public class ShowPhoto {
+import java.io.Serializable;
+
+public class ShowPhoto implements Serializable {
     private Integer id;
 
     private Integer showType;

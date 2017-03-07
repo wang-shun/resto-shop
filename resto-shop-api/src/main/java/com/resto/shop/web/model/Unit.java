@@ -1,11 +1,12 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by KONATA on 2016/9/11.
  */
-public class Unit {
+public class Unit implements Serializable {
 
     private String id;
 

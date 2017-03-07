@@ -2,7 +2,9 @@ package com.resto.shop.web.model;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class Advert {
+import java.io.Serializable;
+
+public class Advert implements Serializable {
     private Integer id;
     
     @NotBlank(message="{标题不能为空}")

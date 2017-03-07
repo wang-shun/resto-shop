@@ -1,9 +1,10 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class TableCode {
+public class TableCode implements Serializable {
     private String id;
 
     //编号名称

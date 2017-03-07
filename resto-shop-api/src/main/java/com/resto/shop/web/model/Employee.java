@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Created by KONATA on 2016/9/6.
  */
-public class Employee {
+public class Employee implements Serializable {
     private Long id;
 
     private String name;

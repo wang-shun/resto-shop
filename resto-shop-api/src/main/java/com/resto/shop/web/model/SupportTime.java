@@ -2,7 +2,9 @@ package com.resto.shop.web.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class SupportTime {
+import java.io.Serializable;
+
+public class SupportTime implements Serializable {
     private Integer id;
 
     private String name;

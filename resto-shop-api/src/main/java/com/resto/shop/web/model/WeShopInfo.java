@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class WeShopInfo {
+public class WeShopInfo implements Serializable {
     private Long id;
 
     private String title;

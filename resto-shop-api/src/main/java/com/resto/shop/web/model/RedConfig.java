@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
@@ -7,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
-public class RedConfig {
+public class RedConfig implements Serializable {
     private Long id;
     
     @NotNull(message="{延迟发送时间   不能为空}")

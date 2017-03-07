@@ -4,7 +4,9 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class ArticleFamily {
+import java.io.Serializable;
+
+public class ArticleFamily implements Serializable{
     private String id;
 
     @NotBlank(message="{类型名称   不能为空}")

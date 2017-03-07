@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class MealItem {
+public class MealItem implements Serializable {
     private Integer id;
 
     private String name;

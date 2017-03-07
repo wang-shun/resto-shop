@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class Notice {
+public class Notice implements Serializable {
     private String id;
     
     @NotBlank(message="通知标题不能为空")

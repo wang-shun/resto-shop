@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * Created by carl on 2016/10/14.
  */
-public class GetNumber {
+public class GetNumber implements Serializable {
 
     private String id;
 

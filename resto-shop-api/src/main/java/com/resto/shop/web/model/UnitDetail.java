@@ -1,11 +1,12 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
  * Created by KONATA on 2016/9/11.
  */
-public class UnitDetail {
+public class UnitDetail implements Serializable {
     private String id;
 
     private String name;

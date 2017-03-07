@@ -2,7 +2,9 @@ package com.resto.shop.web.model;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-public class Kitchen {
+import java.io.Serializable;
+
+public class Kitchen implements Serializable {
     private Integer id;
 
     @NotBlank(message="{厨房名称   不能为空}")

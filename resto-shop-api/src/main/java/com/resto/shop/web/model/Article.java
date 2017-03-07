@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.resto.brand.web.model.Platform;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @JsonInclude(Include.NON_NULL)
-public class Article {
+public class Article implements Serializable{
 
     /**
      * 单品

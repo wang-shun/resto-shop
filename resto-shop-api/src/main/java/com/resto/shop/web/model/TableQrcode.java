@@ -1,11 +1,12 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by carl on 2016/12/16.
  */
-public class TableQrcode {
+public class TableQrcode implements Serializable {
 
     private Long id;
 

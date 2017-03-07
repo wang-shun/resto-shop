@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by KONATA on 2016/10/31.
  * 饿了吗订单明细分组
  */
-public class HungerOrderGroup {
+public class HungerOrderGroup implements Serializable {
 
     private Long id ;
 

@@ -1,11 +1,12 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by carl on 2016/11/14.
  */
-public class LogBase {
+public class LogBase implements Serializable {
 
     private String id;
 

@@ -1,12 +1,13 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by yangwei on 2017/2/22.
  */
-public class VirtualProducts {
+public class VirtualProducts implements Serializable {
     private Integer id;
     private String name;//虚拟餐品名称
     private Integer isUsed;//虚拟餐品是否启用

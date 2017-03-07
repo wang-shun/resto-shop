@@ -1,9 +1,10 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class WeReturnCustomer {
+public class WeReturnCustomer implements Serializable {
     private Long id;
 
     private String shopId;

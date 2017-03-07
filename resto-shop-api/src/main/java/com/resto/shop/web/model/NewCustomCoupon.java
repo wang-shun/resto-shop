@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -9,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import com.resto.brand.web.model.ShopDetail;
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class NewCustomCoupon {
+public class NewCustomCoupon implements Serializable{
     private Long id;
 
     private String name;

@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class WeOrder {
+public class WeOrder implements Serializable {
     private Long id;
 
     private Long index;

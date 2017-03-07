@@ -1,8 +1,9 @@
 package com.resto.shop.web.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class QueueQrcode {
+public class QueueQrcode implements Serializable {
     private String id;
 
     private String brandId;
