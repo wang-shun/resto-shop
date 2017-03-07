@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -83,6 +84,11 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
         shopDetailService.update(shopDetail);
+        ShopDetail shopDetail1 =(ShopDetail) MemcachedUtils.get(getCurrentShopId()+"info");
+        if(shopDetail != null){
+            MemcachedUtils.delete(getCurrentShopId()+"info");
+        }
+
         return Result.getSuccess();
     }
 

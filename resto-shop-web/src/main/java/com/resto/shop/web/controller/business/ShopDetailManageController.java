@@ -1,6 +1,7 @@
  package com.resto.shop.web.controller.business;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.core.util.MemcachedUtils;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.controller.GenericController;
@@ -47,6 +48,10 @@
                  break;
          }
          shopDetailService.update(shopDetail);
+         if(MemcachedUtils.get(getCurrentShopId()+"info") != null){
+             MemcachedUtils.delete(getCurrentShopId()+"info");
+         }
+
          return Result.getSuccess();
      }
 

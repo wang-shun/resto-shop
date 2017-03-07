@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.resto.brand.core.util.MemcachedUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,6 +99,10 @@ public class NewCustomCouponController extends GenericController{
         }
         newCustomCoupon.setCreateTime(new Date());
         newcustomcouponService.insertNewCustomCoupon(newCustomCoupon);
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
+
         return Result.getSuccess();
     }
 
@@ -135,6 +140,9 @@ public class NewCustomCouponController extends GenericController{
         }
 
         newcustomcouponService.update(newCustomCoupon);
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
         return Result.getSuccess();
     }
 
@@ -142,6 +150,9 @@ public class NewCustomCouponController extends GenericController{
     @ResponseBody
     public Result delete(Long id){
         newcustomcouponService.delete(id);
+        if(MemcachedUtils.get(getCurrentBrandId()+"newCustomCoupon") != null){
+            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+        }
         return Result.getSuccess();
     }
 

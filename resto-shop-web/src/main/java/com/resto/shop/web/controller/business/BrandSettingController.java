@@ -4,6 +4,7 @@
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.brand.core.util.MemcachedUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -44,6 +45,10 @@ public class BrandSettingController extends GenericController{
 	public Result modify(@Valid BrandSetting brandSetting){
 		
 		brandSettingService.update(brandSetting);
+		if(MemcachedUtils.get(getCurrentBrandId()+"setting") != null){
+			MemcachedUtils.delete(getCurrentBrandId()+"setting");
+		}
+
 		return Result.getSuccess();
 	}
 	
