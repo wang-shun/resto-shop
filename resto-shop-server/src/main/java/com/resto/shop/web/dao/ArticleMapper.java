@@ -111,4 +111,9 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
 	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
+	/**
+	 * 根据分类查询分类下的所有菜品
+	 */
+	List<Article> getArticleListByFamily(@Param("shopId")String shopId, @Param("articleFamilyId")String articleFamilyId, @Param("currentPage")Integer currentPage, @Param("showCount")Integer showCount);
 }

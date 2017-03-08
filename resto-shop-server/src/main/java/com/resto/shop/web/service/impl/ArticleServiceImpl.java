@@ -467,4 +467,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
     	return articleMapper.queryArticleMealAttr(selectMap);
     }
+
+    @Override
+    public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
+        return articleMapper.getArticleListByFamily(shopId, articleFamilyId, currentPage, showCount);
+    }
 }

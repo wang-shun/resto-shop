@@ -32,6 +32,11 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 	}
 
 	@Override
+	public List<ArticleFamily> selectListBySort(String currentShopId, Integer currentPage, Integer showCount) {
+		return articlefamilyMapper.selectListBySort(currentShopId, currentPage, showCount);
+	}
+
+	@Override
 	public List<ArticleFamily> selectListByDistributionModeId(String currentShopId, Integer distributionModeId) {
 		return articlefamilyMapper.selectListByDistributionModeId(currentShopId, distributionModeId);
 	}
