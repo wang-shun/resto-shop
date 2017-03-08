@@ -115,5 +115,5 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	/**
 	 * 根据分类查询分类下的所有菜品
 	 */
-	List<Article> getArticleListByFamily(@Param("shopId")String shopId, @Param("articleFamilyId")String articleFamilyId, @Param("currentPage")Integer currentPage, @Param("showCount")Integer showCount);
+	List<Article> getArticleListByFamily(@Param("times") List<Integer> supportTimes, @Param("shopId")String shopId, @Param("articleFamilyId")String articleFamilyId, @Param("currentPage")Integer currentPage, @Param("showCount")Integer showCount);
 }

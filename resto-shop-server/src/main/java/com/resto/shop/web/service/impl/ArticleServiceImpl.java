@@ -470,6 +470,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
-        return articleMapper.getArticleListByFamily(shopId, articleFamilyId, currentPage, showCount);
+        List<SupportTime> supportTime = supportTimeService.selectNowSopport(shopId);
+        if (supportTime.isEmpty()) {
+            return null;
+        }
+        List<Integer> list = new ArrayList<>(ApplicationUtils.convertCollectionToMap(Integer.class, supportTime).keySet());
+        return articleMapper.getArticleListByFamily(list, shopId, articleFamilyId, currentPage, showCount);
     }
 }
