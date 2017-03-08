@@ -173,10 +173,10 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("AllOrder")
 	@ResponseBody
-	public Result selectAllOrder(String beginDate,String endDate,String shopId){
+	public Result selectAllOrder(String beginDate,String endDate,String shopId,String customerId){
 	    JSONObject object = new JSONObject();
         try {
-            List<OrderDetailDto> orderDetailDtos = this.listResult(beginDate, endDate, shopId);
+            List<OrderDetailDto> orderDetailDtos = this.listResult(beginDate, endDate, shopId, customerId);
             object.put("result",orderDetailDtos);
         }catch (Exception e){
             log.error("查询店铺订单明细出错！");
@@ -186,13 +186,19 @@ public class OrderController extends GenericController{
         return getSuccessResult(object);
 	}
 
-	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId){
+	public List<OrderDetailDto> listResult(String beginDate,String endDate,String shopId,String customerId){
 		//查询店铺名称
-		ShopDetail shop = shopDetailService.selectById(shopId);
+        ShopDetail shop = new ShopDetail();
+        List<ShopDetail> shopDetails = new ArrayList<>();
+        if (StringUtils.isNotBlank(shopId)) {
+            shop = shopDetailService.selectById(shopId);
+        }else if (StringUtils.isNotBlank(customerId)){
+            shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+        }
 		List<OrderDetailDto> listDto = new ArrayList<>();
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId);
+		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,customerId);
 		for (Order o : list) {
-			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),shop.getName(),o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
+			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),"",o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
             ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--");
             ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 			if(o.getCustomer()!=null){
@@ -201,6 +207,16 @@ public class OrderController extends GenericController{
 					ot.setTelephone(o.getCustomer().getTelephone());
 				}
 			}
+            if (StringUtils.isNotBlank(shopId)) {
+                ot.setShopName(shop.getName());
+            }else if (StringUtils.isNotBlank(customerId)){
+                for (ShopDetail shopDetail : shopDetails){
+                    if (o.getShopDetailId().equalsIgnoreCase(shopDetail.getId())){
+                        ot.setShopName(shopDetail.getName());
+                        break;
+                    }
+                }
+            }
 			ot.setOrderState(OrderState.getStateName(o.getOrderState()));
 			//订单支付
 			if(o.getOrderPaymentItems()!=null){
@@ -307,9 +323,9 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("create_shop_excel")
 	@ResponseBody
-	public Result reportOrder(String beginDate,String endDate,String shopId,OrderDetailDto orderDetailDto,HttpServletRequest request){
+	public Result reportOrder(String beginDate,String endDate,String shopId,String customerId,OrderDetailDto orderDetailDto,HttpServletRequest request){
 		//导出文件名
-		String fileName = "店铺订单列表"+beginDate+"至"+endDate+".xls";
+		String fileName = ""+ (shopId == null || shopId == "" ? "会员" : "店铺") +"订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
@@ -318,7 +334,17 @@ public class OrderController extends GenericController{
 		//定义数据
 		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
-		ShopDetail s = shopDetailService.selectById(shopId);
+        String shopName = "";
+        if (StringUtils.isNotBlank(shopId)) {
+            ShopDetail s = shopDetailService.selectById(shopId);
+            shopName = s.getName();
+        }else if (StringUtils.isNotBlank(customerId)){
+            List<ShopDetail> shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+            for (ShopDetail shopDetail : shopDetails){
+                shopName = shopName.concat(shopDetail.getName()).concat(",");
+            }
+            shopName = shopName.substring(0,shopName.length() - 1);
+        }
         if (orderDetailDto.getShopOrderList() != null){
             SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
             filter.getExcludes().add("shopOrderList");
@@ -327,12 +353,12 @@ public class OrderController extends GenericController{
         }
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", getBrandName());
-		map.put("shops", s.getName());
+		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
-		map.put("reportType", "店铺订单报表");//表的头，第一行内容
+		map.put("reportType", ""+ (shopId == null || shopId == "" ? "会员" : "店铺") +"订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "14");//显示的位置
-		map.put("reportTitle", "品牌订单");//表的名字
+		map.put("num", "15");//显示的位置
+		map.put("reportTitle", ""+ (shopId == null || shopId == "" ? "会员" : "店铺") +"订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
 		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
@@ -345,7 +371,7 @@ public class OrderController extends GenericController{
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
 		}catch(Exception e){
-		    log.error("生成店铺订单报表出错！");
+		    log.error("生成订单报表出错！");
 			e.printStackTrace();
             return new Result(false);
 		}

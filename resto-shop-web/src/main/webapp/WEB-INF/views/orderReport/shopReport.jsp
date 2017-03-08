@@ -2,12 +2,22 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <div id="control">
-    <a class="btn btn-info ajaxify" href="orderReport/list">
-        <span class="glyphicon glyphicon-circle-arrow-left"></span>
-        返回
-    </a>
+    <c:if test="${!empty shopId}">
+        <a class="btn btn-info ajaxify" href="orderReport/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${!empty customerId}">
+        <a class="btn btn-info ajaxify" href="member/myList">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
     <h2 class="text-center">
-        <strong>订单列表</strong>
+        <strong>
+                订单列表
+        </strong>
     </h2>
     <br />
     <div class="row">
@@ -37,7 +47,14 @@
     <!-- 店铺订单列表  -->
     <div class="panel panel-info">
         <div class="panel-heading text-center" style="font-size: 22px;">
-            <strong>店铺订单列表</strong>
+            <strong>
+                <c:if test="${!empty shopId}">
+                    店铺订单列表
+                </c:if>
+                <c:if test="${!empty customerId}">
+                    会员订单列表
+                </c:if>
+            </strong>
         </div>
         <div class="panel-body">
             <table class="table table-striped table-bordered table-hover"
@@ -132,7 +149,8 @@
         language : "zh-CN"
     });
 
-    var shopId = "${shopId}"
+    var shopId = "${shopId}";
+    var customerId = "${customerId}";
     var beginDate = "${beginDate}";
     var endDate = "${endDate}";
 
@@ -278,11 +296,7 @@
             downloadShopOrder : function(){
                 var that = this;
                 try {
-                    var object = {
-                        beginDate : that.searchDate.beginDate,
-                        endDate : that.searchDate.endDate,
-                        shopId : shopId
-                    };
+                    var object = that.getDate();
                     var shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
                     if (shopOrderList.length <= 1000){
                         object.shopOrderList = shopOrderList;
@@ -384,7 +398,8 @@
                 var data = {
                     beginDate : this.searchDate.beginDate,
                     endDate : this.searchDate.endDate,
-                    shopId : shopId
+                    shopId : shopId,
+                    customerId : customerId
                 };
                 return data;
             },

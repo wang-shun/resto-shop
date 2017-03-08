@@ -1789,7 +1789,13 @@
         LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
         where
         <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-        and o.shop_detail_id=#{shopId}
+        and
+        <if test="shopId != null and shopId != ''">
+            o.shop_detail_id=#{shopId}
+        </if>
+        <if test="customerId != null and customerId != ''">
+            o.customer_id=#{customerId}
+        </if>
         and (o.order_state != 1 or o.production_status != 0)
     </select>
 

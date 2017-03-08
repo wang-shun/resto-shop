@@ -251,10 +251,7 @@
                             title: "订单记录",
                             data: "customerId",
                             createdCell: function (td, tdData) {
-                                var button = $("<button class='btn green'>查看详情</button>");
-                                button.click(function () {
-                                    that.openOrderModal(tdData);
-                                })
+                                var button = $("<a href='member/show/orderReport?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&customerId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }
                         },
@@ -329,20 +326,6 @@
                 try {
                     $.post("member/show/billReport",{customerId : customerId},function (result) {
                         var modal = $("#couponModal");
-                        modal.find(".modal-body").html(result);
-                        modal.modal()
-                    });
-                }catch (e){
-                    toastr.clear();
-                    toastr.error("系统异常，请刷新重试");
-                }
-            },
-            openOrderModal : function (customerId) {
-                try {
-                    var object = this.getDate();
-                    object.customerId = customerId;
-                    $.post("member/show/orderReport",object,function (result) {
-                        var modal = $("#orderModal");
                         modal.find(".modal-body").html(result);
                         modal.modal()
                     });
