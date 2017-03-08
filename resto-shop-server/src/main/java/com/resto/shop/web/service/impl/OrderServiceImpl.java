@@ -5348,7 +5348,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         break;
 
                 }
+                //后付 付款后立马不可加菜
+                order.setAllowContinueOrder(false);
                 update(order);
+                //后付 付款后直接确认订单  判断是否可以领取红包
+                confirmOrder(order);
 
             } else { //支付完成
                 if (order.getOrderState() < OrderState.PAYMENT) {

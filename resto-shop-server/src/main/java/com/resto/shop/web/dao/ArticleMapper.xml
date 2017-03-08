@@ -924,7 +924,14 @@ GROUP BY article_id
     </select>
 
     <select id="getArticleListByFamily" resultType="Article">
-        SELECT * from tb_article where activated = 1 and state = 1 and shop_detail_id = #{shopId}
-          and article_family_id = #{articleFamilyId} order by sort LIMIT #{currentPage},#{showCount}
+        SELECT * from tb_article a
+        LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
+        <foreach collection="times" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+        LEFT JOIN tb_support_time st on ast.support_time_id = st.id
+        where a.activated = 1 and a.state = 1 and a.shop_detail_id = #{shopId}
+        and a.article_family_id = #{articleFamilyId} and discount is not null
+        order by a.sort LIMIT #{currentPage},#{showCount}
     </select>
 </mapper>
