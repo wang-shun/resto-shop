@@ -96,11 +96,9 @@ public class ArticleController extends GenericController {
         String id = article.getId();
         if (StringUtils.isEmpty(article.getId())) {
             article.setCreateUserId(getCurrentUserId());
-            article.setInitials(PinyinUtil.getPinYinHeadChar(article.getName()));
             id = articleService.save(article).getId();
             unitService.insertArticleRelation(id, article.getUnits());
         } else {
-            article.setInitials(PinyinUtil.getPinYinHeadChar(article.getName()));
             articleService.update(article);
             //修改单品的时候如果存在推荐餐包 联动修改
             if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
