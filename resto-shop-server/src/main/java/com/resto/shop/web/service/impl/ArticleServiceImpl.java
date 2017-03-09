@@ -155,6 +155,16 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articles;
     }
 
+    @Override
+    public void updateInitialsById(String initials, String articleId) {
+        articleMapper.updateInitialsById(initials, articleId);
+    }
+
+    @Override
+    public List<Article> selectArticleList() {
+        return articleMapper.selectArticleList();
+    }
+
     public void getArticleDiscount(String shopId, List<Article> articles, String show){
         Map<String, Article> articleMap = selectAllSupportArticle(shopId);
         for (Article a : articles) {
