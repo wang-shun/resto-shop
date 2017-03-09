@@ -456,7 +456,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setStatus(1);
             item.setSort(0);
             item.setRemark(remark);
-            if (fans_price != null) {
+            if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
+                item.setUnitPrice(price);
+            } else if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() != 1){
+                item.setUnitPrice(fans_price);
+            } else if (fans_price != null && "wechat".equals(order.getCreateOrderByAddress())){
                 item.setUnitPrice(fans_price);
             } else {
                 item.setUnitPrice(price);
