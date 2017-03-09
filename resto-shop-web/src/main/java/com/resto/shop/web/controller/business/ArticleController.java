@@ -88,8 +88,6 @@ public class ArticleController extends GenericController {
     @RequestMapping("save")
     @ResponseBody
     public Result create(@Valid @RequestBody Article article) {
-
-        System.out.println(article.getVirtualId()+"-----------我可是真的拿到了id呢");
         article.setShopDetailId(getCurrentShopId());
         article.setUpdateUserId(getCurrentUserId());
         article.setUpdateTime(new Date());
