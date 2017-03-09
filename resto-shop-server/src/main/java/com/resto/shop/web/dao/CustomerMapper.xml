@@ -402,28 +402,28 @@
 		c.id customerId,
 		a.id accountId,
 		c.nickname,
-		c.telephone,
+		IFNULL(c.telephone,'--') telephone,
 		c.head_photo photo,
 		(if(ISNULL(c.birthday),'--',DATE_FORMAT(c.birthday,'%Y-%m-%d'))) birthday,
 		if(c.is_bind_phone=1,'注册','未注册') isBindPhone,
 		if((select count(1) from tb_charge_order tco where tco.customer_id = c.id) > 0,'是','否') isCharge,
-		c.province,
-		c.city,
-		case 
+		IF((c.province is null or c.province = ''),'--',c.province) province,
+		IF((c.city is null or c.city = ''),'--',c.city) city,
+		case
 			when c.sex = 1 then '男'
 			when c.sex = 2 then '女'
 			else '未知'
 		end sex,
 		a.remain,
-		(select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id) chargeRemain,
-		(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id) presentRemain,
-		(a.remain - (select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)
-		-(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)) redRemain,
-		(select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3)) sumMoney,
-		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null) amount,
-		ROUND(((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3))/
+		IFNULL((select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id),'0.00') chargeRemain,
+		IFNULL((select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id),'0.00') presentRemain,
+		IFNULL((a.remain - (select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)
+		-(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)),'0.00') redRemain,
+		IFNULL((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3)),'0.00') sumMoney,
+		IFNULL((select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null),'0') amount,
+		IFNULL(ROUND(((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3))/
 		(select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null)
-		),2) money
+		),2),'0.00') money
 	from
 		tb_customer c
 		left join tb_account a on c.account_id = a.id
