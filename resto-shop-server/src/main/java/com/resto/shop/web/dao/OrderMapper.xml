@@ -1871,6 +1871,21 @@
         ) as r
     </select>
 
+    <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
+        select t.id,
+        t.parent_order_id parentOrderId,
+        t.order_money as orderMoney,
+        IFNULL(t.customer_count,0) customerCount
+        from tb_order t
+        where
+        shop_detail_id = #{shopId}
+        and  t.order_state in (2,10,11,12)
+        and t.production_status in(2,3)
+        and t.create_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
+        and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        GROUP BY t.id
+    </select>
+
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
         o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money from tb_order o
@@ -1994,11 +2009,15 @@ where t.id = b.id
     </update>
 
 
-    <select id="getPayment" resultType="java.math.BigDecimal">
-       select ifnull(sum(t2.pay_value),0) from tb_order t
-INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
-where    DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-and t2.payment_mode_id = #{type} and t.shop_detail_id = #{shopId}  and t.production_status in (2,3)
+    <select id="getPayment" parameterType="java.util.Map" resultType="java.math.BigDecimal">
+        select ifnull(sum(t2.pay_value),0) from tb_order t
+        INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
+        where t2.pay_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
+        and t2.pay_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        and t2.payment_mode_id = #{type}
+        and t.shop_detail_id = #{shopId}
+        and t.production_status in (2,3)
+        and t.order_state in (2,10,11,12)
     </select>
 
 

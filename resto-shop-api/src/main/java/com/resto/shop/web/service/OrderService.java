@@ -350,7 +350,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 */
 	Boolean addStock(Order order) throws AppException;
 
-	List<Map<String, Object>> printTotal(String shopId);
+	List<Map<String, Object>> printTotal(String shopId,String beginDate,String endDate);
 
 
     /**

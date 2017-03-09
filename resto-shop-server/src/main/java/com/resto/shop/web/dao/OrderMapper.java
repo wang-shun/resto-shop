@@ -352,7 +352,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	Boolean setStockBySuit(@Param("shopId")String shopId);
 
-	BigDecimal getPayment(@Param("type") Integer type,@Param("shopId") String shopId);
+	BigDecimal getPayment(Map<String, Object> selectMap);
 
     /**
      *
@@ -635,4 +635,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectCompleteByShopIdAndTime(@Param("shopId")String id, @Param("beginDate")Date todayBegin,@Param("endDate") Date todayEnd);
+
+    /**
+     * 用于查询特定时间内的日结小票
+     * @param selectMap
+     * @return
+     */
+    List<Order> getOrderAccountByTime(Map<String, Object> selectMap);
 }

@@ -3045,14 +3045,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Map<String, Object>> printTotal(String shopId) {
+    public List<Map<String, Object>> printTotal(String shopId,String beginDate,String endDate) {
 
         List<Map<String, Object>> printTask = new ArrayList<>();
         ShopDetail shop = shopDetailService.selectById(shopId);
 
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
-            Map<String, Object> ticket = printTotal(shop, printer);
+            Map<String, Object> ticket = printTotal(shop, printer, beginDate, endDate);
             if (ticket != null) {
                 printTask.add(ticket);
             }
@@ -3275,15 +3275,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer) {
+    public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer, String beginDate, String endDate) {
         if (printer == null) {
             return null;
         }
-        Order order = null;
-        if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
-            order = orderMapper.getOrderAccountHoufu(shopDetail.getId());
-        } else {
-            order = orderMapper.getOrderAccount(shopDetail.getId());
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("shopId",shopDetail.getId());
+        selectMap.put("beginDate",beginDate);
+        selectMap.put("endDate",endDate);
+        String orderAccountId = "";
+        BigDecimal orderMoney = new BigDecimal(0);
+        BigDecimal orderCount = new BigDecimal(0);
+        BigDecimal customerCount = new BigDecimal(0);
+        List<Order> orderList = orderMapper.getOrderAccountByTime(selectMap);
+        for (Order orderAccount : orderList){
+            orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
+            orderMoney = orderMoney.add(orderAccount.getOrderMoney());
+            if (StringUtils.isBlank(orderAccount.getParentOrderId())){
+                orderCount = orderCount.add(new BigDecimal(1));
+                customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
+            }
+        }
+        if (StringUtils.isNotBlank(orderAccountId)) {
+            orderAccountId = orderAccountId.substring(0, orderAccountId.length() - 1);
         }
         Map<String, Object> print = new HashMap<>();
         print.put("KITCHEN_NAME", printer.getName());
@@ -3294,38 +3308,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ADD_TIME", new Date());
         Map<String, Object> data = new HashMap<>();
         data.put("RESTAURANT_NAME", shopDetail.getName());
-        data.put("DATE", DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-        BigDecimal totalAmount = new BigDecimal(0);
-        if (order.getOrderTotal() != null) {
-            totalAmount = totalAmount.add(order.getOrderTotal());
+        if (beginDate.equalsIgnoreCase(endDate)) {
+            data.put("DATE", beginDate);
+        }else{
+            data.put("DATE", beginDate+"至"+endDate);
         }
-        data.put("TOTAL_AMOUNT", totalAmount);
-        BigDecimal orderAmount = new BigDecimal(0);
-        if (new BigDecimal(order.getOrderCount()) != null) {
-            orderAmount = orderAmount.add(new BigDecimal(order.getOrderCount()));
-        }
-        data.put("ORDER_AMOUNT", orderAmount);
+        data.put("TOTAL_AMOUNT", orderMoney);
+        data.put("ORDER_AMOUNT", orderCount);
         DecimalFormat df = new DecimalFormat("######0.00");
-        double average = orderAmount.equals(BigDecimal.ZERO) ? 0 :
-                totalAmount.doubleValue() / orderAmount.doubleValue();
+        double average = orderCount.equals(BigDecimal.ZERO) ? 0 :
+                orderMoney.doubleValue() / orderCount.doubleValue();
         data.put("ORDER_AVERAGE", df.format(average));
-        BigDecimal customerAmount = new BigDecimal(0);
-        if (order.getCustomerCount() != null) {
-            customerAmount = customerAmount.add(new BigDecimal(order.getCustomerCount()));
-        }
-        data.put("CUSTOMER_AMOUNT", customerAmount);
-        double customerAverage = customerAmount.equals(BigDecimal.ZERO) ? 0 :
-                totalAmount.doubleValue() / customerAmount.doubleValue();
+        data.put("CUSTOMER_AMOUNT", customerCount);
+        double customerAverage = customerCount.equals(BigDecimal.ZERO) ? 0 :
+                orderMoney.doubleValue() / customerCount.doubleValue();
         data.put("CUSTOMER_AVERAGE", df.format(customerAverage));
-        BigDecimal wxPay = orderMapper.getPayment(PayMode.WEIXIN_PAY, shopDetail.getId());
-        BigDecimal chargePay = orderMapper.getPayment(PayMode.CHARGE_PAY, shopDetail.getId());
-        BigDecimal aliPay = orderMapper.getPayment(PayMode.ALI_PAY, shopDetail.getId());
-//        BigDecimal otherPay = orderMapper.getPayment(PayMode.MONEY_PAY, shopDetail.getId());
-        BigDecimal bankPay = orderMapper.getPayment(PayMode.BANK_CART_PAY, shopDetail.getId());
-        BigDecimal crashPay = orderMapper.getPayment(PayMode.CRASH_PAY, shopDetail.getId());
-//        BigDecimal articlePay = orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId());
+        selectMap.put("type",PayMode.WEIXIN_PAY);
+        BigDecimal wxPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.CHARGE_PAY);
+        BigDecimal chargePay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.ALI_PAY);
+        BigDecimal aliPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.BANK_CART_PAY);
+        BigDecimal bankPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.CRASH_PAY);
+        BigDecimal crashPay = orderMapper.getPayment(selectMap);
         BigDecimal incomeAmount = wxPay.add(chargePay).add(aliPay).add(bankPay).add(crashPay);
-//        BigDecimal incomeAmount = wxPay.add(chargePay).add(aliPay).add(otherPay).add(articlePay);
         data.put("INCOME_AMOUNT", incomeAmount == null ? 0 : incomeAmount);
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
@@ -3333,35 +3341,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         wxItem.put("PAYMENT_MODE", "微信支付");
         Map<String, Object> chargeItem = new HashMap<>();
         chargeItem.put("SUBTOTAL", chargePay == null ? 0 : chargePay);
-        chargeItem.put("PAYMENT_MODE", "充值支付");
+        chargeItem.put("PAYMENT_MODE", "充值金额支付");
         Map<String, Object> aliPayment = new HashMap<>();
         aliPayment.put("SUBTOTAL", aliPay == null ? 0 : aliPay);
         aliPayment.put("PAYMENT_MODE", "支付宝支付");
         Map<String, Object> bankPayment = new HashMap<>();
         bankPayment.put("SUBTOTAL", bankPay == null ? 0 : bankPay);
-        bankPayment.put("PAYMENT_MODE", "银行卡支付");
+        bankPayment.put("PAYMENT_MODE", "银联支付");
         Map<String, Object> crashPayment = new HashMap<>();
         crashPayment.put("SUBTOTAL", crashPay == null ? 0 : crashPay);
-        crashPayment.put("PAYMENT_MODE", "银行卡支付");
-//        Map<String, Object> otherPayment = new HashMap<>();
-//        otherPayment.put("SUBTOTAL", otherPay == null ? 0 : otherPay);
-//        otherPayment.put("PAYMENT_MODE", "其他方式支付");
-//        Map<String, Object> articleBackPay = new HashMap<>();
-//        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay);
-//        articleBackPay.put("PAYMENT_MODE", "退菜红包");
+        crashPayment.put("PAYMENT_MODE", "现金支付");
         incomeItems.add(wxItem);
         incomeItems.add(aliPayment);
-//        incomeItems.add(otherPayment);
         incomeItems.add(bankPayment);
         incomeItems.add(crashPayment);
         incomeItems.add(chargeItem);
-//        incomeItems.add(articleBackPay);
         data.put("INCOME_ITEMS", incomeItems);
-        BigDecimal accountPay = orderMapper.getPayment(PayMode.ACCOUNT_PAY, shopDetail.getId());
-        BigDecimal couponPay = orderMapper.getPayment(PayMode.COUPON_PAY, shopDetail.getId());
-        BigDecimal rewardPay = orderMapper.getPayment(PayMode.REWARD_PAY, shopDetail.getId());
-        BigDecimal waitMoney = orderMapper.getPayment(PayMode.WAIT_MONEY, shopDetail.getId());
-        BigDecimal articlePay = orderMapper.getPayment(PayMode.ARTICLE_BACK_PAY, shopDetail.getId());
+        selectMap.put("type",PayMode.ACCOUNT_PAY);
+        BigDecimal accountPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.COUPON_PAY);
+        BigDecimal couponPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.REWARD_PAY);
+        BigDecimal rewardPay = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.WAIT_MONEY);
+        BigDecimal waitMoney = orderMapper.getPayment(selectMap);
+        selectMap.put("type",PayMode.ARTICLE_BACK_PAY);
+        BigDecimal articlePay = orderMapper.getPayment(selectMap);
         BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay);
         data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
@@ -3382,11 +3387,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         waitMoneyItem.put("PAYMENT_MODE", "等位红包支付");
         discountItems.add(waitMoneyItem);
         Map<String, Object> articleBackPay = new HashMap<>();
-        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay);
-        articleBackPay.put("PAYMENT_MODE", "退菜红包");
+        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
+        articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
         data.put("DISCOUNT_ITEMS", discountItems);
-        List<Map<String, Object>> chargeOrders = chargeOrderService.selectByShopToDay(shopDetail.getId());
+        List<Map<String, Object>> chargeOrders = chargeOrderService.selectByShopToDay(selectMap);
         data.put("STORED_VALUE_COUNT", chargeOrders.size());
         BigDecimal chargeAmount = new BigDecimal(0);
         List<Map<String, Object>> storedValueItems = new ArrayList<Map<String, Object>>();
@@ -3409,10 +3414,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> saledProducts = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> canceledProducts = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> canceledOrders = new ArrayList<Map<String, Object>>();
-        if (StringUtils.isNotBlank(order.getId())) {
+        if (StringUtils.isNotBlank(orderAccountId)) {
             BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
             Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
-            String[] orderIds = order.getId().split(",");
+            String[] orderIds = orderAccountId.split(",");
             Map<String, Object> selectOrderMap = new HashMap<String, Object>();
             selectOrderMap.put("orderIds", orderIds);
             List<Order> orders = orderMapper.selectOrderByOrderIds(selectOrderMap);
