@@ -143,6 +143,17 @@ public class Article implements Serializable{
     //虚拟餐品包id
     private Integer virtualId;
 
+    //餐品首字母
+    private String initials;
+
+    public String getInitials() {
+        return initials;
+    }
+
+    public void setInitials(String initials) {
+        this.initials = initials;
+    }
+
     public Integer getVirtualId() {
         return virtualId;
     }
