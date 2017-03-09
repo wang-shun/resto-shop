@@ -88,6 +88,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setIsBindPhone(false);
 		customer.setLastLoginTime(new Date());
 		customer.setRegiestTime(new Date());
+        customer.setCreateTime(new Date());
 		customer.setAccount(account.getRemain());
 		insert(customer);
 		return customer;

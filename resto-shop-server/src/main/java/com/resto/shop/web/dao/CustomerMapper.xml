@@ -95,6 +95,9 @@
             <if test="isBindPhone != null">
                 is_bind_phone,
             </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
             <if test="regiestTime != null">
                 regiest_time,
             </if>
@@ -168,6 +171,9 @@
             </if>
             <if test="isBindPhone != null">
                 #{isBindPhone,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
             </if>
             <if test="regiestTime != null">
                 #{regiestTime,jdbcType=TIMESTAMP},
@@ -422,7 +428,7 @@
 		tb_customer c
 		left join tb_account a on c.account_id = a.id
 		where
-	  	    <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]>
+	  	    <![CDATA[ create_time >= #{beginDate} and  create_time <= #{endDate}]]>
 	    group by c.id
     </select>
 
