@@ -139,8 +139,25 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
-        Map<String, Article> articleMap = selectAllSupportArticle(currentShopId);
-        for (Article a : articleList) {
+        getArticleDiscount(currentShopId, articleList, show);
+        return articleList;
+    }
+
+    @Override
+    public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
+        List<SupportTime> supportTime = supportTimeService.selectNowSopport(shopId);
+        if (supportTime.isEmpty()) {
+            return null;
+        }
+        List<Integer> list = new ArrayList<>(ApplicationUtils.convertCollectionToMap(Integer.class, supportTime).keySet());
+        List<Article> articles = articleMapper.getArticleListByFamily(list, shopId, articleFamilyId, currentPage, showCount);
+        getArticleDiscount(shopId, articles, "wechat");
+        return articles;
+    }
+
+    public void getArticleDiscount(String shopId, List<Article> articles, String show){
+        Map<String, Article> articleMap = selectAllSupportArticle(shopId);
+        for (Article a : articles) {
             if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
@@ -157,10 +174,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 a.setDiscount(articleMap.get(a.getId()).getDiscount());
             }
         }
-        return articleList;
     }
-
-
 
     @Override
     public int delete(String id) {
@@ -466,10 +480,5 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
     	return articleMapper.queryArticleMealAttr(selectMap);
-    }
-
-    @Override
-    public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
-        return articleMapper.getArticleListByFamily(shopId, articleFamilyId, currentPage, showCount);
     }
 }
