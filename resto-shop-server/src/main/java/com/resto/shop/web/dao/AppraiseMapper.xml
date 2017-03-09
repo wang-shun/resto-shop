@@ -16,13 +16,14 @@
     <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
     <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="feedback_article" property="feedbackArticle" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Base_Column_List">id, picture_url, level, create_time, content, status, type, feedback, red_money, customer_id, order_id, article_id, shop_detail_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_appraise where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_appraise where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.Appraise">insert into tb_appraise (id, picture_url, level, create_time, content, status, type, feedback, red_money, customer_id, order_id, article_id, shop_detail_id) values (#{id,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{content,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{type,jdbcType=TINYINT}, #{feedback,jdbcType=VARCHAR}, #{redMoney,jdbcType=DECIMAL}, #{customerId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Appraise">insert into tb_appraise (id, picture_url, level, create_time, content, status, type, feedback, red_money, customer_id, order_id, article_id, shop_detail_id, feedback_article) values (#{id,jdbcType=VARCHAR}, #{pictureUrl,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{content,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{type,jdbcType=TINYINT}, #{feedback,jdbcType=VARCHAR}, #{redMoney,jdbcType=DECIMAL}, #{customerId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR}, #{feedbackArticle})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Appraise">insert into tb_appraise 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -37,7 +38,8 @@
       <if test="customerId != null">customer_id,</if>  
       <if test="orderId != null">order_id,</if>  
       <if test="articleId != null">article_id,</if>  
-      <if test="shopDetailId != null">shop_detail_id,</if> 
+      <if test="shopDetailId != null">shop_detail_id,</if>
+      <if test="feedbackArticle != null">feedback_article,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -52,7 +54,8 @@
       <if test="customerId != null">#{customerId,jdbcType=VARCHAR},</if>  
       <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">#{articleId,jdbcType=VARCHAR},</if>  
-      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
+      <if test="feedbackArticle != null">#{feedbackArticle,jdbcType=VARCHAR},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Appraise">update tb_appraise 
@@ -68,20 +71,21 @@
       <if test="customerId != null">customer_id = #{customerId,jdbcType=VARCHAR},</if>  
       <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>  
       <if test="articleId != null">article_id = #{articleId,jdbcType=VARCHAR},</if>  
-      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
+      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>
+      <if test="feedbackArticle != null">feedback_article = #{feedbackArticle,jdbcType=VARCHAR},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Appraise">update tb_appraise set picture_url = #{pictureUrl,jdbcType=VARCHAR}, level = #{level,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, content = #{content,jdbcType=VARCHAR}, status = #{status,jdbcType=TINYINT}, type = #{type,jdbcType=TINYINT}, feedback = #{feedback,jdbcType=VARCHAR}, red_money = #{redMoney,jdbcType=DECIMAL}, customer_id = #{customerId,jdbcType=VARCHAR}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Appraise">update tb_appraise set picture_url = #{pictureUrl,jdbcType=VARCHAR}, level = #{level,jdbcType=TINYINT}, create_time = #{createTime,jdbcType=TIMESTAMP}, content = #{content,jdbcType=VARCHAR}, status = #{status,jdbcType=TINYINT}, type = #{type,jdbcType=TINYINT}, feedback = #{feedback,jdbcType=VARCHAR}, red_money = #{redMoney,jdbcType=DECIMAL}, customer_id = #{customerId,jdbcType=VARCHAR}, order_id = #{orderId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, feedback_article = #{feedbackArticle,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Appraise">select * from tb_appraise</select>
   
   <select id="listAppraise" resultType="Appraise">
-  	 SELECT a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo,c.sex
+  	 SELECT a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,a.feedback_article,c.NICKNAME,c.head_photo,c.sex
   	  from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id   	  
   	  where shop_detail_id=#{currentShopId} and LEVEL &gt;= #{minLevel}
   	  	and LEVEL &lt;= #{maxLevel} ORDER BY create_time DESC LIMIT #{currentPage},#{showCount}
   </select>
   <select id="selectDetailedById" resultType="Appraise">
-  	 SELECT a.id, a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo,a.shop_detail_id
+  	 SELECT a.id, a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,a.feedback_article,c.NICKNAME,c.head_photo,a.shop_detail_id
   	  from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id   	  
   	  where a.id=#{0}
   </select>
@@ -114,7 +118,7 @@
   </select>
 
   <select id="selectCustomerAllAppraise" resultType="Appraise">
-    select a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,c.NICKNAME,c.head_photo
+    select a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,a.feedback_article,c.NICKNAME,c.head_photo
     from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id
     where a.customer_id = #{customerId} and a.status = 1 order by a.create_time desc
     LIMIT #{currentPage},#{showCount}
