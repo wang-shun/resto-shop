@@ -326,6 +326,19 @@
 							</div>
 					   </div>
 					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label">pos加菜是否开启粉丝价：</label>
+						<div class="col-sm-9">
+							<div>
+								<label> <input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">启用
+								</label>
+								<label> <input type="radio" name="posPlusType" v-model="m.posPlusType" value="1">不启用
+								</label>
+							</div>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
