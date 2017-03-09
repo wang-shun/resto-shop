@@ -207,6 +207,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.clear();
                 toastr.success("查询中...");
                 var that = this;
                 try{
@@ -218,13 +219,16 @@
                             that.shopCouponInfoTable.rows.add(result.data.shopCouponInfoList).draw();
                             that.shopCouponInfoList = result.data.shopCouponInfoList;
                             that.brandCouponInfo = result.data.brandCouponInfo;
+                            toastr.clear();
                             toastr.success("查询成功");
                         }else {
+                            toastr.clear();
                             toastr.error("查询报表出错");
                         }
                     });
                 }catch(e){
-                    toastr.error("查询报表出错");
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
                 }
             },
             downloadExcel : function(){
@@ -236,8 +240,8 @@
                     if (result.success){
                         window.location.href = "brandMarketing/downloadCouponDto?path="+result.data+"";
                     }else {
-                        toastr.error("下载红包报表失败！");
                         toastr.clear();
+                        toastr.error("下载红包报表失败！");
                     }
                 });
             },

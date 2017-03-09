@@ -210,6 +210,7 @@
                 });
             },
             searchInfo : function() {
+                toastr.clear();
                 toastr.success("查询中...");
                 var that = this;
                 try{
@@ -221,13 +222,16 @@
                             that.shopRedInfoTable.rows.add(result.data.shopRedInfoList).draw();
                             that.shopRedInfoList = result.data.shopRedInfoList;
                             that.brandRedInfo = result.data.brandRedInfo;
+                            toastr.clear();
                             toastr.success("查询成功");
                         }else {
+                            toastr.clear();
                             toastr.error("查询报表出错");
                         }
                     });
                 }catch(e){
-                    toastr.error("查询报表出错");
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
                 }
             },
             downloadExcel : function(){
@@ -239,8 +243,8 @@
                     if (result.success){
                         window.location.href = "brandMarketing/downloadRedPacketDto?path="+result.data+"";
                     }else {
-                        toastr.error("下载红包报表失败！");
                         toastr.clear();
+                        toastr.error("下载红包报表失败！");
                     }
                 });
             },
