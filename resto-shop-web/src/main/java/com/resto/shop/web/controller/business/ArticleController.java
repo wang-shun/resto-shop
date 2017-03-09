@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.brand.core.util.PinyinUtil;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.PlatformService;
@@ -10,6 +11,7 @@ import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
+import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -94,9 +96,11 @@ public class ArticleController extends GenericController {
         String id = article.getId();
         if (StringUtils.isEmpty(article.getId())) {
             article.setCreateUserId(getCurrentUserId());
+            article.setInitials(PinyinUtil.getPinYinHeadChar(article.getName()));
             id = articleService.save(article).getId();
             unitService.insertArticleRelation(id, article.getUnits());
         } else {
+            article.setInitials(PinyinUtil.getPinYinHeadChar(article.getName()));
             articleService.update(article);
             //修改单品的时候如果存在推荐餐包 联动修改
             if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
