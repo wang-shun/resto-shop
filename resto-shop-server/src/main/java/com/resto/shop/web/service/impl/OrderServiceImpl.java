@@ -1756,8 +1756,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         Brand brand = brandService.selectById(order.getBrandId());
         JSONArray json = new JSONArray(printTask);
-        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:" + order.getId() + "返回打印厨打模版" + json.toString());
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:" + order.getId() + "返回打印厨打模版" + json.toString());
+        log.info("订单:" + order.getId() + "返回打印厨打模版" + json.toString());
         //logBaseService.insertLogBaseInfoState(shop, customerService.selectById(order.getCustomerId()),order.getId(),LogBaseState.PRINT_KITCHEN);
         return printTask;
     }
@@ -2041,9 +2042,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.RECEIPT);
 
         JSONObject json = new JSONObject(print);
-        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:" + order.getId() + "返回打印总单模版" + json.toString());
-
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:" + order.getId() + "返回打印总单模版" + json.toString());
+        log.info( "订单:" + order.getId() + "返回打印总单模版" + json.toString());
         return print;
     }
 
