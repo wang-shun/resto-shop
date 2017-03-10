@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
@@ -158,6 +160,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     VirtualProductsService virtualProductsService;
+
+    Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
