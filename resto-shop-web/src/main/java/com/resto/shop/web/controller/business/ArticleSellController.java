@@ -325,10 +325,11 @@ public class ArticleSellController extends GenericController{
     @ResponseBody
 	public Result appendToBrandExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
 	    try{
-            String[][] items = new String[articleSellDto.getBrandArticleUnit().size()][];
+            String[][] items = null;
             int i = 0;
             //如果是单品
             if(type.equals(ArticleType.SIMPLE_ARTICLE)){
+                items = new String[articleSellDto.getBrandArticleUnit().size()][];
                 //定义数据
                 for(Map articleMap : articleSellDto.getBrandArticleUnit()){
                     items[i] = new String[11];
@@ -346,6 +347,7 @@ public class ArticleSellController extends GenericController{
                     i++;
                 }
             }else if(type.equals(ArticleType.TOTAL_ARTICLE)){
+                items = new String[articleSellDto.getBrandArticleFamily().size()][];
                 //定义数据
                 for(Map articleMap : articleSellDto.getBrandArticleFamily()){
                     items[i] = new String[11];

@@ -417,6 +417,10 @@ var vueObj = new Vue({
                                     that.appendBrandUnitExcel();
                                 }else{
                                     that.state = 1;
+                                    that.start = 0;
+                                    that.end = 1000;
+                                    that.startPosition = 1006;
+                                    that.index = 1;
                                     toastr.clear();
                                     toastr.error("生成报表出错");
                                 }
@@ -447,6 +451,10 @@ var vueObj = new Vue({
                                     that.appendBrandFamilyExcel();
                                 }else{
                                     that.state = 1;
+                                    that.start = 0;
+                                    that.end = 1000;
+                                    that.startPosition = 1006;
+                                    that.index = 1;
                                     toastr.clear();
                                     toastr.error("生成报表出错");
                                 }
@@ -456,61 +464,89 @@ var vueObj = new Vue({
                 }
             }catch (e){
                 that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
 				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
             }
         },
         appendBrandUnitExcel : function () {
             var that = this;
-            if (that.index == that.length){
-                that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start);
-            }else{
-                that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start,that.end);
-            }
-            that.object.startPosition = that.startPosition;
-            $.post("articleSell/appendToBrandExcel",that.object,function (result) {
-                if (result.success){
-                    that.start = that.end;
-                    that.end = that.start + 1000;
-                    that.startPosition = that.startPosition + 1000;
-                    that.index++;
-                    if (that.index - 1 == that.length){
-                        that.state = 3;
-                    }else{
-                        that.appendBrandUnitExcel();
-                    }
-                }else{
-                    that.state = 1;
-                    toastr.clear();
-                    toastr.error("生成报表出错");
+            try {
+                if (that.index == that.length) {
+                    that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start);
+                } else {
+                    that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start, that.end);
                 }
-            });
+                that.object.startPosition = that.startPosition;
+                $.post("articleSell/appendToBrandExcel", that.object, function (result) {
+                    if (result.success) {
+                        that.start = that.end;
+                        that.end = that.start + 1000;
+                        that.startPosition = that.startPosition + 1000;
+                        that.index++;
+                        if (that.index - 1 == that.length) {
+                            that.state = 3;
+                        } else {
+                            that.appendBrandUnitExcel();
+                        }
+                    } else {
+                        that.state = 1;
+                        that.start = 0;
+                        that.end = 1000;
+                        that.startPosition = 1006;
+                        that.index = 1;
+                        toastr.clear();
+                        toastr.error("生成报表出错");
+                    }
+                });
+            }catch (e){
+                that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
+                toastr.clear();
+                toastr.error("系统异常，请刷新重试");
+            }
         },
         appendBrandFamilyExcel :function () {
             var that = this;
-            if (that.index == that.length){
-                that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start);
-            }else{
-                that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start,that.end);
-            }
-            that.object.startPosition = that.startPosition;
-            $.post("articleSell/appendToBrandExcel",that.object,function (result) {
-                if (result.success){
-                    that.start = that.end;
-                    that.end = that.start + 1000;
-                    that.startPosition = that.startPosition + 1000;
-                    that.index++;
-                    if (that.index - 1 == that.length){
-                        that.state = 3;
-                    }else{
-                        that.appendBrandFamilyExcel();
-                    }
-                }else{
-                    that.state = 1;
-                    toastr.clear();
-                    toastr.error("生成报表出错");
+            try {
+                if (that.index == that.length) {
+                    that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start);
+                } else {
+                    that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start, that.end);
                 }
-            });
+                that.object.startPosition = that.startPosition;
+                $.post("articleSell/appendToBrandExcel", that.object, function (result) {
+                    if (result.success) {
+                        that.start = that.end;
+                        that.end = that.start + 1000;
+                        that.startPosition = that.startPosition + 1000;
+                        that.index++;
+                        if (that.index - 1 == that.length) {
+                            that.state = 3;
+                        } else {
+                            that.appendBrandFamilyExcel();
+                        }
+                    } else {
+                        that.state = 1;
+                        toastr.clear();
+                        toastr.error("生成报表出错");
+                    }
+                });
+            }catch (e){
+                that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
+                toastr.clear();
+                toastr.error("系统异常，请刷新重试");
+            }
         },
         today : function(){
             date = new Date().format("yyyy-MM-dd");

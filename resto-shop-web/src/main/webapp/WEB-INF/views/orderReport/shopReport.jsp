@@ -327,6 +327,10 @@
                                 that.appendShopExcel();
                             }else{
                                 that.state = 1;
+                                that.start = 0;
+                                that.end = 1000;
+                                that.startPosition = 1005;
+                                that.index = 1;
                                 toastr.clear();
                                 toastr.error("生成报表出错");
                             }
@@ -334,35 +338,53 @@
                     }
                 }catch (e) {
                     that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },
             appendShopExcel : function () {
                 var that = this;
-                if (that.index == that.length){
-                    that.object.shopOrderList = that.shopOrderList.slice(that.start);
-                }else{
-                    that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
-                }
-                that.object.startPosition = that.startPosition;
-                $.post("orderReport/appendShopOrderExcel",that.object,function (result) {
-                    if (result.success){
-                        that.start = that.end;
-                        that.end = that.start + 1000;
-                        that.startPosition = that.startPosition + 1000;
-                        that.index++;
-                        if (that.index-1 == that.length){
-                            that.state = 3;
-                        }else{
-                            that.appendShopExcel();
-                        }
-                    }else{
-                        that.state = 1;
-                        toastr.clear();
-                        toastr.error("生成报表出错");
+                try {
+                    if (that.index == that.length) {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start);
+                    } else {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start, that.end);
                     }
-                });
+                    that.object.startPosition = that.startPosition;
+                    $.post("orderReport/appendShopOrderExcel", that.object, function (result) {
+                        if (result.success) {
+                            that.start = that.end;
+                            that.end = that.start + 1000;
+                            that.startPosition = that.startPosition + 1000;
+                            that.index++;
+                            if (that.index - 1 == that.length) {
+                                that.state = 3;
+                            } else {
+                                that.appendShopExcel();
+                            }
+                        } else {
+                            that.state = 1;
+                            that.start = 0;
+                            that.end = 1000;
+                            that.startPosition = 1005;
+                            that.index = 1;
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
             },
             download : function(){
                 window.location.href = "orderReport/downShopOrderExcel?path="+this.object.path+"";
