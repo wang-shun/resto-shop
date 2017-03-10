@@ -166,7 +166,13 @@
             shopOrderDetails:[],
             orderDetail:{},
             state:1,
-            path : null
+            shopOrderList : [],
+            object : {},
+            length : 0,
+            start : 0,
+            end : 1000,
+            startPosition : 1005,
+            index : 1
         },
         created : function() {
             this.searchDate.beginDate = beginDate;
@@ -261,11 +267,11 @@
                 try {
                     $.post("orderReport/AllOrder", this.getDate(), function (result) {
                         if(result.success) {
-                            that.shopOrderTable.clear();
-                            that.shopOrderTable.rows.add(result.data.result).draw()
-                            that.shopOrderDetails = result.data.result;
                             toastr.clear();
                             toastr.success("查询成功");
+                            that.shopOrderDetails = result.data.result;
+                            that.shopOrderTable.clear();
+                            that.shopOrderTable.rows.add(result.data.result).draw()
                         }else{
                             toastr.clear();
                             toastr.error("查询出错");
@@ -296,12 +302,11 @@
             downloadShopOrder : function(){
                 var that = this;
                 try {
-                    var object = that.getDate();
-                    var shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
-                    if (shopOrderList.length <= 1000){
-                        object.shopOrderList = shopOrderList;
-                        console.log(object.shopOrderList);
-                        $.post("orderReport/create_shop_excel",object,function (result) {
+                    that.object = that.getDate();
+                    that.shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
+                    if (that.shopOrderList.length <= 1000){
+                        that.object.shopOrderList = that.shopOrderList;
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";
                             }else{
@@ -311,71 +316,21 @@
                         })
                     }else{
                         that.state = 2;
-                        var length = Math.ceil(shopOrderList.length/1000);
-                        var start = 0;
-                        var end = 1000;
-                        var startPosition = 1005;
-                        for(var i = 1;i <= length;i++){
-                            if (i != length){
-                                object.shopOrderList = shopOrderList.slice(start,end);
+                        that.length = Math.ceil(that.shopOrderList.length/1000);
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                            if (result.success){
+                                that.object.path = result.data;
+                                that.start = that.end;
+                                that.end = that.start + 1000;
+                                that.index++;
+                                that.appendShopExcel();
                             }else{
-                                object.shopOrderList = shopOrderList.slice(start);
+                                that.state = 1;
+                                toastr.clear();
+                                toastr.error("生成报表出错");
                             }
-                            object.startPosition = startPosition;
-                            object.path = that.path;
-                            if(i == 1){
-                                $.ajax({
-                                    url:"orderReport/create_shop_excel",
-                                    type:"POST",
-                                    async: false,
-                                    data:object,
-                                    dataType:"json",
-                                    success:function(result){
-                                        if(result.success){
-                                            that.path = result.data;
-                                            start = end;
-                                            end = start + 1000;
-                                        }else{
-                                            that.state = 1;
-                                            toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    }
-                                });
-                            }else if(i == length){
-                                $.post("orderReport/appendShopOrderExcel",object,function(result){
-                                    if(result.success){
-                                        that.state = 3;
-                                    }else{
-                                        that.state = 1;
-                                        toastr.clear();
-                                        toastr.error("生成报表出错");
-                                        return;
-                                    }
-                                });
-                            }else{
-                                $.ajax({
-                                    url:"orderReport/appendShopOrderExcel",
-                                    type:"POST",
-                                    async: false,
-                                    data:object,
-                                    dataType:"json",
-                                    success:function(result){
-                                        if(result.success){
-                                            start = end;
-                                            end = start + 1000;
-                                            startPosition = startPosition + 1000;
-                                        }else{
-                                            that.state = 1;
-                                            toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    }
-                                });
-                            }
-                        }
+                        });
                     }
                 }catch (e) {
                     that.state = 1;
@@ -383,9 +338,39 @@
                     toastr.error("系统异常，请刷新重试");
                 }
             },
+            appendShopExcel : function () {
+                var that = this;
+                if (that.index == that.length){
+                    that.object.shopOrderList = that.shopOrderList.slice(that.start);
+                }else{
+                    that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
+                }
+                that.object.startPosition = that.startPosition;
+                $.post("orderReport/appendShopOrderExcel",that.object,function (result) {
+                    if (result.success){
+                        that.start = that.end;
+                        that.end = that.start + 1000;
+                        that.startPosition = that.startPosition + 1000;
+                        that.index++;
+                        if (that.index-1 == that.length){
+                            that.state = 3;
+                        }else{
+                            that.appendShopExcel();
+                        }
+                    }else{
+                        that.state = 1;
+                        toastr.clear();
+                        toastr.error("生成报表出错");
+                    }
+                });
+            },
             download : function(){
-                window.location.href = "orderReport/downShopOrderExcel?path="+this.path+"";
+                window.location.href = "orderReport/downShopOrderExcel?path="+this.object.path+"";
                 this.state = 1;
+                this.start = 0;
+                this.end = 1000;
+                this.startPosition = 1005;
+                this.index = 1;
             },
             keysert: function (key) {
                 return function(a,b){
