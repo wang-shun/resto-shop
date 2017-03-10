@@ -14,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -48,7 +49,7 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-   //@Scheduled(cron = "10  51 13 * * ?")   //每天12点执行
+   @Scheduled(cron = "10  19 15 * * ?")   //每天12点执行
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
 
@@ -75,7 +76,7 @@ public class ReportExceptionTask {
                         log.info("--------------HttpClient 登录成功！");
                         Map<String, String> requestMap = new HashMap<>();
                         requestMap.put("beginDate", "2017-01-01");
-                        requestMap.put("endDate", "2017-01-11");
+                        requestMap.put("endDate", "2017-03-10");
                         requestMap.put("brandName",brand.getBrandName());
                         //循环执行 URLMap 中的链接
                         HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
