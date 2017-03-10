@@ -380,11 +380,12 @@ var vueObj = new Vue({
         createBrnadArticleTotal : function(){
             try {
                 var that = this;
+                var brandReport = that.brandReport;
                 var object = {
                     beginDate : that.searchDate.beginDate,
                     endDate : that.searchDate.endDate,
                     type : that.currentType,
-                    brandReport : that.brandReport
+                    brandReport : brandReport
                 }
                 switch (that.currentType) {
                     case 1:

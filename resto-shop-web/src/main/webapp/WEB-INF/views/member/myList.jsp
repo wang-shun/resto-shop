@@ -20,7 +20,7 @@
                     <button type="button" class="btn btn-primary" @click="week">本周</button>
                     <button type="button" class="btn btn-primary" @click="month">本月</button>
                     <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
-                    <button type="button" class="btn btn-primary" @click="" v-if="state == 1">下载报表</button>
+                    <button type="button" class="btn btn-primary" @click="createExcel" v-if="state == 1">下载报表</button>
                     <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
                     <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
                     <br/>
@@ -135,7 +135,8 @@
             path : null,
             brandCustomerCount : {},
             customerInfoTable : {},
-            memberUserDtos : []
+            memberUserDtos : [],
+            path : ""
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -293,6 +294,101 @@
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
+            },
+            createExcel　: function () {
+                try {
+                    var that = this;
+                    var object = this.getDate();
+                    var brandCustomerCount = this.brandCustomerCount;
+                    object.brandCustomerCount = brandCustomerCount;
+                    var memberUserDtos = this.memberUserDtos;
+                    if (memberUserDtos.length <= 1000){
+                        object.memberUserDtos = memberUserDtos;
+                        $.post("member/member_excel",object,function (result) {
+                            if (result.success){
+                                window.location.href = "member/downloadExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        })
+                    }else{
+                        that.state = 2;
+                        var length = Math.ceil(memberUserDtos.length/1000);
+                        var start = 0;
+                        var end = 1000;
+                        var startPosition = 1006;
+                        for(var i = 1;i <= length;i++){
+                            if (i != length){
+                                object.memberUserDtos = memberUserDtos.slice(start,end);
+                            }else{
+                                object.memberUserDtos = memberUserDtos.slice(start);
+                            }
+                            object.startPosition = startPosition;
+                            object.path = that.path;
+                            if(i == 1){
+                                $.ajax({
+                                    url:"member/member_excel",
+                                    type:"POST",
+                                    async: false,
+                                    data:object,
+                                    dataType:"json",
+                                    success:function(result){
+                                        if(result.success){
+                                            that.path = result.data;
+                                            start = end;
+                                            end = start + 1000;
+                                        }else{
+                                            that.state = 1;
+                                            toastr.clear();
+                                            toastr.error("生成报表出错");
+                                            return;
+                                        }
+                                    }
+                                });
+                            }else if(i == length){
+                                $.post("member/appendExcel",object,function(result){
+                                    if(result.success){
+                                        that.state = 3;
+                                    }else{
+                                        that.state = 1;
+                                        toastr.clear();
+                                        toastr.error("生成报表出错");
+                                        return;
+                                    }
+                                });
+                            }else{
+                                $.ajax({
+                                    url:"member/appendExcel",
+                                    type:"POST",
+                                    async: false,
+                                    data:object,
+                                    dataType:"json",
+                                    success:function(result){
+                                        if(result.success){
+                                            start = end;
+                                            end = start + 1000;
+                                            startPosition = startPosition + 1000;
+                                        }else{
+                                            that.state = 1;
+                                            toastr.clear();
+                                            toastr.error("生成报表出错");
+                                            return;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                } catch (e){
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试")
+                }
+            },
+            download : function () {
+                window.location.href = "member/downloadExcel?path="+this.path+"";
+                this.state = 1;
             },
             getDate : function(){
                 var data = {

@@ -2,8 +2,11 @@
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.entity.Result;
- import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.core.util.AppendToExcelUtil;
+import com.resto.brand.core.util.ExcelUtil;
  import com.resto.brand.core.util.UserOrderExcelUtil;
 import com.resto.brand.web.dto.MemberUserDto;
  import com.resto.brand.web.dto.OrderDetailDto;
@@ -154,47 +157,117 @@ public class MemberController extends GenericController{
 	//下载会员信息报表
 	@RequestMapping("member_excel")
 	@ResponseBody
-	public void reportIncome(String userJson,String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+	public Result reportIncome(String beginDate,String endDate,MemberUserDto memberUserDto,HttpServletRequest request){
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
-		//导出文件名
-		String fileName = "会员管理列表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"customerId","nickname","telephone","birthday","province","city","sex","remain","isCharge","chargeRemain","presentRemain","redRemain","sumMoney","amount","money"};
-		//定义数据
-		List<MemberUserDto>  result = customerService.selectListMemberUser(beginDate, endDate);
-		String shopName="";
-		for (ShopDetail shopDetail : shopDetailList) {
-			shopName += shopDetail.getName()+",";
-		}
-		Map<String,String> map = new HashMap<>();
-		map.put("brandName", getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "会员信息报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "14");//显示的位置
-		map.put("reportTitle", "会员信息");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
-		
-		String[][] headers = {{"用户ID","25"},{"昵称","25"},{"联系电话","25"},{"生日","25"},{"省/市","25"},{"城/区","25"},{"性别","25"},{"余额","25"},{"储值","25"},{"充值金额","25"},{"充值赠送金额","25"},{"红包金额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
-		//定义excel工具类对象
-		ExcelUtil<MemberUserDto> excelUtil=new ExcelUtil<MemberUserDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
+        //导出文件名
+        String fileName = "会员管理列表"+beginDate+"至"+endDate+".xls";
+        //定义读取文件的路径
+        String path = request.getSession().getServletContext().getRealPath(fileName);
+        //定义列
+        String[]columns={"isBindPhone","isCharge","nickname","sex","telephone","birthday","province","city"
+                ,"remain","chargeRemain","presentRemain","redRemain","sumMoney","amount","money"};
+        //定义数据
+        List<MemberUserDto>  result = new ArrayList<>();
+        if (memberUserDto.getBrandCustomerCount() != null){
+            Map<String, Object> brandCustomerMap = memberUserDto.getBrandCustomerCount();
+            MemberUserDto customerCount = new MemberUserDto();
+            customerCount.setIsBindPhone(brandCustomerMap.get("brandName").toString());
+            customerCount.setIsCharge(brandCustomerMap.get("customerCount").toString());
+            customerCount.setNickname(brandCustomerMap.get("registeredCustomerCount").toString());
+            customerCount.setSex(brandCustomerMap.get("unregisteredCustomerCount").toString());
+            customerCount.setTelephone(brandCustomerMap.get("maleCustomerCount").toString());
+            customerCount.setBirthday(brandCustomerMap.get("femaleCustomerCount").toString());
+            customerCount.setRemain(brandCustomerMap.get("unknownCustomerCount").toString());
+            result.add(customerCount);
+        }
+        if (memberUserDto.getMemberUserDtos() != null){
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("brandCustomerCount");
+            filter.getExcludes().add("memberUserDtos");
+            String json = JSON.toJSONString(memberUserDto.getMemberUserDtos(),filter);
+            List<MemberUserDto> memberUserDtos = JSON.parseObject(json, new TypeReference<List<MemberUserDto>>(){});
+            result.addAll(memberUserDtos);
+        }
+        String shopName="";
+        for (ShopDetail shopDetail : shopDetailList) {
+            shopName += shopDetail.getName()+",";
+        }
+        shopName = shopName.substring(0,shopName.length() - 1);
+        Map<String,String> map = new HashMap<>();
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", beginDate);
+        map.put("reportType", "会员信息报表");//表的头，第一行内容
+        map.put("endDate", endDate);
+        map.put("num", "14");//显示的位置
+        map.put("reportTitle", "会员信息");//表的名字
+        map.put("timeType", "yyyy-MM-dd");
+
+        String[][] headers = {{"品牌/用户类型","25"},{"用户总数/储值","25"},{"注册用户数/昵称","25"},{"未注册用户数/性别","25"},{"男性顾客/联系电话","25"},{"女性顾客/生日","25"},
+                {"省/市","25"},{"城/区","25"},{"未知性别/余额","25"},{"充值金额","25"},{"充值赠送金额","25"},{"红包金额","25"},{"订单总额","25"},{"订单数","25"},{"订单平均金额","25"}};
+        //定义excel工具类对象
+        ExcelUtil<MemberUserDto> excelUtil=new ExcelUtil<MemberUserDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportExcel(headers, columns, result, out, map);
+            out.close();
 		}catch(Exception e){
+		    log.error("生成会员店铺报表出错！");
 			e.printStackTrace();
+            return new Result(false);
 		}
+		return getSuccessResult(path);
 	}
+
+	@RequestMapping("/downloadExcel")
+	public void downloadExcel(String path, HttpServletResponse response){
+	    ExcelUtil<Object> excelUtil = new ExcelUtil<>();
+	    try{
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch (Exception e){
+            log.error("下载会员报表出错！");
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping("/appendExcel")
+    @ResponseBody
+    public Result appendExcel(String path, Integer startPosition, MemberUserDto memberUserDto){
+        try {
+            String[][] items = new String[memberUserDto.getMemberUserDtos().size()][];
+            int i = 0;
+            for (Map map : memberUserDto.getMemberUserDtos()){
+                items[i] = new String[15];
+                items[i][0] = map.get("isBindPhone").toString();
+                items[i][1] = map.get("isCharge").toString();
+                items[i][2] = map.get("nickname").toString();
+                items[i][3] = map.get("sex").toString();
+                items[i][4] = map.get("telephone").toString();
+                items[i][5] = map.get("birthday").toString();
+                items[i][6] = map.get("province").toString();
+                items[i][7] = map.get("city").toString();
+                items[i][8] = map.get("remain").toString();
+                items[i][9] = map.get("chargeRemain").toString();
+                items[i][10] = map.get("presentRemain").toString();
+                items[i][11] = map.get("redRemain").toString();
+                items[i][12] = map.get("sumMoney").toString();
+                items[i][13] = map.get("amount").toString();
+                items[i][14] = map.get("money").toString();
+                i++;
+            }
+            AppendToExcelUtil.insertRows(path,startPosition,items);
+        } catch (Exception e){
+            log.error("追加会员报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult();
+    }
 
 	@RequestMapping("/show/orderReport")
 	public String showModal1(String endDate,String beginDate,String customerId,HttpServletRequest request){
