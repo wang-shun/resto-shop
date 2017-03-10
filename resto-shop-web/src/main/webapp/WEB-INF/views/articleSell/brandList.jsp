@@ -174,7 +174,12 @@ var vueObj = new Vue({
         state : 1,
         brandArticleUnit :[],
         brandArticleFamily　:[],
-        path : null
+        object : {},
+        length : 0,
+        start : 0,
+        end : 1000,
+        startPosition : 1006,
+        index : 1
     },
     created : function() {
         var date = new Date().format("yyyy-MM-dd");
@@ -367,8 +372,12 @@ var vueObj = new Vue({
         	}
         },
         download : function(){
-            window.location.href = "articleSell/downloadBrnadArticle?path="+this.path+"";
+            window.location.href = "articleSell/downloadBrnadArticle?path="+this.object.path+"";
             this.state = 1;
+            this.start = 0;
+            this.end = 1000;
+            this.startPosition = 1006;
+            this.index = 1;
         },
         getDate : function(){
             var data = {
@@ -380,19 +389,14 @@ var vueObj = new Vue({
         createBrnadArticleTotal : function(){
             try {
                 var that = this;
-                var brandReport = that.brandReport;
-                var object = {
-                    beginDate : that.searchDate.beginDate,
-                    endDate : that.searchDate.endDate,
-                    type : that.currentType,
-                    brandReport : brandReport
-                }
+                that.object = that.getDate();
+                that.object.type =  that.currentType;
+                that.object.brandReport =  that.brandReport;
                 switch (that.currentType) {
                     case 1:
-                        var articleUnit = that.brandArticleUnit;
-                        if (articleUnit.length <= 1000) {
-                            object.brandArticleUnit = articleUnit;
-                            $.post("articleSell/createBrnadArticle",object,function(result){
+                        if (that.brandArticleUnit.length <= 1000) {
+                            that.object.brandArticleUnit = that.brandArticleUnit;
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
@@ -402,152 +406,51 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleUnit.length/1000);
-                            var start = 0;
-                            var end = 1000;
-                            var startPosition = 1006;
-                            for(var i = 1;i <= length;i++){
-                                if (i != length){
-                                    object.brandArticleUnit = articleUnit.slice(start,end);
+                            that.length = Math.ceil(that.brandArticleUnit.length/1000);
+                            that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start,that.end);
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    that.object.path = result.data;
+                                    that.start = that.end;
+                                    that.end = that.start + 1000;
+                                    that.index++;
+                                    that.appendBrandUnitExcel();
                                 }else{
-                                    object.brandArticleUnit = articleUnit.slice(start);
+                                    that.state = 1;
+                                    toastr.clear();
+                                    toastr.error("生成报表出错");
                                 }
-                                object.startPosition = startPosition;
-                                object.path = that.path;
-                                if(i == 1){
-                                    $.ajax({
-                                        url:"articleSell/createBrnadArticle",
-                                        type:"POST",
-                                        async: false,
-                                        data:object,
-                                        dataType:"json",
-                                        success:function(result){
-                                            if(result.success){
-                                                that.path = result.data;
-                                                start = end;
-                                                end = start + 1000;
-                                            }else{
-                                                that.state = 1;
-												toastr.clear();
-                                                toastr.error("生成报表出错");
-                                                return;
-                                            }
-                                        }
-                                    });
-                                }else if(i == length){
-                                    $.post("articleSell/appendToBrandExcel",object,function(result){
-                                        if(result.success){
-                                            that.state = 3;
-                                        }else{
-                                            that.state = 1;
-											toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    });
-                                }else{
-                                    $.ajax({
-                                        url:"articleSell/appendToBrandExcel",
-                                        type:"POST",
-                                        async: false,
-                                        data:object,
-                                        dataType:"json",
-                                        success:function(result){
-                                            if(result.success){
-                                                start = end;
-                                                end = start + 1000;
-                                                startPosition = startPosition + 1000;
-                                            }else{
-                                                that.state = 1;
-												toastr.clear();
-                                                toastr.error("生成报表出错");
-                                                return;
-                                            }
-                                        }
-                                    });
-                                }
-                            }
+                            });
                         }
                         break;
                     case 2:
-                        var articleFamily = that.brandArticleFamily;
-                        if (articleFamily.length <= 1000) {
-                            object.brandArticleFamily = articleFamily;
-                            $.post("articleSell/createBrnadArticle",object,function(result){
+                        if (that.brandArticleFamily.length <= 1000) {
+                            that.object.brandArticleFamily = that.brandArticleFamily;
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
                                 }else{
-									toastr.clear();
+                                    toastr.clear();
                                     toastr.error("下载报表出错");
                                 }
                             });
                         }else{
                             that.state = 2;
-                            var length = Math.ceil(articleFamily.length/1000);
-                            var start = 0;
-                            var end = 1000;
-                            var startPosition = 1006;
-                            for(var i = 1;i <= length;i++){
-                                if (i != length){
-                                    object.brandArticleFamily = articleFamily.slice(start,end);
+                            that.length = Math.ceil(that.brandArticleFamily.length/1000);
+                            that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start,that.end);
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    that.object.path = result.data;
+                                    that.start = that.end;
+                                    that.end = that.start + 1000;
+                                    that.index++;
+                                    that.appendBrandFamilyExcel();
                                 }else{
-                                    object.brandArticleFamily = articleFamily.slice(start);
+                                    that.state = 1;
+                                    toastr.clear();
+                                    toastr.error("生成报表出错");
                                 }
-                                object.startPosition = startPosition;
-                                object.path = that.path;
-                                if(i == 1){
-                                    $.ajax({
-                                        url:"articleSell/createBrnadArticle",
-                                        type:"POST",
-                                        async: false,
-                                        data:object,
-                                        dataType:"json",
-                                        success:function(result){
-                                            if(result.success){
-                                                that.path = result.data;
-                                                start = end;
-                                                end = start + 1000;
-                                            }else{
-                                                that.state = 1;
-												toastr.clear();
-                                                toastr.error("生成报表出错");
-                                                return;
-                                            }
-                                        }
-                                    });
-                                }else if(i == length){
-                                    $.post("articleSell/appendToBrandExcel",object,function(result){
-                                        if(result.success){
-                                            that.state = 3;
-                                        }else{
-                                            that.state = 1;
-											toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    });
-                                }else{
-                                    $.ajax({
-                                        url:"articleSell/appendToBrandExcel",
-                                        type:"POST",
-                                        async: false,
-                                        data:object,
-                                        dataType:"json",
-                                        success:function(result){
-                                            if(result.success){
-                                                start = end;
-                                                end = start + 1000;
-                                                startPosition = startPosition + 1000;
-                                            }else{
-                                                that.state = 1;
-												toastr.clear();
-                                                toastr.error("生成报表出错");
-                                                return;
-                                            }
-                                        }
-                                    });
-                                }
-                            }
+                            });
                         }
                         break;
                 }
@@ -556,6 +459,58 @@ var vueObj = new Vue({
 				toastr.clear();
                 toastr.error("系统异常，请刷新重试");
             }
+        },
+        appendBrandUnitExcel : function () {
+            var that = this;
+            if (that.index == that.length){
+                that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start);
+            }else{
+                that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start,that.end);
+            }
+            that.object.startPosition = that.startPosition;
+            $.post("articleSell/appendToBrandExcel",that.object,function (result) {
+                if (result.success){
+                    that.start = that.end;
+                    that.end = that.start + 1000;
+                    that.startPosition = that.startPosition + 1000;
+                    that.index++;
+                    if (that.index - 1 == that.length){
+                        that.state = 3;
+                    }else{
+                        that.appendBrandUnitExcel();
+                    }
+                }else{
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("生成报表出错");
+                }
+            });
+        },
+        appendBrandFamilyExcel :function () {
+            var that = this;
+            if (that.index == that.length){
+                that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start);
+            }else{
+                that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start,that.end);
+            }
+            that.object.startPosition = that.startPosition;
+            $.post("articleSell/appendToBrandExcel",that.object,function (result) {
+                if (result.success){
+                    that.start = that.end;
+                    that.end = that.start + 1000;
+                    that.startPosition = that.startPosition + 1000;
+                    that.index++;
+                    if (that.index - 1 == that.length){
+                        that.state = 3;
+                    }else{
+                        that.appendBrandFamilyExcel();
+                    }
+                }else{
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("生成报表出错");
+                }
+            });
         },
         today : function(){
             date = new Date().format("yyyy-MM-dd");
