@@ -40,8 +40,6 @@ import java.text.Format;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 /**
  * Created by KONATA on 2016/10/28.
  * 饿了吗接口实现
