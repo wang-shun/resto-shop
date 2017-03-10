@@ -136,7 +136,12 @@
             brandCustomerCount : {},
             customerInfoTable : {},
             memberUserDtos : [],
-            path : ""
+            object : {},
+            length : 0,
+            start : 0,
+            end : 1000,
+            startPosition : 1006,
+            index : 1
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -271,6 +276,10 @@
                     var API = customerTableAPI;
                     $.post("member/myConList", this.getDate(), function(result) {
                         if(result.success == true){
+                            toastr.clear();
+                            toastr.success("查询成功");
+                            that.brandCustomerCount = result.data.brandCustomerCount;
+                            that.memberUserDtos = result.data.memberUserDtos
                             API.search('');
                             var isBindPhone = API.column(0);
                             var isCharge = API.column(1);
@@ -278,13 +287,9 @@
                             isBindPhone.search('',true,false);
                             isCharge.search('',true,false);
                             sex.search('',true,false);
-                            that.brandCustomerCount = result.data.brandCustomerCount;
-                            that.memberUserDtos = result.data.memberUserDtos
                             that.customerInfoTable.clear();
                             that.customerInfoTable.rows.add(result.data.memberUserDtos).draw();
                             that.customerTableColumn();
-                            toastr.clear();
-                            toastr.success("查询成功");
                         }else{
                             toastr.clear();
                             toastr.error("查询失败");
@@ -298,97 +303,97 @@
             createExcel　: function () {
                 try {
                     var that = this;
-                    var object = this.getDate();
-                    var brandCustomerCount = this.brandCustomerCount;
-                    object.brandCustomerCount = brandCustomerCount;
-                    var memberUserDtos = this.memberUserDtos;
-                    if (memberUserDtos.length <= 1000){
-                        object.memberUserDtos = memberUserDtos;
-                        $.post("member/member_excel",object,function (result) {
+                    that.object = this.getDate();
+                    that.object.brandCustomerCount = that.brandCustomerCount;
+                    if (that.memberUserDtos.length <= 1000){
+                        that.object.memberUserDtos = that.memberUserDtos;
+                        $.post("member/member_excel",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "member/downloadExcel?path="+result.data+"";
                             }else{
                                 toastr.clear();
                                 toastr.error("下载报表出错");
                             }
-                        })
+                        });
                     }else{
                         that.state = 2;
-                        var length = Math.ceil(memberUserDtos.length/1000);
-                        var start = 0;
-                        var end = 1000;
-                        var startPosition = 1006;
-                        for(var i = 1;i <= length;i++){
-                            if (i != length){
-                                object.memberUserDtos = memberUserDtos.slice(start,end);
+                        that.length = Math.ceil(that.memberUserDtos.length/1000);
+                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start,that.end);
+                        $.post("member/member_excel",that.object,function (result) {
+                            if (result.success){
+                                that.object.path = result.data;
+                                that.start = that.end;
+                                that.end = that.start + 1000;
+                                that.index++;
+                                that.appendExcel();
                             }else{
-                                object.memberUserDtos = memberUserDtos.slice(start);
+                                that.state = 1;
+                                that.start = 0;
+                                that.end = 1000;
+                                that.startPosition = 1006;
+                                that.index = 1;
+                                toastr.clear();
+                                toastr.error("生成报表出错");
                             }
-                            object.startPosition = startPosition;
-                            object.path = that.path;
-                            if(i == 1){
-                                $.ajax({
-                                    url:"member/member_excel",
-                                    type:"POST",
-                                    async: false,
-                                    data:object,
-                                    dataType:"json",
-                                    success:function(result){
-                                        if(result.success){
-                                            that.path = result.data;
-                                            start = end;
-                                            end = start + 1000;
-                                        }else{
-                                            that.state = 1;
-                                            toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    }
-                                });
-                            }else if(i == length){
-                                $.post("member/appendExcel",object,function(result){
-                                    if(result.success){
-                                        that.state = 3;
-                                    }else{
-                                        that.state = 1;
-                                        toastr.clear();
-                                        toastr.error("生成报表出错");
-                                        return;
-                                    }
-                                });
-                            }else{
-                                $.ajax({
-                                    url:"member/appendExcel",
-                                    type:"POST",
-                                    async: false,
-                                    data:object,
-                                    dataType:"json",
-                                    success:function(result){
-                                        if(result.success){
-                                            start = end;
-                                            end = start + 1000;
-                                            startPosition = startPosition + 1000;
-                                        }else{
-                                            that.state = 1;
-                                            toastr.clear();
-                                            toastr.error("生成报表出错");
-                                            return;
-                                        }
-                                    }
-                                });
-                            }
-                        }
+                        });
                     }
                 } catch (e){
                     that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1006;
+                    that.index = 1;
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试")
                 }
             },
+            appendExcel : function () {
+                var that = this;
+                try {
+                    if (that.index == that.length) {
+                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start);
+                    } else {
+                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start, that.end);
+                    }
+                    that.object.startPosition = that.startPosition;
+                    $.post("member/appendExcel", that.object, function (result) {
+                        if (result.success) {
+                            that.start = that.end;
+                            that.end = that.start + 1000;
+                            that.startPosition = that.startPosition + 1000;
+                            that.index++;
+                            if (that.index - 1 == that.length) {
+                                that.state = 3;
+                            } else {
+                                that.appendExcel();
+                            }
+                        } else {
+                            that.state = 1;
+                            that.start = 0;
+                            that.end = 1000;
+                            that.startPosition = 1006;
+                            that.index = 1;
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1006;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
             download : function () {
-                window.location.href = "member/downloadExcel?path="+this.path+"";
+                window.location.href = "member/downloadExcel?path="+this.object.path+"";
                 this.state = 1;
+                this.start = 0;
+                this.end = 1000;
+                this.startPosition = 1006;
+                this.index = 1;
             },
             getDate : function(){
                 var data = {
