@@ -4475,6 +4475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //发送本日信息 本月信息 上旬信息
         //本日信息
         StringBuilder todayContent = new StringBuilder();
+
         todayContent.append("{")
                 .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                 .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
