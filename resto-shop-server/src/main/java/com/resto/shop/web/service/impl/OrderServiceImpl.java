@@ -1575,6 +1575,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         JSONArray json = new JSONArray(printTask);
         UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
                 , "订单:" + order.getId() + "返回打印厨打模版" + json.toString());
+        log.info("订单:" + order.getId() + "返回打印厨打模版" + json.toString());
         return printTask;
     }
 
