@@ -46,6 +46,7 @@
         <result column="meal_fee_number" property="mealFeeNumber"/>
         <result column="is_main_food" property="isMainFood"/>
         <result column="virtual_id" property="virtualId"></result>
+        <result column="initials" property="initials"></result>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
@@ -53,7 +54,7 @@
     create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
     fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
     is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
-    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id
+    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -77,7 +78,8 @@
       has_unit, peference, unit, 
       show_big, control_color, show_desc, 
       is_remind,article_type,stock_working_day,stock_weekend,
-      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id)
+      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,
+      is_main_food,virtual_id,initials)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
       #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
       #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
@@ -90,7 +92,7 @@
       #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
       #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
       #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
-      #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER})
+      #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER},#{initials})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
@@ -218,6 +220,9 @@
             <if test="virtualId != null">
                 virtual_id,
             </if>
+            <if test="initials != null">
+                initials,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -343,6 +348,9 @@
             <if test="virtualId != null">
                 #{virtualId,jdbcType=INTEGER}
             </if>
+            <if test="initials != null">
+                #{initials}
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -467,6 +475,9 @@
             <if test="virtualId == -1">
                 virtual_id = null,
             </if>
+            <if test="initials != null">
+                initials = #{initials},
+            </if>
             photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -512,6 +523,7 @@
       meal_fee_number = #{mealFeeNumber},
       is_main_food = #{isMainFood},
       virtual_id = #{virtualId},
+      initials = #{initials},
       photo_square = null
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -924,7 +936,22 @@ GROUP BY article_id
     </select>
 
     <select id="getArticleListByFamily" resultType="Article">
-        SELECT * from tb_article where activated = 1 and state = 1 and shop_detail_id = #{shopId}
-          and article_family_id = #{articleFamilyId} order by sort LIMIT #{currentPage},#{showCount}
+        SELECT * from tb_article a
+        LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
+        <foreach collection="times" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+        LEFT JOIN tb_support_time st on ast.support_time_id = st.id
+        where a.activated = 1 and a.state = 1 and a.shop_detail_id = #{shopId}
+        and a.article_family_id = #{articleFamilyId} and discount is not null
+        order by a.sort LIMIT #{currentPage},#{showCount}
     </select>
+
+    <select id="selectArticleList" resultType="Article">
+        select * from tb_article
+    </select>
+
+    <update id="updateInitialsById">
+        update tb_article set initials = #{initials} where id = #{articleId}
+    </update>
 </mapper>

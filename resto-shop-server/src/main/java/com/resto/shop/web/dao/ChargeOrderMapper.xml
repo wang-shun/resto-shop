@@ -348,11 +348,13 @@
         AND order_state = 1
     </select>
 
-	<select id="selectByShopToDay" parameterType="java.lang.String" resultType="java.util.Map">
+	<select id="selectByShopToDay" parameterType="java.util.Map" resultType="java.util.Map">
 		select tco.charge_money chargeMoney,tc.telephone from tb_charge_order tco
 		inner join tb_customer tc on  tco.customer_id = tc.id
 		where tco.shop_detail_id = #{shopId}
-		and tco.order_state = 1 and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(tco.finish_time,'%d %b %y')
+		and tco.order_state = 1
+		and tco.finish_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
+		and tco.finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
 	</select>
 
     <select id="selectChargeRedPacket" resultType="com.resto.brand.web.dto.RedPacketDto">

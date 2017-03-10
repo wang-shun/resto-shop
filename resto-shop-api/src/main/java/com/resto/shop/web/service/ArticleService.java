@@ -99,4 +99,17 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * 根据分类查询分类下的所有菜品
 	 */
 	List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount);
+
+	/**
+	 * 修改菜品名称的首字母
+	 * @param initials
+	 * @param articleId
+     */
+	void updateInitialsById(String initials, String articleId);
+
+	/**
+	 * 不分条件下所有的菜品
+	 * @return
+     */
+	List<Article> selectArticleList();
 }

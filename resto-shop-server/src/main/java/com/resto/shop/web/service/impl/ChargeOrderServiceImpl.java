@@ -283,8 +283,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	}
 	
 	@Override
-	public List<Map<String, Object>> selectByShopToDay(String shopId) {
-		return chargeorderMapper.selectByShopToDay(shopId);
+	public List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap) {
+		return chargeorderMapper.selectByShopToDay(selectMap);
 	}
 
     @Override

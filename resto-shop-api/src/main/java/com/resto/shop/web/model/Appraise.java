@@ -82,6 +82,17 @@ public class Appraise implements Serializable {
 
     private String sex;
 
+    //反馈选择的餐品
+    private String feedbackArticle;
+
+    public String getFeedbackArticle() {
+        return feedbackArticle;
+    }
+
+    public void setFeedbackArticle(String feedbackArticle) {
+        this.feedbackArticle = feedbackArticle;
+    }
+
     public String getSex() {
         return sex;
     }

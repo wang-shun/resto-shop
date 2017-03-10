@@ -27,6 +27,8 @@ import com.resto.shop.web.service.PrinterService;
 import com.resto.shop.web.service.ThirdService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -45,6 +47,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RpcService
 public class ThirdServiceImpl implements ThirdService {
 
+
+    Logger log = LoggerFactory.getLogger(getClass());
     //用来添加打印小票的序号
     //添加两个Map 一个是订单纬度,一个是店铺纬度
     private static final Map<String, Map<String, Integer>> NUMBER_ORDER_MAP = new ConcurrentHashMap<>();
@@ -225,8 +229,9 @@ public class ThirdServiceImpl implements ThirdService {
         }
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         JSONArray json = new JSONArray(printTask);
-        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+        log.info("订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
         return printTask;
     }
 
@@ -314,8 +319,9 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         JSONObject json = new JSONObject(print);
-        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+        log.info("订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
         return print;
     }
 

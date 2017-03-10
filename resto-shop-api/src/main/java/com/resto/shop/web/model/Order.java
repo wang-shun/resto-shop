@@ -196,6 +196,17 @@ public class Order implements Serializable{
     //订单及他所有加菜订单的原价总和
     private BigDecimal allOrderOriginalAmount;
 
+    //加菜位置  pos为pos端点菜   wechat为wehcat端点菜
+    private String createOrderByAddress;
+
+    public String getCreateOrderByAddress() {
+        return createOrderByAddress;
+    }
+
+    public void setCreateOrderByAddress(String createOrderByAddress) {
+        this.createOrderByAddress = createOrderByAddress;
+    }
+
     public BigDecimal getAllOrderOriginalAmount() {
         return allOrderOriginalAmount;
     }
