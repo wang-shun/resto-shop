@@ -381,6 +381,9 @@ public class Order implements Serializable{
         this.payMode = payMode;
     }
 
+    /**
+     * 订单支付项
+     */
     private List<OrderPaymentItem> orderPaymentItems;
 
     private BigDecimal servicePrice;
