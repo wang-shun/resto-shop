@@ -363,7 +363,6 @@ public class OrderController extends GenericController{
 					orderException.setCreateTime(o.getCreateTime());
 					orderException.setBrandName(getBrandName());
 					orderExceptionService.insert(orderException);
-
 				}
 			}
 		}
@@ -378,7 +377,6 @@ public class OrderController extends GenericController{
 				}else {
 					temp= od.getOrderMoney();
 				}
-
 				BigDecimal tempoi = BigDecimal.ZERO;
 				for( OrderPaymentItem oi :od.getOrderPaymentItems()){
 					tempoi=tempoi.add(oi.getPayValue());
@@ -392,17 +390,11 @@ public class OrderController extends GenericController{
 					orderException2.setCreateTime(od.getCreateTime());
 					orderException2.setBrandName(getBrandName());
 					orderExceptionService.insert(orderException2);
-
 				}
-
-
 			}
 		}
-
 		return  getSuccessResult();
-
 	}
-
 
 	/*
 	测试每日发短信
@@ -411,9 +403,8 @@ public class OrderController extends GenericController{
     @ResponseBody
 	public  Result testEveryDayMessage(){
 	    //定义店铺
-	    ShopDetail s  = shopDetailService.selectByPrimaryKey("f3910fceb055442ab6b3abc6642eb70a");
+	    ShopDetail s  = shopDetailService.selectByPrimaryKey("d89d1a7ef12346bfb0ef92faba8872af");
         orderService.cleanShopOrder(s,null);
         return  getSuccessResult();
     }
-
 }

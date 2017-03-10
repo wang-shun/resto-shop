@@ -43,7 +43,8 @@
         <result column="create_time" property="createTime"/>
         <result column="amount_with_children" property="amountWithChildren"/>
         <result column="customer_id" property="customerId"/>
-
+        <result column="order_mode" property="orderMode" />
+        <result column="pay_type" property="payType" />
         <!-- 用户 -->
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customerId" property="id"/>
@@ -83,6 +84,50 @@
         </association>
         <!-- 评论 -->
     </resultMap>
+
+
+    <!--2017-03-09 yz 查询新用户的订单详情 -->
+    <resultMap id="NewCustomerOrderByShopIdAndTimeMap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="pay_type" property="payType"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="customer_id" property="customerId"/>
+        <!-- 用户 -->
+        <association property="customer" javaType="com.resto.shop.web.model.Customer">
+            <id column="customerId" property="id"/>
+            <result column="share_customer" property="shareCustomer"/>
+        </association>
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
+    </resultMap>
+
+    <resultMap id="CompleteByShopIdAndTimeMap" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
+        <result column="production_status" property="productionStatus" jdbcType="INTEGER"/>
+        <result column="order_mode" property="orderMode" />
+        <result column="pay_type" property="payType" />
+        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="parent_order_id" property="parentOrderId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="customer_id" property="customerId"/>
+        <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
+            <result column="payment_mode_id" property="paymentModeId"/>
+        </collection>
+
+    </resultMap>
+
 
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -2447,6 +2492,8 @@ AND o.production_status IN (2, 3)
     <select id="selectListsmsByShopId" resultMap="everdayReport">
     SELECT
 	o.id,
+	o.order_mode,
+	o.pay_type,
 	o.order_state,
 	o.production_status,
 	o.order_money,
@@ -2466,7 +2513,7 @@ AND o.production_status IN (2, 3)
 	c.is_share
 FROM
 	tb_order o
-LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
+INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
@@ -2665,12 +2712,16 @@ GROUP BY oi.article_name
         GROUP BY c.telephone
     </select>
 
-    <select id="selectNewCustomerOrderByShopIdAndTime" resultType="order">
+    <select id="selectNewCustomerOrderByShopIdAndTime" resultMap="NewCustomerOrderByShopIdAndTimeMap">
         SELECT
+        o.id,
+        o.order_mode,
+        o.pay_type,
         o.customer_id,
         c.share_customer,
         o.order_money,
-        o.amount_with_children
+        o.amount_with_children,
+        oi.payment_mode_id
         FROM
         tb_order o
         INNER JOIN tb_order_payment_item oi
@@ -2703,7 +2754,7 @@ GROUP BY oi.article_name
 
     <select id="selectBackCustomerByShopIdAndTime" resultType="com.resto.brand.web.dto.BackCustomerDto">
         SELECT
-        customer_id,
+        o.customer_id,
         COUNT(*)num
         FROM
         tb_order o
@@ -2715,7 +2766,7 @@ GROUP BY oi.article_name
         o.create_time <#{beginDate}
        ]]>
         AND o.shop_detail_id = #{shopId}
-        AND customer_id in (
+        AND o.customer_id in (
         SELECT customer_id FROM tb_order
         WHERE order_state in(2,10,11,12)
         AND production_status in(2,3)
@@ -2723,16 +2774,23 @@ GROUP BY oi.article_name
         <![CDATA[
             create_time>#{beginDate} AND create_time<#{endDate}
         ]]>
-        AND o.shop_detail_id=#{shopId}
+        AND shop_detail_id=#{shopId}
         )
         GROUP BY customer_id
     </select>
 
-    <select id="selectCompleteByShopIdAndTime" resultType="order">
+    <select id="selectCompleteByShopIdAndTime" resultMap="CompleteByShopIdAndTimeMap">
         SELECT
+        o.id,
+        o.order_mode,
+        o.pay_type,
         o.customer_id,
         o.order_money,
-        o.amount_with_children FROM tb_order o
+        o.create_time,
+        o.amount_with_children,
+        oi.id orderPaymentItem_id,
+        oi.payment_mode_id
+        FROM tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE o.order_state IN (2, 10, 11, 12)
@@ -2744,5 +2802,4 @@ GROUP BY oi.article_name
         AND o.create_time < #{endDate}
         ]]>
     </select>
-
 </mapper>
