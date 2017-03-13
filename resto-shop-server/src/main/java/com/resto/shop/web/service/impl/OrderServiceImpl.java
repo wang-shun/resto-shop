@@ -2326,6 +2326,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(order.getOrderState() != OrderState.PAYMENT){
             return null;
         }
+        if(order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE){
+            return null;
+        }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
@@ -2355,6 +2358,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order confirmBossOrder(Order order) {
         order = selectById(order.getId());
         if(order.getOrderState() != OrderState.PAYMENT){
+            return null;
+        }
+        if(order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE){
             return null;
         }
         Brand brand = brandService.selectById(order.getBrandId());

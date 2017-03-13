@@ -30,7 +30,13 @@ public class ProductionStatus {
 	 * 已下单未打印
 	 */
 	public final static int NOT_PRINT = 5;
-	
+
+	/**
+	 * 订单菜品全是退完
+	 */
+	public final static int REFUND_ARTICLE = 6;
+
+
 	public static String getStatusName(Integer productionStatus){
 		switch (productionStatus) {
 		case ProductionStatus.NOT_ORDER:
