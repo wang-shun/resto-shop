@@ -685,11 +685,14 @@
      LEFT JOIN we_return_customer wc ON wc.shop_id =wo.shop_id
       LEFT JOIN we_return_item wm on wo.shop_id = wm.shop_id 
       WHERE wo.shop_id=#{shopId} 
-      AND wo.create_time=#{createTime}
-       AND cl.create_time=#{createTime} 
-       AND wi.create_time=#{createTime} 
-       AND wm.create_time=#{createTime} 
+      AND
+       <![CDATA[
+                wo.create_time=#{createTime}
+       AND cl.create_time=#{createTime}
+       AND wi.create_time=#{createTime}
+       AND wm.create_time=#{createTime}
        AND wc.create_time=#{createTime}
+      ]]>
 </select>
   <select id="selectList" resultType="WeOrderDetail">select * from we_order_detail</select>
 </mapper>

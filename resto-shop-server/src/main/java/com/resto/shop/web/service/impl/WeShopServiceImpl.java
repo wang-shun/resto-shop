@@ -40,6 +40,7 @@ public class WeShopServiceImpl extends GenericServiceImpl<WeShop, Integer> imple
 
     @Override
     public WeShop selectWeShopByShopIdAndTime(String shopId, String createTime) {
+        System.err.println("进入方法:shopId"+shopId+"createTime"+DateUtil.fomatDate(createTime));
         return weshopMapper.selectWeShopByShopIdAndTime(shopId,DateUtil.fomatDate(createTime));
     }
 }

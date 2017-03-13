@@ -4,6 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.DayMessage;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
@@ -4195,9 +4196,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder) {
-
         //
-
         String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
         String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
         List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
@@ -4238,11 +4237,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endMonth));
         //2定义顾客id集合
         //本日之前出现的所有顾客的Id
-        List<String> customerBeforeToday = new ArrayList<>();
+        List<String> customerBeforeToday = new ArrayList<>(DayMessage.customerBeforeToday);
         //本日出现的顾客id(所有)
         Set<String> customerInToday = new HashSet<>();
         //本日新增用户个数
-        Set<String> todayNewCutomer = new HashSet<>();
+        Set<String> todayNewCutomer = new HashSet<>(DayMessage.customerInToday);
         //本日分享注册的顾客id
         List<String> customerShareInToday = new ArrayList<>();
         //本日新增自然用户个数

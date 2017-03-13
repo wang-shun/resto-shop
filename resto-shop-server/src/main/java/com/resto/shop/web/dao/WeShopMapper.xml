@@ -92,7 +92,10 @@
     FROM
     we_shop ws
     INNER JOIN we_shop_score wss ON ws.shop_id = wss.shop_id
-    WHERE ws.brand_id =#{brandId} and wss.create_time = #{createTime}
+    WHERE ws.brand_id =#{brandId} and
+    <![CDATA[
+           wss.create_time = #{createTime}
+    ]]>
     ORDER  BY  wss.shop_score DESC
 </select>
 
@@ -112,7 +115,11 @@
         FROM
         we_shop ws
         INNER JOIN we_shop_score wss ON ws.shop_id = wss.shop_id
-        WHERE ws.shop_id =#{shopId} and wss.create_time = #{createTime}
+        WHERE ws.shop_id =#{shopId} and
+        <![CDATA[
+          wss.create_time = #{createTime}
+        ]]>
+
     </select>
 
 
