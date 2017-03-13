@@ -80,30 +80,25 @@
 	            var that = this;
                 that.shopAppraiseTable = $("#shopAppraise").DataTable({
                     lengthMenu: [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
-                    autoWidth: false,
+                    order: [[ 0, "desc" ]],
                     columns : [
                         {
                             title:'评分',
-                            data:'appraise.level',
-                            createdCell:function(td,tdData){
-                                $(td).html(getLevel(tdData))
-                            }
+                            data:'levelName'
                         },
                         {
                             title : "评论对象",
-                            data : "appraise.feedback"
+                            data : "feedBack",
+                            orderable : false
                         },
                         {
                             title :"评论时间",
-                            data : "appraise.createTime",
-                            createdCell:function(td,tdData){
-                                $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
-                            }
+                            data : "createTime"
                         },
                         {
                             title : "手机号",
-                            data : "customer.telephone",
-                            defaultContent:""
+                            data : "telephone",
+                            orderable : false
                         },
                         {
                             title : "订单金额",
@@ -111,12 +106,12 @@
                         },
                         {
                             title : "评论金额",
-                            data : "appraise.redMoney"
+                            data : "redMoney"
                         },
                         {
                             title : "评论内容",
-                            data : "appraise.content" ,
-                            defaultContent:"",
+                            data : "content",
+                            orderable : false
                         },
                     ]
                 });
@@ -127,10 +122,15 @@
 	        	try{
 		            var that = this;
                     $.post("appraiseReport/shop_data", this.getDate(), function(result) {
-                        that.shopAppraiseTable.clear();
-                        that.shopAppraiseTable.rows.add(result).draw();
-                        toastr.clear();
-                        toastr.success("查询成功");
+                        if (result.success) {
+                            that.shopAppraiseTable.clear();
+//                        that.shopAppraiseTable.rows.add(result.data).draw();
+                            toastr.clear();
+                            toastr.success("查询成功");
+                        }else {
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
                     });
 	        	}catch(e){
 					toastr.clear();
@@ -175,29 +175,5 @@
 	        }
 	    }
 	});
-
-    function getLevel(level){
-        var levelName = '';
-        switch (level)
-        {
-            case 1:
-                levelName="一星";
-                break;
-            case 2:
-                levelName="二星";
-                break;
-            case 3:
-                levelName="三星";
-                break;
-            case 4:
-                levelName="四星";
-                break;
-            case 5:
-                levelName="五星";
-                break;
-
-        }
-        return levelName;
-    }
 </script>
 

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import org.springframework.stereotype.Controller;
@@ -54,7 +55,6 @@ public class appraiseReportController extends GenericController{
     public void list(){
     }
 	
-	
 	@RequestMapping("/brand_data")
 	@ResponseBody
 	public Result selectMoneyAndNumByDate(String beginDate,String endDate){
@@ -67,7 +67,6 @@ public class appraiseReportController extends GenericController{
         }
         return result;
 	}
-
 
 	private Result getResult(String beginDate, String endDate) {
 		return getSuccessResult(this.getSuccess(beginDate, endDate));
@@ -294,8 +293,8 @@ public class appraiseReportController extends GenericController{
         return getSuccessResult(path);
 	  }
 
-	  @RequestMapping("/downloadBrandExcel")
-	  public void downloadBrandExcel(String path , HttpServletResponse response){
+    @RequestMapping("/downloadBrandExcel")
+    public void downloadBrandExcel(String path , HttpServletResponse response){
 	      ExcelUtil<Object> excelUtil = new ExcelUtil<>();
 	      try{
             excelUtil.download(path, response);
@@ -308,9 +307,16 @@ public class appraiseReportController extends GenericController{
 
     @RequestMapping("shop_data")
     @ResponseBody
-    public List<Order> selectAppraiseByShopId(String beginDate,String endDate,String shopId){
+    public Result selectAppraiseByShopId(String beginDate,String endDate,String shopId){
+        JSONObject object = new JSONObject();
+        try{
 
-        return orderService.selectAppraiseByShopId(beginDate,endDate,shopId);
+        }catch (Exception e){
+            log.error("查看店铺评论报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult(false);
     }
 
 	@RequestMapping("create_shop_excel")
