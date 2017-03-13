@@ -22,6 +22,7 @@ import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.WeItemService;
@@ -217,7 +218,11 @@ public class OrderController extends GenericController{
                     }
                 }
             }
-			ot.setOrderState(OrderState.getStateName(o.getOrderState()));
+            if (!o.getProductionStatus().equals(6)) {
+                ot.setOrderState(OrderState.getStateName(o.getOrderState()) + "-" + ProductionStatus.getStatusName(o.getProductionStatus()));
+            }else{
+                ot.setOrderState("退菜取消");
+            }
 			//订单支付
 			if(o.getOrderPaymentItems()!=null){
 				if(!o.getOrderPaymentItems().isEmpty()){
@@ -303,7 +308,11 @@ public class OrderController extends GenericController{
                 object.put("level",Appraise.getLevel(o.getAppraise().getLevel()));
                 object.put("levelValue",o.getAppraise().getContent());
             }
-            object.put("orderState", OrderState.getStateName(o.getOrderState()));
+            if (!o.getProductionStatus().equals(6)) {
+                object.put("orderState", OrderState.getStateName(o.getOrderState()) + "-" + ProductionStatus.getStatusName(o.getProductionStatus()));
+            }else {
+                object.put("orderState", "退菜取消");
+            }
             BigDecimal articleMoney = BigDecimal.ZERO;
             for (OrderItem item : o.getOrderItems()){
                 articleMoney = articleMoney.add(item.getFinalPrice());
