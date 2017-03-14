@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.business;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.model.Brand;
@@ -44,9 +45,12 @@ public class ShopInfoController extends GenericController{
     @RequestMapping("list_one")
     @ResponseBody
     public Result list_one(){
+        JSONObject object = new JSONObject();
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
-
-        return getSuccessResult(shopDetail);
+        object.put("shop",shopDetail);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        object.put("brand",brandSetting);
+        return getSuccessResult(object);
     }
 
 

@@ -688,11 +688,16 @@
       AND
        <![CDATA[
                 wo.create_time=#{createTime}
-       AND cl.create_time=#{createTime}
-       AND wi.create_time=#{createTime}
+        AND cl.create_time=#{createTime}
+        AND wi.create_time=#{createTime}
        AND wm.create_time=#{createTime}
        AND wc.create_time=#{createTime}
       ]]>
+      <!--
+
+
+      -->
+
 </select>
   <select id="selectList" resultType="WeOrderDetail">select * from we_order_detail</select>
 </mapper>
