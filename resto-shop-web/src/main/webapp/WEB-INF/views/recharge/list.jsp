@@ -176,7 +176,7 @@
                             data : "shopId",
                             orderable : false,
                             createdCell: function (td, tdData) {
-                                var button = $("<a href='recharge/shopRechargeLog?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
+                                var button = $("<a href='recharge/shopRechargeLog?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopDetailId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }
                         },

@@ -95,22 +95,28 @@ public class RechargeLogController extends GenericController{
 
 	/**
 	 * 店铺详细
-	 * @param shopDetailId
+	 * @param shopId
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 */
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
-	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
-		String shopname=getShopList(shopDetailId);
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,begin,end);
-		for (int i=0;i<chargeList.size();i++){
-			chargeList.get(i).getChargelog().setShopName(shopname);
-		}
-        return chargeList ;
+	public Result queryShopchargecord(String shopId, String beginDate, String endDate){
+	    JSONObject object = new JSONObject();
+	    try {
+            String shopname = getShopList(shopId);
+            Date begin = DateUtil.getformatBeginDate(beginDate);
+            Date end = DateUtil.getformatEndDate(endDate);
+            List<ChargeOrder> chargeList = chargeorderService.shopChargeCodes(shopId, begin, end);
+            for (int i = 0; i < chargeList.size(); i++) {
+                chargeList.get(i).getChargelog().setShopName(shopname);
+            }
+            object.put("result",chargeList);
+        }catch (Exception e){
+            return new Result(false);
+        }
+        return getSuccessResult(object);
 	}
 
     /**
@@ -131,6 +137,13 @@ public class RechargeLogController extends GenericController{
         List<ShopDetailDto>  result = new LinkedList<>();
         Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate);
         result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
+        for (ShopDetailDto shopDetailDto : result){
+            if (shopDetailDto.getType().equals(1)) {
+                shopDetailDto.setTypeString("微信充值");
+            }else{
+                shopDetailDto.setTypeString("pos充值");
+            }
+        }
         //导出文件名
         String fileName = "店铺充值记录详细"+beginDate+"至"+endDate
                 +".xls";
@@ -148,7 +161,7 @@ public class RechargeLogController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "充值报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "8");//显示的位置
+		map.put("num", "6");//显示的位置
 		map.put("reportTitle", "充值报表");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
