@@ -7,26 +7,20 @@
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
-		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="beginDate">开始时间：</label>
-		    <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
-		  </div>
-		  <div class="form-group" style="margin-right: 50px;">
-		    <label for="endDate">结束时间：</label>
-		    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
-		  </div>
-
+              <div class="form-group" style="margin-right: 50px;">
+                <label for="beginDate">开始时间：</label>
+                <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
+              </div>
+              <div class="form-group" style="margin-right: 50px;">
+                <label for="endDate">结束时间：</label>
+                <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
+              </div>
 		   	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
-
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
-
-<!--              <button type="button" class="btn btn-primary" @click="benxun">本询</button> -->
-
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-		  	 <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
+		  	 <button type="button" class="btn btn-primary" @click="download">下载报表</button><br/>
 		</form>
 
 	</div>
@@ -34,16 +28,14 @@
 <br/>
 <br/>
 
-<!-- 品牌订单列表 -->
-    <div role="tabpanel" class="tab-pane" id="orderReport">
+    <div role="tabpanel" class="tab-pane">
     	<div class="panel panel-primary" style="border-color:write;">
-		  	<!-- 品牌订单 -->
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
 		  	<strong style="margin-right:100px;font-size:22px">品牌充值记录</strong>
 		  </div>
 		  <div class="panel-body">
-		  	<table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
+		  	<table class="table table-striped table-bordered table-hover" width="100%">
 		  			<thead>
 					<tr>
 						<th>品牌名称</th>
@@ -59,19 +51,25 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<!-- <td><strong>{{brandReport.brandName}}</strong></td> -->
-						<td>{{brandInit.brandName}}</td>
-						<td>{{brandInit.rechargeCount}}</td>
-						<td>{{brandInit.rechargeNum}}</td>
-                        <td>{{brandInit.rechargeGaNum}}</td>
-                        <td>{{brandInit.rechargeWeChat}}</td>
-                        <td>{{brandInit.rechargePos}}</td>
-						<td>{{brandInit.rechargeCsNum}}</td>
-						<td>{{brandInit.rechargeGaCsNum}}</td>
-                        <td>{{brandInit.rechargeSpNum}}</td>
-                        <td>{{brandInit.rechargeGaSpNum}}</td>
-					</tr>
+                    <template v-if="brandCharges.brandName != null">
+                        <tr>
+                            <td>{{brandCharges.brandName}}</td>
+                            <td>{{brandCharges.rechargeCount}}</td>
+                            <td>{{brandCharges.rechargeNum}}</td>
+                            <td>{{brandCharges.rechargeGaNum}}</td>
+                            <td>{{brandCharges.rechargeWeChat}}</td>
+                            <td>{{brandCharges.rechargePos}}</td>
+                            <td>{{brandCharges.rechargeCsNum}}</td>
+                            <td>{{brandCharges.rechargeGaCsNum}}</td>
+                            <td>{{brandCharges.rechargeSpNum}}</td>
+                            <td>{{brandCharges.rechargeGaSpNum}}</td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="10" align="center">暂时没有数据...</td>
+                        </tr>
+                    </template>
 				</tbody>
 		  	</table>
 		  </div>
@@ -79,180 +77,184 @@
 		  </div>
 		</div>
 
-	<!-- 店铺订单列表 -->
-    <div role="tabpanel" class="tab-pane" id="orderReport">
+    <div role="tabpanel" class="tab-pane">
     	<div class="panel panel-primary" style="border-color:write;">
-		  	<!-- 品牌订单 -->
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
 		  	<strong style="margin-right:100px;font-size:22px">店铺充值记录</strong>
 		  </div>
 		  <div class="panel-body">
-		  	<table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
-		  			<thead>
-					<tr>
-						<th>店铺名称</th>
-						<th>充值单数</th>
-						<th>充值总额(元)</th>
-                        <th>充值赠送总额(元)</th>
-                        <th>微信端充值(元)</th>
-                        <th>POS端充值(元)</th>
-                        <th>充值消费(元)</th>
-                        <th>充值赠送消费(元)</th>
-                        <th>操作</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="shopRecharge in shopRrchargeLogs">
-						<td>{{shopRecharge.shopName}}</td>
-						<td>{{shopRecharge.shopCount}}</td>
-						<td>{{shopRecharge.shopNum}}</td>
-                        <td>{{shopRecharge.shopGaNum}}</td>
-                        <td>{{shopRecharge.shopWeChat}}</td>
-                        <td>{{shopRecharge.shopPos}}</td>
-						<td>{{shopRecharge.shopCsNum}}</td>
-                        <td>{{shopRecharge.shopGaCsNum}}</td>
-						<td><button class="btn btn-sm btn-success"
-								@click="showShopReport(shopRecharge.shopId)">查看详情</button></td>
-					</tr>
-				</tbody>
+		  	<table id="shopChargeLogTable" class="table table-striped table-bordered table-hover" width="100%">
 		  	</table>
 		  </div>
 		</div>
 		  </div>
 		</div>
-
-	  <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
-           <div class="modal-dialog modal-full">
-               <div class="modal-content">
-                   <div class="modal-header">
-
-                       <button type="button" class="close" data-dismiss="modal" aria-hidden="true" @click="closeModal"></button>
-                   </div>
-                   <div class="modal-body"> </div>
-                   <div class="modal-footer">
-                        <button type="button" class="btn btn-info btn-block" data-dismiss="modal" aria-hidden="true" @click="closeModal" style="position:absolute;bottom:32px;">关闭</button>
-                   </div>
-               </div>
-               <!-- /.modal-content -->
-           </div>
-           <!-- /.modal-dialog -->
-       </div>
-
     </div>
   </div>
 
- <script src="assets/customer/date.js" type="text/javascript"></script>
+<script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
 
-//时间插件
-$('.form_datetime').datetimepicker({
-		endDate:new Date(),
-		minView:"month",
-		maxView:"month",
-		autoclose:true,//选择后自动关闭时间选择器
-		todayBtn:true,//在底部显示 当天日期
-		todayHighlight:true,//高亮当前日期
-		format:"yyyy-mm-dd",
-		startView:"month",
-		language:"zh-CN"
-	});
+    //时间插件
+    $('.form_datetime').datetimepicker({
+            endDate:new Date(),
+            minView:"month",
+            maxView:"month",
+            autoclose:true,//选择后自动关闭时间选择器
+            todayBtn:true,//在底部显示 当天日期
+            todayHighlight:true,//高亮当前日期
+            format:"yyyy-mm-dd",
+            startView:"month",
+            language:"zh-CN"
+        });
 
 
-//创建vue对象
-var vueObj =  new Vue({
-	el:"#control",
-	data:{
-		brandInit:{},
-		shopRrchargeLogs:[],
-		searchDate : {
-			beginDate : "",
-			endDate : ""
-		},
-		modalInfo:{
-			title:"",
-			content:""
-		},
-	},
-	methods:{
-		searchInfo : function(beginDate, endDate) {
-		var that = this;
-		//判断 时间范围是否合法
-		if(beginDate>endDate){
-			toastr.error("开始时间不能大于结束时间")
-			return ;
-		}
-			$.post("recharge/rechargeLog", this.getDate(null), function(result) {
-				that.brandInit = result.data.brandInit;
-				that.shopRrchargeLogs = result.data.shopRrchargeLogs;
-				toastr.success("查询成功");
-			});
-		},
-		getDate : function(shopDetailId){
-			var data = {
-				shopDetailId :shopDetailId,
-				beginDate : this.searchDate.beginDate,
-				endDate : this.searchDate.endDate
-			};
-			return data;
-		},
-		showShopReport : function(shopDetailId) {
-			$("#reportModal").modal('show');
-				$.post("recharge/shopRechargeLog",this.getDate(shopDetailId),function(result) {
-					var modal = $("#reportModal");
-					modal.find(".modal-body").html(result);
-					modal.find(".text-center > strong").html("店铺充值记录详细");
-					modal.modal()
-				});
-		},
-
-		closeModal : function(){
-			var modal = $("#reportModal");
-			modal.find(".modal-body").html("");
-			modal.modal({show:false});
-		},
-		today : function(){
-			date = new Date().format("yyyy-MM-dd");
-			this.searchDate.beginDate = date
-			this.searchDate.endDate = date
-			this.searchInfo();
-		},
-		yesterDay : function(){
-
-			this.searchDate.beginDate = GetDateStr(-1);
-			this.searchDate.endDate  = GetDateStr(-1);
-			this.searchInfo();
-		},
-
-		week : function(){
-			this.searchDate.beginDate  = getWeekStartDate();
-			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
-			this.searchInfo();
-		},
-		month : function(){
-			this.searchDate.beginDate  = getMonthStartDate();
-			this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
-			this.searchInfo();
-		},
-		//下载
-		brandreportExcel : function (){
-			var beginDate = this.searchDate.beginDate;
-			var endDate = this.searchDate.endDate;
-			location.href="recharge/brandOrShop_excel?beginDate="+beginDate+"&&endDate="+endDate;
-		}
-
-	},
-
-	created : function() {
-		var that = this;
-		var date = new Date().format("yyyy-MM-dd");
-		this.searchDate.beginDate = date;
-		this.searchDate.endDate = date;
-		this.searchInfo();
-	}
-
-})
+    //创建vue对象
+    var vueObj =  new Vue({
+        el:"#control",
+        data:{
+            brandCharges:{},
+            shopChargeLogs:[],
+            shopChargeLogTable:{},
+            searchDate : {
+                beginDate : "",
+                endDate : ""
+            }
+        },
+        created : function() {
+            var date = new Date().format("yyyy-MM-dd");
+            this.searchDate.beginDate = date;
+            this.searchDate.endDate = date;
+            this.initDataTables();
+            this.searchInfo();
+        },
+        methods:{
+            initDataTables:function () {
+                //that代表 vue对象
+                var that = this;
+                that.shopChargeLogTable = $("#shopChargeLogTable").DataTable({
+                    lengthMenu: [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
+                    order: [[ 1, "desc" ]],
+                    columns : [
+                        {
+                            title:"店铺名称",
+                            data:"shopName",
+                            orderable : false
+                        },
+                        {
+                            title : "充值单数",
+                            data : "shopCount"
+                        },
+                        {
+                            title :"充值总额(元)",
+                            data : "shopNum"
+                        },
+                        {
+                            title : "充值赠送总额(元)",
+                            data : "shopGaNum"
+                        },
+                        {
+                            title : "微信端充值(元)",
+                            data : "shopWeChat"
+                        },
+                        {
+                            title : "POS端充值(元)",
+                            data : "shopPos"
+                        },
+                        {
+                            title : "充值消费(元)",
+                            data : "shopCsNum"
+                        },
+                        {
+                            title : "充值赠送消费(元)",
+                            data : "shopGaCsNum"
+                        },
+                        {
+                            title : "操作",
+                            data : "shopId",
+                            orderable : false,
+                            createdCell: function (td, tdData) {
+                                var button = $("<a href='recharge/shopRechargeLog?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
+                                $(td).html(button);
+                            }
+                        },
+                    ]
+                });
+            },
+            searchInfo : function() {
+                var that = this;
+                toastr.clear();
+                toastr.success("查询中...");
+                try {
+                    $.post("recharge/rechargeLog", this.getDate(), function (result) {
+                        if (result.success) {
+                            that.brandCharges = result.data.brandInit;
+                            that.shopChargeLogs = result.data.shopRrchargeLogs;
+                            that.shopChargeLogTable.clear();
+                            that.shopChargeLogTable.rows.add(result.data.shopRrchargeLogs).draw();
+                            toastr.clear();
+                            toastr.success("查询成功");
+                        }else{
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            download : function () {
+                var that = this;
+                try {
+                    var object = that.getDate();
+                    object.brandChargeLogs = that.brandCharges;
+                    object.shopChargeLogs = that.shopChargeLogs;
+                    $.post("recharge/brandOrShop_excel",object,function (result) {
+                        if (result.success){
+                            window.location.href = "recharge/download_brand_excel?path="+result.data+"";
+                        }else{
+                            toastr.clear();
+                            toastr.error("下载报表出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            getDate : function(){
+                var data = {
+                    beginDate : this.searchDate.beginDate,
+                    endDate : this.searchDate.endDate
+                };
+                return data;
+            },
+            today : function(){
+                date = new Date().format("yyyy-MM-dd");
+                this.searchDate.beginDate = date;
+                this.searchDate.endDate = date;
+                this.searchInfo();
+            },
+            yesterDay : function(){
+                this.searchDate.beginDate = GetDateStr(-1);
+                this.searchDate.endDate  = GetDateStr(-1);
+                this.searchInfo();
+            },
+            week : function(){
+                this.searchDate.beginDate  = getWeekStartDate();
+                this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                this.searchInfo();
+            },
+            month : function(){
+                this.searchDate.beginDate  = getMonthStartDate();
+                this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                this.searchInfo();
+            }
+        }
+    })
 
 
 </script>
