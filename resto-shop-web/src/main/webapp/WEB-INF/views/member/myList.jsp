@@ -306,9 +306,11 @@
                 try {
                     var that = this;
                     that.object = this.getDate();
-                    that.object.brandCustomerCount = that.brandCustomerCount;
-                    if (that.memberUserDtos.length <= 1000){
-                        that.object.memberUserDtos = that.memberUserDtos;
+                    that.brandCustomer = that.brandCustomerCount;
+                    that.memberList = that.memberUserDtos;
+                    that.object.brandCustomerCount = that.brandCustomer;
+                    if (that.memberList.length <= 1000){
+                        that.object.memberUserDtos = that.memberList;
                         $.post("member/member_excel",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "member/downloadExcel?path="+result.data+"";
@@ -319,8 +321,8 @@
                         });
                     }else{
                         that.state = 2;
-                        that.length = Math.ceil(that.memberUserDtos.length/1000);
-                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start,that.end);
+                        that.length = Math.ceil(that.memberList.length/1000);
+                        that.object.memberUserDtos = that.memberList.slice(that.start,that.end);
                         $.post("member/member_excel",that.object,function (result) {
                             if (result.success){
                                 that.object.path = result.data;
@@ -353,9 +355,9 @@
                 var that = this;
                 try {
                     if (that.index == that.length) {
-                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start);
+                        that.object.memberUserDtos = that.memberList.slice(that.start);
                     } else {
-                        that.object.memberUserDtos = that.memberUserDtos.slice(that.start, that.end);
+                        that.object.memberUserDtos = that.memberList.slice(that.start, that.end);
                     }
                     that.object.startPosition = that.startPosition;
                     $.post("member/appendExcel", that.object, function (result) {
