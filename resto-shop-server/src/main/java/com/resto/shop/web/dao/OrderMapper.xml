@@ -2617,8 +2617,9 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         update tb_order
         set is_confirm = 1,
         order_state = 2,
-        allow_continue_order = 1
-
+        <if test="order_mode != 2">
+            allow_continue_order = 1
+        </if>
         where id =  #{orderId}
     </update>
 
