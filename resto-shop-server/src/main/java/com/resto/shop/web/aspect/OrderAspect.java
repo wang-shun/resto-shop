@@ -257,7 +257,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "confirmOrderPos()", returning = "order")
     public void confirmOrderPos(Order order) {
-        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+        if((order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY) && order.getPayType() == PayType.PAY){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
