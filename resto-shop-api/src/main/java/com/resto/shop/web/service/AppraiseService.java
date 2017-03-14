@@ -1,14 +1,13 @@
 package com.resto.shop.web.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Appraise;
-import com.sun.javafx.cursor.StandardCursorFrame;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public interface AppraiseService extends GenericService<Appraise, String> {
  
