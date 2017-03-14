@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ShopDetailDto;
@@ -91,22 +95,28 @@ public class RechargeLogController extends GenericController{
 
 	/**
 	 * 店铺详细
-	 * @param shopDetailId
+	 * @param shopId
 	 * @param beginDate
 	 * @param endDate
 	 * @return
 	 */
 	@RequestMapping("/queryShopchargecord")
     @ResponseBody
-	public  List<ChargeOrder>  queryShopchargecord(String shopDetailId, String beginDate, String endDate){
-		String shopname=getShopList(shopDetailId);
-		Date begin = DateUtil.getformatBeginDate(beginDate);
-		Date end = DateUtil.getformatEndDate(endDate);
-        List<ChargeOrder>  chargeList=chargeorderService.shopChargeCodes(shopDetailId,begin,end);
-		for (int i=0;i<chargeList.size();i++){
-			chargeList.get(i).getChargelog().setShopName(shopname);
-		}
-        return chargeList ;
+	public Result queryShopchargecord(String shopId, String beginDate, String endDate){
+	    JSONObject object = new JSONObject();
+	    try {
+            String shopname = getShopList(shopId);
+            Date begin = DateUtil.getformatBeginDate(beginDate);
+            Date end = DateUtil.getformatEndDate(endDate);
+            List<ChargeOrder> chargeList = chargeorderService.shopChargeCodes(shopId, begin, end);
+            for (int i = 0; i < chargeList.size(); i++) {
+                chargeList.get(i).getChargelog().setShopName(shopname);
+            }
+            object.put("result",chargeList);
+        }catch (Exception e){
+            return new Result(false);
+        }
+        return getSuccessResult(object);
 	}
 
     /**
@@ -127,6 +137,13 @@ public class RechargeLogController extends GenericController{
         List<ShopDetailDto>  result = new LinkedList<>();
         Map<String,Object>  resultMap=this.getResultSetDto(shopDetailId,beginDate,endDate);
         result.addAll((Collection<? extends ShopDetailDto>) resultMap.get("shopDetailMap"));
+        for (ShopDetailDto shopDetailDto : result){
+            if (shopDetailDto.getType().equals(1)) {
+                shopDetailDto.setTypeString("微信充值");
+            }else{
+                shopDetailDto.setTypeString("pos充值");
+            }
+        }
         //导出文件名
         String fileName = "店铺充值记录详细"+beginDate+"至"+endDate
                 +".xls";
@@ -144,7 +161,7 @@ public class RechargeLogController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "充值报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "8");//显示的位置
+		map.put("num", "6");//显示的位置
 		map.put("reportTitle", "充值报表");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
@@ -168,7 +185,16 @@ public class RechargeLogController extends GenericController{
 	@RequestMapping("/rechargeLog")
 	@ResponseBody
 	public Result selectBrandOrShopRecharge(String beginDate,String endDate){
-		return this.getResult(beginDate, endDate);
+        Result result = new Result();
+		try {
+            result = this.getResult(beginDate, endDate);
+            result.setSuccess(true);
+        }catch (Exception e){
+            log.error("查询充值报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return result;
 	}
 
 	private Result getResult(String beginDate, String endDate) {
@@ -295,61 +321,79 @@ public class RechargeLogController extends GenericController{
         @SuppressWarnings("unchecked")
     	@RequestMapping("brandOrShop_excel")
     	@ResponseBody
-    	public void reportIncome(String userJson,String beginDate,String endDate,HttpServletRequest request, HttpServletResponse response){
+    	public Result reportIncome(String beginDate,String endDate,RechargeLogDto rechargeLogDto,HttpServletRequest request){
         	List<ShopDetail> shopDetailList = getCurrentShopDetails();
             if(shopDetailList==null){
                 shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
             }
-            List<RechargeLogDto> result = new LinkedList<>();
-    		List<RechargeLogDto> shopRechargeLogDto=(List<RechargeLogDto>) RechargeList(beginDate,endDate).get("shopRrchargeLogs");
-            for (RechargeLogDto rechargeLogDto : shopRechargeLogDto) {
-            	RechargeLogDto shoprecharge=new RechargeLogDto();
-            	shoprecharge.setShopName(rechargeLogDto.getShopName());
-            	shoprecharge.setShopCount(rechargeLogDto.getShopCount());
-            	shoprecharge.setShopNum(rechargeLogDto.getShopNum());
-            	shoprecharge.setShopGaNum(rechargeLogDto.getShopGaNum());
-            	shoprecharge.setShopWeChat(rechargeLogDto.getShopWeChat());
-            	shoprecharge.setShopPos(rechargeLogDto.getShopPos());
-            	shoprecharge.setShopCsNum(rechargeLogDto.getShopCsNum());
-            	shoprecharge.setShopGaCsNum(rechargeLogDto.getShopGaCsNum());
-            	result.add(shoprecharge);
-    		}
+            List<RechargeLogDto> result = new ArrayList<>();
+            if (rechargeLogDto.getBrandChargeLogs() != null){
+                Map<String, Object> brandMap = rechargeLogDto.getBrandChargeLogs();
+                RechargeLogDto brandLogDto = new RechargeLogDto();
+                brandLogDto.setShopName(brandMap.get("brandName").toString());
+                brandLogDto.setShopCount(new BigDecimal(brandMap.get("rechargeCount").toString()));
+                brandLogDto.setShopNum(new BigDecimal(brandMap.get("rechargeNum").toString()));
+                brandLogDto.setShopGaNum(new BigDecimal(brandMap.get("rechargeGaNum").toString()));
+                brandLogDto.setShopWeChat(new BigDecimal(brandMap.get("rechargeWeChat").toString()));
+                brandLogDto.setShopPos(new BigDecimal(brandMap.get("rechargePos").toString()));
+                brandLogDto.setShopCsNum(new BigDecimal(brandMap.get("rechargeCsNum").toString()));
+                brandLogDto.setShopGaCsNum(new BigDecimal(brandMap.get("rechargeGaCsNum").toString()));
+                brandLogDto.setRechargeSpNum(new BigDecimal(brandMap.get("rechargeSpNum").toString()));
+                brandLogDto.setRechargeGaSpNum(new BigDecimal(brandMap.get("rechargeGaSpNum").toString()));
+                result.add(brandLogDto);
+                SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                filter.getExcludes().add("brandChargeLogs");
+                filter.getExcludes().add("shopChargeLogs");
+                String json = JSON.toJSONString(rechargeLogDto.getShopChargeLogs(),filter);
+                List<RechargeLogDto> shopLogs = JSON.parseObject(json,new TypeReference<List<RechargeLogDto>>(){});
+                result.addAll(shopLogs);
+            }
     		//导出文件名
     		String fileName = "充值报表"+beginDate+"至"+endDate+".xls";
     		//定义读取文件的路径
     		String path = request.getSession().getServletContext().getRealPath(fileName);
     		//定义列
-    		String[]columns={"shopName","shopCount","shopNum","shopGaNum","shopWeChat","shopPos","shopCsNum","shopGaCsNum"};
+    		String[]columns={"shopName","shopCount","shopNum","shopGaNum","shopWeChat","shopPos","shopCsNum","shopGaCsNum","rechargeSpNum","rechargeGaSpNum"};
     		//定义数据
     		String shopName="";
     		for (ShopDetail shopDetail : shopDetailList) {
     			shopName += shopDetail.getName()+",";
     		}
+            shopName = shopName.substring(0,shopName.length()-1);
     		Map<String,String> map = new HashMap<>();
     		map.put("brandName", getBrandName());
     		map.put("shops", shopName);
     		map.put("beginDate", beginDate);
     		map.put("reportType", "充值报表");//表的头，第一行内容
     		map.put("endDate", endDate);
-    		map.put("num", "8");//显示的位置
+    		map.put("num", "9");//显示的位置
     		map.put("reportTitle", "充值报表");//表的名字
     		map.put("timeType", "yyyy-MM-dd");
 
-    		String[][] headers = {{"店铺名","25"},{"充值单数","25"},{"店铺充值总额","25"},{"店铺充值赠送总额","25"},{"店铺微信充值总额","25"},{"店铺POS端充值总额","25"},{"店铺充值消费","25"},{"店铺充值赠送消费","25"}};
+    		String[][] headers = {{"店铺名","25"},{"充值单数","25"},{"店铺充值总额","25"},{"店铺充值赠送总额","25"},{"店铺微信充值总额","25"},{"店铺POS端充值总额","25"},{"店铺充值消费","25"},{"店铺充值赠送消费","25"}
+                    ,{"充值剩余总额","25"},{"充值赠送剩余总额","25"}};
     		//定义excel工具类对象
     		ExcelUtil<RechargeLogDto> excelUtil=new ExcelUtil<RechargeLogDto>();
     		try{
     			OutputStream out = new FileOutputStream(path);
     			excelUtil.ExportExcel(headers, columns, result, out, map);
     			out.close();
-    			excelUtil.download(path, response);
-    			JOptionPane.showMessageDialog(null, "导出成功！");
-    			log.info("excel导出成功");
     		}catch(Exception e){
     			e.printStackTrace();
     		}
+    		return getSuccessResult(path);
     	}
-	
 
+    @RequestMapping("/download_brand_excel")
+    public void downloadBrandExcel(String path, HttpServletResponse response){
+        ExcelUtil<Object> excelUtil = new ExcelUtil<>();
+        try{
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 }

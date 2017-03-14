@@ -2656,6 +2656,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         Integer totalNum = 0;
+        BigDecimal sellIncome  = new BigDecimal(0);
+        BigDecimal refundTotal  = new BigDecimal(0);
+        BigDecimal discountTotal  = new BigDecimal(0);
+        Integer refundCount  = 0;
         //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
         /**
@@ -2664,7 +2668,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = orderMapper.selectConfirmMoney(begin, end, brandId);
-        bo.setTotalNum(totalNum);
+        if(bo == null){
+            bo.setSellIncome(sellIncome);
+            bo.setRefundCount(refundCount);
+            bo.setDiscountTotal(discountTotal);
+            bo.setRefundTotal(refundTotal);
+        }
+        bo.setTotalNum(totalNum == null ? 0 : totalNum);
         bo.setBrandName(brandName);
         return bo;
     }
@@ -2854,7 +2864,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Order> list = orderMapper.selectMoneyAndNumByDate(begin, end, brandId);
 
         //封装品牌的数据
-        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
         //品牌订单总额初始值
         BigDecimal d = BigDecimal.ZERO;
         //品牌实际支付初始值
@@ -2866,7 +2876,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //品牌订单数目初始值
         int number = 0;
         //品牌订单营销撬动率
-        String marketPrize = "";
+        String marketPrize = "0";
         Set<String> ids = new HashSet<>();
         for (Order o : list) {
             //封装品牌的数据
@@ -2881,11 +2891,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (!o.getOrderPaymentItems().isEmpty()) {
                     for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                         //品牌实际支付  微信支付+
-                        if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == 6 || oi.getPaymentModeId() == 9 || oi.getPaymentModeId() == 10 || oi.getPaymentModeId() == 11) {
+                        if (oi.getPaymentModeId() == PayMode.WEIXIN_PAY || oi.getPaymentModeId() == PayMode.CHARGE_PAY || oi.getPaymentModeId() == PayMode.ALI_PAY
+                                || oi.getPaymentModeId() == PayMode.BANK_CART_PAY || oi.getPaymentModeId() == PayMode.CRASH_PAY) {
                             d1 = d1.add(oi.getPayValue());
                         }
                         //品牌虚拟支付(加上等位红包支付)
-                        if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
+                        else {
                             d2 = d2.add(oi.getPayValue());
                         }
                     }
@@ -2916,7 +2927,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //封装店铺的数据
         List<OrderPayDto> shopPayDto = new ArrayList<>();
         for (ShopDetail shopDetail : shopDetailList) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "");
+            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
             shopPayDto.add(ot);
         }
 
@@ -3083,10 +3094,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //    }
 
     @Override
-    public List<Order> selectListByTime(String beginDate, String endDate, String shopId) {
+    public List<Order> selectListByTime(String beginDate, String endDate, String shopId, String customerId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTime(begin, end, shopId);
+        return orderMapper.selectListByTime(begin, end, shopId, customerId);
 
     }
 

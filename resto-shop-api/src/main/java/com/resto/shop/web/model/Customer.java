@@ -26,6 +26,8 @@ public class Customer implements Serializable{
 
     private Boolean isBindPhone;
 
+    private Date createTime;
+
     private Date regiestTime;
 
     private Date firstOrderTime;
@@ -72,6 +74,14 @@ public class Customer implements Serializable{
     private Date bindPhoneTime;
 
     private String bindPhoneShop;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public Integer getIsShare() {
         return isShare;

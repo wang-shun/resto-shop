@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
@@ -220,10 +221,13 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		return appraiseMapper.selectCustomerAppraiseAvg(customerId);
 	}
 
-
-
     @Override
     public List<Appraise> selectByTimeAndShopId(String shopId,Date begin, Date end) {
-        return  appraiseMapper.selectByTimeAndShopId(shopId,begin,end);
+        return appraiseMapper.selectByTimeAndShopId(shopId, begin, end);
+    }
+
+    @Override
+    public List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap) {
+        return appraiseMapper.selectAppraiseShopDto(selectMap);
     }
 }

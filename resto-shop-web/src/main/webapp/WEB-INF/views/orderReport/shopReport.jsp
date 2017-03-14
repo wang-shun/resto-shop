@@ -1,137 +1,143 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
-<style>
-	th {
-		width: 30%;
-	}
-	dt,dd{
-		height: 25px;
-	}
-</style>
-<h2 class="text-center">
-	<strong>订单列表</strong>
-</h2>
-<br />
-<div class="row">
-	<div class="col-md-12">
-		<form class="form-inline">
-			<div class="form-group" style="margin-right: 50px;">
-				<label for="beginDate2">开始时间：</label> <input type="text"
-															 class="form-control form_datetime2" id="beginDate2"
-															 readonly="readonly">
-			</div>
-			<div class="form-group" style="margin-right: 50px;">
-				<label for="endDate2">结束时间：</label> <input type="text"
-														   class="form-control form_datetime2" id="endDate2"
-														   readonly="readonly">
-			</div>
+<div id="control">
+    <c:if test="${!empty shopId}">
+        <a class="btn btn-info ajaxify" href="orderReport/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${!empty customerId}">
+        <a class="btn btn-info ajaxify" href="member/myList">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <h2 class="text-center">
+        <strong>
+                订单列表
+        </strong>
+    </h2>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="form-group" style="margin-right: 50px;">
+                    <label for="beginDate">开始时间：</label>
+                    <input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate" readonly="readonly">
+                </div>
+                <div class="form-group" style="margin-right: 50px;">
+                    <label for="endDate">结束时间：</label>
+                    <input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate" readonly="readonly">
+                </div>
+                <button type="button" class="btn btn-primary" @click="today"> 今日</button>
+                <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
+                <button type="button" class="btn btn-primary" @click="week">本周</button>
+                <button type="button" class="btn btn-primary" @click="month">本月</button>
+                <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+                <button type="button" class="btn btn-primary" @click="downloadShopOrder" v-if="state == 1">下载报表</button>
+                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
+                <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button><br/>
+            </form>
+        </div>
+    </div>
+    <br />
+    <br />
+    <!-- 店铺订单列表  -->
+    <div class="panel panel-info">
+        <div class="panel-heading text-center" style="font-size: 22px;">
+            <strong>
+                <c:if test="${!empty shopId}">
+                    店铺订单列表
+                </c:if>
+                <c:if test="${!empty customerId}">
+                    会员订单列表
+                </c:if>
+            </strong>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered table-hover"
+                   id="shopOrder">
+            </table>
+        </div>
+    </div>
 
-			<button type="button" class="btn btn-primary" id="today">今日</button>
-
-			<button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
-
-			<!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
-
-			<button type="button" class="btn btn-primary" id="week">本周</button>
-			<button type="button" class="btn btn-primary" id="month">本月</button>
-
-			<button type="button" class="btn btn-primary" id="searchInfo2">查询报表</button>
-			&nbsp;
-			<button type="button" class="btn btn-primary" id="shopreportExcel">下载报表</button>
-			<br />
-
-		</form>
-	</div>
-</div>
-<br />
-<br />
-<!-- 店铺订单列表  -->
-<div class="panel panel-info">
-	<div class="panel-heading text-center" style="font-size: 22px;">
-		<strong>店铺订单列表</strong>
-	</div>
-	<div class="panel-body">
-		<table class="table table-striped table-bordered table-hover"
-			   id="shopOrder">
-		</table>
-	</div>
-</div>
-
-<div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-						id="closeModal2" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title text-center">
-					<strong>订单详情</strong>
-				</h4>
-			</div>
-			<div class="modal-body">
-				<dl class="dl-horizontal">
-					<dt>店铺名称：</dt>
-					<dd id="shopName"></dd>
-					<dt>订单编号：</dt>
-					<dd id="orderId"></dd>
-
-					<div id="addOrderDiv"></div>
-
-					<dt>微信支付单号：</dt>
-					<dd id="orderPaymentItem_id"></dd>
-					<dt>订单时间：</dt>
-					<dd id="createTime"></dd>
-					<dt>就餐模式：</dt>
-					<dd id="distributionMode"></dd>
-					<dt>验 证 码：</dt>
-					<dd id="verCode"></dd>
-					<dt>手 机 号：</dt>
-					<dd id="telephone"></dd>
-					<dt>订单金额：</dt>
-					<dd id="orderMoney"></dd>
-					<dt>评&nbsp;&nbsp;价：</dt>
-					<dd id="appriase"></dd>
-					<dt>评价内容：</dt>
-					<dd id="content"></dd>
-					<dt>状&nbsp;&nbsp;态：</dt>
-					<dd id="orderState"></dd>
-					<dt>菜品总价：</dt>
-					<dd id="articleTotalPrice"></dd>
-					<dt>服&nbsp;务&nbsp;费：</dt>
-					<dd id="servicePrice"></dd>
-				</dl>
-			</div>
-			<div class="table-scrollable">
-				<table class="table table-condensed table-hover">
-					<thead>
-					<tr>
-						<th>餐品类别</th>
-						<th>餐品名称</th>
-						<th>餐品单价</th>
-						<th>餐品数量</th>
-						<th>小记</th>
-					</tr>
-					</thead>
-					<tbody id="articleList" style="height: 300px;">
-					</tbody>
-				</table>
-			</div>
-
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-block btn-primary" data-dismiss="modal"
-						id="closeModal">关闭</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal fade" id="orderDetail" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            @click="closeModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-center">
+                        <strong>订单详情</strong>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <dl class="dl-horizontal">
+                        <dt>店铺名称：</dt>
+                        <dd>{{orderDetail.shopName}}</dd>
+                        <dt>订单编号：</dt>
+                        <dd>{{orderDetail.orderId}}</dd>
+                        <dt>微信支付单号：</dt>
+                        <dd>{{orderDetail.wechatPayId}}</dd>
+                        <dt>订单时间：</dt>
+                        <dd>{{orderDetail.orderTime}}</dd>
+                        <dt>就餐模式：</dt>
+                        <dd>{{orderDetail.modeText}}</dd>
+                        <dt>验 证 码：</dt>
+                        <dd>{{orderDetail.varCode}}</dd>
+                        <dt>手 机 号：</dt>
+                        <dd>{{orderDetail.telePhone}}</dd>
+                        <dt>订单金额：</dt>
+                        <dd>{{orderDetail.orderMoney}}</dd>
+                        <dt>评&nbsp;&nbsp;价：</dt>
+                        <dd>{{orderDetail.level}}</dd>
+                        <dt>评价内容：</dt>
+                        <dd>{{orderDetail.levelValue}}</dd>
+                        <dt>状&nbsp;&nbsp;态：</dt>
+                        <dd>{{orderDetail.orderState}}</dd>
+                        <dt>菜品总价：</dt>
+                        <dd>{{orderDetail.articleMoney}}</dd>
+                        <dt>服&nbsp;务&nbsp;费：</dt>
+                        <dd>{{orderDetail.servicePrice}}</dd>
+                    </dl>
+                </div>
+                <div class="table-scrollable">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <tr>
+                                <th>餐品类别</th>
+                                <th>餐品名称</th>
+                                <th>餐品单价</th>
+                                <th>餐品数量</th>
+                                <th>小记</th>
+                            </tr>
+                        </thead>
+                        <tbody style="height: 300px;">
+                            <tr v-for="orderItem in orderDetail.orderItems">
+                                <td>{{orderItem.articleFamily.name}}</td>
+                                <td>{{orderItem.articleName}}</td>
+                                <td>{{orderItem.unitPrice}}</td>
+                                <td>{{orderItem.count}}</td>
+                                <td>{{orderItem.finalPrice}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-primary" data-dismiss="modal" @click="closeModal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
     //时间插件
-
-    $('.form_datetime2').datetimepicker({
+    $('.form_datetime').datetimepicker({
         endDate : new Date(),
         minView : "month",
         maxView : "month",
@@ -143,437 +149,292 @@
         language : "zh-CN"
     });
 
-    var shopId = "${shopId}"
-    $("#beginDate2").val("${beginDate}");
-    $("#endDate2").val("${endDate}");
+    var shopId = "${shopId}";
+    var customerId = "${customerId}";
+    var beginDate = "${beginDate}";
+    var endDate = "${endDate}";
 
-    var tb1 = $("#shopOrder").DataTable({
-        "scrollY": "340px",
-        "autoWidth": false,
-        "columnDefs": [
-            { "width": "8%", "targets":0  },
-            { "width": "8%", "targets":1  },
-            { "width": "8%", "targets":2  },
-            { "width": "6%", "targets":3  },
-            { "width": "6%", "targets":4  },
-            { "width": "6%", "targets":5  },
-            { "width": "6%", "targets":6  },
-            { "width": "8%", "targets":7  },
-            { "width": "8%", "targets":8  },
-            { "width": "6%", "targets":9  },
-            { "width": "6%", "targets":10  },
-            { "width": "6%", "targets":11  },
-            { "width": "3%", "targets":12  },
-        ],
-        "lengthMenu" : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
-        ajax : {
-            url : "orderReport/AllOrder",
-            dataSrc : "",
-            data : function(d) {
-                d.beginDate = $("#beginDate2").val();
-                d.endDate = $("#endDate2").val();
-                d.shopId = shopId;
-                return d;
-            }
+    //创建vue对象
+    var vueObj =  new Vue({
+        el:"#control",
+        data:{
+            searchDate : {
+                beginDate : "",
+                endDate : "",
+            },
+            shopOrderTable:{},
+            shopOrderDetails:[],
+            orderDetail:{},
+            state:1,
+            shopOrderList : [],
+            object : {},
+            length : 0,
+            start : 0,
+            end : 1000,
+            startPosition : 1005,
+            index : 1
         },
-        order: [[2,'desc'],[ 1, 'desc' ]],
-        columns : [ {
-            title : "店铺",
-            data : "shopName",
+        created : function() {
+            this.searchDate.beginDate = beginDate;
+            this.searchDate.endDate = endDate;
+            this.createShopOrderTable();
+            this.searchInfo();
         },
-
-            {
-                title : "下单时间",
-                data : "beginTime",
-                createdCell : function(td, tdData) {
-                    $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"))
-                }
-            }, {
-                title : "手机号",
-                data : "telephone",
-                createdCell:function(td,tdData){
-                    if(tdData=="" || tdData==null){
-                        $(td).html("<span class='label label-danger'>没有填写</span>");
-                    }
-                }
-            }, {
-                title : "订单金额",
-                data : "orderMoney"
-            }, {
-                title : "微信支付",
-                data : "weChatPay",
-                createdCell:function (td,tdData,row) {
-                    console.log(row);
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-
-            }, {
-                title : "红包支付",
-                data : "accountPay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-                title : "优惠券支付",
-                data : "couponPay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-                title : "充值金额支付",
-                data : "chargePay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-                title : "充值赠送金额支付",
-                data : "rewardPay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            },{
-                title : "等位红包支付",
-                data : "waitRedPay",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }
-            ,{
-                title : "支付宝支付",
-                data : "aliPayment",
-                defaultContent: '0'
-            }
-            ,{
-                title : "现金支付",
-                data : "backCartPay",
-                defaultContent: '0'
-            },
-            {
-                title : "银联支付",
-                data : "moneyPay",
-                defaultContent: '0'
-            },
-            {
-                title : "退菜返还红包",
-                data : "articleBackPay",
-                defaultContent: '0'
-            },
-            {
-                title : "营销撬动率",
-                data : 'incomePrize',
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-                title : "评价",
-                data : "level",
-                createdCell:function (td,tdData,row) {
-                    if(row.childOrder==true&&row.orderMode==5){
-                        $(td).html("--")
-                    }
-                }
-            }, {
-                title : "订单状态",
-                data : "orderState",
-                createdCell : function(td,tdData){
-                    if(tdData == "异常订单"){
-                        $(td).html("<span class='label label-danger'>订单异常</span>");
-                    }
-                }
-            }, {
-                title : "操作",
-                data : "orderId",
-                createdCell : function(td, tdData,rowData) {
-                    var button = $("<button class='btn green' @click='showShopReport(shop.shopName,shop.shopDetailId)'>查看详情</button>");
-                    button.click(function() {
-                        showDetails(tdData);
-                    })
-                    $(td).html(button);
-                }
-            } ]
-    });
-
-    $("#searchInfo2").click(function() {
-        var beginDate = $("#beginDate2").val();
-        var endDate = $("#endDate2").val();
-        search(beginDate, endDate);
-    })
-
-    function search(beginDate, endDate) {
-        var data = {
-            "beginDate" : beginDate,
-            "endDate" : endDate,
-            "shopId" : shopId
-        };
-        tb1.ajax.reload();
-        toastr.success("查询成功");
-    }
-
-    $("#closeModal").click(function(e) {
-        e.stopPropagation();
-        var modal = $("#orderDetail");
-        //modal.find(".modal-body").html("");
-        modal.modal("hide");
-    })
-
-    function showDetails(orderId) {
-        $.ajax({
-            url : 'orderReport/detailInfo',
-            method : 'post',
-            data : {
-                "orderId" : orderId
-            },
-            success : function(result) {
-                console.log(orderId+"_______________");
-                if (result) {
-                    var data = result.data;
-                    console.log(data);
-
-                    if(data.orderMode == 5){
-                        $("#addOrderDiv").html("");//清空上一次的内容
-                        $(data.childList).each(function(index , item){
-                            var str = "<dt>加菜订单编号["+(++index)+"]：</dt> <dd >"+item.id+"</dd>";
-                            $("#addOrderDiv").append(str);
-                        });
-                    }
-
-                    $("#shopName").html(data.shopName);
-                    $("#orderId").html(data.id);
-                    $("#createTime").html(
-                        new Date(data.createTime)
-                            .format("yyyy-MM-dd hh:mm:ss"));
-                    $("#distributionMode").html(
-                        getDistriubtioMode(data.distributionModeId));
-                    $("#verCode").html(data.verCode);
-                    var telephone = ""
-                    if (typeof(data.customer) !="undefined") {
-                        telephone = data.customer.telephone;
-                    }
-                    var orderPaymentItem_id="";
-                    if(typeof (data.orderPaymentItems)!="undefined"){
-                        var item = data.orderPaymentItems;
-                        for (var i = 0; i <item.length ; i++) {
-                            if(item[i].paymentModeId==1){
-                                orderPaymentItem_id=item[i].id;
-                                break;
+        methods:{
+            createShopOrderTable : function(){
+                var that = this;
+                this.shopOrderTable = $("#shopOrder").DataTable({
+                    lengthMenu : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
+                    order: [[ 1, 'desc' ]],
+                    columns : [
+                        {
+                            title : "店铺",
+                            data : "shopName",
+                            orderable : false
+                        },
+                        {
+                            title : "下单时间",
+                            data : "createTime"
+                        }, {
+                            title : "手机号",
+                            data : "telephone",
+                            orderable : false
+                        },
+                        {
+                            title : "订单状态",
+                            data : "orderState",
+                            orderable : false
+                        }, {
+                            title : "订单金额",
+                            data : "orderMoney"
+                        }, {
+                            title : "微信支付",
+                            data : "weChatPay"
+                        }, {
+                            title : "红包支付",
+                            data : "accountPay"
+                        }, {
+                            title : "优惠券支付",
+                            data : "couponPay"
+                        }, {
+                            title : "充值金额支付",
+                            data : "chargePay"
+                        }, {
+                            title : "充值赠送金额支付",
+                            data : "rewardPay"
+                        },{
+                            title : "等位红包支付",
+                            data : "waitRedPay"
+                        }
+                        ,{
+                            title : "支付宝支付",
+                            data : "aliPayment"
+                        }
+                        ,{
+                            title : "现金支付",
+                            data : "moneyPay"
+                        },
+                        {
+                            title : "银联支付",
+                            data : "backCartPay"
+                        },
+                        {
+                            title : "退菜返还红包",
+                            data : "articleBackPay"
+                        },
+                        {
+                            title : "营销撬动率",
+                            data : 'incomePrize'
+                        },{
+                            title : "操作",
+                            data : "orderId",
+                            orderable : false,
+                            createdCell : function(td, tdData) {
+                                var button = $("<button class='btn green'>查看详情</button>");
+                                button.click(function(){
+                                    that.openOrderDetailModal(tdData);
+                                });
+                                $(td).html(button);
                             }
                         }
-                    };
-                    $("#orderPaymentItem_id").html(orderPaymentItem_id);
-                    $("#telephone").html(telephone);
-                    $("#orderMoney").html(data.orderMoney + "元");
-// 					if (data.appraise) {
-                    $("#appriase").html(data.appraise!=null ? getLevel(data.appraise.level):null);
-                    $("#content").html(data.appraise!=null ? data.appraise.content:null);
-// 					}
-                    $("#orderState").html(getState(data.orderState,data.productionStatus));
-                    $('#articleList').text("");
-
-                    var articleTotalPrice = 0;
-
-                    for (var i = 0; i < data.orderItems.length; i++) {
-                        var obj = data.orderItems[i];
-                        var article = "<tr><td>" + obj.articleFamily.name
-                            + "</td><td>" + obj.articleName + "</td><td>"
-                            + obj.unitPrice + "</td><td>" + obj.count
-                            + "</td><td>" + obj.finalPrice + "</td></tr>";
-                        $('#articleList').append(article);
-                        articleTotalPrice+=obj.finalPrice;
+                    ]
+                });
+            },
+            searchInfo : function() {
+                toastr.clear();
+                toastr.success("查询中...");
+                var that = this;
+                try {
+                    $.post("orderReport/AllOrder", this.getDate(), function (result) {
+                        if(result.success) {
+                            toastr.clear();
+                            toastr.success("查询成功");
+                            that.shopOrderDetails = result.data.result;
+                            that.shopOrderTable.clear();
+                            that.shopOrderTable.rows.add(result.data.result).draw()
+                        }else{
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            openOrderDetailModal : function (orderId) {
+                var that = this;
+                try {
+                    $.post("orderReport/detailInfo",{orderId: orderId},function (result) {
+                        if(result.success){
+                            that.orderDetail = result.data;
+                            $("#orderDetail").modal();
+                        }else{
+                            toastr.clear();
+                            toastr.error("查询出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            downloadShopOrder : function(){
+                var that = this;
+                try {
+                    that.object = that.getDate();
+                    that.shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
+                    if (that.shopOrderList.length <= 1000){
+                        that.object.shopOrderList = that.shopOrderList;
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                            if (result.success){
+                                window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        })
+                    }else{
+                        that.state = 2;
+                        that.length = Math.ceil(that.shopOrderList.length/1000);
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                            if (result.success){
+                                that.object.path = result.data;
+                                that.start = that.end;
+                                that.end = that.start + 1000;
+                                that.index++;
+                                that.appendShopExcel();
+                            }else{
+                                that.state = 1;
+                                that.start = 0;
+                                that.end = 1000;
+                                that.startPosition = 1005;
+                                that.index = 1;
+                                toastr.clear();
+                                toastr.error("生成报表出错");
+                            }
+                        });
                     }
-
-                    $("#articleTotalPrice").html(articleTotalPrice+"元");
-                    $("#servicePrice").html(data.servicePrice+"元");
-                    $("#mealFreePrice").html(data.mealFreePrice+"元");
-                    //-----------------------------------------------------------------------
-
-                    // 					 var oLogin = $("#orderDetail").html();
-                    // 					 console.log(oLogin);
-
-                    // 					 $('body').append( oLogin );
-
-                    // 					oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-                    // 					oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 );
-
-                    // 					$(window).on('scroll',function(){
-
-                    // 						oLogin.css('left' , ($(window).width() - oLogin.outerWidth())/2 );
-                    // 						oLogin.css('top' , ($(window).height() - oLogin.outerHeight())/2 + $(window).scrollTop() );
-
-                    // 					});
-                    //----------------------------------------------------------------
-                    $("#orderDetail").modal();
-                }else{
-                    $("#orderState").html("<h1>没有数据</h1>");
+                }catch (e) {
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
                 }
+            },
+            appendShopExcel : function () {
+                var that = this;
+                try {
+                    if (that.index == that.length) {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start);
+                    } else {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start, that.end);
+                    }
+                    that.object.startPosition = that.startPosition;
+                    $.post("orderReport/appendShopOrderExcel", that.object, function (result) {
+                        if (result.success) {
+                            that.start = that.end;
+                            that.end = that.start + 1000;
+                            that.startPosition = that.startPosition + 1000;
+                            that.index++;
+                            if (that.index - 1 == that.length) {
+                                that.state = 3;
+                            } else {
+                                that.appendShopExcel();
+                            }
+                        } else {
+                            that.state = 1;
+                            that.start = 0;
+                            that.end = 1000;
+                            that.startPosition = 1005;
+                            that.index = 1;
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            download : function(){
+                window.location.href = "orderReport/downShopOrderExcel?path="+this.object.path+"";
+                this.state = 1;
+                this.start = 0;
+                this.end = 1000;
+                this.startPosition = 1005;
+                this.index = 1;
+            },
+            keysert: function (key) {
+                return function(a,b){
+                    var value1 = a[key];
+                    var value2 = b[key];
+                    return value1 - value2;
+                }
+            },
+            getDate : function(){
+                var data = {
+                    beginDate : this.searchDate.beginDate,
+                    endDate : this.searchDate.endDate,
+                    shopId : shopId,
+                    customerId : customerId
+                };
+                return data;
+            },
+            today : function(){
+                date = new Date().format("yyyy-MM-dd");
+                this.searchDate.beginDate = date
+                this.searchDate.endDate = date
+                this.searchInfo();
+            },
+            yesterDay : function(){
 
+                this.searchDate.beginDate = GetDateStr(-1);
+                this.searchDate.endDate  = GetDateStr(-1);
+                this.searchInfo();
+            },
+            week : function(){
+                this.searchDate.beginDate  = getWeekStartDate();
+                this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                this.searchInfo();
+            },
+            month : function(){
+                this.searchDate.beginDate  = getMonthStartDate();
+                this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                this.searchInfo();
+            },
+            closeModal : function () {
+                $("#orderDetail").modal("hide");
             }
-        });
-
-    }
-
-    function getLevel(level) {
-        var levelName = '';
-        switch (level) {
-            case 1:
-                levelName = "一星";
-                break;
-            case 2:
-                levelName = "二星";
-                break;
-            case 3:
-                levelName = "三星";
-                break;
-            case 4:
-                levelName = "四星";
-                break;
-            case 5:
-                levelName = "五星";
-                break;
-
         }
-        return levelName;
-    }
-
-    function getState(state,productionStatus) {
-        var orderState = '';
-        switch (state) {
-            case 1:
-                orderState = "未支付";
-                break;
-            case 2:
-                if(productionStatus==0){
-                    orderState= "已付款";
-                }else if(productionStatus==2){
-                    orderState = "已消费";
-                }else if(productionStatus==5){
-                    orderState = "异常订单";
-                }
-                break;
-            case 9:
-                orderState = "已取消";
-                break;
-            case 10:
-                orderState = "已确认";
-                if(productionStatus==5){
-                    orderState = "异常订单";
-                } else {
-                    orderState = "已消费";
-                }
-                break;
-            case 11:
-                orderState = "已评价";
-                break;
-            case 12:
-                orderState = "已分享";
-                break;
-        }
-        return orderState;
-    }
-
-    function getDistriubtioMode(mode) {
-        var distributionMode = ''
-        switch (mode) {
-            case 1:
-                distributionMode = "堂吃";
-                break;
-            case 2:
-                distributionMode = "自提外卖";
-                break;
-            case 3:
-                distributionMode = "外带";
-                break;
-
-        }
-        return distributionMode;
-    }
-
-    $("#closeModal2").click(function(e) {
-        e.stopPropagation();
-        var modal = $("#orderDetail");
-        modal.find(".modal-body").html("");
-        modal.modal("hide");
-    })
-
-    //查询今日
-
-    $("#today").click(function() {
-        var date = new Date().format("yyyy-MM-dd");
-        //赋值插件上的时间
-        $("#beginDate2").val(date);
-        $("#endDate2").val(date);
-
-        //查询
-        search(date, date);
-
-    })
-
-    //查询昨日
-    $("#yesterDay").click(function() {
-        var beginDate = GetDateStr(-1);
-        var endDate = GetDateStr(-1);
-
-        //赋值插件上时间
-        $("#beginDate2").val(beginDate);
-        $("#endDate2").val(endDate);
-        //查询
-        search(beginDate, endDate);
-
-    })
-
-    //查询本周
-    $("#week").click(function() {
-        var beginDate = getWeekStartDate();
-        ;
-        var endDate = new Date().format("yyyy-MM-dd");
-
-        //赋值插件上时间
-        $("#beginDate2").val(beginDate);
-        $("#endDate2").val(endDate);
-        //查询
-        search(beginDate, endDate);
-
-    })
-
-    //查询本月
-    $("#month").click(function() {
-        var beginDate = getMonthStartDate();
-        var endDate = new Date().format("yyyy-MM-dd");
-
-        //赋值插件上时间
-        $("#beginDate2").val(beginDate);
-        $("#endDate2").val(endDate);
-        //查询
-        search(beginDate, endDate);
-
-    })
-
-    //下载报表
-    $("#shopreportExcel").click(
-        function() {
-            var beginDate = $("#beginDate2").val();
-            var endDate = $("#endDate2").val();
-            //判断 时间范围是否合法
-            if (beginDate > endDate) {
-                toastr.error("开始时间不能大于结束时间");
-                return;
-            }
-
-            location.href = "orderReport/shop_excel?beginDate=" + beginDate
-                + "&&endDate=" + endDate + "&&shopId=" + shopId;
-
-        })
+    });
 </script>

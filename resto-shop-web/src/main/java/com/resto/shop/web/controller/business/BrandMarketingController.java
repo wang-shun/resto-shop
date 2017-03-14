@@ -1,6 +1,9 @@
 package com.resto.shop.web.controller.business;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.CouponDto;
@@ -308,27 +311,25 @@ public class BrandMarketingController extends GenericController{
         String[]columns={"shopName","redCount","redMoney","useRedCount","useRedMoney","useRedCountRatio","useRedOrderCount","useRedOrderMoney"};
         //定义数据
         List<RedPacketDto> result = new ArrayList<>();
-        RedPacketDto brandRedInfo = new RedPacketDto();
-        brandRedInfo.setShopName(redPacketDto.getBrandRedInfo().get("brandName").toString());
-        brandRedInfo.setRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("redCount").toString()));
-        brandRedInfo.setRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("redMoney").toString()));
-        brandRedInfo.setUseRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedCount").toString()));
-        brandRedInfo.setUseRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedMoney").toString()));
-        brandRedInfo.setUseRedCountRatio(redPacketDto.getBrandRedInfo().get("useRedCountRatio").toString());
-        brandRedInfo.setUseRedOrderCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderCount").toString()));
-        brandRedInfo.setUseRedOrderMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderMoney").toString()));
-        result.add(brandRedInfo);
-        for (Map redMap : redPacketDto.getShopRedInfoList()){
-            RedPacketDto redInfo = new RedPacketDto();
-            redInfo.setShopName(redMap.get("shopName").toString());
-            redInfo.setRedCount(new BigDecimal(redMap.get("redCount").toString()));
-            redInfo.setRedMoney(new BigDecimal(redMap.get("redMoney").toString()));
-            redInfo.setUseRedCount(new BigDecimal(redMap.get("useRedCount").toString()));
-            redInfo.setUseRedMoney(new BigDecimal(redMap.get("useRedMoney").toString()));
-            redInfo.setUseRedCountRatio(redMap.get("useRedCountRatio").toString());
-            redInfo.setUseRedOrderCount(new BigDecimal(redMap.get("useRedOrderCount").toString()));
-            redInfo.setUseRedOrderMoney(new BigDecimal(redMap.get("useRedOrderMoney").toString()));
-            result.add(redInfo);
+        if(redPacketDto.getBrandRedInfo() != null) {
+            RedPacketDto brandRedInfo = new RedPacketDto();
+            brandRedInfo.setShopName(redPacketDto.getBrandRedInfo().get("brandName").toString());
+            brandRedInfo.setRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("redCount").toString()));
+            brandRedInfo.setRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("redMoney").toString()));
+            brandRedInfo.setUseRedCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedCount").toString()));
+            brandRedInfo.setUseRedMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedMoney").toString()));
+            brandRedInfo.setUseRedCountRatio(redPacketDto.getBrandRedInfo().get("useRedCountRatio").toString());
+            brandRedInfo.setUseRedOrderCount(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderCount").toString()));
+            brandRedInfo.setUseRedOrderMoney(new BigDecimal(redPacketDto.getBrandRedInfo().get("useRedOrderMoney").toString()));
+            result.add(brandRedInfo);
+        }
+        if(redPacketDto.getShopRedInfoList() != null) {
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("shopRedInfoList");
+            filter.getExcludes().add("brandRedInfo");
+            String json = JSON.toJSONString(redPacketDto.getShopRedInfoList(), filter);
+            List<RedPacketDto> redPacketDtos = JSON.parseObject(json, new TypeReference<List<RedPacketDto>>(){});
+            result.addAll(redPacketDtos);
         }
         //获取店铺名称
         String shopName="";
@@ -489,37 +490,30 @@ public class BrandMarketingController extends GenericController{
                 "useCouponCountRatio","useCouponOrderCount","useCouponOrderMoney","customerCount"};
         //定义数据
         List<CouponDto> result = new ArrayList<>();
-        CouponDto brandCouponInfo = new CouponDto();
-        brandCouponInfo.setBrandName(getBrandName());
-        brandCouponInfo.setCouponType("--");
-        brandCouponInfo.setCouponSoure("--");
-        brandCouponInfo.setCouponShopName("--");
-        brandCouponInfo.setCouponName("--");
-        brandCouponInfo.setCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("couponCount").toString()));
-        brandCouponInfo.setCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("couponMoney").toString()));
-        brandCouponInfo.setUseCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponCount").toString()));
-        brandCouponInfo.setUseCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponMoney").toString()));
-        brandCouponInfo.setUseCouponCountRatio(couponDto.getBrandCouponInfo().get("useCouponCountRatio").toString());
-        brandCouponInfo.setUseCouponOrderCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderCount").toString()));
-        brandCouponInfo.setUseCouponOrderMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderMoney").toString()));
-        brandCouponInfo.setCustomerCount(new BigDecimal(couponDto.getBrandCouponInfo().get("customerCount").toString()));
-        result.add(brandCouponInfo);
-        for (Map map : couponDto.getShopCouponInfoList()){
-            CouponDto shopCouponInfo = new CouponDto();
-            shopCouponInfo.setBrandName(getBrandName());
-            shopCouponInfo.setCouponType(map.get("couponType").toString());
-            shopCouponInfo.setCouponSoure(map.get("couponSoure").toString());
-            shopCouponInfo.setCouponShopName(map.get("couponShopName").toString());
-            shopCouponInfo.setCouponName(map.get("couponName").toString());
-            shopCouponInfo.setCouponCount(new BigDecimal(map.get("couponCount").toString()));
-            shopCouponInfo.setCouponMoney(new BigDecimal(map.get("couponMoney").toString()));
-            shopCouponInfo.setUseCouponCount(new BigDecimal(map.get("useCouponCount").toString()));
-            shopCouponInfo.setUseCouponMoney(new BigDecimal(map.get("useCouponMoney").toString()));
-            shopCouponInfo.setUseCouponCountRatio(map.get("useCouponCountRatio").toString());
-            shopCouponInfo.setUseCouponOrderCount(new BigDecimal(map.get("useCouponOrderCount").toString()));
-            shopCouponInfo.setUseCouponOrderMoney(new BigDecimal(map.get("useCouponOrderMoney").toString()));
-            shopCouponInfo.setCustomerCount(new BigDecimal(map.get("customerCount").toString()));
-            result.add(shopCouponInfo);
+        if (couponDto.getBrandCouponInfo() != null) {
+            CouponDto brandCouponInfo = new CouponDto();
+            brandCouponInfo.setBrandName(getBrandName());
+            brandCouponInfo.setCouponType("--");
+            brandCouponInfo.setCouponSoure("--");
+            brandCouponInfo.setCouponShopName("--");
+            brandCouponInfo.setCouponName("--");
+            brandCouponInfo.setCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("couponCount").toString()));
+            brandCouponInfo.setCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("couponMoney").toString()));
+            brandCouponInfo.setUseCouponCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponCount").toString()));
+            brandCouponInfo.setUseCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponMoney").toString()));
+            brandCouponInfo.setUseCouponCountRatio(couponDto.getBrandCouponInfo().get("useCouponCountRatio").toString());
+            brandCouponInfo.setUseCouponOrderCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderCount").toString()));
+            brandCouponInfo.setUseCouponOrderMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderMoney").toString()));
+            brandCouponInfo.setCustomerCount(new BigDecimal(couponDto.getBrandCouponInfo().get("customerCount").toString()));
+            result.add(brandCouponInfo);
+        }
+        if (couponDto.getShopCouponInfoList() != null) {
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("brandCouponInfo");
+            filter.getExcludes().add("shopCouponInfoList");
+            String json = JSON.toJSONString(couponDto.getShopCouponInfoList(), filter);
+            List<CouponDto> couponDtos = JSON.parseObject(json, new TypeReference<List<CouponDto>>(){});
+            result.addAll(couponDtos);
         }
         //获取店铺名称
         String shopName="";

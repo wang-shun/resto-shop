@@ -18,7 +18,10 @@
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-             <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="createBrnadArticleTotal" v-if="state == 1">下载报表</button>
+             <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
+             <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
              <br/>
           </div>
 		</form>
@@ -33,7 +36,6 @@
 				  	<strong style="margin-right:100px;font-size:22px">
 				  		品牌菜品销售表
 				  	</strong>
-				  	<button type="button" class="btn btn-primary" @click="downloadBrnadArticleTotal" style="float: right;">下载报表</button>
 				  </div>
 				  <div class="panel-body">
 				  	<table id="brandMarketing" class="table table-striped table-bordered table-hover" style="width: 100%">
@@ -48,17 +50,21 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-if="brandReport.brandName != null">
-								<td><strong>{{brandReport.brandName}}</strong></td>
-								<td>{{brandReport.totalNum}}</td>
-								<td>{{brandReport.sellIncome}}</td>
-		                        <td>{{brandReport.discountTotal}}</td>
-		                        <td>{{brandReport.refundCount}}</td>
-		                        <td>{{brandReport.refundTotal}}</td>
-							</tr>
-							<tr v-else>
-								<td align="center" colspan="5">载入中...</td>
-							</tr>
+                            <template v-if="brandReport.brandName != null">
+                                <tr>
+                                    <td><strong>{{brandReport.brandName}}</strong></td>
+                                    <td>{{brandReport.totalNum}}</td>
+                                    <td>{{brandReport.sellIncome}}</td>
+                                    <td>{{brandReport.discountTotal}}</td>
+                                    <td>{{brandReport.refundCount}}</td>
+                                    <td>{{brandReport.refundTotal}}</td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td align="center" colspan="6">暂时没有数据...</td>
+                                </tr>
+                            </template>
 						</tbody>
 				  	</table>
 				  </div>
@@ -87,7 +93,6 @@
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
 			  	   <strong style="margin-right:100px;font-size:22px">品牌菜品销售表(单品)</strong>
-			  	   <button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleUnitTable" class="table table-striped table-bordered table-hover"
@@ -104,7 +109,6 @@
 	    	<div class="panel panel-info">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">品牌菜品销售表(套餐)</strong>
-			  	<button type="button" class="btn btn-primary" @click="brandreportExcel" style="float: right;">下载报表</button>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="brandArticleFamilyTable" class="table table-striped table-bordered table-hover"
@@ -157,14 +161,8 @@ var brandFamilyAPI = null;
 var vueObj = new Vue({
     el : "#control",
     data : {
-        brandReport : {
-            brandName : "",
-            totalNum : 0,
-            sellIncome:0,
-            discountTotal:0,
-            refundTotal:0,
-            refundCount:0,
-        },
+        brandReport : {},
+        brandInfo : {},
         searchDate : {
             beginDate : "",
             endDate : "",
@@ -173,7 +171,18 @@ var vueObj = new Vue({
         brandArticleUnitTable:{},//单品dataTables对象
         brandArticleFamilyTable:{},//套餐datatables对象
         api:{},
-        resultData:[]
+        resultData:[],
+        state : 1,
+        brandArticleUnit :[],
+        brandArticleFamily　:[],
+        brandArticleUnitList :[],
+        brandArticleFamilyList　:[],
+        object : {},
+        length : 0,
+        start : 0,
+        end : 1000,
+        startPosition : 1006,
+        index : 1
     },
     created : function() {
         var date = new Date().format("yyyy-MM-dd");
@@ -324,100 +333,226 @@ var vueObj = new Vue({
         //切换单品、套餐 type 1:单品 2:套餐
         chooseType:function (type) {
           this.currentType= type;
-          this.searchInfo();
         },
-        searchInfo : function(isInit) {
+        searchInfo : function() {
+            toastr.clear();
+            toastr.success("查询中...");
         	try{
 	            var that = this;
 	            var api1 = brandUnitAPI;
 	            var api2 = brandFamilyAPI;
-	            //判断 时间范围是否合法
-	            if (that.searchDate.beginDate > that.searchDate.endDate) {
-	                toastr.error("开始时间不能大于结束时间");
-	                toastr.clear();
-	                return false;
-	            }
-	            that.selectBrandArticleToatl();
-	            switch (that.currentType)
-	            {
-	                case 1:
-	                	//清空datatable的column搜索条件
-	                	api1.search('');
-	                	var column1 = api1.column(1);
-	                	column1.search('', true, false);
-	                	//清空表格
-	                	that.brandArticleUnitTable.clear().draw();
-	                    that.brandUnitTable();
-	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
-		                	if(result.success == true){
-			                    that.brandArticleUnitTable.rows.add(result.data).draw();
-			                  	//重绘搜索列
-			                    that.brandUnitTable();
-		            		}
-	                    });
-	                	break;
-	                case 2:
-                		//清空datatable的column搜索条件
+                $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
+                    if(result.success == true){
+                        that.brandReport = result.data.brandReport;
+                        //清空brandUnitDatatable的column搜索条件
+                        api1.search('');
+                        var column1 = api1.column(1);
+                        column1.search('', true, false);
+                        //清空brandFamilyDatatable的column搜索条件
                         api2.search('');
-                    	var column1 = api2.column(1);
-                    	column1.search('', true, false);
-                    	//清空表格
-                    	that.brandArticleFamilyTable.clear().draw();
+                        var column2 = api2.column(1);
+                        column2.search('', true, false);
+                        that.brandArticleUnit = result.data.brandArticleUnit;
+                        that.brandArticleUnitTable.clear().draw();
+                        that.brandArticleUnitTable.rows.add(result.data.brandArticleUnit).draw();
+                        //重绘搜索列
+                        that.brandUnitTable();
+                        that.brandArticleFamily = result.data.brandArticleFamily;
+                        that.brandArticleFamilyTable.clear();
+                        that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
+                        //重绘搜索列
                         that.brandFamilyTable();
-	                    $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
-		                	if(result.success == true){
-		                        that.brandArticleFamilyTable.rows.add(result.data).draw();
-		                        //重绘搜索列
-		                        that.brandFamilyTable();
-		            		}
-	                    });
-	                   break;
-	            }
+						toastr.clear();
+                        toastr.success("查询成功");
+                    }else{
+						toastr.clear();
+                        toastr.error("查询失败");
+                    }
+                });
         	}catch(e){
-        		toastr.error("查询品牌菜品销售表失败!");
-	            toastr.clear();
-	            return;
+				toastr.clear();
+                toastr.error("系统异常，请刷新重试");
         	}
-            toastr.success("查询成功");
-            toastr.clear(); 
         },
-        selectBrandArticleToatl : function(){
-        	var that = this;
-        	$.post("articleSell/list_brand", this.getDate(), function(result) {
-                that.brandReport.brandName = result.brandName;
-                that.brandReport.totalNum = result.totalNum;
-                that.brandReport.sellIncome=result.sellIncome;
-                that.brandReport.discountTotal=result.discountTotal;
-                that.brandReport.refundCount=result.refundCount;
-                that.brandReport.refundTotal=result.refundTotal;
-            });
+        download : function(){
+            window.location.href = "articleSell/downloadBrnadArticle?path="+this.object.path+"";
+            this.state = 1;
+            this.start = 0;
+            this.end = 1000;
+            this.startPosition = 1006;
+            this.index = 1;
         },
         getDate : function(){
             var data = {
                 beginDate : this.searchDate.beginDate,
                 endDate : this.searchDate.endDate,
-                type : this.currentType
             };
             return data;
         },
-        brandreportExcel : function(){
-            var that = this;
-            var beginDate = that.searchDate.beginDate;
-            var endDate = that.searchDate.endDate;
-            switch(that.currentType){
-                case 1:
-                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
-                    break;
-                case 2:
-                    location.href="articleSell/downloadBrnadArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType;
-                    break;
+        createBrnadArticleTotal : function(){
+            try {
+                var that = this;
+                that.brandInfo = that.brandReport;
+                that.object = that.getDate();
+                that.object.type =  that.currentType;
+                that.object.brandReport =  that.brandInfo;
+                switch (that.currentType) {
+                    case 1:
+                        that.brandArticleUnitList = that.brandArticleUnit;
+                        if (that.brandArticleUnitList.length <= 1000) {
+                            that.object.brandArticleUnit = that.brandArticleUnitList;
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
+                                }else{
+									toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                        }else{
+                            that.state = 2;
+                            that.length = Math.ceil(that.brandArticleUnitList.length/1000);
+                            that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start,that.end);
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    that.object.path = result.data;
+                                    that.start = that.end;
+                                    that.end = that.start + 1000;
+                                    that.index++;
+                                    that.appendBrandUnitExcel();
+                                }else{
+                                    that.state = 1;
+                                    that.start = 0;
+                                    that.end = 1000;
+                                    that.startPosition = 1006;
+                                    that.index = 1;
+                                    toastr.clear();
+                                    toastr.error("生成报表出错");
+                                }
+                            });
+                        }
+                        break;
+                    case 2:
+                        that.brandArticleFamilyList = that.brandArticleFamily;
+                        if (that.brandArticleFamilyList.length <= 1000) {
+                            that.object.brandArticleFamily = that.brandArticleFamilyList;
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
+                                }else{
+                                    toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                        }else{
+                            that.state = 2;
+                            that.length = Math.ceil(that.brandArticleFamilyList.length/1000);
+                            that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start,that.end);
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    that.object.path = result.data;
+                                    that.start = that.end;
+                                    that.end = that.start + 1000;
+                                    that.index++;
+                                    that.appendBrandFamilyExcel();
+                                }else{
+                                    that.state = 1;
+                                    that.start = 0;
+                                    that.end = 1000;
+                                    that.startPosition = 1006;
+                                    that.index = 1;
+                                    toastr.clear();
+                                    toastr.error("生成报表出错");
+                                }
+                            });
+                        }
+                        break;
+                }
+            }catch (e){
+                that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
+				toastr.clear();
+                toastr.error("系统异常，请刷新重试");
             }
         },
-        downloadBrnadArticleTotal : function(){
-        	var that = this;
-            var beginDate = that.searchDate.beginDate;
-            var endDate = that.searchDate.endDate;
-            location.href="articleSell/downloadBrnadArticleTotal?beginDate="+beginDate+"&&endDate="+endDate+"";
+        appendBrandUnitExcel : function () {
+            var that = this;
+            try {
+                if (that.index == that.length) {
+                    that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start);
+                } else {
+                    that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start, that.end);
+                }
+                that.object.startPosition = that.startPosition;
+                $.post("articleSell/appendToBrandExcel", that.object, function (result) {
+                    if (result.success) {
+                        that.start = that.end;
+                        that.end = that.start + 1000;
+                        that.startPosition = that.startPosition + 1000;
+                        that.index++;
+                        if (that.index - 1 == that.length) {
+                            that.state = 3;
+                        } else {
+                            that.appendBrandUnitExcel();
+                        }
+                    } else {
+                        that.state = 1;
+                        that.start = 0;
+                        that.end = 1000;
+                        that.startPosition = 1006;
+                        that.index = 1;
+                        toastr.clear();
+                        toastr.error("生成报表出错");
+                    }
+                });
+            }catch (e){
+                that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
+                toastr.clear();
+                toastr.error("系统异常，请刷新重试");
+            }
+        },
+        appendBrandFamilyExcel :function () {
+            var that = this;
+            try {
+                if (that.index == that.length) {
+                    that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start);
+                } else {
+                    that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start, that.end);
+                }
+                that.object.startPosition = that.startPosition;
+                $.post("articleSell/appendToBrandExcel", that.object, function (result) {
+                    if (result.success) {
+                        that.start = that.end;
+                        that.end = that.start + 1000;
+                        that.startPosition = that.startPosition + 1000;
+                        that.index++;
+                        if (that.index - 1 == that.length) {
+                            that.state = 3;
+                        } else {
+                            that.appendBrandFamilyExcel();
+                        }
+                    } else {
+                        that.state = 1;
+                        toastr.clear();
+                        toastr.error("生成报表出错");
+                    }
+                });
+            }catch (e){
+                that.state = 1;
+                that.start = 0;
+                that.end = 1000;
+                that.startPosition = 1006;
+                that.index = 1;
+                toastr.clear();
+                toastr.error("系统异常，请刷新重试");
+            }
         },
         today : function(){
             date = new Date().format("yyyy-MM-dd");
@@ -430,7 +565,6 @@ var vueObj = new Vue({
             this.searchDate.endDate  = GetDateStr(-1);
             this.searchInfo();
         },
-
         week : function(){
             this.searchDate.beginDate  = getWeekStartDate();
             this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
@@ -443,15 +577,11 @@ var vueObj = new Vue({
         },
         brandUnitTable : function(){
          	var api = brandUnitAPI;
-            api.search('');
-            var data = api.data();
             var columnsSetting = api.settings()[0].oInit.columns;
             $(columnsSetting).each(function (i) {
                 if (this.s_filter) {
                     var column = api.column(i);
-                    var title = this.title;
                     var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                    var that = this;
                     column.data().unique().each(function (d) {
                         select.append('<option value="' + d + '">' + d + '</option>')
                     });
@@ -466,15 +596,11 @@ var vueObj = new Vue({
         },
         brandFamilyTable : function(){
        		var api = brandFamilyAPI;
-           	api.search('');
-           	var data = api.data();
            	var columnsSetting = api.settings()[0].oInit.columns;
            	$(columnsSetting).each(function (i) {
                if (this.s_filter) {
                    var column = api.column(i);
-                   var title = this.title;
                    var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                   var that = this;
                    column.data().unique().each(function (d) {
                        select.append('<option value="' + d + '">' + d + '</option>')
                    });
@@ -489,11 +615,6 @@ var vueObj = new Vue({
         }
     }
 });
-
-function Trim(str)
-{ 
-    return str.replace(/(^\s*)|(\s*$)/g, ""); 
-}
 
 function openModal(articleId) {
 	var beginDate = $("#beginDate").val();
@@ -511,7 +632,8 @@ function openModal(articleId) {
             modal.modal()
         },
         error: function () {
-            toastr.error("系统异常请重新刷新");
+			toastr.clear();
+            toastr.error("系统异常，请刷新重试");
         }
     });
 }

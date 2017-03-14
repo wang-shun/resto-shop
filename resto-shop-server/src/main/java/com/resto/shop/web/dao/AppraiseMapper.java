@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.dto.AppraiseShopDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -42,6 +43,7 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     
     Map<String, Object> selectCustomerAppraiseAvg(@Param("customerId") String customerId);
 
-
     List<Appraise> selectByTimeAndShopId(@Param("shopId") String shopId,@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+    List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap);
 }

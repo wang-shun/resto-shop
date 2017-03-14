@@ -491,4 +491,14 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
     	return articleMapper.queryArticleMealAttr(selectMap);
     }
+
+    @Override
+    public List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap) {
+        return articleMapper.selectArticleByType(selectMap);
+    }
+
+    @Override
+    public Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap) {
+        return articleMapper.selectArticleOrderCount(selectMap);
+    }
 }

@@ -284,4 +284,21 @@ public class Appraise implements Serializable {
     public void setAppraiseMessage(List<AppraiseFile> appraiseMessage) {
         this.appraiseMessage = appraiseMessage;
     }
+
+    public static final String getLevel(Byte value){
+        switch (value){
+            case 1:
+                return "一星";
+            case 2:
+                return "二星";
+            case 3:
+                return "三星";
+            case 4:
+                return "五星";
+            case 5:
+                return "五星";
+            default:
+                return "未知评价";
+        }
+    }
 }

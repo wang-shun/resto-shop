@@ -120,4 +120,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void updateInitialsById(@Param("initials") String initials, @Param("articleId") String articleId);
 
 	List<Article> selectArticleList();
+
+    List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap);
+
+    Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 }

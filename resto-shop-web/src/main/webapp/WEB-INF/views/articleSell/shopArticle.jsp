@@ -22,7 +22,7 @@
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
              <button type="button" class="btn btn-primary" @click="month">本月</button>
-             <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
+             <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
              &nbsp;
              <button type="button" class="btn btn-primary" @click="shopreportExcel">下载报表</button>
              <br/>
@@ -130,7 +130,9 @@
 	        currentType:1,//当前选中页面
 	        shopArticleUnitTable:{},//单品dataTables对象
 	        shopArticleFamilyTable:{},//套餐datatables对象
-	        api:{}
+	        api:{},
+            shopArticleUnitDtos:[],
+            shopArticleFamilyDtos:[]
 	    },
 	    created : function() {
 	        this.searchDate.beginDate = beginDate;
@@ -280,83 +282,92 @@
 	        //切换单品、套餐 type 1:单品 2:套餐
 	        chooseType:function (type) {
 	          this.currentType= type;
-	          this.searchInfo();
 	        },
-	        searchInfo : function(isInit) {
+	        searchInfo : function() {
+                toastr.clear();
+                toastr.success("查询中...");
 	        	try{
 		            var that = this;
 		            var api1 = shopUnitAPI;
 		            var api2 = shopFamilyAPI;
-		            //判断 时间范围是否合法
-		            if (that.searchDate.beginDate > that.searchDate.endDate) {
-		                toastr.error("开始时间不能大于结束时间");
-		                toastr.clear();
-		                return false;
-		            }
-		            switch (that.currentType)
-		            {
-		                case 1:
-		                	//清空datatable的column搜索条件
-		                	api1.search('');
-		                	var column1 = api1.column(1);
-		                	column1.search('', true, false);
-		                	//清空表格
-		                	that.shopArticleUnitTable.clear().draw();
-		                    that.shopUnitTable();
-		                    $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
-			                	if(result.success == true){
-				                    that.shopArticleUnitTable.rows.add(result.data).draw();
-				                  	//重绘搜索列
-				                    that.shopUnitTable();
-			            		}
-		                    });
-		                	break;
-		                case 2:
-	                		//清空datatable的column搜索条件
-	                        api2.search('');
-	                    	var column1 = api2.column(1);
-	                    	column1.search('', true, false);
-	                    	//清空表格
-	                    	that.shopArticleFamilyTable.clear().draw();
-	                        that.shopFamilyTable();
-		                    $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
-			                	if(result.success == true){
-			                        that.shopArticleFamilyTable.rows.add(result.data).draw();
-			                        //重绘搜索列
-			                        that.shopFamilyTable();
-			            		}
-		                    });
-		                   break;
-		            }
+                    $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
+                        if(result.success == true){//清空datatable的column搜索条件
+                            api1.search('');
+                            var column1 = api1.column(1);
+                            column1.search('', true, false);
+                            //清空表格
+                            that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
+                            that.shopArticleUnitTable.clear();
+                            that.shopArticleUnitTable.rows.add(result.data.shopArticleUnitDtos).draw();
+                            //重绘搜索列
+                            that.shopUnitTable();
+                            //清空datatable的column搜索条件
+                            api2.search('');
+                            var column2 = api2.column(1);
+                            column2.search('', true, false);
+                            //清空表格
+                            that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
+                            that.shopArticleFamilyTable.clear();
+                            that.shopArticleFamilyTable.rows.add(result.data.shopArticleFamilyDtos).draw();
+                            //重绘搜索列
+                            that.shopFamilyTable();
+							toastr.clear();
+                            toastr.success("查询成功");
+                        }else{
+							toastr.clear();
+                            toastr.error("查询报表出错");
+                        }
+                    });
 	        	}catch(e){
-	        		toastr.error("查询店铺菜品销售表失败!");
-		            toastr.clear();
-		            return;
+					toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
 	        	}
-	            toastr.success("查询成功");
-	            toastr.clear(); 
 	        },
 	        getDate : function(){
 	            var data = {
 	                beginDate : this.searchDate.beginDate,
 	                endDate : this.searchDate.endDate,
-	                type : this.currentType,
 	                shopId : shopId
 	            };
 	            return data;
 	        },
 	        shopreportExcel : function(){
-	            var that = this;
-	            var beginDate = that.searchDate.beginDate;
-	            var endDate = that.searchDate.endDate;
-	            switch(that.currentType){
-	                case 1:
-	                    location.href="articleSell/downloadShopArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType+"&&shopId="+shopId;
-	                    break;
-	                case 2:
-	                    location.href="articleSell/downloadShopArticle?beginDate="+beginDate+"&&endDate="+endDate+"&&type="+that.currentType+"&&shopId="+shopId;
-	                    break;
-	            }
+	            try {
+                    var that = this;
+                    var object = {
+                        beginDate : that.searchDate.beginDate,
+                        endDate : that.searchDate.endDate,
+                        type : that.currentType,
+                        shopId : shopId
+                    }
+                    switch (that.currentType) {
+                        case 1:
+                            object.shopArticleUnit = that.shopArticleUnitDtos;
+                            $.post("articleSell/createShopArticle",object,function (result) {
+                                if(result.success){
+	                                window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+                                }else{
+									toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                            break;
+                        case 2:
+                            object.shopArticleFamily = that.shopArticleFamilyDtos;
+                            $.post("articleSell/createShopArticle",object,function (result) {
+                                if(result.success){
+                                    window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+                                }else{
+									toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                            break;
+                    }
+                }catch (e){
+					toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
 	        },
 	        today : function(){
 	            date = new Date().format("yyyy-MM-dd");
@@ -383,14 +394,11 @@
 	        shopUnitTable : function(){
 	         	var api = shopUnitAPI;
 	            api.search('');
-	            var data = api.data();
 	            var columnsSetting = api.settings()[0].oInit.columns;
 	            $(columnsSetting).each(function (i) {
 	                if (this.s_filter) {
 	                    var column = api.column(i);
-	                    var title = this.title;
 	                    var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-	                    var that = this;
 	                    column.data().unique().each(function (d) {
 	                        select.append('<option value="' + d + '">' + d + '</option>')
 	                    });
@@ -406,14 +414,11 @@
 	        shopFamilyTable : function(){
 	       		var api = shopFamilyAPI;
 	           	api.search('');
-	           	var data = api.data();
 	           	var columnsSetting = api.settings()[0].oInit.columns;
 	           	$(columnsSetting).each(function (i) {
 	               if (this.s_filter) {
 	                   var column = api.column(i);
-	                   var title = this.title;
 	                   var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-	                   var that = this;
 	                   column.data().unique().each(function (d) {
 	                       select.append('<option value="' + d + '">' + d + '</option>')
 	                   });
@@ -433,12 +438,7 @@
 	        }
 	    }
 	});
-	
-	function Trim(str)
-	{ 
-	    return str.replace(/(^\s*)|(\s*$)/g, ""); 
-	}
-	
+
 	function openMealAttrModal(articleId) {
 		var beginDate = $("#beginDate").val();
 		var endDate = $("#endDate").val();
@@ -447,8 +447,7 @@
 	        data: {
 	            'articleId': articleId,
 	            'beginDate': beginDate,
-	            'endDate': endDate,
-	            'shopId': shopId
+	            'endDate': endDate
 	        },
 	        success: function (result) {
 	            var modal = $("#mealAttrModal");
@@ -456,7 +455,8 @@
 	            modal.modal()
 	        },
 	        error: function () {
-	            toastr.error("系统异常请重新刷新");
+				toastr.clear();
+                toastr.error("系统异常，请刷新重试");
 	        }
 	    });
 	}

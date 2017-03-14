@@ -155,8 +155,8 @@
     <select id="selectShopIncomeList" parameterType="java.util.Map" resultType="java.util.Map">
         select
         td.shop_detail_id shopDetailId,
-        SUM(td.original_amount) originalAmount,
-        SUM(td.order_money) orderMoney
+        IFNULL(SUM(td.original_amount),0) originalAmount,
+        IFNULL(SUM(td.order_money),0) orderMoney
         <foreach collection="payModeList" item="payMode">
             ,IFNULL((select <if test="payMode.payMode == 11">
                 ABS(SUM(pay_value))

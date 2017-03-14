@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Appraise;
+import com.sun.javafx.cursor.StandardCursorFrame;
 
 public interface AppraiseService extends GenericService<Appraise, String> {
  
@@ -67,4 +69,6 @@ public interface AppraiseService extends GenericService<Appraise, String> {
      * @return
      */
     List<Appraise> selectByTimeAndShopId(String  id, Date begin, Date end);
+
+    List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap);
 }

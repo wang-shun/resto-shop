@@ -19,15 +19,13 @@
 	var articleId = "${articleId}";
 	var beginDate = "${beginDate}";
 	var endDate = "${endDate}";
-	var shopId = "${shopId}";
 	$.ajax( {  
 	    url:'articleSell/queryArticleMealAttr',
 	    async:false,
 	    data:{  
 	    	'articleId':articleId,
 	    	'beginDate':beginDate,
-	    	'endDate':endDate,
-	    	'shopId':shopId
+	    	'endDate':endDate
 	    },  
 	    success:function(result) { 
 	    	if(result.success == true){
@@ -36,8 +34,9 @@
 	    		dataSource=[];
 	    	}
 	     },  
-	     error : function() { 
-	    	 toastr.error("系统异常请重新刷新");
+	     error : function() {
+			 toastr.clear();
+             toastr.error("系统异常，请刷新重试");
 	     }   
 	});
 	

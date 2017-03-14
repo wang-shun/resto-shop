@@ -66,6 +66,7 @@
     var beginDate = $("#beginDate").val();
     var endDate = $("#endDate").val();
     var dataSource;
+    toastr.success('查询中...');
     $.ajax( {
         url:'totalIncome/reportIncome',
         async:false,
@@ -75,9 +76,12 @@
         },
         success:function(data) {
             dataSource=data;
+            toastr.clear();
+            toastr.success('查询成功');
         },
         error : function() {
-            toastr.error("系统异常请重新刷新");
+            toastr.clear();
+            toastr.error("系统异常,请刷新重试");
         }
     });
 
@@ -87,7 +91,7 @@
         columns : [
             {
                 title : "品牌",
-                data : "brandName",
+                data : "shopName",
             },
             {
                 title : "原价销售总额(元)",
@@ -236,7 +240,6 @@
 
     });
 
-
     //本周
     $("#week").click(function(){
         beginDate = getWeekStartDate();
@@ -246,15 +249,6 @@
         searchInfo(beginDate,endDate);
 
     });
-
-
-    //本旬
-    $("#benxun").click(function(){
-
-
-
-    });
-
 
     //本月
     $("#month").click(function(){
@@ -266,9 +260,9 @@
 
     });
 
-
-
     function searchInfo(beginDate,endDate){
+        toastr.clear();
+        toastr.success('查询中...');
         //更新数据源
         $.ajax( {
             url:'totalIncome/reportIncome',
@@ -282,29 +276,39 @@
                 tb2.clear().draw();
                 tb1.rows.add(result.brandIncome).draw();
                 tb2.rows.add(result.shopIncome).draw();
+                toastr.clear();
                 toastr.success('查询成功');
             },
             error : function() {
-                toastr.error("系统异常请重新刷新");
+                toastr.clear();
+                toastr.error("系统异常，请刷新重试");
             }
         });
     }
-
 
     //导出品牌数据
     $("#brandreportExcel").click(function(){
         beginDate = $("#beginDate").val();
         endDate = $("#endDate").val();
-        location.href="totalIncome/brandExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
+        var object = {
+            beginDate : beginDate,
+            endDate : endDate,
+            brandIncomeDtos : dataSource.brandIncome,
+            shopIncomeDtos : dataSource.shopIncome
+        }
+        try {
+            $.post("totalIncome/brandExprotExcel",object,function (result) {
+                if (result.success){
+                    location.href="totalIncome/downloadExcel?path="+result.data+"";
+                }else{
+                    toastr.clear();
+                    toastr.error("生成报表出错");
+                }
+            });
+        }catch (e){
+            toastr.clear();
+            toastr.error("系统异常，请刷新重试");
+        }
 
     })
-
-    //导出店铺数据
-
-    $("#shopreportExcel").click(function(){
-        beginDate=$("#beginDate").val();
-        endDate = $("#endDate").val();
-        location.href="totalIncome/shopExprotExcel?beginDate="+beginDate+"&&endDate="+endDate;
-    })
-
 </script>

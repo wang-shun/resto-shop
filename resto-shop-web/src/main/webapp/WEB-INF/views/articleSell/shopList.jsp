@@ -68,7 +68,8 @@
 	            beginDate : "",
 	            endDate : "",
 	        },
-	        shopArticleTable : {}
+	        shopArticleTable : {},
+            shopArticleReportDtos : []
 	    },
 	    created : function() {
 	        var date = new Date().format("yyyy-MM-dd");
@@ -128,25 +129,26 @@
 	            });
 	        },
 	    	searchInfo : function(isInit) {
+                toastr.clear();
+                toastr.success("查询中...");
 	        	try{
 		            var that = this;
-		            //判断 时间范围是否合法
-		            if (that.searchDate.beginDate > that.searchDate.endDate) {
-		                toastr.error("开始时间不能大于结束时间");
-		                toastr.clear();
-		                return false;
-		            }
-		            that.shopArticleTable.clear().draw();
 		            $.post("articleSell/list_shop", this.getDate(), function(result) {
-		                that.shopArticleTable.rows.add(result).draw();
+		                if(result.success) {
+                            that.shopArticleTable.clear().draw();
+                            that.shopArticleTable.rows.add(result.data.list).draw();
+                            that.shopArticleReportDtos = result.data.list;
+							toastr.clear();
+                            toastr.success("查询成功");
+                        }else{
+							toastr.clear();
+                            toastr.error("查询报表出错");
+                        }
 		            });
 	        	}catch(e){
-	        		toastr.error("查询店铺菜品销售表失败!");
-		            toastr.clear();
-		            return;
+					toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
 	        	}
-	            toastr.success("查询成功");
-	            toastr.clear(); 
 	        },
 	        getDate : function(){
 	            var data = {
@@ -178,9 +180,24 @@
 	        },
 	        shopReportExcel : function(){
 	            var that = this;
-	            var beginDate = that.searchDate.beginDate;
-	            var endDate = that.searchDate.endDate;
-                location.href="articleSell/shop_articleId_excel?beginDate="+beginDate+"&&endDate="+endDate+"&&sort="+sort;
+                try {
+                    var object = {
+                        beginDate: that.searchDate.beginDate,
+                        endDate: that.searchDate.endDate,
+                        shopArticleReportDtos: that.shopArticleReportDtos
+                    }
+                    $.post("articleSell/create_shop_article_excel", object, function (result) {
+                        if (result.success){
+                            window.location.href = "articleSell/downloadShopArticleExcel?path="+result.data+"";
+                        }else{
+							toastr.clear();
+                            toastr.error("下载报表出错");
+                        }
+                    });
+                }catch (e){
+					toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
 	        }
 	    }
 	});
