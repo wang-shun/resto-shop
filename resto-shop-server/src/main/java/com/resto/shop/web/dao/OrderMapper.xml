@@ -927,7 +927,7 @@
         customer_id = #{customerId}
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
-        or (order_mode = 5 and parent_order_id is null)) and is_refund_order = false,
+        or (order_mode = 5 and parent_order_id is null)) and is_refund_order = 0
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
             <foreach collection="orderState" item="state" open="("
