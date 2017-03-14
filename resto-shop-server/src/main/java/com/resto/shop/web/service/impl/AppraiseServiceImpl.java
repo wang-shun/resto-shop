@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
@@ -219,4 +220,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public Map<String, Object> selectCustomerAppraiseAvg(String customerId) {
 		return appraiseMapper.selectCustomerAppraiseAvg(customerId);
 	}
+
+    @Override
+    public List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap) {
+        return appraiseMapper.selectAppraiseShopDto(selectMap);
+    }
 }

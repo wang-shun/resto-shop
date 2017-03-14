@@ -25,7 +25,9 @@
                 <button type="button" class="btn btn-primary" @click="week">本周</button>
                 <button type="button" class="btn btn-primary" @click="month">本月</button>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-                <button type="button" class="btn btn-primary" @click="shopreportExcel">下载报表</button><br/>
+                <button type="button" class="btn btn-primary" @click="createExcel" v-if="state == 1">下载报表</button>
+                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
+                <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button><br/>
             </form>
         </div>
     </div>
@@ -66,7 +68,15 @@
 	            beginDate : "",
 	            endDate : "",
 	        },
-            shopAppraiseTable : {}
+            shopAppraiseTable : {},
+            appraiseShopDtos : [],
+            state:1,
+            object : {},
+            length : 0,
+            start : 0,
+            end : 1000,
+            startPosition : 1005,
+            index : 1
 	    },
 	    created : function() {
 	        this.searchDate.beginDate = beginDate;
@@ -123,8 +133,9 @@
 		            var that = this;
                     $.post("appraiseReport/shop_data", this.getDate(), function(result) {
                         if (result.success) {
+                            that.appraiseShopDtos = result.data.appraiseShopDtos;
                             that.shopAppraiseTable.clear();
-//                        that.shopAppraiseTable.rows.add(result.data).draw();
+                            that.shopAppraiseTable.rows.add(result.data.appraiseShopDtos).draw();
                             toastr.clear();
                             toastr.success("查询成功");
                         }else {
@@ -145,13 +156,93 @@
 	            };
 	            return data;
 	        },
-	        shopreportExcel : function(){
-	            try {
-                }catch (e){
-					toastr.clear();
+	        createExcel : function(){
+                var that = this;
+                try {
+                    that.object = that.getDate();
+                    that.appraiseShopDtos = that.appraiseShopDtos.sort(this.keysert('level'));
+                    if (that.shopOrderList.length <= 1000){
+                        that.object.shopOrderList = that.shopOrderList;
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                            if (result.success){
+                                window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        })
+                    }else{
+                        that.state = 2;
+                        that.length = Math.ceil(that.shopOrderList.length/1000);
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
+                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                            if (result.success){
+                                that.object.path = result.data;
+                                that.start = that.end;
+                                that.end = that.start + 1000;
+                                that.index++;
+                                that.appendShopExcel();
+                            }else{
+                                that.state = 1;
+                                that.start = 0;
+                                that.end = 1000;
+                                that.startPosition = 1005;
+                                that.index = 1;
+                                toastr.clear();
+                                toastr.error("生成报表出错");
+                            }
+                        });
+                    }
+                }catch (e) {
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
+                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
 	        },
+            appendShopExcel : function () {
+                var that = this;
+                try {
+                    if (that.index == that.length) {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start);
+                    } else {
+                        that.object.shopOrderList = that.shopOrderList.slice(that.start, that.end);
+                    }
+                    that.object.startPosition = that.startPosition;
+                    $.post("orderReport/appendShopOrderExcel", that.object, function (result) {
+                        if (result.success) {
+                            that.start = that.end;
+                            that.end = that.start + 1000;
+                            that.startPosition = that.startPosition + 1000;
+                            that.index++;
+                            if (that.index - 1 == that.length) {
+                                that.state = 3;
+                            } else {
+                                that.appendShopExcel();
+                            }
+                        } else {
+                            that.state = 1;
+                            that.start = 0;
+                            that.end = 1000;
+                            that.startPosition = 1005;
+                            that.index = 1;
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1005;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
 	        today : function(){
 	            date = new Date().format("yyyy-MM-dd");
 	            this.searchDate.beginDate = date
@@ -172,7 +263,14 @@
 	            this.searchDate.beginDate  = getMonthStartDate();
 	            this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
 	            this.searchInfo();
-	        }
+	        },
+            keysert: function (key) {
+                return function(a,b){
+                    var value1 = a[key];
+                    var value2 = b[key];
+                    return value1 - value2;
+                }
+            }
 	    }
 	});
 </script>

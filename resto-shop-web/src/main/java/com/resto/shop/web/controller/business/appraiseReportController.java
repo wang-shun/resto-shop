@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.shop.web.service.AppraiseService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,6 +51,9 @@ public class appraiseReportController extends GenericController{
 	private BrandService brandService;
 	@Resource
 	private ShopDetailService shopDetailService;
+
+    @Resource
+    private AppraiseService appraiseService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -310,13 +314,18 @@ public class appraiseReportController extends GenericController{
     public Result selectAppraiseByShopId(String beginDate,String endDate,String shopId){
         JSONObject object = new JSONObject();
         try{
-
+            Map<String, Object> selectMap = new HashMap<>();
+            selectMap.put("beginDate",beginDate);
+            selectMap.put("endDate",endDate);
+            selectMap.put("shopId",shopId);
+            List<AppraiseShopDto> appraiseShopDtos = appraiseService.selectAppraiseShopDto(selectMap);
+            object.put("appraiseShopDtos",appraiseShopDtos);
         }catch (Exception e){
             log.error("查看店铺评论报表出错！");
             e.printStackTrace();
             return new Result(false);
         }
-        return getSuccessResult(false);
+        return getSuccessResult(object);
     }
 
 	@RequestMapping("create_shop_excel")

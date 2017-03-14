@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.dto.AppraiseShopDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -40,4 +41,6 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
     List<Appraise> selectByGoodAppraise();
     
     Map<String, Object> selectCustomerAppraiseAvg(@Param("customerId") String customerId);
+    
+    List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap);
 }
