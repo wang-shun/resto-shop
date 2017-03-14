@@ -92,9 +92,9 @@ public class OrderAspect {
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-//
+//            现金银联支付应该在pos上确认订单已收款后在进行出单
             if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
-                MQMessageProducer.sendPlaceOrderMessage(order);
+                MQMessageProducer.sendPlaceOrderNoPayMessage(order);
             }
 
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
@@ -259,7 +259,6 @@ public class OrderAspect {
     public void confirmOrderPos(Order order) {
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
-
     }
 
     @AfterReturning(value = "afterPay()", returning = "order")
@@ -396,11 +395,19 @@ public class OrderAspect {
 
 				if (order.getEmployeeId() == null) {
                     if(order.getPrintOrderTime() == null){
-                        MQMessageProducer.sendPlaceOrderMessage(order);
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                            MQMessageProducer.sendPlaceOrderNoPayMessage(order);
+                        }else{
+                            MQMessageProducer.sendPlaceOrderMessage(order);
+                        }
                     }
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
-						MQMessageProducer.sendPlaceOrderMessage(order);
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                            MQMessageProducer.sendPlaceOrderNoPayMessage(order);
+                        }else{
+                            MQMessageProducer.sendPlaceOrderMessage(order);
+                        }
 					}
 				}
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");

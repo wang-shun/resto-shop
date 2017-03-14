@@ -298,6 +298,54 @@
                             </div>
                     </div>
 
+                    <div class="form-group" v-show="b.aliPay == 1">
+                        <label class="col-sm-3 control-label">开启支付宝支付：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="aliPay"v-model="m.aliPay" value="1">启用
+                                </label>
+                                <label> <input type="radio" name="aliPay" v-model="m.aliPay" value="0">不启用
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" v-show="b.openUnionPay == 1">
+                        <label class="col-sm-3 control-label">开启银联支付：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="openUnionPay"v-model="m.openUnionPay" value="1">启用
+                                </label>
+                                <label> <input type="radio" name="openUnionPay" v-model="m.openUnionPay" value="0">不启用
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" v-show="b.openMoneyPay == 1">
+                        <label class="col-sm-3 control-label">开启现金支付：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="openMoneyPay"v-model="m.openMoneyPay" value="1">启用
+                                </label>
+                                <label> <input type="radio" name="openMoneyPay" v-model="m.openMoneyPay" value="0">不启用
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">pos加菜是否开启粉丝价：</label>
+                        <div class="col-sm-9">
+                            <div>
+                                <label> <input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">启用
+                                </label>
+                                <label> <input type="radio" name="posPlusType" v-model="m.posPlusType" value="1">不启用
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
 					<div class="form-group" style="margin-left: 55px;">
 						<div class="control-label" style="text-align: inherit">是否启用服务费：</div>
 						<label style="position: relative;left: 195px;bottom: 21px;">
@@ -325,18 +373,6 @@
 								</div>
 							</div>
 					   </div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label">pos加菜是否开启粉丝价：</label>
-						<div class="col-sm-9">
-							<div>
-								<label> <input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">启用
-								</label>
-								<label> <input type="radio" name="posPlusType" v-model="m.posPlusType" value="1">不启用
-								</label>
-							</div>
-						</div>
 					</div>
 
 					<div class="text-center">
@@ -373,7 +409,8 @@
 				var vueObj = new Vue({
 					el : "#control",
 					data : {
-						m : result.data,
+						m : result.data.shop,
+                        b : result.data.brand,
 						showa:true,
 						showlate:true,
 						showp:true
@@ -453,7 +490,8 @@
                                 type:"post",
                                 dataType:"json",
                                 success:function (resultData) {
-                                    that.m = resultData.data;
+                                    that.m = resultData.data.shop;
+                                    that.b = resultData.data.brand;
                                 }
                             });
                         }
