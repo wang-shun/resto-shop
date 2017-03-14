@@ -593,7 +593,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.MONEY_PAY);
+            item.setPaymentModeId(PayMode.CRASH_PAY);
             item.setPayTime(order.getCreateTime());
             item.setPayValue(payMoney);
             item.setRemark("现金支付:" + item.getPayValue());
