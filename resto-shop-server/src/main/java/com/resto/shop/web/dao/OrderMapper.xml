@@ -201,6 +201,7 @@
         <result column="is_pay" property="isPay"/>
         <result column="base_meal_all_count" property="baseMealAllCount"/>
         <result column="pay_type" property="payType"/>
+        <result column="is_refund_order" property="isRefundOrder"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="orderPaymentId" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -377,7 +378,7 @@
         parent_order_id, allow_continue_order,
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
-        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm
+        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -586,6 +587,9 @@
             <if test="payType != null">
                 pay_type,
             </if>
+            <if test="isRefundOrder != null">
+                is_refund_order,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -726,6 +730,9 @@
             <if test="payType != null">
                 #{payType},
             </if>
+            <if test="isRefundOrder != null">
+                #{isRefundOrder},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -864,6 +871,9 @@
             <if test="payMode != null">
                 pay_mode = #{payMode},
             </if>
+            <if test="isRefundOrder != null">
+                is_refund_order = #{isRefundOrder},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -905,7 +915,7 @@
         allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
         count_with_child = #{countWithChild,jdbcType=INTEGER},
         last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
-        pay_type = #{payType}
+        pay_type = #{payType},is_refund_order = #{isRefundOrder}
         where id = #{id,jdbcType=VARCHAR}
     </update>
 
@@ -917,7 +927,7 @@
         customer_id = #{customerId}
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
-        or (order_mode = 5 and parent_order_id is null))
+        or (order_mode = 5 and parent_order_id is null)) and is_refund_order = 0,
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
             <foreach collection="orderState" item="state" open="("

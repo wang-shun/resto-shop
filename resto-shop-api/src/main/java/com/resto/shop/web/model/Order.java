@@ -199,6 +199,17 @@ public class Order implements Serializable{
     //加菜位置  pos为pos端点菜   wechat为wehcat端点菜
     private String createOrderByAddress;
 
+    //是否退菜光 包括自订单   默认否
+    private Boolean isRefundOrder;
+
+    public Boolean getIsRefundOrder() {
+        return isRefundOrder;
+    }
+
+    public void setIsRefundOrder(Boolean isRefundOrder) {
+        this.isRefundOrder = isRefundOrder;
+    }
+
     public String getCreateOrderByAddress() {
         return createOrderByAddress;
     }
