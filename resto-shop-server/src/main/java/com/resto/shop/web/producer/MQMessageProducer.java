@@ -167,6 +167,7 @@ public class MQMessageProducer {
 		obj.put("printTimes",order.getPrintTimes());
 		obj.put("amountWithChildren",order.getAmountWithChildren());
 		obj.put("printOrderTime",order.getPrintOrderTime());
+		obj.put("payMode",order.getPayMode());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_NOPAY_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
