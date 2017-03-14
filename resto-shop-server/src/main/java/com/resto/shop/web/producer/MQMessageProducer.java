@@ -158,6 +158,7 @@ public class MQMessageProducer {
 		obj.put("shopDetailId", order.getShopDetailId());
 		obj.put("articleCount", order.getArticleCount());
 		obj.put("orderMode",order.getOrderMode());
+		obj.put("orderState",order.getOrderState());
 		obj.put("productionStatus", order.getProductionStatus());
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
