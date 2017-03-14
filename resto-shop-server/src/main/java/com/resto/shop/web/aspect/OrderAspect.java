@@ -93,9 +93,9 @@ public class OrderAspect {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
 //            现金银联支付应该在pos上确认订单已收款后在进行出单
-//            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
-//                MQMessageProducer.sendPlaceOrderMessage(order);
-//            }
+            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                MQMessageProducer.sendPlaceOrderMessage(order);
+            }
 
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
