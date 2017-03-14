@@ -92,10 +92,10 @@ public class OrderAspect {
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-//
-            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
-                MQMessageProducer.sendPlaceOrderMessage(order);
-            }
+//            现金银联支付应该在pos上确认订单已收款后在进行出单
+//            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+//                MQMessageProducer.sendPlaceOrderMessage(order);
+//            }
 
             if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
@@ -257,9 +257,11 @@ public class OrderAspect {
 
     @AfterReturning(value = "confirmOrderPos()", returning = "order")
     public void confirmOrderPos(Order order) {
+        if((order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY) && order.getPayType() == PayType.PAY){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
-
     }
 
     @AfterReturning(value = "afterPay()", returning = "order")

@@ -2618,7 +2618,6 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         set is_confirm = 1,
         order_state = 2,
         allow_continue_order = 1
-
         where id =  #{orderId}
     </update>
 
