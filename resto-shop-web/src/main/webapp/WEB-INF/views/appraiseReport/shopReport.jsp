@@ -161,12 +161,12 @@
                 var that = this;
                 try {
                     that.object = that.getDate();
-                    that.appraiseShopDtos = that.appraiseShopDtos.sort(this.keysert('level'));
-                    if (that.shopOrderList.length <= 1000){
-                        that.object.shopOrderList = that.shopOrderList;
-                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                    that.appraiseShopList = that.appraiseShopDtos.sort(this.keysert('level'));
+                    if (that.appraiseShopList.length <= 1000){
+                        that.object.appraiseShopDtos = that.appraiseShopList;
+                        $.post("appraiseReport/create_shop_excel",that.object,function (result) {
                             if (result.success){
-                                window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";
+                                window.location.href = "appraiseReport/downloadShopExcel?path="+result.data+"";
                             }else{
                                 toastr.clear();
                                 toastr.error("下载报表出错");
@@ -174,15 +174,15 @@
                         })
                     }else{
                         that.state = 2;
-                        that.length = Math.ceil(that.shopOrderList.length/1000);
-                        that.object.shopOrderList = that.shopOrderList.slice(that.start,that.end);
-                        $.post("orderReport/create_shop_excel",that.object,function (result) {
+                        that.length = Math.ceil(that.appraiseShopList.length/1000);
+                        that.object.appraiseShopDtos = that.appraiseShopList.slice(that.start,that.end);
+                        $.post("appraiseReport/create_shop_excel",that.object,function (result) {
                             if (result.success){
                                 that.object.path = result.data;
                                 that.start = that.end;
                                 that.end = that.start + 1000;
                                 that.index++;
-                                that.appendShopExcel();
+                                that.appendExcel();
                             }else{
                                 that.state = 1;
                                 that.start = 0;
@@ -204,16 +204,16 @@
                     toastr.error("系统异常，请刷新重试");
                 }
 	        },
-            appendShopExcel : function () {
+            appendExcel : function () {
                 var that = this;
                 try {
                     if (that.index == that.length) {
-                        that.object.shopOrderList = that.shopOrderList.slice(that.start);
+                        that.object.appraiseShopDtos = that.appraiseShopList.slice(that.start);
                     } else {
-                        that.object.shopOrderList = that.shopOrderList.slice(that.start, that.end);
+                        that.object.appraiseShopDtos = that.appraiseShopList.slice(that.start, that.end);
                     }
                     that.object.startPosition = that.startPosition;
-                    $.post("orderReport/appendShopOrderExcel", that.object, function (result) {
+                    $.post("appraiseReport/appendShopExcel", that.object, function (result) {
                         if (result.success) {
                             that.start = that.end;
                             that.end = that.start + 1000;
@@ -222,7 +222,7 @@
                             if (that.index - 1 == that.length) {
                                 that.state = 3;
                             } else {
-                                that.appendShopExcel();
+                                that.appendExcel();
                             }
                         } else {
                             that.state = 1;
@@ -243,6 +243,14 @@
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
+            },
+            download : function(){
+                window.location.href = "appraiseReport/downloadShopExcel?path="+this.object.path+"";
+                this.state = 1;
+                this.start = 0;
+                this.end = 1000;
+                this.startPosition = 1005;
+                this.index = 1;
             },
 	        today : function(){
 	            date = new Date().format("yyyy-MM-dd");

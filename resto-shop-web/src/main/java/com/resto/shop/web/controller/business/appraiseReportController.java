@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.shop.web.service.AppraiseService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -330,7 +331,7 @@ public class appraiseReportController extends GenericController{
 
 	@RequestMapping("create_shop_excel")
 	@ResponseBody
-	public void report_shopExcel (String beginDate,String endDate,String shopId,HttpServletRequest request, HttpServletResponse response){
+	public Result report_shopExcel (String beginDate,String endDate,String shopId,AppraiseShopDto appraiseShopDto,HttpServletRequest request){
 		//获取店铺名称
         ShopDetail s = shopDetailService.selectById(shopId);
 		//导出文件名
@@ -355,8 +356,14 @@ public class appraiseReportController extends GenericController{
 		map.put("reportTitle", "店铺评论");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 		List<AppraiseShopDto> result = new LinkedList<>();
-
-		String[][] headers = {{"评分","25"},{"评论对象","25"},{"评论时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"评论金额","25"},{"评论内容","25"}};
+        if (appraiseShopDto.getAppraiseShopDtos() != null){
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("appraiseShopDtos");
+            String json = JSON.toJSONString(appraiseShopDto.getAppraiseShopDtos(), filter);
+            List<AppraiseShopDto> dtos = JSON.parseObject(json, new TypeReference<List<AppraiseShopDto>>(){});
+            result.addAll(dtos);
+        }
+		String[][] headers = {{"评分","25"},{"评论对象","25"},{"评论时间","25"},{"手机号","25"},{"订单金额(元)","25"},{"评论金额","25"},{"评论内容","100"}};
 		//定义excel工具类对象
 		ExcelUtil<AppraiseShopDto> excelUtil=new ExcelUtil<AppraiseShopDto>();
 		OutputStream out  = null;
@@ -364,42 +371,55 @@ public class appraiseReportController extends GenericController{
 			out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
 			out.close();
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
 		}catch(Exception e){
 			e.printStackTrace();
+            return new Result(false);
 		}finally {  
 			if (out != null) {  
 				try {  
 					out.close();  
 				} catch (IOException io) {  
-					//log  
-				}  
+				}
 			}  
 		}
+		return getSuccessResult(path);
 	}
 
-	private String getLevel(Integer level){
-        String levelName = "";
-        switch (level)
-        {
-            case 1:
-                levelName="一星";
-                break;
-            case 2:
-                levelName="二星";
-                break;
-            case 3:
-                levelName="三星";
-                break;
-            case 4:
-                levelName="四星";
-                break;
-            case 5:
-                levelName="五星";
-                break;
+	@RequestMapping("/appendShopExcel")
+    @ResponseBody
+	public Result appendShopExcel(String path, Integer startPosition, AppraiseShopDto appraiseShopDto){
+	    try{
+            String[][] items = new String[appraiseShopDto.getAppraiseShopDtos().size()][];
+            int i = 0;
+            for (Map map : appraiseShopDto.getAppraiseShopDtos()){
+                items[i] = new String[7];
+                items[i][0] = map.get("levelName").toString();
+                items[i][1] = map.get("feedBack").toString();
+                items[i][2] = map.get("createTime").toString();
+                items[i][3] = map.get("telephone").toString();
+                items[i][4] = map.get("orderMoney").toString();
+                items[i][5] = map.get("redMoney").toString();
+                items[i][6] = map.get("content").toString();
+                i++;
+            }
+            AppendToExcelUtil.insertRows(path,startPosition,items);
+        }catch (Exception e){
+            log.error("追加店铺评论报表出错！");
+            e.printStackTrace();
+            return new Result(false);
         }
-        return levelName;
+        return getSuccessResult();
+    }
+
+	@RequestMapping("/downloadShopExcel")
+	public void downloadShopExcel(String path, HttpServletResponse response){
+	    ExcelUtil<Object> excelUtil = new ExcelUtil<>();
+	    try{
+			excelUtil.download(path, response);
+			JOptionPane.showMessageDialog(null, "导出成功！");
+			log.info("excel导出成功");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
