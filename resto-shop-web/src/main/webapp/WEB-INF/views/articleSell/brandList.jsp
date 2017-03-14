@@ -162,6 +162,7 @@ var vueObj = new Vue({
     el : "#control",
     data : {
         brandReport : {},
+        brandInfo : {},
         searchDate : {
             beginDate : "",
             endDate : "",
@@ -174,6 +175,8 @@ var vueObj = new Vue({
         state : 1,
         brandArticleUnit :[],
         brandArticleFamily　:[],
+        brandArticleUnitList :[],
+        brandArticleFamilyList　:[],
         object : {},
         length : 0,
         start : 0,
@@ -389,13 +392,15 @@ var vueObj = new Vue({
         createBrnadArticleTotal : function(){
             try {
                 var that = this;
+                that.brandInfo = that.brandReport;
                 that.object = that.getDate();
                 that.object.type =  that.currentType;
-                that.object.brandReport =  that.brandReport;
+                that.object.brandReport =  that.brandInfo;
                 switch (that.currentType) {
                     case 1:
-                        if (that.brandArticleUnit.length <= 1000) {
-                            that.object.brandArticleUnit = that.brandArticleUnit;
+                        that.brandArticleUnitList = that.brandArticleUnit;
+                        if (that.brandArticleUnitList.length <= 1000) {
+                            that.object.brandArticleUnit = that.brandArticleUnitList;
                             $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
@@ -406,8 +411,8 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            that.length = Math.ceil(that.brandArticleUnit.length/1000);
-                            that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start,that.end);
+                            that.length = Math.ceil(that.brandArticleUnitList.length/1000);
+                            that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start,that.end);
                             $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     that.object.path = result.data;
@@ -428,8 +433,9 @@ var vueObj = new Vue({
                         }
                         break;
                     case 2:
-                        if (that.brandArticleFamily.length <= 1000) {
-                            that.object.brandArticleFamily = that.brandArticleFamily;
+                        that.brandArticleFamilyList = that.brandArticleFamily;
+                        if (that.brandArticleFamilyList.length <= 1000) {
+                            that.object.brandArticleFamily = that.brandArticleFamilyList;
                             $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
@@ -440,8 +446,8 @@ var vueObj = new Vue({
                             });
                         }else{
                             that.state = 2;
-                            that.length = Math.ceil(that.brandArticleFamily.length/1000);
-                            that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start,that.end);
+                            that.length = Math.ceil(that.brandArticleFamilyList.length/1000);
+                            that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start,that.end);
                             $.post("articleSell/createBrnadArticle",that.object,function(result){
                                 if(result.success){
                                     that.object.path = result.data;
@@ -476,9 +482,9 @@ var vueObj = new Vue({
             var that = this;
             try {
                 if (that.index == that.length) {
-                    that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start);
+                    that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start);
                 } else {
-                    that.object.brandArticleUnit = that.brandArticleUnit.slice(that.start, that.end);
+                    that.object.brandArticleUnit = that.brandArticleUnitList.slice(that.start, that.end);
                 }
                 that.object.startPosition = that.startPosition;
                 $.post("articleSell/appendToBrandExcel", that.object, function (result) {
@@ -516,9 +522,9 @@ var vueObj = new Vue({
             var that = this;
             try {
                 if (that.index == that.length) {
-                    that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start);
+                    that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start);
                 } else {
-                    that.object.brandArticleFamily = that.brandArticleFamily.slice(that.start, that.end);
+                    that.object.brandArticleFamily = that.brandArticleFamilyList.slice(that.start, that.end);
                 }
                 that.object.startPosition = that.startPosition;
                 $.post("articleSell/appendToBrandExcel", that.object, function (result) {
