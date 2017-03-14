@@ -70,6 +70,7 @@
 	        },
             shopAppraiseTable : {},
             appraiseShopDtos : [],
+            appraiseShopList : [],
             state:1,
             object : {},
             length : 0,
