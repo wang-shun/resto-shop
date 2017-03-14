@@ -1111,8 +1111,8 @@
         and( (production_status = 5 and order_state != 9 and print_times = 0) or
         (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 40  )
         or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
-        or (production_status = 0 and order_state = 1 and order_mode = 6 and pay_type = 1 and now() - create_time > 120 )
-        or (production_status = 0 and order_state = 2 and now() - create_time > 40 )
+        or (production_status = 0 and order_state = 1 and order_mode = 6 and pay_type = 1 and print_times = 0 and now() - create_time > 120 )
+        or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
         )
         order by push_order_time DESC;
     </select>
