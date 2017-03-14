@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -40,11 +41,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.LogUtils.url;
 
 /**
  *
  */
 @RpcService
+@Component
 public class OrderServiceImpl extends GenericServiceImpl<Order, String> implements OrderService {
 
     //用来添加打印小票的序号
@@ -166,8 +169,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     Logger log = LoggerFactory.getLogger(getClass());
 
-    @Value("#{configProperties['pos.action.url']}")
-    private static String url;
+
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {

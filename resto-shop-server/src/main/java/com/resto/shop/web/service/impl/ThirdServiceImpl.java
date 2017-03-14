@@ -27,7 +27,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -39,6 +38,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.LogUtils.url;
 
 /**
  * Created by KONATA on 2016/10/28.
@@ -85,8 +85,6 @@ public class ThirdServiceImpl implements ThirdService {
     @Autowired
     private BrandService brandService;
 
-    @Value("#{configProperties['pos.action.url']}")
-    private static String url;
 
 
 
