@@ -1,10 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.HungerUtil;
-import com.resto.brand.core.util.UserActionUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -30,6 +27,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -39,6 +37,8 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 /**
  * Created by KONATA on 2016/10/28.
@@ -84,6 +84,10 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Autowired
     private BrandService brandService;
+
+    @Value("#{configProperties['pos.action.url']}")
+    private static String url;
+
 
 
     @Override
@@ -232,6 +236,12 @@ public class ThirdServiceImpl implements ThirdService {
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
         log.info("订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return printTask;
     }
 
@@ -322,6 +332,12 @@ public class ThirdServiceImpl implements ThirdService {
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
         log.info("订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return print;
     }
 
