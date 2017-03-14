@@ -351,7 +351,6 @@
                         });
                     }
 
-
                     $("#shopName").html(data.shopName);
                     $("#orderId").html(data.id);
                     $("#createTime").html(
@@ -365,9 +364,15 @@
                         telephone = data.customer.telephone;
                     }
                     var orderPaymentItem_id="";
-                    if(typeof (data.orderPaymentItem)!="undefined"){
-                        orderPaymentItem_id=data.orderPaymentItem.id;
-                    }
+                    if(typeof (data.orderPaymentItems)!="undefined"){
+                        var item = data.orderPaymentItems;
+                        for (var i = 0; i <item.length ; i++) {
+                            if(item[i].paymentModeId==1){
+                                orderPaymentItem_id=item[i].id;
+                                break;
+                            }
+                        }
+                    };
                     $("#orderPaymentItem_id").html(orderPaymentItem_id);
                     $("#telephone").html(telephone);
                     $("#orderMoney").html(data.orderMoney + "元");
