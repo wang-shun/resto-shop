@@ -292,11 +292,14 @@
 		            var api2 = shopFamilyAPI;
                     $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
                         if(result.success == true){//清空datatable的column搜索条件
+                            toastr.clear();
+                            toastr.success("查询成功");
+                            that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
+                            that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
                             api1.search('');
                             var column1 = api1.column(1);
                             column1.search('', true, false);
                             //清空表格
-                            that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
                             that.shopArticleUnitTable.clear();
                             that.shopArticleUnitTable.rows.add(result.data.shopArticleUnitDtos).draw();
                             //重绘搜索列
@@ -306,13 +309,10 @@
                             var column2 = api2.column(1);
                             column2.search('', true, false);
                             //清空表格
-                            that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
                             that.shopArticleFamilyTable.clear();
                             that.shopArticleFamilyTable.rows.add(result.data.shopArticleFamilyDtos).draw();
                             //重绘搜索列
                             that.shopFamilyTable();
-							toastr.clear();
-                            toastr.success("查询成功");
                         }else{
 							toastr.clear();
                             toastr.error("查询报表出错");
