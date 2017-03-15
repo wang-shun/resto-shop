@@ -1324,7 +1324,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCallNumberTime(new Date());
             update(order);
         }
-
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "推送微信就餐提醒并修改生产状态为已叫号,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return order;
     }
 
