@@ -281,12 +281,21 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean editStock(String articleId, Integer count, String shopId) {
+        Article article = articleMapper.selectByPrimaryKey(articleId);
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
         articleMapper.editStock(articleId, count, emptyRemark);
         articleMapper.editPriceStock(articleId, count, emptyRemark);
         orderMapper.setStockBySuit(shopId);
         articleMapper.initSizeCurrent();
         articleMapper.initEmpty();
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "店铺:"+shopDetail.getName()+"修改菜品("+article.getName()+")Id为:"+articleId+"的库存为:"+count+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return true;
     }
 
