@@ -220,11 +220,11 @@ public class OrderController extends GenericController{
                     }
                 }
             }
-            if (!o.getProductionStatus().equals(6)) {
-                ot.setOrderState(OrderState.getStateName(o.getOrderState()));
-            }else{
-                ot.setOrderState("退菜取消");
-            }
+			if(o.getProductionStatus() == ProductionStatus.REFUND_ARTICLE){
+				ot.setOrderState("退菜取消");
+			}else{
+				ot.setOrderState(OrderState.getStateName(o.getOrderState()));
+			}
 			//订单支付
 			if(o.getOrderPaymentItems()!=null){
 				if(!o.getOrderPaymentItems().isEmpty()){
@@ -310,11 +310,11 @@ public class OrderController extends GenericController{
                 object.put("level",Appraise.getLevel(o.getAppraise().getLevel()));
                 object.put("levelValue",o.getAppraise().getContent());
             }
-            if (!o.getProductionStatus().equals(6)) {
-                object.put("orderState", OrderState.getStateName(o.getOrderState()));
-            }else {
-                object.put("orderState", "退菜取消");
-            }
+			if(o.getProductionStatus() == ProductionStatus.REFUND_ARTICLE){
+				object.put("orderState", "退菜取消");
+			}else{
+				object.put("orderState", OrderState.getStateName(o.getOrderState()));
+			}
             BigDecimal articleMoney = BigDecimal.ZERO;
             for (OrderItem item : o.getOrderItems()){
                 articleMoney = articleMoney.add(item.getFinalPrice());
