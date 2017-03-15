@@ -191,6 +191,13 @@ public class ThirdServiceImpl implements ThirdService {
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketType.KITCHEN);
                     printTask.add(print);
+                    MemcachedUtils.put(print_id,print);
+                    List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+                    if(printList == null){
+                        printList = new ArrayList<>();
+                    }
+                    printList.add(print_id);
+                    MemcachedUtils.put(shopDetail.getId()+"printList",printList);
                 }
             }else{
                 for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
@@ -222,6 +229,13 @@ public class ThirdServiceImpl implements ThirdService {
                         print.put("STATUS", 0);
                         print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
                         printTask.add(print);
+                        MemcachedUtils.put(print_id,print);
+                        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+                        if(printList == null){
+                            printList = new ArrayList<>();
+                        }
+                        printList.add(print_id);
+                        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
                     }
 
                 }
@@ -336,6 +350,13 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        MemcachedUtils.put(print_id,print);
+        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+        if(printList == null){
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
         return print;
     }
 
