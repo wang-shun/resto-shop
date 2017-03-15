@@ -2265,6 +2265,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order cancelOrderPos(String orderId) throws AppException {
         Order order = selectById(orderId);
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (order.getClosed()) {
             throw new AppException(AppException.ORDER_IS_CLOSED);
         } else {
@@ -2284,6 +2286,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 log.info("库存还原失败:" + order.getId());
             }
             orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", shopDetail.getName());
+            map.put("type", "posAction");
+            map.put("content", "店铺:"+shopDetail.getName()+"拒绝订单:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
         }
         return order;
     }
