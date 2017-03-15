@@ -1358,6 +1358,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "推送微信就餐提醒并修改生产状态为已叫号,请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        Map orderMap = new HashMap(4);
+        orderMap.put("brandName", brand.getBrandName());
+        orderMap.put("fileName", order.getId());
+        orderMap.put("type", "orderAction");
+        orderMap.put("content", "订单:" + order.getId() + "推送微信就餐提醒并修改生产状态为已叫号,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, orderMap);
         return order;
     }
 
@@ -2346,6 +2352,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("fileName", shopDetail.getName());
             map.put("type", "posAction");
             map.put("content", "店铺:"+shopDetail.getName()+"拒绝订单:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brand.getBrandName());
+            orderMap.put("fileName", orderId);
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, map);
         }
         return order;
