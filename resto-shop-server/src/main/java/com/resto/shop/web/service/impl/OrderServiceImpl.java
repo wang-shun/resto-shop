@@ -5654,10 +5654,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
+            o.setCountWithChild(o.getCountWithChild() - order.getOrderItems().size());
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
+            parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
@@ -6026,8 +6028,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void confirmOrderPos(String orderId) {
-        orderMapper.confirmOrderPos(orderId);
         Order order = selectById(orderId);
+        orderMapper.confirmOrderPos(orderId);
+        if(order.getPayType() == PayType.NOPAY){
+            confirmOrder(order);
+        }
         updateChild(order);
     }
 
