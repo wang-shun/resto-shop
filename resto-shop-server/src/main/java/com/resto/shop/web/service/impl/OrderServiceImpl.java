@@ -2246,6 +2246,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("type", "posAction");
             map.put("content", "订单:" + order.getId() + "已确认收款,请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, map);
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brand.getBrandName());
+            orderMap.put("fileName", order.getId());
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "被确认,请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, orderMap);
             return order;
         }
         return null;
@@ -2284,6 +2290,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "订单加菜时间已过期，不允许继续加菜！");
 //            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brand.getBrandName());
+            orderMap.put("fileName", order.getId());
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "被确认,请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, orderMap);
             return order;
         }
         return null;
