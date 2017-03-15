@@ -681,10 +681,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
             order.setNeedScan(Common.YES);
         }
-        //判断order订单的pay_all字段的取值
-        if(order.getPayType() == PayType.PAY && order.getPayMode() == OrderPayMode.YUE_PAY){
-            order.setPayAll(2);
-        }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
@@ -702,6 +698,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                parent.setPayAll(PayAllType.NOT_SUBMIT);
                 update(parent);
             }
         } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
@@ -714,6 +711,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Double amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                parent.setPayAll(PayAllType.NOT_SUBMIT);
                 update(parent);
             }
         }

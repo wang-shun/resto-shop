@@ -202,17 +202,6 @@ public class Order implements Serializable{
     //是否退菜光 包括自订单   默认否
     private Boolean isRefundOrder;
 
-    //订单及其自订单是否全部支付完毕   0存在没支付完 1付款中(支付宝现金余额微信) 2全部支付完
-    private Integer payAll;
-
-    public Integer getPayAll() {
-        return payAll;
-    }
-
-    public void setPayAll(Integer payAll) {
-        this.payAll = payAll;
-    }
-
     public Boolean getIsRefundOrder() {
         return isRefundOrder;
     }
