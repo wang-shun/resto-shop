@@ -1105,6 +1105,7 @@
         SELECT
         push_order_time,
         id,
+        serial_number,
         ver_code,
         article_count,
         table_number,
