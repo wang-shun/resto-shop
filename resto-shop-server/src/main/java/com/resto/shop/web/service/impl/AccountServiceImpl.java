@@ -2,16 +2,16 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.UserActionUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -30,6 +30,9 @@ import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.LogUtils.url;
 
 /**
  *
@@ -241,6 +244,12 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD,shopDetail.getId());
 	    	//微信推送
 			wxPush(chargeOrder);
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", shopDetail.getName());
+            map.put("type", "posAction");
+            map.put("content", "店铺:"+shopDetail.getName()+"执行pos端充值(金额为:"+chargeOrder.getChargeBalance()+")操作手机号:"+operationPhone+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
     	}catch (Exception e) {
     		log.error("插入ChargeOrder或AccountLog失败!");
     		throw e;
