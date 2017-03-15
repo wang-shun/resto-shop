@@ -3181,7 +3181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         List<Map<String, Object>> printTask = new ArrayList<>();
         ShopDetail shop = shopDetailService.selectById(shopId);
-
+        Brand brand = brandService.selectById(shop.getBrandId());
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
             Map<String, Object> ticket = printTotal(shop, printer, beginDate, endDate);
@@ -3190,7 +3190,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shop.getName());
+        map.put("type", "posAction");
+        map.put("content", "店铺:" + shop.getName() + "打印了日结小票返回模版为:" + printTask.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return printTask;
     }
 
