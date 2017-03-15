@@ -221,7 +221,7 @@ public class OrderController extends GenericController{
                 }
             }
             if (!o.getProductionStatus().equals(6)) {
-                ot.setOrderState(OrderState.getStateName(o.getOrderState()) + "-" + ProductionStatus.getStatusName(o.getProductionStatus()));
+                ot.setOrderState(OrderState.getStateName(o.getOrderState()));
             }else{
                 ot.setOrderState("退菜取消");
             }
@@ -311,7 +311,7 @@ public class OrderController extends GenericController{
                 object.put("levelValue",o.getAppraise().getContent());
             }
             if (!o.getProductionStatus().equals(6)) {
-                object.put("orderState", OrderState.getStateName(o.getOrderState()) + "-" + ProductionStatus.getStatusName(o.getProductionStatus()));
+                object.put("orderState", OrderState.getStateName(o.getOrderState()));
             }else {
                 object.put("orderState", "退菜取消");
             }
