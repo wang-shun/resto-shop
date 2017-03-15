@@ -163,7 +163,7 @@ public class Order implements Serializable{
     public OrderPaymentItem orderPaymentItem;
 
     //菜品总数量（包含加菜）
-    private int totalCount;
+    private Integer totalCount;
 
     //加菜次数
     private int childCount;
@@ -344,11 +344,11 @@ public class Order implements Serializable{
         this.childCount = childCount;
     }
 
-    public int getTotalCount() {
+    public Integer getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCount(int totalCount) {
+    public void setTotalCount(Integer totalCount) {
         this.totalCount = totalCount;
     }
 
