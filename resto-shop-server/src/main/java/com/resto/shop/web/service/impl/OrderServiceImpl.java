@@ -713,6 +713,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(parent);
             }
         }
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getId());
+        map.put("type", "orderAction");
+        map.put("content", "订单:" + order.getId() + "已创建,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return jsonResult;
     }
 
@@ -783,6 +789,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 changePushOrder(order);
             }
         }
+        Brand brand = brandService.selectById(order.getBrandId());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getId());
+        map.put("type", "orderAction");
+        map.put("content", "订单:" + order.getId() + "支付成功,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return order;
     }
 
@@ -1178,6 +1191,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setId(newPayItemId);
             orderPaymentItemService.insert(item);
         }
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getId());
+        map.put("type", "orderAction");
+        map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
     }
 
     @Override
@@ -1259,6 +1278,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
+        Brand brand = brandService.selectById(order.getBrandId());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getId());
+        map.put("type", "orderAction");
+        map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
     }
 
     @Override
