@@ -698,7 +698,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-                parent.setPayAll(PayAllType.NOT_SUBMIT);
                 update(parent);
             }
         } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
@@ -711,7 +710,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Double amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
                 parent.setCountWithChild(articleCountWithChildren);
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-                parent.setPayAll(PayAllType.NOT_SUBMIT);
                 update(parent);
             }
         }
