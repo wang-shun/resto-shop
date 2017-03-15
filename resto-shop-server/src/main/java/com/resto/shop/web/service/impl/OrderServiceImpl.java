@@ -6308,5 +6308,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data[LuroufanExcelModel.REMARK] = "";
     }
 
-
+    @Override
+    public List<Order> selectByOrderSatesAndNoPay(String shopId) {
+        return orderMapper.selectByOrderSatesAndNoPay(shopId);
+    }
 }

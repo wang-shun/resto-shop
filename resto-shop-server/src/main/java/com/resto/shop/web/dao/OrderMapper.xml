@@ -2855,4 +2855,14 @@ GROUP BY oi.article_name
         AND o.create_time < #{endDate}
         ]]>
     </select>
+
+    <select id="selectByOrderSatesAndNoPay" resultType="Order">
+        SELECT tb_order.*,
+        ifnull(count_with_child,article_count) as
+        totalCount
+        from tb_order where shop_detail_id = #{shopId}
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state = 1 and pay_type = 0 and pay_mode in (2,3,4)
+        ORDER BY create_time ASC
+    </select>
 </mapper>
