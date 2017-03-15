@@ -681,8 +681,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
             order.setNeedScan(Common.YES);
         }
-
-
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {

@@ -5,6 +5,8 @@ package com.resto.shop.web.constant;
  */
 public class OrderPayMode {
 
+    public static final int YUE_PAY = 0;
+
     public static final int WX_PAY = 1;
 
     public static final int ALI_PAY = 2;
