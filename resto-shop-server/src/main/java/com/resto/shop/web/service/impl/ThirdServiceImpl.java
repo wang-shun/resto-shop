@@ -511,6 +511,14 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                 }
+                ShopDetail shopDetail = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId());
+                Brand brand = brandService.selectById(shopDetail.getBrandId());
+                Map addHungermap = new HashMap(4);
+                addHungermap.put("brandName", brand.getBrandName());
+                addHungermap.put("fileName", shopDetail.getName());
+                addHungermap.put("type", "posAction");
+                addHungermap.put("content", "店铺:"+shopDetail.getName()+"接收到新增的饿了么订单:"+hungerOrder.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, addHungermap);
             }
 
         }
