@@ -1825,6 +1825,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
+        print.put("ORDER_ID",serialNumber);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -2089,15 +2090,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
-        if (order.getOrderState() == OrderState.SUBMIT) {
+//        if (order.getOrderState() == OrderState.SUBMIT) {
+//            data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
+//        } else {
+//            if (order.getPayType() == PayType.PAY) {
+//                data.put("RESTAURANT_NAME", shopDetail.getName());
+//            } else {
+//                data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+//            }
+//
+//        }
+        if(order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT){
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+        }else if(order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT){
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+        }else if(order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY){
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
-        } else {
-            if (order.getPayType() == PayType.PAY) {
-                data.put("RESTAURANT_NAME", shopDetail.getName());
-            } else {
-                data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-            }
-
+        }else{
+            data.put("RESTAURANT_NAME", shopDetail.getName());
         }
 
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
