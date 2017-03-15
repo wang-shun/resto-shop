@@ -5746,6 +5746,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
                 "订单发送推送：" + msg.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "退菜推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
     }
 
     @Override
