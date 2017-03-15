@@ -681,8 +681,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
             order.setNeedScan(Common.YES);
         }
-
-
+        //判断order订单的pay_all字段的取值
+        if(order.getPayType() == PayType.PAY && order.getPayMode() == OrderPayMode.YUE_PAY){
+            order.setPayAll(2);
+        }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
         if (order.getPaymentAmount().doubleValue() == 0) {
