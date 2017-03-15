@@ -134,11 +134,11 @@
 		            var that = this;
                     $.post("appraiseReport/shop_data", this.getDate(), function(result) {
                         if (result.success) {
+                            toastr.clear();
+                            toastr.success("查询成功");
                             that.appraiseShopDtos = result.data.appraiseShopDtos;
                             that.shopAppraiseTable.clear();
                             that.shopAppraiseTable.rows.add(result.data.appraiseShopDtos).draw();
-                            toastr.clear();
-                            toastr.success("查询成功");
                         }else {
                             toastr.clear();
                             toastr.error("查询出错");

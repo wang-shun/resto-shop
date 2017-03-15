@@ -343,7 +343,11 @@ var vueObj = new Vue({
 	            var api2 = brandFamilyAPI;
                 $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
                     if(result.success == true){
+                        toastr.clear();
+                        toastr.success("查询成功");
                         that.brandReport = result.data.brandReport;
+                        that.brandArticleUnit = result.data.brandArticleUnit;
+                        that.brandArticleFamily = result.data.brandArticleFamily;
                         //清空brandUnitDatatable的column搜索条件
                         api1.search('');
                         var column1 = api1.column(1);
@@ -352,18 +356,14 @@ var vueObj = new Vue({
                         api2.search('');
                         var column2 = api2.column(1);
                         column2.search('', true, false);
-                        that.brandArticleUnit = result.data.brandArticleUnit;
                         that.brandArticleUnitTable.clear().draw();
                         that.brandArticleUnitTable.rows.add(result.data.brandArticleUnit).draw();
                         //重绘搜索列
                         that.brandUnitTable();
-                        that.brandArticleFamily = result.data.brandArticleFamily;
                         that.brandArticleFamilyTable.clear();
                         that.brandArticleFamilyTable.rows.add(result.data.brandArticleFamily).draw();
                         //重绘搜索列
                         that.brandFamilyTable();
-						toastr.clear();
-                        toastr.success("查询成功");
                     }else{
 						toastr.clear();
                         toastr.error("查询失败");
