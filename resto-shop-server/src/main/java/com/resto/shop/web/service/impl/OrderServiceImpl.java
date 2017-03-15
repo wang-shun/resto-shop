@@ -1324,7 +1324,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCallNumberTime(new Date());
             update(order);
         }
-
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Brand brand = brandService.selectById(order.getBrandId());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "推送微信就餐提醒并修改生产状态为已叫号,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return order;
     }
 
@@ -1792,6 +1799,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
+        print.put("ORDER_ID",serialNumber);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -2192,6 +2200,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "确认订单！");
 //            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", shopDetail.getName());
+            map.put("type", "posAction");
+            map.put("content", "订单:" + order.getId() + "已确认收款,请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
             return order;
         }
         return null;
@@ -3188,7 +3202,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         List<Map<String, Object>> printTask = new ArrayList<>();
         ShopDetail shop = shopDetailService.selectById(shopId);
-
+        Brand brand = brandService.selectById(shop.getBrandId());
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
             Map<String, Object> ticket = printTotal(shop, printer, beginDate, endDate);
@@ -3197,7 +3211,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shop.getName());
+        map.put("type", "posAction");
+        map.put("content", "店铺:" + shop.getName() + "打印了日结小票返回模版为:" + printTask.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return printTask;
     }
 

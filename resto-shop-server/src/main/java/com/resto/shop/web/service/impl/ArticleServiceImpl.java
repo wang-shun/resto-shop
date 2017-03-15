@@ -6,10 +6,13 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.brand.web.dto.brandArticleReportDto;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
@@ -27,6 +30,9 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.LogUtils.url;
+
 /**
  *
  */
@@ -39,6 +45,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Resource
     private OrderMapper orderMapper;
 
+    @Resource
+    private BrandService brandService;
 
     @Resource
     private ArticlePriceService articlePriceServer;
@@ -250,6 +258,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean clearStock(String articleId, String shopId) {
+        Article article = articleMapper.selectByPrimaryKey(articleId);
         String emptyRemark = "【手动沽清】";
         articleMapper.clearStock(articleId, emptyRemark);
         articleMapper.clearPriceTotal(articleId, emptyRemark);
@@ -259,23 +268,53 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         orderMapper.setStockBySuit(shopId);
         articleMapper.initSizeCurrent();
         articleMapper.clearMain(articleId, emptyRemark);
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        Map map = new HashMap(4);
+        map.put("brandName", shopDetail.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "店铺:"+shopDetail.getName()+"沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return true;
     }
 
     @Override
     public Boolean editStock(String articleId, Integer count, String shopId) {
+        Article article = articleMapper.selectByPrimaryKey(articleId);
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
         articleMapper.editStock(articleId, count, emptyRemark);
         articleMapper.editPriceStock(articleId, count, emptyRemark);
         orderMapper.setStockBySuit(shopId);
         articleMapper.initSizeCurrent();
         articleMapper.initEmpty();
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "店铺:"+shopDetail.getName()+"修改菜品("+article.getName()+")Id为:"+articleId+"的库存为:"+count+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
         return true;
     }
 
     @Override
     public Boolean setActivated(String articleId, Integer activated) {
+        Article article = articleMapper.selectByPrimaryKey(articleId);
+        ShopDetail shopDetail = shopDetailService.selectById(article.getShopDetailId());
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
         int row = articleMapper.setActivate(articleId, activated);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        if (activated.equals(0)){
+            map.put("content", "店铺:"+shopDetail.getName()+"下架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else{
+            map.put("content", "店铺:"+shopDetail.getName()+"上架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
+        doPost(url, map);
         return row > 0 ? true : false;
     }
 
