@@ -1398,6 +1398,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
         doPost(url, map);
+        Map orderMap = new HashMap(4);
+        orderMap.put("brandName", brand.getBrandName());
+        orderMap.put("fileName", order.getId());
+        orderMap.put("type", "orderAction");
+        orderMap.put("content", "订单"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
+        doPost(url, orderMap);
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "printSuccess订单打印完成");
         //ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -5352,6 +5358,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 map.put("type", "posAction");
                                 map.put("content", "订单:" + order.getId() + "退菜返还红包"+backMoney+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
                                 doPost(url, map);
+                                Map orderMap = new HashMap(4);
+                                orderMap.put("brandName", brand.getBrandName());
+                                orderMap.put("fileName", order.getId());
+                                orderMap.put("type", "orderAction");
+                                orderMap.put("content", "订单:" + order.getId() + "退菜返还红包"+backMoney+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                                doPost(url, orderMap);
                             }
                             Map map = new HashMap(4);
                             map.put("brandName", brand.getBrandName());
@@ -5360,6 +5372,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("content", "订单:" + order.getId() + "退菜微信返还"+(maxWxPay > refundMoney ? refundMoney : maxWxPay)+"元回调返回信息:"+result.toString()+"" +
                                     ",返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
                             doPost(url, map);
+                            Map orderMap = new HashMap(4);
+                            orderMap.put("brandName", brand.getBrandName());
+                            orderMap.put("fileName", order.getId());
+                            orderMap.put("type", "orderAction");
+                            orderMap.put("content", "订单:" + order.getId() + "退菜微信返还"+(maxWxPay > refundMoney ? refundMoney : maxWxPay)+"元回调返回信息:"+result.toString()+"" +
+                                    ",返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                            doPost(url, orderMap);
                         }
                         break;
                     case PayMode.ALI_PAY:
@@ -5414,6 +5433,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 accountMap.put("type", "posAction");
                                 accountMap.put("content", "订单:" + order.getId() + "退菜返还红包"+backMoney+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
                                 doPost(url, accountMap);
+                                Map orderAccountMap = new HashMap(4);
+                                orderAccountMap.put("brandName", brand.getBrandName());
+                                orderAccountMap.put("fileName", order.getId());
+                                orderAccountMap.put("type", "orderAction");
+                                orderAccountMap.put("content", "订单:" + order.getId() + "退菜返还红包"+backMoney+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                                doPost(url, orderAccountMap);
                             }
                             Map aliMap = new HashMap(4);
                             aliMap.put("brandName", brand.getBrandName());
@@ -5422,6 +5447,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             aliMap.put("content", "订单:" + order.getId() + "退菜支付宝返还"+refundTotal+"元回调返回信息:"+resultJson+"" +
                                     ",返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
                             doPost(url, aliMap);
+                            Map orderAliMap = new HashMap(4);
+                            orderAliMap.put("brandName", brand.getBrandName());
+                            orderAliMap.put("fileName", order.getId());
+                            orderAliMap.put("type", "orderAction");
+                            orderAliMap.put("content", "订单:" + order.getId() + "退菜支付宝返还"+refundTotal+"元回调返回信息:"+resultJson+"" +
+                                    ",返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                            doPost(url, orderAliMap);
                         }
                         break;
                 }
@@ -5456,6 +5488,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("type", "posAction");
             map.put("content", "订单:" + order.getId() + "退菜返还红包"+order.getRefundMoney()+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, map);
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brand.getBrandName());
+            orderMap.put("fileName", order.getId());
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "退菜返还红包"+order.getRefundMoney()+"元,返还用户Id:"+customer.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, orderMap);
         }
     }
 
@@ -5478,7 +5516,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 articleMap.put("fileName", shopDetail.getName());
                 articleMap.put("type", "posAction");
                 articleMap.put("content", "订单:" + order.getId() + "退菜释放"+orderItem.getCount()+"份菜品("+orderItem.getArticleName()+"),请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, articleMap);
+                Map orderArticleMap = new HashMap(4);
+                orderArticleMap.put("brandName", brand.getBrandName());
+                orderArticleMap.put("fileName", order.getId());
+                orderArticleMap.put("type", "orderAction");
+                orderArticleMap.put("content", "订单:" + order.getId() + "退菜释放"+orderItem.getCount()+"份菜品("+orderItem.getArticleName()+"),请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, orderArticleMap);
                 if (item.getType() == OrderItemType.SETMEALS) {
                     //如果退了套餐，清空子品
                     orderitemMapper.refundArticleChild(orderItem.getId());
@@ -5490,6 +5533,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     articleFamilyMap.put("type", "posAction");
                     articleFamilyMap.put("content", "订单:" + order.getId() + "退菜释放"+orderItem.getCount()+"份套餐("+orderItem.getArticleName()+")下的子品项,请求服务器地址为:" + MQSetting.getLocalIP());
                     doPost(url, articleFamilyMap);
+                    Map orderArticleFamilyMap = new HashMap(4);
+                    orderArticleFamilyMap.put("brandName", brand.getBrandName());
+                    orderArticleFamilyMap.put("fileName", order.getId());
+                    orderArticleFamilyMap.put("type", "orderAction");
+                    orderArticleFamilyMap.put("content", "订单:" + order.getId() + "退菜释放"+orderItem.getCount()+"份套餐("+orderItem.getArticleName()+")下的子品项,请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPost(url, orderArticleFamilyMap);
                 }
 
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
@@ -5504,6 +5553,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 map.put("type", "posAction");
                 map.put("content", "订单:" + order.getId() + "退了"+customerCount+"份服务费("+shopDetail.getServiceName()+"),请求服务器地址为:" + MQSetting.getLocalIP());
                 doPost(url, map);
+                Map orderMap = new HashMap(4);
+                orderMap.put("brandName", brand.getBrandName());
+                orderMap.put("fileName", order.getId());
+                orderMap.put("type", "orderAction");
+                orderMap.put("content", "订单:" + order.getId() + "退了"+customerCount+"份服务费("+shopDetail.getServiceName()+"),请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, orderMap);
             }
         }
 
@@ -5729,6 +5784,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("type", "posAction");
             map.put("content", "订单:" + order.getId() + "退菜退菜修改父订单:"+o.getParentOrderId()+"amountWithChildren字段的值,请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, map);
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brandSetting.getBrandName());
+            orderMap.put("fileName", order.getId());
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "退菜退菜修改父订单:"+o.getParentOrderId()+"amountWithChildren字段的值,请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, orderMap);
         }
         update(o);
         Map map = new HashMap(4);
@@ -5737,6 +5798,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        Map orderMap = new HashMap(4);
+        orderMap.put("brandName", brandSetting.getBrandName());
+        orderMap.put("fileName", order.getId());
+        orderMap.put("type", "orderAction");
+        orderMap.put("content", "订单:" + order.getId() + "退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, orderMap);
     }
 
     @Override
@@ -5814,6 +5881,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "退菜推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        Map orderMap = new HashMap(4);
+        orderMap.put("brandName", brand.getBrandName());
+        orderMap.put("fileName", order.getId());
+        orderMap.put("type", "orderAction");
+        orderMap.put("content", "订单:" + order.getId() + "退菜推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, orderMap);
     }
 
     @Override
