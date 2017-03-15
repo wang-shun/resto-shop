@@ -5949,8 +5949,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void confirmOrderPos(String orderId) {
-        orderMapper.confirmOrderPos(orderId);
         Order order = selectById(orderId);
+        orderMapper.confirmOrderPos(orderId);
+        if(order.getPayType() == PayType.NOPAY){
+            confirmOrder(order);
+        }
         updateChild(order);
     }
 
