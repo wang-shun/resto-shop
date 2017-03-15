@@ -164,6 +164,7 @@ public class MQMessageProducer {
 		obj.put("parentOrderId", order.getParentOrderId());
 		obj.put("originalAmount", order.getOriginalAmount());
 		obj.put("orderMoney", order.getOrderMoney());
+		obj.put("totalCount",order.getTotalCount());
 		obj.put("serialNumber",order.getSerialNumber());
 		obj.put("printTimes",order.getPrintTimes());
 		obj.put("amountWithChildren",order.getAmountWithChildren());
