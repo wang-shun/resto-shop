@@ -2074,9 +2074,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            }
 //
 //        }
-        if(order.getPayType() == PayType.NOPAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY)){
+        if(order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT){
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-        }else if(order.getOrderState() == OrderState.SUBMIT){
+        }else if(order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT){
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+        }else if(order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY){
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         }else{
             data.put("RESTAURANT_NAME", shopDetail.getName());
