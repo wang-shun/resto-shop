@@ -763,6 +763,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
+                //微信支付 杀进程 后 加菜   优先还给他钱
+                if(parent.getOrderState() == OrderState.SUBMIT && parent.getOrderMode() == OrderPayMode.WX_PAY && parent.getPaymentAmount() != parent.getOrderMoney()){
+                    refundPaymentByUnfinishedOrder(parent.getId());
+                }
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
                 if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
                     parent.setLastOrderTime(order.getCreateTime());
