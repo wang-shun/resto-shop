@@ -274,7 +274,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("brandName", shopDetail.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "店铺:"+shopDetail.getName()+"沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "店铺:"+shopDetail.getName()+"在pos端沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
         return true;
     }
@@ -310,9 +310,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         if (activated.equals(0)){
-            map.put("content", "店铺:"+shopDetail.getName()+"下架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "店铺:"+shopDetail.getName()+"在pos端下架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
         }else{
-            map.put("content", "店铺:"+shopDetail.getName()+"上架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "店铺:"+shopDetail.getName()+"在pos端上架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
         }
         doPost(url, map);
         return row > 0 ? true : false;
