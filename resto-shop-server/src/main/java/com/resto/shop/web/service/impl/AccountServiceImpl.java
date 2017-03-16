@@ -174,8 +174,20 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
 			item.setResultData(account.getId());
 			orderPaymentItemService.insert(item);
-			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-					"订单使用余额(红包)支付了：" + item.getPayValue());
+//			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//					"订单使用余额(红包)支付了：" + item.getPayValue());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", order.getId());
+            map.put("type", "orderAction");
+            map.put("content", "订单:" + order.getId() + "订单使用余额(红包)支付了:"+item.getPayValue()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
+            Map customerMap = new HashMap(4);
+            customerMap.put("brandName", brand.getBrandName());
+            customerMap.put("fileName", order.getCustomerId());
+            customerMap.put("type", "UserAction");
+            customerMap.put("content", "用户:"+customer.getNickname()+"使用余额(红包)支付了:"+item.getPayValue()+"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, customerMap);
 		}
 		return realPay;
 	}
