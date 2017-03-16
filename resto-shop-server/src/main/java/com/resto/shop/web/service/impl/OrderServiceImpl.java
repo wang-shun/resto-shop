@@ -1718,6 +1718,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //保存基本信息
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("PORT", printer.getPort());
+        print.put("OID",order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
@@ -1817,6 +1818,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String modeText = getModeText(order);//就餐模式
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("TABLE_NO", tableNumber);
+        print.put("OID",order.getId());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getSerialNumber());
@@ -1906,6 +1908,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //保存基本信息
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("PORT", printer.getPort());
+        print.put("OID",order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
