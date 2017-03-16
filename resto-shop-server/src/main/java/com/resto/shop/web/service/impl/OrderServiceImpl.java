@@ -1695,7 +1695,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
         List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId, order.getId());
-
+        StringBuilder sb = new StringBuilder();
         for (OrderItem orderItem : orderItems) {
             String articleId = orderItem.getArticleId();
 
@@ -1706,6 +1706,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (article.getVirtualId() == null) {
                 Map<String, Object> item = new HashMap<String, Object>();
                 item.put("ARTICLE_NAME", orderItem.getArticleName());
+                sb.append(orderItem.getArticleName()+" ");
                 item.put("ARTICLE_COUNT", orderItem.getCount());
                 items.add(item);
             }
@@ -1717,6 +1718,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //保存基本信息
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("PORT", printer.getPort());
+        print.put("OID",order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
@@ -1797,6 +1799,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printList = new ArrayList<>();
         }
         printList.add(print_id);
+        MemcachedUtils.put(print_id+"customer",customer);
+
+        MemcachedUtils.put(print_id+"article",sb.toString());
         MemcachedUtils.put(shopDetail.getId()+"printList",printList);
     }
 
@@ -1813,6 +1818,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String modeText = getModeText(order);//就餐模式
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("TABLE_NO", tableNumber);
+        print.put("OID",order.getId());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getSerialNumber());
@@ -1842,6 +1848,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.RESTAURANTLABEL);
         printTask.add(print);
         MemcachedUtils.put(print_id,print);
+        MemcachedUtils.put(print_id+"customer",customer);
+        MemcachedUtils.put(print_id+"article",article.getArticleName());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
             printList = new ArrayList<>();
@@ -1854,7 +1862,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private void getKitchenModel(OrderItem article, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
         //保存 菜品的名称和数量
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        StringBuilder sb = new StringBuilder();
         Map<String, Object> item = new HashMap<String, Object>();
+        sb.append(article.getArticleName() + " ");
         item.put("ARTICLE_NAME", article.getArticleName());
         item.put("ARTICLE_COUNT", article.getCount());
         items.add(item);
@@ -1868,6 +1878,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (OrderItem obj : list) {
                     Map<String, Object> child_item = new HashMap<String, Object>();
                     child_item.put("ARTICLE_NAME", obj.getArticleName());
+                    sb.append(obj.getArticleName() + " ");
                     if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
                         child_item.put("ARTICLE_COUNT", obj.getRefundCount());
                     } else {
@@ -1882,6 +1893,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (OrderItem obj : article.getChildren()) {
                     Map<String, Object> child_item = new HashMap<String, Object>();
                     child_item.put("ARTICLE_NAME", obj.getArticleName());
+                    sb.append(obj.getArticleName() + " ");
                     if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
                         child_item.put("ARTICLE_COUNT", obj.getRefundCount());
                     } else {
@@ -1896,6 +1908,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //保存基本信息
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("PORT", printer.getPort());
+        print.put("OID",order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
@@ -1972,6 +1985,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         printTask.add(print);
 
         MemcachedUtils.put(print_id,print);
+        MemcachedUtils.put(print_id+"customer",customer);
+        MemcachedUtils.put(print_id+"article",sb.toString());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
             printList = new ArrayList<>();
