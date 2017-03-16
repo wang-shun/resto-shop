@@ -1005,8 +1005,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "微信点X取消订单！");
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "微信点X取消订单！");
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrderHoufu(order);
             result.setSuccess(true);
