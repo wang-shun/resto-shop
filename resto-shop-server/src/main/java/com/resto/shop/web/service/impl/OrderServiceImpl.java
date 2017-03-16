@@ -1744,6 +1744,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //添加到 打印集合
         printTask.add(print);
         MemcachedUtils.put(print_id,print);
+        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+        if(printList == null){
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
     }
 
     private void getKitchenLabel(OrderItem article, Order order, Printer printer,
@@ -1787,6 +1793,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.RESTAURANTLABEL);
         printTask.add(print);
+        MemcachedUtils.put(print_id,print);
+        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+        if(printList == null){
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
 
     }
 
@@ -1909,7 +1922,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                print.put("TABLE_NO", tableNumber);
         //添加到 打印集合
         printTask.add(print);
+
         MemcachedUtils.put(print_id,print);
+        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+        if(printList == null){
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
     }
 
 
@@ -2209,6 +2229,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("content", "订单:" + order.getId() + "返回打印总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, logMap);
         MemcachedUtils.put(print_id,print);
+        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
+        if(printList == null){
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
         return print;
     }
 
@@ -6308,5 +6334,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data[LuroufanExcelModel.REMARK] = "";
     }
 
-
+    @Override
+    public List<Order> selectByOrderSatesAndNoPay(String shopId) {
+        return orderMapper.selectByOrderSatesAndNoPay(shopId);
+    }
 }

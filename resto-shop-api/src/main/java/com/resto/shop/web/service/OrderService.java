@@ -608,4 +608,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<OrderItem> selectCustomerListByShopIdAndTime(String zuoriDay, String id);
 
 	void alipayRefund(String orderId,BigDecimal refundTotal);
+
+	List<Order> selectByOrderSatesAndNoPay(String shopId);
 }

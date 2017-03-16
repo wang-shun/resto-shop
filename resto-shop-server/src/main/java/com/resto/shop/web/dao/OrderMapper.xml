@@ -1096,7 +1096,7 @@
         and order_state != 9
         and (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4) and is_confirm = 0))
         and table_number is not null
---         and parent_order_id is null
+        and parent_order_id is null
         order by create_time ASC;
 
     </select>
@@ -2854,5 +2854,15 @@ GROUP BY oi.article_name
           o.create_time > #{beginDate}
         AND o.create_time < #{endDate}
         ]]>
+    </select>
+
+    <select id="selectByOrderSatesAndNoPay" resultType="Order">
+        SELECT tb_order.*,
+        ifnull(count_with_child,article_count) as
+        totalCount
+        from tb_order where shop_detail_id = #{shopId}
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state = 1 and pay_type = 0 and pay_mode in (2,3,4) and parent_order_id is not null
+        ORDER BY create_time ASC
     </select>
 </mapper>

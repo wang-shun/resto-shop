@@ -642,4 +642,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> getOrderAccountByTime(Map<String, Object> selectMap);
+
+	/**
+	 * 添加加菜订单 是用支付宝 现金 银联支付的时候  未确认的时候  需要在pos新增订单上出现
+	 * @param shopId
+	 * @return
+     */
+	List<Order> selectByOrderSatesAndNoPay(String shopId);
 }
