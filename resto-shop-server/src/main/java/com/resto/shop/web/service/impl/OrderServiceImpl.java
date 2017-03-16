@@ -1023,7 +1023,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 result.setSuccess(autoRefundOrder(orderId));
             }
         }
-        update(order);
+        orderMapper.updateByPrimaryKeySelective(order);
         if (order.getParentOrderId() != null) {  //子订单
             Order parent = selectById(order.getParentOrderId());
             int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
