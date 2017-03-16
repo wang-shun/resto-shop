@@ -279,18 +279,28 @@
 								</label>
 						</div>
 					</div>
-
-					<div class="form-group" v-show="b.openMoneyPay == 1">
-						<label class="col-md-4 control-label">开启现金支付：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="openMoneyPay"v-model="m.openMoneyPay" value="1">启用
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="openMoneyPay" v-model="m.openMoneyPay" value="0">不启用
-							</label>
-						</div>
-					</div>
+                    <div class="form-group" v-show="b.openMoneyPay == 1">
+                        <label class="col-md-4 control-label">开启现金支付：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="openMoneyPay"v-model="m.openMoneyPay" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="openMoneyPay" v-model="m.openMoneyPay" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" v-show="b.openShanhuiPay == 1">
+                        <label class="col-md-4 control-label">美团闪惠支付：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="openShanhuiPay"v-model="m.openShanhuiPay" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="openShanhuiPay" v-model="m.openShanhuiPay" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
 					<div class="form-group">
 						<label class="col-md-4 control-label">pos加菜是否开启粉丝价：</label>
 						<div  class="col-md-6 radio-list">
