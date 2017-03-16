@@ -994,7 +994,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Result refundPaymentByUnfinishedOrder(String orderId, BigDecimal payAmountNow) {
+    public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
         order.setIsPay(OrderPayState.NOT_PAY);
@@ -1014,9 +1014,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (hasPay == null) {
                 hasPay = BigDecimal.valueOf(0);
             }
-            if(hasPay.add(payAmountNow).compareTo(order.getOrderMoney()) == 0){
-                order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
-            }
+            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
         } else {
             if (!order.getOperatorId().equals("sb")) {
                 result.setSuccess(autoRefundOrder(orderId));
