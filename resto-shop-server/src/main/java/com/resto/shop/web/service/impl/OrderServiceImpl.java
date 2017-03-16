@@ -994,7 +994,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Result refundPaymentByUnfinishedOrder(String orderId) {
+    public Result refundPaymentByUnfinishedOrder(String orderId, BigDecimal payAmountNow) {
         Result result = new Result();
         Order order = selectById(orderId);
         order.setIsPay(OrderPayState.NOT_PAY);
@@ -1005,8 +1005,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "微信点X取消订单！");
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "微信点X取消订单！");
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrderHoufu(order);
             result.setSuccess(true);
@@ -1014,7 +1014,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (hasPay == null) {
                 hasPay = BigDecimal.valueOf(0);
             }
-            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
+            if(hasPay.add(payAmountNow).compareTo(order.getOrderMoney()) == 0){
+                order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
+            }
         } else {
             if (!order.getOperatorId().equals("sb")) {
                 result.setSuccess(autoRefundOrder(orderId));
