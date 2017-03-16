@@ -548,7 +548,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	/**
 	 * 返回未支付的订单的支付项
 	 */
-	Result refundPaymentByUnfinishedOrder(String orderId, BigDecimal payAmountNow);
+	Result refundPaymentByUnfinishedOrder(String orderId);
 
 	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
 	
