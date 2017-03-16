@@ -47,7 +47,7 @@
 							</div>
 						</div>
                         <!--    仅   后付款模式   显示-->
-						<div class="form-group" v-if="m.shopMode == 5">
+						<div class="form-group" v-show="m.shopMode == 5">
 							<label class="col-md-4 control-label">买单后出总单：</label>
 							<div  class="col-md-6 radio-list">
 								<label class="radio-inline">
@@ -85,7 +85,7 @@
 							</div>
 						</div>
                         <!--    仅   混合支付模式（大Boos模式）  显示         begin-->
-						<div class="form-group"  v-if="m.shopMode == 6">
+						<div class="form-group"  v-show="m.shopMode == 6">
 							<label class="col-md-4 control-label">允许先付：</label>
 							<div  class="col-md-6 radio-list">
 								<label class="radio-inline">
@@ -96,7 +96,7 @@
 								</label>
 							</div>
 						</div>
-						<div class="form-group"  v-if="m.shopMode == 6">
+						<div class="form-group"  v-show="m.shopMode == 6">
 							<label class="col-md-4 control-label">允许后付：</label>
 							<div  class="col-md-6 radio-list">
 								<label class="radio-inline">
