@@ -4171,8 +4171,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
             msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", setting.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         }
     }
 
@@ -4823,8 +4829,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             sb.append("订单金额：" + order.getOrderMoney() + "\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + sb.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + sb.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -5280,7 +5292,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());
-
+        Map customerMap = new HashMap(4);
+        customerMap.put("brandName", brand.getBrandName());
+        customerMap.put("fileName", customer.getId());
+        customerMap.put("type", "UserAction");
+        customerMap.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, customerMap);
         return result;
     }
 
@@ -5887,6 +5904,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
 //                "订单发送推送：" + msg.toString());
+        Map customerMap = new HashMap(4);
+        customerMap.put("brandName", brand.getBrandName());
+        customerMap.put("fileName", customer.getId());
+        customerMap.put("type", "UserAction");
+        customerMap.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, customerMap);
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());

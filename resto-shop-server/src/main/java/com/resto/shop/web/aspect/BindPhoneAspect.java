@@ -2,10 +2,14 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.util.LogUtils;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShareSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShareSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
@@ -28,7 +32,11 @@ import com.resto.shop.web.service.SmsLogService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 @Component
 @Aspect
@@ -47,6 +55,8 @@ public class BindPhoneAspect {
 	SmsLogService smsLogService;
 	@Resource
 	ShopDetailService shopDetailService;
+    @Resource
+    BrandService brandService;
 	@Resource
 	WechatConfigService wechatConfigService;
 
@@ -99,7 +109,13 @@ public class BindPhoneAspect {
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
 				log.info("异步发送分享注册微信通知ID:" + shareCustomer + " 内容:" + msg);
 				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
-
+                Brand brand = brandService.selectById(sc.getBrandId());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", sc.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
 			}
 			log.info("首次绑定手机，执行指定动作");
 

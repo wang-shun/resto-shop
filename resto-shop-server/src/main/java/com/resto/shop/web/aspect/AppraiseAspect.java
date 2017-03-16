@@ -1,5 +1,7 @@
 package com.resto.shop.web.aspect;
 
+import com.resto.brand.core.util.LogUtils;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -23,6 +25,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 /**
  * Created by carl on 2016/11/22.
@@ -69,6 +75,12 @@ public class AppraiseAspect {
                     msg.append(customer.getNickname() + "为你在" + shopDetail.getName() + "写的评论点了赞，\n<a href='" + url+ "'>快去回复TA吧~</a>");
                 }
                 WeChatUtils.sendCustomerMsg(msg.toString(), aCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
             }
         }
     }
@@ -95,12 +107,24 @@ public class AppraiseAspect {
         }
         if(!appraise.getCustomerId().equals(appraiseComment.getCustomerId())){
             WeChatUtils.sendCustomerMsg(msg.toString(), appCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         }
         //继续发送给你回复的人
         if(appraiseComment.getPid() != null && appraiseComment.getPid().length() > 30){
             Customer faCustomer = customerService.selectById(appraiseComment.getPid());
             if(!faCustomer.getWechatId().equals(appCustomer.getWechatId())){
                 WeChatUtils.sendCustomerMsg(msg.toString(), faCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
             }
         }
     }
