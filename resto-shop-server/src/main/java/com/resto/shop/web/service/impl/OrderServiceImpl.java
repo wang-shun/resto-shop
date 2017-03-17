@@ -6337,10 +6337,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectBaseToThirdList(String beginDate, String endDate, String brandId, String shopId) {
+    public List<Order> selectBaseToThirdList(String brandId, String beginDate, String endDate) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return  orderMapper.selectBaseToThirdList(begin,end,brandId);
-
     }
+
+    @Override
+    public List<Order> selectBaseToThirdListByShopId(String shopId, String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectBaseToThirdListByShopId(begin,end,shopId);
+    }
+
+
 }

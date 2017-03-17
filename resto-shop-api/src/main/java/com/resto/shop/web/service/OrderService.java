@@ -616,8 +616,9 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
      * @param beginDate
      * @param endDate
      * @param brandId
-     * @param shopId
      * @return
      */
-    List<Order> selectBaseToThirdList(String beginDate, String endDate, String brandId, String shopId);
+    List<Order> selectBaseToThirdList(String brandId,String beginDate, String endDate);
+
+    List<Order> selectBaseToThirdListByShopId(String shopId,String beginDate,String endDate);
 }

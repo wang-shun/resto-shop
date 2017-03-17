@@ -20,7 +20,7 @@ public class AccountLogController extends GenericController{
 
 	@Resource
 	AccountLogService accountlogService;
-	
+
 	@RequestMapping("/list")
     public void list(){
     }
@@ -30,28 +30,28 @@ public class AccountLogController extends GenericController{
 	public List<AccountLog> listData(){
 		return accountlogService.selectList();
 	}
-	
+
 	@RequestMapping("list_one")
 	@ResponseBody
 	public Result list_one(String id){
 		AccountLog accountlog = accountlogService.selectById(id);
 		return getSuccessResult(accountlog);
 	}
-	
+
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid AccountLog brand){
 		accountlogService.insert(brand);
 		return Result.getSuccess();
 	}
-	
+
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid AccountLog brand){
 		accountlogService.update(brand);
 		return Result.getSuccess();
 	}
-	
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(String id){

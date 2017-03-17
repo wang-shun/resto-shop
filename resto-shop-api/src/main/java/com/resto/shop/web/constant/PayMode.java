@@ -44,14 +44,8 @@ public class PayMode {
                 return "退菜返还金额";
             case CRASH_PAY:
                 return "现金支付";
-            case APPRAISE_RED_PAY:
-                return "评论红包支付";
-            case SHARE_RED_PAY:
-                return "分享返利红包支付";
-            case REFUND_ARTICLE_RED_PAY:
-                return "退菜红包支付";
             default:
-                return "未知";
+                return "";
             }
 	}
 

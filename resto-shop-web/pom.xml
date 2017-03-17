@@ -88,6 +88,12 @@
             <artifactId>resto-brand-api</artifactId>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>cn.restoplus</groupId>-->
+            <!--<artifactId>resto-shop-server</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>cn.restoplus</groupId>
             <artifactId>resto-shop-api</artifactId>

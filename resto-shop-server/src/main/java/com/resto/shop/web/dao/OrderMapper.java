@@ -658,4 +658,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectBaseToThirdList(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("brandId") String brandId);
+
+    List<Order> selectBaseToThirdListByShopId(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("shopId") String shopId);
 }
