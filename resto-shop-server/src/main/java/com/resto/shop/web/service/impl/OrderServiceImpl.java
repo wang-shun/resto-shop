@@ -577,7 +577,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payMoney = BigDecimal.ZERO;
         }
         //如果是余额不满足时，使用现金或者银联支付
-        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
+        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.YL_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(orderId);
@@ -589,7 +589,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "订单使用银联支付了：" + item.getPayValue());
             order.setAllowContinueOrder(false);
-        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(orderId);
@@ -597,6 +597,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayTime(order.getCreateTime());
             item.setPayValue(payMoney);
             item.setRemark("现金支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单使用银联支付了：" + item.getPayValue());
+            order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.SHANHUI_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("闪惠支付:" + item.getPayValue());
             orderPaymentItemService.insert(item);
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "订单使用银联支付了：" + item.getPayValue());
