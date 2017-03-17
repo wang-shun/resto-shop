@@ -174,8 +174,20 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
 			item.setResultData(account.getId());
 			orderPaymentItemService.insert(item);
-			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-					"订单使用余额(红包)支付了：" + item.getPayValue());
+//			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//					"订单使用余额(红包)支付了：" + item.getPayValue());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", order.getId());
+            map.put("type", "orderAction");
+            map.put("content", "订单:" + order.getId() + "订单使用余额(红包)支付了:"+item.getPayValue()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, map);
+            Map customerMap = new HashMap(4);
+            customerMap.put("brandName", brand.getBrandName());
+            customerMap.put("fileName", order.getCustomerId());
+            customerMap.put("type", "UserAction");
+            customerMap.put("content", "用户:"+customer.getNickname()+"使用余额(红包)支付了:"+item.getPayValue()+"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, customerMap);
 		}
 		return realPay;
 	}
@@ -265,12 +277,24 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		if(chargeOrder.getNumberDayNow() > 0){
 			String msgFrist = "充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～";
 			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～,请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
 		}
 		StringBuffer msg = new StringBuffer();
 		msg.append("今日充值余额已到账，快去看看吧~");
 		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
 		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
 	}
 	
 }

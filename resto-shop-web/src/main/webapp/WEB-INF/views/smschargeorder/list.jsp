@@ -369,21 +369,23 @@ dt, dd {
 										})
 								info.push(btn);
 							}
-							var btn = createBtn(null,"删除订单","btn-sm red-sunglo",function() {
-										C.confirmDialog("确定要删除么","提示",
-										function() {
-											var data = {"id":tdData}; 
-											$.post("smschargeorder/deleteOrder",data,function(result){
-												if(result){
-													toastr.success("删除成功！");
-												}else{
-													toastr.error("删除失败！");
-												}
-												tb.ajax.reload();//刷新
-											})
-										});
-									})
-							info.push(btn);
+							if(rowData.orderStatus == 0){	//只有未支付的订单才可以删除
+								var btn = createBtn(null,"删除订单","btn-sm red-sunglo",function() {
+									C.confirmDialog("确定要删除么","提示",
+											function() {
+												var data = {"id":tdData};
+												$.post("smschargeorder/deleteOrder",data,function(result){
+													if(result){
+														toastr.success("删除成功！");
+													}else{
+														toastr.error("删除失败！");
+													}
+													tb.ajax.reload();//刷新
+												})
+											});
+								})
+								info.push(btn);
+							}
 							$(td).html(info);
 						}
 					} ],

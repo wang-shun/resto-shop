@@ -1,5 +1,7 @@
 package com.resto.shop.web.aspect;
 
+import com.resto.brand.core.util.LogUtils;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.WechatConfig;
@@ -18,6 +20,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 /**
  * Created by carl on 2016/10/16.
@@ -54,17 +60,35 @@ public class GetNumberAspect {
                 StringBuffer msg = new StringBuffer();
                 msg.append(customer.getNickname() + "，请至餐厅就餐，您一共获得" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元的等位红包。\n");
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", setting.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
             	log.info("发送就餐提示");
                 StringBuffer msg = new StringBuffer();
                 msg.append("亲，您一共获得"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将直接使用哦。\n");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", setting.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
             	log.info("发送过号提示");
                 StringBuffer msg = new StringBuffer();
                 msg.append(customer.getNickname() + "已过号，谢谢您的支持与谅解，" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元等位红包已失效，期待您的下次光临。\n");
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", setting.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
             }
         }
     }

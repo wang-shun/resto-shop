@@ -649,4 +649,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
      */
 	List<Order> selectByOrderSatesAndNoPay(String shopId);
+
+    /**
+     * 查询订单--订单项--订单菜品 用于第三方的接口
+     * @param begin
+     * @param end
+     * @param brandId
+     * @return
+     */
+    List<Order> selectBaseToThirdList(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("brandId") String brandId);
 }

@@ -11,15 +11,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.util.*;
 import com.resto.shop.web.constant.Common;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -40,6 +38,8 @@ import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 
 import cn.restoplus.rpc.server.RpcService;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 /**
  *
@@ -238,6 +238,12 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\"");
         str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
         long begin=coupon.getBeginDate().getTime();
         long end=coupon.getEndDate().getTime();
         timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
@@ -257,7 +263,13 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	            	str.append("优惠券到期提醒\n");
 	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
-	                String pr=price+"";//将BigDecimal类型转换成String
+                    Map map = new HashMap(4);
+                    map.put("brandName", setting.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPost(LogUtils.url, map);
+                    String pr=price+"";//将BigDecimal类型转换成String
 
                     if(setting.getIsSendCouponMsg() == Common.YES){
                         sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信

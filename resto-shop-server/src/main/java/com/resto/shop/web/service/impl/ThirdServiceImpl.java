@@ -572,6 +572,8 @@ public class ThirdServiceImpl implements ThirdService {
     @Override
     public HungerOrder getOutFoodInfo(String id) {
         HungerOrder order = hungerOrderMapper.selectById(id);
+        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
+        order.setDetails(orderDetail);
         order.setShopName(shopDetailService.selectByRestaurantId(order.getRestaurantId()).getName());
         return order;
     }
