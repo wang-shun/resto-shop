@@ -271,7 +271,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         Map map = new HashMap(4);
-        map.put("brandName", shopDetail.getBrandName());
+        map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "店铺:"+shopDetail.getName()+"在pos端沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
