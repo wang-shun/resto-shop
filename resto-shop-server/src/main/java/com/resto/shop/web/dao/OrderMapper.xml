@@ -132,64 +132,42 @@
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
-        <result column="customer_count" property="customerCount"
-                jdbcType="INTEGER"/>
-        <result column="accounting_time" property="accountingTime"
-                jdbcType="DATE"/>
+        <result column="customer_count" property="customerCount" jdbcType="INTEGER"/>
+        <result column="accounting_time" property="accountingTime" jdbcType="DATE"/>
         <result column="order_state" property="orderState" jdbcType="INTEGER"/>
-        <result column="production_status" property="productionStatus"
-                jdbcType="INTEGER"/>
-        <result column="original_amount" property="originalAmount"
-                jdbcType="DECIMAL"/>
-        <result column="reduction_amount" property="reductionAmount"
-                jdbcType="DECIMAL"/>
-        <result column="payment_amount" property="paymentAmount"
-                jdbcType="DECIMAL"/>
+        <result column="production_status" property="productionStatus"  jdbcType="INTEGER"/>
+        <result column="original_amount" property="originalAmount" jdbcType="DECIMAL"/>
+        <result column="reduction_amount" property="reductionAmount" jdbcType="DECIMAL"/>
+        <result column="payment_amount" property="paymentAmount"  jdbcType="DECIMAL"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="ali_pay_discount_money" property="aliPayDiscountMoney"/>
-        <result column="article_count" property="articleCount"
-                jdbcType="INTEGER"/>
-        <result column="serial_number" property="serialNumber"
-                jdbcType="VARCHAR"/>
+        <result column="article_count" property="articleCount" jdbcType="INTEGER"/>
+        <result column="serial_number" property="serialNumber" jdbcType="VARCHAR"/>
         <result column="confirm_time" property="confirmTime" jdbcType="TIMESTAMP"/>
         <result column="print_times" property="printTimes" jdbcType="INTEGER"/>
         <result column="allow_cancel" property="allowCancel" jdbcType="BIT"/>
-        <result column="allow_appraise" property="allowAppraise"
-                jdbcType="BIT"/>
+        <result column="allow_appraise" property="allowAppraise"  jdbcType="BIT"/>
         <result column="closed" property="closed" jdbcType="BIT"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="operator_id" property="operatorId" jdbcType="VARCHAR"/>
         <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
-        <result column="distribution_date" property="distributionDate"
-                jdbcType="DATE"/>
-        <result column="distribution_time_id" property="distributionTimeId"
-                jdbcType="INTEGER"/>
-        <result column="delivery_point_id" property="deliveryPointId"
-                jdbcType="INTEGER"/>
-        <result column="shop_detail_id" property="shopDetailId"
-                jdbcType="VARCHAR"/>
-        <result column="distribution_mode_id" property="distributionModeId"
-                jdbcType="INTEGER"/>
+        <result column="distribution_date" property="distributionDate"  jdbcType="DATE"/>
+        <result column="distribution_time_id" property="distributionTimeId"  jdbcType="INTEGER"/>
+        <result column="delivery_point_id" property="deliveryPointId"  jdbcType="INTEGER"/>
+        <result column="shop_detail_id" property="shopDetailId"  jdbcType="VARCHAR"/>
+        <result column="distribution_mode_id" property="distributionModeId"  jdbcType="INTEGER"/>
         <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
-        <result column="push_order_time" property="pushOrderTime"
-                jdbcType="TIMESTAMP"/>
-        <result column="print_order_time" property="printOrderTime"
-                jdbcType="TIMESTAMP"/>
-        <result column="call_number_time" property="callNumberTime"
-                jdbcType="TIMESTAMP"/>
+        <result column="push_order_time" property="pushOrderTime" jdbcType="TIMESTAMP"/>
+        <result column="print_order_time" property="printOrderTime"  jdbcType="TIMESTAMP"/>
+        <result column="call_number_time" property="callNumberTime" jdbcType="TIMESTAMP"/>
         <result column="order_mode" property="orderMode" jdbcType="INTEGER"/>
         <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
-        <result column="amount_with_children" property="amountWithChildren"
-                jdbcType="DECIMAL"/>
-        <result column="parent_order_id" property="parentOrderId"
-                jdbcType="VARCHAR"/>
-        <result column="allow_continue_order" property="allowContinueOrder"
-                jdbcType="BIT"/>
-        <result column="count_with_child" property="countWithChild"
-                jdbcType="INTEGER"/>
-        <result column="last_order_time" property="lastOrderTime"
-                jdbcType="TIMESTAMP"/>
+        <result column="amount_with_children" property="amountWithChildren" jdbcType="DECIMAL"/>
+        <result column="parent_order_id" property="parentOrderId" jdbcType="VARCHAR"/>
+        <result column="allow_continue_order" property="allowContinueOrder"  jdbcType="BIT"/>
+        <result column="count_with_child" property="countWithChild" jdbcType="INTEGER"/>
+        <result column="last_order_time" property="lastOrderTime"  jdbcType="TIMESTAMP"/>
         <result column="orderCount" property="orderCount"/>
         <result column="orderTotal" property="orderTotal"/>
         <result column="service_price" property="servicePrice"/>
@@ -208,8 +186,11 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
         <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
+            <result column="orderItemId" property="id"/>
             <result column="article_name" property="articleName"/>
             <result column="count" property="count"/>
+            <result column="original_price" property="orginalPrice"/>
+            <result column="type" property="type"/>
         </collection>
     </resultMap>
 
@@ -2414,7 +2395,6 @@ GROUP BY r.table_number
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
-
         ]]>
     </select>
 
@@ -2425,7 +2405,6 @@ GROUP BY r.table_number
         on o.id = oi.order_id
         WHERE  o.brand_id = #{brandId} and o.order_state =1 AND o.production_status=0
         and  <![CDATA[ o.create_time >= #{begin} and o.create_time <= #{end}
-
         ]]>
     </select>
 
@@ -2865,4 +2844,37 @@ GROUP BY oi.article_name
         and order_state = 1 and pay_type = 0 and pay_mode in (2,3,4) and parent_order_id is not null
         ORDER BY create_time ASC
     </select>
+
+    <!-- 查询订单 -订单菜品 订单支付项 用于第三方接口 -->
+    <select id="selectBaseToThirdList" resultMap="BaseResultMap">
+      SELECT
+	o.id,
+	o.order_state,
+	o.create_time,
+	o.push_order_time,
+	o.shop_detail_id,
+	o.table_number,
+	o.serial_number,
+	oi.original_price,
+    oi.id orderItemId,
+	oi.type,
+	oi.article_id,
+	oi.article_name,
+	oi.count,
+	opi.id orderPaymentId,
+	opi.pay_value,
+	opi.payment_mode_id,
+FROM
+	tb_order o
+INNER JOIN tb_order_item oi ON o.id = oi.order_id
+INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
+WHERE  o.order_state in(2,10,11,12) AND
+o.production_status in(2,3)
+AND  <![CDATA[
+o.create_time>#{beginDate} AND  o.create_time<#{endDate}
+]]]> AND  o.brand_id =#{brandId}
+
+
+    </select>
+
 </mapper>

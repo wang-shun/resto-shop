@@ -1,9 +1,7 @@
 package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.UserActionUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
@@ -22,7 +20,11 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 @Component
 @Aspect
@@ -169,8 +171,14 @@ public class OrderAspect {
         try {
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
         }
@@ -372,8 +380,14 @@ public class OrderAspect {
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId()); ;//根据订单找到对应的店铺
         WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 
@@ -543,8 +557,14 @@ public class OrderAspect {
                 msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
             }
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         }
     }
 
@@ -572,8 +592,14 @@ public class OrderAspect {
         String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
         str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
         String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单发送推送：" + str.toString());
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单发送推送：" + str.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
     }
 
 //    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
@@ -622,8 +648,14 @@ public class OrderAspect {
             msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
             scanaQRcode(config, customer, setting, order);
         }
@@ -668,8 +700,14 @@ public class OrderAspect {
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         //logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
 //        log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单发送推送：" + msg.toString());
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单发送推送：" + msg.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
@@ -725,8 +763,14 @@ public class OrderAspect {
 
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            log.info("发送订单取消通知成功:" + msg + result);
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
             MQMessageProducer.sendNoticeOrderMessage(order);
 
             if (order.getParentOrderId() != null) {  //子订单
@@ -750,8 +794,14 @@ public class OrderAspect {
         msg.append("交易码:" + order.getVerCode() + "\n");
         msg.append("请留意餐厅叫号信息");
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单发送推送：" + msg.toString());
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单发送推送：" + msg.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
 //        log.info("发送取餐信息成功:" + result);
     }
 }

@@ -6,10 +6,7 @@ import com.aliyun.openservices.ons.api.Action;
 import com.aliyun.openservices.ons.api.ConsumeContext;
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
-import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.core.util.UserActionUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
@@ -39,6 +36,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.resto.brand.core.util.HttpClient.doPost;
 
 @Component
 public class OrderMessageListener implements MessageListener {
@@ -156,6 +155,12 @@ public class OrderMessageListener implements MessageListener {
         str.append("优惠券到期提醒"+"\n");
         str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+        Map map = new HashMap(4);
+        map.put("brandName", setting.getBrandName());
+        map.put("fileName", customer.getId());
+        map.put("type", "UserAction");
+        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(LogUtils.url, map);
         if(setting.getIsSendCouponMsg() == Common.YES){
             sendNote(shopName,pr,name,pushDay,customer.getId());
         }
@@ -251,8 +256,14 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -384,8 +395,14 @@ public class OrderMessageListener implements MessageListener {
             }
             sb.append("订单金额："+order.getOrderMoney()+"\n");
             WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }

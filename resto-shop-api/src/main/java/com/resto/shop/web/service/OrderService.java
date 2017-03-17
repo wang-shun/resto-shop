@@ -610,4 +610,14 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	void alipayRefund(String orderId,BigDecimal refundTotal);
 
 	List<Order> selectByOrderSatesAndNoPay(String shopId);
+
+    /**
+     * 查询第三方接口需要的订单数据
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @param shopId
+     * @return
+     */
+    List<Order> selectBaseToThirdList(String beginDate, String endDate, String brandId, String shopId);
 }
