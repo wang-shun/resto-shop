@@ -1248,6 +1248,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
+                case PayMode.BANK_CART_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.CRASH_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.SHANHUI_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
             }
             item.setId(newPayItemId);
             orderPaymentItemService.insert(item);
