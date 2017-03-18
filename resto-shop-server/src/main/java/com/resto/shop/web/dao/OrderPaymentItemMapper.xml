@@ -226,4 +226,10 @@
 		where order_id = #{orderId}
 		and payment_mode_id = 11
 	</select>
+
+    <select id="selectByShanhuiPayOrder" resultType="com.resto.shop.web.model.OrderPaymentItem">
+        select * from tb_order_payment_item
+        where order_id = #{orderId}
+        and payment_mode_id = 16
+    </select>
 </mapper>
