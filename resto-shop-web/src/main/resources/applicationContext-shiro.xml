@@ -22,6 +22,7 @@
                 /paynotify/alipay_notify=anon<!-- 支付宝通知 -->
                 /paynotify/alipay_return=anon<!-- 支付宝通知 -->
                 /paynotify/wxpay_notify=anon<!-- 微信通知 -->
+                /api/* =anon <!-- 对接嫩绿茶-->
                 <!-- 其他资源需要认证 -->
                 /** = authc
             </value>

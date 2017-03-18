@@ -54,7 +54,7 @@ public class PayMode {
             case SHANHUI_PAY:
                 return "闪惠支付";
             default:
-                return "未知";
+                return "";
             }
 	}
 

@@ -4,13 +4,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import javax.annotation.Resource;
-
 import com.resto.brand.web.model.OrderException;
-import com.resto.brand.web.model.ShopMode;
 import com.resto.brand.web.service.OrderExceptionService;
-import com.resto.shop.web.constant.ProductionStatus;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.WeShop;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +21,6 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
 
 /**
  * 用于同步第三方数据库的Controller(以及用来查询不正常的订单存到品牌)
@@ -64,6 +58,7 @@ public class SyncDataController extends GenericController {
 
     @Resource
     WeShopService weShopService;
+
 
     // 品牌总收入，旗下所有店铺收入总和
     @RequestMapping("syncBrandIncome")
@@ -462,7 +457,6 @@ public class SyncDataController extends GenericController {
         return getSuccessResult(customers);
     }
 
-
     // 插入小程序需要的数据
 //    @RequestMapping("brand_score")
 //    @ResponseBody
@@ -490,8 +484,6 @@ public class SyncDataController extends GenericController {
 //        return  null;
 //    }
 
-
-
    //  插入小程序需要的数据
     @RequestMapping("getWeAppInfo")
     @ResponseBody
@@ -518,8 +510,5 @@ public class SyncDataController extends GenericController {
 
         return  Result.getSuccess();
     }
-
-
-
 
 }

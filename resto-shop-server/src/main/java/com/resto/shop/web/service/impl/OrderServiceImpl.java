@@ -4,7 +4,6 @@ import cn.restoplus.rpc.server.RpcService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.enums.DayMessage;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
@@ -42,6 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.resto.brand.core.util.HttpClient.doPost;
 import static com.resto.brand.core.util.LogUtils.url;
+import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
+import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
 
 /**
  *
@@ -255,7 +256,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(old.getCustomerId());
 
 
-        if (detail.getShopMode() != 5) {
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER) {
             if (order.getUseCoupon() != null) {
                 Coupon coupon = couponService.useCoupon(orderMoney, old);
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -4341,7 +4342,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!newCustomerOrders.isEmpty()) {
             for (Order o : newCustomerOrders) {
                 newCustomerOrderNum++;
-                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                newCustomerOrderTotal = newCustomerOrderTotal.add( getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
                     newShareCustomerOrderNum++;
                     newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
@@ -4625,50 +4626,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
                 .append("}");
 
-//            if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
-//                //截取电话号码
-//                String[] telephones = shopDetail.getnoticeTelephone().split("，");
-//                for (String tel : telephones) {
-//                    try {
-//                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }
-        SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+            if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
+                //截取电话号码
+                String[] telephones = shopDetail.getnoticeTelephone().split("，");
+                for (String tel : telephones) {
+                    try {
+                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
-    }
-
-
-    public static String formatDouble(double d) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        if(d==0){
-            return "0.00";
-        }
-        return df.format(d);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(formatDouble(0));
-    }
-
-
-    public static BigDecimal getOrderMoney(Integer shopMode, Integer payType, BigDecimal orderMoney, BigDecimal amountWithChildern) {
-        BigDecimal temp = BigDecimal.ZERO;
-        if (ShopMode.HOUFU_ORDER == shopMode && amountWithChildern.compareTo(BigDecimal.ZERO) > 0) {
-            temp = temp.add(amountWithChildern);
-        } else if (ShopMode.BOSS_ORDER == shopMode) {
-            if (payType == 1 && amountWithChildern.compareTo(BigDecimal.ZERO) > 0) {
-                temp = temp.add(amountWithChildern);
-            } else {
-                temp = temp.add(orderMoney);
             }
-        } else {
-            temp = temp.add(orderMoney);
-        }
-        return temp;
+     //   SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+
     }
 
 
@@ -6349,10 +6320,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectBaseToThirdList(String beginDate, String endDate, String brandId, String shopId) {
+    public List<Order> selectBaseToThirdList(String brandId, String beginDate, String endDate) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return  orderMapper.selectBaseToThirdList(begin,end,brandId);
-
     }
+
+    @Override
+    public List<Order> selectBaseToThirdListByShopId(String shopId, String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectBaseToThirdListByShopId(begin,end,shopId);
+    }
+
+
 }

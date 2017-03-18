@@ -189,7 +189,7 @@
             <result column="orderItemId" property="id"/>
             <result column="article_name" property="articleName"/>
             <result column="count" property="count"/>
-            <result column="original_price" property="orginalPrice"/>
+            <result column="original_price" property="originalPrice"/>
             <result column="type" property="type"/>
         </collection>
     </resultMap>
@@ -2393,7 +2393,7 @@ GROUP BY r.table_number
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2845,6 +2845,7 @@ GROUP BY oi.article_name
         ORDER BY create_time ASC
     </select>
 
+    <!-- 2017-03-17 yz -->
     <!-- 查询订单 -订单菜品 订单支付项 用于第三方接口 -->
     <select id="selectBaseToThirdList" resultMap="BaseResultMap">
       SELECT
@@ -2863,18 +2864,48 @@ GROUP BY oi.article_name
 	oi.count,
 	opi.id orderPaymentId,
 	opi.pay_value,
-	opi.payment_mode_id,
+	opi.payment_mode_id
 FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
+opi.payment_mode_id not in (13,14,15) AND
 o.production_status in(2,3)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
-]]]> AND  o.brand_id =#{brandId}
+]]> AND  o.brand_id =#{brandId}
 
+    </select>
 
+    <select id="selectBaseToThirdListByShopId" resultMap="BaseResultMap">
+          SELECT
+	o.id,
+	o.order_state,
+	o.create_time,
+	o.push_order_time,
+	o.shop_detail_id,
+	o.table_number,
+	o.serial_number,
+	oi.original_price,
+    oi.id orderItemId,
+	oi.type,
+	oi.article_id,
+	oi.article_name,
+	oi.count,
+	opi.id orderPaymentId,
+	opi.pay_value,
+	opi.payment_mode_id
+FROM
+	tb_order o
+INNER JOIN tb_order_item oi ON o.id = oi.order_id
+INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
+WHERE  o.order_state in(2,10,11,12) AND
+opi.payment_mode_id not in (13,14,15) AND
+o.production_status in(2,3)
+AND  <![CDATA[
+o.create_time>#{beginDate} AND  o.create_time<#{endDate}
+]]> AND  o.shop_detail_id =#{shopId}
     </select>
 
 </mapper>
