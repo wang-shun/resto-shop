@@ -2393,7 +2393,7 @@ GROUP BY r.table_number
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2870,6 +2870,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
+opi.payment_mode_id not in (13,14,15) AND
 o.production_status in(2,3)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -2900,6 +2901,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
+opi.payment_mode_id not in (13,14,15) AND
 o.production_status in(2,3)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}

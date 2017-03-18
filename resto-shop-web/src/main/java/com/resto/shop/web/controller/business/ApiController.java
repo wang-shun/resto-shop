@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.OrderCountUtils;
 import com.resto.brand.core.util.ThirdPatyUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -28,6 +29,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.resto.brand.core.util.OrderCountUtils.addKey;
+import static com.resto.brand.core.util.OrderCountUtils.getPayDetail;
 
 /**
  * 用于同步第三方数据库的Controller(以及用来查询不正常的订单存到品牌)
@@ -153,71 +157,6 @@ public class ApiController extends GenericController {
         }
     }
 
-    /**
-     * 合并订单项中相同的payModeId
-     * @param key
-     * @param value
-     */
-    private void addKey(Integer key, BigDecimal value,Map<Integer,BigDecimal> payMap) {
-        if(payMap.get(key)!=null){//说明map中已有改值
-            payMap.put(key,payMap.get(key).add(value));
-        }else {
-            payMap.put(key,value);
-        }
-    }
-
-
-    private   String getPayDetail (Map<Integer,BigDecimal> payMap){
-        StringBuilder sb = new StringBuilder();
-        for(Map.Entry<Integer,BigDecimal> map:payMap.entrySet()){
-            switch (map.getKey()){
-                case PayMode.WEIXIN_PAY:
-                    sb.append("微信支付金额为"+map.getValue());
-                    break;
-                case PayMode.ACCOUNT_PAY:
-                    sb.append("红包(余额)支付金额为:"+map.getValue());
-                    break;
-                case PayMode.COUPON_PAY:
-                    sb.append("优惠券支付金额为:"+map.getValue());
-                    break;
-                case PayMode.MONEY_PAY:
-                    sb.append("其它方式支付金额为:"+map.getValue());
-                    break;
-                case PayMode.BANK_CART_PAY:
-                    sb.append("银行卡支付金额为:"+map.getValue());
-                    break;
-                case PayMode.CHARGE_PAY:
-                    sb.append("充值支付金额为:"+map.getValue());
-                    break;
-                case PayMode.REWARD_PAY:
-                    sb.append("充值返还支付金额为:"+map.getValue());
-                    break;
-                case PayMode.WAIT_MONEY:
-                    sb.append("等位红包的支付金额为:"+map.getValue());
-                    break;
-                case PayMode.HUNGER_MONEY:
-                    sb.append("饿了么支付金额为:"+map.getValue());
-                    break;
-                case PayMode.ALI_PAY:
-                    sb.append("支付宝支付金额为:"+map.getValue());
-                    break;
-                case PayMode.ARTICLE_BACK_PAY:
-                    sb.append("退菜红包支付金额为:"+map.getValue());
-                    break;
-                case PayMode.CRASH_PAY:
-                    sb.append("现金支付金额为:"+map.getValue());
-                    break;
-                case PayMode.APPRAISE_RED_PAY:
-                    sb.append("评论红包支付金额为:"+map.getValue());
-                    break;
-                case  PayMode.SHARE_RED_PAY:
-                    sb.append("分享返利红包金额为"+map.getValue());
-                default:
-                        break;
-            }
-        }
-        return  sb.toString();
-    }
 
 
 

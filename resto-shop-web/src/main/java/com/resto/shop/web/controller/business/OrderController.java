@@ -29,7 +29,6 @@ import com.resto.shop.web.service.WeItemService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
@@ -43,7 +42,6 @@ import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.OrderService;
-import sun.security.provider.SHA;
 
 @Controller
 @RequestMapping("orderReport")
