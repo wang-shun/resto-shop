@@ -141,4 +141,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public OrderPaymentItem selectByShanhuiPayOrder(String orderId) {
         return orderpaymentitemMapper.selectByShanhuiPayOrder(orderId);
     }
+
+    @Override
+    public void updateByShanhuiPayOrder(String orderId, String param) {
+        orderpaymentitemMapper.updateByShanhuiPayOrder(orderId, param);
+    }
 }

@@ -232,4 +232,8 @@
         where order_id = #{orderId}
         and payment_mode_id = 16
     </select>
+
+    <update id="updateByShanhuiPayOrder" >
+        update tb_order_payment_item set result_data = #{param} where order_id = #{orderId} and payment_mode_id = 16
+    </update>
 </mapper>

@@ -64,4 +64,11 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     OrderPaymentItem selectByShanhuiPayOrder(String orderId);
+
+    /**
+     * 修改订单使用闪惠支付的时候订单项信息
+     * @param orderId
+     * @param param
+     */
+    void updateByShanhuiPayOrder(String orderId, String param);
 }
