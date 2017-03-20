@@ -2209,7 +2209,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if(faOrder.getPayType() == PayType.NOPAY){
-                    data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
+                    data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 }else{
                     data.put("RESTAURANT_NAME", shopDetail.getName());
                 }
