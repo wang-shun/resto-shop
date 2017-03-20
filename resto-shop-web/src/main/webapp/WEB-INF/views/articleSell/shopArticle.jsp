@@ -5,7 +5,7 @@
 	<span class="glyphicon glyphicon-circle-arrow-left"></span>
 	返回
 </a>
-<h2 class="text-center"><strong>店铺菜品销售报表</strong></h2><br/>
+<h2 class="text-center"><strong>${shopName}</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">

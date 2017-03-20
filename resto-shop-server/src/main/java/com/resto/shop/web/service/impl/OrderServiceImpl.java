@@ -761,7 +761,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
             }
-        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
+        } else if (order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
@@ -2205,7 +2205,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else if(order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY){
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         }else{
-            data.put("RESTAURANT_NAME", shopDetail.getName());
+            if(order.getParentOrderId() != null){
+                //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
+                Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+                if(faOrder.getPayType() == PayType.NOPAY){
+                    data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+                }else{
+                    data.put("RESTAURANT_NAME", shopDetail.getName());
+                }
+            }else{
+                data.put("RESTAURANT_NAME", shopDetail.getName());
+            }
         }
 
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));

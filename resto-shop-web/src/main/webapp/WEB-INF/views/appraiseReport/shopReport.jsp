@@ -35,7 +35,7 @@
     <!-- 店铺订单列表  -->
     <div class="panel panel-info">
         <div class="panel-heading text-center" style="font-size: 22px;">
-            <strong>店铺评论列表</strong>
+            <strong>店铺评论记录</strong>
         </div>
         <div class="panel-body">
             <table class="table table-striped table-bordered table-hover" id="shopAppraise">

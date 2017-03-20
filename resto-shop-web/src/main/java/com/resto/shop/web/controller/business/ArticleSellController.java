@@ -199,10 +199,11 @@ public class ArticleSellController extends GenericController{
      * @return
      */
 	@RequestMapping("/showShopArticle")
-	public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId){
+	public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId, String shopName){
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
 		request.setAttribute("shopId", shopId);
+        request.setAttribute("shopName",shopName);
 		return "articleSell/shopArticle";
 	}
 

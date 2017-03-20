@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 
 <div id="control">
-    <h2 class="text-center"><strong>订单列表</strong></h2><br/>
+    <h2 class="text-center"><strong>订单报表</strong></h2><br/>
     <div class="row" id="searchTools">
         <div class="col-md-12">
             <form class="form-inline">
@@ -34,7 +34,7 @@
             <!-- 品牌订单 -->
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
-                    <strong style="margin-right:100px;font-size:22px">品牌订单列表</strong>
+                    <strong style="margin-right:100px;font-size:22px">品牌订单报表</strong>
                 </div>
                 <div class="panel-body">
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -68,6 +68,9 @@
                     </table>
                 </div>
 
+                <div class="panel-heading text-center">
+                    <strong style="margin-right:100px;font-size:22px">店铺订单报表</strong>
+                </div>
                 <div class="panel-body">
                     <table id="shopOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                     </table>
@@ -149,7 +152,8 @@
                             data: "shopDetailId",
                             orderable : false,
                             createdCell: function (td, tdData, rowData) {
-                                var button = $("<a href='orderReport/show/shopReport?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
+                                var shopName = rowData.name;
+                                var button = $("<a href='orderReport/show/shopReport?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"&&shopName="+shopName+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }
                         }

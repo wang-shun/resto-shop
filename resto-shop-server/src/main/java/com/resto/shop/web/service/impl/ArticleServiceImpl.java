@@ -258,7 +258,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean clearStock(String articleId, String shopId) {
-        Article article = articleMapper.selectByPrimaryKey(articleId);
+        Article article = null;
+        if(articleId.indexOf("@")> -1){
+            String aid = articleId.substring(0,articleId.indexOf("@"));
+            article = articleMapper.selectByPrimaryKey(aid);
+        }else{
+            article = articleMapper.selectByPrimaryKey(articleId);
+        }
         String emptyRemark = "【手动沽清】";
         articleMapper.clearStock(articleId, emptyRemark);
         articleMapper.clearPriceTotal(articleId, emptyRemark);
@@ -281,7 +287,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public Boolean editStock(String articleId, Integer count, String shopId) {
-        Article article = articleMapper.selectByPrimaryKey(articleId);
+        Article article = null;
+        if(articleId.indexOf("@")> -1){
+            String aid = articleId.substring(0,articleId.indexOf("@"));
+            article = articleMapper.selectByPrimaryKey(aid);
+        }else{
+            article = articleMapper.selectByPrimaryKey(articleId);
+        }
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;

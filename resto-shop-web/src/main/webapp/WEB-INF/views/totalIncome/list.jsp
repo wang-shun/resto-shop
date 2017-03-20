@@ -34,11 +34,15 @@
     <div id="report-editor">
         <div class="panel panel-success">
             <div class="panel-heading text-center">
-                <strong style="margin-right:100px;font-size:22px">收入条目</strong>
+                <strong style="margin-right:100px;font-size:22px">品牌收入条目</strong>
             </div>
             <div class="panel-body">
                 <table id="brandReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
-                <br/>
+            </div>
+            <div class="panel-heading text-center">
+                <strong style="margin-right:100px;font-size:22px">店铺收入条目</strong>
+            </div>
+            <div class="panel-body">
                 <table id="shopReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
             </div>
         </div>

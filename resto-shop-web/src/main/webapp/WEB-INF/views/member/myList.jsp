@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-    <h2 class="text-center"><strong>会员信息列表</strong></h2>
+    <h2 class="text-center"><strong>会员信息报表</strong></h2>
     <div class="row" id="searchTools">
         <div class="col-md-12">
             <form class="form-inline">
@@ -36,7 +36,7 @@
         <div class="panel panel-primary" style="border-color:write;">
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
-                    <strong style="margin-right:100px;font-size:22px">会员信息表</strong>
+                    <strong style="margin-right:100px;font-size:22px">会员信息报表</strong>
                 </div>
                 <div class="panel-body">
                     <table class="table table-striped table-bordered table-hover" width="100%">

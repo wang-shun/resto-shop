@@ -40,7 +40,7 @@
             <!-- 品牌订单 -->
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
-                    <strong style="margin-right:100px;font-size:22px">品牌评论列表</strong>
+                    <strong style="margin-right:100px;font-size:22px">品牌评论报表</strong>
                 </div>
                 <div class="panel-body">
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -90,7 +90,7 @@
             <!-- 品牌订单 -->
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
-                    <strong style="margin-right:100px;font-size:22px">店铺评论列表</strong>
+                    <strong style="margin-right:100px;font-size:22px">店铺评论报表</strong>
                 </div>
                 <div class="panel-body">
                     <table id="appraiseTable" class="table table-striped table-bordered table-hover" width="100%">

@@ -121,7 +121,8 @@
 	                        data: "shopId",
 	                        orderable : false,
 	                        createdCell: function (td, tdData, rowData) {
- 	                            var button = $("<a href='articleSell/showShopArticle?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
+	                            var shopName = rowData.shopName;
+ 	                            var button = $("<a href='articleSell/showShopArticle?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"&&shopName="+shopName+"' class='btn green ajaxify '>查看详情</a>");
  	                            $(td).html(button);
 	                        }
 	                    }

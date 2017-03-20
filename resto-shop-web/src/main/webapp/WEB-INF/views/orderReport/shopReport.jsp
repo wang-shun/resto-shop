@@ -16,7 +16,12 @@
     </c:if>
     <h2 class="text-center">
         <strong>
-                订单列表
+            <c:if test="${!empty shopName}">
+                ${shopName}
+            </c:if>
+            <c:if test="${empty shopName}">
+                订单记录
+            </c:if>
         </strong>
     </h2>
     <br />
@@ -49,10 +54,10 @@
         <div class="panel-heading text-center" style="font-size: 22px;">
             <strong>
                 <c:if test="${!empty shopId}">
-                    店铺订单列表
+                    店铺订单记录
                 </c:if>
                 <c:if test="${!empty customerId}">
-                    会员订单列表
+                    会员订单记录
                 </c:if>
             </strong>
         </div>
@@ -153,7 +158,7 @@
     var customerId = "${customerId}";
     var beginDate = "${beginDate}";
     var endDate = "${endDate}";
-
+    var shopOrderTableAPI = null;
     //创建vue对象
     var vueObj =  new Vue({
         el:"#control",
@@ -203,6 +208,7 @@
                         {
                             title : "订单状态",
                             data : "orderState",
+                            s_filter: true,
                             orderable : false
                         }, {
                             title : "订单金额",
@@ -257,7 +263,11 @@
                                 $(td).html(button);
                             }
                         }
-                    ]
+                    ],
+                    initComplete: function () {
+                        shopOrderTableAPI = this.api();
+                        that.shopOrderTableColumn();
+                    }
                 });
             },
             searchInfo : function() {
@@ -269,9 +279,14 @@
                         if(result.success) {
                             toastr.clear();
                             toastr.success("查询成功");
+                            var API = shopOrderTableAPI;
+                            API.search('');
+                            var orderState = API.column(3);
+                            orderState.search('',true,false);
                             that.shopOrderDetails = result.data.result;
                             that.shopOrderTable.clear();
-                            that.shopOrderTable.rows.add(result.data.result).draw()
+                            that.shopOrderTable.rows.add(result.data.result).draw();
+                            that.shopOrderTableColumn();
                         }else{
                             toastr.clear();
                             toastr.error("查询出错");
@@ -434,6 +449,25 @@
             },
             closeModal : function () {
                 $("#orderDetail").modal("hide");
+            },
+            shopOrderTableColumn : function () {
+                var api = shopOrderTableAPI;
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
             }
         }
     });
