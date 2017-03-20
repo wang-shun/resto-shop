@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.OrderCountUtils;
 import com.resto.brand.core.util.ThirdPatyUtils;
 import com.resto.brand.web.model.Brand;
@@ -125,8 +126,8 @@ public class ApiController extends GenericController {
                 for (Order o : orderList) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("posId", o.getShopDetailId());
-                    map.put("addTime", o.getCreateTime());//订单创建时间
-                    map.put("posDate", o.getPushOrderTime());//订单推送时间
+                    map.put("addTime", DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));//订单创建时间
+                    map.put("posDate", DateUtil.formatDate(o.getPushOrderTime(),"yyyy-MM-dd HH:mm:ss"));//订单推送时间
                     map.put("tableNumber", o.getTableNumber());//座号
                     map.put("serialNumber", o.getSerialNumber());//
                     //订单支付项
@@ -145,8 +146,8 @@ public class ApiController extends GenericController {
                         for (OrderItem orderItem : o.getOrderItems()) {
                             Map<String, String> itemMap = new HashedMap();
                             itemMap.put("menuType", ItemType.getItemTypeName(orderItem.getType()));//订单菜品类型
-                            itemMap.put("menuCode", orderItem.getType().toString());//菜品id
-                            itemMap.put("menuName", orderItem.getType().toString());//菜品name
+                            itemMap.put("menuCode", orderItem.getArticleId());//菜品id
+                            itemMap.put("menuName", orderItem.getArticleName());//菜品name
                             itemMap.put("quanity", orderItem.getType().toString());//个数
                             // itemMap.put("parentType",orderItem.getParentId());//针对套餐和子品
                             itemList.add(itemMap);
@@ -161,8 +162,5 @@ public class ApiController extends GenericController {
         }
         return  result;
     }
-
-
-
 
 }

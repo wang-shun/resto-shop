@@ -188,6 +188,7 @@
         <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
             <result column="orderItemId" property="id"/>
             <result column="article_name" property="articleName"/>
+            <result column="article_id" property="articleId"/>
             <result column="count" property="count"/>
             <result column="original_price" property="originalPrice"/>
             <result column="type" property="type"/>

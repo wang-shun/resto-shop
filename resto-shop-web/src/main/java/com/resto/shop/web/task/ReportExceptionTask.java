@@ -49,14 +49,15 @@ public class ReportExceptionTask {
 
     //@Scheduled(cron = "0/5 * *  * * ?")   //每5秒执行一次 cron = "00 09 14 * * ?"
     //				   ss mm HH
-   @Scheduled(cron = "10  19 15 * * ?")   //每天12点执行
+   @Scheduled(cron = "10  45 13 * * ?")   //每天12点执行
+
     public void syncData() throws ClassNotFoundException, UnsupportedEncodingException {
         System.out.println("开始");
 
         //查询所有的品牌
         List<Brand> brandList = brandService.selectList();
         for (Brand brand : brandList) {
-         if(!"测试专用品牌".equals(brand.getBrandName())&&!"餐加".equals(brand.getBrandName())&&!"港都小排挡".equals(brand.getBrandName())&&!"夜狼音乐餐吧".equals(brand.getBrandName())&&!"座头市".equals(brand.getBrandName()) ){
+         if(NotmatchBrand(brand.getBrandName())){
                     //获取品牌用户
                     BrandUser brandUser = brandUserService.selectUserInfoByBrandIdAndRole(brand.getId(), 8);
                     //创建 Client 对象
@@ -75,8 +76,8 @@ public class ReportExceptionTask {
                     if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
                         log.info("--------------HttpClient 登录成功！");
                         Map<String, String> requestMap = new HashMap<>();
-                        requestMap.put("beginDate", "2017-01-01");
-                        requestMap.put("endDate", "2017-03-10");
+                        requestMap.put("beginDate", "2017-03-11");
+                        requestMap.put("endDate", "2017-03-17");
                         requestMap.put("brandName",brand.getBrandName());
                         //循环执行 URLMap 中的链接
                         HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
@@ -89,12 +90,36 @@ public class ReportExceptionTask {
                         if(httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
                             log.info("执行了插入异常订单项的请求");
                         }
-
                     }
-
                 }
             }
    }
+
+   //定义匹配的品牌  只查询下面定义的品牌
+    private  Boolean matchBrand(String brandName){
+       Boolean tag = false;
+       List<String> nameList = new ArrayList<>();
+        nameList.add("火宴山");
+        if(nameList.contains(brandName)){
+            tag=true;
+        }
+       return  tag;
+    }
+
+    //定义不匹配的品牌 除了以下品牌不查其它都查
+    private  Boolean NotmatchBrand(String brandName){
+        Boolean tag = true;
+        List<String> nameList = new ArrayList<>();
+        nameList.add("测试专用品牌");
+        nameList.add("餐加");
+        nameList.add("港都小排挡");
+        nameList.add("夜狼音乐餐吧");
+        nameList.add("座头市");
+        if(nameList.contains(brandName)){
+            tag = false;
+        }
+        return  tag;
+    }
 
 
     /**
