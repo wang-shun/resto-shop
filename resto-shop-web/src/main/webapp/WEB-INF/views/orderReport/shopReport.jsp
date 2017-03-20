@@ -16,7 +16,12 @@
     </c:if>
     <h2 class="text-center">
         <strong>
-                订单列表
+            <c:if test="${!empty shopName}">
+                ${shopName}
+            </c:if>
+            <c:if test="${empty shopName}">
+                订单记录
+            </c:if>
         </strong>
     </h2>
     <br />
@@ -49,10 +54,10 @@
         <div class="panel-heading text-center" style="font-size: 22px;">
             <strong>
                 <c:if test="${!empty shopId}">
-                    店铺订单列表
+                    店铺订单记录
                 </c:if>
                 <c:if test="${!empty customerId}">
-                    会员订单列表
+                    会员订单记录
                 </c:if>
             </strong>
         </div>

@@ -66,10 +66,11 @@ public class RechargeLogController extends GenericController{
 	 * @return
 	 */
 	@RequestMapping("/shopRechargeLog")
-	public String shopchargerecord(String shopDetailId,String beginDate,String endDate ){
+	public String shopchargerecord(String shopDetailId,String beginDate,String endDate, String shopName){
 		getRequest().setAttribute("shopDetailId",shopDetailId);
 		getRequest().setAttribute("beginDate",beginDate);
 		getRequest().setAttribute("endDate",endDate);
+        getRequest().setAttribute("shopName",shopName);
 		return "recharge/shopchargerecord";
 	}
 

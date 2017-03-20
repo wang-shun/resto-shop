@@ -32,7 +32,7 @@
     	<div class="panel panel-primary" style="border-color:write;">
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">品牌充值记录</strong>
+		  	<strong style="margin-right:100px;font-size:22px">品牌充值报表</strong>
 		  </div>
 		  <div class="panel-body">
 		  	<table class="table table-striped table-bordered table-hover" width="100%">
@@ -81,7 +81,7 @@
     	<div class="panel panel-primary" style="border-color:write;">
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">店铺充值记录</strong>
+		  	<strong style="margin-right:100px;font-size:22px">店铺充值报表</strong>
 		  </div>
 		  <div class="panel-body">
 		  	<table id="shopChargeLogTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -175,8 +175,9 @@
                             title : "操作",
                             data : "shopId",
                             orderable : false,
-                            createdCell: function (td, tdData) {
-                                var button = $("<a href='recharge/shopRechargeLog?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopDetailId="+tdData+"' class='btn green ajaxify '>查看详情</a>");
+                            createdCell: function (td, tdData, rowData) {
+                                var shopName = rowData.shopName;
+                                var button = $("<a href='recharge/shopRechargeLog?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopDetailId="+tdData+"&&shopName="+shopName+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }
                         },

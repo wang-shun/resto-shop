@@ -6,7 +6,7 @@
         返回
     </a>
     <h2 class="text-center">
-        <strong>店铺充值记录</strong>
+        <strong>${shopName}</strong>
     </h2>
     <br />
     <div class="row">

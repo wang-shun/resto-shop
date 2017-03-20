@@ -164,10 +164,11 @@ public class OrderController extends GenericController{
 
 	//进入店铺订单报表页面
 	@RequestMapping("/show/shopReport")
-	public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
+	public String showModal(String beginDate,String endDate,String shopId,String shopName,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
         request.setAttribute("shopId", shopId);
+        request.setAttribute("shopName",shopName);
 		return "orderReport/shopReport";
 	}
 
