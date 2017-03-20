@@ -246,6 +246,7 @@
         <id column="id" property="id"/>
         <result column="order_money" property="orderMoney"/>
         <result column="order_mode" property="orderMode"/>
+        <result column="pay_type" property="payType"/>
         <result column="amount_with_children" property="amountWithChildren"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItemId" property="id"/>
@@ -2362,12 +2363,14 @@ GROUP BY r.table_number
 
 
     <select id="selectExceptionOrderListBybrandId" resultType="Order">
-        select id from tb_order
+        SELECT  o.id FROM tb_order o
+INNER JOIN tb_order_payment_item oi
+on o.id = oi.order_id
         WHERE
-        brand_id=#{brandId}
+        o.brand_id=#{brandId}
         AND
-        <![CDATA[ create_time >#{beginDate} AND create_time  <#{endDate}]]>
-        AND order_state IN(2,10,11,12) AND  production_status NOT  in (2,3)
+        <![CDATA[o. create_time >#{beginDate} AND o.create_time  <#{endDate}]]>
+        AND o.order_state IN(2,10,11,12) AND o.production_status NOT  in (2,3)
     </select>
 
     <select id="selectHasPayListOrderByBrandId" resultType="Order">
@@ -2387,6 +2390,8 @@ GROUP BY r.table_number
         o.order_mode,
         o.order_money ,
         o.amount_with_children,
+        o.order_mode,
+        o.pay_type,
         oi.id as orderPaymentItemId,
         oi.pay_value,
         oi.payment_mode_id
