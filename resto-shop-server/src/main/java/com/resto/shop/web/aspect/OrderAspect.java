@@ -277,27 +277,24 @@ public class OrderAspect {
 
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Brand brand = brandService.selectById(order.getBrandId());
-        if (order != null && (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getOrderState() == OrderState.PAYMENT
-                && order.getProductionStatus() == ProductionStatus.PRINTED) {
-            Customer customer = customerService.selectById(order.getCustomerId());
-            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-            String money = "(";
-            for (OrderPaymentItem orderPaymentItem : paymentItems) {
-                money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
-            }
-            StringBuffer msg = new StringBuffer();
-            BigDecimal sum = order.getOrderMoney();
-            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
-            for (Order child : orders) { //遍历子订单
-                sum = sum.add(child.getOrderMoney());
-            }
-            msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
-            msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
-            WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单发送推送：" + msg.toString());
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+        List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        String money = "(";
+        for (OrderPaymentItem orderPaymentItem : paymentItems) {
+            money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
         }
+        StringBuffer msg = new StringBuffer();
+        BigDecimal sum = order.getOrderMoney();
+        List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+        for (Order child : orders) { //遍历子订单
+            sum = sum.add(child.getOrderMoney());
+        }
+        msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
+        msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
+        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
     }
 
 
