@@ -6155,59 +6155,58 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         orderMapper.confirmOrderPos(orderId);
         if(order.getPayType() == PayType.NOPAY){
             confirmOrder(order);
+            //如果是余额不满足时，使用现金或者银联支付
+            if (order.getPaymentAmount().compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(order.getPaymentAmount());
+                item.setRemark("银联支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单使用银联支付了：" + item.getPayValue());
+                Map cartPayMap = new HashMap(4);
+                cartPayMap.put("brandName", brand.getBrandName());
+                cartPayMap.put("fileName", order.getId());
+                cartPayMap.put("type", "orderAction");
+                cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, cartPayMap);
+                Map CustomerCartPayMap = new HashMap(4);
+                CustomerCartPayMap.put("brandName", brand.getBrandName());
+                CustomerCartPayMap.put("fileName", customer.getId());
+                CustomerCartPayMap.put("type", "UserAction");
+                CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, CustomerCartPayMap);
+                order.setAllowContinueOrder(false);
+            } else if (order.getPaymentAmount().compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.CRASH_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(order.getPaymentAmount());
+                item.setRemark("现金支付:" + item.getPayValue());
+                orderPaymentItemService.insert(item);
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单使用银联支付了：" + item.getPayValue());
+                Map crashPayMap = new HashMap(4);
+                crashPayMap.put("brandName", brand.getBrandName());
+                crashPayMap.put("fileName", order.getId());
+                crashPayMap.put("type", "orderAction");
+                crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, crashPayMap);
+                Map CustomerCrashPayMap = new HashMap(4);
+                CustomerCrashPayMap.put("brandName", brand.getBrandName());
+                CustomerCrashPayMap.put("fileName", customer.getId());
+                CustomerCrashPayMap.put("type", "UserAction");
+                CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(url, CustomerCrashPayMap);
+                order.setAllowContinueOrder(false);
+            }
         }
         updateChild(order);
-
-        //如果是余额不满足时，使用现金或者银联支付
-        if (order.getPaymentAmount().compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.BANK_CART_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(order.getPaymentAmount());
-            item.setRemark("银联支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单使用银联支付了：" + item.getPayValue());
-            Map cartPayMap = new HashMap(4);
-            cartPayMap.put("brandName", brand.getBrandName());
-            cartPayMap.put("fileName", order.getId());
-            cartPayMap.put("type", "orderAction");
-            cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, cartPayMap);
-            Map CustomerCartPayMap = new HashMap(4);
-            CustomerCartPayMap.put("brandName", brand.getBrandName());
-            CustomerCartPayMap.put("fileName", customer.getId());
-            CustomerCartPayMap.put("type", "UserAction");
-            CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, CustomerCartPayMap);
-            order.setAllowContinueOrder(false);
-        } else if (order.getPaymentAmount().compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
-            OrderPaymentItem item = new OrderPaymentItem();
-            item.setId(ApplicationUtils.randomUUID());
-            item.setOrderId(orderId);
-            item.setPaymentModeId(PayMode.CRASH_PAY);
-            item.setPayTime(order.getCreateTime());
-            item.setPayValue(order.getPaymentAmount());
-            item.setRemark("现金支付:" + item.getPayValue());
-            orderPaymentItemService.insert(item);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单使用银联支付了：" + item.getPayValue());
-            Map crashPayMap = new HashMap(4);
-            crashPayMap.put("brandName", brand.getBrandName());
-            crashPayMap.put("fileName", order.getId());
-            crashPayMap.put("type", "orderAction");
-            crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, crashPayMap);
-            Map CustomerCrashPayMap = new HashMap(4);
-            CustomerCrashPayMap.put("brandName", brand.getBrandName());
-            CustomerCrashPayMap.put("fileName", customer.getId());
-            CustomerCrashPayMap.put("type", "UserAction");
-            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, CustomerCrashPayMap);
-            order.setAllowContinueOrder(false);
-        }
     }
 
     @Override
