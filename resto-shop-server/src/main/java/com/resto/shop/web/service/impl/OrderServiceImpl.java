@@ -5614,35 +5614,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
-                        order.setPaymentAmount(pay);
-//                        order.setOrderState(OrderState.SUBMIT);
-//                        order.setPrintTimes(1);
-//                        order.setAllowContinueOrder(false);
-//                        item.setId(ApplicationUtils.randomUUID());
-//                        item.setOrderId(orderId);
-//                        item.setPaymentModeId(PayMode.BANK_CART_PAY);
-//                        item.setPayTime(new Date());
-//                        item.setPayValue(pay);
-//                        item.setRemark("银联支付:" + item.getPayValue());
-//                        orderPaymentItemService.insert(item);
-//                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                                "订单使用银联支付了：" + item.getPayValue());
+                        order.setPaymentAmount(price);
+                        order.setOrderState(OrderState.SUBMIT);
+                        order.setPrintTimes(1);
+                        order.setAllowContinueOrder(false);
+                        item.setId(ApplicationUtils.randomUUID());
+                        item.setOrderId(orderId);
+                        item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                        item.setPayTime(new Date());
+                        item.setPayValue(pay);
+                        item.setRemark("银联支付:" + item.getPayValue());
+                        orderPaymentItemService.insert(item);
+                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                                "订单使用银联支付了：" + item.getPayValue());
 //                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
-                        order.setPaymentAmount(pay);
-//                        order.setOrderState(OrderState.SUBMIT);
-//                        order.setPrintTimes(1);
-//                        order.setAllowContinueOrder(false);
-//                        item.setId(ApplicationUtils.randomUUID());
-//                        item.setOrderId(orderId);
-//                        item.setPaymentModeId(PayMode.CRASH_PAY);
-//                        item.setPayTime(new Date());
-//                        item.setPayValue(pay);
-//                        item.setRemark("现金支付:" + item.getPayValue());
-//                        orderPaymentItemService.insert(item);
-//                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                                "订单使用现金支付了：" + item.getPayValue());
+                        order.setPaymentAmount(price);
+                        order.setOrderState(OrderState.SUBMIT);
+                        order.setPrintTimes(1);
+                        order.setAllowContinueOrder(false);
+                        item.setId(ApplicationUtils.randomUUID());
+                        item.setOrderId(orderId);
+                        item.setPaymentModeId(PayMode.CRASH_PAY);
+                        item.setPayTime(new Date());
+                        item.setPayValue(pay);
+                        item.setRemark("现金支付:" + item.getPayValue());
+                        orderPaymentItemService.insert(item);
+                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                                "订单使用现金支付了：" + item.getPayValue());
 //                        updateChild(order);
                         break;
                     default:
