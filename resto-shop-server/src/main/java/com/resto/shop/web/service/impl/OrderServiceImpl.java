@@ -610,11 +610,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if (payMoney.doubleValue() < 0) {
-            payMoney = BigDecimal.ZERO;
-        }
         //如果是余额不满足时，使用现金或者银联支付
-        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 3) {
+        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.YL_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(orderId);
@@ -638,7 +635,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, CustomerCartPayMap);
             order.setAllowContinueOrder(false);
-        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == 4) {
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setOrderId(orderId);
@@ -761,7 +758,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
             }
-        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
+        } else if (order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
@@ -6201,6 +6198,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
+        Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+        Customer customer = customerService.selectById(order.getCustomerId());
         orderMapper.confirmOrderPos(orderId);
         if(order.getPayType() == PayType.NOPAY){
             confirmOrder(order);

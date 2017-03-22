@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import javax.annotation.Resource;
+
+import com.resto.brand.core.util.OrderCountUtils;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.shop.web.model.*;
@@ -372,7 +374,6 @@ public class SyncDataController extends GenericController {
     public  Result syncOrderPaymentItemException(String beginDate,String endDate,String brandName){
         //1.查退款失败原因为： 累计退款金额大于支付金额
         List<OrderPaymentItem> orderPaymentItemList = orderpaymentitemService.selectListByResultData(beginDate,endDate);
-
         if(!orderPaymentItemList.isEmpty()){
             for(OrderPaymentItem oi : orderPaymentItemList){
                 Order order = orderService.selectById(oi.getOrderId());
@@ -401,11 +402,7 @@ public class SyncDataController extends GenericController {
                         for(OrderPaymentItem oi : order.getOrderPaymentItems()){
                             temp=temp.add(oi.getPayValue());
                         }
-                        BigDecimal  orderMoney = order.getOrderMoney();
-                        //如果当前的店铺的模式为后付款模式 并且该订单的amountWithChildren不为0则orderMoney选择
-                        if(order.getOrderMode()==5&&order.getAmountWithChildren().compareTo(BigDecimal.ZERO)!=0){
-                            orderMoney = order.getAmountWithChildren();
-                        }
+                        BigDecimal  orderMoney = OrderCountUtils.getOrderMoney(order.getOrderMode(),order.getPayType(), order.getOrderMoney(),order.getAmountWithChildren());
 
                         if(orderMoney.compareTo(temp)!=0){
                             Order order2 = orderService.selectById(order.getId());
