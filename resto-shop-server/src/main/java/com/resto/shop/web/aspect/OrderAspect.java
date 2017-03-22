@@ -654,54 +654,55 @@ public class OrderAspect {
 
     @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
-        log.info("确认订单成功后回调:" + order.getId());
-        Customer customer = customerService.selectById(order.getCustomerId());
-        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
-        Brand brand = brandService.selectById(customer.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        if(order != null){
+            log.info("确认订单成功后回调:" + order.getId());
+            Customer customer = customerService.selectById(order.getCustomerId());
+            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+            Brand brand = brandService.selectById(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
-        if (order.getAllowAppraise()) {
-            StringBuffer msg = new StringBuffer();
-            msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
-            msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
+            if (order.getAllowAppraise()) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
-            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单发送推送：" + msg.toString());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", customer.getId());
-            map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPost(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
-            scanaQRcode(config, customer, setting, order);
-        }
-        try {
-            if (customer.getFirstOrderTime() == null) { //分享判定
-                customerService.updateFirstOrderTime(customer.getId());
-                if (customer.getShareCustomer() != null) {
-                    Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
-                    if (shareCustomer != null) {
-                        ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
-                        if (shareSetting != null) {
-                            log.info("是被分享用户，并且分享设置已启用:" + customer.getId() + " oid:" + order.getId() + " setting:" + shareSetting.getId());
-                            BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting, order, shareCustomer, customer);
-                            log.info("准备发送返利通知");
-                            sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney,order);
-                        } else{
-                            log.info("准备发送返利通知  but品牌没有设置返利  so返利0元");
-                            sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO,order);
+                scanaQRcode(config, customer, setting, order);
+            }
+            try {
+                if (customer.getFirstOrderTime() == null) { //分享判定
+                    customerService.updateFirstOrderTime(customer.getId());
+                    if (customer.getShareCustomer() != null) {
+                        Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
+                        if (shareCustomer != null) {
+                            ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+                            if (shareSetting != null) {
+                                log.info("是被分享用户，并且分享设置已启用:" + customer.getId() + " oid:" + order.getId() + " setting:" + shareSetting.getId());
+                                BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting, order, shareCustomer, customer);
+                                log.info("准备发送返利通知");
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney,order);
+                            } else{
+                                log.info("准备发送返利通知  but品牌没有设置返利  so返利0元");
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO,order);
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                log.error("分享功能出错:" + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            log.error("分享功能出错:" + e.getMessage());
-            e.printStackTrace();
         }
-
     }
 
     private void sendRewardShareMsg(Customer shareCustomer, Customer customer, WechatConfig config,

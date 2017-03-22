@@ -2319,7 +2319,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
-        if (order.getOrderState() != OrderState.PAYMENT) {
+        if (order.getOrderState() != OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM) {
             return null;
         }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
@@ -2366,7 +2366,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmBossOrder(Order order) {
         order = selectById(order.getId());
-        if (order.getOrderState() != OrderState.PAYMENT) {
+        if (order.getOrderState() != OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM) {
             return null;
         }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
