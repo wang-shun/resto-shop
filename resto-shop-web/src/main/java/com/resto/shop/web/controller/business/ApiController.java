@@ -78,7 +78,7 @@ public class ApiController extends GenericController {
 
     @RequestMapping(value = "getThirdData", method = RequestMethod.POST)
     @ResponseBody
-    public Result getThirdData(String signature, String timestamp, String nonce, String appId, String thirdAppid, String beginDate, String endDate, HttpServletRequest request) {
+    public Result getThirdData(String signature, String timestamp, String nonce, String appid, String thirdAppid, String beginDate, String endDate, HttpServletRequest request) {
         //默认返回false
         Result result = new Result();
         result.setSuccess(false);
@@ -97,7 +97,7 @@ public class ApiController extends GenericController {
          */
         if (ThirdPatyUtils.checkSignature(signature, timestamp, nonce, appidList)) {
             //定位数据库
-            BrandSetting brandSetting = brandSettingService.selectByAppid(appId);
+            BrandSetting brandSetting = brandSettingService.selectByAppid(appid);
             if (null == brandSetting || "0".equals(brandSetting.getOpenThirdInterface().toString())) {
                 result.setSuccess(false);
                 result.setMessage("参数非法");
@@ -106,6 +106,7 @@ public class ApiController extends GenericController {
             //判断是需要店铺数据还是品牌数据
             List<Order> orderList = new ArrayList<>();
             if (StringUtils.isEmpty(thirdAppid)) {//说明需要的是品牌数据
+                //定位数据库
                 request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
                 orderList = orderService.selectBaseToThirdList(brandSetting.getBrandId(), beginDate, endDate);
             } else {

@@ -1,9 +1,9 @@
 package com.resto.shop.web.producer;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
+import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.shop.web.constant.OrderPosStatus;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
@@ -19,6 +19,7 @@ import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Order;
+import org.springframework.util.CollectionUtils;
 
 
 public class MQMessageProducer {
@@ -192,6 +193,13 @@ public class MQMessageProducer {
 		obj.put("amountWithChildren",order.getAmountWithChildren());
 		obj.put("printOrderTime",order.getPrintOrderTime());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
+		MemcachedUtils.put(order.getId()+"status", OrderPosStatus.SEND_MSG_SUCCESS);
+		List<String> orderList = (List<String>) MemcachedUtils.get(order.getShopDetailId()+"sendMsgList");
+		if(CollectionUtils.isEmpty(orderList)){
+			orderList = new ArrayList<>();
+		}
+		orderList.add(order.getId());
+		MemcachedUtils.put(order.getShopDetailId()+"sendMsgList",orderList);
 		sendMessageASync(message);
 	}
 
