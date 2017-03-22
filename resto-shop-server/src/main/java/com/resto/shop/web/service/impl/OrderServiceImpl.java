@@ -4613,8 +4613,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("satisfied2:").append("'").append(theTenDaySatisfaction).append("'").append(",")
                 //本月满意度
                 .append("satisfied3:").append("'").append(monthSatisfaction).append("'").append(",")
-                //外卖总额
-                .append("outFoodTotal:").append("'").append(monthOrderBooks).append("'").append(",")
+                //今日外卖金额
+                .append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
                 //总营业额
                 .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
                 //本月总额
