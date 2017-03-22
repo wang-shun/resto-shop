@@ -121,7 +121,7 @@ public class ApiController extends GenericController {
                 }
             }
             //把需要的信息封装起来
-            List<Map<String, Object>> ThirdData = new ArrayList<>();
+            List<Map<String, Object>> ThirdData = new ArrayList<>(1000);
             if (!orderList.isEmpty()) {
                 for (Order o : orderList) {
                     Map<String, Object> map = new HashMap<>();
