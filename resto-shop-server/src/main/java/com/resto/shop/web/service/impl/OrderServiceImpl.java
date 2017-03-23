@@ -758,7 +758,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
             }
-        } else if (order.getOrderMode() == ShopMode.BOSS_ORDER) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());

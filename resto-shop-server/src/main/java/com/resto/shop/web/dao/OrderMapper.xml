@@ -916,7 +916,7 @@
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
         or (order_mode = 5 and parent_order_id is null)
-        or (parent_order_id is not null and pay_mode in(2,3,4) and order_state = 1)
+        or (parent_order_id is not null and pay_mode in(1,2,3,4) and order_state = 1)
         ) and is_refund_order = 0
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
@@ -1242,6 +1242,7 @@
         select * from tb_order
         where parent_order_id=#{0}
         and order_state != 9
+        and (order_state != 1 and pay_mode in (1,2,3,4))
     </select>
 
     <select id="selectListByParentId" resultType="Order">
