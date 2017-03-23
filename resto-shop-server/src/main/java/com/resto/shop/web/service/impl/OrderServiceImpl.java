@@ -6210,6 +6210,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(order.getPayType() == PayType.NOPAY){
             confirmOrder(order);
         }
+        if(order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY)){
+            payOrderSuccess(order);
+        }
         updateChild(order);
     }
 
