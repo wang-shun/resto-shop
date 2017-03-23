@@ -892,8 +892,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectByParentId(String parentOrderId) {
-        return orderMapper.selectByParentId(parentOrderId);
+    public List<Order> selectByParentId(String parentOrderId, Integer parentOrderPayType) {
+        return orderMapper.selectByParentId(parentOrderId,parentOrderPayType);
     }
 
     @Override
@@ -4115,7 +4115,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
@@ -4147,7 +4147,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
@@ -4193,7 +4193,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             StringBuffer msg = new StringBuffer();
             BigDecimal sum = order.getOrderMoney();
-            List<Order> orders = selectByParentId(order.getId()); //得到子订单
+            List<Order> orders = selectByParentId(order.getId(),order.getPayType()); //得到子订单
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
@@ -4229,7 +4229,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(new BigDecimal(0));
             order.setAllowContinueOrder(false);
             update(order);
-            List<Order> orders = orderMapper.selectByParentId(order.getId());
+            List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
             for (Order child : orders) {
                 if (child.getOrderState() < OrderState.PAYMENT) {
                     child.setOrderState(OrderState.PAYMENT);
@@ -5129,7 +5129,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> getChildItem(String orderId) {
-        List<Order> childs = orderMapper.selectByParentId(orderId);
+        Order parent = orderMapper.selectByPrimaryKey(orderId);
+        List<Order> childs = orderMapper.selectByParentId(orderId, parent.getPayType());
         List<Order> result = new ArrayList<>();
         for (Order child : childs) {
             Order order = getOrderInfo(child.getId());
@@ -5273,7 +5274,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             msg.append(shopDetail.getServiceName() + "：" + parent.getServicePrice() + "\n");
         }
         BigDecimal sum = parent.getOrderMoney();
-        List<Order> orders = selectByParentId(parent.getId()); //得到子订单
+        List<Order> orders = selectByParentId(parent.getId(),parent.getPayType()); //得到子订单
         for (Order child : orders) { //遍历子订单
             sum = sum.add(child.getOrderMoney());
         }
@@ -5733,7 +5734,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     private void updateChild(Order order) {
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);

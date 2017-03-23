@@ -555,7 +555,7 @@ public class OrderAspect {
                 msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
             }
             BigDecimal sum = order.getOrderMoney();
-            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+            List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
