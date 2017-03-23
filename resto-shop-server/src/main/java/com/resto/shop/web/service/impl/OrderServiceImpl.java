@@ -2347,15 +2347,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "确认订单！");
-//            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", shopDetail.getName());
-            map.put("type", "posAction");
-            map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brand.getBrandName());
             orderMap.put("fileName", order.getId());
@@ -2395,11 +2386,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "确认订单！");
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单加菜时间已过期，不允许继续加菜！");
-//            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brand.getBrandName());
             orderMap.put("fileName", order.getId());
@@ -6209,6 +6195,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Customer customer = customerService.selectById(order.getCustomerId());
         orderMapper.confirmOrderPos(orderId);
         if(order.getPayType() == PayType.NOPAY){
@@ -6218,6 +6205,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payOrderSuccess(order);
         }
         updateChild(order);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
     }
 
     @Override
