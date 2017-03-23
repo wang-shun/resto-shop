@@ -1247,7 +1247,7 @@
 
     <select id="selectListByParentId" resultType="Order">
         select * from tb_order
-        where parent_order_id=#{orderId} and order_state not in (1,9)
+        where parent_order_id=#{orderId}
     </select>
 
     <select id="selectChildIdsByParentIdByFive" resultType="String">
