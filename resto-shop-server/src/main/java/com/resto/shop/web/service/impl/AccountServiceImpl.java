@@ -81,6 +81,12 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
     		throw new RuntimeException("金额为0，异常");
 		}
 
+		if(account.getRemain().doubleValue() < payMoney.doubleValue()){
+    		//如果账户余额比 要支付的金额小的话
+			throw new RuntimeException("金额异常，要支付的金额 比 实际金额大");
+		}
+
+
 //		if(account.getRemain().equals(BigDecimal.ZERO)||payMoney.equals(BigDecimal.ZERO)){
 //			return BigDecimal.ZERO;
 //		}
