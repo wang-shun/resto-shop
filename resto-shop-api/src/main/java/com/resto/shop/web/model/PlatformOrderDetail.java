@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import com.resto.brand.core.util.ApplicationUtils;
+
 import java.math.BigDecimal;
 
 public class PlatformOrderDetail {
@@ -61,5 +63,17 @@ public class PlatformOrderDetail {
 
     public void setShowName(String showName) {
         this.showName = showName == null ? null : showName.trim();
+    }
+
+    public PlatformOrderDetail() {
+    }
+
+    public PlatformOrderDetail(HungerOrderDetail detail) {
+        id = ApplicationUtils.randomUUID();
+        platformOrderId = detail.getOrderId();
+        name = detail.getName();
+        price = detail.getPrice();
+        quantity = detail.getQuantity();
+        showName = detail.getName() + detail.getSpecs();
     }
 }

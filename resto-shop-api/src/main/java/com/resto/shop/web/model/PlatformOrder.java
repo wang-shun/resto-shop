@@ -1,5 +1,8 @@
 package com.resto.shop.web.model;
 
+import com.resto.brand.core.enums.PlatformKey;
+import com.resto.brand.core.util.ApplicationUtils;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -142,5 +145,25 @@ public class PlatformOrder {
 
     public void setSourceText(String sourceText) {
         this.sourceText = sourceText == null ? null : sourceText.trim();
+    }
+
+    public PlatformOrder(){}
+
+    public PlatformOrder(HungerOrder order) {
+        id = ApplicationUtils.randomUUID();
+        type = PlatformKey.ELEME;
+        platformOrderId = order.getOrderId();
+        //todo 需要赋值
+        shopDetailId = order.getShopDetailId();
+        originalPrice = order.getOriginalPrice();
+        totalPrice = order.getTotalPrice();
+        address = order.getAddress();
+        phone = order.getPhoneList();
+        name = order.getConsignee();
+        orderCreateTime = order.getCreatedAt();
+        createTime = new Date();
+        payType = "已在线支付";
+        remark = order.getDescription();
+        sourceText = order.toString();
     }
 }

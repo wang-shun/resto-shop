@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.json.JSONObject;
 import org.springframework.util.StringUtils;
 
@@ -82,6 +83,16 @@ public class HungerOrder implements Serializable {
     private List<HungerOrderDetail> details;
 
     private String shopName;
+
+    private String shopDetailId;
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
 
     final public String getShopName() {
         return shopName;
@@ -330,5 +341,40 @@ public class HungerOrder implements Serializable {
         deliveryGeo = object.optString("delivery_geo");
         deliveryPoiAddress = object.optString("delivery_poi_address");
 
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("address", address)
+                .append("consignee", consignee)
+                .append("createdAt", createdAt)
+                .append("deliverFee", deliverFee)
+                .append("deliverTime", deliverTime)
+                .append("description", description)
+                .append("invoice", invoice)
+                .append("isBook", isBook)
+                .append("isOnlinePaid", isOnlinePaid)
+                .append("orderId", orderId)
+                .append("phoneList", phoneList)
+                .append("restaurantId", restaurantId)
+                .append("restaurantName", restaurantName)
+                .append("restaurantNumber", restaurantNumber)
+                .append("statusCode", statusCode)
+                .append("totalPrice", totalPrice)
+                .append("originalPrice", originalPrice)
+                .append("userId", userId)
+                .append("userName", userName)
+                .append("deliveryGeo", deliveryGeo)
+                .append("deliveryPoiAddress", deliveryPoiAddress)
+                .append("sum", sum)
+                .append("detailCount", detailCount)
+                .append("extra", extra)
+                .append("groups", groups)
+                .append("details", details)
+                .append("shopName", shopName)
+                .append("shopDetailId", shopDetailId)
+                .toString();
     }
 }

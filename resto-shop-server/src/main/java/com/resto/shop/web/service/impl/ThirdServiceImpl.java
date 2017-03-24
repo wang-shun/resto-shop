@@ -12,10 +12,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
-import com.resto.shop.web.dao.ArticleMapper;
-import com.resto.shop.web.dao.CustomerMapper;
-import com.resto.shop.web.dao.HungerOrderMapper;
-import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.dao.*;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -56,6 +53,15 @@ public class ThirdServiceImpl implements ThirdService {
     @Resource
     OrderPaymentItemService orderPaymentItemService;
 
+    @Resource
+    private PlatformOrderMapper platformorderMapper;
+
+    @Resource
+    private PlatformOrderDetailMapper platformorderdetailMapper;
+
+    @Resource
+    private PlatformOrderExtraMapper platformorderextraMapper;
+
     @Autowired
     private HungerOrderMapper hungerOrderMapper;
 
@@ -76,7 +82,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Autowired
     private KitchenService kitchenService;
-    
+
     @Autowired
     private CustomerMapper customerMapper;
 
@@ -90,16 +96,15 @@ public class ThirdServiceImpl implements ThirdService {
     private PlatformOrderExtraService platformOrderExtraService;
 
 
-
     @Override
     public List<Map<String, Object>> printOrderByPlatform(String platformId, Integer type) {
         List<Map<String, Object>> result = null;
         switch (type) {
             case PlatformKey.ELEME:
-                result = printElemeOrder(platformId);
+                result = printPlatformOrder(platformId, type);
                 break;
             case PlatformKey.MEITUAN:
-                result = printPlatformOrder(platformId,type);
+                result = printPlatformOrder(platformId, type);
                 break;
             default:
                 break;
@@ -108,11 +113,11 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     /**
-     *  打印第三方外卖订单（饿了么，美团，百度）
+     * 打印第三方外卖订单（饿了么，美团，百度）
      */
-    private List<Map<String, Object>> printPlatformOrder(String platformOrderId,int type){
+    private List<Map<String, Object>> printPlatformOrder(String platformOrderId, int type) {
         List<Map<String, Object>> printTask = new ArrayList<>();
-        PlatformOrder order = platformOrderService.selectByPlatformOrderId(platformOrderId,type);
+        PlatformOrder order = platformOrderService.selectByPlatformOrderId(platformOrderId, type);
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
 
@@ -120,8 +125,8 @@ public class ThirdServiceImpl implements ThirdService {
 
         List<Printer> ticketPrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.RECEPTION);
 
-        for (Printer printer : ticketPrinter){
-            Map<String, Object> ticket = printPlatformOrderTicket(order,orderDetailList,orderExtraList,shopDetail,printer);
+        for (Printer printer : ticketPrinter) {
+            Map<String, Object> ticket = printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, printer);
             if (ticket != null) {
                 printTask.add(ticket);
             }
@@ -135,7 +140,7 @@ public class ThirdServiceImpl implements ThirdService {
         return printTask;
     }
 
-    private Map<String, Object>  printPlatformOrderTicket(PlatformOrder order,List<PlatformOrderDetail> orderDetailList,List<PlatformOrderExtra> orderExtraList,ShopDetail shopDetail,Printer printer){
+    private Map<String, Object> printPlatformOrderTicket(PlatformOrder order, List<PlatformOrderDetail> orderDetailList, List<PlatformOrderExtra> orderExtraList, ShopDetail shopDetail, Printer printer) {
         if (printer == null) {
             return null;
         }
@@ -150,7 +155,7 @@ public class ThirdServiceImpl implements ThirdService {
             items.add(item);
         }
 
-        for(PlatformOrderExtra orderExtra : orderExtraList){
+        for (PlatformOrderExtra orderExtra : orderExtraList) {
             Map<String, Object> item = new HashMap<>();
             item.put("ARTICLE_NAME", orderExtra.getName());
             item.put("ARTICLE_COUNT", orderExtra.getQuantity());
@@ -170,7 +175,7 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
-        data.put("ORDER_NUMBER",nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
+        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");
@@ -179,7 +184,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", "");
-        data.put("CUSTOMER_COUNT",0);
+        data.put("CUSTOMER_COUNT", 0);
         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -190,18 +195,18 @@ public class ThirdServiceImpl implements ThirdService {
         payment.put("PAYMENT_MODE", "222");
         payment.put("SUBTOTAL", 0);
         paymentList.add(payment);
-        data.put("PAYMENT_ITEMS",paymentList);
-        data.put("CUSTOMER_SATISFACTION_DEGREE",0);
-        data.put("CUSTOMER_SATISFACTION","");
-        data.put("CUSTOMER_PROPERTY","");
-        data.put("ALREADY_PAYED",order.getPayType());
+        data.put("PAYMENT_ITEMS", paymentList);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        data.put("ALREADY_PAYED", order.getPayType());
         data.put("DELIVERY_SOURCE", PlatformKey.getPlatformName(order.getType()));
-        data.put("DELIVERY_ADDRESS",order.getAddress() +"\n\n【备注】："+order.getRemark());
+        data.put("DELIVERY_ADDRESS", order.getAddress() + "\n\n【备注】：" + order.getRemark());
 
-        String phone = order.getPhone().replace("\"", "").replace("[","").replace("]","");
+        String phone = order.getPhone().replace("\"", "").replace("[", "").replace("]", "");
 
         data.put("CONTACT_NAME", order.getName());
-        data.put("CONTACT_TEL",phone);
+        data.put("CONTACT_TEL", phone);
 //
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -211,20 +216,20 @@ public class ThirdServiceImpl implements ThirdService {
         JSONObject json = new JSONObject(print);
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
-        log.info("订单:"+order.getPlatformOrderId()+"返回打印总单模版"+json.toString());
+        log.info("订单:" + order.getPlatformOrderId() + "返回打印总单模版" + json.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
-        MemcachedUtils.put(print_id,print);
-        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-        if(printList == null){
+        MemcachedUtils.put(print_id, print);
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
         return print;
     }
 
@@ -267,7 +272,7 @@ public class ThirdServiceImpl implements ThirdService {
                 continue;
             }
             //生成厨房小票
-            if(printer.getTicketType() == TicketType.PRINT_TICKET){
+            if (printer.getTicketType() == TicketType.PRINT_TICKET) {
                 for (PlatformOrderDetail article : kitchenArticleMap.get(kitchenId)) {
                     Map<String, Object> print = new HashMap<String, Object>();
                     print.put("PORT", printer.getPort());
@@ -291,17 +296,17 @@ public class ThirdServiceImpl implements ThirdService {
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketType.KITCHEN);
                     printTask.add(print);
-                    MemcachedUtils.put(print_id,print);
-                    List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-                    if(printList == null){
+                    MemcachedUtils.put(print_id, print);
+                    List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                    if (printList == null) {
                         printList = new ArrayList<>();
                     }
                     printList.add(print_id);
-                    MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+                    MemcachedUtils.put(shopDetail.getId() + "printList", printList);
                 }
-            }else{
+            } else {
                 for (PlatformOrderDetail article : kitchenArticleMap.get(kitchenId)) {
-                    for(int i = 0;i < article.getQuantity();i++){
+                    for (int i = 0; i < article.getQuantity(); i++) {
                         Map<String, Object> print = new HashMap<String, Object>();
                         print.put("TABLE_NO", "");
                         print.put("KITCHEN_NAME", printer.getName());
@@ -314,7 +319,7 @@ public class ThirdServiceImpl implements ThirdService {
                         Map<String, Object> data = new HashMap<String, Object>();
                         data.put("ORDER_ID", order.getPlatformOrderId());
                         data.put("ARTICLE_NAME", article.getName());
-                        data.put("ARTICLE_NUMBER", i+"/"+article.getQuantity());
+                        data.put("ARTICLE_NUMBER", i + "/" + article.getQuantity());
                         data.put("DISTRIBUTION_MODE", PlatformKey.getPlatformName(order.getType()));
                         data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
                         data.put("CUSTOMER_ADDRESS", order.getAddress());
@@ -324,18 +329,18 @@ public class ThirdServiceImpl implements ThirdService {
                         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
                         data.put("RESTAURANT_NAME", shopDetail.getName());
                         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
-                        data.put("ARTICLE_COUNT",1);
-                        print.put("DATA",data);
+                        data.put("ARTICLE_COUNT", 1);
+                        print.put("DATA", data);
                         print.put("STATUS", 0);
                         print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
                         printTask.add(print);
-                        MemcachedUtils.put(print_id,print);
-                        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-                        if(printList == null){
+                        MemcachedUtils.put(print_id, print);
+                        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                        if (printList == null) {
                             printList = new ArrayList<>();
                         }
                         printList.add(print_id);
-                        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+                        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
                     }
 
                 }
@@ -347,7 +352,7 @@ public class ThirdServiceImpl implements ThirdService {
         JSONArray json = new JSONArray(printTask);
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
-        log.info("订单:"+order.getPlatformOrderId()+"返回打印厨打模版"+json.toString());
+        log.info("订单:" + order.getPlatformOrderId() + "返回打印厨打模版" + json.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
@@ -365,7 +370,7 @@ public class ThirdServiceImpl implements ThirdService {
         ShopDetail shopDetail = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId());
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-                , "订单:"+orderId+"接收到饿了么订单！");
+                , "订单:" + orderId + "接收到饿了么订单！");
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
             Map<String, Object> ticket = printTicket(hungerOrder, details, shopDetail, printer);
@@ -423,7 +428,7 @@ public class ThirdServiceImpl implements ThirdService {
                 continue;
             }
             //生成厨房小票
-            if(printer.getTicketType() == TicketType.PRINT_TICKET){
+            if (printer.getTicketType() == TicketType.PRINT_TICKET) {
                 for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
                     Map<String, Object> print = new HashMap<String, Object>();
                     print.put("PORT", printer.getPort());
@@ -447,17 +452,17 @@ public class ThirdServiceImpl implements ThirdService {
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketType.KITCHEN);
                     printTask.add(print);
-                    MemcachedUtils.put(print_id,print);
-                    List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-                    if(printList == null){
+                    MemcachedUtils.put(print_id, print);
+                    List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                    if (printList == null) {
                         printList = new ArrayList<>();
                     }
                     printList.add(print_id);
-                    MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+                    MemcachedUtils.put(shopDetail.getId() + "printList", printList);
                 }
-            }else{
+            } else {
                 for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
-                    for(int i = 0;i < article.getQuantity();i++){
+                    for (int i = 0; i < article.getQuantity(); i++) {
                         Map<String, Object> print = new HashMap<String, Object>();
                         print.put("TABLE_NO", "");
                         print.put("KITCHEN_NAME", printer.getName());
@@ -470,7 +475,7 @@ public class ThirdServiceImpl implements ThirdService {
                         Map<String, Object> data = new HashMap<String, Object>();
                         data.put("ORDER_ID", order.getOrderId());
                         data.put("ARTICLE_NAME", article.getName());
-                        data.put("ARTICLE_NUMBER", i+"/"+article.getQuantity());
+                        data.put("ARTICLE_NUMBER", i + "/" + article.getQuantity());
                         data.put("DISTRIBUTION_MODE", "饿了吗外卖");
                         data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
                         data.put("CUSTOMER_ADDRESS", order.getAddress());
@@ -480,18 +485,18 @@ public class ThirdServiceImpl implements ThirdService {
                         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
                         data.put("RESTAURANT_NAME", shopDetail.getName());
                         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
-                        data.put("ARTICLE_COUNT",1);
-                        print.put("DATA",data);
+                        data.put("ARTICLE_COUNT", 1);
+                        print.put("DATA", data);
                         print.put("STATUS", 0);
                         print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
                         printTask.add(print);
-                        MemcachedUtils.put(print_id,print);
-                        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-                        if(printList == null){
+                        MemcachedUtils.put(print_id, print);
+                        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                        if (printList == null) {
                             printList = new ArrayList<>();
                         }
                         printList.add(print_id);
-                        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+                        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
                     }
 
                 }
@@ -503,7 +508,7 @@ public class ThirdServiceImpl implements ThirdService {
         JSONArray json = new JSONArray(printTask);
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
-        log.info("订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+        log.info("订单:" + order.getOrderId() + "返回打印厨打模版" + json.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
@@ -536,7 +541,7 @@ public class ThirdServiceImpl implements ThirdService {
         }
 
         List<HungerOrderExtra> extras = hungerOrderMapper.getExtra(order.getOrderId().toString());
-        for(HungerOrderExtra extra : extras){
+        for (HungerOrderExtra extra : extras) {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", extra.getPrice().doubleValue() * extra.getQuantity());
             item.put("ARTICLE_NAME", extra.getName());
@@ -556,7 +561,7 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getOrderId());
-        data.put("ORDER_NUMBER",nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+        data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");
@@ -565,7 +570,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("REDUCTION_AMOUNT", order.getOriginalPrice().subtract(order.getTotalPrice()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
         data.put("TABLE_NUMBER", "");
-        data.put("CUSTOMER_COUNT",0);
+        data.put("CUSTOMER_COUNT", 0);
         data.put("PAYMENT_AMOUNT", order.getTotalPrice());
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -576,20 +581,20 @@ public class ThirdServiceImpl implements ThirdService {
         payment.put("PAYMENT_MODE", "222");
         payment.put("SUBTOTAL", 0);
         paymentList.add(payment);
-        data.put("PAYMENT_ITEMS",paymentList);
-        data.put("CUSTOMER_SATISFACTION_DEGREE",0);
-        data.put("CUSTOMER_SATISFACTION","");
-        data.put("CUSTOMER_PROPERTY","");
-        data.put("ALREADY_PAYED","已在线支付");
-        data.put("DELIVERY_SOURCE","饿了吗");
-        data.put("DELIVERY_ADDRESS",order.getAddress());
+        data.put("PAYMENT_ITEMS", paymentList);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        data.put("ALREADY_PAYED", "已在线支付");
+        data.put("DELIVERY_SOURCE", "饿了吗");
+        data.put("DELIVERY_ADDRESS", order.getAddress());
 
         String phone = order.getPhoneList().replace("\"", "");
-        phone = phone.replace("[","");
-        phone = phone.replace("]","");
+        phone = phone.replace("[", "");
+        phone = phone.replace("]", "");
 
         data.put("CONTACT_NAME", order.getConsignee());
-        data.put("CONTACT_TEL",phone);
+        data.put("CONTACT_TEL", phone);
 //
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -599,20 +604,20 @@ public class ThirdServiceImpl implements ThirdService {
         JSONObject json = new JSONObject(print);
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
 //                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
-        log.info("订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+        log.info("订单:" + order.getOrderId() + "返回打印总单模版" + json.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
-        MemcachedUtils.put(print_id,print);
-        List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
-        if(printList == null){
+        MemcachedUtils.put(print_id, print);
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId()+"printList",printList);
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
         return print;
     }
 
@@ -736,6 +741,10 @@ public class ThirdServiceImpl implements ThirdService {
             if (json.optString("code").equals(CodeType.SUCCESS)) {
                 JSONObject order = json.getJSONObject("data");
                 HungerOrder hungerOrder = new HungerOrder(order);
+                String shopId = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId()).getId();
+                hungerOrder.setShopDetailId(shopId);
+                PlatformOrder platformOrder = new PlatformOrder(hungerOrder);
+                platformorderMapper.insertSelective(platformOrder);
                 hungerOrderMapper.insertHungerOrder(hungerOrder);
 
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -754,7 +763,10 @@ public class ThirdServiceImpl implements ThirdService {
                     if (array != null) {
                         for (int i = 0; i < array.length(); i++) {
                             HungerOrderExtra extra = new HungerOrderExtra(array.getJSONObject(i), order.optString("order_id"));
+                            PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(extra);
+                            platformorderextraMapper.insertSelective(platformOrderExtra);
                             hungerOrderMapper.insertHungerExtra(extra);
+
                         }
                     }
 
@@ -769,7 +781,8 @@ public class ThirdServiceImpl implements ThirdService {
                                 for (int k = 0; k < details.length(); k++) {
                                     JSONObject orderDetailJson = details.getJSONObject(k);
                                     HungerOrderDetail orderDetail = new HungerOrderDetail(orderDetailJson, orderGroup.getId(), order.optString("order_id"));
-                                    String shopId = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId()).getId();
+                                    PlatformOrderDetail platformOrderDetail = new PlatformOrderDetail(orderDetail);
+                                    platformorderdetailMapper.insertSelective(platformOrderDetail);
                                     hungerOrderMapper.insertHungerOrderDetail(orderDetail);
                                     updateStock(orderDetail.getName(), shopId, orderDetail.getQuantity(), StockType.STOCK_MINUS);
                                     JSONArray garnish = orderDetailJson.optJSONArray("garnish");
@@ -794,7 +807,7 @@ public class ThirdServiceImpl implements ThirdService {
                 addHungermap.put("brandName", brand.getBrandName());
                 addHungermap.put("fileName", shopDetail.getName());
                 addHungermap.put("type", "posAction");
-                addHungermap.put("content", "店铺:"+shopDetail.getName()+"接收到新增的饿了么订单:"+hungerOrder.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                addHungermap.put("content", "店铺:" + shopDetail.getName() + "接收到新增的饿了么订单:" + hungerOrder.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPost(url, addHungermap);
             }
 

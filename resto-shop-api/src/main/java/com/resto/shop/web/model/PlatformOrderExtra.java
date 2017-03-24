@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import com.resto.brand.core.util.ApplicationUtils;
+
 import java.math.BigDecimal;
 
 public class PlatformOrderExtra {
@@ -51,5 +53,16 @@ public class PlatformOrderExtra {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public PlatformOrderExtra() {
+    }
+
+    public PlatformOrderExtra(HungerOrderExtra extra) {
+        id = ApplicationUtils.randomUUID();
+        platformOrderId = extra.getOrderId();
+        name = extra.getName();
+        price = extra.getPrice();
+        quantity = extra.getQuantity();
     }
 }
