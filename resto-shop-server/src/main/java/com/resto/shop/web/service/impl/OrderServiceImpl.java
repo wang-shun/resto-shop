@@ -4633,6 +4633,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (String tel : telephones) {
                     try {
                         SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+                        Thread thread = Thread.currentThread();
+                        thread.sleep(3000);//暂停1.5秒后程序继续执行
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
