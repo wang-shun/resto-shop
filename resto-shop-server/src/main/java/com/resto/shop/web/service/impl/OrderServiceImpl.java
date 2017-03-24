@@ -429,7 +429,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //判断折扣是否匹配，如果不匹配则不允许买单
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
-                    org_price = item.getPrice();
+                    if(a.getFansPrice() != null){
+                        org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
+                    }else{
+                        org_price = item.getPrice();
+                    }
                     price = item.getPrice();
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
@@ -758,7 +762,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                 update(parent);
             }
-        } else if (order.getOrderMode() == ShopMode.BOSS_ORDER) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
             if (order.getParentOrderId() != null) {  //子订单
                 Order parent = selectById(order.getParentOrderId());
                 int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
@@ -888,8 +892,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Order> selectByParentId(String parentOrderId) {
-        return orderMapper.selectByParentId(parentOrderId);
+    public List<Order> selectByParentId(String parentOrderId, Integer parentOrderPayType) {
+        return orderMapper.selectByParentId(parentOrderId,parentOrderPayType);
     }
 
     @Override
@@ -2054,21 +2058,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<Map<String, Object>> items = new ArrayList<>();
         List<Map<String, Object>> refundItems = new ArrayList<>();
+        List<String> articleIds = new ArrayList<>();
         for (OrderItem article : orderItems) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
-            item.put("ARTICLE_NAME", article.getArticleName());
-            item.put("ARTICLE_COUNT", article.getOrginCount());
-            items.add(item);
-            if (article.getRefundCount() != 0) {
-                Map<String, Object> refundItem = new HashMap<>();
-                refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
-                if (article.getArticleName().contains("加")) {
-                    article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+            if(!article.getType().equals(OrderItemType.MEALS_CHILDREN)){
+                articleIds.add(article.getArticleId());
+            }
+        }
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("articleIds", articleIds);
+        List<Map<String, Object>> articleSort = articleService.selectArticleSort(selectMap);
+        for (Map sort : articleSort){
+            for (OrderItem article : orderItems) {
+                if (article.getType().equals(OrderItemType.SETMEALS)){
+                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
+                        getOrderItems(article, items, refundItems);
+                        getOrderItemMeal(orderItems,items,refundItems,article.getId());
+                        break;
+                    }
+                }else {
+                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
+                        getOrderItems(article, items, refundItems);
+                        break;
+                    }
                 }
-                refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
-                refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
-                refundItems.add(refundItem);
             }
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -2099,7 +2111,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else if (order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2) {
             if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 Map<String, Object> item = new HashMap<>();
-
                 List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
                 BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
                 BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
@@ -2191,16 +2202,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
-//        if (order.getOrderState() == OrderState.SUBMIT) {
-//            data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
-//        } else {
-//            if (order.getPayType() == PayType.PAY) {
-//                data.put("RESTAURANT_NAME", shopDetail.getName());
-//            } else {
-//                data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-//            }
-//
-//        }
         if(order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)){
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         }else if(order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT){
@@ -2297,8 +2298,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.RECEIPT);
 
         JSONObject json = new JSONObject(print);
-//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-//                , "订单:"+order.getId()+"返回打印总单模版"+json.toString());
         Map logMap = new HashMap(4);
         logMap.put("brandName", brand.getBrandName());
         logMap.put("fileName", shopDetail.getName());
@@ -2315,6 +2314,45 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return print;
     }
 
+    public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems){
+        Map<String, Object> item = new HashMap<>();
+        item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
+        item.put("ARTICLE_NAME", article.getArticleName());
+        item.put("ARTICLE_COUNT", article.getOrginCount());
+        items.add(item);
+        if (article.getRefundCount() != 0) {
+            Map<String, Object> refundItem = new HashMap<>();
+            refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
+            if (article.getArticleName().contains("加")) {
+                article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+            }
+            refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
+            refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+            refundItems.add(refundItem);
+        }
+    }
+
+    public void getOrderItemMeal(List<OrderItem> orderItems, List<Map<String, Object>> items, List<Map<String, Object>> refundItems, String articleId){
+        for (OrderItem article : orderItems) {
+            if (article.getParentId().equals(articleId)) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
+                item.put("ARTICLE_NAME", article.getArticleName());
+                item.put("ARTICLE_COUNT", article.getOrginCount());
+                items.add(item);
+                if (article.getRefundCount() != 0) {
+                    Map<String, Object> refundItem = new HashMap<>();
+                    refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
+                    if (article.getArticleName().contains("加")) {
+                        article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+                    }
+                    refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
+                    refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+                    refundItems.add(refundItem);
+                }
+            }
+        }
+    }
 
     @Override
     public Order confirmOrder(Order order) {
@@ -2343,15 +2381,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "确认订单！");
-//            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", shopDetail.getName());
-            map.put("type", "posAction");
-            map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brand.getBrandName());
             orderMap.put("fileName", order.getId());
@@ -2391,11 +2420,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "确认订单！");
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单加菜时间已过期，不允许继续加菜！");
-//            log.info("订单已确认:" + order.getId() + "评论:" + order.getAllowAppraise());
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brand.getBrandName());
             orderMap.put("fileName", order.getId());
@@ -4111,7 +4135,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
@@ -4143,7 +4167,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
         }
 
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
@@ -4189,7 +4213,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             StringBuffer msg = new StringBuffer();
             BigDecimal sum = order.getOrderMoney();
-            List<Order> orders = selectByParentId(order.getId()); //得到子订单
+            List<Order> orders = selectByParentId(order.getId(),order.getPayType()); //得到子订单
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
@@ -4225,7 +4249,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(new BigDecimal(0));
             order.setAllowContinueOrder(false);
             update(order);
-            List<Order> orders = orderMapper.selectByParentId(order.getId());
+            List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
             for (Order child : orders) {
                 if (child.getOrderState() < OrderState.PAYMENT) {
                     child.setOrderState(OrderState.PAYMENT);
@@ -5127,7 +5151,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Order> getChildItem(String orderId) {
-        List<Order> childs = orderMapper.selectByParentId(orderId);
+        Order parent = orderMapper.selectByPrimaryKey(orderId);
+        List<Order> childs = orderMapper.selectByParentId(orderId, parent.getPayType());
         List<Order> result = new ArrayList<>();
         for (Order child : childs) {
             Order order = getOrderInfo(child.getId());
@@ -5271,7 +5296,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             msg.append(shopDetail.getServiceName() + "：" + parent.getServicePrice() + "\n");
         }
         BigDecimal sum = parent.getOrderMoney();
-        List<Order> orders = selectByParentId(parent.getId()); //得到子订单
+        List<Order> orders = selectByParentId(parent.getId(),parent.getPayType()); //得到子订单
         for (Order child : orders) { //遍历子订单
             sum = sum.add(child.getOrderMoney());
         }
@@ -5670,7 +5695,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
-                        order.setPaymentAmount(price);
+                        order.setPaymentAmount(pay);
                         order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
                         order.setAllowContinueOrder(false);
@@ -5686,7 +5711,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
-                        order.setPaymentAmount(price);
+                        order.setPaymentAmount(pay);
                         order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
                         order.setAllowContinueOrder(false);
@@ -5731,7 +5756,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     private void updateChild(Order order) {
-        List<Order> orders = orderMapper.selectByParentId(order.getId());
+        List<Order> orders = orderMapper.selectByParentId(order.getId(),order.getPayType());
         for (Order child : orders) {
             if (child.getOrderState() < OrderState.PAYMENT) {
                 child.setOrderState(OrderState.PAYMENT);
@@ -6207,12 +6232,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Customer customer = customerService.selectById(order.getCustomerId());
         orderMapper.confirmOrderPos(orderId);
         if(order.getPayType() == PayType.NOPAY){
             confirmOrder(order);
         }
+        if(order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY)){
+            payOrderSuccess(order);
+        }
         updateChild(order);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map);
     }
 
     @Override

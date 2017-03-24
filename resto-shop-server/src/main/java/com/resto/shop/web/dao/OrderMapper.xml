@@ -916,7 +916,7 @@
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
         or (order_mode = 5 and parent_order_id is null)
-        or (parent_order_id is not null and pay_mode in(2,3,4) and order_state = 1)
+        or (parent_order_id is not null and pay_mode in(1,2,3,4) and order_state = 1)
         ) and is_refund_order = 0
         <if test="orderState != null and orderState != '' ">
             and ORDER_STATE in
@@ -1008,7 +1008,7 @@
         amount_with_children,
         ifnull(count_with_child,article_count) as
         totalCount,
-        (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
+        (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id and t2.order_state not in (1,9) ) as childCount
         FROM
         tb_order
         WHERE
@@ -1240,8 +1240,11 @@
     </select>
     <select id="selectByParentId" resultType="Order">
         select * from tb_order
-        where parent_order_id=#{0}
+        where parent_order_id=#{parentOrderId}
         and order_state != 9
+        <if test="parentOrderPayType == 0">
+            and order_state != 1
+        </if>
     </select>
 
     <select id="selectListByParentId" resultType="Order">

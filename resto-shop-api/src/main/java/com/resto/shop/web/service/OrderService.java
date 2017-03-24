@@ -139,7 +139,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public void updateAllowContinue(String id, boolean b);
 
-	List<Order> selectByParentId(String parentOrderId);
+	List<Order> selectByParentId(String parentOrderId,Integer parentOrderPayType);
 
 	public Order findCustomerNewPackage(String currentCustomerId, String currentShopId);
 	

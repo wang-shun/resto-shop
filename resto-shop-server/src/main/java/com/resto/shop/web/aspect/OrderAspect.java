@@ -335,7 +335,9 @@ public class OrderAspect {
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
+        if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
+            orderService.confirmOrder(order);
+        }
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
@@ -555,7 +557,7 @@ public class OrderAspect {
                 msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
             }
             BigDecimal sum = order.getOrderMoney();
-            List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
+            List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
             for (Order child : orders) { //遍历子订单
                 sum = sum.add(child.getOrderMoney());
             }
