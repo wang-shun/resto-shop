@@ -77,9 +77,13 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 
 	@Override
 	public BigDecimal useAccount(BigDecimal payMoney, Account account,Integer source,String shopDetailId) {
-		if(account.getRemain().equals(BigDecimal.ZERO)||payMoney.equals(BigDecimal.ZERO)){
-			return BigDecimal.ZERO;
+    	if(account.getRemain().doubleValue() <= 0 || payMoney.doubleValue() <= 0){
+    		throw new RuntimeException("金额为0，异常");
 		}
+
+//		if(account.getRemain().equals(BigDecimal.ZERO)||payMoney.equals(BigDecimal.ZERO)){
+//			return BigDecimal.ZERO;
+//		}
 		//如果 需要支付的金额大于余额，则扣除所有余额
 		BigDecimal useAccountValue = BigDecimal.ZERO;
 		if(payMoney.compareTo(account.getRemain())>=0){
