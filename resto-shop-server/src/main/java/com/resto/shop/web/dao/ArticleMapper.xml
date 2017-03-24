@@ -927,7 +927,7 @@ GROUP BY article_id
     </select>
 
     <select id="selectArticleSort" parameterType="java.util.Map" resultType="java.util.Map">
-        select ta.id articleId, tap.id articleUnitId, taf.id articleFamilyId, ta.sort, taf.peference
+        select ta.id articleId, IFNULL(tap.id,'') articleUnitId, taf.id articleFamilyId, ta.sort, taf.peference
         from tb_article ta
         left join tb_article_price tap
         on tap.article_id = ta.id

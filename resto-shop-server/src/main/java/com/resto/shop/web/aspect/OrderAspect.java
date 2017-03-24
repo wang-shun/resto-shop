@@ -335,7 +335,9 @@ public class OrderAspect {
                 && order.getOrderMode() == ShopMode.CALL_NUMBER){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
+        if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
+            orderService.confirmOrder(order);
+        }
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
