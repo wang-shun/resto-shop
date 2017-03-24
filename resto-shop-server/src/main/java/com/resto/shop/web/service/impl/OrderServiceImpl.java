@@ -1355,9 +1355,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
             }
             payOrderSuccess(order);
-            if(order.getPayType() == PayType.NOPAY){
-                confirmOrder(order);
-            }
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }
