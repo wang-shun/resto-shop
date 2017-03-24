@@ -57,4 +57,18 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     public List<OrderPaymentItem> selectPaymentCountByOrderId(String orderId);
     
     public OrderPaymentItem selectPayMentSumByrefundOrder(String orderId);
+
+    /**
+     * 查询订单使用闪惠支付的时候订单项信息
+     * @param orderId
+     * @return
+     */
+    OrderPaymentItem selectByShanhuiPayOrder(String orderId);
+
+    /**
+     * 修改订单使用闪惠支付的时候订单项信息
+     * @param orderId
+     * @param param
+     */
+    void updateByShanhuiPayOrder(String orderId, String param);
 }

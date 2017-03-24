@@ -663,6 +663,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, CustomerCrashPayMap);
             order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.SHANHUI_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("闪惠支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单使用银联支付了：" + item.getPayValue());
+            order.setAllowContinueOrder(false);
         }
 
         if (payMoney.doubleValue() < 0) {
@@ -1241,6 +1253,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.CRASH_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.SHANHUI_PAY:
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
             }

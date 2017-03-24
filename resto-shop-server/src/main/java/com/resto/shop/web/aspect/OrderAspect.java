@@ -94,8 +94,8 @@ public class OrderAspect {
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
-//            现金银联支付应该在pos上确认订单已收款后在进行出单
-            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+//            现金银联闪惠支付应该在pos上确认订单已收款后在进行出单
+            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
                 MQMessageProducer.sendPlaceOrderNoPayMessage(order);
             }
 
@@ -430,7 +430,7 @@ public class OrderAspect {
 
 				if (order.getEmployeeId() == null) {
                     if(order.getPrintOrderTime() == null){
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
                         }else{
                             MQMessageProducer.sendPlaceOrderMessage(order);
@@ -438,7 +438,7 @@ public class OrderAspect {
                     }
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY){
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
                         }else{
                             MQMessageProducer.sendPlaceOrderMessage(order);
