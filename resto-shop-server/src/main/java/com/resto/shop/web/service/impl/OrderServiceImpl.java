@@ -1355,7 +1355,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
             }
             payOrderSuccess(order);
-            if(order.getPayType() == PayType.NOPAY){
+            if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER){
                 confirmOrder(order);
             }
         } else {
