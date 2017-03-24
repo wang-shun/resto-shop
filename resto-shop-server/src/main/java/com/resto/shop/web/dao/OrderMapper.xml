@@ -1243,7 +1243,7 @@
         where parent_order_id=#{parentOrderId}
         and order_state != 9
         <if test="parentOrderPayType == 0">
-            and (order_state != 1 and pay_mode in (1,2,3,4))
+            and (order_state != 1 and pay_mode in (0,1,2,3,4))
         </if>
     </select>
 
