@@ -126,4 +126,6 @@ public interface ArticleService extends GenericService<Article, String> {
      * @return
      */
     Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
+
+    List<Map<String, Object>> selectArticleSort(Map<String, Object> selectMap);
 }

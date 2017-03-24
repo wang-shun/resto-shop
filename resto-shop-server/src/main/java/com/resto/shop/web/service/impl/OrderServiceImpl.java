@@ -2058,21 +2058,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<Map<String, Object>> items = new ArrayList<>();
         List<Map<String, Object>> refundItems = new ArrayList<>();
+        String[] articleIds = new String[orderItems.size()];
+        int index = 0;
         for (OrderItem article : orderItems) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
-            item.put("ARTICLE_NAME", article.getArticleName());
-            item.put("ARTICLE_COUNT", article.getOrginCount());
-            items.add(item);
-            if (article.getRefundCount() != 0) {
-                Map<String, Object> refundItem = new HashMap<>();
-                refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
-                if (article.getArticleName().contains("加")) {
-                    article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+            articleIds[index] = article.getArticleId();
+            index++;
+        }
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("articleIds", articleIds);
+        List<Map<String, Object>> articleSort = articleService.selectArticleSort(selectMap);
+        for (Map sort : articleSort){
+            for (OrderItem article : orderItems) {
+                if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
+                    item.put("ARTICLE_NAME", article.getArticleName());
+                    item.put("ARTICLE_COUNT", article.getOrginCount());
+                    items.add(item);
+                    if (article.getRefundCount() != 0) {
+                        Map<String, Object> refundItem = new HashMap<>();
+                        refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
+                        if (article.getArticleName().contains("加")) {
+                            article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+                        }
+                        refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
+                        refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
+                        refundItems.add(refundItem);
+                    }
+                    break;
                 }
-                refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
-                refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
-                refundItems.add(refundItem);
             }
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());

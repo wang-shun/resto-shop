@@ -925,4 +925,22 @@ GROUP BY article_id
             and ta.shop_detail_id = #{shopDetailId}
         </if>
     </select>
+
+    <select id="selectArticleSort" parameterType="java.util.Map" resultType="java.util.Map">
+        select ta.id articleId, tap.id articleUnitId, taf.id articleFamilyId, ta.sort, taf.peference
+        from tb_article ta
+        left join tb_article_price tap
+        on tap.article_id = ta.id
+        inner join tb_article_family taf
+        on ta.article_family_id = taf.id
+        where ta.id in
+        <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        or tap.id in
+        <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        ORDER BY taf.peference asc, ta.sort asc
+    </select>
 </mapper>
