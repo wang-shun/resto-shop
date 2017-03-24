@@ -5676,7 +5676,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         order.setPaymentAmount(pay);
                         break;
                     case OrderPayMode.YL_PAY:
-                        order.setPaymentAmount(price);
+                        order.setPaymentAmount(pay);
                         order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
                         order.setAllowContinueOrder(false);
@@ -5692,7 +5692,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
-                        order.setPaymentAmount(price);
+                        order.setPaymentAmount(pay);
                         order.setOrderState(OrderState.SUBMIT);
                         order.setPrintTimes(1);
                         order.setAllowContinueOrder(false);
