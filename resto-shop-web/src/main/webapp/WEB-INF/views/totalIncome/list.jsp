@@ -142,6 +142,10 @@
                 data : "moneyPay"
             },
             {
+                title : "积分支付(元)",
+                data : "integralPayment"
+            },
+            {
                 title : "退菜返还红包(元)",
                 data:"articleBackPay"
             },
@@ -204,6 +208,10 @@
             {
                 title : "现金支付(元)",
                 data : "moneyPay"
+            },
+            {
+                title : "积分支付(元)",
+                data : "integralPayment"
             },
             {
                 title : "退菜返还红包(元)",

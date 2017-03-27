@@ -245,6 +245,10 @@
                             data : "backCartPay"
                         },
                         {
+                            title : "积分支付",
+                            data : "integralPay"
+                        },
+                        {
                             title : "退菜返还红包",
                             data : "articleBackPay"
                         },
