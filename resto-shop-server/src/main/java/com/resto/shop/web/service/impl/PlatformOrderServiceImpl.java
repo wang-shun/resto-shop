@@ -45,7 +45,7 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
         PlatformOrder platformOrder = meituanConvertToPlatformOrder(orderDto);;
         platformorderMapper.insertSelective(platformOrder);
         platformOrderDetailService.meituanOrderDetail(orderDto.getOrderId(),orderDto.getDetail());
-        platformOrderExtraService.meituanOrderExtra(orderDto.getOrderId(),orderDto.getExtras());
+        platformOrderExtraService.meituanOrderExtra(orderDto);
     }
 
     public PlatformOrder meituanConvertToPlatformOrder(MeiTuanOrderDto orderDto){

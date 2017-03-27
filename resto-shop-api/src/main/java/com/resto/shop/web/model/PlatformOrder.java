@@ -153,7 +153,6 @@ public class PlatformOrder {
         id = ApplicationUtils.randomUUID();
         type = PlatformKey.ELEME;
         platformOrderId = order.getOrderId();
-        //todo 需要赋值
         shopDetailId = order.getShopDetailId();
         originalPrice = order.getOriginalPrice();
         totalPrice = order.getTotalPrice();
