@@ -2061,24 +2061,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<String> articleIds = new ArrayList<>();
         for (OrderItem article : orderItems) {
             if(!article.getType().equals(OrderItemType.MEALS_CHILDREN)){
-                articleIds.add(article.getArticleId());
+                if (article.getArticleId().contains("@")) {
+                    articleIds.add(article.getArticleId().substring(0,article.getArticleId().indexOf("@")));
+                }else{
+                    articleIds.add(article.getArticleId());
+                }
             }
         }
         Map<String, Object> selectMap = new HashMap<>();
         selectMap.put("articleIds", articleIds);
-        List<Map<String, Object>> articleSort = articleService.selectArticleSort(selectMap);
-        for (Map sort : articleSort){
+        List<String> articleSort = articleService.selectArticleSort(selectMap);
+        for (String articleId : articleSort){
             for (OrderItem article : orderItems) {
-                if (article.getType().equals(OrderItemType.SETMEALS)){
-                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
-                        getOrderItems(article, items, refundItems);
-                        getOrderItemMeal(orderItems,items,refundItems,article.getId());
-                        break;
-                    }
+                if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())){
+                    getOrderItems(article, items, refundItems);
+                    getOrderItemMeal(orderItems,items,refundItems,article.getId());
                 }else {
-                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
-                        getOrderItems(article, items, refundItems);
-                        break;
+                    if (article.getArticleId().contains("@")) {
+                        if (articleId.equalsIgnoreCase(article.getArticleId().substring(0, article.getArticleId().indexOf("@")))) {
+                            getOrderItems(article, items, refundItems);
+                        }
+                    }else{
+                        if (articleId.equalsIgnoreCase(article.getArticleId())) {
+                            getOrderItems(article, items, refundItems);
+                        }
                     }
                 }
             }

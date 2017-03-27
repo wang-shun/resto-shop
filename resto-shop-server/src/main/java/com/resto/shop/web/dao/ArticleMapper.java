@@ -125,5 +125,5 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
     Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 
-    List<Map<String, Object>> selectArticleSort(Map<String, Object> selectMap);
+    List<String> selectArticleSort(Map<String, Object> selectMap);
 }
