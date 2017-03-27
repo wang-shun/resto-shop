@@ -851,19 +851,23 @@ public class ThirdServiceImpl implements ThirdService {
 
 
     public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
-        // 根据id查询订单
-        HungerOrder order = hungerOrderMapper.selectById(orderId);
-        //查询店铺
-        ShopDetail shopDetail = shopDetailService.selectByRestaurantId(order.getRestaurantId());
-        List<HungerOrderDetail> orderDetails = hungerOrderMapper.selectDetailsById(order.getOrderId());
+
+
+        PlatformOrder order = platformOrderService.selectById(orderId);
+        List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
+        List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
+
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+
+
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
-                return printTicket(order, orderDetails, shopDetail, printer.get(0));
+                return printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, printer.get(0));
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            return printTicket(order, orderDetails, shopDetail, p);
+            return printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, p);
         }
         return null;
     }
@@ -871,11 +875,16 @@ public class ThirdServiceImpl implements ThirdService {
 
     @Override
     public List<Map<String, Object>> printKitchenReceipt(String oid) {
-        HungerOrder order = hungerOrderMapper.selectById(oid);
-        List<HungerOrderDetail> details = hungerOrderMapper.selectDetailsById(order.getOrderId());
-        ShopDetail shopDetail = shopDetailService.selectByRestaurantId(order.getRestaurantId());
         List<Map<String, Object>> printTask = new ArrayList<>();
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, details, shopDetail);
+        PlatformOrder order = platformOrderService.selectById(oid);
+        List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
+
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+
+
+
+
+        List<Map<String, Object>> kitchenTicket = printPlatformOrderKitchen(order, orderDetailList, shopDetail);
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }

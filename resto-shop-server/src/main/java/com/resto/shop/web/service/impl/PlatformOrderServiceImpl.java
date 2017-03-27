@@ -36,13 +36,13 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
     }
 
     @Override
-    public PlatformOrder selectByPlatformOrderId(String platformOrderId,int type) {
+    public PlatformOrder selectByPlatformOrderId(String platformOrderId,Integer type) {
         return platformorderMapper.selectByPlatformOrderId(platformOrderId,type);
     }
 
     @Override
     public void meituanNewOrder(MeiTuanOrderDto orderDto) {
-        PlatformOrder platformOrder = meituanConvertToPlatformOrder(orderDto);;
+        PlatformOrder platformOrder = meituanConvertToPlatformOrder(orderDto);
         platformorderMapper.insertSelective(platformOrder);
         platformOrderDetailService.meituanOrderDetail(orderDto.getOrderId(),orderDto.getDetail());
         platformOrderExtraService.meituanOrderExtra(orderDto);

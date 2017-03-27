@@ -84,6 +84,12 @@
   <select id="selectList" resultType="PlatformOrder">select * from tb_platform_order</select>
 
   <select id="selectByPlatformOrderId" resultType="PlatformOrder">
-    select * from tb_platform_order where platform_order_id = #{platformOrderId} and type = #{type}
+    select * from tb_platform_order where platform_order_id = #{platformOrderId}
+    <if test="type != null">
+      and type = #{type}
+    </if>
+
   </select>
+
+
 </mapper>

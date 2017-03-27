@@ -10,7 +10,9 @@ public interface PlatformOrderService extends GenericService<PlatformOrder, Stri
      * @param platformOrderId
      * @return
      */
-    PlatformOrder selectByPlatformOrderId(String platformOrderId,int type);
+    PlatformOrder selectByPlatformOrderId(String platformOrderId,Integer type);
+
+
 
     /**
      * 美团外卖新订单

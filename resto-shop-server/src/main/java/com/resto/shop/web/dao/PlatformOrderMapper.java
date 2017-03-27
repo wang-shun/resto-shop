@@ -19,5 +19,5 @@ public interface PlatformOrderMapper  extends GenericDao<PlatformOrder,String> {
 
     int updateByPrimaryKey(PlatformOrder record);
 
-    PlatformOrder selectByPlatformOrderId(@Param("platformOrderId") String platformOrderId, @Param("type") int type);
+    PlatformOrder selectByPlatformOrderId(@Param("platformOrderId") String platformOrderId, @Param("type") Integer type);
 }

@@ -74,6 +74,11 @@ public class PlatformOrderDetail {
         name = detail.getName();
         price = detail.getPrice();
         quantity = detail.getQuantity();
-        showName = detail.getName() + detail.getSpecs();
+        if(detail.getSpecs().contains(",")){
+            showName = detail.getName() + detail.getSpecs();
+        }else{
+            showName = detail.getName();
+        }
+
     }
 }
