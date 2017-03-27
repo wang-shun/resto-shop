@@ -941,6 +941,7 @@ GROUP BY article_id
         <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
             #{articleId}
         </foreach>
+        GROUP BY ta.id
         ORDER BY taf.peference asc, ta.sort asc
     </select>
 </mapper>
