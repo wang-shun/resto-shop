@@ -26,9 +26,11 @@
         <result column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
         <result column="delivery_geo" property="deliveryGeo"/>
+        <result column="type" property="type"/>
         <result column="article_sum" property="sum"/>
         <result column="delivery_poi_address" property="deliveryPoiAddress"/>
         <result column="detail_count" property="detailCount"/>
+        <result column="shop_detail_id" property="shopDetailId"/>
         <collection property="details" javaType="List" ofType="HungerOrderDetail">
             <id column="detail_id" property="id"/>
             <result column="detail_name" property="name"/>
@@ -59,19 +61,19 @@
     </insert>
 
 
-    <insert id="insertHungerGroup" parameterType="HungerOrderGroup" useGeneratedKeys="true" keyProperty="id"  >
+    <insert id="insertHungerGroup" parameterType="HungerOrderGroup" useGeneratedKeys="true" keyProperty="id">
         insert into tb_hunger_order_group
         (order_id)
         values (#{orderId})
     </insert>
 
-    <insert id="insertHungerOrderDetail"   useGeneratedKeys="true" keyProperty="id" parameterType="HungerOrderDetail">
+    <insert id="insertHungerOrderDetail" useGeneratedKeys="true" keyProperty="id" parameterType="HungerOrderDetail">
         insert into tb_hunger_order_detail
         (order_id,group_id,category_id,name,price,article_id,quantity,tp_food_id,specs)
         values (#{orderId},#{groupId},#{categoryId},#{name},#{price},#{articleId},#{quantity},#{tpFoodId},#{specs})
     </insert>
 
-    <insert id="insertHungerOrderGarnish"  useGeneratedKeys="true" keyProperty="id" parameterType="HungerOrderGarnish">
+    <insert id="insertHungerOrderGarnish" useGeneratedKeys="true" keyProperty="id" parameterType="HungerOrderGarnish">
         insert into tb_hunger_order_garnish
         (parent_id,order_id,group_id,category_id,name,price,article_id,quantity,tp_food_id)
         values (
@@ -79,7 +81,7 @@
         )
     </insert>
 
-    <update id="updateHungerOrder" >
+    <update id="updateHungerOrder">
         update tb_hunger_order
         set status_code = #{state}
         where order_id = #{orderId}
@@ -94,22 +96,27 @@
     </select>
 
     <select id="selectById" resultMap="BaseResultMap">
-        select t.*,SUBSTR(t.phone_list,3,CHARACTER_LENGTH(t.phone_list)-4) phoneList,t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,
-         t2.specs as detail_specs ,sum(t2.quantity) as article_sum  from tb_hunger_order t
-          left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
-
-
+      select t.address,t.`name` as consignee,t.create_time as created_at,t.remark as description,
+t.platform_order_id as order_id,t.phone as phone_list,t.shop_detail_id
+         ,t2.show_name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity
+          ,
+           (select sum(tb_platform_order_detail.quantity) as article_sum from tb_platform_order_detail where tb_platform_order_detail.platform_order_id = t.platform_order_id)
+           as article_sum
+          from tb_platform_order t
+          left join tb_platform_order_detail t2 on t.platform_order_id = t2.platform_order_id
          where t.id = #{id}
     </select>
 
     <select id="getOutFoodList" resultMap="BaseResultMap">
-        select t.*,SUBSTR(t.phone_list,3,CHARACTER_LENGTH(t.phone_list)-4) phoneList,
-        t2.id as detail_id,t2.name as detail_name,t2.price as detail_price,t2.quantity as detail_quantity,COUNT(t2.order_id) detail_count,
-         t2.specs as detail_specs ,sum(t2.quantity) as article_sum from tb_hunger_order t
-        left join tb_hunger_order_detail t2 on t.order_id = t2.order_id
-        where t.restaurant_id = #{restaurantId}
-        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.created_at,'%d %b %y')
-        group by t.id
+select t.id,t.type
+,t.address,t.`name` as consignee,t.create_time as created_at,t.remark as description,
+t.platform_order_id as order_id,t.phone as phone_list,sum(t2.quantity) as article_sum,
+t.total_price
+from tb_platform_order t
+left join tb_platform_order_detail t2 on t.platform_order_id = t2.platform_order_id
+where t.shop_detail_id = #{shopId}
+and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+GROUP BY t.id
     </select>
 
     <select id="getExtra" resultType="HungerOrderExtra">

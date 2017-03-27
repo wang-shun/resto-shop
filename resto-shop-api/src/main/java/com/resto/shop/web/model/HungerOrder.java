@@ -18,7 +18,7 @@ import java.util.List;
 public class HungerOrder implements Serializable {
 
     //主键
-    private Long id;
+    private String id;
     //送货地址
     private String address;
     //送货人姓名
@@ -66,6 +66,8 @@ public class HungerOrder implements Serializable {
     private Integer sum;
 
     private Integer detailCount;
+
+    private Integer type;
     
     public Integer getDetailCount() {
 		return detailCount;
@@ -85,6 +87,14 @@ public class HungerOrder implements Serializable {
     private String shopName;
 
     private String shopDetailId;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
     public String getShopDetailId() {
         return shopDetailId;
@@ -134,11 +144,11 @@ public class HungerOrder implements Serializable {
         this.extra = extra;
     }
 
-    final public Long getId() {
+    public String getId() {
         return id;
     }
 
-    final public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

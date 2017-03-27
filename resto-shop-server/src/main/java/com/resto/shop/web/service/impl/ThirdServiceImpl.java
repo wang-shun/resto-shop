@@ -833,17 +833,19 @@ public class ThirdServiceImpl implements ThirdService {
     @Override
     public List<HungerOrder> getOutFoodList(String shopId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        List<HungerOrder> hungerOrders = hungerOrderMapper.getOutFoodList(shopDetail.getRestaurantId());
+        List<HungerOrder> hungerOrders = hungerOrderMapper.getOutFoodList(shopDetail.getId());
         return hungerOrders;
     }
 
 
     @Override
     public HungerOrder getOutFoodInfo(String id) {
+//        PlatformOrder order = platformorderMapper.selectOrderInfo(id);
         HungerOrder order = hungerOrderMapper.selectById(id);
-        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
-        order.setDetails(orderDetail);
-        order.setShopName(shopDetailService.selectByRestaurantId(order.getRestaurantId()).getName());
+
+//        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
+//        order.setDetails(orderDetail);
+        order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
         return order;
     }
 

@@ -27,7 +27,7 @@ public interface HungerOrderMapper {
 
     HungerOrder selectByOrderId(String orderId);
 
-    List<HungerOrder> getOutFoodList(@Param("restaurantId") String restaurantId);
+    List<HungerOrder> getOutFoodList( String shopId);
 
     HungerOrder selectById(String id);
 
