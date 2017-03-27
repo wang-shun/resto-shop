@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.MeiTuanOrderDto;
 import com.resto.shop.web.model.PlatformOrderExtra;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface PlatformOrderExtraService extends GenericService<PlatformOrderE
      */
     List<PlatformOrderExtra> selectByPlatformOrderId(String platformOrderId);
 
-    void meituanOrderExtra(String orderId,String orderExtra);
+    void meituanOrderExtra(MeiTuanOrderDto orderDto);
 }
