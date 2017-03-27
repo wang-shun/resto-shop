@@ -15,6 +15,5 @@ public interface PlatformOrderExtraService extends GenericService<PlatformOrderE
      */
     List<PlatformOrderExtra> selectByPlatformOrderId(String platformOrderId);
 
-    void meituanOrderExtra(String orderId,String orderExtra);
     void meituanOrderExtra(MeiTuanOrderDto orderDto);
 }

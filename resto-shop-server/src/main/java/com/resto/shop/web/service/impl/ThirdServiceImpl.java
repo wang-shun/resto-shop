@@ -159,7 +159,7 @@ public class ThirdServiceImpl implements ThirdService {
             Map<String, Object> item = new HashMap<>();
             item.put("ARTICLE_NAME", orderExtra.getName());
             item.put("ARTICLE_COUNT", orderExtra.getQuantity());
-            item.put("SUBTOTAL", orderExtra.getPrice().doubleValue() * orderExtra.getQuantity());
+            item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
             items.add(item);
         }
 
