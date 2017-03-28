@@ -1416,7 +1416,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
 
                 } else {
-                    if (order.getDistributionModeId() != 3) {
+                    if (order.getDistributionModeId() == DistributionType.RESTAURANT_MODE_ID) {
                         order.setAllowContinueOrder(true);
                     }
                 }
