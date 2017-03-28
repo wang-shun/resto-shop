@@ -184,6 +184,8 @@
             <result column="orderPaymentId" property="id"/>
             <result column="pay_value" property="payValue"/>
             <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="result_data" property="resultData"/>
+            <result column="pay_time" property="payTime"/>
         </collection>
         <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
             <result column="orderItemId" property="id"/>
@@ -191,6 +193,9 @@
             <result column="article_id" property="articleId"/>
             <result column="count" property="count"/>
             <result column="original_price" property="originalPrice"/>
+            <result column="unit_price" property="unitPrice"/>
+            <result column="original_count" property="originalCount"/>
+            <result column="refund_count" property="refundCount"/>
             <result column="type" property="type"/>
         </collection>
     </resultMap>
@@ -2825,6 +2830,7 @@ GROUP BY oi.article_name
         o.id,
         o.order_mode,
         o.pay_type,
+        o.print_order_time,
         o.customer_id,
         o.order_money,
         o.create_time,
@@ -2861,6 +2867,7 @@ GROUP BY oi.article_name
 	o.id,
 	o.order_state,
 	o.create_time,
+	o.print_order_time,
 	o.push_order_time,
 	o.shop_detail_id,
 	o.table_number,
@@ -2871,6 +2878,9 @@ GROUP BY oi.article_name
 	oi.article_id,
 	oi.article_name,
 	oi.count,
+	oi.unit_price,
+	oi.refund_count,
+	oi.orgin_count,
 	opi.id orderPaymentId,
 	opi.pay_value,
 	opi.payment_mode_id
@@ -2899,6 +2909,9 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 	oi.original_price,
     oi.id orderItemId,
 	oi.type,
+	oi.unit_price,
+	oi.refund_count,
+	oi.orgin_count,
 	oi.article_id,
 	oi.article_name,
 	oi.count,
@@ -2916,5 +2929,57 @@ AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 ]]> AND  o.shop_detail_id =#{shopId}
     </select>
+
+    <select id="selectBaseToKCList" resultMap="BaseResultMap">
+        SELECT
+        o.id,
+        o.shop_detail_id,
+        o.order_state,
+        o.create_time,
+        o.parent_order_id,
+        oi.id order_payment_id,
+        oi.pay_time,
+        oi.payment_mode_id,
+        oi.pay_value,
+        oi.result_data
+        FROM
+        tb_order o
+        RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2, 9, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND oi.payment_mode_id = 1
+        AND <![CDATA[
+         oi.pay_time>#{beginDate} AND  oi.pay_time<#{endDate}
+       ]]>
+        AND  o.brand_id=#{brandId}
+    </select>
+
+    <select id="selectBaseToKCListByShopId" resultMap="BaseResultMap">
+               SELECT
+        o.id,
+        o.amount_with_children,
+        o.order_money,
+        o.shop_detail_id,
+        o.order_state,
+        o.create_time,
+        o.parent_order_id,
+        oi.id order_payment_id,
+        oi.pay_time,
+        oi.payment_mode_id,
+        oi.pay_value,
+        oi.result_data
+        FROM
+        tb_order o
+        RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2, 9, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND oi.payment_mode_id = 1
+        AND <![CDATA[
+         oi.pay_time>#{beginDate} AND  oi.pay_time<#{endDate}
+       ]]> AND o.shop_detail_id =#{shopId}
+    </select>
+
 
 </mapper>

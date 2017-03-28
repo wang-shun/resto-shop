@@ -660,4 +660,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectBaseToThirdList(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("brandId") String brandId);
 
     List<Order> selectBaseToThirdListByShopId(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("shopId") String shopId);
+
+    /**
+     * kc对接的订单
+     * @param brandId
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<Order> selectBaseToKCList(@Param("brandId") String brandId,@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+    List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
 }

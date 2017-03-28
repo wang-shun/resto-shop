@@ -612,7 +612,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	List<Order> selectByOrderSatesAndNoPay(String shopId);
 
     /**
-     * 查询第三方接口需要的订单数据
+     * 查询第三方接口嫩绿茶需要的订单数据
      * @param beginDate
      * @param endDate
      * @param brandId
@@ -621,4 +621,15 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<Order> selectBaseToThirdList(String brandId,String beginDate, String endDate);
 
     List<Order> selectBaseToThirdListByShopId(String shopId,String beginDate,String endDate);
+
+    /**
+     *
+     * @param brandId
+     * @param beginDate
+     * @param endDate kc需要的数据
+     * @return
+     */
+    List<Order> selectBaseToKCList(String brandId, String beginDate, String endDate);
+
+    List<Order> selectBaseToKCListByShopId(String shopId,String beginDate,String endDate);
 }

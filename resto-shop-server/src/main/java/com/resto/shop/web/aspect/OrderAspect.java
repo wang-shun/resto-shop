@@ -350,46 +350,41 @@ public class OrderAspect {
     public void pushOrder() {
     }
 
-    ;
+
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.callNumber(..))")
     public void callNumber() {
     }
 
-    ;
+
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
     public void printSuccess() {
     }
 
-    ;
+
 
 
     @Pointcut("execution(* com.resto.shop.web.service.AccountService.houFuPayOrder(..))")
     public void houFuPayOrder() {
     }
 
-    ;
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderModeFive(..))")
     public void payOrderModeFive() {
     }
 
-    ;
+
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderWXModeFive(..))")
     public void payOrderWXModeFive() {
     }
 
-    ;
-
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payPrice(..))")
     public void payPrice() {
     }
-
-    ;
 
 
 
@@ -445,6 +440,7 @@ public class OrderAspect {
                         }
 					}
 				}
+
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
 //                if ((order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER) && order.getEmployeeId() == null) {  //坐下点餐在立即下单的时候，发送支付成功消息通知

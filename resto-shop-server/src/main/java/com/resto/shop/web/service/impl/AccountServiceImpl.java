@@ -30,6 +30,7 @@ import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.shop.web.util.LogTemplateUtils;
 
 import static com.resto.brand.core.util.HttpClient.doPost;
 import static com.resto.brand.core.util.LogUtils.url;
@@ -186,18 +187,22 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			orderPaymentItemService.insert(item);
 //			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //					"订单使用余额(红包)支付了：" + item.getPayValue());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", order.getId());
-            map.put("type", "orderAction");
-            map.put("content", "订单:" + order.getId() + "订单使用余额(红包)支付了:"+item.getPayValue()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
-            Map customerMap = new HashMap(4);
-            customerMap.put("brandName", brand.getBrandName());
-            customerMap.put("fileName", order.getCustomerId());
-            customerMap.put("type", "UserAction");
-            customerMap.put("content", "用户:"+customer.getNickname()+"使用余额(红包)支付了:"+item.getPayValue()+"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, customerMap);
+//            Map map = new HashMap(4);
+//            map.put("brandName", brand.getBrandName());
+//            map.put("fileName", order.getId());
+//            map.put("type", "orderAction");
+//            map.put("content", "订单:" + order.getId() + "订单使用余额(红包)支付了:"+item.getPayValue()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, map);
+            LogTemplateUtils.getAccountByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+
+//            Map customerMap = new HashMap(4);
+//            customerMap.put("brandName", brand.getBrandName());
+//            customerMap.put("fileName", order.getCustomerId());
+//            customerMap.put("type", "UserAction");
+//            customerMap.put("content", "用户:"+customer.getNickname()+"使用余额(红包)支付了:"+item.getPayValue()+"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, customerMap);
+            LogTemplateUtils.getAccountByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+
 		}
 		return realPay;
 	}

@@ -37,6 +37,8 @@ public class MQMessageProducer {
 		JSONObject obj = new JSONObject();
 		obj.put("orderId", orderId);
 		obj.put("brandId", brandId);
+		//是否是自动取消
+        obj.put("auto",true);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER, obj.toJSONString().getBytes());				
 		message.setStartDeliverTime(System.currentTimeMillis()+delay);
 		sendMessageASync(message);
