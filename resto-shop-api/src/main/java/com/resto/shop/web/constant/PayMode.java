@@ -18,6 +18,7 @@ public class PayMode {
     public static final int SHARE_RED_PAY = 14; //分享返利红包支付
     public static final int REFUND_ARTICLE_RED_PAY = 15; //退菜红包支付
     public static final int SHANHUI_PAY = 16; //闪惠支付
+    public static final int INTEGRAL_PAY = 17; //会员积分支付
 
     public static String getPayModeName(int state){
 	    switch (state) {
@@ -53,6 +54,8 @@ public class PayMode {
                 return "退菜红包支付";
             case SHANHUI_PAY:
                 return "闪惠支付";
+            case INTEGRAL_PAY:
+                return "积分支付";
             default:
                 return "";
             }

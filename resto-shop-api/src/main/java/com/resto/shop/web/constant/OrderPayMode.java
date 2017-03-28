@@ -17,6 +17,8 @@ public class OrderPayMode {
 
     public static final int SHH_PAY = 5;
 
+    public static final int JF_PAY = 6;
+
     public static String getPayModeName(int state){
         switch (state) {
             case WX_PAY:
@@ -29,6 +31,8 @@ public class OrderPayMode {
                 return "现金支付";
             case SHH_PAY:
                 return "闪惠支付";
+            case JF_PAY:
+                return "积分支付";
             default:
                 return "余额支付";
         }

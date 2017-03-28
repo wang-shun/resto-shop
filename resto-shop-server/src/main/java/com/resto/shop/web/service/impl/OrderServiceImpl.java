@@ -675,6 +675,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "订单使用银联支付了：" + item.getPayValue());
             order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.JF_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.INTEGRAL_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("积分支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            Map crashPayMap = new HashMap(4);
+            crashPayMap.put("brandName", brand.getBrandName());
+            crashPayMap.put("fileName", order.getId());
+            crashPayMap.put("type", "orderAction");
+            crashPayMap.put("content", "订单:"+order.getId()+"订单使用积分支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, crashPayMap);
+            Map CustomerCrashPayMap = new HashMap(4);
+            CustomerCrashPayMap.put("brandName", brand.getBrandName());
+            CustomerCrashPayMap.put("fileName", customer.getId());
+            CustomerCrashPayMap.put("type", "UserAction");
+            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用积分支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, CustomerCrashPayMap);
+            order.setAllowContinueOrder(false);
         }
 
         if (payMoney.doubleValue() < 0) {
@@ -1068,8 +1090,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单已取消！");
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单已取消！");
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             int refundTotal = 0;
@@ -1191,6 +1213,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.SHANHUI_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.INTEGRAL_PAY:
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
             }
@@ -5662,8 +5688,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("银联支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
-                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                                "订单使用银联支付了：" + item.getPayValue());
+//                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                                "订单使用银联支付了：" + item.getPayValue());
 //                        updateChild(order);
                         break;
                     case OrderPayMode.XJ_PAY:
@@ -5678,10 +5704,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPayValue(pay);
                         item.setRemark("现金支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
-                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                                "订单使用现金支付了：" + item.getPayValue());
+//                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                                "订单使用现金支付了：" + item.getPayValue());
 //                        updateChild(order);
                         break;
+                    case OrderPayMode.JF_PAY:
+                        order.setPaymentAmount(pay);
+                        order.setOrderState(OrderState.SUBMIT);
+                        order.setPrintTimes(1);
+                        order.setAllowContinueOrder(false);
+                        item.setId(ApplicationUtils.randomUUID());
+                        item.setOrderId(orderId);
+                        item.setPaymentModeId(PayMode.INTEGRAL_PAY);
+                        item.setPayTime(new Date());
+                        item.setPayValue(pay);
+                        item.setRemark("积分支付:" + item.getPayValue());
+                        orderPaymentItemService.insert(item);
                     default:
                         break;
 

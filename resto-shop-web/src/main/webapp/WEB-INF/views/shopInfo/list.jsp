@@ -307,6 +307,19 @@
 							<input type="text" class="form-control" name="dazhongShopId" v-model="m.dazhongShopId" required="required">
 						</div>
 					</div>
+
+                    <div class="form-group" v-show="b.integralPay == 1">
+                        <label class="col-md-4 control-label">开启积分支付：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="integralPay"v-model="m.integralPay" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="integralPay" v-model="m.integralPay" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+
 					<div class="form-group">
 						<label class="col-md-4 control-label">pos加菜是否开启粉丝价：</label>
 						<div  class="col-md-6 radio-list">

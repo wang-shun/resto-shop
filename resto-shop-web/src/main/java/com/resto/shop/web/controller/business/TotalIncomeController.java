@@ -81,7 +81,7 @@ public class TotalIncomeController extends GenericController {
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
         //给每个店铺赋初始值
         for (ShopDetail s : shopDetailList) {
-            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId());
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO);
             shopIncomeDtos.add(sin);
         }
         Map<String, Object> selectMap = new HashMap<String, Object>();
@@ -132,6 +132,10 @@ public class TotalIncomeController extends GenericController {
         payModeMap.put("payMode", PayMode.MONEY_PAY);
         payModeMap.put("payName", "otherPayment");
         selectList.add(payModeMap);
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode", PayMode.INTEGRAL_PAY);
+        payModeMap.put("payName", "integralPayment");
+        selectList.add(payModeMap);
         selectMap.put("payModeList", selectList);
         List<Map<String, Object>> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(selectMap);
         //得到店铺营业信息
@@ -151,6 +155,8 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setMoneyPay(new BigDecimal(shopIncomeMap.get("crashPayment").toString()));
                     shopIncomeDto.setArticleBackPay(new BigDecimal(shopIncomeMap.get("articleBackPay").toString()).abs());
                     shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
+                    shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
+                    shopIncomeDto.setIntegralPayment(new BigDecimal(shopIncomeMap.get("integralPayment").toString()));
                 }
             }
         }
@@ -169,6 +175,7 @@ public class TotalIncomeController extends GenericController {
         BigDecimal articleBackPay = BigDecimal.ZERO;
         BigDecimal bankCartPayment = BigDecimal.ZERO;
         BigDecimal crashPayment = BigDecimal.ZERO;
+        BigDecimal integralPayment = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
                 originalAmount = originalAmount.add(sdto.getOriginalAmount());
@@ -184,6 +191,7 @@ public class TotalIncomeController extends GenericController {
                 bankCartPayment = bankCartPayment.add(sdto.getBackCartPay());
                 crashPayment = crashPayment.add(sdto.getMoneyPay());
                 articleBackPay = articleBackPay.add(sdto.getArticleBackPay());
+                integralPayment = integralPayment.add(sdto.getIntegralPayment());
             }
         }
         List<ShopIncomeDto> brandIncomeDtos = new ArrayList<ShopIncomeDto>();
@@ -202,6 +210,7 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setBackCartPay(bankCartPayment);
         brandIncomeDto.setMoneyPay(crashPayment);
         brandIncomeDto.setArticleBackPay(articleBackPay);
+        brandIncomeDto.setIntegralPayment(integralPayment);
         brandIncomeDtos.add(brandIncomeDto);
         Map<String, Object> map = new HashMap<>();
         map.put("shopIncome", shopIncomeDtos);
@@ -245,14 +254,14 @@ public class TotalIncomeController extends GenericController {
         map.put("beginDate", beginDate);
         map.put("reportType", "品牌营业额报表");// 表的头，第一行内容
         map.put("endDate", endDate);
-        map.put("num", "13");// 显示的位置
+        map.put("num", "14");// 显示的位置
         map.put("reportTitle", "品牌收入条目");// 表的名字
         map.put("timeType", "yyyy-MM-dd");
 
         String[][] headers = {{"品牌/店铺", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
-                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
+                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"积分支付(元)", "23"}, {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
         String[] columns = {"shopName", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
-                "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "articleBackPay", "otherPayment"};
+                "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "integralPayment" ,"articleBackPay", "otherPayment"};
 
         List<ShopIncomeDto> result = new ArrayList<>();
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
