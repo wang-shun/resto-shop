@@ -435,7 +435,7 @@ public class OrderAspect {
 
 				if (order.getEmployeeId() == null) {
                     if(order.getPrintOrderTime() == null){
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
                         }else{
                             MQMessageProducer.sendPlaceOrderMessage(order);
@@ -443,7 +443,7 @@ public class OrderAspect {
                     }
 				} else {
 					if (order.getOrderState().equals(OrderState.PAYMENT)) {
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
+                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
                         }else{
                             MQMessageProducer.sendPlaceOrderMessage(order);
