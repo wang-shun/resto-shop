@@ -2275,7 +2275,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     public void getOrderItemMeal(List<OrderItem> orderItems, List<Map<String, Object>> items, List<Map<String, Object>> refundItems, String articleId){
         for (OrderItem article : orderItems) {
-            if (article.getParentId().equals(articleId)) {
+            if (article.getParentId() != null && article.getParentId().equals(articleId)) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
                 item.put("ARTICLE_NAME", article.getArticleName());
