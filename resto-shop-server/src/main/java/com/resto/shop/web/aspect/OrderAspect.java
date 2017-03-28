@@ -336,7 +336,8 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
         if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
-            orderService.confirmOrder(order);
+            MQMessageProducer.sendAutoConfirmOrder(order, 20 * 1000);
+//            orderService.confirmOrder(order);
         }
 
 
