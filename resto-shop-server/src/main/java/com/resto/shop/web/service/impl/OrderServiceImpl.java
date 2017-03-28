@@ -3373,9 +3373,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         ShopDetail shop = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shop.getBrandId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
         for (Printer printer : ticketPrinter) {
-            Map<String, Object> ticket = printTotal(shop, printer, beginDate, endDate);
+            Map<String, Object> ticket = printTotal(brandSetting,shop, printer, beginDate, endDate);
             if (ticket != null) {
                 printTask.add(ticket);
             }
@@ -3603,7 +3604,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    public Map<String, Object> printTotal(ShopDetail shopDetail, Printer printer, String beginDate, String endDate) {
+    public Map<String, Object> printTotal(BrandSetting setting ,ShopDetail shopDetail, Printer printer, String beginDate, String endDate) {
         if (printer == null) {
             return null;
         }
@@ -3653,69 +3654,105 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_AVERAGE", df.format(customerAverage));
         selectMap.put("type", PayMode.WEIXIN_PAY);
         BigDecimal wxPay = orderMapper.getPayment(selectMap);
+        wxPay = wxPay == null ? BigDecimal.ZERO : wxPay;
         selectMap.put("type", PayMode.CHARGE_PAY);
         BigDecimal chargePay = orderMapper.getPayment(selectMap);
+        chargePay = chargePay == null ? BigDecimal.ZERO : chargePay;
         selectMap.put("type", PayMode.ALI_PAY);
         BigDecimal aliPay = orderMapper.getPayment(selectMap);
+        aliPay = aliPay == null ? BigDecimal.ZERO : aliPay;
         selectMap.put("type", PayMode.BANK_CART_PAY);
         BigDecimal bankPay = orderMapper.getPayment(selectMap);
+        bankPay = bankPay == null ? BigDecimal.ZERO : bankPay;
         selectMap.put("type", PayMode.CRASH_PAY);
         BigDecimal crashPay = orderMapper.getPayment(selectMap);
-        BigDecimal incomeAmount = wxPay.add(chargePay).add(aliPay).add(bankPay).add(crashPay);
-        data.put("INCOME_AMOUNT", incomeAmount == null ? 0 : incomeAmount);
+        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay;
+        selectMap.put("type", PayMode.SHANHUI_PAY);
+        BigDecimal shanhuiPay = orderMapper.getPayment(selectMap);
+        shanhuiPay = shanhuiPay == null ? BigDecimal.ZERO : shanhuiPay;
+        selectMap.put("type", PayMode.INTEGRAL_PAY);
+        BigDecimal integralPay = orderMapper.getPayment(selectMap);
+        integralPay = integralPay == null ? BigDecimal.ZERO : integralPay;
         List<Map<String, Object>> incomeItems = new ArrayList<>();
         Map<String, Object> wxItem = new HashMap<>();
-        wxItem.put("SUBTOTAL", wxPay == null ? 0 : wxPay);
+        wxItem.put("SUBTOTAL", wxPay);
         wxItem.put("PAYMENT_MODE", "微信支付");
-        Map<String, Object> chargeItem = new HashMap<>();
-        chargeItem.put("SUBTOTAL", chargePay == null ? 0 : chargePay);
-        chargeItem.put("PAYMENT_MODE", "充值金额支付");
-        Map<String, Object> aliPayment = new HashMap<>();
-        aliPayment.put("SUBTOTAL", aliPay == null ? 0 : aliPay);
-        aliPayment.put("PAYMENT_MODE", "支付宝支付");
-        Map<String, Object> bankPayment = new HashMap<>();
-        bankPayment.put("SUBTOTAL", bankPay == null ? 0 : bankPay);
-        bankPayment.put("PAYMENT_MODE", "银联支付");
-        Map<String, Object> crashPayment = new HashMap<>();
-        crashPayment.put("SUBTOTAL", crashPay == null ? 0 : crashPay);
-        crashPayment.put("PAYMENT_MODE", "现金支付");
         incomeItems.add(wxItem);
-        incomeItems.add(aliPayment);
-        incomeItems.add(bankPayment);
-        incomeItems.add(crashPayment);
+        Map<String, Object> chargeItem = new HashMap<>();
+        chargeItem.put("SUBTOTAL", chargePay);
+        chargeItem.put("PAYMENT_MODE", "充值金额支付");
         incomeItems.add(chargeItem);
+        Map<String, Object> aliPayment = new HashMap<>();
+        aliPayment.put("SUBTOTAL", aliPay);
+        aliPayment.put("PAYMENT_MODE", "支付宝支付");
+        incomeItems.add(aliPayment);
+        BigDecimal incomeAmount = wxPay.add(chargePay).add(aliPay);
+        if ((setting.getOpenUnionPay().equals(Common.YES) && shopDetail.getOpenUnionPay().equals(Common.YES)) || bankPay.compareTo(BigDecimal.ZERO) > 0) {
+            Map<String, Object> bankPayment = new HashMap<>();
+            bankPayment.put("SUBTOTAL", bankPay);
+            bankPayment.put("PAYMENT_MODE", "银联支付");
+            incomeAmount = incomeAmount.add(bankPay);
+            incomeItems.add(bankPayment);
+        }
+        if ((setting.getOpenMoneyPay().equals(Common.YES) && shopDetail.getOpenMoneyPay().equals(Common.YES)) || crashPay.compareTo(BigDecimal.ZERO) > 0) {
+            Map<String, Object> crashPayment = new HashMap<>();
+            crashPayment.put("SUBTOTAL", crashPay);
+            crashPayment.put("PAYMENT_MODE", "现金支付");
+            incomeAmount = incomeAmount.add(crashPay);
+            incomeItems.add(crashPayment);
+        }
+        if ((setting.getOpenShanhuiPay().equals(Common.YES) && shopDetail.getOpenShanhuiPay().equals(Common.YES)) || shanhuiPay.compareTo(BigDecimal.ZERO) > 0){
+            Map<String, Object> shanhuiPayment = new HashMap<>();
+            shanhuiPayment.put("SUBTOTAL", shanhuiPay);
+            shanhuiPayment.put("PAYMENT_MODE","闪惠支付");
+            incomeAmount = incomeAmount.add(shanhuiPay);
+            incomeItems.add(shanhuiPayment);
+        }
+        if ((setting.getIntegralPay().equals(Common.YES) && shopDetail.getIntegralPay().equals(Common.YES)) || integralPay.compareTo(BigDecimal.ZERO) > 0){
+            Map<String, Object> integralPayMent = new HashMap<>();
+            integralPayMent.put("SUBTOTAL", integralPay);
+            integralPayMent.put("PAYMENT_MODE", "积分支付");
+            incomeAmount = incomeAmount.add(integralPay);
+            incomeItems.add(integralPayMent);
+        }
+        data.put("INCOME_AMOUNT",  incomeAmount);
         data.put("INCOME_ITEMS", incomeItems);
         selectMap.put("type", PayMode.ACCOUNT_PAY);
         BigDecimal accountPay = orderMapper.getPayment(selectMap);
+        accountPay = accountPay == null ? BigDecimal.ZERO : accountPay;
         selectMap.put("type", PayMode.COUPON_PAY);
         BigDecimal couponPay = orderMapper.getPayment(selectMap);
+        couponPay = couponPay == null ? BigDecimal.ZERO : couponPay;
         selectMap.put("type", PayMode.REWARD_PAY);
         BigDecimal rewardPay = orderMapper.getPayment(selectMap);
+        rewardPay = rewardPay == null ? BigDecimal.ZERO : rewardPay;
         selectMap.put("type", PayMode.WAIT_MONEY);
         BigDecimal waitMoney = orderMapper.getPayment(selectMap);
+        waitMoney = waitMoney == null ? BigDecimal.ZERO : waitMoney;
         selectMap.put("type", PayMode.ARTICLE_BACK_PAY);
         BigDecimal articlePay = orderMapper.getPayment(selectMap);
+        articlePay = articlePay == null ? BigDecimal.ZERO : articlePay;
         BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay);
-        data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
+        data.put("DISCOUNT_AMOUNT", discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         Map<String, Object> accountPayItem = new HashMap<>();
-        accountPayItem.put("SUBTOTAL", accountPay == null ? 0 : accountPay);
+        accountPayItem.put("SUBTOTAL", accountPay);
         accountPayItem.put("PAYMENT_MODE", "红包支付");
         discountItems.add(accountPayItem);
         Map<String, Object> couponPayItem = new HashMap<>();
-        couponPayItem.put("SUBTOTAL", couponPay == null ? 0 : couponPay);
+        couponPayItem.put("SUBTOTAL", couponPay);
         couponPayItem.put("PAYMENT_MODE", "优惠券支付");
         discountItems.add(couponPayItem);
         Map<String, Object> rewardPayItem = new HashMap<>();
-        rewardPayItem.put("SUBTOTAL", rewardPay == null ? 0 : rewardPay);
+        rewardPayItem.put("SUBTOTAL", rewardPay);
         rewardPayItem.put("PAYMENT_MODE", "充值赠送支付");
         discountItems.add(rewardPayItem);
         Map<String, Object> waitMoneyItem = new HashMap<>();
-        waitMoneyItem.put("SUBTOTAL", waitMoney == null ? 0 : waitMoney);
+        waitMoneyItem.put("SUBTOTAL", waitMoney);
         waitMoneyItem.put("PAYMENT_MODE", "等位红包支付");
         discountItems.add(waitMoneyItem);
         Map<String, Object> articleBackPay = new HashMap<>();
-        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
+        articleBackPay.put("SUBTOTAL", articlePay.abs());
         articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
         data.put("DISCOUNT_ITEMS", discountItems);
