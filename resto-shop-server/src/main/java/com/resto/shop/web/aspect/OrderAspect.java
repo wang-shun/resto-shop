@@ -96,7 +96,7 @@ public class OrderAspect {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
 //            现金银联闪惠支付应该在pos上确认订单已收款后在进行出单
-            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY){
+            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
                 MQMessageProducer.sendPlaceOrderNoPayMessage(order);
             }
 
@@ -159,7 +159,7 @@ public class OrderAspect {
             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4){
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER){
             String url = "";
             if(order.getParentOrderId() == null){
                 url = setting.getWechatWelcomeUrl()+"?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
