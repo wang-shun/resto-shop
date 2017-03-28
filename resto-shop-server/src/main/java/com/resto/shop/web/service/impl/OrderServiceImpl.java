@@ -1056,8 +1056,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                "订单已取消！");
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                "订单已取消！");
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             int refundTotal = 0;
@@ -1176,6 +1176,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.CRASH_PAY:
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.INTEGRAL_PAY:
+                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
             }
