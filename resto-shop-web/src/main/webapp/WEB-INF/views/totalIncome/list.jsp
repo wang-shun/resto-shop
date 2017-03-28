@@ -142,6 +142,10 @@
                 data : "moneyPay"
             },
             {
+                title : "闪惠支付(元)",
+                data : "shanhuiPayment"
+            },
+            {
                 title : "积分支付(元)",
                 data : "integralPayment"
             },
@@ -208,6 +212,10 @@
             {
                 title : "现金支付(元)",
                 data : "moneyPay"
+            },
+            {
+                title : "闪惠支付(元)",
+                data : "shanhuiPayment"
             },
             {
                 title : "积分支付(元)",

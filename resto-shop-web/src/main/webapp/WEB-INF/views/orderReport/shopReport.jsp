@@ -245,6 +245,10 @@
                             data : "backCartPay"
                         },
                         {
+                            title : "闪惠支付",
+                            data : "shanhuiPay"
+                        },
+                        {
                             title : "积分支付",
                             data : "integralPay"
                         },
