@@ -825,7 +825,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public Order payOrderSuccess(Order order) {
+    public synchronized Order payOrderSuccess(Order order) {
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
@@ -988,7 +988,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public boolean autoRefundOrder(String orderId) {
+    public synchronized boolean autoRefundOrder(String orderId) {
         Order order = selectById(orderId);
         if (order.getAllowCancel()) {
             order.setAllowCancel(false);
@@ -1008,9 +1008,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Result refundPaymentByUnfinishedOrder(String orderId) {
+    public synchronized Result refundPaymentByUnfinishedOrder(String orderId) {
+
+
         Result result = new Result();
         Order order = selectById(orderId);
+        if(order.getOrderState() != OrderState.SUBMIT){
+            return new Result(false);
+        }
         order.setIsPay(OrderPayState.NOT_PAY);
         if (order.getPayMode() == 2) {
             order.setIsPay(0);
@@ -1057,76 +1062,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
         return result;
-//        Result result = new Result();
-//
-//        //首先获得订单
-//        Order order = orderMapper.selectByPrimaryKey(orderId);
-//        if(order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER){
-//            //如果订单状态不是1 或者 是后付模式
-//            result.setMessage("订单状态不符合退款条件");
-//            result.setSuccess(false);
-//            return result;
-//        }
-//        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-//        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(orderId);
-//        for (OrderPaymentItem item : payItemsList) {
-//            String newPayItemId = ApplicationUtils.randomUUID();
-//            switch (item.getPaymentModeId()) {
-//                case PayMode.COUPON_PAY:
-//                    couponService.refundCoupon(item.getResultData());
-//                    break;
-//                case PayMode.ACCOUNT_PAY:
-//                    accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER);
-//                    break;
-//                case PayMode.CHARGE_PAY:
-//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData());
-//                    break;
-//                case PayMode.REWARD_PAY:
-//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData());
-//                    break;
-//                case PayMode.WEIXIN_PAY:
-//                    WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
-//                    JSONObject obj = new JSONObject(item.getResultData());
-//                    int refund = obj.getInt("total_fee");
-//                    Map<String, String> jsonObject = null;
-//                    if(shopDetail.getWxServerId() == null){
-//                        jsonObject  = WeChatPayUtils.refund(newPayItemId, obj.getString("transaction_id"),
-//                                obj.getInt("total_fee"),refund , config.getAppid(), config.getMchid(),
-//                                config.getMchkey(), config.getPayCertPath());
-//                    }else{
-//                        WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-//
-//                        jsonObject = WeChatPayUtils.refundNew(newPayItemId, obj.getString("transaction_id"),
-//                                obj.getInt("total_fee"),refund, wxServerConfig.getAppid(), wxServerConfig.getMchid(),
-//                                StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
-//                    }
-//                    item.setResultData(new JSONObject(jsonObject).toString());
-//                    break;
-//                case PayMode.WAIT_MONEY:
-//                    getNumberService.refundWaitMoney(order);
-//                    break;
-//                case PayMode.ALI_PAY: //如果是支付宝支付
-//                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-//                    AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ?  brandSetting.getAliAppId() : shopDetail.getAliAppId().trim() ,
-//                            StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ?  brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-//                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ?  brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
-//                    Map map = new HashMap();
-//                    map.put("out_trade_no", order.getId());
-//                    map.put("refund_amount", item.getPayValue());
-//                    String resultJson = AliPayUtils.refundPay(map);
-//                    item.setResultData(new JSONObject(resultJson).toString());
-//                    break;
-//            }
-//            order.setPaymentAmount(order.getPaymentAmount().add(item.getPayValue()));
-//            item.setId(newPayItemId);
-//            item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-//            orderPaymentItemService.insert(item);
-//        }
-//        order.setIsPay(OrderPayState.NOT_PAY);
-//        update(order);
-//        logBaseService.insertLogBaseInfoState(shopDetail, customerService.selectById(order.getCustomerId()), order, LogBaseState.NOT_PAYMENT_ORDER);
-//        result.setSuccess(true);
-//        return result;
     }
 
     private void refundOrder(Order order) {
@@ -1359,7 +1294,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order orderWxPaySuccess(OrderPaymentItem item) {
+    public synchronized Order orderWxPaySuccess(OrderPaymentItem item) {
 
         Order order = selectById(item.getOrderId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
@@ -2076,24 +2011,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<String> articleIds = new ArrayList<>();
         for (OrderItem article : orderItems) {
             if(!article.getType().equals(OrderItemType.MEALS_CHILDREN)){
-                articleIds.add(article.getArticleId());
+                if (article.getArticleId().contains("@")) {
+                    articleIds.add(article.getArticleId().substring(0,article.getArticleId().indexOf("@")));
+                }else{
+                    articleIds.add(article.getArticleId());
+                }
             }
         }
         Map<String, Object> selectMap = new HashMap<>();
         selectMap.put("articleIds", articleIds);
-        List<Map<String, Object>> articleSort = articleService.selectArticleSort(selectMap);
-        for (Map sort : articleSort){
+        List<String> articleSort = articleService.selectArticleSort(selectMap);
+        for (String articleId : articleSort){
             for (OrderItem article : orderItems) {
-                if (article.getType().equals(OrderItemType.SETMEALS)){
-                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
-                        getOrderItems(article, items, refundItems);
-                        getOrderItemMeal(orderItems,items,refundItems,article.getId());
-                        break;
-                    }
+                if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())){
+                    getOrderItems(article, items, refundItems);
+                    getOrderItemMeal(orderItems,items,refundItems,article.getId());
                 }else {
-                    if (article.getArticleId().equals(sort.get("articleId").toString()) || article.getArticleId().equals(sort.get("articleUnitId").toString())) {
-                        getOrderItems(article, items, refundItems);
-                        break;
+                    if (article.getArticleId().contains("@")) {
+                        if (articleId.equalsIgnoreCase(article.getArticleId().substring(0, article.getArticleId().indexOf("@")))) {
+                            getOrderItems(article, items, refundItems);
+                        }
+                    }else{
+                        if (articleId.equalsIgnoreCase(article.getArticleId())) {
+                            getOrderItems(article, items, refundItems);
+                        }
                     }
                 }
             }
@@ -4672,6 +4613,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (String tel : telephones) {
                     try {
                         SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+                        Thread thread = Thread.currentThread();
+                        thread.sleep(3000);//暂停1.5秒后程序继续执行
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

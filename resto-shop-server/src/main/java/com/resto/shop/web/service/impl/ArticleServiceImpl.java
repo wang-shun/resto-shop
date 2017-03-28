@@ -554,7 +554,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<Map<String, Object>> selectArticleSort(Map<String, Object> selectMap) {
+    public List<String> selectArticleSort(Map<String, Object> selectMap) {
         return articleMapper.selectArticleSort(selectMap);
     }
 }

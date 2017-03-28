@@ -926,18 +926,12 @@ GROUP BY article_id
         </if>
     </select>
 
-    <select id="selectArticleSort" parameterType="java.util.Map" resultType="java.util.Map">
-        select ta.id articleId, IFNULL(tap.id,'') articleUnitId, taf.id articleFamilyId, ta.sort, taf.peference
+    <select id="selectArticleSort" parameterType="java.util.Map" resultType="java.lang.String">
+        select ta.id articleId
         from tb_article ta
-        left join tb_article_price tap
-        on tap.article_id = ta.id
         inner join tb_article_family taf
         on ta.article_family_id = taf.id
         where ta.id in
-        <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
-            #{articleId}
-        </foreach>
-        or tap.id in
         <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
             #{articleId}
         </foreach>
