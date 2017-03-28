@@ -7,6 +7,7 @@ import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
+import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
@@ -264,9 +265,13 @@ public class OrderAspect {
 
 
     @AfterReturning(value = "confirmOrderPos()", returning = "order")
-    public void confirmOrderPos(Order order) {
+    public void confirmOrderPos(Order order) throws AppException {
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+
+        if(order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
+            orderService.pushOrder(order.getId());
+        }
     }
 
     @AfterReturning(value = "afterPay()", returning = "order")
