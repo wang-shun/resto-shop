@@ -1889,8 +1889,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(print_id+"customer",customer);
-
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",sb.toString());
         MemcachedUtils.put(shopDetail.getId()+"printList",printList);
     }
@@ -1942,7 +1943,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.RESTAURANTLABEL);
         printTask.add(print);
         MemcachedUtils.put(print_id,print);
-        MemcachedUtils.put(print_id+"customer",customer);
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",article.getArticleName());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
@@ -2082,7 +2085,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         printTask.add(print);
 
         MemcachedUtils.put(print_id,print);
-        MemcachedUtils.put(print_id+"customer",customer);
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",sb.toString());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
