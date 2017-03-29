@@ -1925,7 +1925,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
         Customer customer = customerService.selectById(order.getCustomerId());
-        String phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone() + "/" + order.getVerCode();
+        String phone = order.getVerCode();
+        if(customer != null){
+            phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone() + "/" + order.getVerCode();
+        }
+
         data.put("CUSTOMER_TEL", phone);
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
