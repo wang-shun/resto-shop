@@ -1870,15 +1870,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         customerStr.append("" + gao.toString() + " ");
         Customer customer = customerService.selectById(order.getCustomerId());
-        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if (customerDetail != null) {
-            if (customerDetail.getBirthDate() != null) {
-                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
-                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+        if(customer != null){
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
                 }
             }
         }
+
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -1895,8 +1898,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(print_id+"customer",customer);
-
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",sb.toString());
         MemcachedUtils.put(shopDetail.getId()+"printList",printList);
     }
@@ -1931,7 +1935,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
         Customer customer = customerService.selectById(order.getCustomerId());
-        String phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone() + "/" + order.getVerCode();
+        String phone = order.getVerCode();
+        if(customer != null){
+            phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone() + "/" + order.getVerCode();
+        }
+
         data.put("CUSTOMER_TEL", phone);
         data.put("TABLE_NUMBER", order.getTableNumber());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
@@ -1944,7 +1952,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.RESTAURANTLABEL);
         printTask.add(print);
         MemcachedUtils.put(print_id,print);
-        MemcachedUtils.put(print_id+"customer",customer);
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",article.getArticleName());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
@@ -2060,15 +2070,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         customerStr.append("" + gao.toString() + " ");
         Customer customer = customerService.selectById(order.getCustomerId());
-        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if (customerDetail != null) {
-            if (customerDetail.getBirthDate() != null) {
-                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
-                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+        if(customer != null){
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
                 }
             }
         }
+
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -2081,7 +2094,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         printTask.add(print);
 
         MemcachedUtils.put(print_id,print);
-        MemcachedUtils.put(print_id+"customer",customer);
+        if(customer != null){
+            MemcachedUtils.put(print_id+"customer",customer);
+        }
         MemcachedUtils.put(print_id+"article",sb.toString());
         List<String> printList = (List<String>)MemcachedUtils.get(shopDetail.getId()+"printList");
         if(printList == null){
@@ -2377,15 +2392,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         customerStr.append("" + gao.toString() + " ");
         Customer customer = customerService.selectById(order.getCustomerId());
-        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if (customerDetail != null) {
-            if (customerDetail.getBirthDate() != null) {
-                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
-                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+        if(customer != null){
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
                 }
             }
         }
+
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", 0);
