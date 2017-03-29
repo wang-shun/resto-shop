@@ -19,6 +19,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -387,6 +388,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal originMoney = BigDecimal.ZERO;
         int articleCount = 0;
         BigDecimal extraMoney = BigDecimal.ZERO;
+
+//记录订单菜品-------------------------------
         for (OrderItem item : order.getOrderItems()) {
             Article a = null;
             BigDecimal org_price = null;
@@ -518,7 +521,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 break;
             }
         }
-
         if (!jsonResult.isSuccess()) {
             return jsonResult;
         }
@@ -529,10 +531,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setMealFeePrice(new BigDecimal(0));
         }
         orderItemService.insertItems(order.getOrderItems());
+        //记录订单菜品 yz 2017-03-27
+        LogTemplateUtils.getOrderItemLogByOrderType(brand.getBrandName(),order.getId(),order.getOrderItems());
+
         BigDecimal payMoney = totalMoney.add(order.getServicePrice());
         payMoney = payMoney.add(order.getMealFeePrice());
 
-        // 使用优惠卷
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         if (order.getWaitMoney().doubleValue() > 0) {
             OrderPaymentItem item = new OrderPaymentItem();
@@ -546,18 +550,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用等位红包支付了：" + item.getPayValue());
-            Map waitPayMap = new HashMap(4);
-            waitPayMap.put("brandName", brand.getBrandName());
-            waitPayMap.put("fileName", order.getId());
-            waitPayMap.put("type", "orderAction");
-            waitPayMap.put("content", "订单:"+order.getId()+"使用等位红包支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, waitPayMap);
-            Map CustomerWaitPayMap = new HashMap(4);
-            CustomerWaitPayMap.put("brandName", brand.getBrandName());
-            CustomerWaitPayMap.put("fileName", customer.getId());
-            CustomerWaitPayMap.put("type", "UserAction");
-            CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, CustomerWaitPayMap);
+            LogTemplateUtils.getWaitMoneyLogByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+
+//            Map CustomerWaitPayMap = new HashMap(4);
+//            CustomerWaitPayMap.put("brandName", brand.getBrandName());
+//            CustomerWaitPayMap.put("fileName", customer.getId());
+//            CustomerWaitPayMap.put("type", "UserAction");
+//            CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerWaitPayMap);
+            LogTemplateUtils.getWaitMoneyLogByUserType(brand.getBrandName(),order.getId(),item.getPayValue(),customer.getNickname());
             GetNumber getNumber = getNumberService.selectById(order.getWaitId());
             log.error(order.getWaitId() + "-----------222222222222222");
             getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
@@ -580,18 +581,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单使用优惠卷支付了：" + item.getPayValue());
-                Map couponPaymap = new HashMap(4);
-                couponPaymap.put("brandName", brand.getBrandName());
-                couponPaymap.put("fileName", order.getId());
-                couponPaymap.put("type", "orderAction");
-                couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, couponPaymap);
-                Map CustomerCouponPaymap = new HashMap(4);
-                CustomerCouponPaymap.put("brandName", brand.getBrandName());
-                CustomerCouponPaymap.put("fileName", customer.getId());
-                CustomerCouponPaymap.put("type", "UserAction");
-                CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, CustomerCouponPaymap);
+//                Map couponPaymap = new HashMap(4);
+//                couponPaymap.put("brandName", brand.getBrandName());
+//                couponPaymap.put("fileName", order.getId());
+//                couponPaymap.put("type", "orderAction");
+//                couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, couponPaymap);
+                LogTemplateUtils.getCouponByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+
+//                Map CustomerCouponPaymap = new HashMap(4);
+//                CustomerCouponPaymap.put("brandName", brand.getBrandName());
+//                CustomerCouponPaymap.put("fileName", customer.getId());
+//                CustomerCouponPaymap.put("type", "UserAction");
+//                CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, CustomerCouponPaymap);
+                LogTemplateUtils.getCouponByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+
                 payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
             // 使用余额
@@ -626,18 +631,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-            Map cartPayMap = new HashMap(4);
-            cartPayMap.put("brandName", brand.getBrandName());
-            cartPayMap.put("fileName", order.getId());
-            cartPayMap.put("type", "orderAction");
-            cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, cartPayMap);
-            Map CustomerCartPayMap = new HashMap(4);
-            CustomerCartPayMap.put("brandName", brand.getBrandName());
-            CustomerCartPayMap.put("fileName", customer.getId());
-            CustomerCartPayMap.put("type", "UserAction");
-            CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, CustomerCartPayMap);
+//            Map cartPayMap = new HashMap(4);
+//            cartPayMap.put("brandName", brand.getBrandName());
+//            cartPayMap.put("fileName", order.getId());
+//            cartPayMap.put("type", "orderAction");
+//            cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, cartPayMap);
+            LogTemplateUtils.getBankByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+
+//            Map CustomerCartPayMap = new HashMap(4);
+//            CustomerCartPayMap.put("brandName", brand.getBrandName());
+//            CustomerCartPayMap.put("fileName", customer.getId());
+//            CustomerCartPayMap.put("type", "UserAction");
+//            CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerCartPayMap);
+            LogTemplateUtils.getBankByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
             order.setAllowContinueOrder(false);
         } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
@@ -650,18 +658,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-            Map crashPayMap = new HashMap(4);
-            crashPayMap.put("brandName", brand.getBrandName());
-            crashPayMap.put("fileName", order.getId());
-            crashPayMap.put("type", "orderAction");
-            crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, crashPayMap);
-            Map CustomerCrashPayMap = new HashMap(4);
-            CustomerCrashPayMap.put("brandName", brand.getBrandName());
-            CustomerCrashPayMap.put("fileName", customer.getId());
-            CustomerCrashPayMap.put("type", "UserAction");
-            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, CustomerCrashPayMap);
+//            Map crashPayMap = new HashMap(4);
+//            crashPayMap.put("brandName", brand.getBrandName());
+//            crashPayMap.put("fileName", order.getId());
+//            crashPayMap.put("type", "orderAction");
+//            crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, crashPayMap);
+            LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+            LogTemplateUtils.getMoneyByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+
+//            Map CustomerCrashPayMap = new HashMap(4);
+//            CustomerCrashPayMap.put("brandName", brand.getBrandName());
+//            CustomerCrashPayMap.put("fileName", customer.getId());
+//            CustomerCrashPayMap.put("type", "UserAction");
+//            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerCrashPayMap);
             order.setAllowContinueOrder(false);
         } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
             OrderPaymentItem item = new OrderPaymentItem();
@@ -702,7 +713,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (payMoney.doubleValue() < 0) {
             payMoney = BigDecimal.ZERO;
         }
-
+        //yz 记录订单支付项 2017-03-27
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
         order.setAllowCancel(true); // 订单是否允许取消
@@ -1412,6 +1423,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
+            LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(),order.getId(),order.getProductionStatus());
+            LogTemplateUtils.getParentOrderPrintSuccessByPOSType(brand.getBrandName(),order.getId(),order.getProductionStatus());
             if (order.getOrderMode() != ShopMode.CALL_NUMBER ) {
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
 
@@ -1425,23 +1438,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("打印成功，订单为子订单:" + order.getId() + " pid:" + order.getParentOrderId());
             order.setAllowContinueOrder(false);
             order.setAllowAppraise(false);
+            LogTemplateUtils.getChildOrderPrintSuccessByOrderType(brand.getBrandName(),order.getId(),order.getProductionStatus());
+            LogTemplateUtils.getChildOrderPrintSuccessByPOSType(brand.getBrandName(),order.getId(),order.getProductionStatus());
         }
         order.setProductionStatus(ProductionStatus.PRINTED);
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
         update(order);
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", shopDetail.getName());
-        map.put("type", "posAction");
-        map.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
-        doPost(url, map);
-        Map orderMap = new HashMap(4);
-        orderMap.put("brandName", brand.getBrandName());
-        orderMap.put("fileName", order.getId());
-        orderMap.put("type", "orderAction");
-        orderMap.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
-        doPost(url, orderMap);
+//        Map map = new HashMap(4);
+//        map.put("brandName", brand.getBrandName());
+//        map.put("fileName", shopDetail.getName());
+//        map.put("type", "posAction");
+//        map.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
+//        doPost(url, map);
+//        Map orderMap = new HashMap(4);
+//        orderMap.put("brandName", brand.getBrandName());
+//        orderMap.put("fileName", order.getId());
+//        orderMap.put("type", "orderAction");
+//        orderMap.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
+//        doPost(url, orderMap);
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "printSuccess订单打印完成");
         //ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -2348,6 +2363,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
+        Integer orginState = order.getOrderState();//订单开始确认的状体
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
@@ -2363,12 +2379,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", order.getId());
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+            //Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, orderMap);
+            /**
+             * 记录订单自动确认2-10过程
+             */
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(),order,orginState,"confirmOrder");
+
             return order;
         }
         return null;
@@ -2383,6 +2404,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
             return null;
         }
+        Integer orginState = order.getOrderState();
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
@@ -2402,12 +2424,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", order.getId());
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+//            Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, orderMap);
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(),order,orginState,"confirmBossOrder");
             return order;
         }
         return null;
@@ -2471,18 +2494,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 log.info("库存还原失败:" + order.getId());
             }
             orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", shopDetail.getName());
-            map.put("type", "posAction");
-            map.put("content", "店铺:"+shopDetail.getName()+"在pos端执行拒绝订单:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", orderId);
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
+//            Map map = new HashMap(4);
+//            map.put("brandName", brand.getBrandName());
+//            map.put("fileName", shopDetail.getName());
+//            map.put("type", "posAction");
+//            map.put("content", "店铺:"+shopDetail.getName()+"在pos端执行拒绝订单:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, map);
+            LogTemplateUtils.cancelOrderByOrderType(brand.getBrandName(),orderId);
+            LogTemplateUtils.cancleOrderByPosType(brand.getBrandName(),shopDetail.getName(),order.getId());
+
+//            Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", orderId);
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, map);
         }
         return order;
     }
@@ -5830,7 +5856,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             total = total.add(item.getFinalPrice());
             if (o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES && shopDetail.getIsMealFee() == Common.YES) {
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
-                ;
                 mealTotalPrice = mealTotalPrice.add(mealPrice);
                 mealCount += item.getCount() * item.getMealFeeNumber();
                 total = total.add(mealPrice);
@@ -5842,8 +5867,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
             }
-
-
         }
 
         if (o.getServicePrice() == null) {
@@ -5884,12 +5907,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
-        Map orderMap = new HashMap(4);
-        orderMap.put("brandName", brandSetting.getBrandName());
-        orderMap.put("fileName", order.getId());
-        orderMap.put("type", "orderAction");
-        orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, orderMap);
+//        Map orderMap = new HashMap(4);
+//        orderMap.put("brandName", brandSetting.getBrandName());
+//        orderMap.put("fileName", order.getId());
+//        orderMap.put("type", "orderAction");
+//        orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
+//        doPost(url, orderMap);
+        LogTemplateUtils.getBackArticleByOrderType(brandSetting.getBrandName(),order.getId(),o.getOrderItems());
     }
 
     @Override
@@ -6262,6 +6286,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
+        //开始状态
+        Integer originState = order.getOrderState();
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -6279,6 +6305,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(),order,originState);
     }
 
     @Override
@@ -6402,6 +6429,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return  orderMapper.selectBaseToThirdListByShopId(begin,end,shopId);
+    }
+
+    @Override
+    public List<Order> selectBaseToKCList(String brandId, String beginDate, String endDate) {
+
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectBaseToKCList(brandId,begin,end);
+
+    }
+
+    @Override
+    public List<Order> selectBaseToKCListByShopId(String shopId, String beginDate, String endDate) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return  orderMapper.selectBaseToKCListByShopId(shopId,begin,end);
     }
 
 
