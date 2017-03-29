@@ -566,7 +566,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         payMoney = payMoney.subtract(order.getWaitMoney());
 
-        if (detail.getShopMode() != ShopMode.HOUFU_ORDER) {
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
             if (order.getUseCoupon() != null && order.getParentOrderId() == null) {
                 Coupon coupon = couponService.useCoupon(totalMoney, order);
                 OrderPaymentItem item = new OrderPaymentItem();
