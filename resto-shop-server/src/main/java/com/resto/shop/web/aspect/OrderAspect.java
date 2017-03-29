@@ -10,6 +10,7 @@ import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -408,6 +409,7 @@ public class OrderAspect {
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 
+        LogTemplateUtils.getCallNumber(brand.getBrandName(),order.getId());
         if(shopDetail.getIsPush() == Common.YES){ //开启就餐提醒
         	MQMessageProducer.sendRemindMsg(order,shopDetail.getPushTime() * 1000);	
         }

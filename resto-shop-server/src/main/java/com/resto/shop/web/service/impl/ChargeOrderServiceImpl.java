@@ -21,6 +21,7 @@ import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -113,13 +114,13 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	}
 
 	@Override
-	public void useChargePay(BigDecimal remainPay,String customerId,Order order) {
+	public void useChargePay(BigDecimal remainPay,String customerId,Order order,String brandName) {
 		BigDecimal[] result = new BigDecimal[]{BigDecimal.ZERO,BigDecimal.ZERO};
-		useBalance(result,remainPay,customerId,order);
+		useBalance(result,remainPay,customerId,order,brandName);
 
 	}
 
-	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order) {
+	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order,String brandName) {
 		ChargeOrder chargeOrder = chargeorderMapper.selectFirstBalanceOrder(customerId);
 		if(chargeOrder!=null){
 			BigDecimal useReward = useReward(chargeOrder,remindPay);  //使用返利支付
@@ -138,6 +139,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setRemark("充值余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
+				//记录充值余额支付
+                LogTemplateUtils.getChargeByOrderType(brandName,item.getPayValue(),order.getId());
+
 			}
 			if(useReward.compareTo(BigDecimal.ZERO)>0){
 				OrderPaymentItem item = new OrderPaymentItem();
@@ -149,10 +153,13 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setRemark("赠送余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
+				//记录充值赠送余额支付
+                LogTemplateUtils.getChargeRewardByOrderType(brandName,item.getPayValue(),order.getId());
+
 			}
 			if(remindPay.compareTo(totalPay)>0){
 				remindPay = remindPay.subtract(totalPay).setScale(2, BigDecimal.ROUND_HALF_UP);
-				useBalance(result,remindPay,customerId,order);
+				useBalance(result,remindPay,customerId,order,brandName);
 			}
 		}
 	}

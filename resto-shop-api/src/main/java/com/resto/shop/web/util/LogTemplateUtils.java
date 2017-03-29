@@ -19,8 +19,8 @@ public class LogTemplateUtils {
 
     //日志类型
   public static final String POSTYPE = "posAction";
-  public static final String USERTYPE="userAction";
-  public static final String ORDERTYPE="orderActoin";
+  public static final String USERTYPE="UserAction";
+  public static final String ORDERTYPE="orderAction";
 
     //order模板map
     public static  Map getOrderBaseMap(String brandName,String id,String logType){
@@ -91,6 +91,19 @@ public class LogTemplateUtils {
         doPost(url, map);
     }
 
+    //充值余额支付
+    public static void getChargeByOrderType(String brandName, BigDecimal payValue, String id) {
+        Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
+        map.put("content", "订单:" + id + "订单使用了充值余额支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
+    }
+
+    //充值赠送余额支付
+    public static void getChargeRewardByOrderType(String brandName, BigDecimal payValue, String id) {
+        Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
+        map.put("content", "订单:" + id + "订单使用了充值赠送余额支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
+    }
+
+
     //父订单打印
     public static void getParentOrderPrintSuccessByOrderType(String brandName, String id,Integer status) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
@@ -149,6 +162,7 @@ public class LogTemplateUtils {
             }
             sb.append("退菜总额为:"+temp);
         }
+        map.put("content", "订单:" + id + "在pos端执行退菜:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url,map);
     }
 
@@ -160,6 +174,25 @@ public class LogTemplateUtils {
     public static void cancelOrderByOrderType(String brandName, String orderId) {
         Map map=getOrderBaseMap(brandName,orderId,ORDERTYPE);
         map.put("content", "订单:" +orderId + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url,map);
+    }
+
+    /**
+     * 记录订单被叫号
+     * @param brandName
+     * @param id
+     */
+    public static void getCallNumber(String brandName, String id) {
+        Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
+        map.put("content", "订单:" +id + "订单被叫号,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url,map);
+    }
+
+    public  static  void  getAppraiseByOrderType(String brandName,Appraise appraise,String content){
+        Map map=getOrderBaseMap(brandName,appraise.getOrderId(),ORDERTYPE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
+        map.put("content", "订单:" +appraise.getOrderId() + sb.toString() + MQSetting.getLocalIP());
         doPost(url,map);
     }
 
@@ -231,6 +264,7 @@ public class LogTemplateUtils {
         map.put("content", "店铺:"+name+"在pos端执行拒绝订单:" + orderId + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url,map);
     }
+
 
 
     //记录 posAction end---------------------------------------------------------

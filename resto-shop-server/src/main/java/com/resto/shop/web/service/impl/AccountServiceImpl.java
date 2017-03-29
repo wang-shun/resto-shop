@@ -8,11 +8,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
-import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -171,7 +169,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
 				redPay = redPackageMoney;
 				BigDecimal remainPay = realPay.subtract(redPay).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
-				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
+				chargeOrderService.useChargePay(remainPay,customer.getId(),order,brand.getBrandName());
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){
@@ -225,7 +223,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			}else{ //如果红包金额不足够支付所有金额，则剩余金额从充值订单里面扣除
 				redPay = redPackageMoney;
 				BigDecimal remainPay = realPay.subtract(redPay).setScale(2, BigDecimal.ROUND_HALF_UP);  //除去红包后，需要支付的金额
-				chargeOrderService.useChargePay(remainPay,customer.getId(),order);
+				chargeOrderService.useChargePay(remainPay,customer.getId(),order,brand.getBrandName());
 			}
 		}
 		if(redPay.compareTo(BigDecimal.ZERO)>0){

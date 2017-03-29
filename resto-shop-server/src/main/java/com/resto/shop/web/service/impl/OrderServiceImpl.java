@@ -680,9 +680,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payMoney = BigDecimal.ZERO;
         }
         //yz 记录订单支付项 2017-03-27
-
-
-
         order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
         order.setAllowCancel(true); // 订单是否允许取消
@@ -5762,7 +5759,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             total = total.add(item.getFinalPrice());
             if (o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee() == Common.YES && shopDetail.getIsMealFee() == Common.YES) {
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
-                ;
                 mealTotalPrice = mealTotalPrice.add(mealPrice);
                 mealCount += item.getCount() * item.getMealFeeNumber();
                 total = total.add(mealPrice);
@@ -5774,8 +5770,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
             }
-
-
         }
 
         if (o.getServicePrice() == null) {
@@ -5816,12 +5810,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
-        Map orderMap = new HashMap(4);
-        orderMap.put("brandName", brandSetting.getBrandName());
-        orderMap.put("fileName", order.getId());
-        orderMap.put("type", "orderAction");
-        orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, orderMap);
+//        Map orderMap = new HashMap(4);
+//        orderMap.put("brandName", brandSetting.getBrandName());
+//        orderMap.put("fileName", order.getId());
+//        orderMap.put("type", "orderAction");
+//        orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
+//        doPost(url, orderMap);
+        LogTemplateUtils.getBackArticleByOrderType(brandSetting.getBrandName(),order.getId(),o.getOrderItems());
     }
 
     @Override
