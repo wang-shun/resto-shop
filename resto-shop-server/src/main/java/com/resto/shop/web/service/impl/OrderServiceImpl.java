@@ -913,8 +913,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setOrderId(orderId);
                 item.setPaymentModeId(PayMode.GIVE_CHANGE);
                 item.setPayTime(order.getCreateTime());
-                item.setPayValue(order.getPaymentAmount());
-                item.setRemark("找零:" + order.getPaymentAmount());
+                item.setPayValue(order.getGiveChange());
+                item.setRemark("找零:" + order.getGiveChange());
                 orderPaymentItemService.insert(item);
             }
         }
