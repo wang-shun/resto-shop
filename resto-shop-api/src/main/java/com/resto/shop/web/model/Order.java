@@ -203,6 +203,16 @@ public class Order implements Serializable{
     //是否退菜光 包括自订单   默认否
     private Boolean isRefundOrder;
 
+    private Integer isGetShareCoupon;
+
+    public Integer getIsGetShareCoupon() {
+        return isGetShareCoupon;
+    }
+
+    public void setIsGetShareCoupon(Integer isGetShareCoupon) {
+        this.isGetShareCoupon = isGetShareCoupon;
+    }
+
     public Boolean getIsRefundOrder() {
         return isRefundOrder;
     }

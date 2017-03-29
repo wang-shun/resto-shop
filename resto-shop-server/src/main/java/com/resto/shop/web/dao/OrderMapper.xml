@@ -180,6 +180,7 @@
         <result column="base_meal_all_count" property="baseMealAllCount"/>
         <result column="pay_type" property="payType"/>
         <result column="is_refund_order" property="isRefundOrder"/>
+        <result column="is_get_share_coupon" property="isGetShareCoupon"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="orderPaymentId" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -371,7 +372,7 @@
         parent_order_id, allow_continue_order,
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
-        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order
+        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order,is_get_share_coupon
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -407,7 +408,7 @@
         brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time, pay_type)
+        last_order_time, pay_type, is_get_share_coupon)
         values (#{id,jdbcType=VARCHAR},
         #{tableNumber,jdbcType=VARCHAR},
         #{customerCount,jdbcType=INTEGER},
@@ -437,7 +438,7 @@
         #{parentOrderId,jdbcType=VARCHAR}, #{allowContinueOrder,jdbcType=BIT},
         #{countWithChild,jdbcType=INTEGER},
         #{lastOrderTime,jdbcType=TIMESTAMP},
-        #{payType})
+        #{payType},#{isGetShareCoupon})
     </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Order">
         insert into tb_order
@@ -583,6 +584,9 @@
             <if test="isRefundOrder != null">
                 is_refund_order,
             </if>
+            <if test="isGetShareCoupon != null">
+                is_get_share_coupon,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -726,6 +730,9 @@
             <if test="isRefundOrder != null">
                 #{isRefundOrder},
             </if>
+            <if test="isGetShareCoupon != null">
+                #{isGetShareCoupon},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -867,6 +874,9 @@
             <if test="isRefundOrder != null">
                 is_refund_order = #{isRefundOrder},
             </if>
+            <if test="isGetShareCoupon != null">
+                is_get_share_coupon = #{isGetShareCoupon},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -908,7 +918,7 @@
         allow_continue_order = #{allowContinueOrder,jdbcType=BIT},
         count_with_child = #{countWithChild,jdbcType=INTEGER},
         last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
-        pay_type = #{payType},is_refund_order = #{isRefundOrder}
+        pay_type = #{payType},is_refund_order = #{isRefundOrder},is_get_share_coupon = #{isGetShareCoupon}
         where id = #{id,jdbcType=VARCHAR}
     </update>
 
