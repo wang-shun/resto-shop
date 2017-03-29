@@ -2323,6 +2323,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
+        Integer orginState = order.getOrderState();//订单开始确认的状体
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
@@ -2338,12 +2339,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", order.getId());
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+            //Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, orderMap);
+            /**
+             * 记录订单自动确认2-10过程
+             */
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(),order,orginState,"confirmOrder");
+
             return order;
         }
         return null;
@@ -2358,6 +2364,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
             return null;
         }
+        Integer orginState = order.getOrderState();
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
@@ -2377,12 +2384,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setAllowAppraise(false);
             }
             update(order);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", order.getId());
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+//            Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, orderMap);
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(),order,orginState,"confirmBossOrder");
             return order;
         }
         return null;
@@ -6189,6 +6197,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
+        //开始状态
+        Integer originState = order.getOrderState();
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -6206,6 +6216,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
+        LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(),order,originState);
     }
 
     @Override

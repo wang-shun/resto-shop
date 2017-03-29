@@ -104,6 +104,13 @@ public class LogTemplateUtils {
     }
 
 
+
+    public static void getConfirmByOrderType(String brandName, Order order, Integer orginState,String content) {
+        Map map=getOrderBaseMap(brandName,order.getId(),ORDERTYPE);
+        map.put("content", "订单:" + order.getId() + "订单被自动确认,开始状态:"+orginState+"修改后状态:"+order.getOrderState()+"确认走的方法为:"+content+",请求服务器地址为:" + MQSetting.getLocalIP());
+    }
+
+
     //父订单打印
     public static void getParentOrderPrintSuccessByOrderType(String brandName, String id,Integer status) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
@@ -188,12 +195,29 @@ public class LogTemplateUtils {
         doPost(url,map);
     }
 
+    /**
+     * 记录评论
+     * @param brandName
+     * @param appraise
+     * @param content
+     */
     public  static  void  getAppraiseByOrderType(String brandName,Appraise appraise,String content){
         Map map=getOrderBaseMap(brandName,appraise.getOrderId(),ORDERTYPE);
         StringBuilder sb = new StringBuilder();
         sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
-        map.put("content", "订单:" +appraise.getOrderId() + sb.toString() + MQSetting.getLocalIP());
+        map.put("content", "订单:" +appraise.getOrderId() + sb.toString() +"服务器地址"+ MQSetting.getLocalIP());
         doPost(url,map);
+    }
+
+    /**
+     * 记录 pos手动确认
+     * @param brandName
+     * @param
+     * @param originState
+     */
+    public static void getConfirmOrderPosByOrderType(String brandName, Order o, Integer originState) {
+        Map map=getOrderBaseMap(brandName,o.getId(),ORDERTYPE);
+        map.put("content","订单:"+o.getId()+"确认开始前订单状态:"+originState+"确认之后订单状态:"+o.getOrderState()+"服务器地址:"+MQSetting.getLocalIP());
     }
 
     //记录orderAction end-------------------------------------------------------------
@@ -264,6 +288,7 @@ public class LogTemplateUtils {
         map.put("content", "店铺:"+name+"在pos端执行拒绝订单:" + orderId + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url,map);
     }
+
 
 
 
