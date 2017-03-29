@@ -10,6 +10,7 @@
         <result column="count" property="count"/>
         <result column="print_type" property="printType"/>
         <result column="kitchen_id" property="kitchenId"/>
+        <result column="choice_type" property="choiceType"/>
 
         <collection property="articles" javaType="List" ofType="com.resto.shop.web.model.ArticleRecommendPrice">
             <id column="article_recommend_price_id" property="id"/>
@@ -66,7 +67,10 @@
                 print_type = #{printType},
             </if>
             <if test="kitchenId != null">
-                kitchen_id = #{kitchenId}
+                kitchen_id = #{kitchenId},
+            </if>
+            <if test="choiceType != null">
+                choice_type = #{choiceType}
             </if>
         </set>
         where id = #{id}
@@ -74,7 +78,7 @@
     </update>
 
     <select id="getRecommendById" resultMap="RecommendResultMap">
-        select t.id,t.name,t.count,t.is_used,t.print_type,t.kitchen_id,
+        select t.id,t.name,t.count,t.is_used,t.print_type,t.kitchen_id,t.choice_type,
         t2.id as article_recommend_price_id,t2.article_id,t2.max_count,t2.price,t2.article_name,
         t2.sort,t2.kitchen_id  as  article_kitchen_id
         from tb_recommend t
@@ -92,7 +96,7 @@
     </delete>
 
     <select id="getRecommendByArticleId" resultMap="RecommendResultMap">
-        select t4.photo_small as imageUrl, t3.article_name,t3.price,t3.article_id,t3.max_count,t2.id,t2.count,t2.name, t3.kitchen_id as article_kitchen_id  from tb_article t
+        select t4.photo_small as imageUrl, t3.article_name,t3.price,t3.article_id,t3.max_count,t2.id,t2.count,t2.name,t2.choice_type, t3.kitchen_id as article_kitchen_id  from tb_article t
       INNER JOIN tb_recommend t2 on t2.id = t.recommend_id
       INNER JOIN tb_recommend_article t3 on t3.recommend_id = t2.id
 			INNER JOIN tb_article t4 on t3.article_id = t4.id

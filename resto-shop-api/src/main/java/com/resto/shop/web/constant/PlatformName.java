@@ -6,4 +6,5 @@ package com.resto.shop.web.constant;
  */
 public class PlatformName {
     public static final String E_LE_ME = "饿了么";
+    public static final String MEITUAN = "美团";
 }
