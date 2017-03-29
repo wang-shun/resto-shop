@@ -142,6 +142,9 @@
                                     <input type="radio" name="couponType" id="inlineRadio2" value="0" v-model="m.couponType">新用户
                                 </label>
                                 <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio5" value="3" v-model="m.couponType">分享
+                                </label>
+                                <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio3" value="1" v-model="m.couponType">邀&nbsp;请
                                 </label>
                                 <label class="radio-inline">
@@ -239,6 +242,8 @@
                             $(td).html("<span class='label label-info'>邀&nbsp;请</span>");
                         }else if(tdData == 2){
                             $(td).html("<span class='label label-success'>生&nbsp;日</span>");
+                        }else if(tdData == 3){
+                            $(td).html("<span class='label label-warning'>分&nbsp;享</span>");
                         }
                     }
                 },

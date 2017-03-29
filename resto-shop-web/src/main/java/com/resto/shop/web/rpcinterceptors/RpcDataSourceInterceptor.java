@@ -29,9 +29,6 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
     }
 
 
-
-
-
 	public static void main(String[] args) {
 		boolean b = "com.resto.shop.web.service.AdvertService".matches("^com.resto.shop.web.service.*");
 					 
