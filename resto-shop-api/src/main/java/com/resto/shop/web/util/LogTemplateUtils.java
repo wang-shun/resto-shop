@@ -259,6 +259,32 @@ public class LogTemplateUtils {
         doPost(url,map);
     }
 
+    /**
+     * 添加购物车
+     */
+    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article,Integer type){
+        Map map=getOrderBaseMap(brandName,customer.getId(),USERTYPE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("用户:"+customer.getNickname())
+                .append("将菜品id:"+article.getId())
+                .append("菜品类型为:")
+                .append(OrderItemType.getPayModeName(type)).append("菜品名字为:")
+                .append(article.getName()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
+        map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
+        doPost(url,map);
+    }
+
+    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Integer type,String articelId,String articleName){
+        Map map=getOrderBaseMap(brandName,customer.getId(),USERTYPE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("用户:"+customer.getNickname())
+                .append("将菜品id:"+articelId)
+                .append("将菜品类型为:").append(OrderItemType.getPayModeName(type))
+                .append("菜品名字为:").append(articleName).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
+        map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
+        doPost(url,map);
+    }
+
 
     //记录userActin end---------------------------------------------------------
 
