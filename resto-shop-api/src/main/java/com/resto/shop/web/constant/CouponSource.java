@@ -11,4 +11,5 @@ public class CouponSource {
         public final static String WECHAT_PROMOTION_REBATE = "2"; //微信推广 被推广人使用后，推广人获得红包
         public static final String NEW_CUSTOMER_COUPON = "3"; //新用户绑定手机赠送红包
         public static final String BIRTHDAY_COUPON = "4"; //用户生日赠送优惠卷
+        public static final String SHARE_COUPON = "5"; //分享赠送优惠卷
 }
