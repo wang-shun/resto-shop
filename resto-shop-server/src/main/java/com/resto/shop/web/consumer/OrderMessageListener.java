@@ -21,6 +21,7 @@ import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -361,6 +362,7 @@ public class OrderMessageListener implements MessageListener {
         String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
         JSONObject obj = JSONObject.parseObject(msg);
         String brandId = obj.getString("brandId");
+        Boolean auto = obj.getBoolean("auto");
         DataSourceContextHolder.setDataSourceName(brandId);
         Order order = orderService.selectById(obj.getString("orderId"));
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -368,6 +370,7 @@ public class OrderMessageListener implements MessageListener {
         if (order.getOrderState() == OrderState.SUBMIT) {
             log.info("自动取消订单:" + obj.getString("orderId"));
             orderService.cancelOrder(obj.getString("orderId"));
+            LogTemplateUtils.getAutoCancleOrderByOrderType(brand.getBrandName(),order.getId(),auto);
             log.info("款项自动退还到相应账户:" + obj.getString("orderId"));
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(brandId);

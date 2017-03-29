@@ -1,17 +1,16 @@
 package com.resto.shop.web.controller.business;
 
+import cn.restoplus.rpc.common.util.StringUtil;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.OrderCountUtils;
+import com.resto.brand.core.util.StringNameUtil;
 import com.resto.brand.core.util.ThirdPatyUtils;
-import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.config.SessionKey;
-import com.resto.shop.web.constant.ItemType;
-import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -128,28 +127,33 @@ public class ApiController extends GenericController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("posId", o.getShopDetailId());
                     map.put("addTime", DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));//订单创建时间
-                    map.put("posDate", DateUtil.formatDate(o.getPushOrderTime(),"yyyy-MM-dd HH:mm:ss"));//订单推送时间
+                    map.put("posDate", DateUtil.formatDate(o.getPrintOrderTime(),"yyyy-MM-dd HH:mm:ss"));//订单推送时间
                     map.put("tableNumber", o.getTableNumber());//座号
                     map.put("serialNumber", o.getSerialNumber());//
                     //订单支付项
-                    map.put("payDetail", "");//订单支付项详细
+                    List<Map<Integer,BigDecimal>> payList = new ArrayList<>();
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         Map<Integer, BigDecimal> payMap = new HashedMap();
                         for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
                             addKey(oi.getPaymentModeId(), oi.getPayValue(), payMap);
                         }
-                        //合并完支付项后 完整输出
-                        map.put("payDetail", getPayDetail(payMap));
+                        payList.add(payMap);
                     }
-                    List<Map<String, String>> itemList = new ArrayList<>();
+                    List<Map<String, Object>> itemList = new ArrayList<>();
                     //订单菜品项
                     if (!o.getOrderItems().isEmpty()) {
                         for (OrderItem orderItem : o.getOrderItems()) {
-                            Map<String, String> itemMap = new HashedMap();
-                            itemMap.put("menuType", ItemType.getItemTypeName(orderItem.getType()));//订单菜品类型
+                            Map<String, Object> itemMap = new HashedMap();
+                            //对名字进行截取存规格
+                            String str =StringNameUtil.getName(orderItem.getArticleName());
+                            itemMap.put("menuName", str);
+                            itemMap.put("attr", StringNameUtil.getAttr(orderItem.getArticleName()));
+                            itemMap.put("menuType", orderItem.getType());//订单菜品类型
                             itemMap.put("menuCode", orderItem.getArticleId());//菜品id
-                            itemMap.put("menuName", orderItem.getArticleName());//菜品name
-                            itemMap.put("quanity", orderItem.getType().toString());//个数
+                            itemMap.put("number", orderItem.getCount());//个数
+                            itemMap.put("originalPrice",orderItem.getOriginalPrice());
+                            itemMap.put("unitPirce",orderItem.getUnitPrice());
+                            itemMap.put("refundCount",orderItem.getRefundCount());
                             // itemMap.put("parentType",orderItem.getParentId());//针对套餐和子品
                             itemList.add(itemMap);
                         }
@@ -163,5 +167,85 @@ public class ApiController extends GenericController {
         }
         return  result;
     }
+
+    //对接kc
+    @RequestMapping(value = "getKcData", method = RequestMethod.POST)
+    @ResponseBody
+    public Result getKcData(String signature, String timestamp, String nonce, String appid, String thirdAppid, String beginDate, String endDate, HttpServletRequest request) {
+        //默认返回false
+        Result result = new Result();
+        result.setSuccess(false);
+        //查询所有已经配置第三方接口的品牌
+        List<BrandSetting> brandSettingList = brandSettingService.selectListByState();
+        List<String> appidList = new ArrayList<>();
+        if (!brandSettingList.isEmpty()) {
+            for (BrandSetting brandSetting : brandSettingList) {
+                appidList.add(brandSetting.getAppid());
+            }
+        }
+        /**
+         * 1.将appId timestamp nonce 三个参数进行字典排序
+         * 2,.将3个参数字符串拼接成一个字符串进行sha1加密
+         */
+        if (ThirdPatyUtils.checkSignature(signature, timestamp, nonce, appidList)) {
+            //定位数据库
+            BrandSetting brandSetting = brandSettingService.selectByAppid(appid);
+            if (null == brandSetting || "0".equals(brandSetting.getOpenThirdInterface().toString())) {
+                result.setSuccess(false);
+                result.setMessage("参数非法");
+                return result;
+            }
+            //判断是需要店铺数据还是品牌数据
+            List<Order> orderList = new ArrayList<>();
+            //定位数据库
+            request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
+            if (StringUtils.isEmpty(thirdAppid)) {//说明需要的是品牌数据
+                orderList = orderService.selectBaseToKCList(brandSetting.getBrandId(), beginDate, endDate);
+            } else {
+                //说明需要的是店铺端的数据
+                //判断是否是
+                ShopDetail shopDetail = shopDetailService.selectByThirdAppId(thirdAppid);
+                if (null == shopDetail) {
+                    result.setSuccess(false);
+                    result.setMessage("参数非法");
+                    return result;
+                } else {
+                    orderList = orderService.selectBaseToKCListByShopId(shopDetail.getId(), beginDate, endDate);
+                }
+            }
+            //把需要的信息封装起来
+            List<Map<String, Object>> ThirdData = new ArrayList<>(1000);
+                for (Order o : orderList) {
+                        Map<String,Object> ordermap = new HashedMap();
+                        ordermap.put("id",o.getId());//订单id
+                        ordermap.put("createTime",DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));//下单时间
+                        ordermap.put("orderMoney",o.getOrderMoney());//订单金额
+                        ordermap.put("amountWithChild",o.getAmountWithChildren());
+                        ordermap.put("cancel",o.getOrderState()==9?0:1);
+                        ordermap.put("parentOrderId",o.getParentOrderId());
+                        List<Map<String,Object>> payList = new ArrayList<>();
+                        if(!o.getOrderPaymentItems().isEmpty()){
+                            for(OrderPaymentItem oi:o.getOrderPaymentItems()){
+                                Map<String,Object> payMap = new HashedMap();
+                                payMap.put("type",oi.getPayValue().compareTo(BigDecimal.ZERO)>0?1:-1);
+                                payMap.put("payValue",oi.getPayValue());
+                                payMap.put("payTime",DateUtil.formatDate(oi.getPayTime(),"yyyy-MM-dd HH:mm:ss"));
+                                if(oi.getResultData().contains("ERROR")||oi.getResultData().equals("{}")||oi.getResultData().contains("累计退款金额大于支付金额")){
+                                    payMap.put("state",0);
+                                }else {
+                                    payMap.put("state",1);
+                                }
+                                payList.add(payMap);
+                            }
+                        }
+                        ordermap.put("payList",payList);
+                    ThirdData.add(ordermap);
+                    }
+                return getSuccessResult(ThirdData);
+                }
+               return  result;
+            }
+
+
 
 }

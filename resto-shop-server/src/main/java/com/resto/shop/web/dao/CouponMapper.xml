@@ -185,6 +185,7 @@
         WHEN 0 THEN '注册优惠间'
         WHEN 1 THEN '邀请优惠卷'
         WHEN 2 THEN '生日优惠卷'
+        WHEN 3 THEN '分享优惠卷'
         END couponType,
         IF(tc.brand_id is not null,'品牌','店铺') couponSoure,
         tc.`name` couponName,

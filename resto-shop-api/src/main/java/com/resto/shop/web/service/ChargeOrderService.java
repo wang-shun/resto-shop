@@ -36,7 +36,8 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 * @param order
 	 * @return  array[0]充值支付金额  array[1]赠送支付金额
 	 */
-	void useChargePay(BigDecimal remainPay, String customerId, Order order);
+	void useChargePay(BigDecimal remainPay, String customerId, Order order,String brandName);
+
 
 
 	void refundCharge(BigDecimal payValue, String id,String shopDetailId);

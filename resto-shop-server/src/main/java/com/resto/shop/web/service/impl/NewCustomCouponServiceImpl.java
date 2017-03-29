@@ -165,6 +165,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setUseWithAccount(cfg.getUseWithAccount());
                 coupon.setDistributionModeId(cfg.getDistributionModeId());
                 coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
+                if (couponType.equals(3)){
+                    coupon.setCouponSource(CouponSource.SHARE_COUPON);
+                }
                 coupon.setCustomerId(cus.getId());
                 coupon.setPushDay(cfg.getPushDay());
                 coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
