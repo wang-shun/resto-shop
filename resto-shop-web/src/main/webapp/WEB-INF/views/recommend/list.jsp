@@ -96,6 +96,25 @@
                                                 </div>
 
 
+                                                <div class="caption">
+                                                    <label class="control-label col-md-4"
+                                                           style="width:120px">选择类型&nbsp;</label>
+                                                    <div class="col-md-4" >
+
+                                                        <select class="form-control" style="width:150px;padding-right: 15px"
+                                                                id="choiceType" v-model="m.choiceType" name="choiceType"
+                                                                 >
+                                                            <option value="1" >必选</option>
+                                                            <option selected value="0" >任选</option>
+                                                        </select>
+
+
+                                                    </div>
+
+
+                                                </div>
+
+
                                                 <div class="tools">
                                                     <a href="javascript:;" class="remove"
                                                        @click="delMealAttr(attr)"></a>
@@ -560,6 +579,7 @@
                                 $('#maxCount').val(result.count);
                                 $('#printType').val(result.printType);
                                 $('#totalKitchen').val(result.kitchenId);
+                                $('#choiceType').val(result.choiceType);
                                 that.articles = [];
                                 if(  $('#printType').val() == 1){
                                     that.printType = 1;
@@ -625,7 +645,8 @@
                                 count: $('#maxCount').val(),
                                 id : recommendId,
                                 printType:$('#printType').val(),
-                                kitchenId:$('#totalKitchen').val()
+                                kitchenId:$('#totalKitchen').val(),
+                                choiceType:$('#choiceType').val()
                             };
                             data.articles = this.articles;
 //                            if($('#printType').val() == 0){

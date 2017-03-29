@@ -26,6 +26,16 @@ public class ArticleRecommend implements Serializable {
 
     private String imageUrl;
 
+    private Integer choiceType;
+
+    public Integer getChoiceType() {
+        return choiceType;
+    }
+
+    public void setChoiceType(Integer choiceType) {
+        this.choiceType = choiceType;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
