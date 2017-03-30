@@ -351,6 +351,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }
         }
+        if(!StringUtils.isEmpty(order.getParentOrderId())){  //如果是加菜订单
+            Order farOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+            if(farOrder.getOrderState() == OrderState.SUBMIT && (farOrder.getPayMode() == OrderPayMode.YL_PAY || farOrder.getPayMode() == OrderPayMode.XJ_PAY ||
+                    farOrder.getPayMode() == OrderPayMode.SHH_PAY || farOrder.getPayMode() == OrderPayMode.JF_PAY )){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("付款中的订单，请等待服务员确认后在进行加菜");
+                return jsonResult;
+            }
+        }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
@@ -1523,7 +1532,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(),order.getId(),order.getProductionStatus());
             LogTemplateUtils.getParentOrderPrintSuccessByPOSType(brand.getBrandName(),order.getId(),order.getProductionStatus());
-            if (order.getOrderMode() != ShopMode.CALL_NUMBER ) {
+            //现金 银联 闪惠 积分 支付的时候  在付款中 服务员尚未确定的时候  不可加菜  有一段加菜真空期！
+            if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY
+                    && order.getPayMode() != OrderPayMode.SHH_PAY && order.getPayMode() != OrderPayMode.JF_PAY) {
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
 
                 } else {
@@ -4814,17 +4825,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
                 //截取电话号码
-                String[] telephones = shopDetail.getnoticeTelephone().split("，");
-                for (String tel : telephones) {
-                    try {
-                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
-                        Thread thread = Thread.currentThread();
-                        thread.sleep(3000);//暂停1.5秒后程序继续执行
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                String  telephones = shopDetail.getnoticeTelephone().replaceAll("，",",");
+                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
             }
      //   SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
 
