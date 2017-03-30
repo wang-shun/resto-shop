@@ -351,6 +351,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }
         }
+        if(!StringUtils.isEmpty(order.getParentOrderId())){  //如果是加菜订单
+            Order farOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+            if(farOrder.getOrderState() == OrderState.SUBMIT && (farOrder.getPayMode() == OrderPayMode.YL_PAY || farOrder.getPayMode() == OrderPayMode.XJ_PAY ||
+                    farOrder.getPayMode() == OrderPayMode.SHH_PAY || farOrder.getPayMode() == OrderPayMode.JF_PAY )){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("付款中的订单，请等待服务员确认后在进行加菜");
+                return jsonResult;
+            }
+        }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
