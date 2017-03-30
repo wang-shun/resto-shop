@@ -1532,7 +1532,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(),order.getId(),order.getProductionStatus());
             LogTemplateUtils.getParentOrderPrintSuccessByPOSType(brand.getBrandName(),order.getId(),order.getProductionStatus());
-            if (order.getOrderMode() != ShopMode.CALL_NUMBER ) {
+            if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY) {
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
 
                 } else {
