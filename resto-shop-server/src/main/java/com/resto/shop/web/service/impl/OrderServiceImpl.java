@@ -4621,17 +4621,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
                 //截取电话号码
-                String[] telephones = shopDetail.getnoticeTelephone().split("，");
-                for (String tel : telephones) {
-                    try {
-                        SMSUtils.sendMessage(tel, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
-                        Thread thread = Thread.currentThread();
-                        thread.sleep(3000);//暂停1.5秒后程序继续执行
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                String telephones = shopDetail.getnoticeTelephone().replaceAll("，",",");
+                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122",null);//推送本日信息
             }
      //   SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
 

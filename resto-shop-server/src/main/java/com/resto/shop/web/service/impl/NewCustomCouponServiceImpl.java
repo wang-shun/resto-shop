@@ -193,7 +193,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 }
                 long begin=coupon.getBeginDate().getTime();
                 long end=coupon.getEndDate().getTime();
-                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
+                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail,null);
             }
         }
     }
@@ -246,11 +246,12 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         doPost(LogUtils.url, map);
         long begin=coupon.getBeginDate().getTime();
         long end=coupon.getEndDate().getTime();
-        timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
+        map.put("content", "系统向用户:"+customer.getNickname()+"生日优惠券发短信提醒:"+",请求服务器地址为:" + MQSetting.getLocalIP());
+        timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail,map);
     }
 
     //得到优惠券的时间，然后做定时任务
-	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail){
+	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail,Map<String,String>logMap){
             Integer pushDay = shopDetail.getRecommendTime();
 	    	Customer customer=customerService.selectById(customerId);
 	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -272,7 +273,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                     String pr=price+"";//将BigDecimal类型转换成String
 
                     if(setting.getIsSendCouponMsg() == Common.YES){
-                        sendNote(shopDetail.getName(),pr,name,pushDay,customerId);//发送短信
+                        sendNote(shopDetail.getName(),pr,name,pushDay,customerId,logMap);//发送短信
                     }
 
 	    		}else{
@@ -286,7 +287,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    }
      
 	  //发送短信
-	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId){
+	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId,Map<String,String>logMap){
 	        Customer customer=customerService.selectById(customerId);
 	        String day=pushDay+"";//将得到的int转换成String
 	    	Map param = new HashMap();
@@ -294,7 +295,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("price", price);
 			param.put("name", name);
 			param.put("day", day);
-            SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
+            SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
 	    }
 	    
 	    

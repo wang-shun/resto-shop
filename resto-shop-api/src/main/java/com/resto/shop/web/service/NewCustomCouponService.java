@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.Brand;
@@ -33,7 +34,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
     List<NewCustomCoupon> selectListShopId(String currentShopId);
     
     
-    void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail);
+    void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail,Map<String,String> logMap);
 
     /**
      * 查询生日优惠卷
