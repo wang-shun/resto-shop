@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.model.Customer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -130,9 +131,9 @@ public class SmsLogoInfoController extends GenericController{
 	 */
 	@RequestMapping("/sendCode")
 	public String sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId, @RequestParam("smsLogType")int smsLogType){
-		
+
 //		return smsLogService.sendCode(phone, code, brandId, shopId);
-		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType);
+		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null);
 	}
 	
 }

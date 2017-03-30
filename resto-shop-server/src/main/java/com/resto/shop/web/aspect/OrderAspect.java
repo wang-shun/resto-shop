@@ -131,6 +131,9 @@ public class OrderAspect {
 
     private void sendPaySuccessMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
+        if(customer == null){
+            return;
+        }
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
         StringBuffer msg = new StringBuffer();
         msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
