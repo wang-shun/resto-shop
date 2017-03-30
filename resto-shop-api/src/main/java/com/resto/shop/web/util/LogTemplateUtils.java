@@ -1,6 +1,7 @@
 package com.resto.shop.web.util;
 
 import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.web.model.Brand;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.model.*;
 
@@ -303,14 +304,18 @@ public class LogTemplateUtils {
      * 记录评论
      */
     public  static  void  getAppraiseByUserType(String brandName,Appraise appraise,String content,Customer customer){
-        Map map=getOrderBaseMap(brandName,appraise.getOrderId(),ORDERTYPE);
+        Map map=getOrderBaseMap(brandName,appraise.getCustomerId(),USERTYPE);
         StringBuilder sb = new StringBuilder();
         sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
         map.put("content", "用户:" +customer.getNickname() + sb.toString() +"服务器地址"+ MQSetting.getLocalIP());
         doPost(url,map);
     }
 
+    public static void getRefundWechatByUserType(Order order, Brand brand, String name) {
+        Map map=getOrderBaseMap(brand.getBrandName(),order.getCustomerId(),USERTYPE);
+        map.put("content", "用户:" +order.getCustomer().getNickname() +"用户在微信支付上点了×" +"服务器地址"+ MQSetting.getLocalIP());
 
+    }
     //记录userActin end---------------------------------------------------------
 
 
