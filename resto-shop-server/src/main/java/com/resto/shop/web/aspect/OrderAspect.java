@@ -93,11 +93,11 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            if(order.getCustomerId().equals("0")){
-                //pos端点餐
-                MQMessageProducer.sendPlaceOrderMessage(order);
-                return;
-            }
+//            if(order.getCustomerId().equals("0")){
+//                //pos端点餐
+//                MQMessageProducer.sendPlaceOrderMessage(order);
+//                return;
+//            }
 
 
 
