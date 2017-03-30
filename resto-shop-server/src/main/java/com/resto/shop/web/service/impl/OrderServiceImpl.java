@@ -1532,6 +1532,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(),order.getId(),order.getProductionStatus());
             LogTemplateUtils.getParentOrderPrintSuccessByPOSType(brand.getBrandName(),order.getId(),order.getProductionStatus());
+            //现金 银联 闪惠 积分 支付的时候  在付款中 服务员尚未确定的时候  不可加菜  有一段加菜真空期！
             if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY
                     && order.getPayMode() != OrderPayMode.SHH_PAY && order.getPayMode() != OrderPayMode.JF_PAY) {
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
