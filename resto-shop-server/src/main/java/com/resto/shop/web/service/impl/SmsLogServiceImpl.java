@@ -2,9 +2,11 @@ package com.resto.shop.web.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.model.Customer;
 import org.json.JSONObject;
 
 import com.resto.brand.core.entity.Result;
@@ -58,7 +60,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     
 	@Override
-	public String sendCode(String phone, String code, String brandId, String shopId, int smsLogType) {
+	public String sendCode(String phone, String code, String brandId, String shopId, int smsLogType,Map<String,String> logMap) {
 		Brand b = brandService.selectById(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
 		//查询
@@ -68,7 +70,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		//发送短信返回
 		String string = null;
 		if(smsLogType == SmsLogType.AUTO_CODE){
-			string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser);
+			string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser,logMap);
 		}
 
 		SmsLog smsLog = new SmsLog();
@@ -90,7 +92,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 					//更新短信账户的信息
 					smsAcountService.updateByBrandId(brandId);
 					//判断是否要提醒商家充值短信账户
-					sendNotice(b,brandUser);
+					sendNotice(b,brandUser,logMap);
 				}catch(Exception e){
 					log.error("发送短信失败:"+e.getMessage());
 				}
@@ -103,7 +105,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		return string;
 	}
 
-	private void sendNotice(Brand b,BrandUser brandUser) {
+	private void sendNotice(Brand b,BrandUser brandUser,Map<String,String>logMap) {
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(b.getId());
 		//获取短信账户短信提醒
 		String str = smsAcount.getSmsRemind();
@@ -113,33 +115,40 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		//判断是否需要提醒
 		if(this.isHave(arrs, remindNum+"")){
 			//提醒商家充值
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),remindNum, brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),remindNum, brandUser.getPhone(),logMap);
 		}
 	}
 
 	
-	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser){
+	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser,Map<String,String> logMap){
 		//判断该品牌账户的余额是否充足
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取剩余短信条数
 		int remindNum = smsAcount.getRemainderNum();
 		String [] arrs = smsAcount.getSmsRemind().split(",");
+        StringBuilder sb = new StringBuilder();
 		//判断剩余短信条数是否大于设定的最小可发短信值
 		if(remindNum<this.getMinStr(arrs)){
 			//我们提醒商家充值
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone());
+            String content = sb.append(logMap.get("content")).append("商家剩余条数不足").toString();
+            logMap.put("content",content);
+			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
 			log.info("剩余短信为"+remindNum+"条无法发短信");
 			//返回false标记让商家无法发短信
 			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
 		}else{
 			//剩余短信在设置的范围内
 			if(this.isHave(arrs, remindNum+"")){
+                String content = sb.append(logMap.get("content")).append("在固定条数短信时发短信给商家").toString();
+                logMap.put("content",content);
 				//发短信提醒商家
-				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone());
+				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone(),logMap);
 			}
 		}
 		//商家给客户发短信
-		return SMSUtils.sendCode(sign, serviceName, code, phone);
+        String content = sb.append(logMap.get("content")).append("商家给客户发短信").toString();
+		logMap.put("content",content);
+		return SMSUtils.sendCode(sign, serviceName, code, phone,logMap);
 	}
 
 	@Override

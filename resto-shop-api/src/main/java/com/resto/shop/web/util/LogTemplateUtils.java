@@ -253,10 +253,23 @@ public class LogTemplateUtils {
         doPost(url,map);
     }
 
+    //现金支付
     public static void getMoneyByUserType(String brandName, String id, String nickname, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,USERTYPE);
         map.put("content", "用户:"+nickname+"使用现金支付了:"+payValue+"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url,map);
+    }
+
+    //充值余额支付
+    public static void getChargeByUserType(String brandName, Customer customer,BigDecimal payValue) {
+        Map map=getOrderBaseMap(brandName,customer.getId(),ORDERTYPE);
+        map.put("content", "用户:" + customer.getNickname() + "使用了充值余额支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
+    }
+
+    //充值赠送余额支付
+    public static void getChargeRewardByUserType(String brandName,Customer customer, BigDecimal payValue) {
+        Map map=getOrderBaseMap(brandName,customer.getId(),ORDERTYPE);
+        map.put("content", "用户:" + customer.getNickname() + "使用了充值赠送余额支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
     }
 
     /**
@@ -265,10 +278,11 @@ public class LogTemplateUtils {
     public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article){
         Map map=getOrderBaseMap(brandName,customer.getId(),USERTYPE);
         StringBuilder sb = new StringBuilder();
+        String articleTypeName=OrderItemType.getPayModeName(article.getArticleType());
         sb.append("用户:"+customer.getNickname())
                 .append("将菜品id:"+article.getId())
                 .append("菜品类型为:")
-                .append(OrderItemType.getPayModeName(article.getArticleType())).append("菜品名字为:")
+                .append(articleTypeName).append("菜品名字为:")
                 .append(article.getName()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
         doPost(url,map);
@@ -282,6 +296,17 @@ public class LogTemplateUtils {
                 .append("将菜品类型为:").append(OrderItemType.getPayModeName(type))
                 .append("菜品名字为:").append(articleName).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
+        doPost(url,map);
+    }
+
+    /**
+     * 记录评论
+     */
+    public  static  void  getAppraiseByUserType(String brandName,Appraise appraise,String content,Customer customer){
+        Map map=getOrderBaseMap(brandName,appraise.getOrderId(),ORDERTYPE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
+        map.put("content", "用户:" +customer.getNickname() + sb.toString() +"服务器地址"+ MQSetting.getLocalIP());
         doPost(url,map);
     }
 

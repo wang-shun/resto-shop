@@ -321,7 +321,7 @@
                     </div>
 
                     <div class="form-group" v-show="b.posOpenTable == 1">
-                        <label class="col-md-4 control-label">开启pos开台：</label>
+                        <label class="col-md-4 control-label">开启pos开单：</label>
                         <div  class="col-md-6 radio-list">
                             <label class="radio-inline">
                                 <input type="radio" name="posOpenTable"v-model="m.posOpenTable" value="1">启用
