@@ -374,6 +374,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (customer != null && customer.getTelephone() != null) {
             order.setVerCode(customer.getTelephone().substring(7));
+        } else  if(customer == null && order.getOrderMode() == ShopMode.CALL_NUMBER && order.getTableNumber() != null){
+            order.setVerCode(order.getTableNumber());
         } else {
             if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
@@ -3956,7 +3958,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 BigDecimal nowCustomerCount = new BigDecimal(orderAll.getCustomerCount() == null ? 0 : orderAll.getCustomerCount());
                 BigDecimal oldCustomerCount = new BigDecimal(orderAll.getBaseCustomerCount() == null ? 0 : orderAll.getBaseCustomerCount());
                 if (orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)) {
-                    if (StringUtils.isBlank(orderAll.getParentOrderId())) {
+                    if (StringUtils.isNotBlank(orderAll.getParentOrderId())) {
                         serviceMap.put(orderAll.getId(), 0);
                     } else {
                         nowService = nowService.add(nowCustomerCount);

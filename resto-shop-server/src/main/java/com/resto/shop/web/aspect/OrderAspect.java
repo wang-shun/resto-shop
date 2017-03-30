@@ -438,10 +438,6 @@ public class OrderAspect {
     @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
     public void pushOrderAfter(Order order) throws Throwable {
         if (order != null) {
-            if(order.getCustomerId().equals("0")){
-                //pos点餐
-                return;
-            }
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
                     return;
