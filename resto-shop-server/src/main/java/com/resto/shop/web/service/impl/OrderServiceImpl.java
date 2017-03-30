@@ -331,6 +331,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
     }
 
+
+    /**
+    * @Author: KONATA
+    * @Description
+    * @Date: 15:42 2017/3/30
+    */
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -339,9 +345,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        if (customer == null) {
-            throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
-        } else if (order.getOrderItems().isEmpty()) {
+        if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
@@ -561,15 +565,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用等位红包支付了：" + item.getPayValue());
+//                Map waitPayMap = new HashMap(4);
+//                waitPayMap.put("brandName", brand.getBrandName());
+//                waitPayMap.put("fileName", order.getId());
+//                waitPayMap.put("type", "orderAction");
+//                waitPayMap.put("content", "订单:"+order.getId()+"使用等位红包支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, waitPayMap);
+//                Map CustomerWaitPayMap = new HashMap(4);
+//                CustomerWaitPayMap.put("brandName", brand.getBrandName());
+//                CustomerWaitPayMap.put("fileName", customer.getId());
+//                CustomerWaitPayMap.put("type", "UserAction");
+//                CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, CustomerWaitPayMap);
                 LogTemplateUtils.getWaitMoneyLogByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
-
-//            Map CustomerWaitPayMap = new HashMap(4);
-//            CustomerWaitPayMap.put("brandName", brand.getBrandName());
-//            CustomerWaitPayMap.put("fileName", customer.getId());
-//            CustomerWaitPayMap.put("type", "UserAction");
-//            CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, CustomerWaitPayMap);
                 LogTemplateUtils.getWaitMoneyLogByUserType(brand.getBrandName(), order.getId(), item.getPayValue(), customer.getNickname());
+
                 GetNumber getNumber = getNumberService.selectById(order.getWaitId());
                 log.error(order.getWaitId() + "-----------222222222222222");
                 getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
@@ -578,7 +588,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             payMoney = payMoney.subtract(order.getWaitMoney());
 
-            if (detail.getShopMode() != ShopMode.HOUFU_ORDER) {
+            if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
                 if (order.getUseCoupon() != null && order.getParentOrderId() == null) {
                     Coupon coupon = couponService.useCoupon(totalMoney, order);
                     OrderPaymentItem item = new OrderPaymentItem();
@@ -592,22 +602,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单使用优惠卷支付了：" + item.getPayValue());
-//                Map couponPaymap = new HashMap(4);
-//                couponPaymap.put("brandName", brand.getBrandName());
-//                couponPaymap.put("fileName", order.getId());
-//                couponPaymap.put("type", "orderAction");
-//                couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, couponPaymap);
+//                    Map couponPaymap = new HashMap(4);
+//                    couponPaymap.put("brandName", brand.getBrandName());
+//                    couponPaymap.put("fileName", order.getId());
+//                    couponPaymap.put("type", "orderAction");
+//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    doPost(url, couponPaymap);
+//                    Map CustomerCouponPaymap = new HashMap(4);
+//                    CustomerCouponPaymap.put("brandName", brand.getBrandName());
+//                    CustomerCouponPaymap.put("fileName", customer.getId());
+//                    CustomerCouponPaymap.put("type", "UserAction");
+//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    doPost(url, CustomerCouponPaymap);
                     LogTemplateUtils.getCouponByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
-
-//                Map CustomerCouponPaymap = new HashMap(4);
-//                CustomerCouponPaymap.put("brandName", brand.getBrandName());
-//                CustomerCouponPaymap.put("fileName", customer.getId());
-//                CustomerCouponPaymap.put("type", "UserAction");
-//                CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerCouponPaymap);
                     LogTemplateUtils.getCouponByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
-
                     payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
                 // 使用余额
@@ -642,20 +650,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-//            Map cartPayMap = new HashMap(4);
-//            cartPayMap.put("brandName", brand.getBrandName());
-//            cartPayMap.put("fileName", order.getId());
-//            cartPayMap.put("type", "orderAction");
-//            cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, cartPayMap);
+//                Map cartPayMap = new HashMap(4);
+//                cartPayMap.put("brandName", brand.getBrandName());
+//                cartPayMap.put("fileName", order.getId());
+//                cartPayMap.put("type", "orderAction");
+//                cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, cartPayMap);
                 LogTemplateUtils.getBankByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
 
-//            Map CustomerCartPayMap = new HashMap(4);
-//            CustomerCartPayMap.put("brandName", brand.getBrandName());
-//            CustomerCartPayMap.put("fileName", customer.getId());
-//            CustomerCartPayMap.put("type", "UserAction");
-//            CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, CustomerCartPayMap);
+//                Map CustomerCartPayMap = new HashMap(4);
+//                CustomerCartPayMap.put("brandName", brand.getBrandName());
+//                CustomerCartPayMap.put("fileName", customer.getId());
+//                CustomerCartPayMap.put("type", "UserAction");
+//                CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, CustomerCartPayMap);
                 LogTemplateUtils.getBankByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
                 order.setAllowContinueOrder(false);
             } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
@@ -669,21 +677,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-//            Map crashPayMap = new HashMap(4);
-//            crashPayMap.put("brandName", brand.getBrandName());
-//            crashPayMap.put("fileName", order.getId());
-//            crashPayMap.put("type", "orderAction");
-//            crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, crashPayMap);
+//                Map crashPayMap = new HashMap(4);
+//                crashPayMap.put("brandName", brand.getBrandName());
+//                crashPayMap.put("fileName", order.getId());
+//                crashPayMap.put("type", "orderAction");
+//                crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, crashPayMap);
                 LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                 LogTemplateUtils.getMoneyByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
 
-//            Map CustomerCrashPayMap = new HashMap(4);
-//            CustomerCrashPayMap.put("brandName", brand.getBrandName());
-//            CustomerCrashPayMap.put("fileName", customer.getId());
-//            CustomerCrashPayMap.put("type", "UserAction");
-//            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, CustomerCrashPayMap);
+//                Map CustomerCrashPayMap = new HashMap(4);
+//                CustomerCrashPayMap.put("brandName", brand.getBrandName());
+//                CustomerCrashPayMap.put("fileName", customer.getId());
+//                CustomerCrashPayMap.put("type", "UserAction");
+//                CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, CustomerCrashPayMap);
                 order.setAllowContinueOrder(false);
             } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -830,121 +838,121 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
                     update(parent);
                 }
-            } else {
-                //pos开台支付不存在用户的时候执行
-                OrderPaymentItem item = null;
-                order.setOrderState(OrderState.PAYMENT);
-                order.setAllowContinueOrder(false);
-                order.setAccountingTime(order.getCreateTime()); // 财务结算时间
-                order.setAllowCancel(true); // 订单是否允许取消
-                order.setAllowAppraise(false);
-                order.setArticleCount(articleCount); // 订单餐品总数
-                order.setClosed(false); // 订单是否关闭 否
-                order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-                order.setOriginalAmount(totalMoney);// 原价
-                order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
-                order.setOrderMoney(totalMoney); // 订单实际金额
-                order.setPrintTimes(0);
-                order.setCustomerId("0");
-                order.setOrderMode(ShopMode.CALL_NUMBER);
-                order.setProductionStatus(ProductionStatus.NOT_ORDER);
-                insert(order);
-                jsonResult.setData(order);
-                switch (order.getPayMode()) {
-                    case OrderPayMode.WX_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.WEIXIN_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("微信支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                    case OrderPayMode.ALI_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.ALI_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("支付宝支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                    case OrderPayMode.YL_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.BANK_CART_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("银联支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                    case OrderPayMode.XJ_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.CRASH_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("现金支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                    case OrderPayMode.SHH_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.SHANHUI_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("大众点评支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                    case OrderPayMode.JF_PAY:
-                        item = new OrderPaymentItem();
-                        item.setId(ApplicationUtils.randomUUID());
-                        item.setOrderId(orderId);
-                        item.setPaymentModeId(PayMode.INTEGRAL_PAY);
-                        item.setPayTime(order.getCreateTime());
-                        item.setPayValue(order.getPaymentAmount());
-                        item.setRemark("大众点评支付:" + order.getPaymentAmount());
-                        orderPaymentItemService.insert(item);
-                        break;
-                }
-                if (order.getGiveChange().doubleValue() > 0) {
+            }
+        } else {
+            //pos开台支付不存在用户的时候执行
+            OrderPaymentItem item = null;
+            order.setOrderState(OrderState.PAYMENT);
+            order.setAllowContinueOrder(false);
+            order.setAccountingTime(order.getCreateTime()); // 财务结算时间
+            order.setAllowCancel(true); // 订单是否允许取消
+            order.setAllowAppraise(false);
+            order.setArticleCount(articleCount); // 订单餐品总数
+            order.setClosed(false); // 订单是否关闭 否
+            order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
+            order.setOriginalAmount(totalMoney);// 原价
+            order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
+            order.setOrderMoney(totalMoney); // 订单实际金额
+            order.setPrintTimes(0);
+            order.setCustomerId("0");
+            order.setOrderMode(ShopMode.CALL_NUMBER);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
+            insert(order);
+            jsonResult.setData(order);
+            switch (order.getPayMode()) {
+                case OrderPayMode.WX_PAY:
                     item = new OrderPaymentItem();
                     item.setId(ApplicationUtils.randomUUID());
                     item.setOrderId(orderId);
-                    item.setPaymentModeId(PayMode.GIVE_CHANGE);
+                    item.setPaymentModeId(PayMode.WEIXIN_PAY);
                     item.setPayTime(order.getCreateTime());
-                    item.setPayValue(order.getGiveChange());
-                    item.setRemark("找零:" + order.getGiveChange());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("微信支付:" + order.getPaymentAmount());
                     orderPaymentItemService.insert(item);
-                }
+                    break;
+                case OrderPayMode.ALI_PAY:
+                    item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.ALI_PAY);
+                    item.setPayTime(order.getCreateTime());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("支付宝支付:" + order.getPaymentAmount());
+                    orderPaymentItemService.insert(item);
+                    break;
+                case OrderPayMode.YL_PAY:
+                    item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.BANK_CART_PAY);
+                    item.setPayTime(order.getCreateTime());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("银联支付:" + order.getPaymentAmount());
+                    orderPaymentItemService.insert(item);
+                    break;
+                case OrderPayMode.XJ_PAY:
+                    item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.CRASH_PAY);
+                    item.setPayTime(order.getCreateTime());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("现金支付:" + order.getPaymentAmount());
+                    orderPaymentItemService.insert(item);
+                    break;
+                case OrderPayMode.SHH_PAY:
+                    item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.SHANHUI_PAY);
+                    item.setPayTime(order.getCreateTime());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("大众点评支付:" + order.getPaymentAmount());
+                    orderPaymentItemService.insert(item);
+                    break;
+                case OrderPayMode.JF_PAY:
+                    item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.INTEGRAL_PAY);
+                    item.setPayTime(order.getCreateTime());
+                    item.setPayValue(order.getPaymentAmount());
+                    item.setRemark("大众点评支付:" + order.getPaymentAmount());
+                    orderPaymentItemService.insert(item);
+                    break;
+            }
+            if (order.getGiveChange().doubleValue() > 0) {
+                item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.GIVE_CHANGE);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(order.getGiveChange());
+                item.setRemark("找零:" + order.getGiveChange());
+                orderPaymentItemService.insert(item);
             }
         }
         return jsonResult;
     }
 
-        @Override
-        public void updateOrderChild (String orderId){
-            Order order = orderMapper.selectByPrimaryKey(orderId);
-            Order parent = selectById(order.getParentOrderId());
-            int articleCountWithChildren = selectArticleCountById(parent.getId(), parent.getOrderMode());
-            if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
-                parent.setLastOrderTime(order.getCreateTime());
-            }
-            Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
-            parent.setCountWithChild(articleCountWithChildren);
-            if (amountWithChildren == parent.getOrderMoney().doubleValue()) {
-                parent.setAmountWithChildren(new BigDecimal(0.0));
-            } else {
-                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-            }
-
-            update(parent);
+    @Override
+    public void updateOrderChild(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        Order parent = selectById(order.getParentOrderId());
+        int articleCountWithChildren = selectArticleCountById(parent.getId(), parent.getOrderMode());
+        if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+            parent.setLastOrderTime(order.getCreateTime());
         }
+        Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+        parent.setCountWithChild(articleCountWithChildren);
+        if (amountWithChildren == parent.getOrderMoney().doubleValue()) {
+            parent.setAmountWithChildren(new BigDecimal(0.0));
+        } else {
+            parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+        }
+
+        update(parent);
+    }
 
     public Result checkArticleList(OrderItem orderItem, int count) {
 
