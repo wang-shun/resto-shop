@@ -2185,7 +2185,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())) {
                     getOrderItems(article, items, refundItems);
                     getOrderItemMeal(orderItems, items, refundItems, article.getId());
-                } else {
+                } else if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)){
                     if (article.getArticleId().contains("@")) {
                         if (articleId.equalsIgnoreCase(article.getArticleId().substring(0, article.getArticleId().indexOf("@")))) {
                             getOrderItems(article, items, refundItems);
