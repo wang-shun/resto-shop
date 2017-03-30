@@ -776,7 +776,7 @@ GROUP BY article_id
     </select>
 
     <select id="selectByName" resultType="Article">
-        select * from  tb_article where eleme_name = #{name} and state = 1
+        select * from  tb_article where eleme_name like CONCAT('%',#{name},'%')   and state = 1
         and shop_detail_id = #{shopId}
     </select>
 

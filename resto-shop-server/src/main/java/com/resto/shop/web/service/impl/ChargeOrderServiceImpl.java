@@ -122,6 +122,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	private void useBalance(BigDecimal[] result, BigDecimal remindPay, String customerId, Order order,String brandName) {
 		ChargeOrder chargeOrder = chargeorderMapper.selectFirstBalanceOrder(customerId);
+		Customer c = customerService.selectById(customerId);
 		if(chargeOrder!=null){
 			BigDecimal useReward = useReward(chargeOrder,remindPay);  //使用返利支付
 			BigDecimal useCharge = useCharge(chargeOrder,remindPay.subtract(useReward).setScale(2, BigDecimal.ROUND_HALF_UP));  //使用充值支付
@@ -139,9 +140,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setRemark("充值余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
-				//记录充值余额支付
+				//记录充值余额支付 orderAction
                 LogTemplateUtils.getChargeByOrderType(brandName,item.getPayValue(),order.getId());
-
+                LogTemplateUtils.getChargeByUserType(brandName,c,item.getPayValue());
 			}
 			if(useReward.compareTo(BigDecimal.ZERO)>0){
 				OrderPaymentItem item = new OrderPaymentItem();
@@ -153,9 +154,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setRemark("赠送余额支付:" + item.getPayValue());
 				item.setResultData(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
-				//记录充值赠送余额支付
+				//记录充值赠送余额支付 orderActon
                 LogTemplateUtils.getChargeRewardByOrderType(brandName,item.getPayValue(),order.getId());
-
+                //记录充值赠送 userAction
+                LogTemplateUtils.getChargeByUserType(brandName,c,item.getPayValue());
 			}
 			if(remindPay.compareTo(totalPay)>0){
 				remindPay = remindPay.subtract(totalPay).setScale(2, BigDecimal.ROUND_HALF_UP);

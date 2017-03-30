@@ -340,7 +340,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        if (order.getOrderItems().isEmpty()) {
+        if (customer == null) {
+            throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
+        } else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
@@ -560,65 +562,61 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用等位红包支付了：" + item.getPayValue());
-//                Map waitPayMap = new HashMap(4);
-//                waitPayMap.put("brandName", brand.getBrandName());
-//                waitPayMap.put("fileName", order.getId());
-//                waitPayMap.put("type", "orderAction");
-//                waitPayMap.put("content", "订单:"+order.getId()+"使用等位红包支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, waitPayMap);
-//                Map CustomerWaitPayMap = new HashMap(4);
-//                CustomerWaitPayMap.put("brandName", brand.getBrandName());
-//                CustomerWaitPayMap.put("fileName", customer.getId());
-//                CustomerWaitPayMap.put("type", "UserAction");
-//                CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerWaitPayMap);
-                LogTemplateUtils.getWaitMoneyLogByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
-                LogTemplateUtils.getWaitMoneyLogByUserType(brand.getBrandName(),order.getId(),item.getPayValue(),customer.getNickname());
+            LogTemplateUtils.getWaitMoneyLogByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
 
-                GetNumber getNumber = getNumberService.selectById(order.getWaitId());
-                log.error(order.getWaitId() + "-----------222222222222222");
-                getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
-                getNumberService.update(getNumber);
-            }
+//            Map CustomerWaitPayMap = new HashMap(4);
+//            CustomerWaitPayMap.put("brandName", brand.getBrandName());
+//            CustomerWaitPayMap.put("fileName", customer.getId());
+//            CustomerWaitPayMap.put("type", "UserAction");
+//            CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerWaitPayMap);
+            LogTemplateUtils.getWaitMoneyLogByUserType(brand.getBrandName(),order.getId(),item.getPayValue(),customer.getNickname());
+            GetNumber getNumber = getNumberService.selectById(order.getWaitId());
+            log.error(order.getWaitId() + "-----------222222222222222");
+            getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_THREE);
+            getNumberService.update(getNumber);
+        }
 
-            payMoney = payMoney.subtract(order.getWaitMoney());
+        payMoney = payMoney.subtract(order.getWaitMoney());
 
-            if (detail.getShopMode() != ShopMode.HOUFU_ORDER && order.getPayType() != PayType.NOPAY) {
-                if (order.getUseCoupon() != null && order.getParentOrderId() == null) {
-                    Coupon coupon = couponService.useCoupon(totalMoney, order);
-                    OrderPaymentItem item = new OrderPaymentItem();
-                    item.setId(ApplicationUtils.randomUUID());
-                    item.setOrderId(orderId);
-                    item.setPaymentModeId(PayMode.COUPON_PAY);
-                    item.setPayTime(order.getCreateTime());
-                    item.setPayValue(coupon.getValue());
-                    item.setRemark("优惠卷支付:" + item.getPayValue());
-                    item.setResultData(coupon.getId());
-                    orderPaymentItemService.insert(item);
+        if (detail.getShopMode() != ShopMode.HOUFU_ORDER) {
+            if (order.getUseCoupon() != null && order.getParentOrderId() == null) {
+                Coupon coupon = couponService.useCoupon(totalMoney, order);
+                OrderPaymentItem item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.COUPON_PAY);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(coupon.getValue());
+                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setResultData(coupon.getId());
+                orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单使用优惠卷支付了：" + item.getPayValue());
-//                    Map couponPaymap = new HashMap(4);
-//                    couponPaymap.put("brandName", brand.getBrandName());
-//                    couponPaymap.put("fileName", order.getId());
-//                    couponPaymap.put("type", "orderAction");
-//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                    doPost(url, couponPaymap);
-//                    Map CustomerCouponPaymap = new HashMap(4);
-//                    CustomerCouponPaymap.put("brandName", brand.getBrandName());
-//                    CustomerCouponPaymap.put("fileName", customer.getId());
-//                    CustomerCouponPaymap.put("type", "UserAction");
-//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                    doPost(url, CustomerCouponPaymap);
-                    LogTemplateUtils.getCouponByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
-                    LogTemplateUtils.getCouponByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
-                    payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-                }
-                // 使用余额
-                if (payMoney.doubleValue() > 0 && order.isUseAccount() && order.getPayType() != PayType.NOPAY) {
-                    BigDecimal payValue = accountService.payOrder(order, payMoney, customer, brand, shopDetail);
+//                Map couponPaymap = new HashMap(4);
+//                couponPaymap.put("brandName", brand.getBrandName());
+//                couponPaymap.put("fileName", order.getId());
+//                couponPaymap.put("type", "orderAction");
+//                couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, couponPaymap);
+                LogTemplateUtils.getCouponByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+
+//                Map CustomerCouponPaymap = new HashMap(4);
+//                CustomerCouponPaymap.put("brandName", brand.getBrandName());
+//                CustomerCouponPaymap.put("fileName", customer.getId());
+//                CustomerCouponPaymap.put("type", "UserAction");
+//                CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                doPost(url, CustomerCouponPaymap);
+                LogTemplateUtils.getCouponByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+
+                payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+            // 使用余额
+            if (payMoney.doubleValue() > 0 && order.isUseAccount() && order.getPayType() != PayType.NOPAY) {
+                BigDecimal payValue = accountService.payOrder(order, payMoney, customer, brand, shopDetail);
 //			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
-                    if (payValue.doubleValue() > 0) {
-                        payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
+                if (payValue.doubleValue() > 0) {
+                    payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
 //				OrderPaymentItem item = new OrderPaymentItem();
 //				item.setId(ApplicationUtils.randomUUID());
 //				item.setOrderId(orderId);
@@ -629,210 +627,209 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //				item.setResultData(account.getId());
 //				orderPaymentItemService.insert(item);
 //				payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-                    }
                 }
             }
+        }
 
-            //如果是余额不满足时，使用现金或者银联支付
-            if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.YL_PAY) {
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.BANK_CART_PAY);
-                item.setPayTime(order.getCreateTime());
-                item.setPayValue(payMoney);
-                item.setRemark("银联支付:" + item.getPayValue());
-                orderPaymentItemService.insert(item);
+        //如果是余额不满足时，使用现金或者银联支付
+        if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.YL_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.BANK_CART_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("银联支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-//                Map cartPayMap = new HashMap(4);
-//                cartPayMap.put("brandName", brand.getBrandName());
-//                cartPayMap.put("fileName", order.getId());
-//                cartPayMap.put("type", "orderAction");
-//                cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, cartPayMap);
-                LogTemplateUtils.getBankByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+//            Map cartPayMap = new HashMap(4);
+//            cartPayMap.put("brandName", brand.getBrandName());
+//            cartPayMap.put("fileName", order.getId());
+//            cartPayMap.put("type", "orderAction");
+//            cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, cartPayMap);
+            LogTemplateUtils.getBankByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
 
-//                Map CustomerCartPayMap = new HashMap(4);
-//                CustomerCartPayMap.put("brandName", brand.getBrandName());
-//                CustomerCartPayMap.put("fileName", customer.getId());
-//                CustomerCartPayMap.put("type", "UserAction");
-//                CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerCartPayMap);
-                LogTemplateUtils.getBankByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
-                order.setAllowContinueOrder(false);
-            } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.CRASH_PAY);
-                item.setPayTime(order.getCreateTime());
-                item.setPayValue(payMoney);
-                item.setRemark("现金支付:" + item.getPayValue());
-                orderPaymentItemService.insert(item);
+//            Map CustomerCartPayMap = new HashMap(4);
+//            CustomerCartPayMap.put("brandName", brand.getBrandName());
+//            CustomerCartPayMap.put("fileName", customer.getId());
+//            CustomerCartPayMap.put("type", "UserAction");
+//            CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerCartPayMap);
+            LogTemplateUtils.getBankByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+            order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.CRASH_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("现金支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用银联支付了：" + item.getPayValue());
-//                Map crashPayMap = new HashMap(4);
-//                crashPayMap.put("brandName", brand.getBrandName());
-//                crashPayMap.put("fileName", order.getId());
-//                crashPayMap.put("type", "orderAction");
-//                crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, crashPayMap);
-                LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
-                LogTemplateUtils.getMoneyByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
+//            Map crashPayMap = new HashMap(4);
+//            crashPayMap.put("brandName", brand.getBrandName());
+//            crashPayMap.put("fileName", order.getId());
+//            crashPayMap.put("type", "orderAction");
+//            crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, crashPayMap);
+            LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(),order.getId(),item.getPayValue());
+            LogTemplateUtils.getMoneyByUserType(brand.getBrandName(),customer.getId(),customer.getNickname(),item.getPayValue());
 
-//                Map CustomerCrashPayMap = new HashMap(4);
-//                CustomerCrashPayMap.put("brandName", brand.getBrandName());
-//                CustomerCrashPayMap.put("fileName", customer.getId());
-//                CustomerCrashPayMap.put("type", "UserAction");
-//                CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerCrashPayMap);
-                order.setAllowContinueOrder(false);
-            } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.SHANHUI_PAY);
-                item.setPayTime(order.getCreateTime());
-                item.setPayValue(payMoney);
-                item.setRemark("闪惠支付:" + item.getPayValue());
-                orderPaymentItemService.insert(item);
-                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                        "订单使用银联支付了：" + item.getPayValue());
-                order.setAllowContinueOrder(false);
-            } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.JF_PAY) {
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.INTEGRAL_PAY);
-                item.setPayTime(order.getCreateTime());
-                item.setPayValue(payMoney);
-                item.setRemark("积分支付:" + item.getPayValue());
-                orderPaymentItemService.insert(item);
-                Map crashPayMap = new HashMap(4);
-                crashPayMap.put("brandName", brand.getBrandName());
-                crashPayMap.put("fileName", order.getId());
-                crashPayMap.put("type", "orderAction");
-                crashPayMap.put("content", "订单:"+order.getId()+"订单使用积分支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, crashPayMap);
-                Map CustomerCrashPayMap = new HashMap(4);
-                CustomerCrashPayMap.put("brandName", brand.getBrandName());
-                CustomerCrashPayMap.put("fileName", customer.getId());
-                CustomerCrashPayMap.put("type", "UserAction");
-                CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用积分支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, CustomerCrashPayMap);
-                order.setAllowContinueOrder(false);
-            }
+//            Map CustomerCrashPayMap = new HashMap(4);
+//            CustomerCrashPayMap.put("brandName", brand.getBrandName());
+//            CustomerCrashPayMap.put("fileName", customer.getId());
+//            CustomerCrashPayMap.put("type", "UserAction");
+//            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPost(url, CustomerCrashPayMap);
+            order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.SHANHUI_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("闪惠支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    "订单使用银联支付了：" + item.getPayValue());
+            order.setAllowContinueOrder(false);
+        } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.JF_PAY) {
+            OrderPaymentItem item = new OrderPaymentItem();
+            item.setId(ApplicationUtils.randomUUID());
+            item.setOrderId(orderId);
+            item.setPaymentModeId(PayMode.INTEGRAL_PAY);
+            item.setPayTime(order.getCreateTime());
+            item.setPayValue(payMoney);
+            item.setRemark("积分支付:" + item.getPayValue());
+            orderPaymentItemService.insert(item);
+            Map crashPayMap = new HashMap(4);
+            crashPayMap.put("brandName", brand.getBrandName());
+            crashPayMap.put("fileName", order.getId());
+            crashPayMap.put("type", "orderAction");
+            crashPayMap.put("content", "订单:"+order.getId()+"订单使用积分支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, crashPayMap);
+            Map CustomerCrashPayMap = new HashMap(4);
+            CustomerCrashPayMap.put("brandName", brand.getBrandName());
+            CustomerCrashPayMap.put("fileName", customer.getId());
+            CustomerCrashPayMap.put("type", "UserAction");
+            CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用积分支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(url, CustomerCrashPayMap);
+            order.setAllowContinueOrder(false);
+        }
 
-            if (payMoney.doubleValue() < 0) {
-                payMoney = BigDecimal.ZERO;
-            }
-            //yz 记录订单支付项 2017-03-27
-            order.setAccountingTime(order.getCreateTime()); // 财务结算时间
+        if (payMoney.doubleValue() < 0) {
+            payMoney = BigDecimal.ZERO;
+        }
+        //yz 记录订单支付项 2017-03-27
+        order.setAccountingTime(order.getCreateTime()); // 财务结算时间
 
-            order.setAllowCancel(true); // 订单是否允许取消
-            order.setAllowAppraise(false);
-            order.setArticleCount(articleCount); // 订单餐品总数
-            order.setClosed(false); // 订单是否关闭 否
-            order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-            order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
-            order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
-            order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
-            order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
-            order.setPrintTimes(0);
+        order.setAllowCancel(true); // 订单是否允许取消
+        order.setAllowAppraise(false);
+        order.setArticleCount(articleCount); // 订单餐品总数
+        order.setClosed(false); // 订单是否关闭 否
+        order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
+        order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
+        order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
+        order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
+        order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
+        order.setPrintTimes(0);
 
-            order.setOrderMode(detail.getShopMode());
-            if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
-                order.setTableNumber(order.getVerCode());
-            }
+        order.setOrderMode(detail.getShopMode());
+        if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
+            order.setTableNumber(order.getVerCode());
+        }
 
 //        if(!order.getOrderMode().equals(ShopMode.HOUFU_ORDER)){
-            if (!StringUtils.isEmpty(order.getTableNumber())) {
-                if (order.getParentOrderId() != null) {
-                    Order parentOrder = selectById(order.getParentOrderId());
-                    order.setTableNumber(parentOrder.getTableNumber());
-                    order.setVerCode(parentOrder.getVerCode());
-                    order.setCustomerCount(parentOrder.getCustomerCount());
-                } else {
-                    Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(), brandSetting.getCloseContinueTime());
-                    if (lastOrder != null && lastOrder.getParentOrderId() != null) {
-                        Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
-                        if (parent != null && parent.getAllowContinueOrder()) {
-                            order.setParentOrderId(parent.getId());
-                            order.setTableNumber(parent.getTableNumber());
-                            order.setVerCode(parent.getVerCode());
-                            order.setCustomerCount(parent.getCustomerCount());
-                        }
-                    } else {
-                        if (lastOrder != null && lastOrder.getAllowContinueOrder()) {
-                            order.setParentOrderId(lastOrder.getId());
-                            Order parentOrder = selectById(order.getParentOrderId());
-                            order.setTableNumber(parentOrder.getTableNumber());
-                            order.setVerCode(parentOrder.getVerCode());
-                            order.setCustomerCount(parentOrder.getCustomerCount());
-                        }
-                    }
-                }
-            }
-            //判断是否是后付款模式
-            if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-                order.setOrderState(OrderState.SUBMIT);
-                order.setProductionStatus(ProductionStatus.NOT_ORDER);
-                if (order.getDistributionModeId() != 3) {
-                    order.setAllowContinueOrder(true);
-                }
+        if (!StringUtils.isEmpty(order.getTableNumber())) {
+            if (order.getParentOrderId() != null) {
+                Order parentOrder = selectById(order.getParentOrderId());
+                order.setTableNumber(parentOrder.getTableNumber());
+                order.setVerCode(parentOrder.getVerCode());
+                order.setCustomerCount(parentOrder.getCustomerCount());
             } else {
-                order.setOrderState(OrderState.SUBMIT);
-                order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            }
-            if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.NO) {
-                order.setTableNumber(order.getVerCode());
-            }
-
-            if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.YES) {
-                order.setNeedScan(Common.YES);
-            } else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.TABLE_MODE
-                    && StringUtils.isEmpty(order.getTableNumber())) {
-                order.setNeedScan(Common.YES);
-            } else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.HOUFU_ORDER
-                    && StringUtils.isEmpty(order.getTableNumber())) {
-                order.setNeedScan(Common.YES);
-            }
-
-            if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
-                order.setNeedScan(Common.YES);
-            }
-            insert(order);
-            customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
-            if (order.getPaymentAmount().doubleValue() == 0) {
-                payOrderSuccess(order);
-            }
-
-            jsonResult.setData(order);
-            if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-                if (order.getParentOrderId() != null) {  //子订单
-                    Order parent = selectById(order.getParentOrderId());
-                    int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
-                    if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
-                        parent.setLastOrderTime(order.getCreateTime());
+                Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(), brandSetting.getCloseContinueTime());
+                if (lastOrder != null && lastOrder.getParentOrderId() != null) {
+                    Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
+                    if (parent != null && parent.getAllowContinueOrder()) {
+                        order.setParentOrderId(parent.getId());
+                        order.setTableNumber(parent.getTableNumber());
+                        order.setVerCode(parent.getVerCode());
+                        order.setCustomerCount(parent.getCustomerCount());
                     }
-                    Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
-                    parent.setCountWithChild(articleCountWithChildren);
-                    parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-                    update(parent);
-                }
-            } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
-                if (order.getParentOrderId() != null) {  //子订单
-                    Order parent = selectById(order.getParentOrderId());
-                    int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
-                    if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
-                        parent.setLastOrderTime(order.getCreateTime());
+                } else {
+                    if (lastOrder != null && lastOrder.getAllowContinueOrder()) {
+                        order.setParentOrderId(lastOrder.getId());
+                        Order parentOrder = selectById(order.getParentOrderId());
+                        order.setTableNumber(parentOrder.getTableNumber());
+                        order.setVerCode(parentOrder.getVerCode());
+                        order.setCustomerCount(parentOrder.getCustomerCount());
                     }
-                    Double amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
-                    parent.setCountWithChild(articleCountWithChildren);
-                    parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
-                    update(parent);
                 }
+            }
+        }
+        //判断是否是后付款模式
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            order.setOrderState(OrderState.SUBMIT);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
+            if (order.getDistributionModeId() != 3) {
+                order.setAllowContinueOrder(true);
+            }
+        } else {
+            order.setOrderState(OrderState.SUBMIT);
+            order.setProductionStatus(ProductionStatus.NOT_ORDER);
+        }
+        if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.NO) {
+            order.setTableNumber(order.getVerCode());
+        }
+
+        if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.YES) {
+            order.setNeedScan(Common.YES);
+        } else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.TABLE_MODE
+                && StringUtils.isEmpty(order.getTableNumber())) {
+            order.setNeedScan(Common.YES);
+        } else if (order.getDistributionModeId() != DistributionType.TAKE_IT_SELF && order.getOrderMode() == ShopMode.HOUFU_ORDER
+                && StringUtils.isEmpty(order.getTableNumber())) {
+            order.setNeedScan(Common.YES);
+        }
+
+        if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
+            order.setNeedScan(Common.YES);
+        }
+        insert(order);
+        customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
+        if (order.getPaymentAmount().doubleValue() == 0) {
+            payOrderSuccess(order);
+        }
+
+        jsonResult.setData(order);
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            if (order.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(order.getParentOrderId());
+                int articleCountWithChildren = selectArticleCountById(parent.getId(), order.getOrderMode());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(order.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
+            }
+        } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
+            if (order.getParentOrderId() != null) {  //子订单
+                Order parent = selectById(order.getParentOrderId());
+                int articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
+                if (parent.getLastOrderTime() == null || parent.getLastOrderTime().getTime() < order.getCreateTime().getTime()) {
+                    parent.setLastOrderTime(order.getCreateTime());
+                }
+                Double amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
+                parent.setCountWithChild(articleCountWithChildren);
+                parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                update(parent);
             }
         }else{
             //pos开台支付不存在用户的时候执行
@@ -1893,7 +1890,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -2093,7 +2089,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -2415,7 +2410,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -3886,26 +3880,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal articlePay = orderMapper.getPayment(selectMap);
         articlePay = articlePay == null ? BigDecimal.ZERO : articlePay;
         BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay);
-        data.put("DISCOUNT_AMOUNT", discountAmount);
+        data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         Map<String, Object> accountPayItem = new HashMap<>();
-        accountPayItem.put("SUBTOTAL", accountPay);
+        accountPayItem.put("SUBTOTAL", accountPay == null ? 0 : accountPay);
         accountPayItem.put("PAYMENT_MODE", "红包支付");
         discountItems.add(accountPayItem);
         Map<String, Object> couponPayItem = new HashMap<>();
-        couponPayItem.put("SUBTOTAL", couponPay);
+        couponPayItem.put("SUBTOTAL", couponPay == null ? 0 : couponPay);
         couponPayItem.put("PAYMENT_MODE", "优惠券支付");
         discountItems.add(couponPayItem);
         Map<String, Object> rewardPayItem = new HashMap<>();
-        rewardPayItem.put("SUBTOTAL", rewardPay);
+        rewardPayItem.put("SUBTOTAL", rewardPay == null ? 0 : rewardPay);
         rewardPayItem.put("PAYMENT_MODE", "充值赠送支付");
         discountItems.add(rewardPayItem);
         Map<String, Object> waitMoneyItem = new HashMap<>();
-        waitMoneyItem.put("SUBTOTAL", waitMoney);
+        waitMoneyItem.put("SUBTOTAL", waitMoney == null ? 0 : waitMoney);
         waitMoneyItem.put("PAYMENT_MODE", "等位红包支付");
         discountItems.add(waitMoneyItem);
         Map<String, Object> articleBackPay = new HashMap<>();
-        articleBackPay.put("SUBTOTAL", articlePay.abs());
+        articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
         articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
         data.put("DISCOUNT_ITEMS", discountItems);
@@ -4825,8 +4819,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
                 //截取电话号码
-                String  telephones = shopDetail.getnoticeTelephone().replaceAll("，",",");
-                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
+                String telephones = shopDetail.getnoticeTelephone().replaceAll("，",",");
+                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122",null);//推送本日信息
             }
      //   SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
 
