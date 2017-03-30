@@ -19,14 +19,14 @@
                             <div class="form-group">
                                 <label>优惠券价值</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="couponValue" v-model="m.couponValue" placeholder="请输入数字" required min="0">
+                                    <input type="number" class="form-control" name="couponValue" v-model="m.couponValue" placeholder="(建议输入整数)" required="required" min="1">
                                     <div class="input-group-addon">	<span class="glyphicon glyphicon-yen" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label>优惠券的数量</label>
-                                <input type="text" class="form-control" name="couponNumber" v-model="m.couponNumber" placeholder="请输入数字" required min="0">
+                                <input type="number" class="form-control" name="couponNumber" v-model="m.couponNumber" placeholder="(建议输入整数)" required="required" min="1">
                             </div>
                             <div class="form-group">
                                 <label class="control-label">优惠券有效日期类型</label>
