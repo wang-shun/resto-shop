@@ -907,6 +907,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderPaymentItemService.insert(item);
                     break;
             }
+            if(order.getGiveChange().doubleValue() > 0){
+                item = new OrderPaymentItem();
+                item.setId(ApplicationUtils.randomUUID());
+                item.setOrderId(orderId);
+                item.setPaymentModeId(PayMode.GIVE_CHANGE);
+                item.setPayTime(order.getCreateTime());
+                item.setPayValue(order.getGiveChange());
+                item.setRemark("找零:" + order.getGiveChange());
+                orderPaymentItemService.insert(item);
+            }
         }
         return jsonResult;
     }
