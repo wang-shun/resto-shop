@@ -5793,6 +5793,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order afterPay(String orderId, String couponId, BigDecimal price, BigDecimal pay, BigDecimal waitMoney, Integer payMode) {
         Order order = selectById(orderId);
+        if(order.getPrintTimes() == 1){
+            return null;
+        }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         JSONResult result = new JSONResult<>();
