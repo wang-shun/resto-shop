@@ -205,6 +205,17 @@ public class Order implements Serializable{
 
     private Integer isGetShareCoupon;
 
+    //找零
+    private BigDecimal giveChange;
+
+    public BigDecimal getGiveChange() {
+        return giveChange;
+    }
+
+    public void setGiveChange(BigDecimal giveChange) {
+        this.giveChange = giveChange;
+    }
+
     public Integer getIsGetShareCoupon() {
         return isGetShareCoupon;
     }

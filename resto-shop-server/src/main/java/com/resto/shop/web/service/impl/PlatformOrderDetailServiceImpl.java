@@ -46,7 +46,7 @@ public class PlatformOrderDetailServiceImpl extends GenericServiceImpl<PlatformO
         double boxPrice = 0;
         for (MeiTuanOrderDetailDto detail : orderDetailList ){
             boxNum += detail.getBox_num();
-            boxPrice += detail.getBox_price();
+            boxPrice += detail.getBox_price() * detail.getBox_num();
             platformorderdetailMapper.insertSelective(meituanConvertToPlatformOrderDetail(orderId,detail));
         }
         if(boxPrice>0){
