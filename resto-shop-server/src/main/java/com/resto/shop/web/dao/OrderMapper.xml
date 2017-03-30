@@ -2906,7 +2906,7 @@ INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
 opi.payment_mode_id not in (13,14,15) AND
-o.production_status in(2,3)
+o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 ]]> AND  o.brand_id =#{brandId}
@@ -2940,7 +2940,7 @@ INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
 opi.payment_mode_id not in (13,14,15) AND
-o.production_status in(2,3)
+o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 ]]> AND  o.shop_detail_id =#{shopId}
@@ -2963,7 +2963,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
         o.order_state IN (2, 9, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status IN (2, 3,6)
         AND oi.payment_mode_id = 1
         AND <![CDATA[
          oi.pay_time>#{beginDate} AND  oi.pay_time<#{endDate}
@@ -2990,7 +2990,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
         o.order_state IN (2, 9, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status IN (2, 3,6)
         AND oi.payment_mode_id = 1
         AND <![CDATA[
          oi.pay_time>#{beginDate} AND  oi.pay_time<#{endDate}

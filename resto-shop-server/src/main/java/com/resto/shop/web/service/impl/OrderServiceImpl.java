@@ -374,6 +374,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (customer != null && customer.getTelephone() != null) {
             order.setVerCode(customer.getTelephone().substring(7));
+        } else  if(customer == null && order.getOrderMode() == ShopMode.CALL_NUMBER && order.getTableNumber() != null){
+            order.setVerCode(order.getTableNumber());
         } else {
             if (org.springframework.util.StringUtils.isEmpty(order.getParentOrderId())) {
                 order.setVerCode(generateString(5));
