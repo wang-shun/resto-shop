@@ -828,21 +828,23 @@ public class OrderAspect {
 
     private void sendVerCodeMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
-        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        Brand brand = brandService.selectById(order.getBrandId());
-        StringBuffer msg = new StringBuffer();
-        msg.append("交易码:" + order.getVerCode() + "\n");
-        msg.append("请留意餐厅叫号信息");
-        String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        if(customer != null){
+            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Brand brand = brandService.selectById(order.getBrandId());
+            StringBuffer msg = new StringBuffer();
+            msg.append("交易码:" + order.getVerCode() + "\n");
+            msg.append("请留意餐厅叫号信息");
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", customer.getId());
-        map.put("type", "UserAction");
-        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
 //        log.info("发送取餐信息成功:" + result);
+        }
     }
 }
