@@ -162,22 +162,23 @@ public class OrderMessageListener implements MessageListener {
         map.put("type", "UserAction");
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(LogUtils.url, map);
+        map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
         if(setting.getIsSendCouponMsg() == Common.YES){
-            sendNote(shopName,pr,name,pushDay,customer.getId());
+            sendNote(shopName,pr,name,pushDay,customer.getId(),map);
         }
 
         return Action.CommitMessage;
     }
     
   //发送短信
-    private void sendNote(String shop,String price,String name,String pushDay,String customerId){
+    private void sendNote(String shop,String price,String name,String pushDay,String customerId,Map<String,String>logMap){
         Customer customer=customerService.selectById(customerId);
     	Map param = new HashMap();
         param.put("shop", shop);
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004");
+        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
     }
 
     //
