@@ -141,7 +141,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //
 //	}
 
-    public void giftCoupon(Customer cus,Integer couponType,String shopId) {
+    public BigDecimal giftCoupon(Customer cus,Integer couponType,String shopId) {
         //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
         List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
         //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
@@ -152,6 +152,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         //根据优惠卷配置，添加对应数量的优惠卷
         Date beginDate  = new Date();
+        BigDecimal value = new BigDecimal(0);
         for(NewCustomCoupon cfg: couponConfigs){
             //如果是品牌优惠券设置或者是当前店铺的优惠券设置
             if(cfg.getIsBrand()==1||shopId.equals(cfg.getShopDetailId())){
@@ -194,11 +195,13 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 for(int i=0;i<cfg.getCouponNumber();i++){
                     couponService.insertCoupon(coupon);
                 }
+                value = value.add(coupon.getValue().multiply(new BigDecimal(cfg.getCouponNumber())));
                 long begin=coupon.getBeginDate().getTime();
                 long end=coupon.getEndDate().getTime();
                 timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail);
             }
         }
+        return value;
     }
 
     @Override
@@ -238,7 +241,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         }
         String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
-        str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\"");
+        str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\""+customCoupon.getCouponNumber()+"张");
         str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
         Map map = new HashMap(4);
