@@ -6157,8 +6157,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Map<String, Object> refundOrderPrintReceipt(Order refundOrder) {
+    public List<Map<String, Object>> refundOrderPrintReceipt(Order refundOrder) {
         // 根据id查询订单
+        List<Map<String,Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
         order.setDistributionModeId(DistributionType.REFUND_ORDER);
         order.setBaseCustomerCount(0);
@@ -6188,10 +6189,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
-        if (printer.size() > 0) {
-            return refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+        for (Printer p : printer) {
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            if (ticket != null) {
+                printTask.add(ticket);
+            }
         }
-        return null;
+
+        return printTask;
     }
 
     @Override
