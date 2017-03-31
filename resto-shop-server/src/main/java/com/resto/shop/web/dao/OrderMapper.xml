@@ -2962,7 +2962,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         tb_order o
         RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (2, 9, 10, 11, 12)
+        o.order_state IN (2, 10, 11, 12)
         AND o.production_status IN (2, 3,6)
         AND oi.payment_mode_id = 1
         AND <![CDATA[
@@ -2976,6 +2976,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         o.id,
         o.amount_with_children,
         o.order_money,
+        o.production_status,
         o.shop_detail_id,
         o.order_state,
         o.create_time,
@@ -2989,13 +2990,12 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         tb_order o
         RIGHT  JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (2, 9, 10, 11, 12)
+        o.order_state IN (2, 10, 11, 12)
         AND o.production_status IN (2, 3,6)
         AND oi.payment_mode_id = 1
         AND <![CDATA[
          oi.pay_time>#{beginDate} AND  oi.pay_time<#{endDate}
        ]]> AND o.shop_detail_id =#{shopId}
     </select>
-
 
 </mapper>
