@@ -116,7 +116,7 @@ public class OrderAspect {
 
             //自动取消订单，大boss模式下  先付2小时未付款 自动取消订单
             if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {//未支付和未完全支付的订单，不包括后付款模式
-                long delay = 1000*60;//两个小时后自动取消订单
+                long delay = 1000*60*60*2;//两个小时后自动取消订单
                 MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
             }
 
