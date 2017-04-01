@@ -1166,6 +1166,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.updateByPrimaryKeySelective(order);
             return new Result("支付宝订单更改为微信支付，支付时点击关闭不取消订单", false);
         }
+        if(order.getPayType() == PayType.NOPAY && "sb".equals(order.getOperatorId())){
+            order.setIsPay(0);
+            orderMapper.updateByPrimaryKeySelective(order)
+        }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
@@ -1182,8 +1186,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
         } else {
             if (!order.getOperatorId().equals("sb")) {
-                order.setIsPay(0);
-                orderMapper.updateByPrimaryKeySelective(order);
                 result.setSuccess(autoRefundOrder(orderId));
             }
         }
