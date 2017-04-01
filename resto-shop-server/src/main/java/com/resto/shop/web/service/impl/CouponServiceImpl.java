@@ -188,4 +188,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public List<CouponDto> selectCouponDto(Map<String, Object> selectMap) {
         return couponMapper.selectCouponDto(selectMap);
     }
+
+    @Override
+    public Boolean usedCouponBeforeByOrderId(String orderId) {
+        return couponMapper.usedCouponBeforeByOrderId(orderId) > 0;
+    }
 }

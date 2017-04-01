@@ -5818,20 +5818,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal totalMoney = order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren();
         try {
             if (!StringUtils.isEmpty(couponId)) { //使用了优惠券
-                order.setUseCoupon(couponId);
-                Coupon coupon = couponService.useCoupon(totalMoney, order);
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.COUPON_PAY);
-                item.setPayTime(new Date());
-                item.setPayValue(coupon.getValue());
-                item.setRemark("优惠卷支付:" + item.getPayValue());
-                price = price.subtract(item.getPayValue());
-                item.setResultData(coupon.getId());
-                orderPaymentItemService.insert(item);
-                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                        "订单使用优惠卷支付了：" + item.getPayValue());
+                Boolean usedCouponBefore = couponService.usedCouponBeforeByOrderId(orderId);
+                if(!usedCouponBefore){
+                    order.setUseCoupon(couponId);
+                    Coupon coupon = couponService.useCoupon(totalMoney, order);
+                    OrderPaymentItem item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.COUPON_PAY);
+                    item.setPayTime(new Date());
+                    item.setPayValue(coupon.getValue());
+                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    price = price.subtract(item.getPayValue());
+                    item.setResultData(coupon.getId());
+                    orderPaymentItemService.insert(item);
+                    UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                            "订单使用优惠卷支付了：" + item.getPayValue());
+                }
             }
             if (waitMoney.doubleValue() > 0) { //等位红包支付
                 OrderPaymentItem item = new OrderPaymentItem();
