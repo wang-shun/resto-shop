@@ -1182,6 +1182,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
         } else {
             if (!order.getOperatorId().equals("sb")) {
+                order.setIsPay(0);
+                orderMapper.updateByPrimaryKeySelective(order);
                 result.setSuccess(autoRefundOrder(orderId));
             }
         }
