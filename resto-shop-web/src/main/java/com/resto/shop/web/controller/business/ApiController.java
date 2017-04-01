@@ -175,6 +175,8 @@ public class ApiController extends GenericController {
         //默认返回false
         Result result = new Result();
         result.setSuccess(false);
+        //计算总额
+        BigDecimal sum = BigDecimal.ZERO;
         //查询所有已经配置第三方接口的品牌
         List<BrandSetting> brandSettingList = brandSettingService.selectListByState();
         List<String> appidList = new ArrayList<>();
@@ -244,17 +246,16 @@ public class ApiController extends GenericController {
 //                                }else {
 //                                    payMap.put("state",1);
 //                                }
+                                //计算总额用来对账
+                                sum=sum.add(oi.getPayValue());
                                 payList.add(payMap);
                             }
                         }
                         ordermap.put("payList",payList);
                     ThirdData.add(ordermap);
                     }
-                return getSuccessResult(ThirdData);
+                return getKcSuccessResult(ThirdData,sum,beginDate,endDate);
                 }
                return  result;
             }
-
-
-
 }

@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,14 @@ public abstract class GenericController{
 		return result;
 	}
 
+    public Result getKcSuccessResult(Object data, BigDecimal sum,String beginDate,String endDate){
+        if(data==null){
+            return new Result(true);
+        }
+        JSONResult<Object> result = new JSONResult<Object>(data);
+        result.setMessage("当前查询时间为:"+beginDate+"--"+endDate+"当前时间微信支付总额为:"+sum);
+        return result;
+    }
 
 
 	@ExceptionHandler(value = {Exception.class})
