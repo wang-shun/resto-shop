@@ -211,7 +211,7 @@
     </select>
 
     <select id="usedCouponBeforeByOrderId" resultType="java.lang.Integer">
-        select count(1) from tb_order_payment where order_id = #{orderId} and
+        select count(1) from tb_order_payment_item where order_id = #{orderId} and
         payment_mode_id = 3
     </select>
 </mapper>
