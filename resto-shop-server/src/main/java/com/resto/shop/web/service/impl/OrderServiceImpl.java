@@ -1170,7 +1170,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "微信点X取消订单！");
-        LogTemplateUtils.getRefundWechatByUserType(order,brand,shopDetail.getName());
+      LogTemplateUtils.getRefundWechatByUserType(order,brand,shopDetail.getName());
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
             refundOrderHoufu(order);
@@ -5811,6 +5811,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPrintTimes() == 1) {
             return null;
         }
+        if(order.getPayType() == PayType.NOPAY && "sb".equals(order.getOperatorId())){
+            order.setIsPay(0);
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         JSONResult result = new JSONResult<>();
@@ -5818,20 +5822,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal totalMoney = order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren();
         try {
             if (!StringUtils.isEmpty(couponId)) { //使用了优惠券
-                order.setUseCoupon(couponId);
-                Coupon coupon = couponService.useCoupon(totalMoney, order);
-                OrderPaymentItem item = new OrderPaymentItem();
-                item.setId(ApplicationUtils.randomUUID());
-                item.setOrderId(orderId);
-                item.setPaymentModeId(PayMode.COUPON_PAY);
-                item.setPayTime(new Date());
-                item.setPayValue(coupon.getValue());
-                item.setRemark("优惠卷支付:" + item.getPayValue());
-                price = price.subtract(item.getPayValue());
-                item.setResultData(coupon.getId());
-                orderPaymentItemService.insert(item);
-                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                        "订单使用优惠卷支付了：" + item.getPayValue());
+                Boolean usedCouponBefore = couponService.usedCouponBeforeByOrderId(orderId).size() > 0;
+                if(!usedCouponBefore){
+                    order.setUseCoupon(couponId);
+                    Coupon coupon = couponService.useCoupon(totalMoney, order);
+                    OrderPaymentItem item = new OrderPaymentItem();
+                    item.setId(ApplicationUtils.randomUUID());
+                    item.setOrderId(orderId);
+                    item.setPaymentModeId(PayMode.COUPON_PAY);
+                    item.setPayTime(new Date());
+                    item.setPayValue(coupon.getValue());
+                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    price = price.subtract(item.getPayValue());
+                    item.setResultData(coupon.getId());
+                    orderPaymentItemService.insert(item);
+                    UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                            "订单使用优惠卷支付了：" + item.getPayValue());
+                }else{
+                    Coupon coupon = couponService.selectById(couponId);
+                    pay = pay.add(price);
+                    price = price.subtract(coupon.getValue());
+                }
             }
             if (waitMoney.doubleValue() > 0) { //等位红包支付
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -6157,8 +6168,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Map<String, Object> refundOrderPrintReceipt(Order refundOrder) {
+    public List<Map<String, Object>> refundOrderPrintReceipt(Order refundOrder) {
         // 根据id查询订单
+        List<Map<String,Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
         order.setDistributionModeId(DistributionType.REFUND_ORDER);
         order.setBaseCustomerCount(0);
@@ -6188,10 +6200,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
-        if (printer.size() > 0) {
-            return refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+        for (Printer p : printer) {
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            if (ticket != null) {
+                printTask.add(ticket);
+            }
         }
-        return null;
+
+        return printTask;
     }
 
     @Override

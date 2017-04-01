@@ -51,7 +51,7 @@
                             </div>
 
                             <div class="form-group col-md-4">
-                                <label class="col-md-5 control-label">饿了么名称</label>
+                                <label class="col-md-5 control-label">第三方外卖名称</label>
                                 <div class="col-md-7">
                                     <input type="text" class="form-control" name="elemeName" v-model="m.elemeName"
                                             >
