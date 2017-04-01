@@ -2441,6 +2441,8 @@ on o.id = oi.order_id
     <select id="getLastOrderByTableNumber" resultType="Order">
         select * from tb_order where table_number = #{tableNumber} and order_state = 1
          and pay_mode = 2 and shop_detail_id = #{shopId}
+         and
+         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
          order by create_time desc limit 1
     </select>
 
