@@ -182,14 +182,14 @@
         <result column="is_refund_order" property="isRefundOrder"/>
         <result column="is_get_share_coupon" property="isGetShareCoupon"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
-            <result column="orderPaymentId" property="id"/>
+            <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
             <result column="payment_mode_id" property="paymentModeId"/>
             <result column="result_data" property="resultData"/>
             <result column="pay_time" property="payTime"/>
         </collection>
         <collection property="orderItems" ofType="com.resto.shop.web.model.OrderItem" javaType="List">
-            <result column="orderItemId" property="id"/>
+            <id column="order_item_id" property="id"/>
             <result column="article_name" property="articleName"/>
             <result column="article_id" property="articleId"/>
             <result column="count" property="count"/>
@@ -2972,7 +2972,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     </select>
 
     <select id="selectBaseToKCListByShopId" resultMap="BaseResultMap">
-               SELECT
+      SELECT
         o.id,
         o.amount_with_children,
         o.order_money,
