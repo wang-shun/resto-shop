@@ -1168,7 +1168,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         if(order.getPayType() == PayType.NOPAY && "sb".equals(order.getOperatorId())){
             order.setIsPay(0);
-            orderMapper.updateByPrimaryKeySelective(order)
+            orderMapper.updateByPrimaryKeySelective(order);
         }
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
@@ -6201,7 +6201,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
             if (ticket != null) {
                 printTask.add(ticket);
             }
