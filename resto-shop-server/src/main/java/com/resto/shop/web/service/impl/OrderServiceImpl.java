@@ -5836,8 +5836,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             "订单使用优惠卷支付了：" + item.getPayValue());
                 }else{
                     Coupon coupon = couponService.selectById(couponId);
-                    price = price.subtract(coupon.getValue());
                     pay = pay.add(price);
+                    price = price.subtract(coupon.getValue());
                 }
             }
             if (waitMoney.doubleValue() > 0) { //等位红包支付
