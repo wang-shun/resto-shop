@@ -33,5 +33,5 @@ public interface CouponService extends GenericService<Coupon, String> {
 
     List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
 
-    Boolean usedCouponBeforeByOrderId(String orderId);
+	List<Coupon> usedCouponBeforeByOrderId(String orderId);
 }

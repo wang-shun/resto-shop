@@ -69,5 +69,5 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
 
     List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
 
-    Integer usedCouponBeforeByOrderId(String orderId);
+    List<Coupon> usedCouponBeforeByOrderId(String orderId);
 }

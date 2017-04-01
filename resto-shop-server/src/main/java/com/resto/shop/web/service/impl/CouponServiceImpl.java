@@ -190,7 +190,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     }
 
     @Override
-    public Boolean usedCouponBeforeByOrderId(String orderId) {
-        return couponMapper.usedCouponBeforeByOrderId(orderId) > 0;
+    public List<Coupon> usedCouponBeforeByOrderId(String orderId) {
+        return couponMapper.usedCouponBeforeByOrderId(orderId);
     }
 }
