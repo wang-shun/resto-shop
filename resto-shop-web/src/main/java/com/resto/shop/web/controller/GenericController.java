@@ -61,7 +61,7 @@ public abstract class GenericController{
             return new Result(true);
         }
         JSONResult<Object> result = new JSONResult<Object>(data);
-        result.setMessage("当前查询时间为:"+beginDate+"--"+endDate+"当前时间微信支付总额为:"+sum);
+        result.setMessage("当前查询时间为:"+beginDate+"到"+endDate+"当前时间微信支付总额为:"+sum);
         return result;
     }
 
