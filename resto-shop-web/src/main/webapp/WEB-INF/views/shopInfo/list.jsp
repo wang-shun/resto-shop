@@ -299,7 +299,7 @@
 						</div>
 					</div>
 
-                    <div class="form-group">
+                    <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1">
                         <label class="col-md-4 control-label">pos端支付项：</label>
                         <div  class="col-md-6 radio-list checkbox">
                             <label style="margin-left: 16px;">
