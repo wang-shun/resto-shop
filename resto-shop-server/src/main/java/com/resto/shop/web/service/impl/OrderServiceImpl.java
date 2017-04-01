@@ -6199,7 +6199,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }
