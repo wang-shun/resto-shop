@@ -209,4 +209,9 @@
         and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
         GROUP BY tc.coupon_type
     </select>
+
+    <select id="usedCouponBeforeByOrderId" resultType="Coupon">
+        select * from tb_order_payment_item where order_id = #{orderId} and
+        payment_mode_id = 3
+    </select>
 </mapper>

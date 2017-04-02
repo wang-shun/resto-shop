@@ -257,71 +257,85 @@
 							<input type="text"  name="noticeTelephone" placeholder="多个手机号码以逗号隔开" class="form-control"  v-model="m.noticeTelephone">
 						</div>
 					</div>
-					<div class="form-group" v-show="b.aliPay == 1">
-						<label class="col-md-4 control-label">开启支付宝支付：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="aliPay"v-model="m.aliPay" value="1">启用
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="aliPay" v-model="m.aliPay" value="0">不启用
-							</label>
-						</div>
-					</div>
-					<div class="form-group" v-show="b.openUnionPay == 1">
-						<label class="col-md-4 control-label">开启银联支付：</label>
-						<div  class="col-md-6 radio-list">
-								<label class="radio-inline">
-									<input type="radio" name="openUnionPay"v-model="m.openUnionPay" value="1">启用
-								</label>
-								<label class="radio-inline">
-									<input type="radio" name="openUnionPay" v-model="m.openUnionPay" value="0">不启用
-								</label>
-						</div>
-					</div>
-                    <div class="form-group" v-show="b.openMoneyPay == 1">
-                        <label class="col-md-4 control-label">开启现金支付：</label>
-                        <div  class="col-md-6 radio-list">
-                            <label class="radio-inline">
-                                <input type="radio" name="openMoneyPay"v-model="m.openMoneyPay" value="1">启用
+
+					<div class="form-group">
+						<label class="col-md-4 control-label">微信端支付项：</label>
+						<div  class="col-md-6 radio-list checkbox">
+                            <label style="margin-left: 16px;">
+                                <input type="checkbox" checked="checked" disabled="disabled">
+                                &nbsp;&nbsp;微信支付
                             </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="openMoneyPay" v-model="m.openMoneyPay" value="0">不启用
+                            <label style="margin-left: 16px;" v-show="b.aliPay == 1">
+                                <input type="checkbox" id="aliPay" @change="weChatPaySetting('aliPay')" v-model="m.aliPay" value="1">
+                                <input type="hidden" name="aliPay" v-model="m.aliPay">
+                                &nbsp;&nbsp;支付宝支付
                             </label>
-                        </div>
-                    </div>
-                    <div class="form-group" v-show="b.openShanhuiPay == 1">
-                        <label class="col-md-4 control-label" :class="{ formBox : m.openShanhuiPay == 1}">美团闪惠支付：</label>
-                        <div  class="col-md-6 radio-list">
-                            <label class="radio-inline">
-                                <input type="radio" name="openShanhuiPay"v-model="m.openShanhuiPay" value="1">启用
+                            <label style="margin-left: 16px;" v-show="b.openUnionPay == 1 && m.shopMode == 6">
+                                <input type="checkbox" id="openUnionPay" @change="weChatPaySetting('openUnionPay')" v-model="m.openUnionPay" value="1">
+                                <input type="hidden" name="openUnionPay" v-model="m.openUnionPay">
+                                &nbsp;&nbsp;银联支付
                             </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="openShanhuiPay" v-model="m.openShanhuiPay" value="0">不启用
+                            <label style="margin-left: 16px;" v-show="b.openMoneyPay == 1 && m.shopMode == 6">
+                                <input type="checkbox" id="openMoneyPay" @change="weChatPaySetting('openMoneyPay')" v-model="m.openMoneyPay" value="1">
+                                <input type="hidden" name="openMoneyPay" v-model="m.openMoneyPay">
+                                &nbsp;&nbsp;现金支付
                             </label>
-                        </div>
-                    </div>
-					<div class="form-group" v-if="b.openShanhuiPay == 1 && m.openShanhuiPay==1">
-						<label class="col-md-4 control-label" :class="{ formBox : m.openShanhuiPay == 1}">大众点评店铺ID：</label>
-						<div  class="col-md-6">
-							<input type="text" class="form-control" name="dazhongShopId" v-model="m.dazhongShopId" required="required">
+                            <label style="margin-left: 16px;" :class="{ formBox : m.openShanhuiPay == 1}" v-show="b.openShanhuiPay == 1 && m.shopMode == 6">
+                                <input type="checkbox" id="openShanhuiPay" @change="weChatPaySetting('openShanhuiPay')" v-model="m.openShanhuiPay" value="1">
+                                <input type="hidden" name="openShanhuiPay" v-model="m.openShanhuiPay">
+                                &nbsp;&nbsp;美团闪惠支付
+                                <div class="form-group" v-if="b.openShanhuiPay == 1 && m.openShanhuiPay==1">
+                                    <label class="col-md-3 control-label" :class="{ formBox : m.openShanhuiPay == 1}">大众点评店铺ID：</label>
+                                    <div  class="col-md-6">
+                                        <input type="text" class="form-control" name="dazhongShopId" v-model="m.dazhongShopId" required="required">
+                                    </div>
+                                </div>
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.integralPay == 1 && m.shopMode == 6">
+                                <input type="checkbox" id="integralPay" @change="weChatPaySetting('integralPay')" v-model="m.integralPay" value="1">
+                                <input type="hidden" name="integralPay" v-model="m.integralPay">
+                                &nbsp;&nbsp;积分支付
+                            </label>
 						</div>
 					</div>
 
-                    <div class="form-group" v-show="b.integralPay == 1">
-                        <label class="col-md-4 control-label">开启积分支付：</label>
-                        <div  class="col-md-6 radio-list">
-                            <label class="radio-inline">
-                                <input type="radio" name="integralPay"v-model="m.integralPay" value="1">启用
+                    <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1">
+                        <label class="col-md-4 control-label">pos端支付项：</label>
+                        <div  class="col-md-6 radio-list checkbox">
+                            <label style="margin-left: 16px;">
+                                <input type="checkbox" checked="checked" disabled="disabled">
+                                &nbsp;&nbsp;微信支付
                             </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="integralPay" v-model="m.integralPay" value="0">不启用
+                            <label style="margin-left: 16px;" v-show="b.aliPay == 1">
+                                <input type="checkbox" id="openPosAliPay" @change="posPaySetting('openPosAliPay')" v-model="m.openPosAliPay" value="1">
+                                <input type="hidden" name="openPosAliPay" v-model="m.openPosAliPay">
+                                &nbsp;&nbsp;支付宝支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openUnionPay == 1 && m.shopMode == 2">
+                                <input type="checkbox" id="openPosUnionPay" @change="posPaySetting('openPosUnionPay')" v-model="m.openPosUnionPay" value="1">
+                                <input type="hidden" name="openPosUnionPay" v-model="m.openPosUnionPay">
+                                &nbsp;&nbsp;银联支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openMoneyPay == 1 && m.shopMode == 2">
+                                <input type="checkbox" id="openPosMoneyPay" @change="posPaySetting('openPosMoneyPay')" v-model="m.openPosMoneyPay" value="1">
+                                <input type="hidden" name="openPosMoneyPay" v-model="m.openPosMoneyPay">
+                                &nbsp;&nbsp;现金支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openShanhuiPay == 1 && m.shopMode == 2">
+                                <input type="checkbox" id="openPosShanhuiPay" @change="posPaySetting('openPosShanhuiPay')" v-model="m.openPosShanhuiPay" value="1">
+                                <input type="hidden" name="openPosShanhuiPay" v-model="m.openPosShanhuiPay">
+                                &nbsp;&nbsp;美团闪惠支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.integralPay == 1 && m.shopMode == 2">
+                                <input type="checkbox" id="openPosIntegralPay" @change="posPaySetting('openPosIntegralPay')" v-model="m.openPosIntegralPay" value="1">
+                                <input type="hidden" name="openPosIntegralPay" v-model="m.openPosIntegralPay">
+                                &nbsp;&nbsp;积分支付
                             </label>
                         </div>
                     </div>
 
                     <div class="form-group" v-show="b.posOpenTable == 1">
-                        <label class="col-md-4 control-label">开启pos开单：</label>
+                        <label class="col-md-4 control-label">开启pos点单：</label>
                         <div  class="col-md-6 radio-list">
                             <label class="radio-inline">
                                 <input type="radio" name="posOpenTable"v-model="m.posOpenTable" value="1">启用
@@ -437,6 +451,24 @@
 						'm.isUseServicePrice':'hideServiceP'
 					},
 					methods : {
+                        weChatPaySetting: function (name) {
+                            var that = this;
+                            var checked = $("#"+name).prop("checked");
+                            if (checked){
+                                that.setWeChatSetting(name,1);
+                            }else{
+                                that.setWeChatSetting(name,0);
+                            }
+                        },
+                        posPaySetting: function (name) {
+                            var that = this;
+                            var checked = $("#"+name).prop("checked");
+                            if (checked){
+                                that.setPosPaySetting(name,1);
+                            }else{
+                                that.setPosPaySetting(name,0);
+                            }
+                        },
 						hideServiceP  :function (){
 							if(result.data.isUseServicePrice ==0){
 								this.showp = false;
@@ -511,7 +543,45 @@
 									that.b = resultData.data.brand;
 								}
 							});
-						}
+						},
+                        setWeChatSetting : function (name,value) {
+                            switch (name){
+                                case "aliPay":
+                                    this.m.aliPay = value;
+                                    break;
+                                case "openUnionPay":
+                                    this.m.openUnionPay = value;
+                                    break;
+                                case "openMoneyPay":
+                                    this.m.openMoneyPay = value;
+                                    break;
+                                case "openShanhuiPay":
+                                    this.m.openShanhuiPay = value;
+                                    break;
+                                case "integralPay":
+                                    this.m.integralPay = value;
+                                    break;
+                            }
+                        },
+                        setPosPaySetting : function (name,value) {
+                            switch (name){
+                                case "openPosAliPay":
+                                    this.m.openPosAliPay = value;
+                                    break;
+                                case "openPosUnionPay":
+                                    this.m.openPosUnionPay = value;
+                                    break;
+                                case "openPosMoneyPay":
+                                    this.m.openPosMoneyPay = value;
+                                    break;
+                                case "openPosShanhuiPay":
+                                    this.m.openPosShanhuiPay = value;
+                                    break;
+                                case "openPosIntegralPay":
+                                    this.m.openPosIntegralPay = value;
+                                    break;
+                            }
+                        }
 					}
 				});
 
@@ -519,5 +589,4 @@
 		}
 
 	})
-
 </script>

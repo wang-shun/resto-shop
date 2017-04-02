@@ -550,7 +550,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 */
 	Result refundPaymentByUnfinishedOrder(String orderId);
 
-	Map<String, Object> refundOrderPrintReceipt(Order refundOrder);
+	List<Map<String, Object>> refundOrderPrintReceipt(Order refundOrder);
 	
 	List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder);
 

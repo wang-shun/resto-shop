@@ -175,6 +175,8 @@ public class ApiController extends GenericController {
         //默认返回false
         Result result = new Result();
         result.setSuccess(false);
+        //计算总额
+        BigDecimal sum = BigDecimal.ZERO;
         //查询所有已经配置第三方接口的品牌
         List<BrandSetting> brandSettingList = brandSettingService.selectListByState();
         List<String> appidList = new ArrayList<>();
@@ -221,31 +223,39 @@ public class ApiController extends GenericController {
                         ordermap.put("createTime",DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));//下单时间
                         ordermap.put("orderMoney",o.getOrderMoney());//订单金额
                         ordermap.put("amountWithChild",o.getAmountWithChildren());
-                        ordermap.put("cancel",o.getOrderState()==9?0:1);
+//                        if(o.getProductionStatus()==6){
+//                            ordermap.put("aritlceOver",1);
+//                        }else {
+//                            ordermap.put("articleOver",0);
+//                        }
+//                        ordermap.put("cancel",o.getOrderState()==9?0:1);
+//                        if(o.getOrderState()==9){
+//                            System.out.println("该订单已经取消"+o.getId());
+//                        }
                         ordermap.put("parentOrderId",o.getParentOrderId());
                         List<Map<String,Object>> payList = new ArrayList<>();
                         if(!o.getOrderPaymentItems().isEmpty()){
                             for(OrderPaymentItem oi:o.getOrderPaymentItems()){
                                 Map<String,Object> payMap = new HashedMap();
+                                payMap.put("orderPaymentId",oi.getId());
                                 payMap.put("type",oi.getPayValue().compareTo(BigDecimal.ZERO)>0?1:-1);
                                 payMap.put("payValue",oi.getPayValue());
                                 payMap.put("payTime",DateUtil.formatDate(oi.getPayTime(),"yyyy-MM-dd HH:mm:ss"));
-                                if(oi.getResultData().contains("ERROR")||oi.getResultData().equals("{}")||oi.getResultData().contains("累计退款金额大于支付金额")){
-                                    payMap.put("state",0);
-                                }else {
-                                    payMap.put("state",1);
-                                }
+//                                if(oi.getResultData().contains("ERROR")||oi.getResultData().equals("{}")||oi.getResultData().contains("累计退款金额大于支付金额")){
+//                                    payMap.put("state",0);
+//                                }else {
+//                                    payMap.put("state",1);
+//                                }
+                                //计算总额用来对账
+                                sum=sum.add(oi.getPayValue());
                                 payList.add(payMap);
                             }
                         }
                         ordermap.put("payList",payList);
                     ThirdData.add(ordermap);
                     }
-                return getSuccessResult(ThirdData);
+                return getKcSuccessResult(ThirdData,sum,beginDate,endDate);
                 }
                return  result;
             }
-
-
-
 }
