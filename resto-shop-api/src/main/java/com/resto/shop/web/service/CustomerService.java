@@ -84,4 +84,11 @@ public interface CustomerService extends GenericService<Customer, String> {
 	Integer selectByShareCustomer(String customerId);
 
     List<Customer> selectBirthUser();
+
+    /**
+     * 通过电话号码查询用户信息
+     * @param s
+     * @return
+     */
+    Customer selectByTelePhone(String s);
 }
