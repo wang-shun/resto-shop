@@ -837,8 +837,8 @@ GROUP BY article_id
             or tap.id = toi.article_id
             inner join tb_order td
             on toi.order_id = td.id
-            and td.order_state in (2,10,11,12)
-            and td.production_status in (2,3)
+            and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
+            and td.production_status in (2,3))
             and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
             and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         where ta.article_type = ${type}
@@ -916,8 +916,8 @@ GROUP BY article_id
         or tap.id = toi.article_id
         inner join tb_order td
         on toi.order_id = td.id
-        and td.order_state in (2,10,11,12)
-        and td.production_status in (2,3)
+        and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
+        and td.production_status in (2,3))
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         where ta.article_type = ${type}
