@@ -142,13 +142,16 @@
                                     <input type="radio" name="couponType" id="inlineRadio2" value="0" v-model="m.couponType">新用户
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="couponType" id="inlineRadio5" value="3" v-model="m.couponType">分享
+                                    <input type="radio" name="couponType" id="inlineRadio5" value="3" v-model="m.couponType">分&nbsp;享
                                 </label>
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio3" value="1" v-model="m.couponType">邀&nbsp;请
                                 </label>
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio4" value="2" v-model="m.couponType">生&nbsp;日
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时
                                 </label>
                             </div>
 
@@ -168,6 +171,33 @@
                                     <input type="number"
                                            name="distanceBirthdayDay" placeholder="(建议输入整数)"
                                            v-model="m.distanceBirthdayDay" required="required" min="0"> 日
+                                </div>
+                            </div>
+
+                            <div class="form-group" v-if="m.couponType == 4">
+                                <div class="row">
+                                    <label class="control-label col-md-2">领取时段：</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group date form_datetime">
+                                            <input type="text" readonly class="form-control" @focus="initCouponTime">
+                                            <span class="input-group-btn">
+												<button class="btn default date-set" type="button">
+													<i class="fa fa-calendar" @click="initCouponTime"></i>
+												</button>
+											</span>
+                                        </div>
+                                    </div>
+                                    <label class="control-label col-md-1">至</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group date form_datetime">
+                                            <input type="text" readonly class="form-control" @focus="initCouponTime">
+                                            <span class="input-group-btn">
+												<button class="btn default date-set" type="button">
+													<i class="fa fa-calendar" @click="initCouponTime"></i>
+												</button>
+											</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
