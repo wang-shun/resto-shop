@@ -3775,7 +3775,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order orderAccount : orderList) {
             orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
             orderMoney = orderMoney.add(orderAccount.getOrderMoney());
-            if (StringUtils.isBlank(orderAccount.getParentOrderId())) {
+            if (StringUtils.isBlank(orderAccount.getParentOrderId()) && orderAccount.getProductionStatus() != ProductionStatus.REFUND_ARTICLE) {
                 orderCount = orderCount.add(new BigDecimal(1));
                 customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
             }
