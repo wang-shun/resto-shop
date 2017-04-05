@@ -463,4 +463,9 @@
         on tc.customer_detail_id = tcd.id
         where tcd.birth_date is not null
     </select>
+
+    <select id="selectByTelePhone" resultType="Customer">
+        SELECT * FROM  tb_customer
+        WHERE telephone=#{telePhone}
+    </select>
 </mapper>

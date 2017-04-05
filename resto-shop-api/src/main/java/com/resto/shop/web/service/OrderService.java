@@ -6,6 +6,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
@@ -443,7 +444,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder);
+    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig);
 
     public boolean cancelExceptionOrder(String orderId);
 

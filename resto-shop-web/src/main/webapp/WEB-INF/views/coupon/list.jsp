@@ -182,8 +182,5 @@
 		var C = new Controller(cid,tb);
 		var vueObj = C.vueObj();
 	}());
-	
-	
 
-	
 </script>
