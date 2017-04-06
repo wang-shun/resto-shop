@@ -1962,7 +1962,8 @@
         select t.id,
         t.parent_order_id parentOrderId,
         t.order_money as orderMoney,
-        IFNULL(t.customer_count,0) customerCount
+        IFNULL(t.customer_count,0) customerCount,
+        t.production_status productionStatus
         from tb_order t
         where
         shop_detail_id = #{shopId}

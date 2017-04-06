@@ -150,9 +150,9 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio4" value="2" v-model="m.couponType">生&nbsp;日
                                 </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时
-                                </label>
+                                <%--<label class="radio-inline">--%>
+                                    <%--<input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时--%>
+                                <%--</label>--%>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 1">
