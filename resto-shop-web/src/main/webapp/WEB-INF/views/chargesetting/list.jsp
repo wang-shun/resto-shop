@@ -30,8 +30,6 @@
 							    <input type="radio"  name="showIn" value=0 v-if="!m.id"> 
 							    <input type="radio"  name="showIn" value=0 v-if="m.id" v-model="m.showIn"> 
 							    <label for="showIn">否</label>
-							    
-							    
 						</div>
 						
 						<%--<div class="form-group">--%>
@@ -52,6 +50,32 @@
 							    <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state"> 
 							    <label for="showIn">否</label>
 						</div>
+
+                            <div class="form-group">
+                                <div class="control-label">是否是首冲</div>
+                                <input type="radio"  name="firstCharge" v-model="m.firstCharge" value=1 v-if="m.id">
+                                <input type="radio"  name="firstCharge"  value=1 v-if="!m.id">
+                                <label for="showIn">
+                                <input type="radio"  name="firstCharge" value=0 checked="checked" v-if="!m.id">是
+                                </label>
+                                <label for="showIn">
+                                    <input type="radio"  name="firstCharge" value=0 v-if="m.id" v-model="m.firstCharge">否
+                                </label>
+                            </div>
+
+
+                            <%--<div class="form-group">--%>
+                                <%--<label>是否启用优惠券</label>--%>
+                                <%--<div class="radio-list" style="margin-left: 20px;">--%>
+                                    <%--<label class="radio-inline">--%>
+                                        <%--<input type="radio" name="isActivty" v-model="m.isActivty" value=1 v-if="m.id">--%>
+                                        <%--<input type="radio" name="isActivty" value=1 v-if="!m.id" checked="checked">是</label>--%>
+                                    <%--<label class="radio-inline">--%>
+                                        <%--<input type="radio" name="isActivty" v-model="m.isActivty" value=0 v-if="m.id">--%>
+                                        <%--<input type="radio" name="isActivty" value=0 v-if="!m.id">否</label>--%>
+                                <%--</div>--%>
+                            <%--</div>--%>
+
 							<div class="form-group">
 								<label>赠送金额到账天数</label>
 								<input type="number" class="form-control" required name="numberDay" v-model="m.numberDay">
@@ -91,6 +115,19 @@
 				dataSrc : ""
 			},
 			columns : [
+                {title:"首冲",
+                  data:"firstCharge",
+                    createdCell : function(td, tdData) {
+                        var payType = "";
+                        if(tdData==1){
+                            payType ="<img alt=\"首次\" src=\"assets/pages/img/first.png\" width=\"23px\" height=\"23px\">&nbsp;";
+                        }else{
+                            payType = "<img alt=\"多次\" src=\"assets/pages/img/more.png\" width=\"23px\" height=\"23px\">&nbsp;";
+                        }
+                        $(td).html(payType);
+                    }
+                },
+
 				{                 
 				title : "充值金额",
 				data : "chargeMoney",

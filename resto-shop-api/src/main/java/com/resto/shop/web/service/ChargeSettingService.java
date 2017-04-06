@@ -10,4 +10,6 @@ public interface ChargeSettingService extends GenericService<ChargeSetting, Stri
     List<ChargeSetting> selectListByShopId();
 
     List<ChargeSetting> selectListByShopIdAll();
+
+    List<ChargeSetting> selectListByShopIdAndType(int flag);
 }
