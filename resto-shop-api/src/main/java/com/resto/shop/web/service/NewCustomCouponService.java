@@ -43,4 +43,6 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
     List<NewCustomCoupon> selectBirthCoupon();
 
     void insertBirthCoupon(NewCustomCoupon customCoupon, Customer customer, Brand brand, WechatConfig config, BrandSetting setting);
+
+    List<NewCustomCoupon> selectRealTimeCoupon(Map<String, Object> selectMap);
 }

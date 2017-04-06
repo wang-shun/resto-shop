@@ -150,9 +150,9 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio4" value="2" v-model="m.couponType">生&nbsp;日
                                 </label>
-                                <%--<label class="radio-inline">--%>
-                                    <%--<input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时--%>
-                                <%--</label>--%>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时
+                                </label>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 1">
@@ -179,7 +179,7 @@
                                     <label class="control-label col-md-2">领取时段：</label>
                                     <div class="col-md-4">
                                         <div class="input-group date form_datetime">
-                                            <input type="text" readonly class="form-control" @focus="initCouponTime">
+                                            <input type="text" readonly class="form-control" name="realTimeCouponBeginTime" v-model="m.realTimeCouponBeginTimeString" @focus="initCouponTime">
                                             <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
 													<i class="fa fa-calendar" @click="initCouponTime"></i>
@@ -190,7 +190,7 @@
                                     <label class="control-label col-md-1">至</label>
                                     <div class="col-md-4">
                                         <div class="input-group date form_datetime">
-                                            <input type="text" readonly class="form-control" @focus="initCouponTime">
+                                            <input type="text" readonly class="form-control" name="realTimeCouponEndTime" v-model="m.realTimeCouponEndTimeString" @focus="initCouponTime">
                                             <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
 													<i class="fa fa-calendar" @click="initCouponTime"></i>
@@ -274,6 +274,8 @@
                             $(td).html("<span class='label label-success'>生&nbsp;日</span>");
                         }else if(tdData == 3){
                             $(td).html("<span class='label label-warning'>分&nbsp;享</span>");
+                        }else if(tdData == 4){
+                            $(td).html("<span class='label label-danger'>实&nbsp;时</span>");
                         }
                     }
                 },
