@@ -413,7 +413,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
-            String remark = null;
+            String remark = "";
             switch (item.getType()) {
                 case OrderItemType.ARTICLE://无规格单品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
