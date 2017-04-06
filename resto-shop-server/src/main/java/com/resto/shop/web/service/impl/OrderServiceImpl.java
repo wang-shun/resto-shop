@@ -459,6 +459,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
+                    if(a.getIsEmpty()){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("菜品供应时间变动，请重新购买");
+                        return jsonResult;
+                    }
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());
