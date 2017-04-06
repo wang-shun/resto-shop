@@ -1962,12 +1962,13 @@
         select t.id,
         t.parent_order_id parentOrderId,
         t.order_money as orderMoney,
-        IFNULL(t.customer_count,0) customerCount
+        IFNULL(t.customer_count,0) customerCount,
+        t.production_status productionStatus
         from tb_order t
         where
         shop_detail_id = #{shopId}
-        and  t.order_state in (2,10,11,12)
-        and t.production_status in(2,3)
+        and IF(t.production_status = 6,t.production_status = 6,t.order_state in (2,10,11,12)
+        and t.production_status in(2,3))
         and t.create_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
         and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         GROUP BY t.id
