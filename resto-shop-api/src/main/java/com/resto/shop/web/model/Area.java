@@ -22,8 +22,18 @@ public class Area {
     private Date createTime;
     //店铺id
     private String shopDetailId;
+
+    private String printerName;
     //品牌id
     private String brandId;
+
+    public String getPrinterName() {
+        return printerName;
+    }
+
+    public void setPrinterName(String printerName) {
+        this.printerName = printerName;
+    }
 
     public Long getId() {
         return id;

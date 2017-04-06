@@ -8,16 +8,15 @@
         <result column="print_id" property="printId"/>
         <result column="is_delete" property="isDelete"/>
         <result column="create_time" property="createTime"/>
-        <result column="brand_id" property="brandId"/>
         <result column="shop_detail_id" jdbcType="VARCHAR" property="shopDetailId"/>
-        <association property="printer" column="com.resto.shop.web.model.Printer">
-            <result column="print_name" property="name"/>
-        </association>
+
+        <result column="printer_name" property="printerName"/>
+
     </resultMap>
 
 
     <select id="getAreaList" resultMap="BaseResultMap">
-        select t.id,t.name,t.print_id,t.create_time,t2.name as print_name from tb_area t
+        select t.id,t.name,t.print_id,t.create_time,t2.name as printer_name from tb_area t
         left join tb_printer t2 on t2.id = t.print_id
         where t.shop_detail_id = #{shopId} and t.is_delete = 0
     </select>
@@ -38,9 +37,9 @@
     </update>
 
     <insert id="insertSelective">
-        insert into area
-        (`name`,print_id,shop_detail_id,brand_id)
-        values (#{name},#{printId},#{shopDetailId},#{brandId})
+        insert into tb_area
+        (`name`,print_id,shop_detail_id)
+        values (#{name},#{printId},#{shopDetailId})
     </insert>
 
     <select id="selectByPrimaryKey" resultType="Area">

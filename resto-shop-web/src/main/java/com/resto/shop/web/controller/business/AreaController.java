@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Area;
 import com.resto.shop.web.service.AreaService;
@@ -44,6 +45,7 @@ public class AreaController extends GenericController {
     @RequestMapping("create")
     @ResponseBody
     public Result create(@Valid Area area){
+        area.setShopDetailId(getCurrentShopId());
         areaService.insert(area);
         return Result.getSuccess();
     }

@@ -20,20 +20,15 @@
                             </div>
 
 
-
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">打印机名称：</label>
-                                <div class="col-sm-8">
-                                    <select class="form-control" name="printerId" required v-if="printerList" v-model="m.printId?m.printerId:selected">
-                                        <option v-for="temp in printerList" v-bind:value="temp.id">
-                                            {{ temp.name }}
-                                        </option>
-                                    </select>
-                                    <input class="form-control" value="暂无可用打印机" disabled="disabled" v-else />
-                                </div>
+                                <label>打印机名称</label>
+                                <select class="form-control" name="printId" required v-if="printerList" v-model="m.printId?m.printId:selected">
+                                    <option v-for="temp in printerList" v-bind:value="temp.id">
+                                        {{ temp.name }}
+                                    </option>
+                                </select>
+                                <input class="form-control" value="暂无可用打印机" disabled="disabled" v-else />
                             </div>
-
-
 
                         </div>
                         <input type="hidden" name="id" v-model="m.id"/>
@@ -76,42 +71,18 @@
                     data: "name",
                 },
                 {
-                    title: "模板项",
-                    data: "printer",
-                    defaultContent: "",
-                    createdCell: function (td, tdData) {
-                        $(td).html('');
-                        if (tdData.name) {
-                            var span = $("<span class='btn blue btn-xs'></span>");
-                            $(td).append(span.html(tdData.name));
-                        }
-
-
-                    }
+                    title: "打印机名称",
+                    data: "printerName"
                 },
-                {
-                    title: "是否开启",
-                    data: "isUsed",
-                    createdCell: function (td, tdData) {
-                        if (tdData == 1) {
-                            $(td).html("开启");
-                        } else if (tdData == 0) {
-                            $(td).html("未开启")
-                        }
-                    }
-                },
+
 
                 {
                     title: "操作",
                     data: "id",
                     createdCell: function (td, tdData, rowData, row) {
                         var operator = [
-                            <s:hasPermission name="tabcode/delete">
-                            C.createDelBtn(tdData, "tablecode/delete"),
-                            </s:hasPermission>
-                            <s:hasPermission name="tablecode/modify">
+                            C.createDelBtn(tdData, "area/delete"),
                             C.createEditBtn(rowData),
-                            </s:hasPermission>
                         ];
                         $(td).html(operator);
                     }
@@ -133,7 +104,7 @@
         //获取 就餐模式
         $.ajax({
             type:"post",
-            url:"printer/list_all",
+            url:"printer/qiantai",
             dataType:"json",
             success:function(data){
                 if(data.length > 0){
