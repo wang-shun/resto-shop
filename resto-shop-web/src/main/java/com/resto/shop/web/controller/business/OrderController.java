@@ -502,15 +502,15 @@ public class OrderController extends GenericController{
 		return  getSuccessResult();
 	}
 
-	/*
-	测试每日发短信
-	 */
-	@RequestMapping("/testEveryDayMessage")
-    @ResponseBody
-	public  Result testEveryDayMessage(){
-	    //定义店铺
-	    ShopDetail s  = shopDetailService.selectByPrimaryKey("d89d1a7ef12346bfb0ef92faba8872af");
-        orderService.cleanShopOrder(s,null);
-        return  getSuccessResult();
-    }
+//	/*
+//	测试每日发短信
+//	 */
+//	@RequestMapping("/testEveryDayMessage")
+//    @ResponseBody
+//	public  Result testEveryDayMessage(){
+//	    //定义店铺
+//	    ShopDetail s  = shopDetailService.selectByPrimaryKey("d89d1a7ef12346bfb0ef92faba8872af");
+//        orderService.cleanShopOrder(s,null);
+//        return  getSuccessResult();
+//    }
 }

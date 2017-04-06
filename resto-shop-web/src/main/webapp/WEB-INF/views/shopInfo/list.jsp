@@ -299,49 +299,49 @@
 						</div>
 					</div>
 
-                    <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1">
-                        <label class="col-md-4 control-label">pos端支付项：</label>
-                        <div  class="col-md-6 radio-list checkbox">
-                            <label style="margin-left: 16px;">
-                                <input type="checkbox" checked="checked" disabled="disabled">
-                                &nbsp;&nbsp;微信支付
-                            </label>
-                            <label style="margin-left: 16px;" v-show="b.aliPay == 1">
-                                <input type="checkbox" id="openPosAliPay" @change="posPaySetting('openPosAliPay')" v-model="m.openPosAliPay" value="1">
-                                <input type="hidden" name="openPosAliPay" v-model="m.openPosAliPay">
-                                &nbsp;&nbsp;支付宝支付
-                            </label>
-                            <label style="margin-left: 16px;" v-show="b.openUnionPay == 1 && m.shopMode == 2">
-                                <input type="checkbox" id="openPosUnionPay" @change="posPaySetting('openPosUnionPay')" v-model="m.openPosUnionPay" value="1">
-                                <input type="hidden" name="openPosUnionPay" v-model="m.openPosUnionPay">
-                                &nbsp;&nbsp;银联支付
-                            </label>
-                            <label style="margin-left: 16px;" v-show="b.openMoneyPay == 1 && m.shopMode == 2">
-                                <input type="checkbox" id="openPosMoneyPay" @change="posPaySetting('openPosMoneyPay')" v-model="m.openPosMoneyPay" value="1">
-                                <input type="hidden" name="openPosMoneyPay" v-model="m.openPosMoneyPay">
-                                &nbsp;&nbsp;现金支付
-                            </label>
-                            <label style="margin-left: 16px;" v-show="b.openShanhuiPay == 1 && m.shopMode == 2">
-                                <input type="checkbox" id="openPosShanhuiPay" @change="posPaySetting('openPosShanhuiPay')" v-model="m.openPosShanhuiPay" value="1">
-                                <input type="hidden" name="openPosShanhuiPay" v-model="m.openPosShanhuiPay">
-                                &nbsp;&nbsp;美团闪惠支付
-                            </label>
-                            <label style="margin-left: 16px;" v-show="b.integralPay == 1 && m.shopMode == 2">
-                                <input type="checkbox" id="openPosIntegralPay" @change="posPaySetting('openPosIntegralPay')" v-model="m.openPosIntegralPay" value="1">
-                                <input type="hidden" name="openPosIntegralPay" v-model="m.openPosIntegralPay">
-                                &nbsp;&nbsp;积分支付
-                            </label>
-                        </div>
-                    </div>
-
                     <div class="form-group" v-show="b.posOpenTable == 1">
-                        <label class="col-md-4 control-label">开启pos点单：</label>
+                        <label class="col-md-4 control-label" :class="{ formBox : m.posOpenTable == 1 && m.shopMode == 2}">开启pos点单：</label>
                         <div  class="col-md-6 radio-list">
                             <label class="radio-inline">
                                 <input type="radio" name="posOpenTable"v-model="m.posOpenTable" value="1">启用
                             </label>
                             <label class="radio-inline">
                                 <input type="radio" name="posOpenTable" v-model="m.posOpenTable" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1 && m.posOpenTable == 1">
+                        <label class="col-md-4 control-label formBox">pos端支付项：</label>
+                        <div  class="col-md-6 radio-list checkbox">
+                            <label style="margin-left: 16px;" class="formBox">
+                                <input type="checkbox" checked="checked" disabled="disabled">
+                                &nbsp;&nbsp;微信支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.aliPay == 1" :class="{ formBox : m.openPosAliPay == 1}">
+                                <input type="checkbox" id="openPosAliPay" @change="posPaySetting('openPosAliPay')" v-model="m.openPosAliPay" value="1">
+                                <input type="hidden" name="openPosAliPay" v-model="m.openPosAliPay">
+                                &nbsp;&nbsp;支付宝支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openUnionPay == 1" :class="{ formBox : m.openPosUnionPay == 1}">
+                                <input type="checkbox" id="openPosUnionPay" @change="posPaySetting('openPosUnionPay')" v-model="m.openPosUnionPay" value="1">
+                                <input type="hidden" name="openPosUnionPay" v-model="m.openPosUnionPay">
+                                &nbsp;&nbsp;银联支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openMoneyPay == 1" :class="{ formBox : m.openPosMoneyPay == 1}">
+                                <input type="checkbox" id="openPosMoneyPay" @change="posPaySetting('openPosMoneyPay')" v-model="m.openPosMoneyPay" value="1">
+                                <input type="hidden" name="openPosMoneyPay" v-model="m.openPosMoneyPay">
+                                &nbsp;&nbsp;现金支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.openShanhuiPay == 1" :class="{ formBox : m.openPosShanhuiPay == 1}">
+                                <input type="checkbox" id="openPosShanhuiPay" @change="posPaySetting('openPosShanhuiPay')" v-model="m.openPosShanhuiPay" value="1">
+                                <input type="hidden" name="openPosShanhuiPay" v-model="m.openPosShanhuiPay">
+                                &nbsp;&nbsp;美团闪惠支付
+                            </label>
+                            <label style="margin-left: 16px;" v-show="b.integralPay == 1" :class="{ formBox : m.openPosIntegralPay == 1}">
+                                <input type="checkbox" id="openPosIntegralPay" @change="posPaySetting('openPosIntegralPay')" v-model="m.openPosIntegralPay" value="1">
+                                <input type="hidden" name="openPosIntegralPay" v-model="m.openPosIntegralPay">
+                                &nbsp;&nbsp;积分支付
                             </label>
                         </div>
                     </div>
@@ -357,6 +357,19 @@
 							</label>
 						</div>
 					</div>
+
+                    <div class="form-group" v-show="b.openPosCharge == 1">
+                        <label class="col-md-4 control-label">开启pos账户充值：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="openPosCharge"v-model="m.openPosCharge" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="openPosCharge" v-model="m.openPosCharge" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+
 					<div class="form-group">
 						<label class="col-md-4 control-label">是否开启美团外卖自动出单：</label>
 						<div  class="col-md-6 radio-list">
