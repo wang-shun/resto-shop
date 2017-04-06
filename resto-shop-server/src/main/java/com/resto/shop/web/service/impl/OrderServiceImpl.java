@@ -507,6 +507,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setOriginalPrice(org_price);
             item.setStatus(1);
             item.setSort(0);
+            if(remark.equals("0%")){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"供应时间发生改变，请重新购买");
+                return jsonResult;
+            }
             item.setRemark(remark);
             if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
                 item.setUnitPrice(price);
