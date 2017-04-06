@@ -75,6 +75,16 @@ public class Customer implements Serializable{
 
     private String bindPhoneShop;
 
+    private String realTimeCouponIds;
+
+    public String getRealTimeCouponIds() {
+        return realTimeCouponIds;
+    }
+
+    public void setRealTimeCouponIds(String realTimeCouponIds) {
+        this.realTimeCouponIds = realTimeCouponIds;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
