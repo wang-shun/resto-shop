@@ -146,8 +146,11 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			}
 		}
 		//商家给客户发短信
-        String content = sb.append(logMap.get("content")).append("商家给客户发短信").toString();
-		logMap.put("content",content);
+		if(logMap != null){
+			String content = sb.append(logMap.get("content")).append("商家给客户发短信").toString();
+			logMap.put("content",content);
+		}
+
 		return SMSUtils.sendCode(sign, serviceName, code, phone,logMap);
 	}
 
