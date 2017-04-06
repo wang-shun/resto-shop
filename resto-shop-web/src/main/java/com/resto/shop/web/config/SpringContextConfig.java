@@ -32,6 +32,12 @@ public class SpringContextConfig {
 
 
     @Bean
+    public AreaService areaService() {
+        return getProxy(AreaService.class);
+    }
+
+
+    @Bean
     public UserService userService() {
         return getProxy(UserService.class);
     }
