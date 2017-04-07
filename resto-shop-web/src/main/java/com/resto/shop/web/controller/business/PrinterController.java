@@ -59,6 +59,7 @@ public class PrinterController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid Printer printer){
 		printerService.update(printer);
+
 		return Result.getSuccess();
 	}
 	

@@ -11,4 +11,8 @@ import java.util.List;
 public interface AreaMapper extends GenericDao<Area,Long> {
 
     List<Area> getAreaList(String shopId);
+
+    void  updateArea(String printId);
+
+    void  deleteArea(String printId);
 }

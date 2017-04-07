@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Area;
@@ -22,6 +23,9 @@ public class AreaController extends GenericController {
 
     @Autowired
     private AreaService areaService;
+
+    @Autowired
+    TableQrcodeService tableQrcodeService;
 
     @RequestMapping("/list")
     public void list(){
@@ -54,6 +58,7 @@ public class AreaController extends GenericController {
     @ResponseBody
     public Result modify(@Valid Area area){
         areaService.update(area);
+        tableQrcodeService.updateTable(area.getId(),area.getName());
         return Result.getSuccess();
     }
 
@@ -61,6 +66,7 @@ public class AreaController extends GenericController {
     @ResponseBody
     public Result delete(Long id){
         areaService.delete(id);
+        tableQrcodeService.deleteArea(id);
         return Result.getSuccess();
     }
 }

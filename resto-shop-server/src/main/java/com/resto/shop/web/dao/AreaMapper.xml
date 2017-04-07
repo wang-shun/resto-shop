@@ -47,4 +47,10 @@
         select id,`name`,print_id from tb_area
         where id = #{id}
     </select>
+
+    <update id="deleteArea">
+        update tb_area
+        set print_id = null
+        where print_id = #{printId}
+    </update>
 </mapper>

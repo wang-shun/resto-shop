@@ -23,6 +23,17 @@ public class Printer implements Serializable {
     //小票类型 0小票 1贴纸
     private Integer ticketType;
 
+    //打印机范围 0-前台打印机 1-区域打印机
+    private Integer range;
+
+    public Integer getRange() {
+        return range;
+    }
+
+    public void setRange(Integer range) {
+        this.range = range;
+    }
+
     public Integer getTicketType() {
         return ticketType;
     }

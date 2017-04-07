@@ -30,4 +30,11 @@ public class AreaServiceImpl extends GenericServiceImpl<Area, Long> implements A
     public List<Area> getAreaList(String shopId) {
         return areaMapper.getAreaList(shopId);
     }
+
+
+
+    @Override
+    public void deleteArea(String printId) {
+        areaMapper.deleteArea(printId);
+    }
 }

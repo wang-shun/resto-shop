@@ -57,6 +57,17 @@
 										小票</label>
 								</div>
 							</div>
+							<div class="form-group">
+								<div class="col-sm-3 control-label">范围：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="radio"  name="range" required v-model="m.range" value="1">
+										区域打印机</label>
+									<label class="radio-inline">
+										<input type="radio"  name="range" v-model="m.range" value="0">
+										前台打印机</label>
+								</div>
+							</div>
 						</div>
 						<div class="text-center">
 							<input type="hidden" name="id" v-model="m.id" />

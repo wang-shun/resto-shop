@@ -11,4 +11,8 @@ import java.util.List;
 public interface AreaService extends GenericService<Area, Long> {
 
     List<Area> getAreaList(String shopId);
+
+
+
+    void deleteArea(String printId);
 }

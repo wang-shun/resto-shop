@@ -2700,11 +2700,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
             if(tableQrcode.getAreaId() == null){
-                ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
             }else{
                 Area area = areaService.selectById(tableQrcode.getAreaId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
                 if(area == null){
-                    ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+
                 }else{
                     Printer printer = printerService.selectById(area.getPrintId().intValue());
                     ticketPrinter.add(printer);
@@ -6307,17 +6308,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
             if(tableQrcode.getAreaId() == null){
-                printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                printer = printerService.selectQiantai(shopDetail.getId());
             }else{
                 Area area = areaService.selectById(tableQrcode.getAreaId());
+                printer = printerService.selectQiantai(shopDetail.getId());
                 if(area == null){
-                    printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+
                 }else{
                     Printer p = printerService.selectById(area.getPrintId().intValue());
                     printer.add(p);
                 }
             }
-
         }
 
 
