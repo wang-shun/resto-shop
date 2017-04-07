@@ -36,7 +36,7 @@ public class PrinterController extends GenericController{
 	@RequestMapping("/qiantai")
 	@ResponseBody
 	public List<Printer> qiantai(){
-		return printerService.selectByShopAndType(getCurrentShopId(),2);
+		return printerService.selectQiantai(getCurrentShopId());
 	}
 
 	
