@@ -7,13 +7,13 @@ import java.io.Serializable;
 public class Printer implements Serializable {
     private Integer id;
 
-    @NotBlank(message="{打印机名称 不能为空}")
+//    @NotBlank(message="{打印机名称 不能为空}")
     private String name;
 
-    @NotBlank(message="{IP 地址不能为空}")
+//    @NotBlank(message="{IP 地址不能为空}")
     private String ip;
     
-    @NotBlank(message="{端口号 不能为空}")
+//    @NotBlank(message="{端口号 不能为空}")
     private String port;
 
     private String shopDetailId;
