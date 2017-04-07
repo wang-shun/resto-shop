@@ -7,7 +7,7 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.PermissionService;
 import com.resto.shop.web.service.ShowPhotoService;
-import com.resto.shop.web.service.TableQrcodeService;
+//import com.resto.shop.web.service.TableQrcodeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
