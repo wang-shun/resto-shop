@@ -421,7 +421,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
-            String remark = null;
+            String remark = "";
             switch (item.getType()) {
                 case OrderItemType.ARTICLE://无规格单品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -467,6 +467,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
+                    if(a.getIsEmpty()){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("菜品供应时间变动，请重新购买");
+                        return jsonResult;
+                    }
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());
@@ -510,6 +515,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setOriginalPrice(org_price);
             item.setStatus(1);
             item.setSort(0);
+            if(remark.equals("0%")){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"供应时间发生改变，请重新购买");
+                return jsonResult;
+            }
             item.setRemark(remark);
             if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
                 item.setUnitPrice(price);

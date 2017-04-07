@@ -346,7 +346,7 @@
                 #{isMainFood},
             </if>
             <if test="virtualId != null">
-                #{virtualId,jdbcType=INTEGER}
+                #{virtualId,jdbcType=INTEGER},
             </if>
             <if test="initials != null">
                 #{initials}
