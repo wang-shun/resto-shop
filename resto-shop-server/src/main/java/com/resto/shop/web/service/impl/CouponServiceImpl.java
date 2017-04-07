@@ -207,15 +207,17 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
             for (NewCustomCoupon customCoupon : newCustomCoupons){
                 Coupon coupon = new Coupon();
                 Date beginDate = new Date();
+
                 //判断优惠卷有效日期类型
-                if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)){
+                if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
                     coupon.setBeginDate(beginDate);
                     coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,customCoupon.getCouponValiday()));
-                }else if (customCoupon.getTimeConsType()==TimeCons.MODELB){
+                }else if (customCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
                     coupon.setBeginDate(customCoupon.getBeginDateTime());
                     coupon.setEndDate(customCoupon.getEndDateTime());
                 }
 
+                //判断是店铺优惠卷还是品牌优惠卷
                 if(customCoupon.getIsBrand() == 1 && customCoupon.getBrandId() != null){
                     coupon.setBrandId(customCoupon.getBrandId());
                 }else{
@@ -245,11 +247,14 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
             }
             if (StringUtils.isNotBlank(realTimeCouponIds)){
+                //得到用户领取过的实时优惠卷Id
                 realTimeCouponIds = realTimeCouponIds.substring(0,realTimeCouponIds.length() - 1);
                 customer.setRealTimeCouponIds(realTimeCouponIds);
                 customerService.update(customer);
             }
         }catch (Exception e){
+            e.printStackTrace();
+            log.error("发放实时优惠卷出错！");
             return new ArrayList<>();
         }
         return coupons;
