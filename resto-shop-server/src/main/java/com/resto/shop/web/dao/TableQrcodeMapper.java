@@ -13,5 +13,8 @@ public interface TableQrcodeMapper  extends GenericDao<TableQrcode, Long>{
 
     List<TableQrcode> selectByShopId(String shopId);
 
+
+
+
     TableQrcode selectByTableNumberShopId(@Param("shopId") String shopId, @Param("tableNumber") Integer tableNumber);
 }

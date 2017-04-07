@@ -2,11 +2,12 @@ package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
 import com.resto.brand.web.service.*;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.PermissionService;
 import com.resto.shop.web.service.ShowPhotoService;
-import com.resto.shop.web.service.TableQrcodeService;
+//import com.resto.shop.web.service.TableQrcodeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -29,6 +30,12 @@ public class SpringContextConfig {
     @Bean
     public RoleService roleService() {
         return getProxy(RoleService.class);
+    }
+
+
+    @Bean
+    public AreaService areaService() {
+        return getProxy(AreaService.class);
     }
 
 
@@ -126,7 +133,7 @@ public class SpringContextConfig {
     public ChargeSettingService chargeSettingService() {
         return getProxy(ChargeSettingService.class);
     }
-    
+
     @Bean
     public ChargeLogService chargeLogService() {
         return getProxy(ChargeLogService.class);
@@ -326,17 +333,25 @@ public class SpringContextConfig {
 
 
     @Bean
-    public LogBaseService logBaseService() { return  proxy.create(LogBaseService.class); }
+    public LogBaseService logBaseService() {
+        return proxy.create(LogBaseService.class);
+    }
 
 
     @Bean
-    public SysErrorService sysErrorService() { return  proxy.create(SysErrorService.class); }
+    public SysErrorService sysErrorService() {
+        return proxy.create(SysErrorService.class);
+    }
 
     @Bean
-    public WeItemService weItemService() { return  proxy.create(WeItemService.class); }
+    public WeItemService weItemService() {
+        return proxy.create(WeItemService.class);
+    }
 
     @Bean
-    public WeChargeLogService weChargeLogService() { return  proxy.create(WeChargeLogService.class); }
+    public WeChargeLogService weChargeLogService() {
+        return proxy.create(WeChargeLogService.class);
+    }
 
 
     @Bean
@@ -363,6 +378,7 @@ public class SpringContextConfig {
     public TableQrcodeService tableQrcodeService() {
         return proxy.create(TableQrcodeService.class);
     }
+
 
     @Bean
     public OffLineOrderService offLineOrderService() {
@@ -393,7 +409,6 @@ public class SpringContextConfig {
     public RedPacketService redPacketService() {
         return proxy.create(RedPacketService.class);
     }
-
 
 
     public <T> T getProxy(Class<T> clazz) {
