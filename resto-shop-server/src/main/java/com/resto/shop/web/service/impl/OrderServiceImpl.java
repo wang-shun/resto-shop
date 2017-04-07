@@ -2700,10 +2700,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
             if(tableQrcode.getAreaId() == null){
-                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
             }else{
                 Area area = areaService.selectById(tableQrcode.getAreaId());
-                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
                 if(area == null){
 
                 }else{
@@ -6308,10 +6308,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
             if(tableQrcode.getAreaId() == null){
-                printer = printerService.selectQiantai(shopDetail.getId());
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
             }else{
                 Area area = areaService.selectById(tableQrcode.getAreaId());
-                printer = printerService.selectQiantai(shopDetail.getId());
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
                 if(area == null){
 
                 }else{

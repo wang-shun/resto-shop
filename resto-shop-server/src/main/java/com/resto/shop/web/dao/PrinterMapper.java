@@ -39,5 +39,5 @@ public interface PrinterMapper  extends GenericDao<Printer,Integer> {
 
     Integer checkError(@Param(value = "shopId") String currentShopId);
 
-    List<Printer> selectQiantai(@Param("shopId") String shopId);
+    List<Printer> selectQiantai(@Param("shopId") String shopId,@Param("type") Integer type);
 }

@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.resto.shop.web.constant.PrinterRange;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,7 +37,7 @@ public class PrinterController extends GenericController{
 	@RequestMapping("/qiantai")
 	@ResponseBody
 	public List<Printer> qiantai(){
-		return printerService.selectQiantai(getCurrentShopId());
+		return printerService.selectQiantai(getCurrentShopId(), PrinterRange.QUYU);
 	}
 
 	

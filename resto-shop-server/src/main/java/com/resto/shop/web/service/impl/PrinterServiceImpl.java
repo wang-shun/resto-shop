@@ -45,7 +45,7 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
 	}
 
 	@Override
-	public List<Printer> selectQiantai(String shopId) {
-		return printerMapper.selectQiantai(shopId);
+	public List<Printer> selectQiantai(String shopId,Integer type) {
+		return printerMapper.selectQiantai(shopId,type);
 	}
 }

@@ -17,5 +17,5 @@ public interface PrinterService extends GenericService<Printer, Integer> {
 
 	Integer checkError(String shopId);
 
-	List<Printer> selectQiantai(String shopId);
+	List<Printer> selectQiantai(String shopId,Integer type);
 }
