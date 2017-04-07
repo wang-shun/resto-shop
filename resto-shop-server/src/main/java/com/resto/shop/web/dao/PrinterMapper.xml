@@ -79,6 +79,6 @@
 
   <select id="selectQiantai" resultType="Printer">
     select * from tb_printer where shop_detail_id = #{shopId} and  print_type = 2
-    and range = 0
+    and `range` = 0
   </select>
 </mapper>
