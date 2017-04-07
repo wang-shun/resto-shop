@@ -55,12 +55,10 @@
                                 <div class="control-label">是否是首冲</div>
                                 <input type="radio"  name="firstCharge" v-model="m.firstCharge" value=1 v-if="m.id">
                                 <input type="radio"  name="firstCharge"  value=1 v-if="!m.id">
-                                <label for="showIn">
-                                <input type="radio"  name="firstCharge" value=0 checked="checked" v-if="!m.id">是
-                                </label>
-                                <label for="showIn">
-                                    <input type="radio"  name="firstCharge" value=0 v-if="m.id" v-model="m.firstCharge">否
-                                </label>
+                                <label for="showIn">是 </label>
+                                <input type="radio"  name="firstCharge" value=0 checked="checked" v-if="!m.id">
+                                <label for="showIn">否</label>
+                                    <input type="radio"  name="firstCharge" value=0 v-if="m.id" v-model="m.firstCharge">
                             </div>
 
 
