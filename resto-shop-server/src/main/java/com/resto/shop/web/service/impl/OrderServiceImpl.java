@@ -2682,12 +2682,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         List<Printer> ticketPrinter = new ArrayList<>();
-        if(tableQrcode == null){
+        if(tableQrcode == null ){
             ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
+            if(tableQrcode.getAreaId() == null){
+                ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            }
             Area area = areaService.selectById(tableQrcode.getAreaId());
-            Printer printer = printerService.selectById(area.getPrintId().intValue());
-            ticketPrinter.add(printer);
+            if(area == null){
+                ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            }else{
+                Printer printer = printerService.selectById(area.getPrintId().intValue());
+                ticketPrinter.add(printer);
+            }
         }
 
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
@@ -6283,9 +6290,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(tableQrcode == null){
             printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         }else{
+            if(tableQrcode.getAreaId() == null){
+                printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            }
             Area area = areaService.selectById(tableQrcode.getAreaId());
-            Printer p = printerService.selectById(area.getPrintId().intValue());
-            printer.add(p);
+            if(area == null){
+                printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            }else{
+                Printer p = printerService.selectById(area.getPrintId().intValue());
+                printer.add(p);
+            }
         }
 
 
