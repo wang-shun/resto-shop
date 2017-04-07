@@ -329,9 +329,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      */
     private BigDecimal discount(BigDecimal price, int discount, int wxdiscount, String articleName) throws AppException {
         if (price != null) {
+            log.info(discount+","+wxdiscount);
             if (discount != wxdiscount) {
                 //折扣不匹配
-                log.info(discount+","+wxdiscount);
+
                 throw new AppException(AppException.DISCOUNT_TIMEOUT, articleName + "折扣活动已结束，请重新选购餐品~");
             }
             return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
