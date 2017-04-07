@@ -32,6 +32,13 @@ public class PrinterController extends GenericController{
 	public List<Printer> listData(){
 		return printerService.selectListByShopId(getCurrentShopId());
 	}
+
+	@RequestMapping("/qiantai")
+	@ResponseBody
+	public List<Printer> qiantai(){
+		return printerService.selectByShopAndType(getCurrentShopId(),2);
+	}
+
 	
 	@RequestMapping("list_one")
 	@ResponseBody
@@ -52,6 +59,7 @@ public class PrinterController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid Printer printer){
 		printerService.update(printer);
+
 		return Result.getSuccess();
 	}
 	

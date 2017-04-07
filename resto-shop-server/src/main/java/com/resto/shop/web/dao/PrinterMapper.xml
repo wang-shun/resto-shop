@@ -10,8 +10,9 @@
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
     <result column="print_type" property="printType" jdbcType="INTEGER"/>
     <result column="ticket_type" property="ticketType" />
+    <result column="range" property="range"/>
   </resultMap>
-  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type,ticket_type</sql>
+  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type,ticket_type,`range`</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_printer where id = #{id,jdbcType=INTEGER}
   </select>
@@ -26,6 +27,7 @@
       <if test="shopDetailId != null">shop_detail_id,</if> 
       <if test="printType != null">print_type,</if>
       <if test="ticketType != null">ticket_type,</if>
+      <if test="range != null">`range`,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
@@ -35,6 +37,7 @@
       <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if> 
       <if test="printType != null">#{printType,jdbcType=INTEGER},</if>
       <if test="ticketType != null">#{ticketType},</if>
+      <if test="range != null">#{range},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Printer">update tb_printer 
@@ -45,6 +48,7 @@
       <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if> 
       <if test="printType != null">print_type = #{printType,jdbcType=INTEGER},</if>
       <if test="ticketType != null">ticket_type = #{ticketType},</if>
+      <if test="range != null">`range` = #{range},</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Printer">
@@ -71,5 +75,10 @@
     and shop_detail_id = #{shopId} and DATE_FORMAT(NOW(),'%m-%d-%Y') = DATE_FORMAT(push_order_time,'%m-%d-%Y')
     and print_times = 0 and order_state != 9
   </select>
-  
+
+
+  <select id="selectQiantai" resultType="Printer">
+    select * from tb_printer where shop_detail_id = #{shopId} and  print_type = 2
+    and range = 0
+  </select>
 </mapper>

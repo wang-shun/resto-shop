@@ -169,12 +169,9 @@
 
     <select id="selectRealTimeCoupon" parameterType="java.util.Map" resultMap="BaseResultMap">
         select * from tb_new_custom_coupon where coupon_type = 4 and (is_brand = 1 or shop_detail_id = #{shopId})
-        and is_activty = 1 and real_time_coupon_begin_time &gt;= #{nowDate} and real_time_coupon_end_time &lt;= #{nowDate}
+        and is_activty = 1 and real_time_coupon_begin_time &lt;= #{nowDate} and real_time_coupon_end_time &gt;= #{nowDate}
         <if test="realTimeCouponIds != null">
-            and id not in
-            <foreach collection="realTimeCouponIds" item="realTimeCouponId" open="(" separator="," close=")">
-                ${realTimeCouponId}
-            </foreach>
+            and id not in (${realTimeCouponIds})
         </if>
     </select>
 </mapper>

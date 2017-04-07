@@ -9,7 +9,9 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.model.TableQrcode;
 import com.resto.brand.web.service.*;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
@@ -66,6 +68,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private OrderItemMapper orderitemMapper;
 
+    @Autowired
+    private AreaService areaService;
+
     @Resource
     private RedPacketService redPacketService;
 
@@ -73,6 +78,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private CustomerService customerService;
+
+    @Autowired
+    private TableQrcodeService tableQrcodeService;
 
     @Resource
     private ArticleService articleService;
@@ -321,9 +329,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      */
     private BigDecimal discount(BigDecimal price, int discount, int wxdiscount, String articleName) throws AppException {
         if (price != null) {
+            log.info(discount+","+wxdiscount);
             if (discount != wxdiscount) {
                 //折扣不匹配
-                throw new AppException(AppException.DISCOUNT_TIMEOUT, articleName + "折扣活动已结束，请重新选购餐品~");
+                return new BigDecimal(-1);
+
             }
             return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
         } else {
@@ -333,10 +343,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     /**
-    * @Author: KONATA
-    * @Description
-    * @Date: 15:42 2017/3/30
-    */
+     * @Author: KONATA
+     * @Description
+     * @Date: 15:42 2017/3/30
+     */
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -413,7 +423,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal price = null;
             BigDecimal fans_price = null;
             item.setId(ApplicationUtils.randomUUID());
-            String remark = null;
+            String remark = "";
             switch (item.getType()) {
                 case OrderItemType.ARTICLE://无规格单品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -424,6 +434,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = discount(a.getFansPrice(), a.getDiscount(), item.getDiscount(), a.getName());       //计算折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     remark = a.getDiscount() + "%";          //设置菜品当前折扣
+
                     break;
                 case OrderItemType.RECOMMEND://推荐餐品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -459,6 +470,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
+                    if(a.getIsEmpty()){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("菜品供应时间变动，请重新购买");
+                        return jsonResult;
+                    }
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());
@@ -497,11 +513,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 default:
                     throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
             }
+            if(price != null && price.equals(new BigDecimal(-1))){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"折扣活动已结束，请重新选购餐品~");
+                return jsonResult;
+            }
+            if(fans_price != null && fans_price.equals(new BigDecimal(-1))){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"折扣活动已结束，请重新选购餐品~");
+                return jsonResult;
+            }
+
             item.setMealFeeNumber(mealFeeNumber);
             item.setArticleDesignation(a.getDescription());
             item.setOriginalPrice(org_price);
             item.setStatus(1);
             item.setSort(0);
+            if(remark.equals("0%")){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"供应时间发生改变，请重新购买");
+                return jsonResult;
+            }
             item.setRemark(remark);
             if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
                 item.setUnitPrice(price);
@@ -2652,11 +2684,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Map<String, Object>> printOrderAll(String orderId) {
+
+
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+
+
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+
+
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> ticketPrinter = new ArrayList<>();
+        if(tableQrcode == null ){
+            ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId());
+                if(area == null){
+
+                }else{
+                    Printer printer = printerService.selectById(area.getPrintId().intValue());
+                    ticketPrinter.add(printer);
+                }
+            }
+
+        }
+
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
 
@@ -4952,7 +5009,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("日报:2016.11.20").append("\n")
                 .append("堂吃支付金额:10000元").append("\n")
                 .append("商户录取").append("\n")
-                 .append("堂吃消费笔数:64").append("\n")
+                .append("堂吃消费笔数:64").append("\n")
                 .append("商户录入").append("\n")
                 .append("用户支付消费:62/9500").append("\n")
                 .append("----------------").append("\n")
@@ -6245,9 +6302,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (orderItemIds.size() != 0) {
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
-        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> printer = new ArrayList<>();
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+        if(tableQrcode == null){
+            printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                printer = printerService.selectQiantai(shopDetail.getId());
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                printer = printerService.selectQiantai(shopDetail.getId());
+                if(area == null){
+
+                }else{
+                    Printer p = printerService.selectById(area.getPrintId().intValue());
+                    printer.add(p);
+                }
+            }
+        }
+
+
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }
