@@ -26,6 +26,36 @@ public class TableQrcode implements Serializable {
 
     private String shopName;
 
+    private String areaId;
+
+    private String customerCount;
+
+    private String areaName;
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getCustomerCount() {
+        return customerCount;
+    }
+
+    public void setCustomerCount(String customerCount) {
+        this.customerCount = customerCount;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
+    }
+
     public String getBrandName() {
         return brandName;
     }

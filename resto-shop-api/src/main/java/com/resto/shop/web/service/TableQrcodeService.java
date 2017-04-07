@@ -12,5 +12,8 @@ public interface TableQrcodeService extends GenericService<TableQrcode, Long> {
 
     List<TableQrcode> selectByShopId(String shopId);
 
+
+
+
     TableQrcode selectByTableNumberShopId(String shopId, Integer tableNumber);
 }
