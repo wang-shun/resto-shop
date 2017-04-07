@@ -100,7 +100,7 @@
             mixins: [C.formVueMix],
             methods: {
                 platform: function (model) {
-                    window.open("tablemanager/download");
+                    window.open("tablemanager/download?id="+model.id);
                 }
             }
 
