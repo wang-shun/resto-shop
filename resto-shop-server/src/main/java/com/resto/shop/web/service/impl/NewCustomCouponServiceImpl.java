@@ -245,10 +245,11 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         for(int i = 0; i < customCoupon.getCouponNumber(); i++){
             couponService.insertCoupon(coupon);
         }
-        String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId();
+        String url = setting.getWechatWelcomeUrl()+"?dialog=myCoupon&subpage=my&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
-        str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\""+customCoupon.getCouponNumber()+"张");
-        str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
+        str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
+                "有效期至"+DateUtil.formatDate(coupon.getEndDate(),"MM月dd日")+"，");
+        str.append("<a href='"+url+"'>点击查看</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
@@ -297,7 +298,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    		}
 	    	}
 	    }
-     
+
 	  //发送短信
 	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId,Map<String,String>logMap){
 	        Customer customer=customerService.selectById(customerId);
@@ -309,9 +310,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("day", day);
             SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
 	    }
-	    
-	    
-	    
+
+
+
 
     @Override
 	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {
