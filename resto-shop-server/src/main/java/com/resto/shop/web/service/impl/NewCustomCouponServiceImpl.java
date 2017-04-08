@@ -247,7 +247,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         }
         String url = setting.getWechatWelcomeUrl()+"?dialog=myCoupon&subpage=my&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
-        str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
+        str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
                 "有效期至"+DateUtil.formatDate(coupon.getEndDate(),"MM月dd日")+"，");
         str.append("<a href='"+url+"'>点击查看</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
