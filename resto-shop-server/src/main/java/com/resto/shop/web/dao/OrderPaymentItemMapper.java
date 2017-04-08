@@ -110,4 +110,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     OrderPaymentItem selectByShanhuiPayOrder(String orderId);
 
     void updateByShanhuiPayOrder(@Param("orderId")String orderId, @Param("param")String param);
+
+    OrderPaymentItem insertByBeforePay(OrderPaymentItem record);
 }
