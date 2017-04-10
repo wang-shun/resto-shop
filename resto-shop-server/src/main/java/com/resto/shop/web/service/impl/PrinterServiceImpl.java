@@ -43,4 +43,9 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
 	public Integer checkError(String shopId) {
 		return printerMapper.checkError(shopId) ;
 	}
+
+	@Override
+	public List<Printer> selectQiantai(String shopId,Integer type) {
+		return printerMapper.selectQiantai(shopId,type);
+	}
 }

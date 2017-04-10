@@ -13,19 +13,21 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.CouponDto;
+import com.resto.shop.web.constant.CouponSource;
 import com.resto.shop.web.constant.PayMode;
+import com.resto.shop.web.constant.TimeCons;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.Coupon;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.CouponService;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,6 +52,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Autowired
     OrderMapper orderMapper;
+
+    @Autowired
+    CustomerService customerService;
 
     @Override
     public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
@@ -192,5 +197,66 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     @Override
     public List<Coupon> usedCouponBeforeByOrderId(String orderId) {
         return couponMapper.usedCouponBeforeByOrderId(orderId);
+    }
+
+    @Override
+    public List<Coupon> addRealTimeCoupon(List<NewCustomCoupon> newCustomCoupons, Customer customer) {
+        List<Coupon> coupons = new ArrayList<>();
+        try{
+            String realTimeCouponIds = "";
+            for (NewCustomCoupon customCoupon : newCustomCoupons){
+                Coupon coupon = new Coupon();
+                Date beginDate = new Date();
+
+                //判断优惠卷有效日期类型
+                if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
+                    coupon.setBeginDate(beginDate);
+                    coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,customCoupon.getCouponValiday()));
+                }else if (customCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
+                    coupon.setBeginDate(customCoupon.getBeginDateTime());
+                    coupon.setEndDate(customCoupon.getEndDateTime());
+                }
+
+                //判断是店铺优惠卷还是品牌优惠卷
+                if(customCoupon.getIsBrand() == 1 && customCoupon.getBrandId() != null){
+                    coupon.setBrandId(customCoupon.getBrandId());
+                }else{
+                    coupon.setShopDetailId(customCoupon.getShopDetailId());
+                }
+                //如果没有设置优惠券推送时间，那么，默认为3天
+                if(customCoupon.getPushDay() != null){
+                    coupon.setPushDay(customCoupon.getPushDay());
+                }else{
+                    coupon.setPushDay(3);
+                }
+                coupon.setName(customCoupon.getCouponName());
+                coupon.setValue(customCoupon.getCouponValue());
+                coupon.setMinAmount(customCoupon.getCouponMinMoney());
+                coupon.setCouponType(4);
+                coupon.setBeginTime(customCoupon.getBeginTime());
+                coupon.setEndTime(customCoupon.getEndTime());
+                coupon.setUseWithAccount(customCoupon.getUseWithAccount());
+                coupon.setDistributionModeId(customCoupon.getDistributionModeId());
+                coupon.setCouponSource(CouponSource.REAL_TIME_COUPON);
+                coupon.setCustomerId(customer.getId());
+                coupon.setRecommendDelayTime(0);
+                for(int i = 0; i < customCoupon.getCouponNumber(); i++){
+                    insertCoupon(coupon);
+                    coupons.add(coupon);
+                }
+                realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
+            }
+            if (StringUtils.isNotBlank(realTimeCouponIds)){
+                //得到用户领取过的实时优惠卷Id
+                realTimeCouponIds = realTimeCouponIds.substring(0,realTimeCouponIds.length() - 1);
+                customer.setRealTimeCouponIds(realTimeCouponIds);
+                customerService.update(customer);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("发放实时优惠卷出错！");
+            return new ArrayList<>();
+        }
+        return coupons;
     }
 }

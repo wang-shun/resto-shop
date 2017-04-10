@@ -9,7 +9,9 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.model.TableQrcode;
 import com.resto.brand.web.service.*;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
@@ -66,6 +68,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private OrderItemMapper orderitemMapper;
 
+    @Autowired
+    private AreaService areaService;
+
     @Resource
     private RedPacketService redPacketService;
 
@@ -73,6 +78,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private CustomerService customerService;
+
+    @Autowired
+    private TableQrcodeService tableQrcodeService;
 
     @Resource
     private ArticleService articleService;
@@ -321,9 +329,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      */
     private BigDecimal discount(BigDecimal price, int discount, int wxdiscount, String articleName) throws AppException {
         if (price != null) {
+            log.info(discount+","+wxdiscount);
             if (discount != wxdiscount) {
                 //折扣不匹配
-                throw new AppException(AppException.DISCOUNT_TIMEOUT, articleName + "折扣活动已结束，请重新选购餐品~");
+                return new BigDecimal(-1);
+
             }
             return price.multiply(new BigDecimal(discount)).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
         } else {
@@ -424,6 +434,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = discount(a.getFansPrice(), a.getDiscount(), item.getDiscount(), a.getName());       //计算折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     remark = a.getDiscount() + "%";          //设置菜品当前折扣
+
                     break;
                 case OrderItemType.RECOMMEND://推荐餐品
                     // 查出 item对应的 商品信息，并将item的原价，单价，总价，商品名称，商品详情 设置为对应的
@@ -502,6 +513,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 default:
                     throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
             }
+            if(price != null && price.equals(new BigDecimal(-1))){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"折扣活动已结束，请重新选购餐品~");
+                return jsonResult;
+            }
+            if(fans_price != null && fans_price.equals(new BigDecimal(-1))){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage(a.getName()+"折扣活动已结束，请重新选购餐品~");
+                return jsonResult;
+            }
+
             item.setMealFeeNumber(mealFeeNumber);
             item.setArticleDesignation(a.getDescription());
             item.setOriginalPrice(org_price);
@@ -2662,11 +2684,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Map<String, Object>> printOrderAll(String orderId) {
+
+
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+
+
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+
+
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> ticketPrinter = new ArrayList<>();
+        if(tableQrcode == null ){
+            ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer printer = printerService.selectById(area.getPrintId().intValue());
+                    ticketPrinter.add(printer);
+                }
+            }
+
+        }
+
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
 
@@ -4829,10 +4876,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("satisfied3:").append("'").append(monthSatisfaction).append("'").append(",")
                 //今日外卖金额
                 .append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
-                //总营业额
-                .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
-                //本月总额
-                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
+                //今日总营业额 04-08 doctor luo +外卖金额
+                .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
+                //本月总额 04-08 doctor luo +外卖金额
+                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("'")
                 .append("}");
 
         //封装微信推送文本
@@ -4861,22 +4908,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("优惠券:").append(couponTotal).append("\n")
                 .append("充值赠送:").append(chargeReturn).append("\n")
                 .append("折扣比率").append(discountRatio).append("\n")
-                .append("--------------------")
+                .append("--------------------").append("\n")
                 .append("本日五星评论:").append(fiveStar).append("\n")
                 .append("本日更改意见:").append(fourStar).append("\n")
                 .append("本日差评投诉:").append(oneToThreeStar).append("\n")
                 .append("本日满意度:").append(todaySatisfaction).append("\n")
                 .append("本旬满意度:").append(theTenDaySatisfaction).append("\n")
                 .append("本月满意度:").append(monthSatisfaction).append("\n")
-                .append("---------------------")
+                .append("---------------------").append("\n")
                 .append("今日外卖金额:").append(todayOrderBooks).append("\n")
-                .append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
-                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
+                .append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
+                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("\n");
 
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-            SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122", null);//推送本日信息
+                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122", null);//推送本日信息
             String [] tels = telephones.split(",");
             for(String s:tels){
                 Customer c = customerService.selectByTelePhone(s);
@@ -6255,9 +6302,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (orderItemIds.size() != 0) {
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
-        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> printer = new ArrayList<>();
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+        if(tableQrcode == null){
+            printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer p = printerService.selectById(area.getPrintId().intValue());
+                    printer.add(p);
+                }
+            }
+        }
+
+
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }

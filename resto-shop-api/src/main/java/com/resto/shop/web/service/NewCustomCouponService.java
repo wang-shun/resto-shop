@@ -9,6 +9,7 @@ import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewCustomCoupon;
 
@@ -18,7 +19,7 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
 
     List<NewCustomCoupon> selectListByBrandId(String currentBrandId,String shopId);
 
-	BigDecimal giftCoupon(Customer cus,Integer couponType,String shopId);
+	List<Coupon> giftCoupon(Customer cus, Integer couponType, String shopId);
 
 
     List<NewCustomCoupon> selectListByCouponType(String currentBrandId,Integer couponType,String shopId);
@@ -43,4 +44,6 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
     List<NewCustomCoupon> selectBirthCoupon();
 
     void insertBirthCoupon(NewCustomCoupon customCoupon, Customer customer, Brand brand, WechatConfig config, BrandSetting setting);
+
+    List<NewCustomCoupon> selectRealTimeCoupon(Map<String, Object> selectMap);
 }

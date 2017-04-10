@@ -4,7 +4,6 @@ import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.model.*;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;

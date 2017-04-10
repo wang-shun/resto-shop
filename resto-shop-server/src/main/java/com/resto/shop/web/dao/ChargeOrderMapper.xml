@@ -412,4 +412,22 @@ WHERE
 
     </select>
 
+    <select id="selectByCustomerIdAndBrandId" resultType="ChargeOrder">
+        SELECT
+	c.id,
+	c.charge_money,
+	c.create_time,
+	c.brand_id,
+	c.shop_detail_id,
+	c.type,
+	u.telephone
+FROM
+	tb_charge_order c
+INNER JOIN tb_customer u ON c.customer_id = u.id
+WHERE
+	c.order_state = 1
+AND c.brand_id =#{brandId}
+AND u.id =#{customerId}
+    </select>
+
 </mapper>

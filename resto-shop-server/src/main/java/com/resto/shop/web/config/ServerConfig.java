@@ -40,6 +40,13 @@ public class ServerConfig {
     }
 
     @Bean
+    public TableQrcodeService tableQrcodeService(){
+        return proxy.create(TableQrcodeService.class);
+    }
+
+
+
+    @Bean
     public BrandSettingService brandSettingService(){
         return proxy.create(BrandSettingService.class);
     }

@@ -141,67 +141,73 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //
 //	}
 
-    public BigDecimal giftCoupon(Customer cus,Integer couponType,String shopId) {
-        //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
-        List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
-        //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
-        if(couponConfigs == null || couponConfigs.size()== 0 ){
-            couponType = -1;
-            couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
-        }
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        //根据优惠卷配置，添加对应数量的优惠卷
-        Date beginDate  = new Date();
-        BigDecimal value = new BigDecimal(0);
-        for(NewCustomCoupon cfg: couponConfigs){
-            //如果是品牌优惠券设置或者是当前店铺的优惠券设置
-            if(cfg.getIsBrand()==1||shopId.equals(cfg.getShopDetailId())){
-                Coupon coupon = new Coupon();
-                coupon.setName(cfg.getCouponName());
-                coupon.setValue(cfg.getCouponValue());
-                coupon.setMinAmount(cfg.getCouponMinMoney());
-                coupon.setCouponType(couponType);
-                coupon.setBeginTime(cfg.getBeginTime());
-                coupon.setEndTime(cfg.getEndTime());
-                coupon.setUseWithAccount(cfg.getUseWithAccount());
-                coupon.setDistributionModeId(cfg.getDistributionModeId());
-                coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
-                if (couponType.equals(3)){
-                    coupon.setCouponSource(CouponSource.SHARE_COUPON);
-                }
-                coupon.setCustomerId(cus.getId());
-                coupon.setPushDay(cfg.getPushDay());
-                coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
-                //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
-                if(cfg.getShopDetailId()!=null&&shopId.equals(cfg.getShopDetailId())){
-                    coupon.setShopDetailId(cfg.getShopDetailId());
-                }
-                //如果是品牌的专有优惠券
-                if(cfg.getIsBrand()==1&&cfg.getBrandId()!=null){
-                    coupon.setBrandId(cfg.getBrandId());
-                }
-                //优惠券时间选择的类型分配时间
-                if(cfg.getTimeConsType()==TimeCons.MODELA){
-                    coupon.setBeginDate(beginDate);
-                    coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,cfg.getCouponValiday()));
-                }else if(cfg.getTimeConsType()==TimeCons.MODELB){
-                    coupon.setBeginDate(cfg.getBeginDateTime());
-                    coupon.setEndDate(cfg.getEndDateTime());
-                }
-                //如果没有设置优惠券推送时间，那么，默认为3天
-                if(cfg.getPushDay()==null){
-                	coupon.setPushDay(3);
-                }
-                for(int i=0;i<cfg.getCouponNumber();i++){
-                    couponService.insertCoupon(coupon);
-                }
-                value = value.add(coupon.getValue().multiply(new BigDecimal(cfg.getCouponNumber())));
-                long begin=coupon.getBeginDate().getTime();
-                long end=coupon.getEndDate().getTime();
-                timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail,null);
+    public List<Coupon> giftCoupon(Customer cus,Integer couponType,String shopId) {
+        List<Coupon> coupons = new ArrayList<>();
+        try {
+            //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
+            List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(), couponType);
+            //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
+            if (couponConfigs == null || couponConfigs.size() == 0) {
+                couponType = -1;
+                couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(), couponType);
             }
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+            //根据优惠卷配置，添加对应数量的优惠卷
+            Date beginDate = new Date();
+            for (NewCustomCoupon cfg : couponConfigs) {
+                //如果是品牌优惠券设置或者是当前店铺的优惠券设置
+                if (cfg.getIsBrand() == 1 || shopId.equals(cfg.getShopDetailId())) {
+                    Coupon coupon = new Coupon();
+                    coupon.setName(cfg.getCouponName());
+                    coupon.setValue(cfg.getCouponValue());
+                    coupon.setMinAmount(cfg.getCouponMinMoney());
+                    coupon.setCouponType(couponType);
+                    coupon.setBeginTime(cfg.getBeginTime());
+                    coupon.setEndTime(cfg.getEndTime());
+                    coupon.setUseWithAccount(cfg.getUseWithAccount());
+                    coupon.setDistributionModeId(cfg.getDistributionModeId());
+                    coupon.setCouponSource(CouponSource.NEW_CUSTOMER_COUPON);
+                    if (couponType.equals(3)) {
+                        coupon.setCouponSource(CouponSource.SHARE_COUPON);
+                    }
+                    coupon.setCustomerId(cus.getId());
+                    coupon.setPushDay(cfg.getPushDay());
+                    coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
+                    //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
+                    if (cfg.getShopDetailId() != null && shopId.equals(cfg.getShopDetailId())) {
+                        coupon.setShopDetailId(cfg.getShopDetailId());
+                    }
+                    //如果是品牌的专有优惠券
+                    if (cfg.getIsBrand() == 1 && cfg.getBrandId() != null) {
+                        coupon.setBrandId(cfg.getBrandId());
+                    }
+                    //优惠券时间选择的类型分配时间
+                    if (cfg.getTimeConsType() == TimeCons.MODELA) {
+                        coupon.setBeginDate(beginDate);
+                        coupon.setEndDate(DateUtil.getAfterDayDate(beginDate, cfg.getCouponValiday()));
+                    } else if (cfg.getTimeConsType() == TimeCons.MODELB) {
+                        coupon.setBeginDate(cfg.getBeginDateTime());
+                        coupon.setEndDate(cfg.getEndDateTime());
+                    }
+                    //如果没有设置优惠券推送时间，那么，默认为3天
+                    if (cfg.getPushDay() == null) {
+                        coupon.setPushDay(3);
+                    }
+                    for (int i = 0; i < cfg.getCouponNumber(); i++) {
+                        couponService.insertCoupon(coupon);
+                        coupons.add(coupon);
+                    }
+                    long begin = coupon.getBeginDate().getTime();
+                    long end = coupon.getEndDate().getTime();
+                    timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("发放优惠卷出错！");
+            return new ArrayList<>();
         }
-        return value;
+        return coupons;
     }
 
     @Override
@@ -239,10 +245,11 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         for(int i = 0; i < customCoupon.getCouponNumber(); i++){
             couponService.insertCoupon(coupon);
         }
-        String url = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId();
+        String url = setting.getWechatWelcomeUrl()+"?dialog=myCoupon&subpage=my&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
-        str.append("太棒了！"+brand.getBrandName()+"赠送给您的价值"+coupon.getValue()+"元的\""+coupon.getName()+"\""+customCoupon.getCouponNumber()+"张");
-        str.append("已经到账，<a href='"+url+"'>快来享用美食吧~</a>");
+        str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
+                "有效期至"+DateUtil.formatDate(coupon.getEndDate(),"MM月dd日")+"，");
+        str.append("<a href='"+url+"'>点击查看</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
@@ -291,7 +298,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    		}
 	    	}
 	    }
-     
+
 	  //发送短信
 	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId,Map<String,String>logMap){
 	        Customer customer=customerService.selectById(customerId);
@@ -303,9 +310,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("day", day);
             SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
 	    }
-	    
-	    
-	    
+
+
+
 
     @Override
 	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {
@@ -341,5 +348,10 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     @Override
     public List<NewCustomCoupon> selectBirthCoupon() {
         return newcustomcouponMapper.selectBirthCoupon();
+    }
+
+    @Override
+    public List<NewCustomCoupon> selectRealTimeCoupon(Map<String, Object> selectMap) {
+        return newcustomcouponMapper.selectRealTimeCoupon(selectMap);
     }
 }

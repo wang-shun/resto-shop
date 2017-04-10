@@ -71,4 +71,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @param param
      */
     void updateByShanhuiPayOrder(String orderId, String param);
+
+    OrderPaymentItem insertByBeforePay(OrderPaymentItem orderPaymentItem);
 }

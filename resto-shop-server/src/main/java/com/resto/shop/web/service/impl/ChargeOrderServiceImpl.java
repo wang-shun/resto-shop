@@ -317,6 +317,11 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     }
 
     @Override
+    public List<ChargeOrder> selectByCustomerIdAndBrandId(String customerId, String brandId) {
+        return chargeorderMapper.selectByCustomerIdAndBrandId(customerId,brandId);
+    }
+
+    @Override
     public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap) {
         return chargeorderMapper.selectChargeRedPacket(selectMap);
     }

@@ -23,4 +23,6 @@ public interface ChargeSettingMapper  extends GenericDao<ChargeSetting,String> {
     List<ChargeSetting> selectListByShopId();
 
     List<ChargeSetting> selectListByShopIdAll();
+
+    List<ChargeSetting> selectListByShopIdAndType(int flag);
 }

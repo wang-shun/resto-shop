@@ -846,4 +846,15 @@ public class OrderAspect {
 //        log.info("发送取餐信息成功:" + result);
         }
     }
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderPaymentItemService.insertByBeforePay(..))")
+    public void insertByBeforePay() {
+
+    };
+
+    @AfterReturning(value = "insertByBeforePay()", returning = "orderPaymentItem")
+    public void insertByBeforePay(OrderPaymentItem orderPaymentItem) {
+        Order order = orderService.selectById(orderPaymentItem.getOrderId());
+        MQMessageProducer.sendPlaceOrderNoPayMessage(order);
+    }
 }

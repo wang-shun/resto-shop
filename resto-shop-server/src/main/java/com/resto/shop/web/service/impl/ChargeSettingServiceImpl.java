@@ -31,8 +31,14 @@ public class ChargeSettingServiceImpl extends GenericServiceImpl<ChargeSetting, 
         return chargesettingMapper.selectListByShopId();
     }
 
+
     @Override
     public List<ChargeSetting> selectListByShopIdAll() {
         return chargesettingMapper.selectListByShopIdAll();
+    }
+
+    @Override
+    public List<ChargeSetting> selectListByShopIdAndType(int flag) {
+        return chargesettingMapper.selectListByShopIdAndType(flag);
     }
 }
