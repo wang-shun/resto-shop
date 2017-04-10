@@ -333,10 +333,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     /**
-    * @Author: KONATA
-    * @Description
-    * @Date: 15:42 2017/3/30
-    */
+     * @Author: KONATA
+     * @Description
+     * @Date: 15:42 2017/3/30
+     */
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
@@ -4962,7 +4962,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("日报:2016.11.20").append("\n")
                 .append("堂吃支付金额:10000元").append("\n")
                 .append("商户录取").append("\n")
-                 .append("堂吃消费笔数:64").append("\n")
+                .append("堂吃消费笔数:64").append("\n")
                 .append("商户录入").append("\n")
                 .append("用户支付消费:62/9500").append("\n")
                 .append("----------------").append("\n")
