@@ -817,6 +817,7 @@ GROUP BY article_id
         select
             ta.id articleId,
             if(ta.article_type = 1,'单品','套餐') typeName,
+            taf.id articleFamilyId,
             IFNULL(taf.`name`,'其他')articleFamilyName,
             ta.`name` articleName,
             IFNULL(SUM(toi.count),0)

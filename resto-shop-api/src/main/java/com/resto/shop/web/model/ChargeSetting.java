@@ -39,14 +39,14 @@ public class ChargeSetting implements Serializable{
     @Min(message="赠送金额到账天数最小值为1",value=1)
     private Integer numberDay;
 
-    //是否是首次充值
-    private  Byte firstCharge;
+    // 1.首冲 2多冲 1,2首冲+多冲
+    private  String firstCharge;
 
-    public Byte getFirstCharge() {
+    public String getFirstCharge() {
         return firstCharge;
     }
 
-    public void setFirstCharge(Byte firstCharge) {
+    public void setFirstCharge(String firstCharge) {
         this.firstCharge = firstCharge;
     }
 
