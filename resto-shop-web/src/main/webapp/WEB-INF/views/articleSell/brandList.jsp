@@ -231,7 +231,7 @@ var vueObj = new Vue({
                         orderable : false
                     },
                     {
-                        title : "菜名类别",
+                        title : "菜品类别",
                         data : "articleFamilyName",
                         orderable : false,
                         s_filter: true
@@ -292,7 +292,7 @@ var vueObj = new Vue({
                         orderable : false
                     },
                     {
-                        title : "菜名类别",
+                        title : "菜品类别",
                         data : "articleFamilyName",
                         orderable : false,
                         s_filter: true
@@ -433,7 +433,7 @@ var vueObj = new Vue({
                         api2.search('');
                         var column2 = api2.column(1);
                         column2.search('', true, false);
-                        api3.search('', true, false);
+                        api3.search('');
                         that.brandArticleUnitTable.clear();
                         that.brandArticleUnitTable.rows.add(result.data.brandArticleUnit).draw();
                         //重绘搜索列
