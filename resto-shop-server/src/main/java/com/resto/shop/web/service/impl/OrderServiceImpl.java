@@ -4923,7 +4923,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122", null);//推送本日信息
             String [] tels = telephones.split(",");
             for(String s:tels){
                 Customer c = customerService.selectByTelePhone(s);
@@ -4934,7 +4933,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     WeChatUtils.sendCustomerMsgASync(sb.toString(),c.getWechatId(),wechatConfig.getAppid(),wechatConfig.getAppsecret());
                 }
             }
-
+            if(shopDetail.getDaySmsType()==3){
+                SMSUtils.sendMessage(telephones, todayContent.toString(), "餐加", "SMS_46725122", null);//推送本日信息
+            }
         }
     }
 
