@@ -282,6 +282,8 @@ public class ArticleSellController extends GenericController{
 		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
 		String[] columns = {"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
 		String[][] headers = {{"品牌名称/菜品类型","25"},{"菜名类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        String[] columnsType = {"articleFamilyName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
+        String[][] headersType = {{"品牌名称/菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
 		//获取店铺名称
 		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
 		String shopName="";
@@ -297,11 +299,17 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("brandArticleFamily");
         filter.getExcludes().add("shopArticleUnit");
         filter.getExcludes().add("shopArticleFamily");
+        filter.getExcludes().add("brandArticleType");
+        filter.getExcludes().add("shopArticleType");
 		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
             Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
-            brandReport.setTypeName(brandReportMap.get("brandName").toString());
+            if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
+                brandReport.setTypeName(brandReportMap.get("brandName").toString());
+            }else {
+                brandReport.setArticleFamilyName(brandReportMap.get("brandName").toString());
+            }
             brandReport.setBrandSellNum(Integer.valueOf(brandReportMap.get("totalNum").toString()));
             brandReport.setSalles(new BigDecimal(brandReportMap.get("sellIncome").toString()));
             brandReport.setRefundCount(Integer.valueOf(brandReportMap.get("refundCount").toString()));
@@ -315,7 +323,11 @@ public class ArticleSellController extends GenericController{
 		map.put("shops", shopName);
 		map.put("beginDate", beginDate);
 		map.put("endDate", endDate);
-		map.put("num", "10");//显示的位置
+        if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
+            map.put("num", "10");//显示的位置
+        }else {
+            map.put("num","8");
+        }
 		map.put("timeType", "yyyy-MM-dd");
 		//如果是单品
 		if(type.equals(ArticleType.SIMPLE_ARTICLE)){
@@ -342,12 +354,28 @@ public class ArticleSellController extends GenericController{
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
-		}
+		}else{
+            //导出文件名
+            fileName = "品牌菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "品牌菜品销售报表(类别)");//表的头，第一行内容
+            map.put("reportTitle", "品牌菜品销售报表(类别)");//表的名字
+            //定义数据
+            if (articleSellDto.getBrandArticleType() != null){
+                String json = JSON.toJSONString(articleSellDto.getBrandArticleType(), filter);
+                List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+                result.addAll(articleSellDtos);
+            }
+        }
 		//定义excel工具类对象
 		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
+            if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
+                excelUtil.ExportExcel(headers, columns, result, out, map);
+            }else {
+                excelUtil.ExportExcel(headersType, columnsType, result, out, map);
+            }
 			out.close();
 		}catch(Exception e){
 		    log.error("生成菜品销售报表出错！");

@@ -547,6 +547,18 @@ var vueObj = new Vue({
                             });
                         }
                         break;
+                    case 3:
+                            var brandArticleType = that.brandArticleType.sort(that.keysert("brandSellNum","desc"));
+                            that.object.brandArticleType = brandArticleType;
+                            $.post("articleSell/createBrnadArticle",that.object,function(result){
+                                if(result.success){
+                                    window.location.href = "articleSell/downloadBrnadArticle?path="+result.data+"";
+                                }else{
+                                    toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                        break;
                 }
             }catch (e){
                 that.state = 1;
@@ -632,6 +644,17 @@ var vueObj = new Vue({
                 that.index = 1;
                 toastr.clear();
                 toastr.error("系统异常，请刷新重试");
+            }
+        },
+        keysert: function (key,type) {
+            return function(a,b){
+                var value1 = a[key];
+                var value2 = b[key];
+                if (type == "asc") {
+                    return value1 - value2;
+                }else {
+                    return value2 - value1;
+                }
             }
         },
         today : function(){
