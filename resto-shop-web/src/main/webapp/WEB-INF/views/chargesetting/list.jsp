@@ -53,14 +53,14 @@
 
                         <div class="form-group">
                             <div class="control-label">充值类型（至少选择一项）</div>
-                            <input type="hidden" name="firstCharge" v-model="checkedNames">
+                            <input type="hidden" name="firstCharge" v-model="chargeType">
                             <div  class=" radio-list">
                             <label>
-                                <input type="checkbox" value="1" v-model="checkedNames" :disabled="checkedNames.length==1 && checkedNames==1">
+                                <input type="checkbox" value="1" v-model="chargeType" :disabled="chargeType.length==1 && chargeType==1">
                                 &nbsp;&nbsp;首冲
                             </label>
                             <label >
-                                <input type="checkbox" value="2" v-model="checkedNames" :disabled="checkedNames.length==1 && checkedNames==2">
+                                <input type="checkbox" value="2" v-model="chargeType" :disabled="chargeType.length==1 && chargeType==2">
                                 &nbsp;&nbsp;多冲
                             </label>
                             </div>
@@ -202,7 +202,7 @@
             data:{
                 m:{},
                 showform:false,
-                checkedNames : []
+                chargeType : []
             },
             methods:{
                 openForm:function(){
@@ -219,16 +219,16 @@
                 create:function(){
                     this.m={};
                     this.openForm();
-                    this.checkedNames = ["1","2"];
+                    this.chargeType = ["1","2"];
                 },
                 edit:function(model){
                     this.m= model;
-                    this.checkedNames = [];
+                    this.chargeType = [];
                     var firstChargeCheck = model.firstCharge.split(",");
                     for(var i in firstChargeCheck){
-                        this.checkedNames.push(firstChargeCheck[i]);
+                        this.chargeType.push(firstChargeCheck[i]);
                     }
-                    console.log(this.checkedNames);
+                    console.log(this.chargeType);
                     this.openForm();
                 },
                 save:function(e){
