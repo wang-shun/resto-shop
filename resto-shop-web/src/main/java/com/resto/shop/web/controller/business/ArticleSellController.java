@@ -3,6 +3,7 @@
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +93,9 @@ public class ArticleSellController extends GenericController{
         JSONObject object = new JSONObject();
 	    try {
             Map<String, Object> selectMap = new HashMap<String, Object>();
+            List<ArticleSellDto> brandArticleType = articleFamilyService.selectByShopId(null);
+            BigDecimal brandSellNum = new BigDecimal(0);
+            BigDecimal salles = new BigDecimal(0);
             brandArticleReportDto brandCount = orderService.selectBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
             object.put("brandReport", brandCount);
             selectMap.put("beginDate", beginDate);
@@ -116,6 +120,19 @@ public class ArticleSellController extends GenericController{
                 for (ArticleSellDto articleSellDto : articleUnitSell){
                     if (articleSellDto.getArticleId().equalsIgnoreCase(articleUnitSellDto.getArticleId())){
                         articleUnitSell.remove(articleSellDto);
+                        break;
+                    }
+                }
+                for (ArticleSellDto articleSellDto : brandArticleType){
+                    if (articleSellDto.getArticleFamilyId().equalsIgnoreCase(articleUnitSellDto.getArticleFamilyId())){
+                        articleSellDto.setBrandSellNum(new BigDecimal(articleSellDto.getBrandSellNum()).add(new BigDecimal(articleUnitSellDto.getBrandSellNum())).intValue());
+                        brandSellNum = brandSellNum.add(new BigDecimal(articleUnitSellDto.getBrandSellNum()));
+                        articleSellDto.setSalles(articleSellDto.getSalles().add(articleUnitSellDto.getSalles()));
+                        salles = salles.add(articleUnitSellDto.getSalles());
+                        articleSellDto.setDiscountMoney(articleSellDto.getDiscountMoney().add(articleUnitSellDto.getDiscountMoney()));
+                        articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleUnitSellDto.getRefundCount())).intValue());
+                        articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleUnitSellDto.getRefundTotal()));
+                        articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleUnitSellDto.getLikes())).intValue());
                         break;
                     }
                 }
@@ -154,6 +171,19 @@ public class ArticleSellController extends GenericController{
                         break;
                     }
                 }
+                for (ArticleSellDto articleSellDto : brandArticleType){
+                    if (articleSellDto.getArticleFamilyId().equalsIgnoreCase(articleFamilySellDto.getArticleFamilyId())){
+                        articleSellDto.setBrandSellNum(new BigDecimal(articleSellDto.getBrandSellNum()).add(new BigDecimal(articleFamilySellDto.getBrandSellNum())).intValue());
+                        brandSellNum = brandSellNum.add(new BigDecimal(articleFamilySellDto.getBrandSellNum()));
+                        articleSellDto.setSalles(articleSellDto.getSalles().add(articleFamilySellDto.getSalles()));
+                        salles = salles.add(articleFamilySellDto.getSalles());
+                        articleSellDto.setDiscountMoney(articleSellDto.getDiscountMoney().add(articleFamilySellDto.getDiscountMoney()));
+                        articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleFamilySellDto.getRefundCount())).intValue());
+                        articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleFamilySellDto.getRefundTotal()));
+                        articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleFamilySellDto.getLikes())).intValue());
+                        break;
+                    }
+                }
             }
             for (ArticleSellDto articleSellDto : articleFamilySell){
                 articleSellDto.setBrandSellNum(0);
@@ -166,6 +196,19 @@ public class ArticleSellController extends GenericController{
                 articleFamilySellDtos.add(articleSellDto);
             }
             object.put("brandArticleFamily", articleFamilySellDtos);
+            for (ArticleSellDto articleSellDto : brandArticleType){
+                if (brandSellNum.equals(BigDecimal.ZERO)){
+                    articleSellDto.setNumRatio("0.00%");
+                }else{
+                    articleSellDto.setNumRatio(new BigDecimal(articleSellDto.getBrandSellNum()).divide(brandSellNum,2,BigDecimal.ROUND_HALF_UP).toString());
+                }
+                if (salles.equals(BigDecimal.ZERO)){
+                    articleSellDto.setSalesRatio("0.00%");
+                }else{
+                    articleSellDto.setSalesRatio(articleSellDto.getSalles().divide(salles,2,BigDecimal.ROUND_HALF_UP).toString());
+                }
+            }
+            object.put("brandArticleType",brandArticleType);
         }catch (Exception e){
             log.error("查询菜品销售报表出错！");
             e.printStackTrace();
@@ -237,7 +280,7 @@ public class ArticleSellController extends GenericController{
 		//定义读取文件的路径
 		String path = null;
 		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
-		String[]columns={"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
+		String[] columns = {"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
 		String[][] headers = {{"品牌名称/菜品类型","25"},{"菜名类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
 		//获取店铺名称
 		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());

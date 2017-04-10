@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
+import com.resto.brand.web.dto.ArticleSellDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -32,4 +33,5 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
 
     ArticleFamily checkSame(@Param("shopId") String shopId,@Param("name") String name);
 
+    List<ArticleSellDto> selectByShopId(@Param("shopId") String shopId);
 }

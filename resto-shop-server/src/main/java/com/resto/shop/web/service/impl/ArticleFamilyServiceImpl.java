@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.dao.ArticleFamilyMapper;
 import com.resto.shop.web.model.ArticleFamily;
 import com.resto.shop.web.service.ArticleFamilyService;
@@ -55,4 +56,9 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 	public ArticleFamily checkSame(String shopId, String name) {
 		return articlefamilyMapper.checkSame(shopId, name);
 	}
+
+    @Override
+    public List<ArticleSellDto> selectByShopId(String shopId) {
+        return articlefamilyMapper.selectByShopId(shopId);
+    }
 }
