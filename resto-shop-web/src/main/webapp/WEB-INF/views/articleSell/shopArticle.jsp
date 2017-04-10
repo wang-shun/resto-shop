@@ -44,6 +44,11 @@
 	            <strong>套餐</strong>
 	        </a>
 	    </li>
+        <li role="presentation" @click="chooseType(3)">
+           <a href="#articleType" aria-controls="articleType" role="tab" data-toggle="tab">
+                <strong>类别</strong>
+           </a>
+        </li>
 	  </ul>
 	  <div class="tab-content">
 	  	<!-- 单品 -->
@@ -65,7 +70,7 @@
 	    <div role="tabpanel" class="tab-pane" id="revenueCount">
 	    	<div class="panel panel-primary" style="border-color:white;">
 			  	<!-- 店铺菜品销售表(套餐) -->
-	    	<div class="panel panel-info">
+	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
 			  	<strong style="margin-right:100px;font-size:22px">店铺菜品销售表(套餐)</strong>
 			  </div>
@@ -77,6 +82,23 @@
 			</div>
 			  </div>
 			</div>
+
+          <!-- 类别 -->
+          <div role="tabpanel" class="tab-pane" id="articleType">
+              <div class="panel panel-info" style="border-color:white;">
+                  <!-- 品牌菜品销售表(类别) -->
+                  <div class="panel panel-success">
+                      <div class="panel-heading text-center">
+                          <strong style="margin-right:100px;font-size:22px">店铺菜品销售表(类别)</strong>
+                      </div>
+                      <div class="panel-body">
+                          <table id="shopArticleTypeTable" class="table table-striped table-bordered table-hover"
+                                 style="width: 100%;">
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
 	    </div>
 	  </div>
 	    </div>
@@ -120,6 +142,7 @@
 	var shopId = "${shopId}";
 	var shopUnitAPI = null;
 	var shopFamilyAPI = null;
+    var shopTypeAPI = null;
 	var vueObjShop = new Vue({
 	    el : "#controlShop",
 	    data : {
@@ -130,9 +153,11 @@
 	        currentType:1,//当前选中页面
 	        shopArticleUnitTable:{},//单品dataTables对象
 	        shopArticleFamilyTable:{},//套餐datatables对象
+            shopArticleTypeTable:{},//类别datatables对象
 	        api:{},
             shopArticleUnitDtos:[],
-            shopArticleFamilyDtos:[]
+            shopArticleFamilyDtos:[],
+            shopArticleTypeDtos:[]
 	    },
 	    created : function() {
 	        this.searchDate.beginDate = beginDate;
@@ -155,7 +180,7 @@
 	                        orderable : false
 	                    },
 	                    {
-	                        title : "菜名类别",
+	                        title : "菜品类别",
 	                        data : "articleFamilyName",
 	                        orderable : false,
 	                        s_filter: true
@@ -216,7 +241,7 @@
 	                        orderable : false
 	                    },
 	                    {
-	                        title : "菜名类别",
+	                        title : "菜品类别",
 	                        data : "articleFamilyName",
 	                        orderable : false,
 	                        s_filter: true
@@ -278,8 +303,58 @@
 	                	that.shopFamilyTable();
 	                }
 	            });
+
+                //类别datatable对象
+                that.shopArticleTypeTable=$("#shopArticleTypeTable").DataTable({
+                    lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                    order: [[ 2, "desc" ]],
+                    columns : [
+                        {
+                            title : "菜品类别",
+                            data : "articleFamilyName",
+                            orderable : false
+                        },
+                        {
+                            title : "销量(份)",
+                            data : "shopSellNum",
+                        },
+                        {
+                            title : "销量占比",
+                            data : "numRatio",
+                            orderable : false
+                        },
+                        {
+                            title : "销售额(元)",
+                            data : "salles"
+                        },
+                        {
+                            title : "折扣金额(元)",
+                            data : "discountMoney"
+                        },
+                        {
+                            title : "销售额占比",
+                            data : "salesRatio",
+                            orderable : false
+                        },
+                        {
+                            title:"退菜数量" ,
+                            data:"refundCount"
+                        },
+                        {
+                            title:"退菜金额" ,
+                            data:"refundTotal"
+                        },
+                        {
+                            title:"点赞数量" ,
+                            data:"likes"
+                        }
+                    ],
+                    initComplete: function () {
+                        shopTypeAPI = this.api();
+                    }
+                });
 	        },
-	        //切换单品、套餐 type 1:单品 2:套餐
+	        //切换单品、套餐 type 1:单品 2:套餐 3:类别
 	        chooseType:function (type) {
 	          this.currentType= type;
 	        },
@@ -290,12 +365,14 @@
 		            var that = this;
 		            var api1 = shopUnitAPI;
 		            var api2 = shopFamilyAPI;
+                    var api3 = shopTypeAPI;
                     $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
                         if(result.success == true){//清空datatable的column搜索条件
                             toastr.clear();
                             toastr.success("查询成功");
                             that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
                             that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
+                            that.shopArticleTypeDtos = result.data.shopArticleTypeDtos;
                             api1.search('');
                             var column1 = api1.column(1);
                             column1.search('', true, false);
@@ -313,6 +390,9 @@
                             that.shopArticleFamilyTable.rows.add(result.data.shopArticleFamilyDtos).draw();
                             //重绘搜索列
                             that.shopFamilyTable();
+                            api3.search('');
+                            that.shopArticleTypeTable.clear();
+                            that.shopArticleTypeTable.rows.add(result.data.shopArticleTypeDtos).draw();
                         }else{
 							toastr.clear();
                             toastr.error("查询报表出错");
@@ -359,6 +439,17 @@
                                     window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
                                 }else{
 									toastr.clear();
+                                    toastr.error("下载报表出错");
+                                }
+                            });
+                            break;
+                        case 3:
+                            object.shopArticleType = that.shopArticleTypeDtos;
+                            $.post("articleSell/createShopArticle",object,function (result) {
+                                if(result.success){
+                                    window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+                                }else{
+                                    toastr.clear();
                                     toastr.error("下载报表出错");
                                 }
                             });
