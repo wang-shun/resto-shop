@@ -21,17 +21,17 @@
 						    <label>赠送金额</label>
 						    <input type="text" class="form-control" name="rewardMoney" required v-model="m.rewardMoney" placeholder="请输入数字" min="0">
 						</div>
-						
+
 						<div class="form-group">
 								<div class="control-label">选择是否显示到一级菜单</div>
 							    <input type="radio"  name="showIn" v-model="m.showIn" value=1 v-if="m.id">
 							    <input type="radio"  name="showIn"  value=1 checked="checked"  v-if="!m.id">
 							    <label for="showIn">是</label>
-							    <input type="radio"  name="showIn" value=0 v-if="!m.id"> 
-							    <input type="radio"  name="showIn" value=0 v-if="m.id" v-model="m.showIn"> 
+							    <input type="radio"  name="showIn" value=0 v-if="!m.id">
+							    <input type="radio"  name="showIn" value=0 v-if="m.id" v-model="m.showIn">
 							    <label for="showIn">否</label>
 						</div>
-						
+
 						<%--<div class="form-group">--%>
 						    <%--<label>显示的文本</label>--%>
 						    <%--<input type="text" class="form-control" name="labelText" v-model="m.labelText">--%>
@@ -40,28 +40,31 @@
 						    <label>排序</label>
 						    <input type="text" class="form-control" name="sort" required v-model="m.sort">
 						</div>
-						
-						<div class="form-group">
-								<div class="control-label">是否开启活动</div>
-							    <input type="radio"  name="state" v-model="m.state" value=1 v-if="m.id">
-							    <input type="radio"  name="state"  value=1 v-if="!m.id">
-							    <label for="showIn">是</label>
-							    <input type="radio"  name="state" value=0 checked="checked" v-if="!m.id"> 
-							    <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state"> 
-							    <label for="showIn">否</label>
-						</div>
 
-                            <div class="form-group">
-                                <div class="control-label">是否是首冲</div>
-                                <input type="radio"  name="firstCharge" v-model="m.firstCharge" value=1 v-if="m.id">
-                                <input type="radio"  name="firstCharge"  value=1 v-if="!m.id">
-                                <label for="showIn">是 </label>
-                                <input type="radio"  name="firstCharge" value=0 checked="checked" v-if="!m.id">
-                                <label for="showIn">否</label>
-                                    <input type="radio"  name="firstCharge" value=0 v-if="m.id" v-model="m.firstCharge">
+                        <div class="form-group">
+                            <div class="control-label">是否开启活动</div>
+                            <input type="radio"  name="state" v-model="m.state" value=1 v-if="m.id">
+                            <input type="radio"  name="state"  value=1 v-if="!m.id">
+                            <label for="showIn">是</label>
+                            <input type="radio"  name="state" value=0 checked="checked" v-if="!m.id">
+                            <input type="radio"  name="state" value=0 v-if="m.id" v-model="m.state">
+                            <label for="showIn">否</label>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="control-label">充值类型（至少选择一项）</div>
+                            <input type="hidden" name="firstCharge" v-model="checkedNames">
+                            <div  class=" radio-list">
+                            <label>
+                                <input type="checkbox" value="1" v-model="checkedNames" :disabled="checkedNames.length==1 && checkedNames==1">
+                                &nbsp;&nbsp;首冲
+                            </label>
+                            <label >
+                                <input type="checkbox" value="2" v-model="checkedNames" :disabled="checkedNames.length==1 && checkedNames==2">
+                                &nbsp;&nbsp;多冲
+                            </label>
                             </div>
-
-
+                        </div>
                             <%--<div class="form-group">--%>
                                 <%--<label>是否启用优惠券</label>--%>
                                 <%--<div class="radio-list" style="margin-left: 20px;">--%>
@@ -87,7 +90,7 @@
 	        </div>
 		</div>
 	</div>
-	
+
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="chargesetting/add">
@@ -113,28 +116,30 @@
 				dataSrc : ""
 			},
 			columns : [
-                {title:"首冲",
+                {title:"充值类型",
                   data:"firstCharge",
                     createdCell : function(td, tdData) {
                         var payType = "";
                         if(tdData==1){
                             payType ="<img alt=\"首次\" src=\"assets/pages/img/first.png\" width=\"23px\" height=\"23px\">&nbsp;";
-                        }else{
+                        }else if(tdData==2){
                             payType = "<img alt=\"多次\" src=\"assets/pages/img/more.png\" width=\"23px\" height=\"23px\">&nbsp;";
+                        }else {
+                           payType ="<img alt=\"首次\" src=\"assets/pages/img/first.png\" width=\"23px\" height=\"23px\">&nbsp;"+"<img alt=\"多次\" src=\"assets/pages/img/more.png\" width=\"23px\" height=\"23px\">&nbsp;";
                         }
                         $(td).html(payType);
                     }
                 },
 
-				{                 
+				{
 				title : "充值金额",
 				data : "chargeMoney",
-			},                 
-			{                 
+			},
+			{
 				title : "返还金额",
 				data : "rewardMoney",
-			},                 
-			{                 
+			},
+			{
 				title : "是否显示在菜单栏上",
 				data : "showIn",
 				"render": function(data){
@@ -147,16 +152,16 @@
 					}
 					return data;
 				}
-			},                 
-			{                 
+			},
+			{
 				title : "显示的文本",
 				data : "labelText",
-			},                 
-			{                 
+			},
+			{
 				title : "排序",
 				data : "sort",
-			},                 
-			{                 
+			},
+			{
 				title : "活动状态",
 				data : "state",
 				"render": function(data){
@@ -169,13 +174,11 @@
 					}
 					return data;
 				}
-				
 			},
 			{
 				title : "赠送金额到账天数",
 				data : "numberDay",
 			},
-
 				{
 					title : "操作",
 					data : "id",
@@ -192,12 +195,55 @@
 					}
 				}],
 		});
-		
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
-	}());
-	
-	
 
-	
+		var C = new Controller(cid,tb);
+		var vueObj = C.vueObj({
+            el:cid,
+            data:{
+                m:{},
+                showform:false,
+                checkedNames : []
+            },
+            methods:{
+                openForm:function(){
+                    this.showform = true;
+                },
+                closeForm:function(){
+                    this.m={};
+                    this.showform = false;
+                },
+                cancel:function(){
+                    this.m={};
+                    this.closeForm();
+                },
+                create:function(){
+                    this.m={};
+                    this.openForm();
+                    this.checkedNames = ["1","2"];
+                },
+                edit:function(model){
+                    this.m= model;
+                    this.checkedNames = [];
+                    var firstChargeCheck = model.firstCharge.split(",");
+                    for(var i in firstChargeCheck){
+                        this.checkedNames.push(firstChargeCheck[i]);
+                    }
+                    console.log(this.checkedNames);
+                    this.openForm();
+                },
+                save:function(e){
+                    var that = this;
+                    var formDom = e.target;
+                    C.ajaxFormEx(formDom,function(){
+                        that.cancel();
+                        tb.ajax.reload();
+                    });
+                },
+            },
+        });
+	}());
+
+
+
+
 </script>

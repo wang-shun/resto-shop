@@ -258,6 +258,35 @@
 						</div>
 					</div>
 
+                    <%--<div class="form-group" v-if="m.isOpenSms==1">--%>
+                        <%--<label class="col-md-4 control-label" :class="{ formBox : m.isOpenSms == 1}">通知方式：</label>--%>
+                        <%--<div  class="col-md-6 radio-list">--%>
+                            <%--<label class="radio-inline">--%>
+                                <%--<input type="radio" name="smsType"v-model="m.daySmsType" value="1">短信推送--%>
+                            <%--</label>--%>
+                            <%--<label class="radio-inline">--%>
+                                <%--<input type="radio" name="smsType" v-model="m.daySmsType" value="2">微信推送--%>
+                            <%--</label>--%>
+                        <%--</div>--%>
+                    <%--</div>--%>
+
+
+                    <div class="form-group" v-show="m.isOpenSms==1">
+                        <label class="col-md-4 control-label" :class="{ formBox : m.isOpenSms == 1}">通知方式：</label>
+                        <input type="hidden" name="daySmsType" v-model="getDaySmsType">
+                        <%--day_sms_type--%>
+                        <div  class="col-md-6 radio-list checkbox">
+                            <label style="margin-left: 16px;">
+                                <input type="checkbox"  :true-value="2"  v-model="daySmsTypeWx" disabled>
+                                &nbsp;&nbsp;微信推送
+                            </label>
+                            <label style="margin-left: 16px;">
+                                <input type="checkbox" :true-value="1"  v-model="daySmsTypeSms" >
+                                &nbsp;&nbsp;短信推送
+                            </label>
+                        </div>
+                    </div>
+
 					<div class="form-group">
 						<label class="col-md-4 control-label">微信端支付项：</label>
 						<div  class="col-md-6 radio-list checkbox">
@@ -457,12 +486,30 @@
 						b : result.data.brand,
 						showa:true,
 						showlate:true,
-						showp:true
+						showp:true,
+                        getDaySmsType:null,
+                        daySmsTypeWx : 2,
+                        daySmsTypeSms : 0
 					},
 					watch: {
 						'm.consumeConfineUnit': 'hideShowa',
-						'm.isUseServicePrice':'hideServiceP'
+						'm.isUseServicePrice':'hideServiceP',
 					},
+                    computed : {
+                        getDaySmsType : function () {
+                            return this.daySmsTypeSms + this.daySmsTypeWx;
+                        }
+                    },
+                    created : function () {
+					    //初始化 日结短信   通知方式
+                        if(this.m.daySmsType==3){
+                            this.daySmsTypeWx = 2;
+                            this.daySmsTypeSms = 1;
+                        }else if(this.m.daySmsType==2){
+                            this.daySmsTypeWx=2
+                            this.daySmsTypeSms=false;
+                        }
+                    },
 					methods : {
                         weChatPaySetting: function (name) {
                             var that = this;
