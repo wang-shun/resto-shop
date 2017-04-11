@@ -49,6 +49,8 @@ public class Customer implements Serializable{
     private BigDecimal account;
     
     private String lastOrderShop;
+
+    private String lastTableNumber;
     
     private Date newNoticeTime;
     
@@ -334,6 +336,14 @@ public class Customer implements Serializable{
 
     public void setBindPhoneShop(String bindPhoneShop) {
         this.bindPhoneShop = bindPhoneShop;
+    }
+
+    public String getLastTableNumber() {
+        return lastTableNumber;
+    }
+
+    public void setLastTableNumber(String lastTableNumber) {
+        this.lastTableNumber = lastTableNumber;
     }
 
     @Override
