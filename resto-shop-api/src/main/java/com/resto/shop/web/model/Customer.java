@@ -77,6 +77,17 @@ public class Customer implements Serializable{
 
     private String realTimeCouponIds;
 
+    //是否关注
+    private Integer subscribe;
+
+    public Integer getSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(Integer subscribe) {
+        this.subscribe = subscribe;
+    }
+
     public String getRealTimeCouponIds() {
         return realTimeCouponIds;
     }
