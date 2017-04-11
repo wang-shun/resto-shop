@@ -68,6 +68,17 @@
 										前台打印机</label>
 								</div>
 							</div>
+							<div class="form-group">
+								<div class="col-sm-3 control-label">关联钱箱：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="radio"  name="receiveMoney" required v-model="m.receiveMoney" value="1">
+										是</label>
+									<label class="radio-inline">
+										<input type="radio"  name="receiveMoney" v-model="m.receiveMoney" value="0">
+										否</label>
+								</div>
+							</div>
 						</div>
 						<div class="text-center">
 							<input type="hidden" name="id" v-model="m.id" />

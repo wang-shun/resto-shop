@@ -5,6 +5,7 @@ public class TicketType {
 	public static final String KITCHEN = "KitchenTicket";    //厨大小票类型
 	public static final String PACKAGE = "PackageTicket";    //打包小票类型
 	public static final String RECEIPT = "RestaurantReceipt"; //前台小票类型
+	public static final String OPENCASHDRAW = "OpenCashDrawerCommand"; //前台小票类型
 	public static final String RESTAURANTLABEL = "RestaurantLabel";
 	public static final String DELIVERYLABEL = "DeliveryLabel";
 	public static final String DeliveryTicket = "DeliveryTickets"; //外卖小票
