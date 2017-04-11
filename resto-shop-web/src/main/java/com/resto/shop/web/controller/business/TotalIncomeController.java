@@ -4,10 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +18,8 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -313,5 +313,57 @@ public class TotalIncomeController extends GenericController {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @RequestMapping("/createMonthDto")
+    public void createMonthDto(String year, String month, HttpServletRequest request, HttpServletResponse response){
+        try {
+            Integer monthDay = getMonthDay(year, month);
+            List<ShopDetail> shopDetails = getCurrentShopDetails();
+            if (shopDetails == null) {
+                shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
+            }
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            for (ShopDetail shopDetail : shopDetails) {
+                for (int day = 0; day < monthDay; day++) {
+                    Date beginDate = getBeginDay(year, month, day);
+                    Date endDate = getEndDay(year, month, day);
+                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate),BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO);
+
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("生成月营业报表出错！");
+        }
+    }
+
+    public Integer getMonthDay(String year, String month){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        return calendar.getActualMaximum(Calendar.DATE);
+    }
+
+    public Date getBeginDay(String year, String month, Integer day){
+        Calendar beginDate = Calendar.getInstance();
+        beginDate.set(Calendar.YEAR, Integer.parseInt(year));
+        beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        beginDate.set(Calendar.DATE, day);
+        beginDate.set(Calendar.HOUR_OF_DAY, 0);
+        beginDate.set(Calendar.MINUTE, 0);
+        beginDate.set(Calendar.SECOND,1);
+        return beginDate.getTime();
+    }
+
+    public Date getEndDay(String year, String month, Integer day){
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(Calendar.YEAR, Integer.parseInt(year));
+        endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        endDate.set(Calendar.DATE, day);
+        endDate.set(Calendar.HOUR_OF_DAY, 23);
+        endDate.set(Calendar.MINUTE, 59);
+        endDate.set(Calendar.SECOND,59);
+        return endDate.getTime();
     }
 }

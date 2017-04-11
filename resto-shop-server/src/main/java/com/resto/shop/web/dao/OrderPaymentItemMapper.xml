@@ -190,8 +190,8 @@
         tb_order_payment_item oi
         INNER JOIN tb_order o ON o.id = oi.order_id
         WHERE
-        o.order_state IN (10, 11, 2, 12)
-        AND o.production_status IN (2, 3)
+        IF(o.production_status = 6,o.production_status = 6,o.order_state IN (10, 11, 2, 12)
+        AND o.production_status IN (2, 3))
         AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         AND o.shop_detail_id =  #{shopId}

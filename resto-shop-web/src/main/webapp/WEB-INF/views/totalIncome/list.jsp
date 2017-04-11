@@ -71,7 +71,7 @@
                     </div>
                     <div class="modal-footer" style="border-top:initial;">
                         <button type="button" class="btn btn-default" data-dismiss="modal" style="float: left;margin-left: 5em;">取消</button>
-                        <button type="button" class="btn btn-primary" style="float: right;margin-right: 5em;">生成并下载</button>
+                        <button type="button" class="btn btn-primary" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,8 @@
             years : [],
             months : ["01","02","03","04","05","06","07","08","09","10","11","12"],
             selectYear : new Date().format("yyyy"),
-            selectMonth : new Date().format("MM")
+            selectMonth : new Date().format("MM"),
+            type : null
         },
         created : function(){
             this.getYears();
@@ -119,8 +120,12 @@
                 }
                 this.years = years;
             },
-            openModal : function () {
-              $("#queryCriteriaModal").modal();
+            openModal : function (type) {
+                $("#queryCriteriaModal").modal();
+                this.type = type;
+            },
+            createMonthDto : function () {
+                window.location.href = "";
             }
         }
     });
