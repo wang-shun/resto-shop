@@ -1694,7 +1694,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Kitchen kitchen = kitchenService.getItemKitchenId(item);
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
-                if (printer.getTicketType() == TicketType.PRINT_TICKET && setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                if (printer.getTicketType() == TicketType.PRINT_TICKET && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
                     if (kitchen != null) {
@@ -1718,7 +1718,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
-                if (setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                if (shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     Kitchen kitchen = kitchenService.selectMealKitchen(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();
