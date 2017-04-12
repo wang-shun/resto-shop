@@ -37,14 +37,14 @@
             <div class="panel panel-success">
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">品牌收入条目</strong>
-                    <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
+                    <button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="brandReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
                 </div>
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">店铺收入条目</strong>
-                    <button type="button" style="float: right;" @click="openModal(2)" class="btn btn-primary">月报表</button>
+                    <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="shopReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
@@ -127,14 +127,14 @@
                 this.type = type;
             },
             createMonthDto : function () {
-                alert("---");
                 toastr.success("生成中...");
                 var that = this;
                 that.state = 2;
                 try {
                     $.post("totalIncome/createMonthDto", {
                         year: that.selectYear,
-                        month: that.selectMonth
+                        month: that.selectMonth,
+                        type : that.type
                     }, function (result) {
                         if (result.success) {
                             that.state = 1;

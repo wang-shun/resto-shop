@@ -20,6 +20,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
@@ -330,39 +331,114 @@ public class TotalIncomeController extends GenericController {
 
     @RequestMapping("/createMonthDto")
     @ResponseBody
-    public Result createMonthDto(String year, String month, HttpServletRequest request){
+    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
         Integer monthDay = getMonthDay(year, month);
         // 导出文件名
-        String str = "营业总额月报表" + year.concat("-").concat(month).concat("-01") + "至"
+        String typeName = type.equals(Common.YES) ? "店铺营业总额月报表" : "品牌营业总额月报表" ;
+        String str = typeName + year.concat("-").concat(month).concat("-01") + "至"
                 + year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
         String path = request.getSession().getServletContext().getRealPath(str);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             if (shopDetails == null) {
                 shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
             }
-            String[] shopNames = new String[shopDetails.size()];
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            ShopIncomeDto[][] result = new ShopIncomeDto[shopDetails.size()][monthDay];
-            int i = 0;
-            int j = 0;
-            for (ShopDetail shopDetail : shopDetails) {
-                Map<String, Object> selectMap = new HashMap<>();
-                selectMap.put("beginDate",year.concat("-").concat(month).concat("-01"));
-                selectMap.put("endDate",year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
-                selectMap.put("shopId",shopDetail.getId());
+            String[] shopNames = new String[1];
+            ShopIncomeDto[][] result = new ShopIncomeDto[1][monthDay];
+            Map<String, Object> selectMap = new HashMap<>();
+            selectMap.put("beginDate", year.concat("-").concat(month).concat("-01"));
+            selectMap.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+            if (type.equals(Common.YES)) {
+                shopNames = new String[shopDetails.size()];
+                result = new ShopIncomeDto[shopDetails.size()][monthDay];
+                int i = 0;
+                int j = 0;
+                for (ShopDetail shopDetail : shopDetails) {
+                    selectMap.put("shopId", shopDetail.getId());
+                    List<Order> orders = orderService.selectMonthIncomeDto(selectMap);
+                    for (int day = 0; day < monthDay; day++) {
+                        Date beginDate = getBeginDay(year, month, day);
+                        Date endDate = getEndDay(year, month, day);
+                        ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO);
+                        for (Order order : orders) {
+                            if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
+                                shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
+                                shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(order.getOrderMoney()));
+                                if (order.getOrderPaymentItems() != null) {
+                                    for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()) {
+                                        switch (paymentItem.getPaymentModeId()) {
+                                            case PayMode.WEIXIN_PAY:
+                                                shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.CHARGE_PAY:
+                                                shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.ACCOUNT_PAY:
+                                                shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.COUPON_PAY:
+                                                shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.REWARD_PAY:
+                                                shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.WAIT_MONEY:
+                                                shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.ALI_PAY:
+                                                shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.BANK_CART_PAY:
+                                                shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.MONEY_PAY:
+                                                shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.SHANHUI_PAY:
+                                                shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.INTEGRAL_PAY:
+                                                shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(paymentItem.getPayValue()));
+                                                break;
+                                            case PayMode.ARTICLE_BACK_PAY:
+                                                shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(paymentItem.getPayValue()).abs());
+                                                break;
+                                            default:
+                                                shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        result[i][j] = shopIncomeDto;
+                        j++;
+                    }
+                    shopNames[i] = shopDetail.getName();
+                    i++;
+                    j = 0;
+                }
+            }else {
+                String shopName = "";
+                for (ShopDetail shopDetail : shopDetails){
+                    shopName = shopName.concat(shopDetail.getName()).concat(",");
+                }
+                shopName = shopName.substring(0, shopName.length() - 1);
+                shopNames[0] = shopName;
                 List<Order> orders = orderService.selectMonthIncomeDto(selectMap);
+                int j = 0;
                 for (int day = 0; day < monthDay; day++) {
                     Date beginDate = getBeginDay(year, month, day);
                     Date endDate = getEndDay(year, month, day);
-                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate),BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO);
-                    for (Order order : orders){
-                        if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()){
+                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO);
+                    for (Order order : orders) {
+                        if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
                             shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
                             shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(order.getOrderMoney()));
-                            if (order.getOrderPaymentItems() != null){
-                                for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()){
-                                    switch (paymentItem.getPaymentModeId()){
+                            if (order.getOrderPaymentItems() != null) {
+                                for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()) {
+                                    switch (paymentItem.getPaymentModeId()) {
                                         case PayMode.WEIXIN_PAY:
                                             shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(paymentItem.getPayValue()));
                                             break;
@@ -407,17 +483,14 @@ public class TotalIncomeController extends GenericController {
                             }
                         }
                     }
-                    result[i][j] = shopIncomeDto;
+                    result[0][j] = shopIncomeDto;
                     j++;
                 }
-                shopNames[i] = shopDetail.getName();
-                i++;
-                j = 0;
             }
             Map<String, Object> map = new HashMap<>();
             map.put("brandName", getBrandName());
             map.put("beginDate", year.concat("-").concat(month).concat("-01"));
-            map.put("reportType", "店铺营业额月报表");// 表的头，第一行内容
+            map.put("reportType", typeName);// 表的头，第一行内容
             map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
             map.put("num", "15");// 显示的位置
             map.put("timeType", "yyyy-MM-dd");
