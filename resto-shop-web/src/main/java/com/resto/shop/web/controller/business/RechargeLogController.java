@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.annotation.Resource;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ShopDetailDto;
+import com.resto.shop.web.constant.Common;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -395,6 +397,52 @@ public class RechargeLogController extends GenericController{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping("/createMonthDto")
+    public void createMonthDto(String year, String month, Integer type, HttpServletRequest request, HttpServletResponse response){
+        Integer monthDay = getMonthDay(year, month);
+        // 导出文件名
+        String typeName = type.equals(Common.YES) ? "店铺充值记录月报表" : "品牌充值记录月报表" ;
+        String str = typeName + year.concat("-").concat(month).concat("-01") + "至"
+                + year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
+        String path = request.getSession().getServletContext().getRealPath(str);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+        } catch (Exception e){
+            e.printStackTrace();
+            log.error("生成充值月报表出错!");
+        }
+    }
+
+
+    public Integer getMonthDay(String year, String month){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        return calendar.getActualMaximum(Calendar.DATE);
+    }
+
+    public Date getBeginDay(String year, String month, Integer day){
+        Calendar beginDate = Calendar.getInstance();
+        beginDate.set(Calendar.YEAR, Integer.parseInt(year));
+        beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        beginDate.set(Calendar.DATE, day + 1);
+        beginDate.set(Calendar.HOUR_OF_DAY, 0);
+        beginDate.set(Calendar.MINUTE, 0);
+        beginDate.set(Calendar.SECOND,1);
+        return beginDate.getTime();
+    }
+
+    public Date getEndDay(String year, String month, Integer day){
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(Calendar.YEAR, Integer.parseInt(year));
+        endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        endDate.set(Calendar.DATE, day + 1);
+        endDate.set(Calendar.HOUR_OF_DAY, 23);
+        endDate.set(Calendar.MINUTE, 59);
+        endDate.set(Calendar.SECOND,59);
+        return endDate.getTime();
     }
 
 }

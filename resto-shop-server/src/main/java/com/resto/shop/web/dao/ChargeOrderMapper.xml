@@ -430,4 +430,14 @@ AND c.brand_id =#{brandId}
 AND u.id =#{customerId}
     </select>
 
+    <select id="selectMonthDto" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time
+        from tb_charge_order
+        where order_state = 1
+        <if test="shopId != null">
+          and shop_detail_id = #{shopId}
+        </if>
+        and finish_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and finish_time &lt;= CONCAT(#{endDate},' 23:59:59')
+    </select>
 </mapper>

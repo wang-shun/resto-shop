@@ -307,7 +307,7 @@
             createMonthDto : function () {
                 var that = this;
                 try {
-                    location.href = "/createMonthDto?year=" + that.selectYear + "&month="+that.selectMonth+"&type="+that.type+"";
+//                    location.href = "/createMonthDto?year=" + that.selectYear + "&month="+that.selectMonth+"&type="+that.type+"";
                 }catch (e){
                     toastr.clear();
                     toastr.error("生成月报表出错");
