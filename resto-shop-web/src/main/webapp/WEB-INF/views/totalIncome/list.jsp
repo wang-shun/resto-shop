@@ -71,7 +71,8 @@
                     </div>
                     <div class="modal-footer" style="border-top:initial;">
                         <button type="button" class="btn btn-default" data-dismiss="modal" style="float: left;margin-left: 5em;">取消</button>
-                        <button type="button" class="btn btn-primary" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
+                        <button type="button" class="btn btn-primary" v-if="state == 1" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
+                        <button type="button" class="btn btn-success" v-if="state == 2" disabled="disabled" style="float: right;margin-right: 5em;">生成中...</button>
                     </div>
                 </div>
             </div>
@@ -101,7 +102,8 @@
             months : ["01","02","03","04","05","06","07","08","09","10","11","12"],
             selectYear : new Date().format("yyyy"),
             selectMonth : new Date().format("MM"),
-            type : null
+            type : null,
+            state : 1
         },
         created : function(){
             this.getYears();
@@ -125,7 +127,30 @@
                 this.type = type;
             },
             createMonthDto : function () {
-                window.location.href = "";
+                alert("---");
+                toastr.success("生成中...");
+                var that = this;
+                that.state = 2;
+                try {
+                    $.post("totalIncome/createMonthDto", {
+                        year: that.selectYear,
+                        month: that.selectMonth
+                    }, function (result) {
+                        if (result.success) {
+                            that.state = 1;
+                            window.location.href = "totalIncome/downloadExcel?path=" + result.data + "";
+                        } else {
+                            that.state = 1;
+                            toastr.clear();
+                            toastr.error("生成月报表出错");
+                            return;
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("生成月报表出错");
+                }
             }
         }
     });

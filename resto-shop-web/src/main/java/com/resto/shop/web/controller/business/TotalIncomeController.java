@@ -3,9 +3,12 @@ package com.resto.shop.web.controller.business;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +20,18 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.Result;
+import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.OrderService;
 import com.sun.org.apache.bcel.internal.generic.MONITORENTER;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.record.crypto.Biff8DecryptingStream;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,6 +60,9 @@ public class TotalIncomeController extends GenericController {
 
     @Resource
     ChargeOrderService chargeOrderService;
+
+    @Resource
+    OrderService orderService;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -316,26 +329,113 @@ public class TotalIncomeController extends GenericController {
     }
 
     @RequestMapping("/createMonthDto")
-    public void createMonthDto(String year, String month, HttpServletRequest request, HttpServletResponse response){
+    @ResponseBody
+    public Result createMonthDto(String year, String month, HttpServletRequest request){
+        Integer monthDay = getMonthDay(year, month);
+        // 导出文件名
+        String str = "营业总额月报表" + year.concat("-").concat(month).concat("-01") + "至"
+                + year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
+        String path = request.getSession().getServletContext().getRealPath(str);
         try {
-            Integer monthDay = getMonthDay(year, month);
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             if (shopDetails == null) {
                 shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
             }
+            String[] shopNames = new String[shopDetails.size()];
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            ShopIncomeDto[][] result = new ShopIncomeDto[shopDetails.size()][monthDay];
+            int i = 0;
+            int j = 0;
             for (ShopDetail shopDetail : shopDetails) {
+                Map<String, Object> selectMap = new HashMap<>();
+                selectMap.put("beginDate",year.concat("-").concat(month).concat("-01"));
+                selectMap.put("endDate",year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+                selectMap.put("shopId",shopDetail.getId());
+                List<Order> orders = orderService.selectMonthIncomeDto(selectMap);
                 for (int day = 0; day < monthDay; day++) {
                     Date beginDate = getBeginDay(year, month, day);
                     Date endDate = getEndDay(year, month, day);
                     ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate),BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO);
-
+                    for (Order order : orders){
+                        if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()){
+                            shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
+                            shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(order.getOrderMoney()));
+                            if (order.getOrderPaymentItems() != null){
+                                for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()){
+                                    switch (paymentItem.getPaymentModeId()){
+                                        case PayMode.WEIXIN_PAY:
+                                            shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.CHARGE_PAY:
+                                            shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.ACCOUNT_PAY:
+                                            shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.COUPON_PAY:
+                                            shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.REWARD_PAY:
+                                            shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.WAIT_MONEY:
+                                            shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.ALI_PAY:
+                                            shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.BANK_CART_PAY:
+                                            shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.MONEY_PAY:
+                                            shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.SHANHUI_PAY:
+                                            shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.INTEGRAL_PAY:
+                                            shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(paymentItem.getPayValue()));
+                                            break;
+                                        case PayMode.ARTICLE_BACK_PAY:
+                                            shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(paymentItem.getPayValue()).abs());
+                                            break;
+                                        default:
+                                            shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    result[i][j] = shopIncomeDto;
+                    j++;
                 }
+                shopNames[i] = shopDetail.getName();
+                i++;
+                j = 0;
             }
+            Map<String, Object> map = new HashMap<>();
+            map.put("brandName", getBrandName());
+            map.put("beginDate", year.concat("-").concat(month).concat("-01"));
+            map.put("reportType", "店铺营业额月报表");// 表的头，第一行内容
+            map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+            map.put("num", "15");// 显示的位置
+            map.put("timeType", "yyyy-MM-dd");
+            map.put("reportTitle", shopNames);// 表的名字
+            String[][] headers = {{"日期", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
+                    {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"闪惠支付(元)", "23"}, {"积分支付(元)", "23"}, {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
+            String[] columns = {"date", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
+                    "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment" ,"articleBackPay", "otherPayment"};
+            ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
+            out.close();
         }catch (Exception e){
             e.printStackTrace();
             log.error("生成月营业报表出错！");
+            return new Result(false);
         }
+        return getSuccessResult(path);
     }
 
     public Integer getMonthDay(String year, String month){
@@ -349,7 +449,7 @@ public class TotalIncomeController extends GenericController {
         Calendar beginDate = Calendar.getInstance();
         beginDate.set(Calendar.YEAR, Integer.parseInt(year));
         beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-        beginDate.set(Calendar.DATE, day);
+        beginDate.set(Calendar.DATE, day + 1);
         beginDate.set(Calendar.HOUR_OF_DAY, 0);
         beginDate.set(Calendar.MINUTE, 0);
         beginDate.set(Calendar.SECOND,1);
@@ -360,7 +460,7 @@ public class TotalIncomeController extends GenericController {
         Calendar endDate = Calendar.getInstance();
         endDate.set(Calendar.YEAR, Integer.parseInt(year));
         endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-        endDate.set(Calendar.DATE, day);
+        endDate.set(Calendar.DATE, day + 1);
         endDate.set(Calendar.HOUR_OF_DAY, 23);
         endDate.set(Calendar.MINUTE, 59);
         endDate.set(Calendar.SECOND,59);

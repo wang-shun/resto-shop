@@ -633,4 +633,11 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<Order> selectBaseToKCList(String brandId, String beginDate, String endDate);
 
     List<Order> selectBaseToKCListByShopId(String shopId,String beginDate,String endDate);
+
+    /**
+     * 查询营业报表月报表
+     * @param selectMap
+     * @return
+     */
+    List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 }

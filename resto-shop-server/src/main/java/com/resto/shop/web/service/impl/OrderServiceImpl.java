@@ -6711,5 +6711,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectBaseToKCListByShopId(shopId, begin, end);
     }
 
-
+    @Override
+    public List<Order> selectMonthIncomeDto(Map<String, Object> selectMap) {
+        return orderMapper.selectMonthIncomeDto(selectMap);
+    }
 }
