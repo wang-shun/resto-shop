@@ -32,7 +32,8 @@
     	<div class="panel panel-primary" style="border-color:write;">
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">品牌充值报表</strong>
+              <strong style="margin-right:100px;font-size:22px">品牌充值报表</strong>
+              <button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>
 		  </div>
 		  <div class="panel-body">
 		  	<table class="table table-striped table-bordered table-hover" width="100%">
@@ -81,7 +82,8 @@
     	<div class="panel panel-primary" style="border-color:write;">
     	<div class="panel panel-info">
 		  <div class="panel-heading text-center">
-		  	<strong style="margin-right:100px;font-size:22px">店铺充值报表</strong>
+		  	  <strong style="margin-right:100px;font-size:22px">店铺充值报表</strong>
+              <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
 		  </div>
 		  <div class="panel-body">
 		  	<table id="shopChargeLogTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -90,6 +92,31 @@
 		</div>
 		  </div>
 		</div>
+
+    <div class="modal fade" id="queryCriteriaModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content" style="width: 30em;margin: 15% auto;">
+                <div class="modal-header" style="border-bottom:initial;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 align="center"><b>下载月报表</b></h4>
+                </div>
+                <div class="modal-body" align="center">
+                    <select style="padding: 5px 12px;" :value="selectYear" v-model="selectYear">
+                        <option :value="year" v-for="year in years">{{year}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">年</span>
+                    <select style="padding: 5px 12px;" :value="selectMonth" v-model="selectMonth">
+                        <option :value="month" v-for="month in months">{{month}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">月</span>
+                </div>
+                <div class="modal-footer" style="border-top:initial;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="float: left;margin-left: 5em;">取消</button>
+                    <button type="button" class="btn btn-primary" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
   </div>
 
@@ -121,9 +148,15 @@
             searchDate : {
                 beginDate : "",
                 endDate : ""
-            }
+            },
+            years : [],
+            months : ["01","02","03","04","05","06","07","08","09","10","11","12"],
+            selectYear : new Date().format("yyyy"),
+            selectMonth : new Date().format("MM"),
+            type : null
         },
         created : function() {
+            this.getYears();
             var date = new Date().format("yyyy-MM-dd");
             this.searchDate.beginDate = date;
             this.searchDate.endDate = date;
@@ -253,6 +286,33 @@
                 this.searchDate.beginDate  = getMonthStartDate();
                 this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
+            },
+            getYears : function() {
+                var years = new Array();
+                var year = 2016;
+                var nowYear = parseInt(new Date().format("yyyy"));
+                for (var i = 0;true;i++){
+                    years[i] = year;
+                    if (year == nowYear){
+                        break;
+                    }
+                    year++;
+                }
+                this.years = years;
+            },
+            openModal : function (type) {
+                $("#queryCriteriaModal").modal();
+                this.type = type;
+            },
+            createMonthDto : function () {
+                var that = this;
+                try {
+                    location.href = "/createMonthDto?year=" + that.selectYear + "&month="+that.selectMonth+"&type="+that.type+"";
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("生成月报表出错");
+                    return;
+                }
             }
         }
     })
