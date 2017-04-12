@@ -49,6 +49,8 @@ public class Customer implements Serializable{
     private BigDecimal account;
     
     private String lastOrderShop;
+
+    private String lastTableNumber;
     
     private Date newNoticeTime;
     
@@ -76,6 +78,17 @@ public class Customer implements Serializable{
     private String bindPhoneShop;
 
     private String realTimeCouponIds;
+
+    //是否关注
+    private Integer subscribe;
+
+    public Integer getSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(Integer subscribe) {
+        this.subscribe = subscribe;
+    }
 
     public String getRealTimeCouponIds() {
         return realTimeCouponIds;
@@ -323,6 +336,14 @@ public class Customer implements Serializable{
 
     public void setBindPhoneShop(String bindPhoneShop) {
         this.bindPhoneShop = bindPhoneShop;
+    }
+
+    public String getLastTableNumber() {
+        return lastTableNumber;
+    }
+
+    public void setLastTableNumber(String lastTableNumber) {
+        this.lastTableNumber = lastTableNumber;
     }
 
     @Override

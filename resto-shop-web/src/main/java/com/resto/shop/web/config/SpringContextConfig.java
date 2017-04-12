@@ -410,6 +410,11 @@ public class SpringContextConfig {
         return proxy.create(RedPacketService.class);
     }
 
+    @Bean
+    public PosUserService posUserService() {
+        return proxy.create(PosUserService.class);
+    }
+
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
