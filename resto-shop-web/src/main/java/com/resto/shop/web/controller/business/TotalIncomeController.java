@@ -330,8 +330,7 @@ public class TotalIncomeController extends GenericController {
     }
 
     @RequestMapping("/createMonthDto")
-    @ResponseBody
-    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
+    public void createMonthDto(String year, String month, Integer type, HttpServletRequest request, HttpServletResponse response){
         Integer monthDay = getMonthDay(year, month);
         // 导出文件名
         String typeName = type.equals(Common.YES) ? "店铺营业总额月报表" : "品牌营业总额月报表" ;
@@ -503,12 +502,13 @@ public class TotalIncomeController extends GenericController {
             OutputStream out = new FileOutputStream(path);
             excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
             out.close();
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
         }catch (Exception e){
             e.printStackTrace();
             log.error("生成月营业报表出错！");
-            return new Result(false);
+            JOptionPane.showMessageDialog(null, "导出失败！");
         }
-        return getSuccessResult(path);
     }
 
     public Integer getMonthDay(String year, String month){
