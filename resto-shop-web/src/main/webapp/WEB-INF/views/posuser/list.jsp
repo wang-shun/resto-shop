@@ -14,34 +14,13 @@
 	            	<form role="form" action="{{m.id?'posuser/modify':'posuser/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-    <label>name</label>
-    <input type="text" class="form-control" name="name" v-model="m.name">
-</div>
-<div class="form-group">
-    <label>password</label>
-    <input type="text" class="form-control" name="password" v-model="m.password">
-</div>
-<div class="form-group">
-    <label>createUserId</label>
-    <input type="text" class="form-control" name="createUserId" v-model="m.createUserId">
-</div>
-<div class="form-group">
-    <label>updateTime</label>
-    <input type="text" class="form-control" name="updateTime" v-model="m.updateTime">
-</div>
-<div class="form-group">
-    <label>updateUserId</label>
-    <input type="text" class="form-control" name="updateUserId" v-model="m.updateUserId">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-<div class="form-group">
-    <label>brandId</label>
-    <input type="text" class="form-control" name="brandId" v-model="m.brandId">
-</div>
-
+								<label>name</label>
+								<input type="text" class="form-control" name="name" v-model="m.name">
+							</div>
+							<div class="form-group">
+								<label>password</label>
+								<input type="text" class="form-control" name="password" v-model="m.password">
+							</div>
 						</div>
 						<input type="hidden" name="id" v-model="m.id" />
 						<input class="btn green"  type="submit"  value="保存"/>
@@ -78,34 +57,13 @@
 			},
 			columns : [
 				{                 
-	title : "name",
-	data : "name",
-},                 
-{                 
-	title : "password",
-	data : "password",
-},                 
-{                 
-	title : "createUserId",
-	data : "createUserId",
-},                 
-{                 
-	title : "updateTime",
-	data : "updateTime",
-},                 
-{                 
-	title : "updateUserId",
-	data : "updateUserId",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-{                 
-	title : "brandId",
-	data : "brandId",
-},                 
-
+					title : "name",
+					data : "name",
+				},
+				{
+					title : "password",
+					data : "password",
+				},
 				{
 					title : "操作",
 					data : "id",
