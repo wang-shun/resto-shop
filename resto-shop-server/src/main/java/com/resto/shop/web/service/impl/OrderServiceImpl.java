@@ -4830,9 +4830,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //今日外卖金额
                 .append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
                 //总营业额
-                .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
+                .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
                 //本月总额
-                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
+                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("'")
                 .append("}");
 
         //封装微信推送文本
@@ -4870,8 +4870,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("本月满意度:").append(monthSatisfaction).append("\n")
                 .append("---------------------")
                 .append("今日外卖金额:").append(todayOrderBooks).append("\n")
-                .append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
-                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
+                .append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
+                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("\n");
 
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
