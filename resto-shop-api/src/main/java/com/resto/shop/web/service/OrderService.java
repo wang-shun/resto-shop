@@ -640,4 +640,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
      * @return
      */
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
+
+    void changeOrderMode(String orderId);
 }
