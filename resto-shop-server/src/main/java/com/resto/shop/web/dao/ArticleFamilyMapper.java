@@ -34,4 +34,12 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
     ArticleFamily checkSame(@Param("shopId") String shopId,@Param("name") String name);
 
     List<ArticleSellDto> selectByShopId(@Param("shopId") String shopId);
+
+    /**
+     * 新版pos查询菜品
+     * @param shopDetailId
+     * @param distributionModeId
+     * @return
+     */
+    List<ArticleFamily> selectnewPosListPage(@Param("shopId") String shopDetailId,  @Param("distributionModeId") Integer distributionModeId);
 }
