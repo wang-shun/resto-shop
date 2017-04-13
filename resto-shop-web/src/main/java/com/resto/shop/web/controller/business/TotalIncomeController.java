@@ -331,7 +331,7 @@ public class TotalIncomeController extends GenericController {
 
     @RequestMapping("/createMonthDto")
     @ResponseBody
-    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request, HttpServletResponse response){
+    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
         Integer monthDay = getMonthDay(year, month);
         // 导出文件名
         String typeName = type.equals(Common.YES) ? "店铺营业总额月报表" : "品牌营业总额月报表" ;
@@ -465,7 +465,7 @@ public class TotalIncomeController extends GenericController {
                                         case PayMode.BANK_CART_PAY:
                                             shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(paymentItem.getPayValue()));
                                             break;
-                                        case PayMode.MONEY_PAY:
+                                        case PayMode.CRASH_PAY:
                                             shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(paymentItem.getPayValue()));
                                             break;
                                         case PayMode.SHANHUI_PAY:
@@ -477,8 +477,10 @@ public class TotalIncomeController extends GenericController {
                                         case PayMode.ARTICLE_BACK_PAY:
                                             shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(paymentItem.getPayValue()).abs());
                                             break;
-                                        default:
+                                        case PayMode.MONEY_PAY:
                                             shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
+                                            break;
+                                        default:
                                             break;
                                     }
                                 }

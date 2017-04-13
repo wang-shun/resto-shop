@@ -31,4 +31,14 @@ public interface ArticleFamilyService extends GenericService<ArticleFamily, Stri
 	ArticleFamily checkSame(String shopId,String name);
 
     List<ArticleSellDto> selectByShopId(String shopId);
+
+    /**
+     * 新版pos 查询菜品分类 分页
+     * @param shopDetailId
+     * @param page
+     * @param size
+     * @param distributionModeId
+     * @return
+     */
+    List<ArticleFamily> selectnewPosListPage(String shopDetailId,Integer page,Integer size,Integer distributionModeId);
 }

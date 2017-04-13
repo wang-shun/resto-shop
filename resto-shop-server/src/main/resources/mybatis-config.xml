@@ -63,6 +63,11 @@
     <plugins>
         <plugin interceptor="com.resto.brand.core.feature.orm.mybatis.PaginationResultSetHandlerInterceptor"/>
         <plugin interceptor="com.resto.brand.core.feature.orm.mybatis.PaginationStatementHandlerInterceptor"/>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <property name="helperDialect" value="mysql"/>
+        </plugin>
     </plugins>
 
 </configuration>
