@@ -14,7 +14,7 @@
                     <form role="form" action="{{m.id?'area/modify':'area/create'}}" @submit.prevent="save">
                         <div class="form-body">
                             <div class="form-group">
-                                <label>桌位名称</label>
+                                <label>区域名称</label>
                                 <input type="text" class="form-control" name="name" v-model="m.name"
                                        @blur="checkName(m.name)">
                             </div>
