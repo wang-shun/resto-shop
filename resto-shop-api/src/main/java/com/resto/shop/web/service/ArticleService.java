@@ -128,4 +128,14 @@ public interface ArticleService extends GenericService<Article, String> {
     Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 
     List<String> selectArticleSort(Map<String, Object> selectMap);
+
+    /**
+     * 新pos根据菜品分类查询 菜品(在供应时间内)
+     * @param shopId
+     * @param page
+     * @param size
+     * @param familyId
+     * @return
+     */
+    List<Article> selectnewPosListByFamillyId(String shopId,Integer page,Integer size,String familyId);
 }
