@@ -331,7 +331,7 @@ public class TotalIncomeController extends GenericController {
 
     @RequestMapping("/createMonthDto")
     @ResponseBody
-    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request, HttpServletResponse response){
+    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
         Integer monthDay = getMonthDay(year, month);
         // 导出文件名
         String typeName = type.equals(Common.YES) ? "店铺营业总额月报表" : "品牌营业总额月报表" ;
