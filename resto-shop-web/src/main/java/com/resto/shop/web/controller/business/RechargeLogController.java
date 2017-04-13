@@ -400,7 +400,8 @@ public class RechargeLogController extends GenericController{
     }
 
     @RequestMapping("/createMonthDto")
-    public void createMonthDto(String year, String month, Integer type, HttpServletRequest request, HttpServletResponse response){
+    @ResponseBody
+    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
         Integer monthDay = getMonthDay(year, month);
         // 导出文件名
         String typeName = type.equals(Common.YES) ? "店铺充值记录月报表" : "品牌充值记录月报表" ;
@@ -409,10 +410,13 @@ public class RechargeLogController extends GenericController{
         String path = request.getSession().getServletContext().getRealPath(str);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
+
         } catch (Exception e){
             e.printStackTrace();
             log.error("生成充值月报表出错!");
+            new Result(false);
         }
+        return getSuccessResult(path);
     }
 
 
