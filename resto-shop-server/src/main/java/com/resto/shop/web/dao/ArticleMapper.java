@@ -126,4 +126,13 @@ public interface ArticleMapper extends GenericDao<Article, String>{
     Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 
     List<String> selectArticleSort(Map<String, Object> selectMap);
+
+    /**
+     * 查询在供应时间内 查询分类所有菜品(分页)
+     * @param supportTimes
+     * @param shopId
+     * @param familyId
+     * @return
+     */
+    List<Article> selectnewPosListByFamillyId(@Param("times") List<Integer> supportTimes, @Param("shopId") String shopId,@Param("articleFamilyId") String familyId);
 }

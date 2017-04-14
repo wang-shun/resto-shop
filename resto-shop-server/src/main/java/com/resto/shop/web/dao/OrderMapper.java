@@ -671,4 +671,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectBaseToKCList(@Param("brandId") String brandId,@Param("beginDate") Date begin, @Param("endDate") Date end);
 
     List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
+
+    List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 }

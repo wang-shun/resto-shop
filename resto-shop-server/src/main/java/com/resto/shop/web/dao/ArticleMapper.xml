@@ -817,6 +817,7 @@ GROUP BY article_id
         select
             ta.id articleId,
             if(ta.article_type = 1,'单品','套餐') typeName,
+            taf.id articleFamilyId,
             IFNULL(taf.`name`,'其他')articleFamilyName,
             ta.`name` articleName,
             IFNULL(SUM(toi.count),0)
@@ -937,4 +938,17 @@ GROUP BY article_id
         </foreach>
         ORDER BY taf.peference asc, ta.sort asc
     </select>
+
+    <select id="selectnewPosListByFamillyId" resultType="Article">
+        SELECT * from tb_article a
+        LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
+        <foreach collection="times" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+        LEFT JOIN tb_support_time st on ast.support_time_id = st.id
+        where a.activated = 1 and a.state = 1 and a.shop_detail_id = #{shopId}
+        and a.article_family_id = #{articleFamilyId} and discount is not null
+        order by a.sort
+    </select>
+
 </mapper>

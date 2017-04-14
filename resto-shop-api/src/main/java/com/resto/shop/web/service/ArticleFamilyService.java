@@ -3,6 +3,7 @@ package com.resto.shop.web.service;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.model.ArticleFamily;
 
 public interface ArticleFamilyService extends GenericService<ArticleFamily, String> {
@@ -28,4 +29,16 @@ public interface ArticleFamilyService extends GenericService<ArticleFamily, Stri
      * @return
      */
 	ArticleFamily checkSame(String shopId,String name);
+
+    List<ArticleSellDto> selectByShopId(String shopId);
+
+    /**
+     * 新版pos 查询菜品分类 分页
+     * @param shopDetailId
+     * @param page
+     * @param size
+     * @param distributionModeId
+     * @return
+     */
+    List<ArticleFamily> selectnewPosListPage(String shopDetailId,Integer page,Integer size,Integer distributionModeId);
 }

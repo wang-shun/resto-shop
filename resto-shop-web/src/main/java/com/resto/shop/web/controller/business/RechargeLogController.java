@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.annotation.Resource;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.ShopDetailDto;
+import com.resto.shop.web.constant.Common;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -395,6 +397,139 @@ public class RechargeLogController extends GenericController{
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping("/createMonthDto")
+    @ResponseBody
+    public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
+        Integer monthDay = getMonthDay(year, month);
+        // 导出文件名
+        String typeName = type.equals(Common.YES) ? "店铺充值记录月报表" : "品牌充值记录月报表" ;
+        String str = typeName + year.concat("-").concat(month).concat("-01") + "至"
+                + year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
+        String path = request.getSession().getServletContext().getRealPath(str);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            List<ShopDetail> shopDetails = getCurrentShopDetails();
+            String[] shopNames = new String[1];
+            RechargeLogDto[][] rechargeLogDtos = new RechargeLogDto[1][monthDay];
+            Map<String, Object> selectMap = new HashMap<>();
+            selectMap.put("beginDate",year.concat("-").concat(month).concat("-01"));
+            selectMap.put("endDate",year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+            if (type.equals(Common.YES)){
+                shopNames = new String[shopDetails.size()];
+                rechargeLogDtos = new RechargeLogDto[shopDetails.size()][monthDay];
+                int i = 0;
+                int j = 0;
+                for (ShopDetail shopDetail : shopDetails){
+                    selectMap.put("shopId",shopDetail.getId());
+                    List<ChargeOrder> chargeOrders = chargeorderService.selectMonthDto(selectMap);
+                    for (int day = 0; day < monthDay; day++){
+                        Date beginDate = getBeginDay(year, month, day);
+                        Date endDate = getEndDay(year, month, day);
+                        RechargeLogDto rechargeLogDto = new RechargeLogDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                        for (ChargeOrder chargeOrder : chargeOrders){
+                            if (endDate.getTime() >= chargeOrder.getFinishTime().getTime() && beginDate.getTime() <= chargeOrder.getFinishTime().getTime()){
+                                rechargeLogDto.setShopCount(rechargeLogDto.getShopCount().add(new BigDecimal(1)));
+                                rechargeLogDto.setShopNum(rechargeLogDto.getShopNum().add(chargeOrder.getChargeMoney()));
+                                rechargeLogDto.setShopGaNum(rechargeLogDto.getShopGaNum().add(chargeOrder.getRewardMoney()));
+                                if (chargeOrder.getType().equals(Common.YES)){
+                                    rechargeLogDto.setShopWeChat(rechargeLogDto.getShopWeChat().add(chargeOrder.getChargeMoney()));
+                                } else{
+                                    rechargeLogDto.setShopPos(rechargeLogDto.getShopPos().add(chargeOrder.getChargeMoney()));
+                                }
+                                rechargeLogDto.setShopCsNum(rechargeLogDto.getShopCsNum().add(chargeOrder.getChargeMoney().subtract(chargeOrder.getChargeBalance())));
+                                rechargeLogDto.setShopGaCsNum(rechargeLogDto.getShopGaCsNum().add(chargeOrder.getRewardMoney().subtract(chargeOrder.getRewardBalance())));
+                            }
+                        }
+                        rechargeLogDtos[i][j] = rechargeLogDto;
+                        j++;
+                    }
+                    shopNames[i] = shopDetail.getName();
+                    i++;
+                    j = 0;
+                }
+            } else{
+                String shopName = "";
+                for (ShopDetail shopDetail : shopDetails){
+                    shopName = shopName.concat(shopDetail.getName()).concat(",");
+                }
+                shopName = shopName.substring(0, shopName.length() - 1);
+                shopNames[0] = shopName;
+                List<ChargeOrder> chargeOrders = chargeorderService.selectMonthDto(selectMap);
+                int j = 0;
+                for (int day = 0; day < monthDay; day++){
+                    Date beginDate = getBeginDay(year, month, day);
+                    Date endDate = getEndDay(year, month, day);
+                    RechargeLogDto rechargeLogDto = new RechargeLogDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                    for (ChargeOrder chargeOrder : chargeOrders){
+                        if (endDate.getTime() >= chargeOrder.getFinishTime().getTime() && beginDate.getTime() <= chargeOrder.getFinishTime().getTime()){
+                            rechargeLogDto.setShopCount(rechargeLogDto.getShopCount().add(new BigDecimal(1)));
+                            rechargeLogDto.setShopNum(rechargeLogDto.getShopNum().add(chargeOrder.getChargeMoney()));
+                            rechargeLogDto.setShopGaNum(rechargeLogDto.getShopGaNum().add(chargeOrder.getRewardMoney()));
+                            if (chargeOrder.getType().equals(Common.YES)){
+                                rechargeLogDto.setShopWeChat(rechargeLogDto.getShopWeChat().add(chargeOrder.getChargeMoney()));
+                            } else{
+                                rechargeLogDto.setShopPos(rechargeLogDto.getShopPos().add(chargeOrder.getChargeMoney()));
+                            }
+                            rechargeLogDto.setShopCsNum(rechargeLogDto.getShopCsNum().add(chargeOrder.getChargeMoney().subtract(chargeOrder.getChargeBalance())));
+                            rechargeLogDto.setShopGaCsNum(rechargeLogDto.getShopGaCsNum().add(chargeOrder.getRewardMoney().subtract(chargeOrder.getRewardBalance())));
+                        }
+                    }
+                    rechargeLogDtos[0][j] = rechargeLogDto;
+                    j++;
+                }
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("brandName", getBrandName());
+            map.put("beginDate", year.concat("-").concat(month).concat("-01"));
+            map.put("reportType", typeName);// 表的头，第一行内容
+            map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+            map.put("num", "7");// 显示的位置
+            map.put("timeType", "yyyy-MM-dd");
+            map.put("reportTitle", shopNames);// 表的名字
+            String[][] headers = {{"日期","25"},{"充值单数","25"},{"店铺充值总额","25"},{"店铺充值赠送总额","25"},{"店铺微信充值总额","25"},{"店铺POS端充值总额","25"},{"店铺充值消费","25"},{"店铺充值赠送消费","25"}};
+            String[] columns = {"date","shopCount","shopNum","shopGaNum","shopWeChat","shopPos","shopCsNum","shopGaCsNum"};
+            ExcelUtil<RechargeLogDto> excelUtil = new ExcelUtil<>();
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.createMonthDtoExcel(headers, columns, rechargeLogDtos, out, map);
+            out.close();
+        } catch (Exception e){
+            e.printStackTrace();
+            log.error("生成充值月报表出错!");
+            new Result(false);
+        }
+        return getSuccessResult(path);
+    }
+
+
+    public Integer getMonthDay(String year, String month){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        return calendar.getActualMaximum(Calendar.DATE);
+    }
+
+    public Date getBeginDay(String year, String month, Integer day){
+        Calendar beginDate = Calendar.getInstance();
+        beginDate.set(Calendar.YEAR, Integer.parseInt(year));
+        beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        beginDate.set(Calendar.DATE, day + 1);
+        beginDate.set(Calendar.HOUR_OF_DAY, 0);
+        beginDate.set(Calendar.MINUTE, 0);
+        beginDate.set(Calendar.SECOND,1);
+        return beginDate.getTime();
+    }
+
+    public Date getEndDay(String year, String month, Integer day){
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(Calendar.YEAR, Integer.parseInt(year));
+        endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+        endDate.set(Calendar.DATE, day + 1);
+        endDate.set(Calendar.HOUR_OF_DAY, 23);
+        endDate.set(Calendar.MINUTE, 59);
+        endDate.set(Calendar.SECOND,59);
+        return endDate.getTime();
     }
 
 }

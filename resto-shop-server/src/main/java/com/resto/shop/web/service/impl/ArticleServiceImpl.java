@@ -2,6 +2,8 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -556,5 +558,19 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<String> selectArticleSort(Map<String, Object> selectMap) {
         return articleMapper.selectArticleSort(selectMap);
+    }
+
+    @Override
+    public List<Article> selectnewPosListByFamillyId(String shopId, Integer page, Integer size, String familyId) {
+        List<SupportTime> supportTime = supportTimeService.selectNowSopport(shopId);
+        if (supportTime.isEmpty()) {
+            return null;
+        }
+        List<Integer> list = new ArrayList<>(ApplicationUtils.convertCollectionToMap(Integer.class, supportTime).keySet());
+        PageHelper.startPage(page,size);
+        List<Article> articleList = articleMapper.selectnewPosListByFamillyId(list,shopId,familyId);
+        PageInfo<Article> pageInfo = new PageInfo<>(articleList);
+        return pageInfo.getList();
+
     }
 }

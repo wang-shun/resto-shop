@@ -26,6 +26,17 @@ public class Printer implements Serializable {
     //打印机范围 0-前台打印机 1-区域打印机
     private Integer range;
 
+    //是否关联钱箱 0-否 1-是
+    private Integer receiveMoney;
+
+    public Integer getReceiveMoney() {
+        return receiveMoney;
+    }
+
+    public void setReceiveMoney(Integer receiveMoney) {
+        this.receiveMoney = receiveMoney;
+    }
+
     public Integer getRange() {
         return range;
     }

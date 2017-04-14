@@ -614,31 +614,33 @@ public class OrderAspect {
         ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, order.getShopDetailId());
-        BigDecimal money = new BigDecimal("0.00");
-        for(NewCustomCoupon coupon : coupons){
-            money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
-        }
-        str.append("邀请朋友扫一扫，");
-        if(money.doubleValue() == 0.00 && shareSetting == null){
-            str.append("送他/她红包，朋友到店消费后，您将获得红包返利\n");
-        }else if(money.doubleValue() == 0.00){
-            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得红包返利\n");
-        }else if(shareSetting == null){
-            str.append("送他/她红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
-        }else{
-            str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
-        }
-        String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
-        str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
-        String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
+        if(coupons.size() > 0 ){
+            BigDecimal money = new BigDecimal("0.00");
+            for(NewCustomCoupon coupon : coupons){
+                money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
+            }
+            str.append("邀请朋友扫一扫，");
+            if(money.doubleValue() == 0.00 && shareSetting == null){
+                str.append("送他/她红包，朋友到店消费后，您将获得红包返利\n");
+            }else if(money.doubleValue() == 0.00){
+                str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得红包返利\n");
+            }else if(shareSetting == null){
+                str.append("送他/她红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+            }else{
+                str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+            }
+            String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
+            str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
+            String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + str.toString());
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", customer.getId());
-        map.put("type", "UserAction");
-        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPost(LogUtils.url, map);
+        }
     }
 
 //    @AfterReturning(value = "payOrderModeFive()||payPrice()", returning = "order")
