@@ -724,19 +724,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPaymentModeId(PayMode.INTEGRAL_PAY);
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(payMoney);
-                item.setRemark("积分支付:" + item.getPayValue());
+                item.setRemark("会员支付:" + item.getPayValue());
                 orderPaymentItemService.insert(item);
                 Map crashPayMap = new HashMap(4);
                 crashPayMap.put("brandName", brand.getBrandName());
                 crashPayMap.put("fileName", order.getId());
                 crashPayMap.put("type", "orderAction");
-                crashPayMap.put("content", "订单:" + order.getId() + "订单使用积分支付了：" + item.getPayValue() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                crashPayMap.put("content", "订单:" + order.getId() + "订单使用会员支付了：" + item.getPayValue() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPost(url, crashPayMap);
                 Map CustomerCrashPayMap = new HashMap(4);
                 CustomerCrashPayMap.put("brandName", brand.getBrandName());
                 CustomerCrashPayMap.put("fileName", customer.getId());
                 CustomerCrashPayMap.put("type", "UserAction");
-                CustomerCrashPayMap.put("content", "用户:" + customer.getNickname() + "使用积分支付了：" + item.getPayValue() + "订单Id为:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                CustomerCrashPayMap.put("content", "用户:" + customer.getNickname() + "使用会员支付了：" + item.getPayValue() + "订单Id为:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPost(url, CustomerCrashPayMap);
                 order.setAllowContinueOrder(false);
             }
@@ -1547,9 +1547,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(), order.getId(), order.getProductionStatus());
             LogTemplateUtils.getParentOrderPrintSuccessByPOSType(brand.getBrandName(), order.getId(), order.getProductionStatus());
-            //现金 银联 闪惠 积分 支付的时候  在付款中 服务员尚未确定的时候  不可加菜  有一段加菜真空期！
-            if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY
-                    && order.getPayMode() != OrderPayMode.SHH_PAY && order.getPayMode() != OrderPayMode.JF_PAY) {
+            //现金 银联 闪惠 积分 支付的时候  在付款中 服务员尚未确定的时候  不可加菜  有一段加菜真空期！  已废弃  wyj
+//            if (order.getOrderMode() != ShopMode.CALL_NUMBER && order.getPayMode() != OrderPayMode.YL_PAY && order.getPayMode() != OrderPayMode.XJ_PAY
+//                    && order.getPayMode() != OrderPayMode.SHH_PAY && order.getPayMode() != OrderPayMode.JF_PAY) {
+            if (order.getOrderMode() != ShopMode.CALL_NUMBER) {
                 if (order.getPayType() == PayType.NOPAY && order.getOrderState() == OrderState.PAYMENT) {
 
                 } else {
@@ -3902,7 +3903,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if ((setting.getIntegralPay().equals(Common.YES) && shopDetail.getIntegralPay().equals(Common.YES)) || integralPay.compareTo(BigDecimal.ZERO) > 0) {
             Map<String, Object> integralPayMent = new HashMap<>();
             integralPayMent.put("SUBTOTAL", integralPay);
-            integralPayMent.put("PAYMENT_MODE", "积分支付");
+            integralPayMent.put("PAYMENT_MODE", "会员支付");
             incomeAmount = incomeAmount.add(integralPay);
             incomeItems.add(integralPayMent);
         }
@@ -6000,7 +6001,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.setPaymentModeId(PayMode.INTEGRAL_PAY);
                         item.setPayTime(new Date());
                         item.setPayValue(pay);
-                        item.setRemark("积分支付:" + item.getPayValue());
+                        item.setRemark("会员支付:" + item.getPayValue());
                         orderPaymentItemService.insert(item);
                     default:
                         break;

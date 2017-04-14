@@ -249,7 +249,7 @@
                             data : "shanhuiPay"
                         },
                         {
-                            title : "积分支付",
+                            title : "会员支付",
                             data : "integralPay"
                         },
                         {
