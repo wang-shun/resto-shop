@@ -294,7 +294,7 @@
                             <label style="margin-left: 16px;" v-show="b.integralPay == 1 && m.shopMode == 6">
                                 <input type="checkbox" id="integralPay" @change="weChatPaySetting('integralPay')" v-model="m.integralPay" value="1">
                                 <input type="hidden" name="integralPay" v-model="m.integralPay">
-                                &nbsp;&nbsp;积分支付
+                                &nbsp;&nbsp;会员支付
                             </label>
 						</div>
 					</div>
@@ -341,7 +341,7 @@
                             <label style="margin-left: 16px;" v-show="b.integralPay == 1" :class="{ formBox : m.openPosIntegralPay == 1}">
                                 <input type="checkbox" id="openPosIntegralPay" @change="posPaySetting('openPosIntegralPay')" v-model="m.openPosIntegralPay" value="1">
                                 <input type="hidden" name="openPosIntegralPay" v-model="m.openPosIntegralPay">
-                                &nbsp;&nbsp;积分支付
+                                &nbsp;&nbsp;会员支付
                             </label>
                         </div>
                     </div>
