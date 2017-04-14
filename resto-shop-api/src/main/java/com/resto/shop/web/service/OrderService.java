@@ -594,7 +594,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	Order getCustomerLastOrder(String customerId);
 
-	void confirmOrderPos(String orderId);
+	Order confirmOrderPos(String orderId);
 
 	BigDecimal selectPayBefore(String orderId);
 

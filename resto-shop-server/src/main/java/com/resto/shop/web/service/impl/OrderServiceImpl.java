@@ -6509,7 +6509,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void confirmOrderPos(String orderId) {
+    public Order confirmOrderPos(String orderId) {
         Order order = selectById(orderId);
         //开始状态
         Integer originState = order.getOrderState();
@@ -6520,7 +6520,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPayType() == PayType.NOPAY) {
             confirmOrder(order);
         }
-        if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY)) {
+        if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
+                || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY)) {
             payOrderSuccess(order);
         }
         updateChild(order);
@@ -6531,6 +6532,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url, map);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
+        return order;
     }
 
     @Override
