@@ -32,7 +32,7 @@ public class OrderPayMode {
             case SHH_PAY:
                 return "闪惠支付";
             case JF_PAY:
-                return "积分支付";
+                return "会员支付";
             default:
                 return "余额支付";
         }
