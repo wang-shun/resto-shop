@@ -34,6 +34,8 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Init
 			druidDataSource.setPassword(config.getPassword());
 			druidDataSource.setDriverClassName(config.getDriverClassName());
 			druidDataSource.setInitialSize(1);
+			druidDataSource.setRemoveAbandoned(true);
+			druidDataSource.setRemoveAbandonedTimeout(10);
 			druidDataSource.setMinIdle(1);
 			druidDataSource.setMaxActive(100);
 			druidDataSource.setMaxWait(60000);

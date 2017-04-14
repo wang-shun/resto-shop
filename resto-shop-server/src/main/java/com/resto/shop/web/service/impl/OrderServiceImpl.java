@@ -1668,27 +1668,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
 
-
             if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
 //                continue;
-                if (setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                Kitchen kitchen = kitchenService.getItemKitchenId(item);
+                String kitchenId = kitchen.getId().toString();
+                Printer printer = printerService.selectById(kitchen.getPrinterId());
+                if (printer.getTicketType() == TicketType.PRINT_TICKET && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
-                    Kitchen kitchen = kitchenService.getItemKitchenId(item);
                     if (kitchen != null) {
-                        String kitchenId = kitchen.getId().toString();
+
                         kitchenMap.put(kitchenId, kitchen);
                         if (!kitchenArticleMap.containsKey(kitchenId)) {
                             //如果没有 则新建
                             kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                         }
+                        if(printer.getTicketType() == TicketType.PRINT_LABEL){
+                            OrderItem parent = orderItemService.selectById(item.getParentId());
+                            if(!kitchenArticleMap.get(kitchenId).contains(parent)){
+                                kitchenArticleMap.get(kitchenId).add(parent);
+                            }
+                        }
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
+
+
                 }
             }
 
             if (OrderItemType.SETMEALS == item.getType()) { //如果类型是套餐那么continue
-                if (setting.getPrintType().equals(PrinterType.TOTAL) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
+                if (shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     Kitchen kitchen = kitchenService.selectMealKitchen(item);
                     if (kitchen != null) {
                         String kitchenId = kitchen.getId().toString();
@@ -1772,7 +1781,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 } else {
                     //贴纸
                     for (int i = 0; i < article.getCount(); i++) {
-                        if (countMap.containsKey(article.getArticleId())) {
+                        if(article.getType() == OrderItemType.SETMEALS){
+                            countMap.put(article.getArticleId(), 0);
+                        }else if (article.getType() == OrderItemType.MEALS_CHILDREN){
+                            OrderItem parent = orderItemService.selectById(article.getParentId());
+                            countMap.put(parent.getArticleId(), countMap.get(parent.getArticleId())+1);
+                            countMap.put(article.getArticleId(),countMap.get(parent.getArticleId()));
+                        }else if (countMap.containsKey(article.getArticleId())) {
                             countMap.put(article.getArticleId(), countMap.get(article.getArticleId()) + 1);
                         } else {
                             countMap.put(article.getArticleId(), 1);
@@ -1936,11 +1951,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                  ShopDetail shopDetail, List<Map<String, Object>> printTask, Map map, List<OrderItem> orderItems) {
         int currentCount = (int) map.get(article.getArticleId());
         int i = 0;
+
         for (OrderItem orderItem : orderItems) {
-            if (orderItem.getArticleId().equals(article.getArticleId())) {
+            if(article.getType() == OrderItemType.SETMEALS
+                    && orderItem.getParentId().equals(article.getId())){
+                i++;
+            }else if (article.getType() == OrderItemType.MEALS_CHILDREN
+                    && orderItem.getParentId().equals(article.getParentId())){
+                i++;
+            } else if(article.getType() != OrderItemType.SETMEALS
+                    && article.getType() != OrderItemType.MEALS_CHILDREN && orderItem.getArticleId().equals(article.getArticleId())){
                 i += article.getCount().intValue();
             }
         }
+
+
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         String modeText = getModeText(order);//就餐模式
         Map<String, Object> print = new HashMap<String, Object>();
@@ -1964,7 +1989,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         String phone = order.getVerCode();
         if (customer != null) {
-            phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone() + "/" + order.getVerCode();
+            phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone();
         }
 
         data.put("CUSTOMER_TEL", phone);
@@ -2131,6 +2156,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         printList.add(print_id);
         MemcachedUtils.put(shopDetail.getId() + "printList", printList);
     }
+
 
 
     private String getModeText(Order order) {
