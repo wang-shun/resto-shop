@@ -633,4 +633,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<Order> selectBaseToKCList(String brandId, String beginDate, String endDate);
 
     List<Order> selectBaseToKCListByShopId(String shopId,String beginDate,String endDate);
+
+	void changeOrderMode(String orderId);
 }

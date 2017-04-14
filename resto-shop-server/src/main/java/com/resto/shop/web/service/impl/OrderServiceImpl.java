@@ -6672,4 +6672,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+    @Override
+    public void changeOrderMode(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order.getPayMode() == OrderPayMode.YL_PAY){
+            order.setPayMode(OrderPayMode.XJ_PAY);
+        }else if (order.getPayMode() == OrderPayMode.XJ_PAY){
+            order.setPayMode(OrderPayMode.YL_PAY);
+        }
+        update(order);
+
+        List<OrderPaymentItem> list = orderPaymentItemService.selectByOrderId(orderId);
+        for(OrderPaymentItem paymentItem:list){
+            if(paymentItem.getPaymentModeId() == PayMode.CRASH_PAY
+                    && paymentItem.getPayValue().doubleValue() > 0){
+                paymentItem.setPaymentModeId(PayMode.BANK_CART_PAY);
+                paymentItem.setRemark("银联支付:"+paymentItem.getPayValue());
+                orderPaymentItemService.update(paymentItem);
+            }else if (paymentItem.getPaymentModeId() == PayMode.BANK_CART_PAY
+                    && paymentItem.getPayValue().doubleValue() > 0){
+                paymentItem.setPaymentModeId(PayMode.CRASH_PAY);
+                paymentItem.setRemark("现金:"+paymentItem.getPayValue());
+                orderPaymentItemService.update(paymentItem);
+            }
+        }
+
+    }
+
 }
