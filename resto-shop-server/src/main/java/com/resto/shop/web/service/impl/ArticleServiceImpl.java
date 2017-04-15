@@ -268,6 +268,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = "【手动沽清】";
+        MemcachedUtils.put(articleId+Common.KUCUN,0);
         if(articleId.indexOf("@")> -1){
             String aid = articleId.substring(0,articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
