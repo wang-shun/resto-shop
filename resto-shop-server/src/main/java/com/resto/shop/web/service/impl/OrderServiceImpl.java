@@ -4242,8 +4242,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                     }
                     if (articleCount == null) {
-                        if (article.getCurrentWorkingStock() > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+                        if (articlePrice.getCurrentWorkingStock() > 1) {
+                            MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
                         } else {
                             MemcachedUtils.put(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
@@ -4326,8 +4326,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }else{
-                        MemcachedUtils.put(articleId+Common.KUCUN,article.getCurrentWorkingStock()+1);
-                        if(article.getCurrentWorkingStock() == 0){
+                        MemcachedUtils.put(articleId+Common.KUCUN,articlePrice.getCurrentWorkingStock()+1);
+                        if(articlePrice.getCurrentWorkingStock() == 0){
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
