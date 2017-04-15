@@ -356,6 +356,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
+        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() != PayType.NOPAY
+                && order.getDistributionModeId() == DistributionType.RESTAURANT_MODE_ID
+                && order.getTableNumber() == null){
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("桌号异常请重新扫描！");
+            return jsonResult;
+        }
+
+
+
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
             if (orderCount > 0) {
