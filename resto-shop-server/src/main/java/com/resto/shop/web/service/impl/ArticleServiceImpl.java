@@ -279,21 +279,21 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             articleMapper.clearStock(articleId, emptyRemark);
             articleMapper.clearPriceTotal(articleId, emptyRemark);
         }
-        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
-        for(Article tc : taocan){
-            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
-            if(suit != null){
-                if(suit == 0 && tc.getCount() > 0){
-                    orderMapper.setEmptyFail(tc.getId());
-                }
-                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
-            }else{
-                if(tc.getIsEmpty() && tc.getCount() > 0){
-                    orderMapper.setEmptyFail(tc.getId());
-                }
-                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
-            }
-        }
+//        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
+//        for(Article tc : taocan){
+//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            if(suit != null){
+//                if(suit == 0 && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }else{
+//                if(tc.getIsEmpty() && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }
+//        }
 
 
 
@@ -342,21 +342,21 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 orderMapper.setEmpty(articleId);
             }
         }
-        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
-        for(Article tc : taocan){
-            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
-            if(suit != null){
-                if(suit == 0 && tc.getCount() > 0){
-                    orderMapper.setEmptyFail(tc.getId());
-                }
-                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
-            }else{
-                if(tc.getIsEmpty() && tc.getCount() > 0){
-                    orderMapper.setEmptyFail(tc.getId());
-                }
-                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
-            }
-        }
+//        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
+//        for(Article tc : taocan){
+//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            if(suit != null){
+//                if(suit == 0 && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }else{
+//                if(tc.getIsEmpty() && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }
+//        }
 //        articleMapper.editStock(articleId, count, emptyRemark);
 //        articleMapper.editPriceStock(articleId, count, emptyRemark);
 //        orderMapper.setStockBySuit(shopId);
