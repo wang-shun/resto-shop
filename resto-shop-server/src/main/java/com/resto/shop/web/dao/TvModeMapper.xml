@@ -36,4 +36,12 @@
     </trim> 
   </insert>
   <select id="selectList" resultType="TvMode">select * from tb_tv_mode</select>
+
+  <select id="selectByDeviceShopIdSource" resultType="TvMode">
+    select * from tb_tv_mode where shop_detail_id = #{shopId} and device_token = #{deviceToken} and app_source = #{appSource}
+  </select>
+
+  <select id="selectByShopIdSource" resultType="TvMode">
+    select * from tb_tv_mode where shop_detail_id = #{shopId} and app_source = #{appSource}
+  </select>
 </mapper>

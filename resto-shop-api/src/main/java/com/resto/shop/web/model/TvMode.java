@@ -11,7 +11,7 @@ public class TvMode {
 
     private String deviceToken;
 
-    private String appSource;
+    private Integer appSource;
 
     private Date lastLogonTime;
 
@@ -51,12 +51,12 @@ public class TvMode {
         this.deviceToken = deviceToken == null ? null : deviceToken.trim();
     }
 
-    public String getAppSource() {
+    public Integer getAppSource() {
         return appSource;
     }
 
-    public void setAppSource(String appSource) {
-        this.appSource = appSource == null ? null : appSource.trim();
+    public void setAppSource(Integer appSource) {
+        this.appSource = appSource;
     }
 
     public Date getLastLogonTime() {
