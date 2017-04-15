@@ -1671,6 +1671,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
 //                continue;
                 Kitchen kitchen = kitchenService.getItemKitchenId(item);
+                if(kitchen == null){
+                    continue;
+                }
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
                 if (printer.getTicketType() == TicketType.PRINT_TICKET && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
