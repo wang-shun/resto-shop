@@ -146,6 +146,16 @@ public class Article implements Serializable{
     //餐品首字母
     private String initials;
 
+    private  Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
     public String getInitials() {
         return initials;
     }
