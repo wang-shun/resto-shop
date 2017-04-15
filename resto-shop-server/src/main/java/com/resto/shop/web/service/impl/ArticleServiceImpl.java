@@ -279,6 +279,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             articleMapper.clearStock(articleId, emptyRemark);
             articleMapper.clearPriceTotal(articleId, emptyRemark);
         }
+
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
 //            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
