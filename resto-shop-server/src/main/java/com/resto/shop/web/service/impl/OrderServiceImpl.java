@@ -356,13 +356,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() != PayType.NOPAY
-                && order.getDistributionModeId() == DistributionType.RESTAURANT_MODE_ID
-                && order.getTableNumber() == null){
-            jsonResult.setSuccess(false);
-            jsonResult.setMessage("桌号异常请重新扫描！");
-            return jsonResult;
-        }
+
 
 
 
