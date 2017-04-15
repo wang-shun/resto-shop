@@ -5,7 +5,6 @@ import javax.annotation.Resource;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.LogBaseService;
 import com.resto.shop.web.service.ThirdService;
-import com.resto.shop.web.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
