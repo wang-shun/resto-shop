@@ -149,6 +149,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
+        for(Article article : articleList){
+            Integer count = (Integer)MemcachedUtils.get(article.getId()+Common.KUCUN);
+            if(count != null){
+                article.setCurrentWorkingStock(count);
+            }
+        }
         getArticleDiscount(currentShopId, articleList, show);
         return articleList;
     }
