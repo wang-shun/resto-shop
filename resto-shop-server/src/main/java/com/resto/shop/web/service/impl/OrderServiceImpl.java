@@ -348,6 +348,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
+
+        if(brandSetting.getIsUseServicePrice() == Common.YES &&  shopDetail.getIsUseServicePrice() == Common.YES
+                && (order.getCustomerCount() == 0 || order.getCustomerCount() == null)){
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("请输入就餐人数！");
+            return jsonResult;
+        }
+
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
             if (orderCount > 0) {
@@ -1671,6 +1679,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
 //                continue;
                 Kitchen kitchen = kitchenService.getItemKitchenId(item);
+                if(kitchen == null){
+                    continue;
+                }
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
                 if (printer.getTicketType() == TicketType.PRINT_TICKET && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
@@ -4142,28 +4153,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String msg = "";
         int min = 0;
         int endMin = 10000;
+        Integer ck =(Integer) MemcachedUtils.get(orderItem.getArticleId()+Common.KUCUN);
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
-                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                }
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             case OrderItemType.UNITPRICE:
                 //如果是有规则菜品，则判断该规则是否有库存
-                current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticlePriceCount(orderItem.getArticleId());
+                }
+
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             case OrderItemType.SETMEALS:
                 //如果是套餐,不做判断，只判断套餐下的子品是否有库存
-                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                }
                 Map<String, Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
                 for (OrderItem oi : orderItem.getChildren()) {
                     //查询当前菜品，剩余多少份
-                    min = orderMapper.selectArticleCount(oi.getArticleId());
+                    Integer cck =(Integer) MemcachedUtils.get(oi.getArticleId()+Common.KUCUN);
+                    if(cck != null){
+                        min = cck;
+                    }else{
+                        min = orderMapper.selectArticleCount(oi.getArticleId());
+                    }
                     if (order_items_map.containsKey(oi.getArticleId())) {
                         order_items_map.put(oi.getArticleId(), order_items_map.get(oi.getArticleId()) + oi.getCount());
                         min -= oi.getCount();
@@ -4182,21 +4213,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 break;
             case OrderItemType.MEALS_CHILDREN:
                 //如果是套餐下的子品 当成单品来判断
-                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                }
+//                current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= orderItem.getCount();
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= orderItem.getCount() ? "库存足够" : orderItem.getArticleName() + "库存不足,请重新选购餐品";
                 break;
             case OrderItemType.UNIT_NEW:
                 //如果是单品无规格，直接判断菜品是否有库存
-                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                }
+//                current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
                 break;
             case OrderItemType.RECOMMEND:
                 //如果是单品无规格，直接判断菜品是否有库存
-                current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                if(ck != null){
+                    current = ck;
+                }else{
+                    current = orderMapper.selectArticleCount(orderItem.getArticleId());
+                }
+//                current = orderMapper.selectArticleCount(orderItem.getArticleId());
                 result = current >= count;
                 msg = current == 0 ? orderItem.getArticleName() + "已售罄,请取消订单后重新下单" :
                         current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + current + "个,请重新选购餐品";
@@ -4242,8 +4288,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                     }
                     if (articleCount == null) {
-                        if (article.getCurrentWorkingStock() > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+                        if (articlePrice.getCurrentWorkingStock() > 1) {
+                            MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
                         } else {
                             MemcachedUtils.put(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
@@ -4291,13 +4337,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
         //同时更新套餐库存(套餐库存为 最小库存的单品)
-        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
-        for(Article article : taocan){
-            MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
-            if(article.getCount() == 0){
-                orderMapper.setEmpty(article.getId());
-            }
-        }
+//        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
+//        for(Article article : taocan){
+//            MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//            if(article.getCount() == 0){
+//                orderMapper.setEmpty(article.getId());
+//            }
+//        }
 //        orderMapper.setStockBySuit(order.getShopDetailId());
         return true;
     }
@@ -4326,8 +4372,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }else{
-                        MemcachedUtils.put(articleId+Common.KUCUN,article.getCurrentWorkingStock()+1);
-                        if(article.getCurrentWorkingStock() == 0){
+                        MemcachedUtils.put(articleId+Common.KUCUN,articlePrice.getCurrentWorkingStock()+1);
+                        if(articlePrice.getCurrentWorkingStock() == 0){
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
@@ -4372,21 +4418,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
         //同时更新套餐库存(套餐库存为 最小库存的单品)
-        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
-        for(Article article : taocan){
-            Integer suit = (Integer) MemcachedUtils.get(article.getId()+Common.KUCUN);
-            if(suit != null){
-                if(suit == 0 && article.getCount() > 0){
-                    orderMapper.setEmptyFail(article.getId());
-                }
-                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
-            }else{
-                if(article.getIsEmpty() && article.getCount() > 0){
-                    orderMapper.setEmptyFail(article.getId());
-                }
-                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
-            }
-        }
+//        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
+//        for(Article article : taocan){
+//            Integer suit = (Integer) MemcachedUtils.get(article.getId()+Common.KUCUN);
+//            if(suit != null){
+//                if(suit == 0 && article.getCount() > 0){
+//                    orderMapper.setEmptyFail(article.getId());
+//                }
+//                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//            }else{
+//                if(article.getIsEmpty() && article.getCount() > 0){
+//                    orderMapper.setEmptyFail(article.getId());
+//                }
+//                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//            }
+//        }
         return true;
     }
 
