@@ -348,6 +348,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
+
+        if(brandSetting.getIsUseServicePrice() == Common.YES &&  shopDetail.getIsUseServicePrice() == Common.YES
+                && (order.getCustomerCount() == 0 || order.getCustomerCount() == null)){
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("请输入就餐人数！");
+            return jsonResult;
+        }
+
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
             if (orderCount > 0) {
