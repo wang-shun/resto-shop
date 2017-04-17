@@ -350,7 +350,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if(brandSetting.getIsUseServicePrice() == Common.YES &&  shopDetail.getIsUseServicePrice() == Common.YES
-                && (order.getCustomerCount() == 0 || order.getCustomerCount() == null)){
+                && (order.getCustomerCount() == 0 || order.getCustomerCount() == null)
+                && order.getDistributionModeId == DistributionType.RESTAURANT_MODE_ID){
             jsonResult.setSuccess(false);
             jsonResult.setMessage("请输入就餐人数！");
             return jsonResult;
