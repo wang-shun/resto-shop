@@ -594,7 +594,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	Order getCustomerLastOrder(String customerId);
 
-	void confirmOrderPos(String orderId);
+	Order confirmOrderPos(String orderId);
 
 	BigDecimal selectPayBefore(String orderId);
 
@@ -634,12 +634,5 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     List<Order> selectBaseToKCListByShopId(String shopId,String beginDate,String endDate);
 
-    /**
-     * 查询营业报表月报表
-     * @param selectMap
-     * @return
-     */
-    List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
-
-    void changeOrderMode(String orderId);
+	void changeOrderMode(String orderId);
 }

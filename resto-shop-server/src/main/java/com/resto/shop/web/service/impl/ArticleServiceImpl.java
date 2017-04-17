@@ -9,6 +9,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.brand.web.dto.brandArticleReportDto;
@@ -18,6 +19,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
@@ -149,6 +151,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
+        for(Article article : articleList){
+            Integer count = (Integer)MemcachedUtils.get(article.getId()+Common.KUCUN);
+            if(count != null){
+                article.setCurrentWorkingStock(count);
+            }
+        }
         getArticleDiscount(currentShopId, articleList, show);
         return articleList;
     }
@@ -253,31 +261,59 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             freeDay = 1;
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
-//        log.error("-------  " + activated);
-
+        for(ArticleStock articleStock : result){
+            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId()+ Common.KUCUN);
+            if(ck != null){
+                articleStock.setCurrentStock(ck);
+            }
+        }
         return result;
     }
 
     @Override
     public Boolean clearStock(String articleId, String shopId) {
         Article article = null;
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        String emptyRemark = "【手动沽清】";
+        MemcachedUtils.put(articleId+Common.KUCUN,0);
         if(articleId.indexOf("@")> -1){
             String aid = articleId.substring(0,articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
+            articleMapper.clearPriceStock(articleId, emptyRemark);
+
         }else{
             article = articleMapper.selectByPrimaryKey(articleId);
+            articleMapper.clearStock(articleId, emptyRemark);
+            articleMapper.clearPriceTotal(articleId, emptyRemark);
         }
-        String emptyRemark = "【手动沽清】";
-        articleMapper.clearStock(articleId, emptyRemark);
-        articleMapper.clearPriceTotal(articleId, emptyRemark);
-        articleMapper.clearPriceStock(articleId, emptyRemark);
+
+//        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
+//        for(Article tc : taocan){
+//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            if(suit != null){
+//                if(suit == 0 && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }else{
+//                if(tc.getIsEmpty() && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }
+//        }
+
+
+
+
 //        articleMapper.cleanPriceAll(articleId,emptyRemark);//方法重复
         //如果有规格的
-        orderMapper.setStockBySuit(shopId);
-        articleMapper.initSizeCurrent();
-        articleMapper.clearMain(articleId, emptyRemark);
-        ShopDetail shopDetail = shopDetailService.selectById(shopId);
-        Brand brand = brandService.selectById(shopDetail.getBrandId());
+
+//        orderMapper.setStockBySuit(shopId);
+//        articleMapper.initSizeCurrent();
+//        articleMapper.clearMain(articleId, emptyRemark);
+
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
@@ -290,7 +326,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public Boolean editStock(String articleId, Integer count, String shopId) {
         Article article = null;
+        Boolean moreType = false;
         if(articleId.indexOf("@")> -1){
+             moreType = true;
             String aid = articleId.substring(0,articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
         }else{
@@ -299,11 +337,41 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
-        articleMapper.editStock(articleId, count, emptyRemark);
-        articleMapper.editPriceStock(articleId, count, emptyRemark);
-        orderMapper.setStockBySuit(shopId);
-        articleMapper.initSizeCurrent();
-        articleMapper.initEmpty();
+        MemcachedUtils.put(articleId+Common.KUCUN,count);
+        if(article.getIsEmpty()){
+            if(moreType && count > 0){
+                orderMapper.setArticlePriceEmptyFail(articleId);
+            }else if (!moreType && count > 0){
+                orderMapper.setEmptyFail(articleId);
+            }
+        }else{
+            if(moreType && count == 0){
+                orderMapper.setArticlePriceEmpty(articleId);
+            }else if (!moreType && count == 0){
+                orderMapper.setEmpty(articleId);
+            }
+        }
+//        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
+//        for(Article tc : taocan){
+//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            if(suit != null){
+//                if(suit == 0 && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }else{
+//                if(tc.getIsEmpty() && tc.getCount() > 0){
+//                    orderMapper.setEmptyFail(tc.getId());
+//                }
+//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//            }
+//        }
+//        articleMapper.editStock(articleId, count, emptyRemark);
+//        articleMapper.editPriceStock(articleId, count, emptyRemark);
+//        orderMapper.setStockBySuit(shopId);
+//        articleMapper.initSizeCurrent();
+
+//        articleMapper.initEmpty();
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());

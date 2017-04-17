@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.web.dto.*;
+import com.resto.shop.web.model.Article;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -672,5 +673,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
 
-    List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
+    List<Article> getStockBySuit(String shopId);
+
 }

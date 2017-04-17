@@ -56,7 +56,7 @@ public class PayMode {
             case SHANHUI_PAY:
                 return "闪惠支付";
             case INTEGRAL_PAY:
-                return "积分支付";
+                return "会员支付";
             case GIVE_CHANGE:
                 return "找零";
             default:

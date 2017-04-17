@@ -2055,14 +2055,14 @@
         update tb_article
         set is_empty = 1 , empty_remark = '【系统自动沽清】菜品已售馨'
         where id = #{articleId}
-        and current_working_stock = 0
+
     </update>
 
     <update id="setArticlePriceEmpty">
         update tb_article_price
         set empty_remark = '【系统自动沽清】菜品此规格已售馨'
         where id = #{articleId}
-        and current_working_stock = 0
+
     </update>
 
     <update id="setEmptyFail">
@@ -2096,6 +2096,18 @@ where t.id = b.id
 
     </update>
 
+    <select id="getStockBySuit" resultType="com.resto.shop.web.model.Article">
+select min(count) as count,article_name,id,is_empty from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id
+ ,t.is_empty from tb_article t
+INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+INNER JOIN tb_article t4 on t4.id = t3.article_id
+where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+GROUP BY t2.id
+) as r
+GROUP BY article_name
+    </select>
+    
 
     <select id="getPayment" parameterType="java.util.Map" resultType="java.math.BigDecimal">
         select ifnull(sum(t2.pay_value),0) from tb_order t

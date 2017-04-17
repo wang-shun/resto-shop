@@ -234,7 +234,7 @@
                 data : "shanhuiPayment"
             },
             {
-                title : "积分支付(元)",
+                title : "会员支付(元)",
                 data : "integralPayment"
             },
             {
@@ -306,7 +306,7 @@
                 data : "shanhuiPayment"
             },
             {
-                title : "积分支付(元)",
+                title : "会员支付(元)",
                 data : "integralPayment"
             },
             {
