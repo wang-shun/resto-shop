@@ -368,6 +368,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("不好意思，这桌有人了");
                 return jsonResult;
             }
+        }else{
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("桌号不得为空");
+            return jsonResult;
         }
         if (!StringUtils.isEmpty(order.getParentOrderId())) {  //如果是加菜订单
             Order farOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
