@@ -368,7 +368,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("不好意思，这桌有人了");
                 return jsonResult;
             }
-        }else{
+        }else if((order.getDistributionModeId() == 3 && shopDetail.getContinueOrderScan() == 1 && StringUtils.isEmpty(order.getTableNumber())) && order.getOrderMode() == ShopMode.BOSS_ORDER
+                || order.getDistributionModeId() == 1 && StringUtils.isEmpty(order.getTableNumber()) && order.getOrderMode() == ShopMode.BOSS_ORDER){
             jsonResult.setSuccess(false);
             jsonResult.setMessage("桌号不得为空");
             return jsonResult;
