@@ -4916,6 +4916,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
+
         sb.append("本旬黑榜top10：").append("\n");
         //封装差评top10
         if(badNum==0){//无差评
