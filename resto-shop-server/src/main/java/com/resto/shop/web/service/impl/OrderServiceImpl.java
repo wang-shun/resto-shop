@@ -7199,4 +7199,57 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
         }
     }
+
+    @Override
+    public void posPayOrder(Order oldOrder) {
+        Order order = selectById(oldOrder.getId());
+        order.setPayMode(oldOrder.getPayMode());
+        updateChild(order);
+        Order newOrder  = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setOrderState(OrderState.PAYMENT);
+        newOrder.setPayMode(order.getPayMode());
+        update(newOrder);
+        OrderPaymentItem paymentItem = new OrderPaymentItem();
+        paymentItem.setId(ApplicationUtils.randomUUID());
+        paymentItem.setPayTime(new Date());
+        paymentItem.setPayValue(order.getOrderMoney());
+        Integer payMode = 0;
+        String remark = "";
+        switch (order.getPayMode()){
+            case 1:
+                payMode = PayMode.WEIXIN_PAY;
+                remark = "微信支付:"+order.getOrderMoney();
+                break;
+            case 2:
+                payMode = PayMode.ALI_PAY;
+                remark = "支付宝支付:"+order.getOrderMoney();
+                break;
+            case 3:
+                payMode = PayMode.BANK_CART_PAY;
+                remark = "银联支付:"+order.getOrderMoney();
+                break;
+            case 4:
+                payMode = PayMode.CRASH_PAY;
+                remark = "现金支付:"+order.getOrderMoney();
+                break;
+            case 5:
+                payMode = PayMode.SHANHUI_PAY;
+                remark = "闪惠支付:"+order.getOrderMoney();
+                break;
+            case 6:
+                payMode = PayMode.INTEGRAL_PAY;
+                remark = "积分支付:"+order.getOrderMoney();
+                break;
+            default:
+                break;
+        }
+        paymentItem.setPaymentModeId(payMode);
+        paymentItem.setRemark(remark);
+        paymentItem.setOrderId(order.getId());
+        orderPaymentItemService.insert(paymentItem);
+        if (!order.getPayMode().equals(1) && !order.getPayMode().equals(2)){
+            confirmOrderPos(order.getId());
+        }
+    }
 }

@@ -641,4 +641,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
      * @param s
      */
     void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
+
+    void posPayOrder(Order oldOrder);
 }
