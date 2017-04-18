@@ -7250,7 +7250,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         paymentItem.setOrderId(order.getId());
         orderPaymentItemService.insert(paymentItem);
         if (!order.getPayMode().equals(1) && !order.getPayMode().equals(2)){
-            confirmOrderPos(order.getId());
+            orderMapper.confirmOrderPos(order.getId());
         }
     }
 }
