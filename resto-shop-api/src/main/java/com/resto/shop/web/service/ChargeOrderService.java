@@ -83,4 +83,6 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
     List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap);
 
     List<ChargeOrder> selectListByDateAndShopId(String zuoriDay, String zuoriDay1, String id);
+
+    List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
 }

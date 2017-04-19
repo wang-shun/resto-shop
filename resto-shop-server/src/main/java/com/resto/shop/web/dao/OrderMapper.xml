@@ -3023,4 +3023,17 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
        ]]> AND o.shop_detail_id =#{shopId}
     </select>
 
+    <select id="selectMonthIncomeDto" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select td.id,td.create_time,td.original_amount,td.order_money,top.id order_payment_id,top.payment_mode_id,top.pay_value from tb_order td
+        left join tb_order_payment_item top
+        on td.id = top.order_id
+        where IF(td.production_status = 6, td.production_status = 6
+        , td.order_state in (2,10,11,12) and td.production_status in (2,3))
+        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        <if test="shopId != null">
+            and td.shop_detail_id = #{shopId}
+        </if>
+        ORDER BY td.create_time ASC
+    </select>
 </mapper>

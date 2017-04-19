@@ -7253,4 +7253,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.confirmOrderPos(order.getId());
         }
     }
+
+    @Override
+    public List<Order> selectMonthIncomeDto(Map<String, Object> selectMap) {
+        return orderMapper.selectMonthIncomeDto(selectMap);
+    }
 }
