@@ -699,9 +699,9 @@ public class ThirdServiceImpl implements ThirdService {
                 List<HungerOrderDetail> details = hungerOrderMapper.selectDetailsById(orderId);
                 String shopId = shopDetailService.selectByRestaurantId(hungerOrder.getRestaurantId()).getId();
                 if (!CollectionUtils.isEmpty(details)) {
-                    for (HungerOrderDetail detail : details) {
-                        updateStock(detail.getName(), shopId, detail.getQuantity(), StockType.STOCK_ADD);
-                    }
+//                    for (HungerOrderDetail detail : details) {
+//                        updateStock(detail.getName(), shopId, detail.getQuantity(), StockType.STOCK_ADD);
+//                    }
                 }
             }
 
@@ -784,14 +784,14 @@ public class ThirdServiceImpl implements ThirdService {
                                     PlatformOrderDetail platformOrderDetail = new PlatformOrderDetail(orderDetail);
                                     platformorderdetailMapper.insertSelective(platformOrderDetail);
                                     hungerOrderMapper.insertHungerOrderDetail(orderDetail);
-                                    updateStock(orderDetail.getName(), shopId, orderDetail.getQuantity(), StockType.STOCK_MINUS);
+//                                    updateStock(orderDetail.getName(), shopId, orderDetail.getQuantity(), StockType.STOCK_MINUS);
                                     JSONArray garnish = orderDetailJson.optJSONArray("garnish");
                                     if (garnish != null) {
                                         for (int o = 0; o < garnish.length(); o++) {
                                             HungerOrderGarnish orderGarnish = new HungerOrderGarnish(garnish.getJSONObject(o), orderDetailJson.optString("id"),
                                                     order.optString("order_id"), orderGroup.getId());
                                             hungerOrderMapper.insertHungerOrderGarnish(orderGarnish);
-                                            updateStock(orderGarnish.getName(), shopId, orderGarnish.getQuantity(), StockType.STOCK_MINUS);
+//                                            updateStock(orderGarnish.getName(), shopId, orderGarnish.getQuantity(), StockType.STOCK_MINUS);
                                         }
 
                                     }
