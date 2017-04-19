@@ -74,6 +74,48 @@ public class NewCustomCoupon implements Serializable{
 
     private Integer distanceBirthdayDay;
 
+    @DateTimeFormat(pattern=("yyyy-MM-dd HH:mm:ss"))
+    private Date realTimeCouponBeginTime;
+
+    @DateTimeFormat(pattern=("yyyy-MM-dd HH:mm:ss"))
+    private Date realTimeCouponEndTime;
+
+    private String realTimeCouponBeginTimeString;
+
+    private String realTimeCouponEndTimeString;
+
+    public String getRealTimeCouponBeginTimeString() {
+        return realTimeCouponBeginTimeString;
+    }
+
+    public void setRealTimeCouponBeginTimeString(String realTimeCouponBeginTimeString) {
+        this.realTimeCouponBeginTimeString = realTimeCouponBeginTimeString;
+    }
+
+    public String getRealTimeCouponEndTimeString() {
+        return realTimeCouponEndTimeString;
+    }
+
+    public void setRealTimeCouponEndTimeString(String realTimeCouponEndTimeString) {
+        this.realTimeCouponEndTimeString = realTimeCouponEndTimeString;
+    }
+
+    public Date getRealTimeCouponBeginTime() {
+        return realTimeCouponBeginTime;
+    }
+
+    public void setRealTimeCouponBeginTime(Date realTimeCouponBeginTime) {
+        this.realTimeCouponBeginTime = realTimeCouponBeginTime;
+    }
+
+    public Date getRealTimeCouponEndTime() {
+        return realTimeCouponEndTime;
+    }
+
+    public void setRealTimeCouponEndTime(Date realTimeCouponEndTime) {
+        this.realTimeCouponEndTime = realTimeCouponEndTime;
+    }
+
     public Integer getDistanceBirthdayDay() {
         return distanceBirthdayDay;
     }
