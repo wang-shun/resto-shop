@@ -208,6 +208,16 @@ public class Order implements Serializable{
     //找零
     private BigDecimal giveChange;
 
+    private Integer isPosPay;
+
+    public Integer getIsPosPay() {
+        return isPosPay;
+    }
+
+    public void setIsPosPay(Integer isPosPay) {
+        this.isPosPay = isPosPay;
+    }
+
     public BigDecimal getGiveChange() {
         return giveChange;
     }

@@ -30,6 +30,7 @@
         <result column="real_time_coupon_ids" property="realTimeCouponIds"/>
         <result column="subscribe" property="subscribe"/>
         <result column="last_table_number" property="lastTableNumber"/>
+        <result column="birthday_coupon_ids" property="birthdayCouponIds"/>
         <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
             <id column="id" property="id"/>
             <result column="birth_date" property="birthDate"/>
@@ -46,7 +47,7 @@
     id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone, 
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, 
     city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
-    bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number
+    bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -66,7 +67,7 @@
       sex, province, city, 
       country, last_order_shop, new_notice_time,
       share_customer,is_now_register, customer_detail_id, bind_phone_time, bind_phone_shop, real_time_coupon_ids,
-      subscribe, last_table_number)
+      subscribe, last_table_number, birthday_coupon_ids)
     values (#{id,jdbcType=VARCHAR}, #{wechatId,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
       #{telephone,jdbcType=VARCHAR}, #{headPhoto,jdbcType=VARCHAR}, #{defaultDeliveryPoint,jdbcType=INTEGER}, 
       #{isBindPhone,jdbcType=BIT}, #{regiestTime,jdbcType=TIMESTAMP}, #{firstOrderTime,jdbcType=TIMESTAMP}, 
@@ -74,7 +75,7 @@
       #{sex,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{lastOrderShop,jdbcType=VARCHAR}, #{newNoticeTime,jdbcType=TIMESTAMP}, 
       #{shareCustomer,jdbcType=VARCHAR},#{isNowRegister},#{customerDetailId},#{bindPhoneTime},#{bindPhoneShop},#{realTimeCouponIds},
-      #{subscribe},#{lastTableNumber})
+      #{subscribe},#{lastTableNumber},#{birthdayCouponIds})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Customer">
         insert into tb_customer
@@ -163,6 +164,9 @@
             <if test="lastTableNumber != null">
                 last_table_number,
             </if>
+            <if test="birthdayCouponIds != null">
+                birthday_coupon_ids,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -248,6 +252,9 @@
             </if>
             <if test="lastTableNumber != null">
                 #{lastTableNumber},
+            </if>
+            <if test="birthdayCouponIds != null">
+                #{birthdayCouponIds},
             </if>
         </trim>
     </insert>
@@ -335,6 +342,9 @@
             <if test="lastTableNumber != null">
                 last_table_number = #{lastTableNumber},
             </if>
+            <if test="birthdayCouponIds != null">
+                birthday_coupon_ids = #{birthdayCouponIds},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -364,7 +374,8 @@
       bind_phone_shop = #{bindPhoneShop},
       real_time_coupon_ids = #{realTimeCouponIds},
       subscribe = #{subscribe},
-      last_table_number = #{lastTableNumber}
+      last_table_number = #{lastTableNumber},
+      birthday_coupon_ids = #{birthdayCouponIds}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 

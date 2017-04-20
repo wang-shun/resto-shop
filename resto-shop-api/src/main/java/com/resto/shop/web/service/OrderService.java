@@ -635,4 +635,19 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<Order> selectBaseToKCListByShopId(String shopId,String beginDate,String endDate);
 
 	void changeOrderMode(String orderId);
+
+    /**
+     * 每日短信fix查看
+     * @param s
+     */
+    void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
+
+    void posPayOrder(Order oldOrder);
+
+    /**
+     * 查询营业报表月报表
+     * @param selectMap
+     * @return
+     */
+    List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 }
