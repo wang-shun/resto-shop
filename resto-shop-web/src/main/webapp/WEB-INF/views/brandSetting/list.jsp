@@ -85,18 +85,18 @@
 							<input type="number" class="form-control" name="closeContinueTime" v-model="m.closeContinueTime" required="required">
 							<div style="color: red" id="timeTips"></div>
 						</div>
-
-						<div class="form-group">
-							<div class="control-label">是否选择配送模式</div>
-							<label >
-								<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="1">
-								是
-							</label>
-							<label>
-								<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0">
-								否
-							</label>
-						</div>
+						<!--		以后	配送模式，都以店铺设置为准，品牌设置不再生效	2017年4月19日 17:51:05		—lmx		-->
+						<%--<div class="form-group">--%>
+							<%--<div class="control-label">是否选择配送模式</div>--%>
+							<%--<label >--%>
+								<%--<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="1">--%>
+								<%--是--%>
+							<%--</label>--%>
+							<%--<label>--%>
+								<%--<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0">--%>
+								<%--否--%>
+							<%--</label>--%>
+						<%--</div>--%>
 
 						<div class="form-group">
 							<div class="control-label">是否红包弹窗</div>

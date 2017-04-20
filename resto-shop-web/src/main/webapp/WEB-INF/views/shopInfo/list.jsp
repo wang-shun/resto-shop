@@ -413,11 +413,25 @@
 
                     <! -- 第三方接口appid-->
                     <div  class="form-group" v-if="b.openThirdInterface==1">
-                        <label class="col-md-4 control-label" :class="{ formBox : b.openThirdInterface == 1}">第三方接口appid：</label>
+                        <label class="col-md-4 control-label">第三方接口appid：</label>
                         <div class="col-sm-6">
                             <input type="text"  name="thirdAppid"  class="form-control"  v-model="m.thirdAppid">
                         </div>
                     </div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" >是否选择配送模式：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="isChoiceMode"v-model="m.isChoiceMode" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="isChoiceMode" v-model="m.isChoiceMode" value="0">否
+							</label>
+						</div>
+					</div>
+
+
 
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
