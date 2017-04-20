@@ -4635,21 +4635,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder,WechatConfig wechatConfig) {
+    public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder,WechatConfig wechatConfig,String brandName) {
         //判断是否需要发送旬短信
        int temp= DateUtil.getEarlyMidLate();
         //1.结店退款
         refundShopDetailOrder(shopDetail);
         Map<String,String> dayMap= querryDateData(shopDetail,offLineOrder,1);
         //2.查询数据
-        //if(temp==1||temp==2||temp==3){ //测试先放开--
+        if(temp==1||temp==2||temp==3){ //测试先放开--
             //查询旬相关的内容
            Map<String,String> xunMap= querryXunData(shopDetail,offLineOrder,temp);
-        //}
+            pushMessage(xunMap,shopDetail,wechatConfig,brandName);
+        }
 
         //3发短信推送/微信推送
-        pushMessage(dayMap,shopDetail,wechatConfig);
-        pushMessage(xunMap,shopDetail,wechatConfig);
+        pushMessage(dayMap,shopDetail,wechatConfig,brandName);
+      //  pushMessage(xunMap,shopDetail,wechatConfig);
     }
 
     private Map<String,String> querryXunData(ShopDetail shopDetail, OffLineOrder offLineOrder, int temp) {
@@ -4952,20 +4953,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    private void pushMessage(Map<String, String> querryMap,ShopDetail shopDetail,WechatConfig wechatConfig) {
+    private void pushMessage(Map<String, String> querryMap,ShopDetail shopDetail,WechatConfig wechatConfig,String brandName) {
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-            SMSUtils.sendMessage(telephones, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+
             String [] tels = telephones.split(",");
             for(String s:tels){
+                String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+                //记录日志
+                LogTemplateUtils.dayMessageSms(brandName,shopDetail.getName(),s,smsResult);
                 Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
-
                  */
                 if(null!=c){
-                    WeChatUtils.sendCustomerMsgASync(querryMap.get("wechat"),c.getWechatId(),wechatConfig.getAppid(),wechatConfig.getAppsecret());
+                   WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"),c.getWechatId(),wechatConfig.getAppid(),wechatConfig.getAppsecret(),s,brandName,shopDetail.getName());
                 }
             }
 

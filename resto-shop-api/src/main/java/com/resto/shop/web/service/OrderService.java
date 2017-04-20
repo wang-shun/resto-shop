@@ -444,7 +444,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig);
+    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig,String brandName);
 
     public boolean cancelExceptionOrder(String orderId);
 

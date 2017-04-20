@@ -22,9 +22,12 @@ public class LogTemplateUtils {
   public static final String USERTYPE="UserAction";
   public static final String ORDERTYPE="orderAction";
 
+  public static final String DAYSMSTYPE="daySmsAction";
+
     //order模板map
     public static  Map getOrderBaseMap(String brandName,String id,String logType){
         //注:如果是id是customerId 则logType传userAction 如果是orderId则传orderActoin 如果是shopDetailId则传posAction
+        //id是telephone传daySmsAction
         Map map = new HashMap(4);
         map.put("brandName",brandName);
         map.put("fileName",id);
@@ -349,5 +352,11 @@ public class LogTemplateUtils {
 
     //记录 posAction end---------------------------------------------------------
 
+    //记录每日短信
+    public static void  dayMessageSms(String brandName,String shopName,String telephone,String result){
+        Map map=getOrderBaseMap(brandName,telephone,DAYSMSTYPE);
+        map.put("content","发送日结短信短信推送店铺为:"+shopName+"发送短信返回的内容为:"+result+"请求服务器地址:"+MQSetting.getLocalIP());
+        doPost(url,map);
+    }
 
 }
