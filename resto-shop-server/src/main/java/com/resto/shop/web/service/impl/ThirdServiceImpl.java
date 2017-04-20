@@ -561,7 +561,23 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getOrderId());
-        data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+        String orderNumber = "";
+        Integer orderCount = (Integer) MemcachedUtils.get(order.getShopDetailId()+"deliveryCount");
+        if(orderCount == null){
+            orderCount = 1;
+        }else{
+            orderCount++;
+            MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderCount);
+        }
+        if(orderCount < 10){
+            orderNumber = "00"+orderCount;
+        }else if(orderCount < 100){
+            orderNumber = "0"+orderCount;
+        }else{
+            orderNumber = ""+orderCount;
+        }
+        MemcachedUtils.put(order.getOrderId()+"countNumber",orderNumber);
+        data.put("ORDER_NUMBER",orderNumber);
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");

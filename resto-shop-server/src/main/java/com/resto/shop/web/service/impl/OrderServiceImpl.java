@@ -2331,7 +2331,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        String orderNumber = "";
+        Integer orderCount = (Integer) MemcachedUtils.get(order.getShopDetailId()+"orderCount");
+        if(orderCount == null){
+            orderCount = 1;
+        }else{
+            orderCount++;
+            MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderCount);
+        }
+        if(orderCount < 10){
+            orderNumber = "00"+orderCount;
+        }else if(orderCount < 100){
+            orderNumber = "0"+orderCount;
+        }else{
+            orderNumber = ""+orderCount;
+        }
+//        nextNumber(order.getShopDetailId(), order.getId())
+        data.put("ORDER_NUMBER",orderNumber);
+        MemcachedUtils.put(order.getId()+"countNumber",orderNumber);
         if (refundItems.size() != 0) {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < refundItems.size(); i++) {
@@ -6881,7 +6898,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"countNumber"));
         data.put("ITEMS", refundItems);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         Map<String, Object> payMentItem = new HashMap<String, Object>();
