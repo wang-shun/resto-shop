@@ -4945,6 +4945,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
+
                  */
                 if(null!=c){
                     WeChatUtils.sendCustomerMsgASync(querryMap.get("wechat"),c.getWechatId(),wechatConfig.getAppid(),wechatConfig.getAppsecret());
