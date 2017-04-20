@@ -1,18 +1,10 @@
 package com.resto.shop.web.service.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.dto.CouponDto;
 import com.resto.shop.web.constant.CouponSource;
 import com.resto.shop.web.constant.PayMode;
@@ -23,13 +15,17 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.CouponService;
-
-import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -247,7 +243,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 }
                 realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
             }
-            if (StringUtils.isNotBlank(realTimeCouponIds)){
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(realTimeCouponIds)){
                 Customer newCustomer = new Customer();
                 newCustomer.setId(customer.getId());
                 //得到用户领取过的实时优惠卷Id
