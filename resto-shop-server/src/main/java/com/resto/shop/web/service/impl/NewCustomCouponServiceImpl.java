@@ -245,6 +245,15 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         for(int i = 0; i < customCoupon.getCouponNumber(); i++){
             couponService.insertCoupon(coupon);
         }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy");
+        String birthCouponIds = String.valueOf(customCoupon.getId()).concat(":").concat(format.format(new Date()));
+        if (customer.getBirthdayCouponIds() != null){
+            birthCouponIds = customer.getBirthdayCouponIds().concat(",").concat(birthCouponIds);
+        }
+        Customer newCustomer = new Customer();
+        newCustomer.setId(customer.getId());
+        newCustomer.setBirthdayCouponIds(birthCouponIds);
+        customerService.update(newCustomer);
         String url = setting.getWechatWelcomeUrl()+"?dialog=myCoupon&subpage=my&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
         str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
@@ -298,7 +307,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    		}
 	    	}
 	    }
-
 	  //发送短信
 	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId,Map<String,String>logMap){
 	        Customer customer=customerService.selectById(customerId);
@@ -310,9 +318,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 			param.put("day", day);
             SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
 	    }
-
-
-
 
     @Override
 	public List<NewCustomCoupon> selectListByCouponType(String brandId, Integer couponType,String shopId) {

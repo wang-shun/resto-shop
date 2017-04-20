@@ -51,7 +51,7 @@ public class Customer implements Serializable{
     private String lastOrderShop;
 
     private String lastTableNumber;
-    
+
     private Date newNoticeTime;
     
     private String shareCustomer;
@@ -79,6 +79,8 @@ public class Customer implements Serializable{
 
     private String realTimeCouponIds;
 
+    private String birthdayCouponIds;
+
     //是否关注
     private Integer subscribe;
 
@@ -88,6 +90,14 @@ public class Customer implements Serializable{
 
     public void setSubscribe(Integer subscribe) {
         this.subscribe = subscribe;
+    }
+
+    public String getBirthdayCouponIds() {
+        return birthdayCouponIds;
+    }
+
+    public void setBirthdayCouponIds(String birthdayCouponIds) {
+        this.birthdayCouponIds = birthdayCouponIds;
     }
 
     public String getRealTimeCouponIds() {

@@ -12,6 +12,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.dto.CouponDto;
 import com.resto.shop.web.constant.CouponSource;
 import com.resto.shop.web.constant.PayMode;
@@ -247,10 +248,15 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
             }
             if (StringUtils.isNotBlank(realTimeCouponIds)){
+                Customer newCustomer = new Customer();
+                newCustomer.setId(customer.getId());
                 //得到用户领取过的实时优惠卷Id
                 realTimeCouponIds = realTimeCouponIds.substring(0,realTimeCouponIds.length() - 1);
-                customer.setRealTimeCouponIds(realTimeCouponIds);
-                customerService.update(customer);
+                if (customer.getRealTimeCouponIds() != null){
+                    realTimeCouponIds = customer.getRealTimeCouponIds().concat(",").concat(realTimeCouponIds);
+                }
+                newCustomer.setRealTimeCouponIds(realTimeCouponIds);
+                customerService.update(newCustomer);
             }
         }catch (Exception e){
             e.printStackTrace();

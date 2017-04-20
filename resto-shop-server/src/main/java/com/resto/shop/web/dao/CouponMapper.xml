@@ -182,7 +182,7 @@
         select
         CASE tc.coupon_type
         WHEN -1 THEN '通用优惠卷'
-        WHEN 0 THEN '注册优惠间'
+        WHEN 0 THEN '注册优惠卷'
         WHEN 1 THEN '邀请优惠卷'
         WHEN 2 THEN '生日优惠卷'
         WHEN 3 THEN '分享优惠卷'

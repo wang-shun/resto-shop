@@ -1,7 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
-
 <h2 class="text-center"><strong>营业总额报表</strong></h2>
 <div id="control">
     <div class="row" id="searchTools">
@@ -37,14 +36,14 @@
             <div class="panel panel-success">
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">品牌收入条目</strong>
-                    <%--<button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>--%>
+                    <button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="brandReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
                 </div>
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">店铺收入条目</strong>
-                    <%--<button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>--%>
+                    <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="shopReportTable" class="table table-striped table-bordered table-hover" width="100%"></table>
