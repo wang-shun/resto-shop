@@ -5967,7 +5967,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             orderItemMap.put("SUBTOTAL",SUBTOTAL);
             orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
-            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_COUNT",ARTICLE_COUNT);
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             for (Printer p : printer) {
                 Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
@@ -6051,7 +6051,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             orderItemMap.put("SUBTOTAL",SUBTOTAL);
             orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
-            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_COUNT",ARTICLE_COUNT);
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             for (Printer p : printer) {
                 Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
