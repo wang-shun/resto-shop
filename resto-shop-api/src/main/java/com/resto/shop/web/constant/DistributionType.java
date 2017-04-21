@@ -5,6 +5,7 @@ public class DistributionType {
 	public final static int DELIVERY_MODE_ID = 2;    //自提外卖
 	public static final int TAKE_IT_SELF = 3;		//外带
 	public static final int REFUND_ORDER = 4;		//退菜
+    public static final int MODIFY_ORDER = 5;		//pos端增加订单菜品数量
 	
 	
 	public static String getModeText(int mid){
@@ -17,6 +18,8 @@ public class DistributionType {
 			return "外带";
 		case REFUND_ORDER:
 			return "退菜";
+        case MODIFY_ORDER:
+            return "加菜";
 		default:
 			return "未知";
 		}

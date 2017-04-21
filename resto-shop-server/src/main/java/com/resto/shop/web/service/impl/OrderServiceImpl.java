@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
@@ -5909,6 +5910,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = orderMapper.selectByPrimaryKey(orderId);
         StringBuffer pushMessage = new StringBuffer();
         BigDecimal updateCount = new BigDecimal(0);
+        List<Map<String, Object>> printTask = new ArrayList<>();
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -5940,12 +5942,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             updateCount = baseCustomerCount.subtract(new BigDecimal(count));
             String message = "";
+            Map<String, Object> orderItemMap = new HashMap<>();
+            String ARTICLE_NAME = shopDetail.getServiceName();
+            BigDecimal ARTICLE_COUNT = updateCount;
+            BigDecimal SUBTOTAL = updateCount.multiply(shopDetail.getServicePrice());
             if (updateCount.compareTo(BigDecimal.ZERO) > 0){
                 message = "减"+updateCount+"份";
+                order.setDistributionModeId(DistributionType.REFUND_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
+                ARTICLE_COUNT = updateCount.multiply(new BigDecimal(-1));
+                SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getServicePrice());
             }else if (updateCount.compareTo(BigDecimal.ZERO) == 0){
                 message = "减"+count+"份";
+                order.setDistributionModeId(DistributionType.REFUND_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
+                ARTICLE_COUNT = new BigDecimal(count).multiply(new BigDecimal(-1));
+                SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getServicePrice());
             }else{
                 message = "加"+updateCount.abs()+"份";
+                order.setDistributionModeId(DistributionType.MODIFY_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(加)");
+                ARTICLE_COUNT = updateCount.abs();
+                SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getServicePrice());
+            }
+            orderItemMap.put("SUBTOTAL",SUBTOTAL);
+            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            for (Printer p : printer) {
+                Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
             }
             pushMessage.append(shopDetail.getServiceName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -5998,12 +6026,38 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             update(order);
             updateCount = baseArticleCount.subtract(new BigDecimal(count));
             String message = "";
+            Map<String, Object> orderItemMap = new HashMap<>();
+            String ARTICLE_NAME = orderItem.getArticleName();
+            BigDecimal ARTICLE_COUNT = updateCount;
+            BigDecimal SUBTOTAL = updateCount.multiply(orderItem.getUnitPrice());
             if (updateCount.compareTo(BigDecimal.ZERO) > 0){
                 message = "减"+updateCount+"份";
+                order.setDistributionModeId(DistributionType.REFUND_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
+                ARTICLE_COUNT = updateCount.multiply(new BigDecimal(-1));
+                SUBTOTAL = ARTICLE_COUNT.multiply(orderItem.getUnitPrice());
             }else if (updateCount.compareTo(BigDecimal.ZERO) == 0){
                 message = "减"+count+"份";
+                order.setDistributionModeId(DistributionType.REFUND_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
+                ARTICLE_COUNT = new BigDecimal(count).multiply(new BigDecimal(-1));
+                SUBTOTAL = ARTICLE_COUNT.multiply(orderItem.getUnitPrice());
             }else{
                 message = "加"+updateCount.abs()+"份";
+                order.setDistributionModeId(DistributionType.MODIFY_ORDER);
+                ARTICLE_NAME = ARTICLE_NAME.concat("(加)");
+                ARTICLE_COUNT = updateCount.abs();
+                SUBTOTAL = ARTICLE_COUNT.multiply(orderItem.getUnitPrice());
+            }
+            orderItemMap.put("SUBTOTAL",SUBTOTAL);
+            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
+            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+            for (Printer p : printer) {
+                Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
             }
             pushMessage.append(orderItem.getArticleName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -6038,6 +6092,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         result.setSuccess(true);
+        result.setMessage(JSON.toJSONString(printTask));
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 
@@ -6061,6 +6116,100 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(LogUtils.url, customerMap);
         return result;
+    }
+
+    public Map<String, Object> modifyOrderPrintReceipt(Order order, Map<String, Object> orderItem, Printer printer, ShopDetail shopDetail){
+        if (printer == null) {
+            return null;
+        }
+        List<Map<String, Object>> orderItems = new ArrayList<>();
+        orderItems.add(orderItem);
+        Map<String, Object> print = new HashMap<>();
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        print.put("TABLE_NO", tableNumber);
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date());
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
+        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"countNumber"));
+        data.put("ITEMS", orderItems);
+        List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
+        data.put("PAYMENT_ITEMS", patMentItems);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        BigDecimal level = new BigDecimal(0);
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        StringBuilder gao = new StringBuilder();
+        if (shopDetail.getIsUserIdentity().equals(1)) {
+            //得到有限制的情况下用户的订单数
+            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
+            //得到无限制情况下用户的订单数
+            int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
+            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+                gao.append("【高频】");
+            }//无限制的时候
+            else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
+                gao.append("【高频】");
+            }
+        }
+        String modeText = getModeText(order);
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("ORIGINAL_AMOUNT", orderItem.get("SUBTOTAL"));
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", 0);
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
+        data.put("PAYMENT_AMOUNT", new BigDecimal(orderItem.get("SUBTOTAL").toString()).compareTo(BigDecimal.ZERO) > 0 ? orderItem.get("SUBTOTAL") : 0);
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("ARTICLE_COUNT", orderItem.get("ARTICLE_COUNT"));
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", level);
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        if (account != null) {
+            customerStr.append("余额：" + account.getRemain() + " ");
+        } else {
+            customerStr.append("余额：0 ");
+        }
+        customerStr.append("" + gao.toString() + " ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+        if (customerDetail != null) {
+            if (customerDetail.getBirthDate() != null) {
+                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                }
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+        print.put("TICKET_TYPE", TicketType.RECEIPT);
+        return print;
     }
 
     @Override
