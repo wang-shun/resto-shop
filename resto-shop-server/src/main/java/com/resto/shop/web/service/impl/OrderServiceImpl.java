@@ -5907,7 +5907,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Result result = new Result();
         Order order = orderMapper.selectByPrimaryKey(orderId);
-
+        StringBuffer pushMessage = new StringBuffer();
+        BigDecimal updateCount = new BigDecimal(0);
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -5936,6 +5937,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
 
             update(order);
+            updateCount = new BigDecimal(order.getBaseCustomerCount()).subtract(new BigDecimal(count));
+            String message = "";
+            if (updateCount.compareTo(BigDecimal.ZERO) > 0){
+                message = "减"+updateCount+"份";
+            }else if (updateCount.compareTo(BigDecimal.ZERO) == 0){
+                message = "减"+count+"份";
+            }else{
+                message = "加"+updateCount.abs()+"份";
+            }
+            pushMessage.append(shopDetail.getServiceName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
 //                    shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId());
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
@@ -5983,6 +5994,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             update(order);
+            updateCount = new BigDecimal(orderItem.getOrginCount()).subtract(new BigDecimal(count));
+            String message = "";
+            if (updateCount.compareTo(BigDecimal.ZERO) > 0){
+                message = "减"+updateCount+"份";
+            }else if (updateCount.compareTo(BigDecimal.ZERO) == 0){
+                message = "减"+count+"份";
+            }else{
+                message = "加"+updateCount.abs()+"份";
+            }
+            pushMessage.append(orderItem.getArticleName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
 //                    shopDetail.getName() + "修改了菜品" + orderItem.getArticleName() + "，数量修改为" + count + ",订单号为:" + order.getId());
             map.put("content", shopDetail.getName() + "修改了菜品" + orderItem.getArticleName() + "，数量修改为" + count + ",订单号为:" + order.getId()
@@ -6026,34 +6047,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         StringBuffer msg = new StringBuffer();
-        msg.append("您的订单信息已被商家确认!" + "\n");
-        msg.append("订单编号:" + parent.getSerialNumber() + "\n");
-        msg.append("桌号：" + parent.getTableNumber() + "\n");
-        msg.append("就餐店铺：" + shopDetailService.selectById(parent.getShopDetailId()).getName() + "\n");
-        msg.append("订单时间：" + DateFormatUtils.format(parent.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-        if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1) {
-            msg.append(shopDetail.getServiceName() + "：" + parent.getServicePrice() + "\n");
-        }
-        BigDecimal sum = parent.getOrderMoney();
-        List<Order> orders = selectByParentId(parent.getId(), parent.getPayType()); //得到子订单
-        for (Order child : orders) { //遍历子订单
-            sum = sum.add(child.getOrderMoney());
-        }
-        msg.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId(parent.getId());
-        if (order.getParentOrderId() != null) {
-            List<OrderItem> child = orderItemService.listByParentId(order.getParentOrderId());
-            for (OrderItem item : child) {
-                order.setOriginalAmount(order.getOriginalAmount().add(item.getFinalPrice()));
-                order.setPaymentAmount(order.getPaymentAmount().add(item.getFinalPrice()));
-            }
-            orderItem.addAll(child);
-        }
-
-        for (OrderItem item : orderItem) {
-            msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
-        }
-        msg.append("订单金额：" + sum + "\n");
+        msg.append("商家已在收银电脑处更新了您的订单信息：" + "\n");
+        msg.append(pushMessage.toString());
         WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());
