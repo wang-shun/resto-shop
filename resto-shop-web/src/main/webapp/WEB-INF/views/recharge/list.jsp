@@ -315,7 +315,7 @@
                     $.post("recharge/createMonthDto",{year : that.selectYear, month : that.selectMonth, type : that.type},function (result) {
                         if (result.success){
                             that.state = 1;
-                            location.href = "recharge/download_brand_excel?path="+result.data+"";
+                            window.location.href = "recharge/download_brand_excel?path="+result.data+"";
                         }else{
                             that.state = 1;
                             toastr.clear();
