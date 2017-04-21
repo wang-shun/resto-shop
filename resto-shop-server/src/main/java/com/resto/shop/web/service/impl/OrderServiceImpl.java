@@ -5921,6 +5921,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         doPost(url, map);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (type == 0) { //如果要修改的是服务费
+            BigDecimal baseCustomerCount = new BigDecimal(order.getCustomerCount());
             order.setCustomerCount(count);
             order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
@@ -5937,7 +5938,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
 
             update(order);
-            updateCount = new BigDecimal(order.getBaseCustomerCount()).subtract(new BigDecimal(count));
+            updateCount = baseCustomerCount.subtract(new BigDecimal(count));
             String message = "";
             if (updateCount.compareTo(BigDecimal.ZERO) > 0){
                 message = "减"+updateCount+"份";
@@ -5956,6 +5957,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
+            BigDecimal baseArticleCount = new BigDecimal(orderItem.getCount());
             if (orderItem.getType() == OrderItemType.MEALS_CHILDREN) {
                 result.setSuccess(false);
                 result.setMessage("套餐子品暂不支持修改");
@@ -5994,7 +5996,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             update(order);
-            updateCount = new BigDecimal(orderItem.getOrginCount()).subtract(new BigDecimal(count));
+            updateCount = baseArticleCount.subtract(new BigDecimal(count));
             String message = "";
             if (updateCount.compareTo(BigDecimal.ZERO) > 0){
                 message = "减"+updateCount+"份";
