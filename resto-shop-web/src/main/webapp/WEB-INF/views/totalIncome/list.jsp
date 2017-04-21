@@ -135,7 +135,7 @@
                     $.post("totalIncome/createMonthDto",{year : that.selectYear, month : that.selectMonth, type : that.type},function (result) {
                         if (result.success){
                             that.state = 1;
-                            location.href="totalIncome/downloadExcel?path="+result.data+"";
+                            window.location.href="totalIncome/downloadExcel?path="+result.data+"";
                         }else{
                             that.state = 1;
                             toastr.clear();
