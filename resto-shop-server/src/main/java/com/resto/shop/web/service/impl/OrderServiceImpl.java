@@ -442,7 +442,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());                      //计算折扣
-                    if(a.getDiscount() != 0 && a.getDiscount() != 100){
+                    if(a.getDiscount() != 100){
                         fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
                     }else{
                         fans_price = a.getFansPrice();
@@ -465,7 +465,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName() + p.getName());
                     org_price = p.getPrice();
                     price = discount(p.getPrice(), a.getDiscount(), item.getDiscount(), p.getName());                      //计算折扣
-                    if(a.getDiscount() != 0 && a.getDiscount() != 100){
+                    if(a.getDiscount() != 100){
                         fans_price = discount(p.getPrice(), a.getDiscount(), item.getDiscount(), p.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
                     }else{
                         fans_price = p.getFansPrice();
@@ -496,7 +496,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());
-                    if(a.getDiscount() != 0 && a.getDiscount() != 100){
+                    if(a.getDiscount() != 100){
                         fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());  //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
                     }else{
                         fans_price = a.getFansPrice();
