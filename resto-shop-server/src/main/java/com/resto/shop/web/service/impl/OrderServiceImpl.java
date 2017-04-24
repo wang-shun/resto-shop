@@ -443,7 +443,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());                      //计算折扣
-                    fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    if(a.getDiscount() != 100){
+                        fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    }else{
+                        fans_price = a.getFansPrice();
+                    }
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     remark = a.getDiscount() + "%";          //设置菜品当前折扣
                     break;
@@ -462,7 +466,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName() + p.getName());
                     org_price = p.getPrice();
                     price = discount(p.getPrice(), a.getDiscount(), item.getDiscount(), p.getName());                      //计算折扣
-                    fans_price = discount(p.getPrice(), a.getDiscount(), item.getDiscount(), p.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    if(a.getDiscount() != 100){
+                        fans_price = discount(p.getPrice(), a.getDiscount(), item.getDiscount(), p.getName());       //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    }else{
+                        fans_price = p.getFansPrice();
+                    }
                     remark = a.getDiscount() + "%";          //设置菜品当前折扣
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
@@ -489,7 +497,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setArticleName(a.getName());
                     org_price = a.getPrice();
                     price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());
-                    fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());  //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    if(a.getDiscount() != 100){
+                        fans_price = discount(a.getPrice(), a.getDiscount(), item.getDiscount(), a.getName());  //计算折扣 （update：粉丝价 更改为 原价*折扣  2017年4月18日 14:08:04  ---lmx）
+                    }else{
+                        fans_price = a.getFansPrice();
+                    }
                     remark = a.getDiscount() + "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
@@ -884,7 +896,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setArticleCount(articleCount); // 订单餐品总数
             order.setClosed(false); // 订单是否关闭 否
             order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-            order.setOriginalAmount(totalMoney);// 原价
+            order.setOriginalAmount(originMoney);// 原价
             order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
             order.setOrderMoney(totalMoney); // 订单实际金额
             order.setPrintTimes(0);
@@ -4958,7 +4970,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-
             String [] tels = telephones.split(",");
             for(String s:tels){
                 String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息

@@ -1105,8 +1105,8 @@
         tb_order
         WHERE
         shop_detail_id=#{shopId}
-        AND
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+--         AND
+--         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
         and (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
         and table_number is not null
@@ -1137,6 +1137,7 @@
         or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
         or (production_status = 1 and order_state = 10 and print_times = 0 and now() - create_time > 40 )
         )
+        and order_mode != 3
         order by push_order_time DESC;
     </select>
 
@@ -2896,7 +2897,7 @@ GROUP BY oi.article_name
         ifnull(count_with_child,article_count) as
         totalCount
         from tb_order where shop_detail_id = #{shopId}
-        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+--         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state = 1 and pay_type = 0 and pay_mode in (2,3,4,5,6) and parent_order_id is not null
         ORDER BY create_time ASC
     </select>
