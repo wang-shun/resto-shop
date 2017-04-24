@@ -82,6 +82,12 @@ public class ShopInfoController extends GenericController{
         if(shopDetail.getPrintKitchen() == null){
             shopDetail.setPrintKitchen(0);
         }
+        if (shopDetail.getModifyOrderPrintReceipt() == null){
+            shopDetail.setModifyOrderPrintReceipt(0);
+        }
+        if (shopDetail.getModifyOrderPrintKitchen() == null){
+            shopDetail.setModifyOrderPrintKitchen(0);
+        }
         if(shopDetail.getIsOpenSms()==0){//表示是关闭日短信通知
             shopDetail.setnoticeTelephone("");
         }else  if(shopDetail.getIsOpenSms()==1){

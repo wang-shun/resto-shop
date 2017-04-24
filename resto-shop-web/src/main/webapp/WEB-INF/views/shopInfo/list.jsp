@@ -239,6 +239,18 @@
 								</label>
 							</div>
 						</div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">POS更新订单打印：</label>
+                            <div  class="col-md-6 checkbox-list">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="modifyOrderPrintReceipt" v-model="m.modifyOrderPrintReceipt" value = "1"> 打印总单
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="modifyOrderPrintKitchen" v-model="m.modifyOrderPrintKitchen" value = "1"> 打印厨打
+                                </label>
+                            </div>
+                        </div>
 					</div>
 					<div class="form-group">
 						<label class="col-md-4 control-label" :class="{ formBox : m.isOpenSms == 1}">日结短信通知：</label>
