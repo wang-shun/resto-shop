@@ -433,10 +433,14 @@ public class RechargeLogController extends GenericController{
                                 rechargeLogDto.setShopCount(rechargeLogDto.getShopCount().add(new BigDecimal(1)));
                                 rechargeLogDto.setShopNum(rechargeLogDto.getShopNum().add(chargeOrder.getChargeMoney()));
                                 rechargeLogDto.setShopGaNum(rechargeLogDto.getShopGaNum().add(chargeOrder.getRewardMoney()));
-                                if (chargeOrder.getType().equals(Common.YES)){
+                                if (chargeOrder.getType() == null) {
                                     rechargeLogDto.setShopWeChat(rechargeLogDto.getShopWeChat().add(chargeOrder.getChargeMoney()));
-                                } else{
-                                    rechargeLogDto.setShopPos(rechargeLogDto.getShopPos().add(chargeOrder.getChargeMoney()));
+                                }else{
+                                    if (chargeOrder.getType().equals(Common.YES)) {
+                                        rechargeLogDto.setShopWeChat(rechargeLogDto.getShopWeChat().add(chargeOrder.getChargeMoney()));
+                                    } else {
+                                        rechargeLogDto.setShopPos(rechargeLogDto.getShopPos().add(chargeOrder.getChargeMoney()));
+                                    }
                                 }
                                 rechargeLogDto.setShopCsNum(rechargeLogDto.getShopCsNum().add(chargeOrder.getChargeMoney().subtract(chargeOrder.getChargeBalance())));
                                 rechargeLogDto.setShopGaCsNum(rechargeLogDto.getShopGaCsNum().add(chargeOrder.getRewardMoney().subtract(chargeOrder.getRewardBalance())));

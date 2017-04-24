@@ -1137,6 +1137,7 @@
         or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
         or (production_status = 1 and order_state = 10 and print_times = 0 and now() - create_time > 40 )
         )
+        and order_mode != 3
         order by push_order_time DESC;
     </select>
 
