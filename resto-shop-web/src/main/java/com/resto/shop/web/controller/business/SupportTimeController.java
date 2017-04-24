@@ -43,6 +43,24 @@ public class SupportTimeController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid SupportTime brand){
 	    brand.setShopDetailId(getCurrentShopId());
+		int count=0;
+		for(int i=0;i<brand.getBeginTime().length();i++){
+			if(brand.getBeginTime().charAt(i)==':'){
+				count++;
+			}
+		}
+		if(count == 1){
+			brand.setBeginTime(brand.getBeginTime()+":00");
+		}
+		int number=0;
+		for(int j=0;j<brand.getEndTime().length();j++){
+			if(brand.getEndTime().charAt(j)==':'){
+				number++;
+			}
+		}
+		if(number == 1){
+			brand.setEndTime(brand.getEndTime()+":59");
+		}
 		supporttimeService.insert(brand);
 		return Result.getSuccess();
 	}
