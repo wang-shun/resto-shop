@@ -10,7 +10,9 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.model.TableQrcode;
 import com.resto.brand.web.service.*;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
@@ -175,6 +177,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     Logger log = LoggerFactory.getLogger(getClass());
 
+
+    @Autowired
+    private TableQrcodeService tableQrcodeService;
+
+    @Autowired
+    private AreaService areaService;
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
@@ -2758,11 +2766,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printOrderAll(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
+
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+
+
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        List<Printer> ticketPrinter = new ArrayList<>();
+        if(tableQrcode == null ){
+            ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer printer = printerService.selectById(area.getPrintId().intValue());
+                    ticketPrinter.add(printer);
+                }
+            }
+
+        }
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
 
@@ -6966,14 +6996,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (orderItemIds.size() != 0) {
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
-        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> printer = new ArrayList<>();
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+        if(tableQrcode == null){
+            printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer p = printerService.selectById(area.getPrintId().intValue());
+                    printer.add(p);
+                }
+            }
+        }
+
+
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }
         }
-
         return printTask;
     }
 
