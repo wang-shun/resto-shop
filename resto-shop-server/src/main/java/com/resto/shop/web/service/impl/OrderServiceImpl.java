@@ -2355,6 +2355,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderTotal);
 
+        if(StringUtils.isEmpty(orderNumber)){
+            orderTotal++;
+        }
+
         String number;
         if(orderTotal < 10){
             number = "00"+orderTotal;
@@ -2366,7 +2370,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if(StringUtils.isEmpty(orderNumber)){
             orderNumber = number;
-            orderTotal++;
         }
         MemcachedUtils.put(order.getId()+"orderNumber",orderNumber);
 
