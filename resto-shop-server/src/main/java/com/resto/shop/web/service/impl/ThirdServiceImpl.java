@@ -567,8 +567,9 @@ public class ThirdServiceImpl implements ThirdService {
             orderCount = 1;
         }else{
             orderCount++;
-            MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderCount);
+
         }
+        MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderCount);
         if(orderCount < 10){
             orderNumber = "00"+orderCount;
         }else if(orderCount < 100){

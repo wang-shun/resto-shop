@@ -2113,7 +2113,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+
+
+
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "countNumber"));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
@@ -2350,8 +2354,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderCount = 1;
         }else{
             orderCount++;
-            MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderCount);
         }
+        MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderCount);
         if(orderCount < 10){
             orderNumber = "00"+orderCount;
         }else if(orderCount < 100){
