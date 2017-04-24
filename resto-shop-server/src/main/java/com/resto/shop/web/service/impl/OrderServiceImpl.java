@@ -6024,6 +6024,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderItem.setCount(count);
             orderItem.setFinalPrice(orderItem.getUnitPrice().multiply(new BigDecimal(count)));
             orderitemMapper.updateByPrimaryKeySelective(orderItem);
+            List<OrderItem> list = orderitemMapper.getListBySort(orderItem.getId(), orderItem.getArticleId());
+            for (OrderItem zpOrderItem : list){
+                zpOrderItem.setCount(count);
+                zpOrderItem.setFinalPrice(zpOrderItem.getUnitPrice().multiply(new BigDecimal(count)));
+                orderitemMapper.updateByPrimaryKeySelective(zpOrderItem);
+            }
             order.setArticleCount(order.getArticleCount() + orderItem.getCount());
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
@@ -6034,6 +6040,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             if (orderItem.getCount() == 0) {
                 orderitemMapper.deleteByPrimaryKey(orderItem.getId());
+                for (OrderItem zpOrderItem : list){
+                    orderitemMapper.deleteByPrimaryKey(zpOrderItem.getId());
+                }
             }
 
             update(order);
