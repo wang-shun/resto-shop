@@ -6084,7 +6084,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
             if (shopDetail.getModifyOrderPrintKitchen().equals(Common.YES)){
-
+                List<OrderItem> orderItemList = new ArrayList<>();
+                orderItem.setCount(ARTICLE_COUNT.abs().intValue());
+                for (OrderItem zpOrderItem : list){
+                    zpOrderItem.setCount(ARTICLE_COUNT.abs().intValue());
+                }
+                orderItem.setChildren(list);
+                orderItemList.add(orderItem);
+                printTask.addAll(printKitchen(order, orderItemList));
             }
             pushMessage.append(orderItem.getArticleName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
