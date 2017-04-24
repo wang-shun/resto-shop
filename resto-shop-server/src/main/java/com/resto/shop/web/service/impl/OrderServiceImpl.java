@@ -1969,7 +1969,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int i = 0;
 
         for (OrderItem orderItem : orderItems) {
-            if (article.getType() == OrderItemType.SETMEALS
+            if(article == null){
+                continue;
+            }
+
+            if ( article.getType() == OrderItemType.SETMEALS
                     && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
