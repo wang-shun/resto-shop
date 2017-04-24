@@ -4063,11 +4063,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         refundPrice = refundPrice.add(orderItem.getUnitPrice().multiply(new BigDecimal(orderItem.getRefundCount())));
                         if (orderAll.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)) {
                             if (!orderId.equals(orderItem.getOrderId())) {
-                                refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getServicePrice()));
+                                refundPrice = refundPrice.add(new BigDecimal(serviceMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getServicePrice() == null ? BigDecimal.ZERO : shopDetail.getServicePrice()));
                             }
                         } else if (orderAll.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) || orderAll.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)) {
                             if (!orderId.equals(orderItem.getOrderId())) {
-                                refundPrice = refundPrice.add(new BigDecimal(mealMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getMealFeePrice()));
+                                refundPrice = refundPrice.add(new BigDecimal(mealMap.get(orderItem.getOrderId()).toString()).multiply(shopDetail.getMealFeePrice() == null ? BigDecimal.ZERO : shopDetail.getMealFeePrice()));
                             }
                         }
                         canceledOrderMap.put(orderItem.getOrderId(), refundPrice);
