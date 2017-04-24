@@ -9,10 +9,10 @@ public class SupportTime implements Serializable {
 
     private String name;
     
-    @DateTimeFormat(pattern="HH:mm")
+    @DateTimeFormat(pattern="HH:mm:ss")
     private String beginTime;
     
-    @DateTimeFormat(pattern="HH:mm")
+    @DateTimeFormat(pattern="HH:mm:ss")
     private String endTime;
 
     private Integer supportWeekBin;
