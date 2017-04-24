@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -85,7 +86,8 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 //					int endMin = DateUtil.getMinOfDay(end);
 					Long begin = DateUtil.parseDate(st.getBeginTime(),"HH:mm:ss").getTime();
 					Long end = DateUtil.parseDate(st.getEndTime(),"HH:mm:ss").getTime();
-					Long nowMin = new Date("HH:mm:ss").getTime();
+					SimpleDateFormat s = new SimpleDateFormat("HH:mm:ss");
+					Long nowMin = DateUtil.parseDate(s.format(new Date()),"HH:mm:ss").getTime();
 					if(begin<=nowMin&&end>=nowMin){
 						support.add(st);
 					}
@@ -97,7 +99,7 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 		return support;
 	} 
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
 //		for(int i=0;i<9;i++){
 //			int bin = 1<<i;
 //			System.out.println(bin);
@@ -117,7 +119,17 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
 		System.out.println("38 -- 25 ---> " + (38&25));
 		System.out.println("27 -- 38 ---> " + (27&38));
 
+		String a = "00:00:05";
+		String b = "23:55:55";
+		Long begin = DateUtil.parseDate(a,"HH:mm:ss").getTime();
+		Long end = DateUtil.parseDate(b,"HH:mm:ss").getTime();
 
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
+//		System.out.println(sdf2.format(new Date()));
+		Long nowMin = DateUtil.parseDate(sdf2.format(new Date()),"HH:mm:ss").getTime();
+		System.out.println(begin);
+		System.out.println(end);
+		System.out.println(nowMin);
 	}
 
 }
