@@ -78,12 +78,15 @@ public class SupportTimeServiceImpl extends GenericServiceImpl<SupportTime, Inte
             System.out.println(bin&freeDaybin);
             if((bin&todaybin)>0||(bin&freeDaybin)>0){
 				try {
-					Date begin = DateUtil.parseDate(st.getBeginTime(),"HH:mm");
-					Date end = DateUtil.parseDate(st.getEndTime(),"HH:mm");
-					int nowMin = DateUtil.getMinOfDay(now);
-					int beginMin = DateUtil.getMinOfDay(begin);
-					int endMin = DateUtil.getMinOfDay(end);
-					if(beginMin<nowMin&&endMin>nowMin){
+//					Date begin = DateUtil.parseDate(st.getBeginTime(),"HH:mm:ss");
+//					Date end = DateUtil.parseDate(st.getEndTime(),"HH:mm:ss");
+//					int nowMin = DateUtil.getMinOfDay(now);
+//					int beginMin = DateUtil.getMinOfDay(begin);
+//					int endMin = DateUtil.getMinOfDay(end);
+					Long begin = DateUtil.parseDate(st.getBeginTime(),"HH:mm:ss").getTime();
+					Long end = DateUtil.parseDate(st.getEndTime(),"HH:mm:ss").getTime();
+					Long nowMin = new Date("HH:mm:ss").getTime();
+					if(begin<=nowMin&&end>=nowMin){
 						support.add(st);
 					}
 				} catch (ParseException e) {
