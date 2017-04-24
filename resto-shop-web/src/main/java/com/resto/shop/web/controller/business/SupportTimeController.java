@@ -42,7 +42,9 @@ public class SupportTimeController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid SupportTime brand){
-	    brand.setShopDetailId(getCurrentShopId());    
+	    brand.setShopDetailId(getCurrentShopId());
+		brand.setBeginTime(brand.getBeginTime()+":00");
+		brand.setEndTime(brand.getEndTime()+":59");
 		supporttimeService.insert(brand);
 		return Result.getSuccess();
 	}
@@ -50,6 +52,8 @@ public class SupportTimeController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid SupportTime brand){
+		brand.setBeginTime(brand.getBeginTime()+":00");
+		brand.setEndTime(brand.getEndTime()+":59");
 		supporttimeService.update(brand);
 		return Result.getSuccess();
 	}
