@@ -1904,7 +1904,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
