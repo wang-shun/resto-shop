@@ -5979,11 +5979,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderItemMap.put("SUBTOTAL",SUBTOTAL);
             orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
             orderItemMap.put("ARTICLE_COUNT",ARTICLE_COUNT);
-            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
-            for (Printer p : printer) {
-                Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
-                if (ticket != null) {
-                    printTask.add(ticket);
+            if (shopDetail.getModifyOrderPrintReceipt().equals(Common.YES)) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                for (Printer p : printer) {
+                    Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                    if (ticket != null) {
+                        printTask.add(ticket);
+                    }
                 }
             }
             pushMessage.append(shopDetail.getServiceName()+"  "+message);
@@ -6063,12 +6065,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderItemMap.put("SUBTOTAL",SUBTOTAL);
             orderItemMap.put("ARTICLE_NAME",ARTICLE_NAME);
             orderItemMap.put("ARTICLE_COUNT",ARTICLE_COUNT);
-            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
-            for (Printer p : printer) {
-                Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
-                if (ticket != null) {
-                    printTask.add(ticket);
+            if (shopDetail.getModifyOrderPrintReceipt().equals(Common.YES)) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                for (Printer p : printer) {
+                    Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                    if (ticket != null) {
+                        printTask.add(ticket);
+                    }
                 }
+            }
+            if (shopDetail.getModifyOrderPrintKitchen().equals(Common.YES)){
+
             }
             pushMessage.append(orderItem.getArticleName()+"  "+message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -6103,7 +6110,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         result.setSuccess(true);
-        result.setMessage(JSON.toJSONString(printTask));
+        result.setMessage(printTask.size() > 0 ? JSON.toJSONString(printTask) : null);
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
 
