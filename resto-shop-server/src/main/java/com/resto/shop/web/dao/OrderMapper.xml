@@ -2382,7 +2382,7 @@ GROUP BY r.table_number
                 #{state}
             </foreach>
         </if>
---         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         ORDER BY create_time ASC
     </select>
 
