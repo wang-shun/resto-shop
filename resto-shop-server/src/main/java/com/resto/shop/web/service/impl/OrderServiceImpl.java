@@ -4957,7 +4957,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-
             String [] tels = telephones.split(",");
             for(String s:tels){
                 String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
