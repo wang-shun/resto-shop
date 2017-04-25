@@ -388,13 +388,13 @@
                     </div>
 
 					<div class="form-group">
-						<label class="col-md-4 control-label">pos加菜是否开启粉丝价：</label>
+						<label class="col-md-4 control-label">pos点单菜品价格：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
-								<input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">启用
+								<input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">粉丝价
 							</label>
 							<label class="radio-inline">
-								<input type="radio" name="posPlusType" v-model="m.posPlusType" value="1">不启用
+								<input type="radio" name="posPlusType" v-model="m.posPlusType" value="1">原价
 							</label>
 						</div>
 					</div>
