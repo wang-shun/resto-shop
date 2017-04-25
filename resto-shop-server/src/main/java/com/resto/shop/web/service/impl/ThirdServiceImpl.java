@@ -175,7 +175,8 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");
@@ -284,7 +285,8 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     data.put("TABLE_NUMBER", PlatformKey.getPlatformName(order.getType()));
-                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+                    data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getQuantity());
                     items.put("ARTICLE_NAME", article.getShowName());
@@ -440,7 +442,8 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     data.put("TABLE_NUMBER", "饿了么");
-                    data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
+                    data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//                    data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getQuantity());
                     items.put("ARTICLE_NAME", article.getName());
@@ -561,22 +564,35 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getOrderId());
-        String orderNumber = "";
-        Integer orderCount = (Integer) MemcachedUtils.get(order.getShopDetailId()+"deliveryCount");
-        if(orderCount == null){
-            orderCount = 1;
-        }else{
-            orderCount++;
-            MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderCount);
+
+
+        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId()+"deliveryCount");
+        if(orderTotal == null){
+            orderTotal = 0;
+        }else if (orderNumber == null){
+            orderTotal++;
         }
-        if(orderCount < 10){
-            orderNumber = "00"+orderCount;
-        }else if(orderCount < 100){
-            orderNumber = "0"+orderCount;
+        MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderTotal);
+
+
+        String number;
+        if(orderTotal < 10){
+            number = "00"+orderTotal;
+        }else if(orderTotal < 100){
+            number = "0"+orderTotal;
         }else{
-            orderNumber = ""+orderCount;
+            number = ""+orderTotal;
         }
-        MemcachedUtils.put(order.getOrderId()+"countNumber",orderNumber);
+
+        if(org.apache.commons.lang3.StringUtils.isEmpty(orderNumber)){
+            orderNumber = number;
+        }
+        MemcachedUtils.put(order.getId()+"orderNumber",orderNumber);
+
+
+
+
         data.put("ORDER_NUMBER",orderNumber);
         data.put("ITEMS", items);
 //

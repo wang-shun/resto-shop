@@ -10,7 +10,9 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
+import com.resto.brand.web.model.TableQrcode;
 import com.resto.brand.web.service.*;
+import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
@@ -175,6 +177,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     Logger log = LoggerFactory.getLogger(getClass());
 
+
+    @Autowired
+    private TableQrcodeService tableQrcodeService;
+
+    @Autowired
+    private AreaService areaService;
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
@@ -1904,7 +1912,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
@@ -2113,7 +2123,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
-        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+
+
+
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
@@ -2344,24 +2358,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        String orderNumber = "";
-        Integer orderCount = (Integer) MemcachedUtils.get(order.getShopDetailId()+"orderCount");
-        if(orderCount == null){
-            orderCount = 1;
-        }else{
-            orderCount++;
-            MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderCount);
+        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId()+"orderCount");
+        if(orderTotal == null){
+            orderTotal = 0;
+        }else if (orderNumber == null){
+            orderTotal++;
         }
-        if(orderCount < 10){
-            orderNumber = "00"+orderCount;
-        }else if(orderCount < 100){
-            orderNumber = "0"+orderCount;
+        MemcachedUtils.put(order.getShopDetailId()+"orderCount",orderTotal);
+
+
+        String number;
+        if(orderTotal < 10){
+            number = "00"+orderTotal;
+        }else if(orderTotal < 100){
+            number = "0"+orderTotal;
         }else{
-            orderNumber = ""+orderCount;
+            number = ""+orderTotal;
         }
+
+        if(StringUtils.isEmpty(orderNumber)){
+            orderNumber = number;
+        }
+        MemcachedUtils.put(order.getId()+"orderNumber",orderNumber);
+
 //        nextNumber(order.getShopDetailId(), order.getId())
         data.put("ORDER_NUMBER",orderNumber);
-        MemcachedUtils.put(order.getId()+"countNumber",orderNumber);
         if (refundItems.size() != 0) {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < refundItems.size(); i++) {
@@ -2744,11 +2766,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printOrderAll(String orderId) {
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
         List<Map<String, Object>> printTask = new ArrayList<>();
+
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+
+
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+        List<Printer> ticketPrinter = new ArrayList<>();
+        if(tableQrcode == null ){
+            ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                ticketPrinter = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer printer = printerService.selectById(area.getPrintId().intValue());
+                    ticketPrinter.add(printer);
+                }
+            }
+
+        }
 
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
 
@@ -6170,7 +6214,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ADD_TIME", new Date());
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"countNumber"));
+        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"orderNumber"));
         data.put("ITEMS", orderItems);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         data.put("PAYMENT_ITEMS", patMentItems);
@@ -6952,14 +6996,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (orderItemIds.size() != 0) {
             orderItems = orderItemService.selectRefundOrderItem(map);
         }
-        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        List<Printer> printer = new ArrayList<>();
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(),Integer.valueOf(order.getTableNumber()));
+        if(tableQrcode == null){
+            printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+        }else{
+            if(tableQrcode.getAreaId() == null){
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+            }else{
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                printer = printerService.selectQiantai(shopDetail.getId(),PrinterRange.QIANTAI);
+                if(area == null){
+
+                }else{
+                    Printer p = printerService.selectById(area.getPrintId().intValue());
+                    printer.add(p);
+                }
+            }
+        }
+
+
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, printer.get(0));
+            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }
         }
-
         return printTask;
     }
 
@@ -7081,7 +7143,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"countNumber"));
+        data.put("ORDER_NUMBER", (String)MemcachedUtils.get(order.getId()+"orderNumber"));
         data.put("ITEMS", refundItems);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         Map<String, Object> payMentItem = new HashMap<String, Object>();
