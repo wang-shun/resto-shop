@@ -341,7 +341,7 @@
 					</div>
 
                     <div class="form-group" v-show="b.posOpenTable == 1">
-                        <label class="col-md-4 control-label" :class="{ formBox : m.posOpenTable == 1 && m.shopMode == 2}">开启pos点单：</label>
+                        <label class="col-md-4 control-label" :class="{ formBox : m.posOpenTable == 1 && m.shopMode == 2}">开启POS点单：</label>
                         <div  class="col-md-6 radio-list">
                             <label class="radio-inline">
                                 <input type="radio" name="posOpenTable"v-model="m.posOpenTable" value="1">启用
@@ -353,7 +353,7 @@
                     </div>
 
                     <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1 && m.posOpenTable == 1">
-                        <label class="col-md-4 control-label formBox">pos端支付项：</label>
+                        <label class="col-md-4 control-label formBox">POS端支付项：</label>
                         <div  class="col-md-6 radio-list checkbox">
                             <label style="margin-left: 16px;" class="formBox">
                                 <input type="checkbox" checked="checked" disabled="disabled">
@@ -388,7 +388,7 @@
                     </div>
 
 					<div class="form-group">
-						<label class="col-md-4 control-label">pos加菜是否开启粉丝价：</label>
+						<label class="col-md-4 control-label">POS加菜是否开启粉丝价：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
 								<input type="radio" name="posPlusType"v-model="m.posPlusType" value="0">启用
@@ -399,8 +399,20 @@
 						</div>
 					</div>
 
+                    <div class="form-group" v-show="m.shopMode == 6 && m.allowAfterPay == 0">
+                        <label class="col-md-4 control-label">开启POS端订单结算功能：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="openPosPayOrder"v-model="m.openPosPayOrder" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="openPosPayOrder" v-model="m.openPosPayOrder" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="form-group" v-show="b.openPosCharge == 1">
-                        <label class="col-md-4 control-label">开启pos账户充值：</label>
+                        <label class="col-md-4 control-label">开启POS账户充值：</label>
                         <div  class="col-md-6 radio-list">
                             <label class="radio-inline">
                                 <input type="radio" name="openPosCharge"v-model="m.openPosCharge" value="1">启用
