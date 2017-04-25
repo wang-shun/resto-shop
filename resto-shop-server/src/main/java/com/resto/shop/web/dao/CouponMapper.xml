@@ -214,4 +214,21 @@
         select * from tb_order_payment_item where order_id = #{orderId} and
         payment_mode_id = 3
     </select>
+
+    <select id="selectPosPayOrderCanUseCoupon" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select * from tb_coupon where
+        DATE_FORMAT(NOW(),'%Y-%m-%d') between DATE_FORMAT(begin_date,'%Y-%m-%d') and DATE_ADD(DATE_FORMAT(end_date,'%Y-%m-%d'),interval 1 day)
+        and IF(recommend_delay_time > 0,
+        DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(DATE_ADD(begin_time,INTERVAL (recommend_delay_time/3600) hour),'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'),
+        DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'))
+        and is_used = 0
+        <if test="useWithAccount != null and useWithAccount == 1">
+          and use_with_account = 1
+        </if>
+        and distribution_mode_id = 1
+        and (shop_detail_id = #{shopId} or brand_id is not null)
+        and min_amount &lt;= #{orderMoney}
+        and customer_id = #{customerId}
+        ORDER BY `value` desc LIMIT 1
+    </select>
 </mapper>
