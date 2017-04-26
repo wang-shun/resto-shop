@@ -70,4 +70,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
     List<String>  selectCustomerList();
 
     Customer selectByTelePhone(@Param("telePhone") String telePhone);
+
+    int registerCustomer(Customer customer);
 }
