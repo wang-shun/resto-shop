@@ -1334,7 +1334,7 @@
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
-        WHERE o.order_state in (10,2,11,12) AND o.production_status in (2,3) and ta.article_type = 1
+        WHERE o.order_state in (10,2,11,12) AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3)) and ta.article_type = 1
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
     </select>
@@ -1623,7 +1623,7 @@
         WHERE
         t2.brand_id = #{brandId}
         AND t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status in (2,3)
+        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3))
         AND t.type != 3
         AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
         ) as r
@@ -1979,7 +1979,7 @@
         where
         shop_detail_id = #{shopId}
         and IF(t.production_status = 6,t.production_status = 6,t.order_state in (2,10,11,12)
-        and t.production_status in(2,3))
+        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3)))
         and t.create_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
         and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         GROUP BY t.id
@@ -2127,7 +2127,7 @@ GROUP BY article_name
         and t2.pay_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         and t2.payment_mode_id = #{type}
         and t.shop_detail_id = #{shopId}
-        and t.production_status in (2,3)
+        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
         and t.order_state in (2,10,11,12)
     </select>
 
