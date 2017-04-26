@@ -3029,7 +3029,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         left join tb_order_payment_item top
         on td.id = top.order_id
         where IF(td.production_status = 6, td.production_status = 6
-        , td.order_state in (2,10,11,12) and td.production_status in (2,3))
+        , td.order_state in (2,10,11,12) and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         <if test="shopId != null">
