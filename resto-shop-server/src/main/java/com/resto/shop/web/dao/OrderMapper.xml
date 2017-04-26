@@ -1547,7 +1547,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status IN (2, 3) AND
+        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3)) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id =#{shopId}
         GROUP BY t.article_name,t4.article_type
         ORDER BY ${sort}
@@ -1947,7 +1947,7 @@
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
         and parent_order_id is null
         GROUP BY t.id
         ) as r

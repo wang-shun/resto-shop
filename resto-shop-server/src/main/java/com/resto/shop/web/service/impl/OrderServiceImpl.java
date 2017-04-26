@@ -7464,56 +7464,77 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void posPayOrder(Order oldOrder) {
-        Order order = selectById(oldOrder.getId());
-        order.setPayMode(oldOrder.getPayMode());
+    public void posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue){
+        Order order = selectById(orderId);
         updateChild(order);
+        Customer customer = customerService.selectById(order.getCustomerId());
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Order newOrder  = new Order();
         newOrder.setId(order.getId());
         newOrder.setOrderState(OrderState.PAYMENT);
-        newOrder.setPayMode(order.getPayMode());
+        newOrder.setPayMode(payMode);
+        newOrder.setGiveChange(giveChange);
         newOrder.setIsPosPay(Common.YES);
         update(newOrder);
         OrderPaymentItem paymentItem = new OrderPaymentItem();
-        paymentItem.setId(ApplicationUtils.randomUUID());
-        paymentItem.setPayTime(new Date());
-        paymentItem.setPayValue(order.getOrderMoney());
-        Integer payMode = 0;
-        String remark = "";
-        switch (order.getPayMode()){
-            case 1:
-                payMode = PayMode.WEIXIN_PAY;
-                remark = "微信支付:"+order.getOrderMoney();
-                break;
-            case 2:
-                payMode = PayMode.ALI_PAY;
-                remark = "支付宝支付:"+order.getOrderMoney();
-                break;
-            case 3:
-                payMode = PayMode.BANK_CART_PAY;
-                remark = "银联支付:"+order.getOrderMoney();
-                break;
-            case 4:
-                payMode = PayMode.CRASH_PAY;
-                remark = "现金支付:"+order.getOrderMoney();
-                break;
-            case 5:
-                payMode = PayMode.SHANHUI_PAY;
-                remark = "闪惠支付:"+order.getOrderMoney();
-                break;
-            case 6:
-                payMode = PayMode.INTEGRAL_PAY;
-                remark = "积分支付:"+order.getOrderMoney();
-                break;
-            default:
-                break;
+        if (payValue.compareTo(BigDecimal.ZERO) > 0) {
+            paymentItem.setId(ApplicationUtils.randomUUID());
+            paymentItem.setPayTime(new Date());
+            paymentItem.setPayValue(payValue);
+            Integer orderPayMode = 0;
+            String remark = "";
+            switch (payMode) {
+                case 1:
+                    orderPayMode = PayMode.WEIXIN_PAY;
+                    remark = "微信支付:" + payValue;
+                    break;
+                case 2:
+                    orderPayMode = PayMode.ALI_PAY;
+                    remark = "支付宝支付:" + payValue;
+                    break;
+                case 3:
+                    orderPayMode = PayMode.BANK_CART_PAY;
+                    remark = "银联支付:" + payValue;
+                    break;
+                case 4:
+                    orderPayMode = PayMode.CRASH_PAY;
+                    remark = "现金支付:" + payValue;
+                    break;
+                case 5:
+                    orderPayMode = PayMode.SHANHUI_PAY;
+                    remark = "闪惠支付:" + payValue;
+                    break;
+                case 6:
+                    orderPayMode = PayMode.INTEGRAL_PAY;
+                    remark = "积分支付:" + payValue;
+                    break;
+                default:
+                    break;
+            }
+            paymentItem.setPaymentModeId(orderPayMode);
+            paymentItem.setRemark(remark);
+            paymentItem.setOrderId(orderId);
+            orderPaymentItemService.insert(paymentItem);
         }
-        paymentItem.setPaymentModeId(payMode);
-        paymentItem.setRemark(remark);
-        paymentItem.setOrderId(order.getId());
-        orderPaymentItemService.insert(paymentItem);
-        if (!order.getPayMode().equals(1) && !order.getPayMode().equals(2)){
-            orderMapper.confirmOrderPos(order.getId());
+        if (remainValue.compareTo(BigDecimal.ZERO) > 0){
+            accountService.payOrder(order,remainValue,customer,brand,shopDetail);
+        }
+        if (couponValue.compareTo(BigDecimal.ZERO) > 0){
+            couponService.useCouponById(orderId,couponId);
+        }
+        if (giveChange.compareTo(BigDecimal.ZERO) > 0){
+            paymentItem = new OrderPaymentItem();
+            paymentItem.setId(ApplicationUtils.randomUUID());
+            paymentItem.setPayTime(new Date());
+            paymentItem.setPayValue(giveChange.multiply(new BigDecimal(-1)));
+            paymentItem.setRemark("pos端结算订单找零:"+giveChange);
+            paymentItem.setPaymentModeId(PayMode.GIVE_CHANGE);
+            paymentItem.setOrderId(orderId);
+            orderPaymentItemService.insert(paymentItem);
+        }
+        if (!payMode.equals(1) && !payMode.equals(2)){
+            orderMapper.confirmOrderPos(orderId);
         }
     }
 

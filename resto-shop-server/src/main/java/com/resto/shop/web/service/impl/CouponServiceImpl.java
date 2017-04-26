@@ -163,6 +163,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		Coupon coupon = selectById(id);
 		coupon.setIsUsed(true);
 		coupon.setRemark("后付款消费优惠券");
+        coupon.setUsingTime(new Date());
 		update(coupon);
 
 
@@ -260,5 +261,10 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
             return new ArrayList<>();
         }
         return coupons;
+    }
+
+    @Override
+    public Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap) {
+        return couponMapper.selectPosPayOrderCanUseCoupon(selectMap);
     }
 }
