@@ -7470,7 +7470,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        Account account = accountService.selectById(customer.getAccountId());
         Order newOrder  = new Order();
         newOrder.setId(order.getId());
         newOrder.setOrderState(OrderState.PAYMENT);
