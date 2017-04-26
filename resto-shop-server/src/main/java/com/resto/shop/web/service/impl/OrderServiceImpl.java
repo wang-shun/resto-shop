@@ -7520,7 +7520,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         if (remainValue.compareTo(BigDecimal.ZERO) > 0){
             accountService.payOrder(order,remainValue,customer,brand,shopDetail);
-            accountService.useAccount(remainValue,account,AccountLog.SOURCE_PAYMENT,shopDetail.getId());
         }
         if (couponValue.compareTo(BigDecimal.ZERO) > 0){
             couponService.useCouponById(orderId,couponId);
