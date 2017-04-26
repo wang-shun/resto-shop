@@ -187,6 +187,9 @@
             <if test="defaultDeliveryPoint != null">
                 #{defaultDeliveryPoint,jdbcType=INTEGER},
             </if>
+            <if test="isBindPhone != null">
+                #{isBindPhone,jdbcType=BIT},
+            </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
