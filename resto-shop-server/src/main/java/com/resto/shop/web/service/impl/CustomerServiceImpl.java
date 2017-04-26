@@ -115,7 +115,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			customer.setShareCustomer(shareCustomer);
 		}
 //		customer.setRegisterShopId(shopId);
-		update(customer);
+//		update(customer);
+		customerMapper.registerCustomer(customer);
 		return customer;
 	}
 
