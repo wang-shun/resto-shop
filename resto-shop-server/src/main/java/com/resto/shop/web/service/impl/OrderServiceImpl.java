@@ -7475,6 +7475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         newOrder.setId(order.getId());
         newOrder.setOrderState(OrderState.PAYMENT);
         newOrder.setPayMode(payMode);
+        newOrder.setGiveChange(giveChange);
         newOrder.setIsPosPay(Common.YES);
         update(newOrder);
         OrderPaymentItem paymentItem = new OrderPaymentItem();
