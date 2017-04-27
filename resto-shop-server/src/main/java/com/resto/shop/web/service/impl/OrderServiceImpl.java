@@ -174,6 +174,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
             ArticleTopService articleTopService;
+    @Resource
+    OrderRemarkService orderRemarkService;
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -2118,6 +2120,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
         print.put("ORDER_ID", serialNumber);
+        StringBuffer MEMO = new StringBuffer();
+        if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
+            String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
+            String remarkName = orderRemarkService.selectOrderRemarkName(orderRemarkIds);
+            MEMO.append(remarkName);
+        }
+        if (StringUtils.isNotBlank(order.getRemark())){
+            if (MEMO.length() > 0){
+                MEMO.append(",").append(order.getRemark());
+            }else{
+                MEMO.append(order.getRemark());
+            }
+        }
+        print.put("MEMO", MEMO.toString());
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -2352,6 +2368,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
+        StringBuffer MEMO = new StringBuffer();
+        if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
+            String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
+            String remarkName = orderRemarkService.selectOrderRemarkName(orderRemarkIds);
+            MEMO.append(remarkName);
+        }
+        if (StringUtils.isNotBlank(order.getRemark())){
+            if (MEMO.length() > 0){
+                MEMO.append(",").append(order.getRemark());
+            }else{
+                MEMO.append(order.getRemark());
+            }
+        }
+        print.put("MEMO", MEMO.toString());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date());
