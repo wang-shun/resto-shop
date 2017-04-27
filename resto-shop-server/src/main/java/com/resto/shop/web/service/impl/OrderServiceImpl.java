@@ -4707,7 +4707,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //3发短信推送/微信推送
         pushMessage(dayMap,shopDetail,wechatConfig,brandName);
-      //  pushMessage(xunMap,shopDetail,wechatConfig);
     }
 
     private Map<String,String> querryXunData(ShopDetail shopDetail, OffLineOrder offLineOrder, int temp) {
@@ -5005,6 +5004,103 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         Map<String,String> map = new HashMap<>();
+
+        //封装短信推送文本
+        //本日信息
+        StringBuilder xunContent = new StringBuilder();
+
+        xunContent.append("{")
+                .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
+                .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
+                //到店总笔数(r+线下)-----
+                .append("countOrder:").append("'").append(xunEnterCount + xunRestoCount.size()).append("'").append(",")
+                //到店消费总额 我们的总额+线下的总额，不包含外卖金额
+                .append("sumOrder:").append("'").append(xunEnterTotal.add(xunRestoTotal)).append("'").append(",")
+                //用户消费笔数  R+订单总数
+                .append("restoCountOrde:").append("'").append(xunRestoCount.size()).append("'").append(",")
+                //用户消费金额: (r+订单总额)
+                .append("restoSumOrder:").append("'").append(xunRestoTotal).append("'").append(",")
+                //用户消费比率  今日 R+订单总数/（R+订单总数+线下堂吃订单数+外卖订单数））
+                .append("restoCustomerRatio:").append("'").append(xunCustomerRatio).append("%").append("'").append(",")
+                //回头消费比率 R+多次消费用户数/R+消费用户数）
+                .append("restoBackCustomerRatio:").append("'").append(xunBackCustomerRatio).append("%").append("'").append(",")
+                //新增用户比率 （今日 R+新增用户数/R+消费用户数）
+                .append("restoNewCustomerRatio:").append("'").append(xunNewCustomerRatio).append("%").append("'").append(",")
+                //新用户消费
+                .append("restoNewCustomerOrder:").append("'").append(newCustomerOrderNum).append("笔/").append(newCustomerOrderTotal).append("'").append(",")
+                // 其中自然用户
+                .append("restoNewNormalCustomerOrder:").append("'").append(newNormalCustomerOrderNum).append("笔/").append(newNormalCustomerOrderTotal).append("'").append(",")
+                //其中分享用户
+                .append("restoNewShareCustomerOrder:").append("'").append(newShareCustomerOrderNum).append("笔/").append(newShareCustomerOrderTotal).append("'").append(",")
+                //回头用户消费
+                .append("restoBackCustomerOrder:").append("'").append(backCustomerOrderNum).append("笔/").append(backCustomerOrderTotal).append("'").append(",")
+                //二次回头用户
+                .append("restoBackTwoCustomerOrder:").append("'").append(backTwoCustomerOrderNum).append("笔/").append(backTwoCustomerOrderTotal).append("'").append(",")
+                //多次回头
+                .append("restoBackTwoMoreCustomerOrder:").append("'").append(backTwoMoreCustomerOderNum).append("笔/").append(backTwoMoreCustomerOrderTotal).append("'").append(",")
+                //折扣合计:648.05（使用红包总额+使用优惠券总额+使用充值赠送总额）
+                .append("discountTotal:").append("'").append(discountTotal).append("'").append(",")
+                //红包
+                .append("redpackTotal:").append("'").append(redPackTotal).append("'").append(",")
+                //优惠券
+                .append("couponTotal:").append("'").append(couponTotal).append("'").append(",")
+                //充值赠送
+                .append("chargeBackTotal:").append("'").append(chargeReturn).append("'").append(",")
+                //折扣比率2.7%（折扣合计/(堂吃消费总额＋折扣合计)
+                .append("discountRatio:").append("'").append(discountRatio).append("%").append("'").append(",")
+                //五星评论
+                .append("xunFiveStar:").append("'").append(fiveStar).append("'").append(",")
+                //本日改进意见
+                .append("xunFourStar:").append("'").append(fourStar).append("'").append(",")
+                //本日差评投诉
+                .append("xunOneToThree:").append("'").append(oneToThreeStar).append("'").append(",")
+                //本日满意度
+                //本旬满意度
+                .append("xunSatisfied:").append("'").append(theTenDaySatisfaction).append("'").append(",")
+                //旬外卖金额
+                .append("xunTakeOutFood:").append("'").append(xunOrderBooks).append("'").append(",")
+                //旬实际收入
+                .append("xunRealIncome:").append("'").append(xunEnterTotal.add(xunRestoTotal).add(xunOrderBooks)).append("'").append(",")
+                //本旬充值
+                .append("xunCharge:").append("'").append(xunChargeMoney).append("'").append(",")
+                .append("xunGoodList:");
+
+        StringBuilder good = new StringBuilder();
+
+        //封装好评top10
+        if(goodNum==0){//无好评
+            good.append("'").append("---------无------------").append("'");
+        }else {
+            if(!goodList.isEmpty()){//
+                good.append("'");
+                for(int i=0;i<goodList.size();i++){
+                    //1、27% 剁椒鱼头
+                    good.append(i+1).append(".").append(NumberUtil.getFormat(goodList.get(i).getNum(),goodNum)).append("%").append(" ").append(goodList.get(i).getName());
+                }
+                good.append("'");
+            }
+        }
+        good.append(",");
+        xunContent.append(good.toString());
+        xunContent.append("xunBadList:");
+        StringBuilder bad = new StringBuilder();
+        //封装差评top10
+        if(badNum==0){//无差评
+            bad.append("'").append("------无-----").append("'");
+        }else {
+            if(!badList.isEmpty()){//
+                bad.append("'");
+                for(int i=0;i<badList.size();i++){
+                    //1、27% 剁椒鱼头
+                    bad.append(i+1).append(".").append(NumberUtil.getFormat(badList.get(i).getNum(),badNum)).append("%").append(" ").append(badList.get(i).getName());
+                }
+                bad.append("'");
+            }
+        }
+        bad.append(",");
+        xunContent.append(bad.toString());
+        xunContent.append("}");
+        map.put("sms",xunContent.toString());
         map.put("wechat",sb.toString());
         return  map;
     }
@@ -5014,9 +5110,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
+            telephones="13317182430";
             String [] tels = telephones.split(",");
             for(String s:tels){
-                String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+                String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_62850136", null);//推送本日信息
                 //记录日志
                 LogTemplateUtils.dayMessageSms(brandName,shopDetail.getName(),s,smsResult);
                 Customer c = customerService.selectByTelePhone(s);
