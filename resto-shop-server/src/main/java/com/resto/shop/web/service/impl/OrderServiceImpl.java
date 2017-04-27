@@ -2120,6 +2120,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
         print.put("ORDER_ID", serialNumber);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", order.getTableNumber());
         StringBuffer MEMO = new StringBuffer();
         if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
             String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
@@ -2133,12 +2138,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 MEMO.append(order.getRemark());
             }
         }
-        print.put("MEMO", MEMO.toString());
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
-        data.put("DISTRIBUTION_MODE", modeText);
-        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("MEMO", MEMO.toString());
 
 
 
@@ -2368,6 +2368,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date());
+
+        Map<String, Object> data = new HashMap<>();
         StringBuffer MEMO = new StringBuffer();
         if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
             String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
@@ -2381,12 +2386,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 MEMO.append(order.getRemark());
             }
         }
-        print.put("MEMO", MEMO.toString());
-        String print_id = ApplicationUtils.randomUUID();
-        print.put("PRINT_TASK_ID", print_id);
-        print.put("ADD_TIME", new Date());
-
-        Map<String, Object> data = new HashMap<>();
+        data.put("MEMO", MEMO.toString());
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
         Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId()+"orderCount");
