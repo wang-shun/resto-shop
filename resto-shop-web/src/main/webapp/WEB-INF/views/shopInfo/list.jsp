@@ -423,6 +423,18 @@
                         </div>
                     </div>
 
+                    <div class="form-group" v-show="b.openOrderRemark == 1">
+                        <label class="col-md-4 control-label">开启订单备注：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="openOrderRemark"v-model="m.openOrderRemark" value="1">启用
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="openOrderRemark" v-model="m.openOrderRemark" value="0">不启用
+                            </label>
+                        </div>
+                    </div>
+
 					<div class="form-group">
 						<label class="col-md-4 control-label">是否开启美团外卖自动出单：</label>
 						<div  class="col-md-6 radio-list">

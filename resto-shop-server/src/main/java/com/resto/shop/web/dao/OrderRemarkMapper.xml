@@ -103,4 +103,8 @@
     <select id="selectList" resultMap="BaseResultMap">
         select * from tb_order_remark
     </select>
+
+    <select id="selectOrderRemarks" resultMap="BaseResultMap">
+        select * from tb_order_remark where state = 1 and shop_detail_id = #{shopId}
+    </select>
 </mapper>

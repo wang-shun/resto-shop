@@ -8,6 +8,7 @@ import com.resto.shop.web.model.OrderRemark;
 import com.resto.shop.web.service.OrderRemarkService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RpcService
 public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, String> implements OrderRemarkService{
@@ -19,4 +20,9 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
 	public GenericDao<OrderRemark, String> getDao() {
 		return orderRemarkMapper;
 	}
+
+    @Override
+    public List<OrderRemark> selectOrderRemarks(String shopId) {
+        return null;
+    }
 }
