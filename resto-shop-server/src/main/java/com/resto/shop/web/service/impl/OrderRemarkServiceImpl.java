@@ -23,6 +23,6 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
 
     @Override
     public List<OrderRemark> selectOrderRemarks(String shopId) {
-        return null;
+        return orderRemarkMapper.selectOrderRemarks(shopId);
     }
 }
