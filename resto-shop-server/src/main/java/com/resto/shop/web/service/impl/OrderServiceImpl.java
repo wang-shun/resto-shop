@@ -4829,7 +4829,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                     }
                     discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-                    discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+                    if(todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO)>0){
+                        discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+                    }
                 }
                 //本日end----------
                 //本月开始------
