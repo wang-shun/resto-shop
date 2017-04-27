@@ -29,7 +29,7 @@
                                 <label class="col-md-3 control-label">是否启用：</label>
                                 <div class="col-sm-8">
                                     <label class="radio-inline">
-                                        <input type="radio" name="state" v-model="orderRemark.state" value="1" checked> 启用
+                                        <input type="radio" name="state" v-model="orderRemark.state" value="1"> 启用
                                     </label>
                                     <label class="radio-inline">
                                         <input type="radio" name="state" v-model="orderRemark.state" value="0"> 不启用
@@ -73,6 +73,7 @@
         created : function() {
             this.initDataTables();
             this.searchInfo();
+            this.getOrderRemark();
         },
         methods : {
             initDataTables:function () {
@@ -155,13 +156,13 @@
                         if (result.success){
                             toastr.clear();
                             toastr.success("修改成功");
-                            that.orderRemark = {};
+                            that.getOrderRemark();
                             that.showform = false;
                             that.searchInfo();
                         }else{
                             toastr.clear();
                             toastr.error("修改失败");
-                            that.orderRemark = {};
+                            that.getOrderRemark();
                             that.showform = false;
                         }
                     });
@@ -170,13 +171,13 @@
                         if (result.success){
                             toastr.clear();
                             toastr.success("新增成功");
-                            that.orderRemark = {};
+                            that.getOrderRemark();
                             that.showform = false;
                             that.searchInfo();
                         }else{
                             toastr.clear();
                             toastr.error("新增失败");
-                            that.orderRemark = {};
+                            that.getOrderRemark();
                             that.showform = false;
                         }
                     });
@@ -187,7 +188,7 @@
             },
             closeShowForm : function () {
                 this.showform = false;
-                this.orderRemark = {};
+                this.getOrderRemark();
             },
             updateOrderRemark : function (orderRemarkId) {
                 var that = this;
@@ -203,15 +204,20 @@
             },
             deleteOrderRemark : function (orderRemarkId) {
                 var that = this;
-                $.post("orderRemark/delete",{"orderRemarkId" : orderRemarkId}, function (result) {
+                $.post("orderRemark/deleteOrderRemark",{"orderRemarkId" : orderRemarkId}, function (result) {
                     if (result.success){
                         toastr.clear();
                         toastr.success("删除成功");
+                        that.searchInfo();
                     }else{
                         toastr.clear();
                         toastr.error("系统异常，请刷新重试");
                     }
                 });
+            },
+            getOrderRemark : function () {
+                this.orderRemark = {};
+                this.orderRemark.state = 1;
             }
         }
     });
