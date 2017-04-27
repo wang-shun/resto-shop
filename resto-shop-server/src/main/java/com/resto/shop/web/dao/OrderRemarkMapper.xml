@@ -101,10 +101,10 @@
     </delete>
 
     <select id="selectList" resultMap="BaseResultMap">
-        select * from tb_order_remark
+        select * from tb_order_remark ORDER BY sort asc
     </select>
 
     <select id="selectOrderRemarks" resultMap="BaseResultMap">
-        select * from tb_order_remark where state = 1 and shop_detail_id = #{shopId}
+        select * from tb_order_remark where state = 1 and shop_detail_id = #{shopId} ORDER BY sort asc
     </select>
 </mapper>
