@@ -150,6 +150,16 @@ public class Order implements Serializable{
     //该订单的优惠券信息
     private Coupon couponInfo;
 
+    private String orderRemarkIds;
+
+    public String getOrderRemarkIds() {
+        return orderRemarkIds;
+    }
+
+    public void setOrderRemarkIds(String orderRemarkIds) {
+        this.orderRemarkIds = orderRemarkIds;
+    }
+
     private  List<Order> childList; //子订单
 
     public Integer getTag() {
