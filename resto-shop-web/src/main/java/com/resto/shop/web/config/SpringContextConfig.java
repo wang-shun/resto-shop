@@ -413,6 +413,9 @@ public class SpringContextConfig {
         return proxy.create(PosUserService.class);
     }
 
+    @Bean
+    public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

@@ -24,25 +24,25 @@
         insert into tb_order_remark
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
-                id = #{id},
+                id,
             </if>
             <if test="remarkName != null">
-                remark_name = #{remarkName},
+                remark_name,
             </if>
             <if test="sort != null">
-                sort = #{sort},
+                sort,
             </if>
             <if test="state != null">
-                state = #{state},
+                state,
             </if>
             <if test="createTime != null">
-                create_time = #{createTime},
+                create_time,
             </if>
             <if test="shopDetailId != null">
-                shop_detail_id = #{shopDetailId},
+                shop_detail_id,
             </if>
             <if test="brandId != null">
-                brand_id = #{brandId},
+                brand_id,
             </if>
         </trim>
         values
