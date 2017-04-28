@@ -114,4 +114,8 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="selectOrderRemarkAll" resultMap="BaseResultMap">
+        select * from tb_order_remark where shop_detail_id = #{shopId} ORDER BY sort asc
+    </select>
 </mapper>

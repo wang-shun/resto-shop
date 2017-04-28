@@ -26,7 +26,7 @@ public class OrderRemarkController extends GenericController{
     @ResponseBody
     public Result selectAll(){
         try{
-            List<OrderRemark> orderRemarks = orderRemarkService.selectList();
+            List<OrderRemark> orderRemarks = orderRemarkService.selectOrderRemarkAll(getCurrentShopId());
             return getSuccessResult(orderRemarks);
         }catch (Exception e){
             e.printStackTrace();

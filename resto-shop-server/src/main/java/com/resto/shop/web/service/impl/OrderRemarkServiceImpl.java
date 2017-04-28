@@ -30,4 +30,9 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
     public String selectOrderRemarkName(String[] orderRemarkIds) {
         return orderRemarkMapper.selectOrderRemarkName(orderRemarkIds);
     }
+
+    @Override
+    public List<OrderRemark> selectOrderRemarkAll(String shopId) {
+        return orderRemarkMapper.selectOrderRemarkAll(shopId);
+    }
 }

@@ -11,4 +11,6 @@ public interface OrderRemarkMapper extends GenericDao<OrderRemark, String>{
     List<OrderRemark> selectOrderRemarks(@Param("shopId") String shopId);
 
     String selectOrderRemarkName(String[] orderRemarkIds);
+
+    List<OrderRemark> selectOrderRemarkAll(@Param("shopId") String shopId);
 }
