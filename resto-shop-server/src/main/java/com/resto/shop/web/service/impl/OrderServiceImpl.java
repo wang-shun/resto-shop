@@ -173,18 +173,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     VirtualProductsService virtualProductsService;
 
     @Resource
-            ArticleTopService articleTopService;
+    ArticleTopService articleTopService;
+
     @Resource
     OrderRemarkService orderRemarkService;
-
-    Logger log = LoggerFactory.getLogger(getClass());
-
 
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
     @Autowired
     private AreaService areaService;
+
+    Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
@@ -2002,8 +2002,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int i = 0;
 
         for (OrderItem orderItem : orderItems) {
-            if (article.getType() == OrderItemType.SETMEALS
-                    && article.getId().equals(orderItem.getParentId())) {
+            if(article == null){
+                continue;
+            }
+
+            if ( article.getType() == OrderItemType.SETMEALS
+                    && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
                     && article.getParentId().equals(orderItem.getParentId())) {
@@ -5237,7 +5241,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                     }
                     discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-                    discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+                    if(todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO)>0){
+                        discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+                    }
                 }
                 //本日end----------
                 //本月开始------

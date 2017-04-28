@@ -189,6 +189,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
+                    for(ArticlePrice price : prices){
+                        Integer ck = (Integer) MemcachedUtils.get(price.getId()+Common.KUCUN);
+                        if(ck != null){
+                            price.setCurrentWorkingStock(ck);
+                        }
+                    }
                     a.setArticlePrices(prices);
                 }
             } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {//套餐
