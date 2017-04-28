@@ -2138,7 +2138,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 MEMO.append(order.getRemark());
             }
         }
-        data.put("MEMO", MEMO.toString());
+        if (MEMO.length() > 0) {
+            data.put("MEMO", "备注："+MEMO.toString());
+        }
 
 
 
@@ -2386,7 +2388,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 MEMO.append(order.getRemark());
             }
         }
-        data.put("MEMO", MEMO.toString());
+        if (MEMO.length() > 0) {
+            data.put("MEMO", "备注："+MEMO.toString());
+        }
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
         Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId()+"orderCount");
