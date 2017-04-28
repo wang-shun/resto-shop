@@ -2125,25 +2125,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
-        StringBuffer MEMO = new StringBuffer();
-        if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
-            String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
-            String remarkName = orderRemarkService.selectOrderRemarkName(orderRemarkIds);
-            MEMO.append(remarkName);
-        }
         if (StringUtils.isNotBlank(order.getRemark())){
-            if (MEMO.length() > 0){
-                MEMO.append(",").append(order.getRemark());
-            }else{
-                MEMO.append(order.getRemark());
-            }
+            data.put("MEMO", "备注："+order.getRemark());
         }
-        if (MEMO.length() > 0) {
-            data.put("MEMO", "备注："+MEMO.toString());
-        }
-
-
-
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
         data.put("ITEMS", items);
@@ -2375,21 +2359,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ADD_TIME", new Date());
 
         Map<String, Object> data = new HashMap<>();
-        StringBuffer MEMO = new StringBuffer();
-        if (StringUtils.isNotBlank(order.getOrderRemarkIds())){
-            String[] orderRemarkIds = order.getOrderRemarkIds().split(",");
-            String remarkName = orderRemarkService.selectOrderRemarkName(orderRemarkIds);
-            MEMO.append(remarkName);
-        }
         if (StringUtils.isNotBlank(order.getRemark())){
-            if (MEMO.length() > 0){
-                MEMO.append(",").append(order.getRemark());
-            }else{
-                MEMO.append(order.getRemark());
-            }
-        }
-        if (MEMO.length() > 0) {
-            data.put("MEMO", "备注："+MEMO.toString());
+            data.put("MEMO", "备注："+order.getRemark());
         }
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
         String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
