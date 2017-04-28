@@ -57,7 +57,7 @@
 										小票</label>
 								</div>
 							</div>
-							<div class="form-group">
+							<div class="form-group" v-if="m.printType == 2">
 								<div class="col-sm-3 control-label">范围：</div>
 								<div class="col-sm-9 radio-list">
 									<label class="radio-inline">
@@ -185,6 +185,12 @@
 						$("#validateMsg").show();
 					}
 				},
+				updateRange:function(){
+					this.m.range = 0;
+				}
+			},
+			watch:{
+				'm.printType': 'updateRange',
 			}
 		});
 		C.vue = vueObj;
