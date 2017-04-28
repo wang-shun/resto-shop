@@ -81,6 +81,7 @@
                 var that = this;
                 that.orderRemarkTable = $("#orderRemarkTable").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                    order: [[ 1, 'asc' ]],
                     columns : [
                         {
                             title : "备注名称",
