@@ -4366,23 +4366,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
-                    Integer base = (Integer) MemcachedUtils.get(articlePrice.getArticleId() + Common.KUCUN);
-                    Article baseArticle = articleService.selectById(articlePrice.getArticleId());
-                    if (base != null) {
-                        if (base > 1) {
-                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base - 1);
-                        } else {
-                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
-                            orderMapper.setEmpty(articlePrice.getArticleId());
-                        }
-                    } else {
-                        if (baseArticle.getCurrentWorkingStock() > 1) {
-                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle.getCurrentWorkingStock() - 1);
-                        } else {
-                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
-                            orderMapper.setEmpty(articlePrice.getArticleId());
-                        }
-                    }
+                    List<ArticlePrice> articlePrices = articlePriceMapper.selectByArticleId(articlePrice.getArticleId());
+
+//                    Integer base = (Integer) MemcachedUtils.get(articlePrice.getArticleId() + Common.KUCUN);
+//                    Article baseArticle = articleService.selectById(articlePrice.getArticleId());
+//                    if (base != null) {
+//                        if (base > 1) {
+//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base - 1);
+//                        } else {
+//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
+//                            orderMapper.setEmpty(articlePrice.getArticleId());
+//                        }
+//                    } else {
+//                        if (baseArticle.getCurrentWorkingStock() > 1) {
+//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle.getCurrentWorkingStock() - 1);
+//                        } else {
+//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
+//                            orderMapper.setEmpty(articlePrice.getArticleId());
+//                        }
+//                    }
                     if (articleCount == null) {
                         if (articlePrice.getCurrentWorkingStock() > 1) {
                             MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
@@ -4397,6 +4399,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             MemcachedUtils.put(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
+                    }
+                    int sum = 0;
+                    for(ArticlePrice price : articlePrices){
+                        Integer count = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+                        if(count != null){
+                            sum+= count;
+                        }else{
+                            sum+= price.getCurrentWorkingStock();
+                        }
+                    }
+                    MemcachedUtils.put(articlePrice.getArticleId()+Common.KUCUN,sum);
+                    if(sum == 0){
+                        orderMapper.setEmpty(articlePrice.getArticleId());
                     }
                     break;
                 case OrderItemType.SETMEALS:
