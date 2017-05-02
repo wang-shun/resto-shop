@@ -245,6 +245,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public com.resto.brand.web.service.ShowPhotoService showPhotoServiceBrands() {
+        return getProxy(com.resto.brand.web.service.ShowPhotoService.class);
+    }
+
+    @Bean
     public BrandSettingService brandSettingService() {
         return getProxy(BrandSettingService.class);
     }
@@ -352,6 +357,10 @@ public class SpringContextConfig {
         return proxy.create(WeChargeLogService.class);
     }
 
+    @Bean
+    public ExperienceService experienceService() {
+        return proxy.create(ExperienceService.class);
+    }
 
     @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {
