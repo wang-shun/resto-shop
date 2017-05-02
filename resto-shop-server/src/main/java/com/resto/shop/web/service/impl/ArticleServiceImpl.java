@@ -292,6 +292,23 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             articleMapper.clearPriceTotal(articleId, emptyRemark);
         }
 
+        int sum = 0;
+        List<ArticlePrice> articlePrices = articlePriceServer.selectByArticleId(aid);
+        for(ArticlePrice price : articlePrices){
+            Integer amount = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+            if(amount != null){
+                sum+= amount;
+            }else{
+                sum+= price.getCurrentWorkingStock();
+            }
+        }
+
+        MemcachedUtils.put(aid+Common.KUCUN,sum);
+        if(sum == 0){
+            orderMapper.setEmpty(aid);
+        }
+
+
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
 //            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
@@ -344,6 +361,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
                 orderMapper.setArticlePriceEmptyFail(articleId);
+                orderMapper.setEmptyFail(aid);
             } else if (!moreType && count > 0) {
                 orderMapper.setEmptyFail(articleId);
             }
