@@ -281,12 +281,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         String emptyRemark = "【手动沽清】";
         MemcachedUtils.put(articleId + Common.KUCUN, 0);
         String aid = articleId;
+        Boolean moreType = true;
         if (articleId.indexOf("@") > -1) {
+            moreType = true;
             aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
             articleMapper.clearPriceStock(articleId, emptyRemark);
 
         } else {
+            moreType = false;
             article = articleMapper.selectByPrimaryKey(articleId);
             articleMapper.clearStock(articleId, emptyRemark);
             articleMapper.clearPriceTotal(articleId, emptyRemark);
@@ -304,7 +307,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
 
         MemcachedUtils.put(aid+Common.KUCUN,sum);
-        if(sum == 0){
+        if(sum == 0 && moreType){
             orderMapper.setEmpty(aid);
         }
 
@@ -384,7 +387,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
 
         MemcachedUtils.put(aid+Common.KUCUN,sum);
-        if(sum == 0){
+        if(sum == 0 && moreType){
             orderMapper.setEmpty(aid);
         }
 
