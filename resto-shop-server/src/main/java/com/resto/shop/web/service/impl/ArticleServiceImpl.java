@@ -305,8 +305,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 sum+= price.getCurrentWorkingStock();
             }
         }
+        if(moreType){
+            MemcachedUtils.put(aid+Common.KUCUN,sum);
+        }
 
-        MemcachedUtils.put(aid+Common.KUCUN,sum);
         if(sum == 0 && moreType){
             orderMapper.setEmpty(aid);
         }
@@ -385,8 +387,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 sum+= price.getCurrentWorkingStock();
             }
         }
+        if(moreType){
+            MemcachedUtils.put(aid+Common.KUCUN,sum);
+        }
 
-        MemcachedUtils.put(aid+Common.KUCUN,sum);
         if(sum == 0 && moreType){
             orderMapper.setEmpty(aid);
         }
