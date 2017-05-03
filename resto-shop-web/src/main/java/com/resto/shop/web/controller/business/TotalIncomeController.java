@@ -180,7 +180,7 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
                     shopIncomeDto.setIntegralPayment(new BigDecimal(shopIncomeMap.get("integralPayment").toString()));
                     shopIncomeDto.setShanhuiPayment(new BigDecimal(shopIncomeMap.get("shanhuiPayment").toString()));
-                    shopIncomeDto.setGiveChangePayment(new BigDecimal(shopIncomeMap.get("giveChangePayment").toString()));
+                    shopIncomeDto.setGiveChangePayment(new BigDecimal(shopIncomeMap.get("giveChangePayment").toString()).abs());
                 }
             }
         }
@@ -417,7 +417,7 @@ public class TotalIncomeController extends GenericController {
                                                 shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
                                                 break;
                                             case PayMode.GIVE_CHANGE:
-                                                shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue()));
+                                                shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue().abs()));
                                                 break;
                                             default:
                                                 break;
@@ -493,7 +493,7 @@ public class TotalIncomeController extends GenericController {
                                             shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
                                             break;
                                         case PayMode.GIVE_CHANGE:
-                                            shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue()));
+                                            shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue().abs()));
                                             break;
                                         default:
                                             break;

@@ -257,7 +257,7 @@ public class OrderController extends GenericController{
                                     ot.setBackCartPay(ot.getBackCartPay().add(oi.getPayValue()));
                                     break;
 								case PayMode.ARTICLE_BACK_PAY:
-									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue()).abs());
+									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue().abs()));
 									break;
                                 case PayMode.INTEGRAL_PAY:
                                     ot.setIntegralPay(ot.getIntegralPay().add(oi.getPayValue()));
@@ -266,7 +266,7 @@ public class OrderController extends GenericController{
                                     ot.setShanhuiPay(ot.getShanhuiPay().add(oi.getPayValue()));
                                     break;
                                 case PayMode.GIVE_CHANGE:
-                                    ot.setGiveChangePayment(ot.getGiveChangePayment().add(oi.getPayValue()));
+                                    ot.setGiveChangePayment(ot.getGiveChangePayment().add(oi.getPayValue().abs()));
                                     break;
 								default:
 									break;
