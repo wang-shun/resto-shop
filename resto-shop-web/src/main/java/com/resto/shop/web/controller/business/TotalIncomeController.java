@@ -370,7 +370,7 @@ public class TotalIncomeController extends GenericController {
                     for (int day = 0; day < monthDay; day++) {
                         Date beginDate = getBeginDay(year, month, day);
                         Date endDate = getEndDay(year, month, day);
-                        ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO);
+                        ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                         for (Order order : orders) {
                             if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
                                 shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
@@ -446,7 +446,7 @@ public class TotalIncomeController extends GenericController {
                 for (int day = 0; day < monthDay; day++) {
                     Date beginDate = getBeginDay(year, month, day);
                     Date endDate = getEndDay(year, month, day);
-                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO);
+                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                     for (Order order : orders) {
                         if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
                             shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
