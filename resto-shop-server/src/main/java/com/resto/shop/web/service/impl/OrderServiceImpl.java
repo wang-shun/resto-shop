@@ -2563,7 +2563,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems) {
         Map<String, Object> item = new HashMap<>();
-        item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
+        item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getChangeCount() != null ? article.getChangeCount() : article.getOrginCount())));
         item.put("ARTICLE_NAME", article.getArticleName());
         item.put("ARTICLE_COUNT", article.getChangeCount() != null ? article.getChangeCount() : article.getOrginCount());
         items.add(item);
