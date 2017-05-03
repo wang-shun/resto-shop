@@ -896,6 +896,9 @@
             <if test="baseCustomerCount != null">
                 base_customer_count = #{baseCustomerCount},
             </if>
+            <if test="giveChange != null">
+                give_change = #{giveChange},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
