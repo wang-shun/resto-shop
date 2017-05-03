@@ -154,6 +154,7 @@ public class TotalIncomeController extends GenericController {
         payModeMap = new HashMap<String, Object>();
         payModeMap.put("payMode", PayMode.SHANHUI_PAY);
         payModeMap.put("payName", "shanhuiPayment");
+        selectList.add(payModeMap);
         payModeMap = new HashMap<String, Object>();
         payModeMap.put("payMode", PayMode.GIVE_CHANGE);
         payModeMap.put("payName", "giveChangePayment");
