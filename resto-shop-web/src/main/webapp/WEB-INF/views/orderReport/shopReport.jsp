@@ -257,6 +257,10 @@
                             data : "articleBackPay"
                         },
                         {
+                            title : "找零",
+                            data : "giveChangePayment"
+                        },
+                        {
                             title : "营销撬动率",
                             data : 'incomePrize'
                         },{

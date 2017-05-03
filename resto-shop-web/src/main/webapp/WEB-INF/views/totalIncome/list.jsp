@@ -241,6 +241,10 @@
                 data:"articleBackPay"
             },
             {
+                title : "找零(元)",
+                data:"giveChangePayment"
+            },
+            {
                 title : "其他方式支付(元)",
                 data : "otherPayment",
             }
@@ -311,6 +315,10 @@
             {
                 title : "退菜返还红包(元)",
                 data:"articleBackPay"
+            },
+            {
+                title : "找零(元)",
+                data:"giveChangePayment"
             },
             {
                 title : "其他方式支付(元)",

@@ -96,7 +96,7 @@ public class TotalIncomeController extends GenericController {
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
         //给每个店铺赋初始值
         for (ShopDetail s : shopDetailList) {
-            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO,BigDecimal.ZERO);
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO);
             shopIncomeDtos.add(sin);
         }
         Map<String, Object> selectMap = new HashMap<String, Object>();
@@ -154,6 +154,9 @@ public class TotalIncomeController extends GenericController {
         payModeMap = new HashMap<String, Object>();
         payModeMap.put("payMode", PayMode.SHANHUI_PAY);
         payModeMap.put("payName", "shanhuiPayment");
+        payModeMap = new HashMap<String, Object>();
+        payModeMap.put("payMode", PayMode.GIVE_CHANGE);
+        payModeMap.put("payName", "giveChangePayment");
         selectList.add(payModeMap);
         selectMap.put("payModeList", selectList);
         List<Map<String, Object>> orderPaymentItemList = orderpaymentitemService.selectShopIncomeList(selectMap);
@@ -177,6 +180,7 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setOtherPayment(new BigDecimal(shopIncomeMap.get("otherPayment").toString()));
                     shopIncomeDto.setIntegralPayment(new BigDecimal(shopIncomeMap.get("integralPayment").toString()));
                     shopIncomeDto.setShanhuiPayment(new BigDecimal(shopIncomeMap.get("shanhuiPayment").toString()));
+                    shopIncomeDto.setGiveChangePayment(new BigDecimal(shopIncomeMap.get("giveChangePayment").toString()));
                 }
             }
         }
@@ -197,6 +201,7 @@ public class TotalIncomeController extends GenericController {
         BigDecimal crashPayment = BigDecimal.ZERO;
         BigDecimal integralPayment = BigDecimal.ZERO;
         BigDecimal shanhuiPayment = BigDecimal.ZERO;
+        BigDecimal giveChangePayment = BigDecimal.ZERO;
         if (!shopIncomeDtos.isEmpty()) {
             for (ShopIncomeDto sdto : shopIncomeDtos) {
                 originalAmount = originalAmount.add(sdto.getOriginalAmount());
@@ -214,6 +219,7 @@ public class TotalIncomeController extends GenericController {
                 articleBackPay = articleBackPay.add(sdto.getArticleBackPay());
                 integralPayment = integralPayment.add(sdto.getIntegralPayment());
                 shanhuiPayment = shanhuiPayment.add(sdto.getShanhuiPayment());
+                giveChangePayment = giveChangePayment.add(sdto.getGiveChangePayment());
             }
         }
         List<ShopIncomeDto> brandIncomeDtos = new ArrayList<ShopIncomeDto>();
@@ -234,6 +240,7 @@ public class TotalIncomeController extends GenericController {
         brandIncomeDto.setArticleBackPay(articleBackPay);
         brandIncomeDto.setIntegralPayment(integralPayment);
         brandIncomeDto.setShanhuiPayment(shanhuiPayment);
+        brandIncomeDto.setGiveChangePayment(giveChangePayment);
         brandIncomeDtos.add(brandIncomeDto);
         Map<String, Object> map = new HashMap<>();
         map.put("shopIncome", shopIncomeDtos);
@@ -282,9 +289,11 @@ public class TotalIncomeController extends GenericController {
         map.put("timeType", "yyyy-MM-dd");
 
         String[][] headers = {{"品牌/店铺", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
-                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}, {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
+                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
+                , {"退菜返还红包(元)", "23"}, {"找零(元)", "23"}, {"其它支付(元)", "23"}};
         String[] columns = {"shopName", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
-                "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment" ,"articleBackPay", "otherPayment"};
+                "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
+                ,"articleBackPay","giveChangePayment", "otherPayment"};
 
         List<ShopIncomeDto> result = new ArrayList<>();
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
@@ -407,6 +416,9 @@ public class TotalIncomeController extends GenericController {
                                             case PayMode.MONEY_PAY:
                                                 shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
                                                 break;
+                                            case PayMode.GIVE_CHANGE:
+                                                shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue()));
+                                                break;
                                             default:
                                                 break;
                                         }
@@ -480,6 +492,9 @@ public class TotalIncomeController extends GenericController {
                                         case PayMode.MONEY_PAY:
                                             shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
                                             break;
+                                        case PayMode.GIVE_CHANGE:
+                                            shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue()));
+                                            break;
                                         default:
                                             break;
                                     }
@@ -500,9 +515,11 @@ public class TotalIncomeController extends GenericController {
             map.put("timeType", "yyyy-MM-dd");
             map.put("reportTitle", shopNames);// 表的名字
             String[][] headers = {{"日期", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
-                    {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}, {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
+                    {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金支付(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
+                    , {"退菜返还红包(元)", "23"}, {"找零(元)", "23"}, {"其它支付(元)", "23"}};
             String[] columns = {"date", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
-                    "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment" ,"articleBackPay", "otherPayment"};
+                    "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
+                    ,"articleBackPay","giveChangePayment", "otherPayment"};
             ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
             OutputStream out = new FileOutputStream(path);
             excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
