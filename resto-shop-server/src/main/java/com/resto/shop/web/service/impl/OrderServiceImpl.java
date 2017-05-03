@@ -2565,7 +2565,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> item = new HashMap<>();
         item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getOrginCount())));
         item.put("ARTICLE_NAME", article.getArticleName());
-        item.put("ARTICLE_COUNT", article.getOrginCount());
+        item.put("ARTICLE_COUNT", article.getChangeCount() != null ? article.getChangeCount() : article.getOrginCount());
         items.add(item);
         if (article.getRefundCount() != 0) {
             Map<String, Object> refundItem = new HashMap<>();
@@ -6006,6 +6006,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (type == 0) { //如果要修改的是服务费
             BigDecimal baseCustomerCount = new BigDecimal(order.getCustomerCount());
             order.setCustomerCount(count);
+            order.setBaseCustomerCount(count);
             order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
@@ -6092,6 +6093,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             orderItem.setCount(count);
+            orderItem.setChangeCount(count);
             orderItem.setFinalPrice(orderItem.getUnitPrice().multiply(new BigDecimal(count)));
             orderitemMapper.updateByPrimaryKeySelective(orderItem);
             List<OrderItem> list = orderitemMapper.getListBySort(orderItem.getId(), orderItem.getArticleId());
