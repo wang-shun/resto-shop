@@ -893,6 +893,9 @@
             <if test="isPosPay != null">
                 is_pos_pay = #{isPosPay},
             </if>
+            <if test="baseCustomerCount != null">
+                base_customer_count = #{baseCustomerCount},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
