@@ -50,5 +50,9 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Experience">update tb_experience set show_type = #{showType,jdbcType=INTEGER}, title = #{title,jdbcType=VARCHAR}, pic_url = #{picUrl,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, photo_square = #{photoSquare,jdbcType=VARCHAR}, show_sort = #{showSort,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}</update>
   <select id="selectList" resultType="Experience">select * from tb_experience</select>
 
-  <delete id="deleteByTitle" parameterType="java.lang.String">delete from tb_experience where title = #{title,jdbcType=VARCHAR}</delete>
+  <select id="selectListByShopId" resultType="Experience">select * from tb_experience where shop_detail_id = #{shopId}</select>
+
+  <delete id="deleteByTitle" parameterType="java.lang.String">
+    delete from tb_experience where title = #{title,jdbcType=VARCHAR} and shop_detail_id = #{shopId}
+  </delete>
 </mapper>

@@ -33,7 +33,7 @@ public class ExperienceController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<ShowPhoto> listData(){
-		List<Experience> experiences = experienceService.selectList();
+		List<Experience> experiences = experienceService.selectListByShopId(getCurrentShopId());
 		List<ShowPhoto> showPhotos= showPhotoServiceBrand.selectList();
 		for(int i = 0; i < showPhotos.size(); i++){
 			showPhotos.get(i).setChoiceIt(false);
@@ -71,7 +71,7 @@ public class ExperienceController extends GenericController{
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(String title){
-		experienceService.deleteByTitle(title);
+		experienceService.deleteByTitle(title, getCurrentShopId());
 		return Result.getSuccess();
 	}
 }

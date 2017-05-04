@@ -8,6 +8,8 @@ import com.resto.shop.web.model.Experience;
 import com.resto.shop.web.service.ExperienceService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+
 /**
  *
  */
@@ -23,7 +25,12 @@ public class ExperienceServiceImpl extends GenericServiceImpl<Experience, Intege
     }
 
     @Override
-    public int deleteByTitle(String title) {
-        return experienceMapper.deleteByTitle(title);
+    public int deleteByTitle(String title, String shopId) {
+        return experienceMapper.deleteByTitle(title, shopId);
+    }
+
+    @Override
+    public List<Experience> selectListByShopId(String shopId) {
+        return experienceMapper.selectListByShopId(shopId);
     }
 }
