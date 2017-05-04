@@ -2705,7 +2705,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Order> selectErrorOrderList(String currentShopId, Date date) {
         Date begin = DateUtil.getDateBegin(date);
-        Date end = DaprintteUtil.getDateEnd(date);
+        Date end = DateUtil.getDateEnd(date);
         return orderMapper.selectErrorOrderList(currentShopId, begin, end);
     }
 
