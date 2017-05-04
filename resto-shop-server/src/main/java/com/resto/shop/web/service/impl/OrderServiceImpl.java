@@ -2217,7 +2217,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return "";
         }
         String text = DistributionType.getModeText(order.getDistributionModeId());
-        if (order.getParentOrderId() != null) {  //如果是加菜的订单，会出现加的字样
+        if (order.getParentOrderId() != null && !order.getDistributionModeId().equals(DistributionType.REFUND_ORDER)) {  //如果是加菜的订单，会出现加的字样
             text += " (加)";
         }
         return text;
