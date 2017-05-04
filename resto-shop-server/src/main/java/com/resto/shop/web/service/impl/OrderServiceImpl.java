@@ -2560,9 +2560,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems) {
         Map<String, Object> item = new HashMap<>();
-        item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getChangeCount() != null ? article.getChangeCount() : article.getOrginCount())));
+        item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getChangeCount() != null && article.getChangeCount().compareTo(0) > 0 ? article.getChangeCount() : article.getOrginCount())));
         item.put("ARTICLE_NAME", article.getArticleName());
-        item.put("ARTICLE_COUNT", article.getChangeCount() != null ? article.getChangeCount() : article.getOrginCount());
+        item.put("ARTICLE_COUNT", article.getChangeCount() != null && article.getChangeCount().compareTo(0) > 0 ? article.getChangeCount() : article.getOrginCount());
         items.add(item);
         if (article.getRefundCount() != 0) {
             Map<String, Object> refundItem = new HashMap<>();
@@ -2705,7 +2705,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Order> selectErrorOrderList(String currentShopId, Date date) {
         Date begin = DateUtil.getDateBegin(date);
-        Date end = DateUtil.getDateEnd(date);
+        Date end = DaprintteUtil.getDateEnd(date);
         return orderMapper.selectErrorOrderList(currentShopId, begin, end);
     }
 
