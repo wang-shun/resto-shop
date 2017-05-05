@@ -13,6 +13,7 @@
         <result column="end_time" property="endTime" jdbcType="TIME"/>
         <result column="is_used" property="isUsed" jdbcType="BIT"/>
         <result column="using_time" property="usingTime" jdbcType="TIMESTAMP"/>
+        <result column="add_time" property="addTime" jdbcType="TIMESTAMP"/>
         <result column="coupon_source" property="couponSource" jdbcType="VARCHAR"/>
         <result column="use_with_account" property="useWithAccount" jdbcType="BIT"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
