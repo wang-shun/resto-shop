@@ -7489,7 +7489,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {
+    public Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {
         Order order = selectById(orderId);
         updateChild(order);
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -7561,6 +7561,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!payMode.equals(1) && !payMode.equals(2)) {
             orderMapper.confirmOrderPos(orderId);
         }
+        return order;
     }
 
     @Override

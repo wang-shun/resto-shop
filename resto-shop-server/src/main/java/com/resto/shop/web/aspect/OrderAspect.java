@@ -314,8 +314,17 @@ public class OrderAspect {
 ////                    "订单发送推送：" + msg.toString());
     }
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrder(..))")
+    public void payOrder() {
 
+    };
 
+    @AfterReturning(value = "payOrder()", returning = "order")
+    public void payOrder(Order order) {
+        if(order.getOrderState() > OrderState.PAYMENT || order.getOrderState() > OrderState.CONFIRM){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
+    }
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
     public void orderPayAfter(Order order) {
