@@ -321,9 +321,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "posPayOrder()", returning = "order")
     public void posPayOrder(Order order) {
-        if(order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM){
-            MQMessageProducer.sendPlaceOrderNoPayMessage(order);
-        }
+        MQMessageProducer.sendPlaceOrderNoPayMessage(order);
     }
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
