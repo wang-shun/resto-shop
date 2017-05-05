@@ -321,7 +321,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "posPayOrder()", returning = "order")
     public void posPayOrder(Order order) {
-        MQMessageProducer.sendPlaceOrderMessage(order);
+        MQMessageProducer.sendPlaceOrderNoPayMessage(order);
     }
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
