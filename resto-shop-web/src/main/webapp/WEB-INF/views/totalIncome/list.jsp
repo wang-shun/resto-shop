@@ -376,6 +376,17 @@
     });
 
     function searchInfo(beginDate,endDate){
+        //判断两个日期的天数是否相差31天之内
+        var days =this.getDays(beginDate,endDate);
+        if(endDate<beginDate){
+            toastr.error("开始时间不能大于结束时间请重新选择")
+            return;
+        }
+        if(days>31){
+            toastr.info("只能查31天内的数据....")
+            return;
+        }
+
         toastr.clear();
         toastr.success('查询中...');
         //更新数据源
@@ -400,6 +411,20 @@
             }
         });
     }
+
+    function getDays(strDateStart,strDateEnd){
+        var strSeparator = "-"; //日期分隔符
+        var oDate1;
+        var oDate2;
+        var iDays;
+        oDate1= strDateStart.split(strSeparator);
+        oDate2= strDateEnd.split(strSeparator);
+        var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+        var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+        iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数
+        return iDays ;
+    }
+
 
     //导出品牌数据
     $("#brandreportExcel").click(function(){

@@ -161,6 +161,16 @@
                 });
             },
             searchInfo : function() {
+                //判断两个日期的天数是否相差31天之内
+                var days =this.getDays(this.getDate().beginDate,this.getDate().endDate);
+                if(this.getDate().endDate<this.getDate().beginDate){
+                    toastr.error("开始时间不能大于结束时间请重新选择")
+                    return;
+                }
+                if(days>31){
+                    toastr.info("只能查31天内的数据....")
+                    return;
+                }
                 toastr.clear();
                 toastr.success("查询中...");
                 var that = this;
@@ -191,6 +201,17 @@
                 return data;
             },
             createOrderExcel : function () {
+                //判断两个日期的天数是否相差31天之内
+                var days =this.getDays(this.searchDate.beginDate,this.searchDate.endDate);
+                if( this.searchDate.endDate<this.searchDate.beginDate){
+                    toastr.error("开始时间不能大于结束时间请重新选择")
+                    return;
+                }
+                if(days>31){
+                    toastr.info("只能下载31天内的数据....")
+                    return;
+                }
+
                 var object = {
                     beginDate : this.searchDate.beginDate,
                     endDate : this.searchDate.endDate,
@@ -232,7 +253,21 @@
                 this.searchDate.beginDate  = getMonthStartDate();
                 this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
+            },
+            getDays:function (beginDate,endDate) {
+                var strSeparator = "-"; //日期分隔符
+                var oDate1;
+                var oDate2;
+                var iDays;
+                oDate1= beginDate.split(strSeparator);
+                oDate2= endDate.split(strSeparator);
+                var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+                var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+                iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数
+                return iDays ;
             }
+
+
         }
     });
 </script>
