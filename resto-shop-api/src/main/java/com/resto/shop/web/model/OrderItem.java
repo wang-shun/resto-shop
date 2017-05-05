@@ -79,6 +79,16 @@ public class OrderItem implements Serializable {
 
     private BigDecimal extraPrice;
 
+    private Integer changeCount;
+
+    public Integer getChangeCount() {
+        return changeCount;
+    }
+
+    public void setChangeCount(Integer changeCount) {
+        this.changeCount = changeCount;
+    }
+
     /**
      * 此订单项，在前端传入的折扣百分比，用于在后台创建订单时做折扣值对比，判断订单是否可创建。
      */

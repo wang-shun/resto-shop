@@ -81,6 +81,16 @@ public class Customer implements Serializable{
 
     private String birthdayCouponIds;
 
+    private String shareCouponIds;
+
+    public String getShareCouponIds() {
+        return shareCouponIds;
+    }
+
+    public void setShareCouponIds(String shareCouponIds) {
+        this.shareCouponIds = shareCouponIds;
+    }
+
     //是否关注
     private Integer subscribe;
 

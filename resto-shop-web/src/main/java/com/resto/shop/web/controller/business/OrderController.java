@@ -201,7 +201,7 @@ public class OrderController extends GenericController{
 		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,customerId);
 		for (Order o : list) {
 			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),"",o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
-            ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--",BigDecimal.ZERO, BigDecimal.ZERO);
+            ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--",BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
             ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 			if(o.getCustomer()!=null){
 				//手机号
@@ -257,13 +257,16 @@ public class OrderController extends GenericController{
                                     ot.setBackCartPay(ot.getBackCartPay().add(oi.getPayValue()));
                                     break;
 								case PayMode.ARTICLE_BACK_PAY:
-									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue()).abs());
+									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue().abs()));
 									break;
                                 case PayMode.INTEGRAL_PAY:
                                     ot.setIntegralPay(ot.getIntegralPay().add(oi.getPayValue()));
                                     break;
                                 case PayMode.SHANHUI_PAY:
                                     ot.setShanhuiPay(ot.getShanhuiPay().add(oi.getPayValue()));
+                                    break;
+                                case PayMode.GIVE_CHANGE:
+                                    ot.setGiveChangePayment(ot.getGiveChangePayment().add(oi.getPayValue().abs()));
                                     break;
 								default:
 									break;
@@ -346,7 +349,7 @@ public class OrderController extends GenericController{
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","createTime","telephone","orderState","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay",
-                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","incomePrize"};
+                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","giveChangePayment","incomePrize"};
 		//定义数据
 		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
@@ -379,7 +382,8 @@ public class OrderController extends GenericController{
 
 		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
                 {"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},
-                {"现金支付(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"},{"营销撬动率","25"}};
+                {"现金支付(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}
+                ,{"找零(元)","25"},{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{
@@ -415,7 +419,7 @@ public class OrderController extends GenericController{
             String[][] items = new String[orderDetailDto.getShopOrderList().size()][];
             int i = 0;
             for (Map map : orderDetailDto.getShopOrderList()){
-                items[i] = new String[18];
+                items[i] = new String[19];
                 items[i][0] = map.get("shopName").toString();
                 items[i][1] = map.get("createTime").toString();
                 items[i][2] = map.get("telephone").toString();
@@ -433,7 +437,8 @@ public class OrderController extends GenericController{
                 items[i][14] = map.get("shanhuiPay").toString();
                 items[i][15] = map.get("integralPay").toString();
                 items[i][16] = map.get("articleBackPay").toString();
-                items[i][17] = map.get("incomePrize").toString();
+                items[i][17] = map.get("giveChangePayment").toString();
+                items[i][18] = map.get("incomePrize").toString();
                 i++;
             }
             AppendToExcelUtil.insertRows(path,startPosition,items);
