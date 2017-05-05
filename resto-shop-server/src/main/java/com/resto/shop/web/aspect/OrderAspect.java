@@ -314,13 +314,13 @@ public class OrderAspect {
 ////                    "订单发送推送：" + msg.toString());
     }
 
-    @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrder(..))")
-    public void payOrder() {
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.posPayOrder(..))")
+    public void posPayOrder() {
 
     };
 
-    @AfterReturning(value = "payOrder()", returning = "order")
-    public void payOrder(Order order) {
+    @AfterReturning(value = "posPayOrder()", returning = "order")
+    public void posPayOrder(Order order) {
         if(order.getOrderState() > OrderState.PAYMENT || order.getOrderState() > OrderState.CONFIRM){
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
