@@ -2799,7 +2799,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-        log.info("哈哈哈哈" + order.getPrintTimes() + "ver-code:" + order.getVerCode());
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
 
             List<OrderItem> child = orderItemService.listByParentId(orderId);
