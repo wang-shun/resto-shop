@@ -109,4 +109,7 @@ public class ServerConfig {
     @Bean
     public WeBrandScoreService weBrandScoreService(){ return  proxy.create(WeBrandScoreService.class); }
 
+    @Bean
+    public OrderRemarkService boOrderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
+
 }
