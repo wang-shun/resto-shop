@@ -1,47 +1,48 @@
 package com.resto.shop.web.controller.business;
 
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.*;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.OrderDetailDto;
+import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.model.OrderException;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.WeItemService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.web.dto.OrderDetailDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.OrderService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("orderReport")
@@ -49,15 +50,8 @@ public class OrderController extends GenericController{
 
 	@Resource
 	private OrderService orderService;
-
-	@Resource
-	private BrandService brandService;
 	@Resource
 	private ShopDetailService shopDetailService;
-
-   @Resource
-	private WeItemService weItemService;
-
 	@Resource
 	private OrderExceptionService orderExceptionService;
 
