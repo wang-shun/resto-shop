@@ -18,7 +18,7 @@
                 <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
                 <!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
                 <button type="button" class="btn btn-primary" id="week">本周</button>
-                <button type="button" class="btn btn-primary" id="month">本月</button>
+                <%--<button type="button" class="btn btn-primary" id="month">本月</button>--%>
 
                 <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
@@ -330,11 +330,8 @@
 
     //查询
     $("#searchReport").click(function(){
-        beginDate = $("#beginDate").val();
-        endDate = $("#endDate").val();
-        searchInfo(beginDate,endDate);
-
-    })
+        searchInfo( $("#beginDate").val(),$("#endDate").val());
+    });
 
     //今日
 
@@ -376,6 +373,16 @@
     });
 
     function searchInfo(beginDate,endDate){
+        var timeCha = new Date(endDate).getTime() - new Date(beginDate).getTime();
+        if(timeCha < 0){
+            toastr.clear();
+            toastr.error("开始时间应该少于结束时间！");
+            return false;
+        }else if(timeCha > 604800000){
+            toastr.clear();
+            toastr.error("暂时按开放大于一周以内的查询！");
+            return false;
+        }
         toastr.clear();
         toastr.success('查询中...');
         //更新数据源
