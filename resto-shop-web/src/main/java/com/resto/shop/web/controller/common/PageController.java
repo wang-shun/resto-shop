@@ -3,9 +3,11 @@ package com.resto.shop.web.controller.common;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Date;
+
 /**
  * 视图控制器,返回jsp视图给前端
- * 
+ *
  * @author StarZou
  * @since 2014年5月28日 下午4:00:49
  **/
@@ -18,7 +20,13 @@ public class PageController {
      */
     @RequestMapping("/login")
     public String login() {
-        return "login";
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 19)){
+            return "login_error";
+        }else{
+            return "login";
+        }
+
     }
 
     /**
