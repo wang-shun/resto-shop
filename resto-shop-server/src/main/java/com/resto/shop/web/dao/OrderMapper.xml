@@ -1777,20 +1777,16 @@
 
     <select id="selectMoneyAndNumByDate" resultMap="orderPaymentlist">
         SELECT
-        o.id,
-        o.shop_detail_id,
-        o.amount_with_children,
-        o.order_money,
-        o.order_mode,
-        o.parent_order_id,
-        oi.payment_mode_id,
-        oi.pay_value
-        FROM
-        tb_order o
-        LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
-        WHERE
-        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>  and brand_id=#{brandId}
+        id,
+        shop_detail_id,
+        amount_with_children,
+        order_money,
+        order_mode,
+        parent_order_id,
+        payment_mode_id,
+        pay_value
+        FROM orderView
+        WHERE <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]>  and brand_id=#{brandId}
     </select>
 
     <select id="selectShopArticleSellByDateAndFamilyId" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -1846,37 +1842,17 @@
 
     <select id="selectListByTime" resultMap="selectOrdersMap">
         SELECT
-        o.id,
-        o.brand_id,
-        o.parent_order_id,
-        o.shop_detail_id,
-        o.create_time,
-        o.distribution_mode_id,
-        o.ver_code,
-        o.order_money,
-        o.order_state,
-        o.production_status,
-        o.service_price,
-        o.order_mode,
-        c.telephone,
-        a.level,
-        oi.pay_value,
-        oi.payment_mode_id
-        FROM
-        tb_order o
-        LEFT JOIN tb_customer c ON o.customer_id = c.id
-        LEFT JOIN tb_appraise a ON o.id = a.order_id
-        LEFT JOIN tb_order_payment_item oi on o.id = oi.order_id
-        where
-        <![CDATA[o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        id,brand_id,parent_order_id,shop_detail_id,create_time,distribution_mode_id,ver_code,
+        order_money,order_state,production_status,service_price,order_mode,telephone,`level`,pay_value,payment_mode_id
+        from orderShopView where
+        <![CDATA[create_time >= #{beginDate} and create_time <= #{endDate}]]>
         and
         <if test="shopId != null and shopId != ''">
-            o.shop_detail_id=#{shopId}
+            shop_detail_id=#{shopId}
         </if>
         <if test="customerId != null and customerId != ''">
-            o.customer_id=#{customerId}
+            customer_id=#{customerId}
         </if>
-        and (o.order_state != 1 or o.production_status != 0)
     </select>
 
 
