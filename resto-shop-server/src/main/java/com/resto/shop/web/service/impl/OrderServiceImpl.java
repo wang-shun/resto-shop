@@ -7570,6 +7570,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order customerByOrderForMyPage(String customerId, String shopId) {
-        return orderMapper.customerByOrderForMyPage(customerId, shopId);
+        Order order = orderMapper.customerByOrderForMyPage(customerId, shopId);
+        return order;
     }
 }
