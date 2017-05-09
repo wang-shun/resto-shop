@@ -7568,4 +7568,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectMonthIncomeDto(Map<String, Object> selectMap) {
         return orderMapper.selectMonthIncomeDto(selectMap);
     }
+
+    @Override
+    public Order customerByOrderForMyPage(String customerId, String shopId) {
+        Order order = orderMapper.customerByOrderForMyPage(customerId, shopId);
+        return order;
+    }
 }
