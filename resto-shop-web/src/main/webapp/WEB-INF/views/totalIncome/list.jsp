@@ -380,7 +380,7 @@
             return false;
         }else if(timeCha > 604800000){
             toastr.clear();
-            toastr.error("暂时按开放大于一周以内的查询！");
+            toastr.error("暂时未开放大于一周以内的查询！");
             return false;
         }
         toastr.clear();
