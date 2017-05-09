@@ -22,17 +22,12 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
 	}
 
     @Override
-    public List<OrderRemark> selectOrderRemarks(String shopId) {
-        return orderRemarkMapper.selectOrderRemarks(shopId);
+    public List<OrderRemark> selectOrderRemarkByShopId(String shopId) {
+        return orderRemarkMapper.selectOrderRemarkByShopId(shopId);
     }
 
     @Override
-    public String selectOrderRemarkName(String[] orderRemarkIds) {
-        return orderRemarkMapper.selectOrderRemarkName(orderRemarkIds);
-    }
-
-    @Override
-    public List<OrderRemark> selectOrderRemarkAll(String shopId) {
-        return orderRemarkMapper.selectOrderRemarkAll(shopId);
+    public void deleteByBoOrderRemarkId(String boOrderRemarkId) {
+            orderRemarkMapper.deleteByBoOrderRemarkId(boOrderRemarkId);
     }
 }

@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface OrderRemarkService extends GenericService<OrderRemark, String>{
 
-    List<OrderRemark> selectOrderRemarkAll(String shopId);
+    List<OrderRemark> selectOrderRemarkByShopId(String shopId);
 
-    List<OrderRemark> selectOrderRemarks(String shopId);
-
-    String selectOrderRemarkName(String[] orderRemarkIds);
+    void deleteByBoOrderRemarkId(String boOrderRemarkId);
 }

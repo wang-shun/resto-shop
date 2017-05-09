@@ -8,9 +8,7 @@ import java.util.List;
 
 public interface OrderRemarkMapper extends GenericDao<OrderRemark, String>{
 
-    List<OrderRemark> selectOrderRemarks(@Param("shopId") String shopId);
+    List<OrderRemark> selectOrderRemarkByShopId(@Param("shopId") String shopId);
 
-    String selectOrderRemarkName(String[] orderRemarkIds);
-
-    List<OrderRemark> selectOrderRemarkAll(@Param("shopId") String shopId);
+    void deleteByBoOrderRemarkId(@Param("boOrderRemarkId") String boOrderRemarkId);
 }

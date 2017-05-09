@@ -175,9 +175,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     ArticleTopService articleTopService;
 
-    @Resource
-    OrderRemarkService orderRemarkService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
