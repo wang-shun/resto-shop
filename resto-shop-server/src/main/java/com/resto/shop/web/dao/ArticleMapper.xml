@@ -653,20 +653,20 @@ where t.id = t2.article_id
 
     <update id="clearStock">
     update tb_article
-        set is_empty = 1  , current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set is_empty = 1  , empty_remark = #{emptyRemark}
         where id = #{articleId}
 
   </update>
 
     <update id="clearPriceStock">
     update tb_article_price
-        set current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set  empty_remark = #{emptyRemark}
         where id = #{articleId}
   </update>
 
     <update id="clearPriceTotal">
         update tb_article_price
-        set current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set  empty_remark = #{emptyRemark}
         where article_id = #{articleId}
     </update>
 
