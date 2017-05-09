@@ -90,10 +90,12 @@
                 }
             },
             save : function (boOrderRemarkId, type) {
+                var that = this;
                 try{
                     $.post("orderRemark/update",{boOrderRemarkId : boOrderRemarkId, type : type},function (result) {
                         toastr.clear();
                         if (result.success){
+                            that.searchInfo();
                             toastr.success("修改成功");
                         }else{
                             toastr.error("修改失败");
