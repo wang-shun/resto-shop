@@ -25,35 +25,73 @@
     <link href="assets/global/css/plugins.css" rel="stylesheet" type="text/css"/>
     <!-- END THEME STYLES -->
     <link rel="shortcut icon" href="assets/pages/img/favicon.ico" />
+    <style>
+        html,body {
+            position: relative;
+            height: 100%;
+            overflow-y: hidden;
+            background: #364150;
+        }
+
+        .msg-dialog {
+            margin: 0 auto;
+            width: 30%;
+            height: 30%;
+            z-index: 15;
+            font-family: "微软雅黑";
+            font-size: 1.5rem;
+            background: #fff;
+            display: table;
+        }
+        .msg-dialog .center {
+            display: block;
+            text-align: center;
+        }
+        .weui_toast {
+            position: fixed;
+            border-radius: 5px;
+            color: #000;
+            display: table;
+            width: 100%;
+            height: 100%;
+        }
+        .middle {
+            display: table-cell;
+            vertical-align: middle;
+            padding: 15px;
+        }
+        .leftText {
+            display: block;
+            text-align: left;
+            margin-left: 8%;
+        }
+        .rightText {
+            display: block;
+            text-align: left;
+            margin-left: 15%;
+        }
+    </style>
 </head>
 <!-- BEGIN BODY -->
 <body class="login">
 <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
-<div class="menu-toggler sidebar-toggler">
-</div>
-<!-- END SIDEBAR TOGGLER BUTTON -->
-<!-- BEGIN LOGO -->
-<div class="logo">
-    <a href="index.html">
-        <img src="assets/pages/img/Resto+.png" style="height: 40px;" alt=""/>
-    </a>
-</div>
-<!-- END LOGO -->
-<!-- BEGIN LOGIN -->
-<div class="content">
-    <!-- BEGIN LOGIN FORM -->
-    <form class="login-form" method="post" action="branduser/login">
-        <div style="text-align: center">
-            <strong>为确保高峰期间系统稳定性，后台开放时间暂时调整为上午《00:00:00 -- 11:00:00》下午《13:00:00 - 17:00:00》
-            晚上《19:00:00 - 00:00:00》,谢谢您的配合，如需紧急修改后台数据
-                联系电话：400 805 1711</strong>
+< <div class="weui_toast">
+    <div class="middle">
+        <div class="msg-dialog">
+            <p class="middle">
+                <span class="center">系统公告</span>
+                <span class="leftText">尊敬的用户：</span>
+                <span style="text-indent:15%;display: block;">为保证高峰期间稳定性，管理后台使用时间临时调整为：</span>
+                <span class="rightText">上午 0:00 - 11:00</span>
+                <span class="rightText">下午 13:00 - 17:00</span>
+                <span class="rightText">晚上 19:00 - 0:00</span>
+                <span class="leftText">在此期间带来的不便请您谅解！感谢您的配合！</span>
+                <span class="rightText">客服热线:400-805-1711</span>
+            </p>
         </div>
-    </form>
-    <!-- END LOGIN FORM -->
+    </div>
 </div>
-<div class="copyright">
-    &copy;  上海餐加企业管理咨询有限公司　v3.1.0
-</div>
+
 <!-- END LOGIN -->
 <script src="assets/global/plugins/jquery.min.js" type="text/javascript"></script>
 <script src="assets/global/plugins/jquery-migrate.min.js" type="text/javascript"></script>
