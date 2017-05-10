@@ -314,8 +314,16 @@ public class OrderAspect {
 ////                    "订单发送推送：" + msg.toString());
     }
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.posPayOrder(..))")
+    public void posPayOrder() {
 
+    };
 
+    @AfterReturning(value = "posPayOrder()", returning = "order")
+    public void posPayOrder(Order order) {
+//        WeChatUtils.sendCustomerMsgASync("测试测试！", "oBHT9sqENykH4eDytavxr7nlmeKs", "wx36bd5b9b7d264a8c", "807530431fe6e19e3f2c4a7d1a149465");
+        MQMessageProducer.sendPlaceOrderNoPayMessage(order);
+    }
 
     @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
     public void orderPayAfter(Order order) {

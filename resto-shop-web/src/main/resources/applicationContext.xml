@@ -15,12 +15,11 @@
     <!-- 自动扫描resto包 ,将带有注解的类 纳入spring容器管理 -->
     <context:component-scan base-package="com.resto.shop.web"></context:component-scan>
 
-    <!-- 引入配置文件 -->
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!-- 对JDBC配置进行解密  -->
+    <bean id="placeholderConfigurer" class="com.resto.brand.core.util.DecryptPropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath*:rpc.properties</value>
+                <value>file:${resources.config.path}/rpc.properties</value>
             </list>
         </property>
     </bean>

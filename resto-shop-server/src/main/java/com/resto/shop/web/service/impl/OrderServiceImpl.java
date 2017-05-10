@@ -2799,7 +2799,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
         }
-
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPrintTimes() == 1) {
 
             List<OrderItem> child = orderItemService.listByParentId(orderId);
@@ -7489,7 +7488,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {
+    public Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {
         Order order = selectById(orderId);
         updateChild(order);
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -7499,6 +7498,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         newOrder.setId(order.getId());
         newOrder.setOrderState(OrderState.PAYMENT);
         newOrder.setPayMode(payMode);
+        newOrder.setPrintTimes(1);
         newOrder.setGiveChange(giveChange);
         newOrder.setIsPosPay(Common.YES);
         update(newOrder);
@@ -7561,6 +7561,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!payMode.equals(1) && !payMode.equals(2)) {
             orderMapper.confirmOrderPos(orderId);
         }
+        return order;
     }
 
     @Override
