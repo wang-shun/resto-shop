@@ -867,4 +867,40 @@ public class OrderAspect {
         Order order = orderService.selectById(orderPaymentItem.getOrderId());
         MQMessageProducer.sendPlaceOrderNoPayMessage(order);
     }
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.colseOrder(..))")
+    public void colseOrder() {
+
+    };
+
+    @AfterReturning(value = "colseOrder()", returning = "order")
+    public void colseOrder(Order order) {
+        Brand brand = brandService.selectById(order.getBrandId());
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(brand.getId());
+        StringBuilder sb = new StringBuilder("亲,今日未完成支付的订单已被系统自动取消,欢迎下次再来本店消费\n");
+        sb.append("订单编号:"+order.getSerialNumber()+"\n");
+        if(order.getOrderMode()!=null){
+            switch (order.getOrderMode()) {
+                case ShopMode.TABLE_MODE:
+                    sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                    break;
+                default:
+                    sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                    break;
+            }
+        }
+        if( order.getShopName()==null||"".equals(order.getShopName())){
+            order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+        }
+        sb.append("就餐店铺："+order.getShopName()+"\n");
+        sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+        sb.append("订单明细：\n");
+        List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+        for(OrderItem item : orderItem){
+            sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+        }
+        sb.append("订单金额："+order.getOrderMoney()+"\n");
+        WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+    }
 }

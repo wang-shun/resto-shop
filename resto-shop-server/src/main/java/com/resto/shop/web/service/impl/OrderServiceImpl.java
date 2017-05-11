@@ -7568,4 +7568,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectMonthIncomeDto(Map<String, Object> selectMap) {
         return orderMapper.selectMonthIncomeDto(selectMap);
     }
+
+    @Override
+    public Order colseOrder(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order.getOrderState() == OrderState.SUBMIT){
+            orderMapper.colseOrder(orderId);
+            order.setOrderState(OrderState.CANCEL);
+        }
+        return order;
+    }
 }

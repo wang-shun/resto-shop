@@ -676,4 +676,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Article> getStockBySuit(String shopId);
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
+
+	void colseOrder(String orderId);
 }

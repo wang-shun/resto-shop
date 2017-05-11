@@ -3019,4 +3019,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         </if>
         ORDER BY td.create_time ASC
     </select>
+
+    <update id="colseOrder">
+        update tb_order set order_state = 9 where id=#{orderId}
+    </update>
 </mapper>
