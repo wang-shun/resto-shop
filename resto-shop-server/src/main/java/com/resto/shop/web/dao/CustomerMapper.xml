@@ -604,6 +604,6 @@
     <select id="selectBySerialNumber" resultType="Customer">
         SSELECT * FROM  tb_customer t
         WHERE t.`
-        serial_number` = #{number}
+        serial_number` = #{number}    //此处就该这么些  被看到红点修改  一修改就出错  -----wyj
     </select>
 </mapper>
