@@ -603,4 +603,9 @@
         SELECT * FROM  tb_customer
         WHERE telephone=#{telePhone}
     </select>
+
+    <select id="selectBySerialNumber" resultType="Customer">
+        SELECT * FROM  tb_customer
+        WHERE serial_number = #{number}
+    </select>
 </mapper>
