@@ -36,7 +36,7 @@ Vue.component('img-file-upload', {
 						if(result.success){
 							that.$dispatch("success",result.data);
 						}else{
-							that.$dispatch("error","后台抱错了，稍后再试试吧！");
+							that.$dispatch("error","图片上传失败，请压缩后再上传！");
 						}
 					},
 					function (){
