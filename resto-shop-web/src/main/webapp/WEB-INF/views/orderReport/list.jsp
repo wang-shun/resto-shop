@@ -201,17 +201,6 @@
                 return data;
             },
             createOrderExcel : function () {
-                //判断两个日期的天数是否相差31天之内
-                var days =this.getDays(this.searchDate.beginDate,this.searchDate.endDate);
-                if( this.searchDate.endDate<this.searchDate.beginDate){
-                    toastr.error("开始时间不能大于结束时间请重新选择")
-                    return;
-                }
-                if(days>31){
-                    toastr.info("只能下载31天内的数据....")
-                    return;
-                }
-
                 var object = {
                     beginDate : this.searchDate.beginDate,
                     endDate : this.searchDate.endDate,
