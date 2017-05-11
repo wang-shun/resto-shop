@@ -45,15 +45,15 @@
             <result column="shop_detail_id" property="shopDetailId"/>
         </association>
     </resultMap>
-    <!--<sql id="Base_Column_List">-->
-    <!--id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone, -->
-    <!--regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, -->
-    <!--city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,-->
-    <!--bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,-->
-    <!--share_coupon_ids,serial_number-->
-  <!--</sql>-->
+    <sql id="Base_Column_List">
+    id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone,
+    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
+    city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
+    bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,
+    share_coupon_ids,serial_number
+  </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
-        select * from tb_customer where id = #{id,jdbcType=VARCHAR}
+        select <include refid="Base_Column_List"/> from tb_customer where id = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tb_customer
@@ -601,10 +601,8 @@
         WHERE telephone=#{telePhone}
     </select>
 
-    <!--此处就该这么xie  被看到红点修改  一修改就出错  -&#45;&#45;&#45;&#45;wyj-->
     <select id="selectBySerialNumber" resultType="Customer">
-        SELECT * FROM  tb_customer t
-        WHERE t.`
-        serial_number`=#{number}
+        SELECT * FROM  tb_customer
+        WHERE serial_number = #{number}
     </select>
 </mapper>
