@@ -45,6 +45,16 @@ public class Coupon implements Serializable {
 
     private Integer recommendDelayTime;
 
+    private Date addTime;
+
+    public Date getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Date addTime) {
+        this.addTime = addTime;
+    }
+
     public Integer getRecommendDelayTime() {
         return recommendDelayTime;
     }
