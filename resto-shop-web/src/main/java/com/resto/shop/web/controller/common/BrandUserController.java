@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.common;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,6 +10,9 @@ import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.Wether;
+import com.resto.brand.web.service.WetherService;
 import com.resto.shop.web.config.SessionKey;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -48,6 +52,9 @@ public class BrandUserController extends GenericController{
     @Resource
     private RoleService roleService;
 
+    @Resource
+    private WetherService wetherService;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
@@ -85,7 +92,8 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
-            session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
+            Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), new Date());
+            session.setAttribute(SessionKey.WETHERINFO,wether);
 
 //            HttpSession session = request.getSession();
 //            session.setAttribute(RedisSessionKey.USER_INFO, JsonUtils.objectToJson(authUserInfo));//存用户的信息

@@ -425,6 +425,12 @@ public class SpringContextConfig {
     @Bean
     public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
 
+    //天气
+    @Bean
+    public  WetherService wetherService(){
+        return proxy.create(WetherService.class);
+    }
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

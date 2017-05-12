@@ -8,7 +8,11 @@
 			<a href="javascript:(0)"> <img	src="<%=resourcePath%>/assets/pages/img/Resto+.png" width="110px" height="20px"	alt="logo" class="logo-default" style="margin-top: 15px;" />
 			</a>
 			<div class="menu-toggler sidebar-toggler"></div>
+            <img src="http://app1.showapi.com/weather/icon/day/08.png">
+
 		</div>
+
+
 		<!-- END LOGO -->
 		<!-- BEGIN RESPONSIVE MENU TOGGLER -->
 		<a href="javascript:;" class="menu-toggler responsive-toggler"
