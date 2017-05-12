@@ -5,6 +5,7 @@ import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
+import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
 import com.resto.shop.web.service.ShowPhotoService;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -430,6 +431,9 @@ public class SpringContextConfig {
     public  WetherService wetherService(){
         return proxy.create(WetherService.class);
     }
+
+    @Bean
+    public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

@@ -642,7 +642,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
      */
     void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
 
-    void posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
+    Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
 
     /**
      * 查询营业报表月报表
@@ -650,4 +650,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
      * @return
      */
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
+
+	Order customerByOrderForMyPage(String customerId, String shopId);
 }

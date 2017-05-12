@@ -13,6 +13,7 @@
         <result column="end_time" property="endTime" jdbcType="TIME"/>
         <result column="is_used" property="isUsed" jdbcType="BIT"/>
         <result column="using_time" property="usingTime" jdbcType="TIMESTAMP"/>
+        <result column="add_time" property="addTime" jdbcType="TIMESTAMP"/>
         <result column="coupon_source" property="couponSource" jdbcType="VARCHAR"/>
         <result column="use_with_account" property="useWithAccount" jdbcType="BIT"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
@@ -220,7 +221,8 @@
         select * from tb_coupon where
         DATE_FORMAT(NOW(),'%Y-%m-%d') between DATE_FORMAT(begin_date,'%Y-%m-%d') and DATE_ADD(DATE_FORMAT(end_date,'%Y-%m-%d'),interval 1 day)
         and IF(recommend_delay_time > 0,
-        DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(DATE_ADD(begin_time,INTERVAL (recommend_delay_time/3600) hour),'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'),
+        (DATE_FORMAT(NOW(),'%H:%i:%s') >= DATE_FORMAT(DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR),'%H:%i:%s'))
+        and (DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s')),
         DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'))
         and is_used = 0
         <if test="useWithAccount != null and useWithAccount == 1">
