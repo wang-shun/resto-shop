@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
@@ -322,7 +322,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "店铺:"+shopDetail.getName()+"在pos端沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return true;
     }
 
@@ -380,7 +380,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "店铺:"+shopDetail.getName()+"修改菜品("+article.getName()+")Id为:"+articleId+"的库存为:"+count+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return true;
     }
 
@@ -399,7 +399,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }else{
             map.put("content", "店铺:"+shopDetail.getName()+"在pos端上架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
         }
-        doPost(url, map);
+        doPostAnsc(url, map);
         return row > 0 ? true : false;
     }
 

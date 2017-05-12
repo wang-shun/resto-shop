@@ -41,7 +41,7 @@ import com.resto.shop.web.service.NewCustomCouponService;
 
 import cn.restoplus.rpc.server.RpcService;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 /**
  *
@@ -301,7 +301,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         map.put("fileName", customer.getId());
         map.put("type", "UserAction");
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+        doPostAnsc(LogUtils.url, map);
         long begin=coupon.getBeginDate().getTime();
         long end=coupon.getEndDate().getTime();
         map.put("content", "系统向用户:"+customer.getNickname()+"生日优惠券发短信提醒:"+",请求服务器地址为:" + MQSetting.getLocalIP());
@@ -327,7 +327,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                     map.put("fileName", customer.getId());
                     map.put("type", "UserAction");
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPost(LogUtils.url, map);
+                    doPostAnsc(LogUtils.url, map);
                     String pr=price+"";//将BigDecimal类型转换成String
 
                     if(setting.getIsSendCouponMsg() == Common.YES){

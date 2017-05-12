@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 @Component
 public class OrderMessageListener implements MessageListener {
@@ -158,7 +158,7 @@ public class OrderMessageListener implements MessageListener {
         map.put("fileName", customer.getId());
         map.put("type", "UserAction");
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+        doPostAnsc(LogUtils.url, map);
         map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
         if(setting.getIsSendCouponMsg() == Common.YES){
             sendNote(shopName,pr,name,pushDay,customer.getId(),map);
@@ -262,7 +262,7 @@ public class OrderMessageListener implements MessageListener {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -403,7 +403,7 @@ public class OrderMessageListener implements MessageListener {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         } else {
             log.info("自动取消订单失败，订单状态不是已提交");
         }

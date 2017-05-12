@@ -28,7 +28,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 /**
  * Created by carl on 2016/11/22.
@@ -80,7 +80,7 @@ public class AppraiseAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }
@@ -112,7 +112,7 @@ public class AppraiseAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
         //继续发送给你回复的人
         if(appraiseComment.getPid() != null && appraiseComment.getPid().length() > 30){
@@ -124,7 +124,7 @@ public class AppraiseAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }

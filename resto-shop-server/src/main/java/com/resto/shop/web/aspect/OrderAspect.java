@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 @Component
 @Aspect
@@ -191,7 +191,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
         }
@@ -430,7 +430,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
 
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -611,7 +611,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
     }
 
@@ -647,7 +647,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
     }
 
@@ -705,7 +705,7 @@ public class OrderAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
                 scanaQRcode(config, customer, setting, order);
             }
@@ -757,7 +757,7 @@ public class OrderAspect {
         map.put("fileName", customer.getId());
         map.put("type", "UserAction");
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+        doPostAnsc(LogUtils.url, map);
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
@@ -820,7 +820,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
             MQMessageProducer.sendNoticeOrderMessage(order);
 
             if (order.getParentOrderId() != null) {  //子订单
@@ -852,7 +852,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
 //        log.info("发送取餐信息成功:" + result);
         }
     }

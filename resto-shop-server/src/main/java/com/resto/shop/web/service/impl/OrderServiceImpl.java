@@ -43,7 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
@@ -420,14 +420,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", order.getId());
         map.put("type", "orderAction");
         map.put("content", "订单:" + order.getId() + "已创建,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         if (customer != null) {
             Map customerMap = new HashMap(4);
             customerMap.put("brandName", brand.getBrandName());
             customerMap.put("fileName", customer.getId());
             customerMap.put("type", "UserAction");
             customerMap.put("content", "用户:" + customer.getNickname() + "创建了订单Id为:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, customerMap);
+            doPostAnsc(url, customerMap);
         }
         BigDecimal totalMoney = BigDecimal.ZERO;
         BigDecimal originMoney = BigDecimal.ZERO;
@@ -623,13 +623,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                waitPayMap.put("fileName", order.getId());
 //                waitPayMap.put("type", "orderAction");
 //                waitPayMap.put("content", "订单:"+order.getId()+"使用等位红包支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, waitPayMap);
+//                doPostAnsc(url, waitPayMap);
 //                Map CustomerWaitPayMap = new HashMap(4);
 //                CustomerWaitPayMap.put("brandName", brand.getBrandName());
 //                CustomerWaitPayMap.put("fileName", customer.getId());
 //                CustomerWaitPayMap.put("type", "UserAction");
 //                CustomerWaitPayMap.put("content", "用户:"+customer.getNickname()+"使用等位红包支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerWaitPayMap);
+//                doPostAnsc(url, CustomerWaitPayMap);
                 LogTemplateUtils.getWaitMoneyLogByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                 LogTemplateUtils.getWaitMoneyLogByUserType(brand.getBrandName(), order.getId(), item.getPayValue(), customer.getNickname());
 
@@ -660,13 +660,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    couponPaymap.put("fileName", order.getId());
 //                    couponPaymap.put("type", "orderAction");
 //                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                    doPost(url, couponPaymap);
+//                    doPostAnsc(url, couponPaymap);
 //                    Map CustomerCouponPaymap = new HashMap(4);
 //                    CustomerCouponPaymap.put("brandName", brand.getBrandName());
 //                    CustomerCouponPaymap.put("fileName", customer.getId());
 //                    CustomerCouponPaymap.put("type", "UserAction");
 //                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                    doPost(url, CustomerCouponPaymap);
+//                    doPostAnsc(url, CustomerCouponPaymap);
                     LogTemplateUtils.getCouponByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                     LogTemplateUtils.getCouponByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
                     payMoney = payMoney.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -708,7 +708,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                cartPayMap.put("fileName", order.getId());
 //                cartPayMap.put("type", "orderAction");
 //                cartPayMap.put("content", "订单:"+order.getId()+"订单使用银联支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, cartPayMap);
+//                doPostAnsc(url, cartPayMap);
                 LogTemplateUtils.getBankByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
 
 //                Map CustomerCartPayMap = new HashMap(4);
@@ -716,7 +716,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                CustomerCartPayMap.put("fileName", customer.getId());
 //                CustomerCartPayMap.put("type", "UserAction");
 //                CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerCartPayMap);
+//                doPostAnsc(url, CustomerCartPayMap);
                 LogTemplateUtils.getBankByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
                 order.setAllowContinueOrder(false);
             } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
@@ -735,7 +735,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                crashPayMap.put("fileName", order.getId());
 //                crashPayMap.put("type", "orderAction");
 //                crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, crashPayMap);
+//                doPostAnsc(url, crashPayMap);
                 LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                 LogTemplateUtils.getMoneyByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
 
@@ -744,7 +744,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                CustomerCrashPayMap.put("fileName", customer.getId());
 //                CustomerCrashPayMap.put("type", "UserAction");
 //                CustomerCrashPayMap.put("content", "用户:"+customer.getNickname()+"使用现金支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-//                doPost(url, CustomerCrashPayMap);
+//                doPostAnsc(url, CustomerCrashPayMap);
                 order.setAllowContinueOrder(false);
             } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.SHH_PAY) {
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -772,13 +772,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 crashPayMap.put("fileName", order.getId());
                 crashPayMap.put("type", "orderAction");
                 crashPayMap.put("content", "订单:" + order.getId() + "订单使用会员支付了：" + item.getPayValue() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, crashPayMap);
+                doPostAnsc(url, crashPayMap);
                 Map CustomerCrashPayMap = new HashMap(4);
                 CustomerCrashPayMap.put("brandName", brand.getBrandName());
                 CustomerCrashPayMap.put("fileName", customer.getId());
                 CustomerCrashPayMap.put("type", "UserAction");
                 CustomerCrashPayMap.put("content", "用户:" + customer.getNickname() + "使用会员支付了：" + item.getPayValue() + "订单Id为:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, CustomerCrashPayMap);
+                doPostAnsc(url, CustomerCrashPayMap);
                 order.setAllowContinueOrder(false);
             }
 
@@ -1402,7 +1402,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", order.getId());
         map.put("type", "orderAction");
         map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     @Override
@@ -1490,7 +1490,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", order.getId());
         map.put("type", "orderAction");
         map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     @Override
@@ -1563,13 +1563,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "被叫号推送微信就餐提醒并修改productionStatus为3,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         Map orderMap = new HashMap(4);
         orderMap.put("brandName", brand.getBrandName());
         orderMap.put("fileName", order.getId());
         orderMap.put("type", "orderAction");
         orderMap.put("content", "订单:" + order.getId() + "被叫号推送微信就餐提醒并修改productionStatus为3,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, orderMap);
+        doPostAnsc(url, orderMap);
         return order;
     }
 
@@ -1616,13 +1616,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //        map.put("fileName", shopDetail.getName());
 //        map.put("type", "posAction");
 //        map.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
-//        doPost(url, map);
+//        doPostAnsc(url, map);
 //        Map orderMap = new HashMap(4);
 //        orderMap.put("brandName", brand.getBrandName());
 //        orderMap.put("fileName", order.getId());
 //        orderMap.put("type", "orderAction");
 //        orderMap.put("content", "订单:"+order.getId()+"打印完成,请求服务器地址为:"+ MQSetting.getLocalIP());
-//        doPost(url, orderMap);
+//        doPostAnsc(url, orderMap);
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "printSuccess订单打印完成");
         //ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -1867,7 +1867,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "返回打印厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
 
         return printTask;
     }
@@ -2547,7 +2547,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("fileName", shopDetail.getName());
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "返回打印总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, logMap);
+        doPostAnsc(url, logMap);
         MemcachedUtils.put(print_id, print);
         List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
         if (printList == null) {
@@ -2631,7 +2631,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMap.put("fileName", order.getId());
 //            orderMap.put("type", "orderAction");
 //            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, orderMap);
+//            doPostAnsc(url, orderMap);
             /**
              * 记录订单自动确认2-10过程
              */
@@ -2676,7 +2676,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMap.put("fileName", order.getId());
 //            orderMap.put("type", "orderAction");
 //            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, orderMap);
+//            doPostAnsc(url, orderMap);
             LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(), order, orginState, "confirmBossOrder");
             return order;
         }
@@ -2746,7 +2746,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            map.put("fileName", shopDetail.getName());
 //            map.put("type", "posAction");
 //            map.put("content", "店铺:"+shopDetail.getName()+"在pos端执行拒绝订单:" + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, map);
+//            doPostAnsc(url, map);
             LogTemplateUtils.cancelOrderByOrderType(brand.getBrandName(), orderId);
             LogTemplateUtils.cancleOrderByPosType(brand.getBrandName(), shopDetail.getName(), order.getId());
 
@@ -2755,7 +2755,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMap.put("fileName", orderId);
 //            orderMap.put("type", "orderAction");
 //            orderMap.put("content", "订单:" + order.getId() + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPost(url, map);
+//            doPostAnsc(url, map);
         }
         return order;
     }
@@ -3681,7 +3681,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shop.getName());
         map.put("type", "posAction");
         map.put("content", "店铺:" + shop.getName() + "在pos端打印了日结小票返回模版为:" + printTask.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return printTask;
     }
 
@@ -4670,7 +4670,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
     }
 
@@ -5678,7 +5678,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + sb.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         } else {
             log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
         }
@@ -5997,7 +5997,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "接收到修改菜品的请求,订单号为 " + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         if (type == 0) { //如果要修改的是服务费
             BigDecimal baseCustomerCount = new BigDecimal(order.getCustomerCount());
@@ -6060,7 +6060,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId());
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
+            doPostAnsc(url, map);
         } else { //修改的是菜品
 
 
@@ -6166,7 +6166,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    shopDetail.getName() + "修改了菜品" + orderItem.getArticleName() + "，数量修改为" + count + ",订单号为:" + order.getId());
             map.put("content", shopDetail.getName() + "修改了菜品" + orderItem.getArticleName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
+            doPostAnsc(url, map);
         }
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER || order.getOrderMode() == ShopMode.BOSS_ORDER) {
@@ -6216,7 +6216,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("fileName", customer.getId());
         customerMap.put("type", "UserAction");
         customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, customerMap);
+        doPostAnsc(LogUtils.url, customerMap);
         return result;
     }
 
@@ -6399,13 +6399,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 map.put("fileName", shopDetail.getName());
                                 map.put("type", "posAction");
                                 map.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + backMoney + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                                doPost(url, map);
+                                doPostAnsc(url, map);
                                 Map orderMap = new HashMap(4);
                                 orderMap.put("brandName", brand.getBrandName());
                                 orderMap.put("fileName", order.getId());
                                 orderMap.put("type", "orderAction");
                                 orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + backMoney + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                                doPost(url, orderMap);
+                                doPostAnsc(url, orderMap);
                             }
                             Map map = new HashMap(4);
                             map.put("brandName", brand.getBrandName());
@@ -6413,14 +6413,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("type", "posAction");
                             map.put("content", "订单:" + order.getId() + "在pos端执行退菜微信返还" + (maxWxPay > refundMoney ? refundMoney : maxWxPay) + "元回调返回信息:" + result.toString() + "" +
                                     ",返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPost(url, map);
+                            doPostAnsc(url, map);
                             Map orderMap = new HashMap(4);
                             orderMap.put("brandName", brand.getBrandName());
                             orderMap.put("fileName", order.getId());
                             orderMap.put("type", "orderAction");
                             orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜微信返还" + (maxWxPay > refundMoney ? refundMoney : maxWxPay) + "元回调返回信息:" + result.toString() + "" +
                                     ",返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPost(url, orderMap);
+                            doPostAnsc(url, orderMap);
                         }
                         break;
                     case PayMode.ALI_PAY:
@@ -6474,13 +6474,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 accountMap.put("fileName", shopDetail.getName());
                                 accountMap.put("type", "posAction");
                                 accountMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + backMoney + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                                doPost(url, accountMap);
+                                doPostAnsc(url, accountMap);
                                 Map orderAccountMap = new HashMap(4);
                                 orderAccountMap.put("brandName", brand.getBrandName());
                                 orderAccountMap.put("fileName", order.getId());
                                 orderAccountMap.put("type", "orderAction");
                                 orderAccountMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + backMoney + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                                doPost(url, orderAccountMap);
+                                doPostAnsc(url, orderAccountMap);
                             }
                             Map aliMap = new HashMap(4);
                             aliMap.put("brandName", brand.getBrandName());
@@ -6488,14 +6488,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             aliMap.put("type", "posAction");
                             aliMap.put("content", "订单:" + order.getId() + "在pos端执行退菜支付宝返还" + refundTotal + "元回调返回信息:" + resultJson + "" +
                                     ",返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPost(url, aliMap);
+                            doPostAnsc(url, aliMap);
                             Map orderAliMap = new HashMap(4);
                             orderAliMap.put("brandName", brand.getBrandName());
                             orderAliMap.put("fileName", order.getId());
                             orderAliMap.put("type", "orderAction");
                             orderAliMap.put("content", "订单:" + order.getId() + "在pos端执行退菜支付宝返还" + refundTotal + "元回调返回信息:" + resultJson + "" +
                                     ",返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPost(url, orderAliMap);
+                            doPostAnsc(url, orderAliMap);
                         }
                         break;
                 }
@@ -6529,13 +6529,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("fileName", shopDetail.getName());
             map.put("type", "posAction");
             map.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
+            doPostAnsc(url, map);
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brand.getBrandName());
             orderMap.put("fileName", order.getId());
             orderMap.put("type", "orderAction");
             orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+            doPostAnsc(url, orderMap);
         }
     }
 
@@ -6563,7 +6563,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderArticleMap.put("fileName", order.getId());
                 orderArticleMap.put("type", "orderAction");
                 orderArticleMap.put("content", "订单:" + order.getId() + "退菜释放" + orderItem.getCount() + "份菜品(" + orderItem.getArticleName() + "),请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, orderArticleMap);
+                doPostAnsc(url, orderArticleMap);
                 if (item.getType() == OrderItemType.SETMEALS) {
                     //如果退了套餐，清空子品
                     orderitemMapper.refundArticleChild(orderItem.getId());
@@ -6574,13 +6574,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     articleFamilyMap.put("fileName", shopDetail.getName());
                     articleFamilyMap.put("type", "posAction");
                     articleFamilyMap.put("content", "订单:" + order.getId() + "在pos端执行退菜释放" + orderItem.getCount() + "份套餐(" + orderItem.getArticleName() + ")下的子品项,请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPost(url, articleFamilyMap);
+                    doPostAnsc(url, articleFamilyMap);
                     Map orderArticleFamilyMap = new HashMap(4);
                     orderArticleFamilyMap.put("brandName", brand.getBrandName());
                     orderArticleFamilyMap.put("fileName", order.getId());
                     orderArticleFamilyMap.put("type", "orderAction");
                     orderArticleFamilyMap.put("content", "订单:" + order.getId() + "退菜释放" + orderItem.getCount() + "份套餐(" + orderItem.getArticleName() + ")下的子品项,请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPost(url, orderArticleFamilyMap);
+                    doPostAnsc(url, orderArticleFamilyMap);
                 }
 
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
@@ -6594,13 +6594,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 map.put("fileName", shopDetail.getName());
                 map.put("type", "posAction");
                 map.put("content", "订单:" + order.getId() + "在pos端执行退菜退了" + customerCount + "份服务费(" + shopDetail.getServiceName() + "),请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, map);
+                doPostAnsc(url, map);
                 Map orderMap = new HashMap(4);
                 orderMap.put("brandName", brand.getBrandName());
                 orderMap.put("fileName", order.getId());
                 orderMap.put("type", "orderAction");
                 orderMap.put("content", "订单:" + order.getId() + "退菜退了" + customerCount + "份服务费(" + shopDetail.getServiceName() + "),请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, orderMap);
+                doPostAnsc(url, orderMap);
             }
         }
 
@@ -6850,13 +6850,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("fileName", shopDetail.getName());
             map.put("type", "posAction");
             map.put("content", "订单:" + order.getId() + "在pos端执行退菜修改父订单:" + o.getParentOrderId() + "amountWithChildren字段的值为:" + parent.getAmountWithChildren().subtract(order.getRefundMoney()) + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, map);
+            doPostAnsc(url, map);
             Map orderMap = new HashMap(4);
             orderMap.put("brandName", brandSetting.getBrandName());
             orderMap.put("fileName", order.getId());
             orderMap.put("type", "orderAction");
             orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改父订单:" + o.getParentOrderId() + "amountWithChildren字段的值为:" + parent.getAmountWithChildren().subtract(order.getRefundMoney()) + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(url, orderMap);
+            doPostAnsc(url, orderMap);
         }
         update(o);
         Map map = new HashMap(4);
@@ -6864,13 +6864,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:" + sum + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
 //        Map orderMap = new HashMap(4);
 //        orderMap.put("brandName", brandSetting.getBrandName());
 //        orderMap.put("fileName", order.getId());
 //        orderMap.put("type", "orderAction");
 //        orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜修改订单项里的菜品数量,订单退掉的菜品数为:"+sum+",请求服务器地址为:" + MQSetting.getLocalIP());
-//        doPost(url, orderMap);
+//        doPostAnsc(url, orderMap);
         LogTemplateUtils.getBackArticleByOrderType(brandSetting.getBrandName(), order.getId(), o.getOrderItems());
     }
 
@@ -6948,19 +6948,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("fileName", customer.getId());
         customerMap.put("type", "UserAction");
         customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, customerMap);
+        doPostAnsc(LogUtils.url, customerMap);
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         Map orderMap = new HashMap(4);
         orderMap.put("brandName", brand.getBrandName());
         orderMap.put("fileName", order.getId());
         orderMap.put("type", "orderAction");
         orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, orderMap);
+        doPostAnsc(url, orderMap);
     }
 
     @Override
@@ -7286,7 +7286,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
