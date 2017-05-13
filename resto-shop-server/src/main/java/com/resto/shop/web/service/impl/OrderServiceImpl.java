@@ -1346,7 +1346,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                     }
                     if (result.containsKey("ERROR")) {
-                        throw new RuntimeException("微信退款异常！");
+                        throw new RuntimeException("微信退款异常！"+result.toString());
                     }
                     item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
@@ -1367,7 +1367,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("out_request_no", newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     if (new JSONObject(resultJson).toString().indexOf("ERROR") != -1) {
-                        throw new RuntimeException("支付宝退款异常！");
+                        throw new RuntimeException("支付宝退款异常！"+resultJson.toString());
                     }
                     item.setResultData(new JSONObject(resultJson).toString());
                     item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
