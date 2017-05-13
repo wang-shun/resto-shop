@@ -2264,6 +2264,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (printer == null) {
             return null;
         }
+        if(shopDetail.getIsPosNew() == Common.POS_NEW){
+            //如果是新版本pos
+            return printTicketPosNew(order,orderItems,shopDetail,printer);
+        }
+
+
         List<Map<String, Object>> items = new ArrayList<>();
         List<Map<String, Object>> refundItems = new ArrayList<>();
         List<String> articleIds = new ArrayList<>();
@@ -2557,6 +2563,306 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         MemcachedUtils.put(shopDetail.getId() + "printList", printList);
         return print;
     }
+
+
+
+    public Map<String, Object> printTicketPosNew(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer){
+        List<Map<String, Object>> items = new ArrayList<>();
+        List<Map<String, Object>> refundItems = new ArrayList<>();
+        List<String> articleIds = new ArrayList<>();
+        for (OrderItem article : orderItems) {
+            if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)) {
+                if (article.getArticleId().contains("@")) {
+                    articleIds.add(article.getArticleId().substring(0, article.getArticleId().indexOf("@")));
+                } else {
+                    articleIds.add(article.getArticleId());
+                }
+            }
+        }
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("articleIds", articleIds);
+        List<String> articleSort = articleService.selectArticleSort(selectMap);
+        for (String articleId : articleSort) {
+            for (OrderItem article : orderItems) {
+                if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())) {
+                    getOrderItems(article, items, refundItems);
+                    getOrderItemMeal(orderItems, items, refundItems, article.getId());
+                } else if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)) {
+                    if (article.getArticleId().contains("@")) {
+                        if (articleId.equalsIgnoreCase(article.getArticleId().substring(0, article.getArticleId().indexOf("@")))) {
+                            getOrderItems(article, items, refundItems);
+                        }
+                    } else {
+                        if (articleId.equalsIgnoreCase(article.getArticleId())) {
+                            getOrderItems(article, items, refundItems);
+                        }
+                    }
+                }
+            }
+        }
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
+
+        if (order.getDistributionModeId() == 1) {
+            if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0
+                    && StringUtils.isBlank(order.getParentOrderId())) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                item.put("ARTICLE_NAME", shopDetail.getServiceName());
+                if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
+                    item.put("ARTICLE_NAME", "就餐人数");
+                }
+                item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                items.add(item);
+                if (order.getBaseCustomerCount() != order.getCustomerCount()) {
+                    Map<String, Object> refundItem = new HashMap<>();
+                    refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
+                    refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
+                    if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
+                        refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
+                    }
+                    refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
+                    refundItems.add(refundItem);
+                }
+            }
+        } else if (order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2) {
+            if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
+                Map<String, Object> item = new HashMap<>();
+                List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+                BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
+                BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
+                if (!CollectionUtils.isEmpty(childs)) {
+                    for (String c : childs) {
+                        Order childOrder = selectById(c);
+                        mealCount = mealCount.add(BigDecimal.valueOf(childOrder.getBaseMealAllCount()));
+                        mealAllNumber = mealAllNumber.add(BigDecimal.valueOf(childOrder.getMealAllNumber()));
+                    }
+                }
+                item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
+                item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+                item.put("ARTICLE_COUNT", mealCount);
+                items.add(item);
+                if (mealCount.doubleValue() != mealAllNumber.doubleValue()) {
+                    Map<String, Object> refundItem = new HashMap<>();
+                    refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(new BigDecimal(order.getBaseMealAllCount() - order.getMealAllNumber())).doubleValue());
+                    refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
+                    refundItem.put("ARTICLE_COUNT", -(order.getBaseMealAllCount() - order.getMealAllNumber()));
+                    refundItems.add(refundItem);
+                }
+            }
+        }
+        Map<String, Object> print = new HashMap<>();
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        print.put("TABLE_NO", tableNumber);
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("LINE_WIDTH",shopDetail.getPageSize());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date().getTime());
+
+        Map<String, Object> data = new HashMap<>();
+        if (StringUtils.isNotBlank(order.getRemark())) {
+            data.put("MEMO", "备注：" + order.getRemark());
+        }
+        data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
+        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId() + "orderCount");
+        if (orderTotal == null) {
+            orderTotal = 0;
+        } else if (orderNumber == null) {
+            orderTotal++;
+        }
+        MemcachedUtils.put(order.getShopDetailId() + "orderCount", orderTotal);
+
+
+        String number;
+        if (orderTotal < 10) {
+            number = "00" + orderTotal;
+        } else if (orderTotal < 100) {
+            number = "0" + orderTotal;
+        } else {
+            number = "" + orderTotal;
+        }
+
+        if (StringUtils.isEmpty(orderNumber)) {
+            orderNumber = number;
+        }
+        MemcachedUtils.put(order.getId() + "orderNumber", orderNumber);
+
+//        nextNumber(order.getShopDetailId(), order.getId())
+        data.put("ORDER_NUMBER", orderNumber);
+        if (refundItems.size() != 0) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            for (int i = 0; i < refundItems.size(); i++) {
+                map = refundItems.get(i);
+                items.add(map);
+            }
+        }
+        data.put("ITEMS", items);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        BigDecimal level = new BigDecimal(0);
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        StringBuilder gao = new StringBuilder();
+        if (shopDetail.getIsUserIdentity().equals(1)) {
+            //得到有限制的情况下用户的订单数
+            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
+            //得到无限制情况下用户的订单数
+            int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
+            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+                gao.append("【高频】");
+            }//无限制的时候
+            else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
+                gao.append("【高频】");
+            }
+        }
+        String modeText = getModeText(order);
+        data.put("DISTRIBUTION_MODE", modeText);
+        if (order.getAmountWithChildren().doubleValue() > 0.0 && order.getPrintTimes() == 1 && order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            data.put("ORIGINAL_AMOUNT", order.getAmountWithChildren());
+        } else {
+            data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        }
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
+        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
+        if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT) {
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+        } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
+        } else {
+            if (order.getParentOrderId() != null) {
+                //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
+                Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+                if (faOrder.getPayType() == PayType.NOPAY) {
+                    data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
+                } else {
+                    data.put("RESTAURANT_NAME", shopDetail.getName());
+                }
+            } else {
+                data.put("RESTAURANT_NAME", shopDetail.getName());
+            }
+        }
+
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        BigDecimal articleCount = new BigDecimal(order.getArticleCount());
+        if (order.getParentOrderId() == null) {
+            articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
+                    : order.getCustomerCount()));
+            articleCount = articleCount.add(new BigDecimal(order.getMealAllNumber() == null ? 0
+                    : order.getMealAllNumber()));
+        }
+
+        List<Order> childList = orderMapper.selectListByParentId(order.getId());
+        for (Order child : childList) {
+            articleCount = articleCount.add(BigDecimal.valueOf(child.getArticleCount()));
+            articleCount = articleCount.add(BigDecimal.valueOf(child.getMealAllNumber() == null ? 0 : child.getMealAllNumber()));
+        }
+
+        data.put("ARTICLE_COUNT", articleCount);
+        List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectPaymentCountByOrderId(order.getId());
+        List<String> child = orderMapper.selectChildIdsByParentId(order.getId());
+        if (!CollectionUtils.isEmpty(child)) {
+            for (String childId : child) {
+                List<OrderPaymentItem> childPay = orderPaymentItemService.selectPaymentCountByOrderId(childId);
+                orderPaymentItems.addAll(childPay);
+            }
+        }
+
+        Map<Integer, BigDecimal> map = new HashMap<>();
+        for (OrderPaymentItem orderPaymentItem : orderPaymentItems) {
+            if (map.containsKey(orderPaymentItem.getPaymentModeId())) {
+                BigDecimal newValue = map.get(orderPaymentItem.getPaymentModeId()).add(orderPaymentItem.getPayValue());
+                map.put(orderPaymentItem.getPaymentModeId(), newValue);
+            } else {
+                map.put(orderPaymentItem.getPaymentModeId(), orderPaymentItem.getPayValue());
+            }
+        }
+
+        if (!map.isEmpty()) {
+            for (Integer key : map.keySet()) {
+                Map<String, Object> patMentItem = new HashMap<String, Object>();
+                patMentItem.put("SUBTOTAL", map.get(key));
+                patMentItem.put("PAYMENT_MODE", PayMode.getPayModeName(key));
+                patMentItems.add(patMentItem);
+            }
+        } else {
+            Map<String, Object> patMentItem = new HashMap<String, Object>();
+            patMentItem.put("SUBTOTAL", 0);
+            patMentItem.put("PAYMENT_MODE", "");
+            patMentItems.add(patMentItem);
+        }
+        data.put("PAYMENT_ITEMS", patMentItems);
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", level);
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        if (account != null) {
+            customerStr.append("余额：" + account.getRemain() + " ");
+        } else {
+            customerStr.append("余额：0 ");
+        }
+        customerStr.append("" + gao.toString() + " ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if (customer != null) {
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
+                }
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+        print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+        print.put("TICKET_MODE",TicketTypeNew.RESTAURANT_RECEIPT);
+        JSONObject json = new JSONObject(print);
+        Map logMap = new HashMap(4);
+        logMap.put("brandName", brand.getBrandName());
+        logMap.put("fileName", shopDetail.getName());
+        logMap.put("type", "posAction");
+        logMap.put("content", "订单:" + order.getId() + "返回打印总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, logMap);
+        MemcachedUtils.put(print_id, print);
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        return print;
+    }
+
+
 
     public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems) {
         Map<String, Object> item = new HashMap<>();
