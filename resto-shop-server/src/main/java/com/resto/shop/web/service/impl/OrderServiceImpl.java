@@ -181,6 +181,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private AreaService areaService;
 
+    @Autowired
+            private SmsLogService smsLogService;
+
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -4709,7 +4712,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig, String brandName) {
+    public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder,Brand brand) {
         //判断是否需要发送旬短信
         int temp = DateUtil.getEarlyMidLate();
         //1.结店退款
@@ -4719,11 +4722,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (temp == 1 || temp == 2 || temp == 3) { //测试先放开--
             //查询旬相关的内容
             Map<String, String> xunMap = querryXunData(shopDetail, offLineOrder, temp);
-            pushMessage(xunMap, shopDetail, wechatConfig, brandName);
+            pushMessage(xunMap, shopDetail,brand);
         }
 
         //3发短信推送/微信推送
-        pushMessage(dayMap, shopDetail, wechatConfig, brandName);
+        pushMessage(dayMap, shopDetail, brand);
         //  pushMessage(xunMap,shopDetail,wechatConfig);
     }
 
@@ -5027,21 +5030,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    private void pushMessage(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, String brandName) {
+    private void pushMessage(Map<String, String> querryMap, ShopDetail shopDetail, Brand brand) {
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
             String[] tels = telephones.split(",");
             for (String s : tels) {
                 String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
-                //记录日志
-                LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
+                //{"model":"107469789933^1110050103554","code":"0","success":true}
+                SmsLog smsLog = new SmsLog();
+                smsLog.setBrandId(brand.getId());
+                smsLog.setShopDetailId(shopDetail.getId());
+                smsLog.setContent("推送日结短信");
+                smsLog.setSmsType(SmsLogType.DAYMESSGAGE);
+                smsLog.setCreateTime(new Date());
+                smsLog.setPhone(s);
+                smsLog.setSmsResult(smsResult);
+                if(com.alibaba.fastjson.JSONObject.parseObject(smsResult).getBoolean("success")){//阿里短信发送成功
+                    smsLog.setIsSuccess(true);
+                }else {
+                    //发送腾讯云日结短信
+                }
+
+                smsLogService.insert(smsLog);
                 Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
                  */
                 if (null != c) {
-                    WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
+                    WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret(), s, brand.getBrandName(), shopDetail.getName());
                 }
             }
 
