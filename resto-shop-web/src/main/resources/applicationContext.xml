@@ -26,7 +26,7 @@
 
 
     <bean id="serviceDiscovery" class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceDiscovery">
-        <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
+        <constructor-arg name="zkAddress" value="${shoprpc.registry_address}"/>
     </bean>
 
     <bean id="proxy" class="cn.restoplus.rpc.client.RpcProxy">
