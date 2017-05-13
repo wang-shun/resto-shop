@@ -92,7 +92,7 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
-            Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), new Date());
+            Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
             session.setAttribute(SessionKey.WETHERINFO,wether);
 
 //            HttpSession session = request.getSession();
