@@ -8,6 +8,8 @@ public class TicketTypeNew {
 
     public static final String LABEL = "Label";
 
+    public static final String COMMAND = "Command";
+
 
     public static final String RESTAURANT_RECEIPT = "RestaurantReceipt";
 
@@ -17,5 +19,5 @@ public class TicketTypeNew {
 
     public static final String RESTAURANT_LABEL = "RestaurantLabel";
 
-    public static final String OPEN_CASH_DRAWER= "openCashDrawer";
+    public static final String OPEN_CASH_DRAWER= "OpenCashDrawer";
 }
