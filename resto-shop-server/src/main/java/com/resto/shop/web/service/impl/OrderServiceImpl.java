@@ -6314,13 +6314,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundArticle(Order order) {
-        if(order.getPayType() == PayType.NOPAY && (order.getPayMode() == PayMode.CRASH_PAY || order.getPayMode() == PayMode.BANK_CART_PAY)){
-            refundArticleNoPay(order);
-            return;
-        }
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
+        if(o.getPayType() == PayType.NOPAY && (o.getPayMode() == PayMode.CRASH_PAY || o.getPayMode() == PayMode.BANK_CART_PAY)){
+            refundArticleNoPay(order);
+            return;
+        }
         Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
