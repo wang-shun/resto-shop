@@ -6317,7 +6317,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
-        if(o.getPayType() == PayType.NOPAY && (o.getPayMode() == PayMode.CRASH_PAY || o.getPayMode() == PayMode.BANK_CART_PAY)){
+        if(o.getPayType() == PayType.NOPAY && (o.getPayMode() == OrderPayMode.XJ_PAY || o.getPayMode() == OrderPayMode.YL_PAY)){
             refundArticleNoPay(order);
             return;
         }
