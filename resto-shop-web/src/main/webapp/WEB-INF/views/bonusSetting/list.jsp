@@ -134,19 +134,6 @@
                 toastr.success("查询中...");
                 var that = this;
                 try{
-//                    $.post("orderRemark/selectAll",function(result){
-//                        if (result.success){
-//                            that.orderRemarkTable.clear();
-//                            that.orderRemarkTable.rows.add(result.data).draw();
-//                            toastr.clear();
-//                            toastr.success("查询成功");
-//                            return;
-//                        }else {
-//                            toastr.clear();
-//                            toastr.error("查询出错");
-//                            return;
-//                        }
-//                    });
                 }catch(e){
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
