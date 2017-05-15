@@ -21,6 +21,10 @@ public class BonusSetting {
 
     private Date createTime;
 
+    private String shopName;
+
+    private String chargeName;
+
     public String getId() {
         return id;
     }
@@ -91,5 +95,21 @@ public class BonusSetting {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getChargeName() {
+        return chargeName;
+    }
+
+    public void setChargeName(String chargeName) {
+        this.chargeName = chargeName;
     }
 }

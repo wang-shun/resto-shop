@@ -1,59 +1,89 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div id="control">
-	<div class="row form-div" v-show="showform">
-		<div class="col-md-offset-3 col-md-6" >
-			<div class="portlet light bordered">
-	            <div class="portlet-title">
-	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki">新建备注</span>
-	                </div>
-	            </div>
-	            <div class="portlet-body">
-	            	<form role="form" class="form-horizontal" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-			           			<label class="col-sm-3 control-label">备注名称：</label>
-							    <div class="col-sm-8">
-						    		<input type="text" class="form-control" maxlength="50" placeholder="建议输入五十个字以内" required v-model="orderRemark.remarkName">
-							    </div>
-							</div>
-							<div class="form-group">
-			           			<label class="col-sm-3 control-label">排序：</label>
-							    <div class="col-sm-8">
-							    	<input type="number" class="form-control"placeholder="建议输入正整数" required v-model="orderRemark.sort" min="1">
-							    </div>
-							</div>
+    <div class="row form-div" v-if="showform">
+        <div class="col-md-offset-3 col-md-6" >
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject bold font-blue-hoki">分红设置</span>
+                    </div>
+                </div>
+
+                <div class="portlet-body">
+                    <form role="form" class="form-horizontal" @submit.prevent="save">
+                        <input type="hidden" name="id"/>
+                        <div class="form-body">
                             <div class="form-group">
-                                <label class="col-md-3 control-label">是否启用：</label>
+                                <label  class="col-sm-2 control-label">充值活动：</label>
                                 <div class="col-sm-8">
+                                    <select class="form-control" v-model="bonusSetting.chargeSettingId">
+                                        <option value="0">全部活动</option>
+                                        <option value="{{chargeSetting.id + ':' + chargeSetting.shopDetailId}}" v-for="chargeSetting in chargeSettings">
+                                            {{chargeSetting.labelText}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label  class="col-sm-2 control-label">分红比例：</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="chargeBonusRatio" v-model="bonusSetting.chargeBonusRatio" min="1"  max="100" required placeholder="请输入1-100整数值">
+                                        <div class="input-group-addon">%</div>
+                                    </div>
+                                    <span class="help-block">请输入1-100整数值</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label  class="col-sm-2 control-label">店长分红：</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="shopownerBonusRatio" v-model="bonusSetting.shopownerBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
+                                        <div class="input-group-addon">%</div>
+                                    </div>
+                                    <span class="help-block">请输入0-100整数值</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label  class="col-sm-2 control-label">员工分红：</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" name="employeeBonusRatio" v-model="bonusSetting.employeeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
+                                        <div class="input-group-addon">%</div>
+                                    </div>
+                                    <span class="help-block">请输入0-100整数值</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">是否启用：</label>
+                                <div  class="col-md-8">
                                     <label class="radio-inline">
-                                        <input type="radio" name="state" v-model="orderRemark.state" value="1"> 启用
+                                        <input type="radio" name="state" value="1" v-model="bonusSetting.state"> 启用
                                     </label>
                                     <label class="radio-inline">
-                                        <input type="radio" name="state" v-model="orderRemark.state" value="0"> 不启用
+                                        <input type="radio" name="state" value="0" v-model="bonusSetting.state"> 不启用
                                     </label>
                                 </div>
                             </div>
-							<div class="text-center">
-								<input type="hidden" name="id"/>
-								<input class="btn green" type="submit" value="保存"/>
-								<a class="btn default" @click="closeShowForm">取消</a>
-							</div>
-						</div>
-					</form>
-	            </div>
-	        </div>
-		</div>
-	</div>
+                        </div>
+                        <div class="form-group text-center">
+                            <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
+                            <a class="btn default" @click="colseShowForm" >取消</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 	
 	<div class="table-div">
 		<div class="table-operator">
-			<button class="btn green pull-right" @click="createOrderRemark">新建</button>
+			<button class="btn green pull-right" @click="openShowForm">新建</button>
 		</div>
 		<div class="clearfix"></div>
 		<div class="table-filter"></div>
 		<div class="table-body">
-			<table class="table table-striped table-hover table-bordered" id = "orderRemarkTable"></table>
+			<table class="table table-striped table-hover table-bordered" id = "bonusSettingTable"></table>
 		</div>
 	</div>
 </div>
@@ -63,9 +93,10 @@
     var vueObj = new Vue({
         el : "#control",
         data : {
-            orderRemarkTable : {},
-            orderRemark : {state : 1},
-            showform : false
+            showform : false,
+            bonusSettingTable : {},
+            chargeSettings :[],
+            bonusSetting : {chargeSettingId : "0", state : 1}
         },
         created : function() {
             this.initDataTables();
@@ -75,12 +106,12 @@
             initDataTables:function () {
                 //that代表 vue对象
                 var that = this;
-                that.orderRemarkTable = $("#orderRemarkTable").DataTable({
+                that.bonusSettingTable = $("#bonusSettingTable").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
                     order: [[ 2, 'asc' ]],
                     columns : [
                         {
-                            title : "备注名称",
+                            title : "店铺",
                             data : "shopName",
                             orderable : false
                         },
@@ -134,6 +165,18 @@
                 toastr.success("查询中...");
                 var that = this;
                 try{
+                    $.post("bonusSetting/list_all",function (result) {
+                        if (result.success){
+                            that.bonusSettingTable.clear();
+                            that.bonusSettingTable.rows.add(result.data.bonusSettings).draw();
+                            that.chargeSettings = result.data.chargeSettings;
+                            toastr.clear();
+                            toastr.success("查询成功");
+                        } else{
+                            toastr.clear();
+                            toastr.error("网络异常，请刷新重试");
+                        }
+                    });
                 }catch(e){
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
@@ -141,6 +184,17 @@
             },
             save : function () {
                 var that = this;
+                try{
+                }catch(e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            openShowForm : function () {
+                this.showform = true;
+            },
+            colseShowForm : function () {
+                this.showform = false;
             }
         }
     });

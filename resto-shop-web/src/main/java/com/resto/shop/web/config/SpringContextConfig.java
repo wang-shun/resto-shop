@@ -429,6 +429,15 @@ public class SpringContextConfig {
     @Bean
     public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
 
+    @Bean
+    public BonusSettingService bonusSettingService() {return  proxy.create(BonusSettingService.class);}
+
+    @Bean
+    public BonusLogService bonusLogService() {return  proxy.create(BonusLogService.class);}
+
+    @Bean
+    public NewEmployeeService newEmployeeService() {return  proxy.create(NewEmployeeService.class);}
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
