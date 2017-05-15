@@ -23,6 +23,7 @@ import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
+import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -6313,6 +6314,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundArticle(Order order) {
+        if(order.getPayType() == PayType.NOPAY && (order.getPayMode() == PayMode.CRASH_PAY || order.getPayMode() == PayMode.BANK_CART_PAY)){
+            refundArticleNoPay(order);
+            return;
+        }
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         //退款完成后变更订单项
         Order o = getOrderInfo(order.getId());
@@ -6534,6 +6539,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPost(url, orderMap);
         }
+    }
+
+    public void refundArticleNoPay(Order order){
+        OrderPaymentItem back = new OrderPaymentItem();
+        back.setId(ApplicationUtils.randomUUID());
+        back.setOrderId(order.getId());
+        back.setPaymentModeId(PayMode.REFUND_CRASH);
+        back.setPayTime(new Date());
+        back.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
+        back.setRemark("现金退款:" + order.getRefundMoney());
+
+        back.setResultData("线下现金退款总金额：" + order.getRefundMoney());
+        orderPaymentItemService.insert(back);
     }
 
     @Override
