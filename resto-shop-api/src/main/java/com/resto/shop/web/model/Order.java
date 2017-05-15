@@ -210,6 +210,28 @@ public class Order implements Serializable{
 
     private Integer isPosPay;
 
+    //是否漏总单 （0-没 1-漏）
+    private Integer printFailFlag;
+
+    //是否漏厨打（0- 没 1-漏）
+    private Integer printKitchenFlag;
+
+    public Integer getPrintKitchenFlag() {
+        return printKitchenFlag;
+    }
+
+    public void setPrintKitchenFlag(Integer printKitchenFlag) {
+        this.printKitchenFlag = printKitchenFlag;
+    }
+
+    public Integer getPrintFailFlag() {
+        return printFailFlag;
+    }
+
+    public void setPrintFailFlag(Integer printFailFlag) {
+        this.printFailFlag = printFailFlag;
+    }
+
     public Integer getIsPosPay() {
         return isPosPay;
     }

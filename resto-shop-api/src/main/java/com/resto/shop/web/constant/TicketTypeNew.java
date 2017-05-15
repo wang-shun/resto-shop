@@ -6,6 +6,8 @@ package com.resto.shop.web.constant;
 public class TicketTypeNew {
     public static final String TICKET = "Ticket";
 
+    public static final String LABEL = "Label";
+
 
     public static final String RESTAURANT_RECEIPT = "RestaurantReceipt";
 

@@ -1821,7 +1821,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 if (printer.getTicketType() == TicketType.PRINT_TICKET) {
                     //小票
-                    getKitchenModel(article, order, printer, shopDetail, printTask);
+                    if(shopDetail.getIsPosNew() ==  Common.POS_NEW){
+                        getKitchenModelNew(article, order, printer, shopDetail, printTask);
+                    }else{
+                        getKitchenModel(article, order, printer, shopDetail, printTask);
+                    }
+
                 } else {
                     //贴纸
                     for (int i = 0; i < article.getCount(); i++) {
@@ -1836,8 +1841,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
                             countMap.put(article.getArticleId(), 1);
                         }
+                        if(shopDetail.getIsPosNew() ==  Common.POS_NEW){
+                            getKitchenLabelNew(article, order, printer, shopDetail, printTask, countMap, kitchenArticleMap.get(kitchenId));
+                        }else{
+                            getKitchenLabel(article, order, printer, shopDetail, printTask, countMap, kitchenArticleMap.get(kitchenId));
+                        }
 
-                        getKitchenLabel(article, order, printer, shopDetail, printTask, countMap, kitchenArticleMap.get(kitchenId));
                     }
 
                 }
@@ -1855,7 +1864,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //生成厨房小票
             for (String recommendId : recommendMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
-                getRecommendModel(recommendId, order, printer, shopDetail, printTask);
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    getRecommendModelNew(recommendId, order, printer, shopDetail, printTask);
+                }else{
+                    getRecommendModel(recommendId, order, printer, shopDetail, printTask);
+                }
+
             }
         }
         Brand brand = brandService.selectById(order.getBrandId());
@@ -1993,6 +2007,131 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         MemcachedUtils.put(shopDetail.getId() + "printList", printList);
     }
 
+    private void getRecommendModelNew(String recommendId, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
+        //桌号
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        List<OrderItem> orderItems = orderitemMapper.getOrderItemByRecommendId(recommendId, order.getId());
+        StringBuilder sb = new StringBuilder();
+        for (OrderItem orderItem : orderItems) {
+            String articleId = orderItem.getArticleId();
+
+            if (articleId.length() > 32) {
+                articleId = orderItem.getArticleId().substring(0, 32);
+            }
+            Article article = articleService.selectById(articleId);
+            if (article.getVirtualId() == null) {
+                Map<String, Object> item = new HashMap<String, Object>();
+                item.put("ARTICLE_NAME", orderItem.getArticleName());
+                sb.append(orderItem.getArticleName() + " ");
+                item.put("ARTICLE_COUNT", orderItem.getCount());
+                items.add(item);
+            }
+
+        }
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = getModeText(order);//就餐模式
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_TASK_ID", recommendId);
+        print.put("TASK_ORDER_ID",order.getId());
+        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", tableNumber);
+        //添加当天打印订单的序号
+
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ITEMS", items);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        BigDecimal level = new BigDecimal(0);
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        StringBuilder gao = new StringBuilder();
+        if (shopDetail.getIsUserIdentity().equals(1)) {
+            //得到有限制的情况下用户的订单数
+            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
+            //得到无限制情况下用户的订单数
+            int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
+            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+                gao.append("【高频】");
+            }//无限制的时候
+            else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
+                gao.append("【高频】");
+            }
+        }
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", level);
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        if (account != null) {
+            customerStr.append("余额：" + account.getRemain() + " ");
+        } else {
+            customerStr.append("余额：0 ");
+        }
+        customerStr.append("" + gao.toString() + " ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if (customer != null) {
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
+                }
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+        print.put("TICKET_MODE", TicketTypeNew.KITCHEN_TICKET);
+        //保存打印配置信息
+//                print.put("ORDER_ID", serialNumber);
+//                print.put("KITCHEN_NAME", kitchen.getName());
+//                print.put("TABLE_NO", tableNumber);
+        //添加到 打印集合
+        printTask.add(print);
+        MemcachedUtils.put(print_id, print);
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        if (customer != null) {
+            MemcachedUtils.put(print_id + "customer", customer);
+        }
+        MemcachedUtils.put(print_id + "article", sb.toString());
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+    }
+
+
     private void getKitchenLabel(OrderItem article, Order order, Printer printer,
                                  ShopDetail shopDetail, List<Map<String, Object>> printTask, Map map, List<OrderItem> orderItems) {
         int currentCount = (int) map.get(article.getArticleId());
@@ -2066,6 +2205,85 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         MemcachedUtils.put(shopDetail.getId() + "printList", printList);
 
     }
+
+
+    private void getKitchenLabelNew(OrderItem article, Order order, Printer printer,
+                                 ShopDetail shopDetail, List<Map<String, Object>> printTask, Map map, List<OrderItem> orderItems) {
+        int currentCount = (int) map.get(article.getArticleId());
+        int i = 0;
+
+        for (OrderItem orderItem : orderItems) {
+            if (article == null) {
+                continue;
+            }
+
+            if (article.getType() == OrderItemType.SETMEALS
+                    && orderItem.getParentId().equals(article.getId())) {
+                i++;
+            } else if (article.getType() == OrderItemType.MEALS_CHILDREN
+                    && article.getParentId().equals(orderItem.getParentId())) {
+                i++;
+            } else if (article.getType() != OrderItemType.SETMEALS
+                    && article.getType() != OrderItemType.MEALS_CHILDREN && article.getArticleId().equals(orderItem.getArticleId())) {
+                i += article.getCount().intValue();
+            }
+        }
+
+
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
+        String modeText = getModeText(order);//就餐模式
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_TASK_ID", article.getId());
+        print.put("TASK_ORDER_ID",article.getOrderId());
+        print.put("TABLE_NO", tableNumber);
+        print.put("OID", order.getId());
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("ADD_TIME", new Date().getTime());
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", order.getSerialNumber());
+        data.put("ARTICLE_NAME", article.getArticleName());
+        data.put("ARTICLE_NUMBER", currentCount + "/" + i);
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+        Customer customer = customerService.selectById(order.getCustomerId());
+        String phone = order.getVerCode();
+        if (customer != null) {
+            phone = StringUtils.isEmpty(customer.getTelephone()) ? order.getVerCode() : customer.getTelephone();
+        }
+
+        data.put("CUSTOMER_TEL", phone);
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("ARTICLE_COUNT", order.getArticleCount());
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+        print.put("TICKET_TYPE", TicketTypeNew.LABEL);
+        print.put("TICKET_MODE",TicketTypeNew.RESTAURANT_LABEL);
+        printTask.add(print);
+        MemcachedUtils.put(print_id, print);
+        if (customer != null) {
+            MemcachedUtils.put(print_id + "customer", customer);
+        }
+        MemcachedUtils.put(print_id + "article", article.getArticleName());
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+
+    }
+
 
     private void getKitchenModel(OrderItem article, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
         //保存 菜品的名称和数量
@@ -2212,6 +2430,161 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+
+
+
+    private void getKitchenModelNew(OrderItem article, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
+        //保存 菜品的名称和数量
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        StringBuilder sb = new StringBuilder();
+        Map<String, Object> item = new HashMap<String, Object>();
+        sb.append(article.getArticleName() + " ");
+        item.put("ARTICLE_NAME", article.getArticleName());
+        item.put("ARTICLE_COUNT", article.getCount());
+        items.add(item);
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = getModeText(order);//就餐模式
+
+
+        if (article.getType() == OrderItemType.SETMEALS) {
+            if (article.getChildren() != null && !article.getChildren().isEmpty()) {
+                List<OrderItem> list = orderitemMapper.getListBySort(article.getId(), article.getArticleId());
+                for (OrderItem obj : list) {
+                    Map<String, Object> child_item = new HashMap<String, Object>();
+                    child_item.put("ARTICLE_NAME", obj.getArticleName());
+                    sb.append(obj.getArticleName() + " ");
+                    if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
+                        child_item.put("ARTICLE_COUNT", obj.getRefundCount());
+                    } else {
+                        child_item.put("ARTICLE_COUNT", obj.getCount());
+                    }
+
+                    items.add(child_item);
+                }
+            }
+        } else {
+            if (!CollectionUtils.isEmpty(article.getChildren())) {
+                for (OrderItem obj : article.getChildren()) {
+                    Map<String, Object> child_item = new HashMap<String, Object>();
+                    child_item.put("ARTICLE_NAME", obj.getArticleName());
+                    sb.append(obj.getArticleName() + " ");
+                    if (order.getIsRefund() != null && order.getIsRefund() == Common.YES) {
+                        child_item.put("ARTICLE_COUNT", obj.getRefundCount());
+                    } else {
+                        child_item.put("ARTICLE_COUNT", obj.getCount());
+                    }
+
+                    items.add(child_item);
+                }
+            }
+        }
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("TABLE_NO", order.getTableNumber());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_TASK_ID", article.getId());
+        print.put("TASK_ORDER_ID",article.getOrderId());
+        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
+        print.put("ADD_TIME",new Date().getTime());
+        print.put("ORDER_ID", serialNumber);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        if (StringUtils.isNotBlank(order.getRemark())) {
+            data.put("MEMO", "备注：" + order.getRemark());
+        }
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ITEMS", items);
+        Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
+        StringBuilder star = new StringBuilder();
+        BigDecimal level = new BigDecimal(0);
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+            Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
+            level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
+                    .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        StringBuilder gao = new StringBuilder();
+        if (shopDetail.getIsUserIdentity().equals(1)) {
+            //得到有限制的情况下用户的订单数
+            int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
+            //得到无限制情况下用户的订单数
+            int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
+            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+                gao.append("【高频】");
+            }//无限制的时候
+            else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
+                gao.append("【高频】");
+            }
+        }
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        data.put("CUSTOMER_SATISFACTION_DEGREE", level);
+        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+        StringBuffer customerStr = new StringBuffer();
+        if (account != null) {
+            customerStr.append("余额：" + account.getRemain() + " ");
+        } else {
+            customerStr.append("余额：0 ");
+        }
+        customerStr.append("" + gao.toString() + " ");
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if (customer != null) {
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
+                }
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerStr.toString());
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+        print.put("TICKET_MODE", TicketTypeNew.KITCHEN_TICKET);
+        //保存打印配置信息
+//                print.put("ORDER_ID", serialNumber);
+//                print.put("KITCHEN_NAME", kitchen.getName());
+//                print.put("TABLE_NO", tableNumber);
+        //添加到 打印集合
+        printTask.add(print);
+
+        MemcachedUtils.put(print_id, print);
+        if (customer != null) {
+            MemcachedUtils.put(print_id + "customer", customer);
+        }
+        MemcachedUtils.put(print_id + "article", sb.toString());
+        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+    }
+
+
+
     private String getModeText(Order order) {
         if (order == null) {
             return "";
@@ -2246,15 +2619,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         child.addAll(orderItems);
 
-
+        List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (selectPrinterId == null) {
-            List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
-                return printTicket(order, child, shopDetail, printer.get(0));
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    return printTicketPosNew(order, child, shopDetail, printer.get(0));
+                }else{
+                    return printTicket(order, child, shopDetail, printer.get(0));
+                }
+
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            return printTicket(order, child, shopDetail, p);
+            if(shopDetail.getIsPosNew() == Common.YES){
+                return printTicketPosNew(order, child, shopDetail, printer.get(0));
+            }else{
+                return printTicket(order, child, shopDetail, p);
+            }
+
         }
         return null;
     }
@@ -2357,12 +2739,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
+        print.put("PRINT_STATE", order.getPrintFailFlag());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
+        print.put("PRINT_STATUS",order.getPrintFailFlag());
         print.put("ADD_TIME", new Date());
 
         Map<String, Object> data = new HashMap<>();
@@ -2654,9 +3038,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
+        print.put("TASK_ORDER_ID", order.getId());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
-        print.put("LINE_WIDTH",shopDetail.getPageSize());
+        print.put("PRINT_STATUS",order.getPrintFailFlag());
+        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
@@ -3115,7 +3501,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, child, shopDetail, printer);
+                Map<String, Object> ticket = null;
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    ticket = printTicketPosNew(order, child, shopDetail, printer);
+                }else{
+                    ticket = printTicket(order, child, shopDetail, printer);
+                }
+
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -3138,7 +3530,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             child.addAll(items);
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, items, shopDetail, printer);
+                Map<String, Object> ticket = null;
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    ticket = printTicketPosNew(order, child, shopDetail, printer);
+                }else{
+                    ticket = printTicket(order, child, shopDetail, printer);
+                }
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -3156,7 +3553,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             child.addAll(items);
 
             for (Printer printer : ticketPrinter) {
-                Map<String, Object> ticket = printTicket(order, child, shopDetail, printer);
+                Map<String, Object> ticket = null;
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    ticket = printTicketPosNew(order, child, shopDetail, printer);
+                }else{
+                    ticket = printTicket(order, child, shopDetail, printer);
+                }
                 if (ticket != null) {
                     printTask.add(ticket);
                 }
@@ -3170,7 +3572,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
             for (Printer printer : packagePrinter) {
-                Map<String, Object> packageTicket = printTicket(order, items, shopDetail, printer);
+                Map<String, Object> packageTicket = null;
+                if(shopDetail.getIsPosNew() == Common.YES){
+                    packageTicket = printTicketPosNew(order, items, shopDetail, printer);
+                }else{
+                    packageTicket = printTicket(order, items, shopDetail, printer);
+                }
                 if (packageTicket != null) {
                     printTask.add(packageTicket);
                 }
@@ -4024,7 +4431,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         items.addAll(child);
 //        }
-
+        List<OrderItem> list = new ArrayList<>();
+        if(order.getPrintKitchenFlag() == Common.YES){
+            for(OrderItem item : items){
+                if(item.getPrintFailFlag() == 1){
+                    list.add(item);
+                }
+            }
+        }else{
+            list.addAll(items);
+        }
 
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 

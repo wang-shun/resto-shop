@@ -94,6 +94,16 @@ public class OrderItem implements Serializable {
      */
     private Integer discount;
 
+    private Integer printFailFlag;
+
+    public Integer getPrintFailFlag() {
+        return printFailFlag;
+    }
+
+    public void setPrintFailFlag(Integer printFailFlag) {
+        this.printFailFlag = printFailFlag;
+    }
+
     final public BigDecimal getExtraPrice() {
         return extraPrice;
     }
