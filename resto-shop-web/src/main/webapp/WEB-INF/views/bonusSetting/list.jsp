@@ -100,7 +100,6 @@
         created : function() {
             this.initDataTables();
             this.searchInfo();
-            this.getBonusSetting();
         },
         methods : {
             initDataTables:function () {
@@ -195,16 +194,13 @@
                 toastr.clear();
                 var that = this;
                 try{
-                    if (that.bonusSetting.id != null){
-                        that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
-                    }
+                    that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
                     $.post("bonusSetting/"+(that.bonusSetting.id != null ? "modify" : "create")+"",that.bonusSetting,function (result) {
                         if (result.success){
                             that.searchInfo();
                         } else{
                             toastr.error("网络异常，请刷新重试");
                         }
-                        that.getBonusSetting();
                         that.showform = false;
                     });
                 }catch(e){
@@ -212,11 +208,7 @@
                 }
             },
             colseShowForm : function () {
-                this.getBonusSetting();
                 this.showform = false;
-            },
-            getBonusSetting : function () {
-                this.bonusSetting = {state : 1};
             },
             updateBonusSetting : function (bonusSetting) {
                 this.showform = true;

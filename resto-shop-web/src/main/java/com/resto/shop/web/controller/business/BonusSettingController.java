@@ -56,6 +56,7 @@ public class BonusSettingController extends GenericController{
                     bonusSetting.setEmployeeBonusRatio(100);
                     bonusSetting.setState(false);
                     bonusSetting.setChargeName(chargeSetting.getLabelText());
+                    bonusSetting.setCreateTime(new Date());
                     for (ShopDetail shopDetail : shopDetails){
                         if (shopDetail.getId().equalsIgnoreCase(chargeSetting.getShopDetailId())){
                             bonusSetting.setShopName(shopDetail.getName());
@@ -90,6 +91,7 @@ public class BonusSettingController extends GenericController{
                     bonusSetting.setEmployeeBonusRatio(100);
                     bonusSetting.setState(false);
                     bonusSetting.setChargeName(chargeSetting.getLabelText());
+                    bonusSetting.setCreateTime(new Date());
                     for (ShopDetail shopDetail : shopDetails){
                         if (shopDetail.getId().equalsIgnoreCase(chargeSetting.getShopDetailId())){
                             bonusSetting.setShopName(shopDetail.getName());
