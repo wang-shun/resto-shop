@@ -3042,7 +3042,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
         print.put("PRINT_STATUS",order.getPrintFailFlag());
-        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
+        print.put("LINE_WIDTH",42);
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
