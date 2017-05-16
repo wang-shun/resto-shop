@@ -11,9 +11,9 @@
 
                 <div class="portlet-body">
                     <form role="form" class="form-horizontal" @submit.prevent="save">
-                        <input type="hidden" name="id"/>
+                        <input type="hidden" name="id" v-model="bonusSetting.id"/>
                         <div class="form-body">
-                            <div class="form-group">
+                            <div class="form-group" v-show="bonusSetting.id == null">
                                 <label  class="col-sm-2 control-label">充值活动：</label>
                                 <div class="col-sm-8">
                                     <select class="form-control" v-model="bonusSetting.chargeSettingId">
@@ -96,11 +96,12 @@
             showform : false,
             bonusSettingTable : {},
             chargeSettings :[],
-            bonusSetting : {chargeSettingId : "0", state : 1}
+            bonusSetting : {}
         },
         created : function() {
             this.initDataTables();
             this.searchInfo();
+            this.getBonusSetting();
         },
         methods : {
             initDataTables:function () {
@@ -152,6 +153,7 @@
                             createdCell: function (td, tdData, rowData) {
                                 var updateButton = $("<button class='btn btn-info btn-sm'>设置</button>");
                                 updateButton.click(function () {
+                                    that.updateBonusSetting(rowData);
                                 });
                                 var operator = [updateButton];
                                 $(td).html(operator);
@@ -185,16 +187,38 @@
             save : function () {
                 var that = this;
                 try{
+                    if (that.bonusSetting.id != null){
+                        that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
+                    }
+                    $.post("bonusSetting/"+(that.bonusSetting.id != null ? "modify" : "create")+"",that.bonusSetting,function (result) {
+                        if (result.success){
+                            that.searchInfo();
+                        } else{
+                            toastr.clear();
+                            toastr.error("网络异常，请刷新重试");
+                        }
+                        that.getBonusSetting();
+                        that.showform = false;
+                    });
                 }catch(e){
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },
             openShowForm : function () {
+                this.getBonusSetting();
                 this.showform = true;
             },
             colseShowForm : function () {
+                this.getBonusSetting();
                 this.showform = false;
+            },
+            getBonusSetting : function () {
+                this.bonusSetting = {chargeSettingId : "0", state : 1};
+            },
+            updateBonusSetting : function (bonusSetting) {
+                this.showform = true;
+                this.bonusSetting = bonusSetting;
             }
         }
     });

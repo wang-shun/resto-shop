@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSONArray;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.service.ChargeSettingService;
@@ -16,6 +17,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.BonusSetting;
 import com.resto.shop.web.service.BonusSettingService;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,14 @@ public class BonusSettingController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid BonusSetting bonussetting){
 	    try{
+	        String[] ids = bonussetting.getChargeSettingId().split(":");
+	        String chargeSettingId = ids[0];
+            String shopDetailId = ids[1];
+            bonussetting.setId(ApplicationUtils.randomUUID());
+            bonussetting.setChargeSettingId(chargeSettingId);
+            bonussetting.setShopDetailId(shopDetailId);
+            bonussetting.setBrandId(getCurrentBrandId());
+            bonussetting.setCreateTime(new Date());
             bonussettingService.insert(bonussetting);
             return getSuccessResult();
         }catch (Exception e){
@@ -83,7 +93,13 @@ public class BonusSettingController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid BonusSetting bonussetting){
-		bonussettingService.update(bonussetting);
-		return Result.getSuccess();
+        try{
+            bonussettingService.update(bonussetting);
+            return getSuccessResult();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("修改分红设置出错！");
+            return new Result(false);
+        }
 	}
 }
