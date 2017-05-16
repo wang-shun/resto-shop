@@ -79,6 +79,7 @@
 
 
 <script>
+    var bonusTableAPI;
     var vueObj = new Vue({
         el : "#control",
         data : {
@@ -101,7 +102,8 @@
                         {
                             title : "店铺",
                             data : "shopName",
-                            orderable : false
+                            orderable : false,
+                            s_filter: true
                         },
                         {
                             title : "充值活动",
@@ -155,7 +157,11 @@
                                 $(td).html(operator);
                             }
                         }
-                    ]
+                    ],
+                    initComplete: function () {
+                        bonusTableAPI = this.api();
+                        that.bonusTable();
+                    }
                 });
             },
             searchInfo : function() {
@@ -165,8 +171,13 @@
                 try{
                     $.post("bonusSetting/list_all",function (result) {
                         if (result.success){
+                            var api = bonusTableAPI;
+                            api.search('');
+                            var column1 = api.column(0);
+                            column1.search('', true, false);
                             that.bonusSettingTable.clear();
                             that.bonusSettingTable.rows.add(result.data).draw();
+                            that.bonusTable();
                             toastr.clear();
                             toastr.success("查询成功");
                         } else{
@@ -237,6 +248,25 @@
                 } else if(chargeBonusRatio > 100){
                     this.bonusSetting.chargeBonusRatio = 100;
                 }
+            },
+            bonusTable : function () {
+                var api = bonusTableAPI;
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
             }
         }
     });
