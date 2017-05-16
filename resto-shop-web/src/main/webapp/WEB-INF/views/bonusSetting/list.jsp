@@ -13,17 +13,6 @@
                     <form role="form" class="form-horizontal" @submit.prevent="save">
                         <input type="hidden" name="id" v-model="bonusSetting.id"/>
                         <div class="form-body">
-                            <%--<div class="form-group" v-show="bonusSetting.id == null">--%>
-                                <%--<label  class="col-sm-2 control-label">充值活动：</label>--%>
-                                <%--<div class="col-sm-8">--%>
-                                    <%--<select class="form-control" v-model="bonusSetting.chargeSettingId">--%>
-                                        <%--<option value="0">全部活动</option>--%>
-                                        <%--<option value="{{chargeSetting.id + ':' + chargeSetting.shopDetailId}}" v-for="chargeSetting in chargeSettings">--%>
-                                            <%--{{chargeSetting.labelText}}--%>
-                                        <%--</option>--%>
-                                    <%--</select>--%>
-                                <%--</div>--%>
-                            <%--</div>--%>
                             <div class="form-group">
                                 <label  class="col-sm-2 control-label">分红比例：</label>
                                 <div class="col-sm-8">
