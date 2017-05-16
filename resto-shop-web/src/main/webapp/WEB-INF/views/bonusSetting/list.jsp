@@ -123,15 +123,24 @@
                         },
                         {
                             title : "充值分红比例",
-                            data : "chargeBonusRatio"
+                            data : "chargeBonusRatio",
+                            createdCell: function (td, tdData) {
+                                $(td).html(tdData+"%");
+                            }
                         },
                         {
                             title : "店长分红比例",
-                            data : "shopownerBonusRatio"
+                            data : "shopownerBonusRatio",
+                            createdCell: function (td, tdData) {
+                                $(td).html(tdData+"%");
+                            }
                         },
                         {
                             title : "员工分红比例",
-                            data : "employeeBonusRatio"
+                            data : "employeeBonusRatio",
+                            createdCell: function (td, tdData) {
+                                $(td).html(tdData+"%");
+                            }
                         },
                         {
                             title : "启用分红",
@@ -185,8 +194,18 @@
                 }
             },
             save : function () {
+                toastr.clear();
                 var that = this;
                 try{
+                    var chargeId = that.bonusSetting.chargeSettingId;
+                    var bonusRatio = parseInt(that.bonusSetting.shopownerBonusRatio) + parseInt(that.bonusSetting.employeeBonusRatio);
+                    if (chargeId == "0"){
+                        toastr.error("请选择充值活动");
+                        return;
+                    }else if(bonusRatio > 100 || bonusRatio < 100){
+                        toastr.error("店长分红比例与员工分红比例之和必须为100%");
+                        return;
+                    }
                     if (that.bonusSetting.id != null){
                         that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
                     }
@@ -194,14 +213,12 @@
                         if (result.success){
                             that.searchInfo();
                         } else{
-                            toastr.clear();
                             toastr.error("网络异常，请刷新重试");
                         }
                         that.getBonusSetting();
                         that.showform = false;
                     });
                 }catch(e){
-                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },
