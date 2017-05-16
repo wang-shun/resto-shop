@@ -28,7 +28,7 @@
                                 <label  class="col-sm-2 control-label">分红比例：</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="chargeBonusRatio" v-model="bonusSetting.chargeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
+                                        <input class="form-control" type="number" name="chargeBonusRatio" @keyup="setChargeBonusRatio" v-model="bonusSetting.chargeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
                                         <div class="input-group-addon">%</div>
                                     </div>
                                     <span class="help-block">请输入0-100整数值</span>
@@ -38,7 +38,7 @@
                                 <label  class="col-sm-2 control-label">店长分红：</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="shopownerBonusRatio" v-model="bonusSetting.shopownerBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
+                                        <input class="form-control" type="number" name="shopownerBonusRatio" @keyup="setEmployeeBonusRatio" @change="setEmployeeBonusRatio" v-model="bonusSetting.shopownerBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
                                         <div class="input-group-addon">%</div>
                                     </div>
                                     <span class="help-block">请输入0-100整数值</span>
@@ -48,7 +48,7 @@
                                 <label  class="col-sm-2 control-label">员工分红：</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="employeeBonusRatio" v-model="bonusSetting.employeeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
+                                        <input class="form-control" type="number" name="employeeBonusRatio" @keyup="setShopownerBonusRatio" @change="setShopownerBonusRatio" v-model="bonusSetting.employeeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
                                         <div class="input-group-addon">%</div>
                                     </div>
                                     <span class="help-block">请输入0-100整数值</span>
@@ -213,6 +213,41 @@
             updateBonusSetting : function (bonusSetting) {
                 this.showform = true;
                 this.bonusSetting = bonusSetting;
+            },
+            setShopownerBonusRatio : function () {
+                if (this.bonusSetting.employeeBonusRatio == ""){
+                    this.bonusSetting.employeeBonusRatio = 0;
+                }
+                var employeeBonusRatio = parseInt(this.bonusSetting.employeeBonusRatio);
+                if (employeeBonusRatio < 0){
+                    this.bonusSetting.employeeBonusRatio = 0;
+                } else if(employeeBonusRatio > 100){
+                    this.bonusSetting.employeeBonusRatio = 100;
+                }
+                this.bonusSetting.shopownerBonusRatio = 100 - parseInt(this.bonusSetting.employeeBonusRatio);
+            },
+            setEmployeeBonusRatio : function () {
+                if (this.bonusSetting.shopownerBonusRatio == ""){
+                    this.bonusSetting.shopownerBonusRatio = 0;
+                }
+                var shopownerBonusRatio = parseInt(this.bonusSetting.shopownerBonusRatio);
+                if (shopownerBonusRatio < 0){
+                    this.bonusSetting.shopownerBonusRatio = 0;
+                } else if(shopownerBonusRatio > 100){
+                    this.bonusSetting.shopownerBonusRatio = 100;
+                }
+                this.bonusSetting.employeeBonusRatio = 100 - parseInt(this.bonusSetting.shopownerBonusRatio);
+            },
+            setChargeBonusRatio : function () {
+                if (this.bonusSetting.chargeBonusRatio == ""){
+                    this.bonusSetting.chargeBonusRatio = 0;
+                }
+                var chargeBonusRatio = parseInt(this.bonusSetting.chargeBonusRatio);
+                if (chargeBonusRatio < 0){
+                    this.bonusSetting.chargeBonusRatio = 0;
+                } else if(chargeBonusRatio > 100){
+                    this.bonusSetting.chargeBonusRatio = 100;
+                }
             }
         }
     });
