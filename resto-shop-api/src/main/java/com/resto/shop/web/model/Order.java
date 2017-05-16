@@ -210,10 +210,10 @@ public class Order implements Serializable{
 
     private Integer isPosPay;
 
-    //是否漏总单 （0-没 1-漏）
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
     private Integer printFailFlag;
 
-    //是否漏厨打（0- 没 1-漏）
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
     private Integer printKitchenFlag;
 
     public Integer getPrintKitchenFlag() {

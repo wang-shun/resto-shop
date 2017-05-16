@@ -94,6 +94,7 @@ public class OrderItem implements Serializable {
      */
     private Integer discount;
 
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
     private Integer printFailFlag;
 
     public Integer getPrintFailFlag() {

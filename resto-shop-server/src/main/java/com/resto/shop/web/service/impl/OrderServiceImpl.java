@@ -4434,7 +4434,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderItem> list = new ArrayList<>();
         if(order.getPrintKitchenFlag() == Common.YES){
             for(OrderItem item : items){
-                if(item.getPrintFailFlag() == 1){
+                if(item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT){
                     list.add(item);
                 }
             }
