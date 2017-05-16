@@ -13,25 +13,25 @@
                     <form role="form" class="form-horizontal" @submit.prevent="save">
                         <input type="hidden" name="id" v-model="bonusSetting.id"/>
                         <div class="form-body">
-                            <div class="form-group" v-show="bonusSetting.id == null">
-                                <label  class="col-sm-2 control-label">充值活动：</label>
-                                <div class="col-sm-8">
-                                    <select class="form-control" v-model="bonusSetting.chargeSettingId">
-                                        <option value="0">全部活动</option>
-                                        <option value="{{chargeSetting.id + ':' + chargeSetting.shopDetailId}}" v-for="chargeSetting in chargeSettings">
-                                            {{chargeSetting.labelText}}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
+                            <%--<div class="form-group" v-show="bonusSetting.id == null">--%>
+                                <%--<label  class="col-sm-2 control-label">充值活动：</label>--%>
+                                <%--<div class="col-sm-8">--%>
+                                    <%--<select class="form-control" v-model="bonusSetting.chargeSettingId">--%>
+                                        <%--<option value="0">全部活动</option>--%>
+                                        <%--<option value="{{chargeSetting.id + ':' + chargeSetting.shopDetailId}}" v-for="chargeSetting in chargeSettings">--%>
+                                            <%--{{chargeSetting.labelText}}--%>
+                                        <%--</option>--%>
+                                    <%--</select>--%>
+                                <%--</div>--%>
+                            <%--</div>--%>
                             <div class="form-group">
                                 <label  class="col-sm-2 control-label">分红比例：</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
-                                        <input class="form-control" type="number" name="chargeBonusRatio" v-model="bonusSetting.chargeBonusRatio" min="1"  max="100" required placeholder="请输入1-100整数值">
+                                        <input class="form-control" type="number" name="chargeBonusRatio" v-model="bonusSetting.chargeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">
                                         <div class="input-group-addon">%</div>
                                     </div>
-                                    <span class="help-block">请输入1-100整数值</span>
+                                    <span class="help-block">请输入0-100整数值</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -78,7 +78,7 @@
 	
 	<div class="table-div">
 		<div class="table-operator">
-			<button class="btn green pull-right" @click="openShowForm">新建</button>
+			<%--<button class="btn green pull-right" @click="openShowForm">新建</button>--%>
 		</div>
 		<div class="clearfix"></div>
 		<div class="table-filter"></div>
@@ -95,7 +95,6 @@
         data : {
             showform : false,
             bonusSettingTable : {},
-            chargeSettings :[],
             bonusSetting : {}
         },
         created : function() {
@@ -179,8 +178,7 @@
                     $.post("bonusSetting/list_all",function (result) {
                         if (result.success){
                             that.bonusSettingTable.clear();
-                            that.bonusSettingTable.rows.add(result.data.bonusSettings).draw();
-                            that.chargeSettings = result.data.chargeSettings;
+                            that.bonusSettingTable.rows.add(result.data).draw();
                             toastr.clear();
                             toastr.success("查询成功");
                         } else{
@@ -197,15 +195,6 @@
                 toastr.clear();
                 var that = this;
                 try{
-                    var chargeId = that.bonusSetting.chargeSettingId;
-                    var bonusRatio = parseInt(that.bonusSetting.shopownerBonusRatio) + parseInt(that.bonusSetting.employeeBonusRatio);
-                    if (chargeId == "0"){
-                        toastr.error("请选择充值活动");
-                        return;
-                    }else if(bonusRatio > 100 || bonusRatio < 100){
-                        toastr.error("店长分红比例与员工分红比例之和必须为100%");
-                        return;
-                    }
                     if (that.bonusSetting.id != null){
                         that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
                     }
@@ -222,21 +211,12 @@
                     toastr.error("系统异常，请刷新重试");
                 }
             },
-            openShowForm : function () {
-                if (this.chargeSettings.length == 0){
-                    toastr.clear();
-                    toastr.error("暂无其他充值活动可绑定，无法添加分红设置");
-                    return;
-                }
-                this.getBonusSetting();
-                this.showform = true;
-            },
             colseShowForm : function () {
                 this.getBonusSetting();
                 this.showform = false;
             },
             getBonusSetting : function () {
-                this.bonusSetting = {chargeSettingId : "0", state : 1};
+                this.bonusSetting = {state : 1};
             },
             updateBonusSetting : function (bonusSetting) {
                 this.showform = true;
@@ -244,9 +224,4 @@
             }
         }
     });
-
-    function Trim(str)
-    {
-        return str.replace(/(^\s*)|(\s*$)/g, "");
-    }
 </script>

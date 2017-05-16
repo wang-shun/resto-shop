@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import com.alibaba.fastjson.JSONArray;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.service.ChargeSettingService;
 import org.springframework.stereotype.Controller;
@@ -40,28 +41,65 @@ public class BonusSettingController extends GenericController{
 	@ResponseBody
 	public Result listData(){
 	    try{
-            Map<String, Object> map = new HashMap<>();
             List<BonusSetting> bonusSettings = bonussettingService.selectList();
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             List<ChargeSetting> chargeSettings = chargeSettingService.selectList();
-            for (BonusSetting setting : bonusSettings){
-                for (ShopDetail shopDetail : shopDetails){
-                    if (setting.getShopDetailId().equalsIgnoreCase(shopDetail.getId())){
-                        setting.setShopName(shopDetail.getName());
-                        break;
+            BonusSetting bonusSetting;
+            if (bonusSettings.isEmpty()){
+                for (ChargeSetting chargeSetting : chargeSettings){
+                    bonusSetting = new BonusSetting();
+                    bonusSetting.setBrandId(getCurrentBrandId());
+                    bonusSetting.setShopDetailId(chargeSetting.getShopDetailId());
+                    bonusSetting.setChargeSettingId(chargeSetting.getId());
+                    bonusSetting.setChargeBonusRatio(0);
+                    bonusSetting.setShopownerBonusRatio(0);
+                    bonusSetting.setEmployeeBonusRatio(100);
+                    bonusSetting.setState(false);
+                    bonusSetting.setChargeName(chargeSetting.getLabelText());
+                    for (ShopDetail shopDetail : shopDetails){
+                        if (shopDetail.getId().equalsIgnoreCase(chargeSetting.getShopDetailId())){
+                            bonusSetting.setShopName(shopDetail.getName());
+                            break;
+                        }
+                    }
+                    bonusSettings.add(bonusSetting);
+                }
+            }else {
+                for (BonusSetting setting : bonusSettings) {
+                    for (ShopDetail shopDetail : shopDetails) {
+                        if (setting.getShopDetailId().equalsIgnoreCase(shopDetail.getId())) {
+                            setting.setShopName(shopDetail.getName());
+                            break;
+                        }
+                    }
+                    for (ChargeSetting chargeSetting : chargeSettings) {
+                        if (setting.getChargeSettingId().equalsIgnoreCase(chargeSetting.getId())) {
+                            setting.setChargeName(chargeSetting.getLabelText());
+                            chargeSettings.remove(chargeSetting);
+                            break;
+                        }
                     }
                 }
                 for (ChargeSetting chargeSetting : chargeSettings){
-                    if (setting.getChargeSettingId().equalsIgnoreCase(chargeSetting.getId())){
-                        setting.setChargeName(chargeSetting.getLabelText());
-                        chargeSettings.remove(chargeSetting);
-                        break;
+                    bonusSetting = new BonusSetting();
+                    bonusSetting.setBrandId(getCurrentBrandId());
+                    bonusSetting.setShopDetailId(chargeSetting.getShopDetailId());
+                    bonusSetting.setChargeSettingId(chargeSetting.getId());
+                    bonusSetting.setChargeBonusRatio(0);
+                    bonusSetting.setShopownerBonusRatio(0);
+                    bonusSetting.setEmployeeBonusRatio(100);
+                    bonusSetting.setState(false);
+                    bonusSetting.setChargeName(chargeSetting.getLabelText());
+                    for (ShopDetail shopDetail : shopDetails){
+                        if (shopDetail.getId().equalsIgnoreCase(chargeSetting.getShopDetailId())){
+                            bonusSetting.setShopName(shopDetail.getName());
+                            break;
+                        }
                     }
+                    bonusSettings.add(bonusSetting);
                 }
             }
-            map.put("bonusSettings",bonusSettings);
-            map.put("chargeSettings",chargeSettings);
-	        return getSuccessResult(map);
+	        return getSuccessResult(bonusSettings);
         }catch (Exception e){
             e.printStackTrace();
             log.error("查看所有分红设置出错！");
@@ -73,13 +111,7 @@ public class BonusSettingController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid BonusSetting bonussetting){
 	    try{
-	        String[] ids = bonussetting.getChargeSettingId().split(":");
-	        String chargeSettingId = ids[0];
-            String shopDetailId = ids[1];
             bonussetting.setId(ApplicationUtils.randomUUID());
-            bonussetting.setChargeSettingId(chargeSettingId);
-            bonussetting.setShopDetailId(shopDetailId);
-            bonussetting.setBrandId(getCurrentBrandId());
             bonussetting.setCreateTime(new Date());
             bonussettingService.insert(bonussetting);
             return getSuccessResult();
