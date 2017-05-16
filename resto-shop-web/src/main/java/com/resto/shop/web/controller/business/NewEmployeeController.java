@@ -10,6 +10,8 @@ import javax.validation.Valid;
 
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.service.CustomerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,6 +27,9 @@ public class NewEmployeeController extends GenericController{
 
 	@Resource
 	NewEmployeeService newEmployeeService;
+
+    @Resource
+    CustomerService customerService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -69,9 +74,14 @@ public class NewEmployeeController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid NewEmployee newemployee){
 	    try{
+            Customer customer = customerService.selectByTelePhone(newemployee.getTelephone());
+	        if (customer == null){
+	            return new Result("该用户未在系统中注册，请确定该手机号用户注册后添加",false);
+            }
 	        newemployee.setId(ApplicationUtils.randomUUID());
             newemployee.setBrandId(getCurrentBrandId());
             newemployee.setCreateTime(new Date());
+            newemployee.setNickName(customer.getNickname());
             newEmployeeService.insert(newemployee);
             return getSuccessResult();
         }catch (Exception e){

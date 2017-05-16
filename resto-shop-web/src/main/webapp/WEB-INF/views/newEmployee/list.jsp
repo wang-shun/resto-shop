@@ -20,12 +20,6 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label  class="col-sm-2 control-label">微信昵称：</label>
-                                <div class="col-sm-8">
-                                    <input class="form-control" type="text" name="nickName" v-model="newEmployee.nickName" required placeholder="请输入微信昵称">
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label  class="col-sm-2 control-label">手机号：</label>
                                 <div class="col-sm-8">
                                     <input class="form-control" type="text" name="telephone" v-model="newEmployee.telephone" required placeholder="请输入手机号">
@@ -216,11 +210,15 @@
                     }
                     $.post("newEmployee/"+(that.newEmployee.id != null ? "modify" : "create")+"",that.newEmployee,function (result) {
                         if (result.success){
+                            that.showform = false;
                             that.searchInfo();
                         } else{
-                            toastr.error("网络异常，请刷新重试");
+                            if (result.message != null){
+                                toastr.error(result.message);
+                            }else {
+                                toastr.error("网络异常，请刷新重试");
+                            }
                         }
-                        that.showform = false;
                     });
                 }catch(e){
                     toastr.error("系统异常，请刷新重试");

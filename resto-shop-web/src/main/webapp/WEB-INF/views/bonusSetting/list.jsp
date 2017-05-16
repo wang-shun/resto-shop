@@ -197,11 +197,11 @@
                     that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
                     $.post("bonusSetting/"+(that.bonusSetting.id != null ? "modify" : "create")+"",that.bonusSetting,function (result) {
                         if (result.success){
+                            that.showform = false;
                             that.searchInfo();
                         } else{
                             toastr.error("网络异常，请刷新重试");
                         }
-                        that.showform = false;
                     });
                 }catch(e){
                     toastr.error("系统异常，请刷新重试");
