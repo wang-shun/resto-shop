@@ -56,5 +56,5 @@
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusSetting">update tb_bonus_setting set charge_setting_id = #{chargeSettingId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR}, charge_bonus_ratio = #{chargeBonusRatio,jdbcType=INTEGER}, shopowner_bonus_ratio = #{shopownerBonusRatio,jdbcType=INTEGER}, employee_bonus_ratio = #{employeeBonusRatio,jdbcType=INTEGER}, state = #{state,jdbcType=BIT}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
-  <select id="selectList" resultType="BonusSetting">select * from tb_bonus_setting</select>
+  <select id="selectList" resultType="BonusSetting">select * from tb_bonus_setting ORDER BY create_time DESC</select>
 </mapper>
