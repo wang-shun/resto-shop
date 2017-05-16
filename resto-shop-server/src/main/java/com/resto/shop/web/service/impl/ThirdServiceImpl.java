@@ -688,7 +688,7 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                     if (check) {
-                        result = hungerPushVersion2(map, brandSetting, brandId);
+                        result = hungerPushVersion2(map, brandSetting);
                     }
                     break;
                 default:
@@ -700,7 +700,7 @@ public class ThirdServiceImpl implements ThirdService {
         return result;
     }
 
-    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting, String brandId) throws Exception {
+    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting) throws Exception {
         Integer type;
         if(StringUtils.isEmpty(map.get("type"))){
             return false;
@@ -710,8 +710,10 @@ public class ThirdServiceImpl implements ThirdService {
         if(type == ElemeType.NEW_ORDER){
             Map m = new HashMap();
             String message = map.get("message").toString();
-            JSONObject messageJson = new JSONObject(message);
-            String orderId = messageJson.optString("orderId");
+            System.out.println(message);
+            message = message.replaceAll("\\\\","");
+            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
+            String orderId = messageJson.getString("orderId");
             m.put("eleme_order_ids", orderId);
             addHungerOrder(m,brandSetting);
         }
