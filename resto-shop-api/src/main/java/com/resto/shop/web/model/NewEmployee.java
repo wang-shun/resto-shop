@@ -21,6 +21,12 @@ public class NewEmployee {
 
     private Date createTime;
 
+    private String shopName;
+
+    private String roleValue;
+
+    private String sexValue;
+
     public String getId() {
         return id;
     }
@@ -91,5 +97,29 @@ public class NewEmployee {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
+
+    public String getRoleValue() {
+        return roleValue;
+    }
+
+    public void setRoleValue(String roleValue) {
+        this.roleValue = roleValue;
+    }
+
+    public String getSexValue() {
+        return sexValue;
+    }
+
+    public void setSexValue(String sexValue) {
+        this.sexValue = sexValue;
     }
 }
