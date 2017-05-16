@@ -9,6 +9,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.service.ChargeSettingService;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -66,17 +67,27 @@ public class BonusSettingController extends GenericController{
                     bonusSettings.add(bonusSetting);
                 }
             }else {
-                for (BonusSetting setting : bonusSettings) {
-                    for (ShopDetail shopDetail : shopDetails) {
-                        if (setting.getShopDetailId().equalsIgnoreCase(shopDetail.getId())) {
-                            setting.setShopName(shopDetail.getName());
+                for (int i = 0, length = bonusSettings.size(); i < length ; i++){
+                    boolean flg = false;
+                    BonusSetting setting = bonusSettings.get(i);
+                    for (ChargeSetting chargeSetting : chargeSettings) {
+                        if (setting.getChargeSettingId().equalsIgnoreCase(chargeSetting.getId())) {
+                            flg = true;
+                            setting.setChargeName(chargeSetting.getLabelText());
+                            chargeSettings.remove(chargeSetting);
                             break;
                         }
                     }
-                    for (ChargeSetting chargeSetting : chargeSettings) {
-                        if (setting.getChargeSettingId().equalsIgnoreCase(chargeSetting.getId())) {
-                            setting.setChargeName(chargeSetting.getLabelText());
-                            chargeSettings.remove(chargeSetting);
+                    if (!flg){
+                        bonussettingService.delete(setting.getId());
+                        bonusSettings.remove(setting);
+                        i--;
+                        length--;
+                        continue;
+                    }
+                    for (ShopDetail shopDetail : shopDetails) {
+                        if (setting.getShopDetailId().equalsIgnoreCase(shopDetail.getId())) {
+                            setting.setShopName(shopDetail.getName());
                             break;
                         }
                     }
