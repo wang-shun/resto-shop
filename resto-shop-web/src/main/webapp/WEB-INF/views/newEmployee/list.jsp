@@ -228,12 +228,14 @@
                 toastr.clear();
                 var that = this;
                 try{
-                    $.post("newEmployee/delete",{id : newEmployeeId},function (result) {
-                        if (result.success){
-                            that.searchInfo();
-                        } else{
-                            toastr.error("网络异常，请刷新重试");
-                        }
+                    that.showDialog(function () {
+                        $.post("newEmployee/delete",{id : newEmployeeId},function (result) {
+                            if (result.success){
+                                that.searchInfo();
+                            } else{
+                                toastr.error("网络异常，请刷新重试");
+                            }
+                        });
                     });
                 }catch(e){
                     toastr.error("系统异常，请刷新重试");
@@ -271,6 +273,24 @@
                         });
                     }
                 });
+            },
+            showDialog : function (successcbk) {
+                var cDialog = new dialog({
+                    title:"提示",
+                    content:"确定要删除吗？",
+                    width:350,
+                    ok:function(){
+                        if(typeof successcbk=="function"){
+                            successcbk();
+                        }
+                    },
+                    cancel:function(){
+                        if(typeof cancelcbk=="function"){
+                            cancelcbk();
+                        }
+                    }
+                });
+                cDialog.showModal();
             }
         }
     });
