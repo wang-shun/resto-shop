@@ -710,7 +710,6 @@ public class ThirdServiceImpl implements ThirdService {
         if(type == ElemeType.NEW_ORDER){
             Map m = new HashMap();
             String message = map.get("message").toString();
-            System.out.println(message);
             message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = messageJson.getString("orderId");
