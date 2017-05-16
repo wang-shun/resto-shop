@@ -223,6 +223,11 @@
                 }
             },
             openShowForm : function () {
+                if (this.chargeSettings.length == 0){
+                    toastr.clear();
+                    toastr.error("暂无其他充值活动可绑定，无法添加分红设置");
+                    return;
+                }
                 this.getBonusSetting();
                 this.showform = true;
             },
