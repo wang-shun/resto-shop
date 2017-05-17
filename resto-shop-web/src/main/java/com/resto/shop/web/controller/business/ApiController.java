@@ -93,8 +93,9 @@ public class ApiController extends GenericController {
          * 2,.将3个参数字符串拼接成一个字符串进行sha1加密
          */
         if (ThirdPatyUtils.checkSignature(signature, timestamp, nonce, appidList)) {
-            //定位数据库
             BrandSetting brandSetting = brandSettingService.selectByAppid(appid);
+            //定位数据库
+            request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
             if (null == brandSetting || "0".equals(brandSetting.getOpenThirdInterface().toString())) {
                 result.setSuccess(false);
                 result.setMessage("参数非法");
@@ -102,9 +103,8 @@ public class ApiController extends GenericController {
             }
             //判断是需要店铺数据还是品牌数据
             List<Order> orderList = new ArrayList<>();
+
             if (StringUtils.isEmpty(thirdAppid)) {//说明需要的是品牌数据
-                //定位数据库
-                request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
                 orderList = orderService.selectBaseToThirdList(brandSetting.getBrandId(), beginDate, endDate);
             } else {
                 //说明需要的是店铺端的数据
