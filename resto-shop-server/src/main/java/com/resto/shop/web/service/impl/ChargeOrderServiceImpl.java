@@ -57,6 +57,12 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	@Resource
 	ChargeOrderMapper chargeOrderMapper;
 
+    @Resource
+    BonusSettingService bonusSettingService;
+
+    @Resource
+    BonusLogService bonusLogService;
+
 
 	@Override
 	public GenericDao<ChargeOrder, String> getDao() {
@@ -69,6 +75,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		byte orderState = 0;
 		ChargeOrder chargeOrder = new ChargeOrder(ApplicationUtils.randomUUID(),chargeSetting.getChargeMoney(),
 				chargeSetting.getRewardMoney(),orderState,new Date(),customerId,shopId,brandId);
+        chargeOrder.setChargeSettingId(settingId);
 		chargeOrder.setChargeBalance(BigDecimal.ZERO);
 		chargeOrder.setRewardBalance(BigDecimal.ZERO);
 		chargeOrder.setTotalBalance(BigDecimal.ZERO);
@@ -103,9 +110,23 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			update(chargeOrder);// 只能更新状态和结束时间
 			//微信推送
 			wxPush(chargeOrder);
+            BonusSetting bonusSetting = bonusSettingService.selectByChargeSettingId(chargeOrder.getChargeSettingId());
+            if (bonusSetting != null){
+                BonusLog bonusLog = new BonusLog();
+                bonusLog.setId(ApplicationUtils.randomUUID());
+                bonusLog.setChargeOrderId(chargeOrder.getId());
+                bonusLog.setBonusSettingId(bonusSetting.getId());
+                BigDecimal bonusAmount = chargeMoney.multiply(new BigDecimal(bonusSetting.getChargeBonusRatio()).divide(new BigDecimal(100)));
+                BigDecimal shopownerBonusAmount = bonusAmount.multiply(new BigDecimal(bonusSetting.getShopownerBonusRatio()).divide(new BigDecimal(100)));
+                BigDecimal employeeBonusAmount = bonusAmount.subtract(shopownerBonusAmount);
+                bonusLog.setBonusAmount(bonusAmount.intValue());
+                bonusLog.setState(0);
+                bonusLog.setShopownerBonusAmount(shopownerBonusAmount.intValue());
+                bonusLog.setEmployeeBonusAmount(employeeBonusAmount.intValue());
+                bonusLog.setCreateTime(new Date());
+                bonusLogService.insert(bonusLog);
+            }
 		}
-
-
 	}
 
 	@Override
