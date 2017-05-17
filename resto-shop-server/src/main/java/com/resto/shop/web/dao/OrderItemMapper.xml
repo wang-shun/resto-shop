@@ -384,5 +384,10 @@ order by t.print_sort asc
     where parent_id =  #{parentId}
   </select>
 
+    <select id="getListByRecommendId" resultType="OrderItem">
+        select * from tb_order_item
+        where recommend_id = #{recommendId}
+        and order_id =  #{orderId}
+    </select>
 
 </mapper>

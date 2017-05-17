@@ -1821,9 +1821,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 if (printer.getTicketType() == TicketType.PRINT_TICKET) {
                     //小票
-                    if(shopDetail.getIsPosNew() ==  Common.POS_NEW){
+                    if (shopDetail.getIsPosNew() == Common.POS_NEW) {
                         getKitchenModelNew(article, order, printer, shopDetail, printTask);
-                    }else{
+                    } else {
                         getKitchenModel(article, order, printer, shopDetail, printTask);
                     }
 
@@ -1841,9 +1841,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
                             countMap.put(article.getArticleId(), 1);
                         }
-                        if(shopDetail.getIsPosNew() ==  Common.POS_NEW){
+                        if (shopDetail.getIsPosNew() == Common.POS_NEW) {
                             getKitchenLabelNew(article, order, printer, shopDetail, printTask, countMap, kitchenArticleMap.get(kitchenId));
-                        }else{
+                        } else {
                             getKitchenLabel(article, order, printer, shopDetail, printTask, countMap, kitchenArticleMap.get(kitchenId));
                         }
 
@@ -1864,9 +1864,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //生成厨房小票
             for (String recommendId : recommendMap.get(kitchenId)) {
                 //保存 菜品的名称和数量
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     getRecommendModelNew(recommendId, order, printer, shopDetail, printTask);
-                }else{
+                } else {
                     getRecommendModel(recommendId, order, printer, shopDetail, printTask);
                 }
 
@@ -2038,10 +2038,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("OID", order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
-        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
+        ArticleRecommend articleRecommend = articleRecommendMapper.getRecommendById(recommendId);
         print.put("PRINT_TASK_ID", recommendId);
-        print.put("TASK_ORDER_ID",order.getId());
-        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
+
+        print.put("TASK_ORDER_ID", order.getId());
+        print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
@@ -2208,7 +2210,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     private void getKitchenLabelNew(OrderItem article, Order order, Printer printer,
-                                 ShopDetail shopDetail, List<Map<String, Object>> printTask, Map map, List<OrderItem> orderItems) {
+                                    ShopDetail shopDetail, List<Map<String, Object>> printTask, Map map, List<OrderItem> orderItems) {
         int currentCount = (int) map.get(article.getArticleId());
         int i = 0;
 
@@ -2233,9 +2235,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         String modeText = getModeText(order);//就餐模式
         Map<String, Object> print = new HashMap<String, Object>();
-        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
         print.put("PRINT_TASK_ID", article.getId());
-        print.put("TASK_ORDER_ID",article.getOrderId());
+        print.put("TASK_ORDER_ID", article.getOrderId());
         print.put("TABLE_NO", tableNumber);
         print.put("OID", order.getId());
         print.put("KITCHEN_NAME", printer.getName());
@@ -2268,7 +2270,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketTypeNew.LABEL);
-        print.put("TICKET_MODE",TicketTypeNew.RESTAURANT_LABEL);
+        print.put("TICKET_MODE", TicketTypeNew.RESTAURANT_LABEL);
         printTask.add(print);
         MemcachedUtils.put(print_id, print);
         if (customer != null) {
@@ -2430,9 +2432,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-
-
-
     private void getKitchenModelNew(OrderItem article, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
         //保存 菜品的名称和数量
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
@@ -2486,11 +2485,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("OID", order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
-        print.put("PRINT_STATUS",order.getPrintKitchenFlag());
+        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
         print.put("PRINT_TASK_ID", article.getId());
-        print.put("TASK_ORDER_ID",article.getOrderId());
-        print.put("LINE_WIDTH",shopDetail.getPageSize() == 0 ? 48 : 42);
-        print.put("ADD_TIME",new Date().getTime());
+        print.put("TASK_ORDER_ID", article.getOrderId());
+        print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
+        print.put("ADD_TIME", new Date().getTime());
         print.put("ORDER_ID", serialNumber);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
@@ -2584,7 +2583,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-
     private String getModeText(Order order) {
         if (order == null) {
             return "";
@@ -2622,18 +2620,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (selectPrinterId == null) {
             if (printer.size() > 0) {
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     return printTicketPosNew(order, child, shopDetail, printer.get(0));
-                }else{
+                } else {
                     return printTicket(order, child, shopDetail, printer.get(0));
                 }
 
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            if(shopDetail.getIsPosNew() == Common.YES){
+            if (shopDetail.getIsPosNew() == Common.YES) {
                 return printTicketPosNew(order, child, shopDetail, printer.get(0));
-            }else{
+            } else {
                 return printTicket(order, child, shopDetail, p);
             }
 
@@ -2646,9 +2644,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (printer == null) {
             return null;
         }
-        if(shopDetail.getIsPosNew() == Common.POS_NEW){
+        if (shopDetail.getIsPosNew() == Common.POS_NEW) {
             //如果是新版本pos
-            return printTicketPosNew(order,orderItems,shopDetail,printer);
+            return printTicketPosNew(order, orderItems, shopDetail, printer);
         }
 
 
@@ -2746,7 +2744,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
-        print.put("PRINT_STATUS",order.getPrintFailFlag());
+        print.put("PRINT_STATUS", order.getPrintFailFlag());
         print.put("ADD_TIME", new Date());
 
         Map<String, Object> data = new HashMap<>();
@@ -2949,8 +2947,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-
-    public Map<String, Object> printTicketPosNew(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer){
+    public Map<String, Object> printTicketPosNew(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
         List<Map<String, Object>> items = new ArrayList<>();
         List<Map<String, Object>> refundItems = new ArrayList<>();
         List<String> articleIds = new ArrayList<>();
@@ -3041,8 +3038,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TASK_ORDER_ID", order.getId());
         print.put("KITCHEN_NAME", printer.getName());
         print.put("PORT", printer.getPort());
-        print.put("PRINT_STATUS",order.getPrintFailFlag());
-        print.put("LINE_WIDTH",42);
+        print.put("PRINT_STATUS", order.getPrintFailFlag());
+        print.put("LINE_WIDTH", 42);
         print.put("ORDER_ID", order.getSerialNumber());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
@@ -3230,7 +3227,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketTypeNew.TICKET);
-        print.put("TICKET_MODE",TicketTypeNew.RESTAURANT_RECEIPT);
+        print.put("TICKET_MODE", TicketTypeNew.RESTAURANT_RECEIPT);
         JSONObject json = new JSONObject(print);
         Map logMap = new HashMap(4);
         logMap.put("brandName", brand.getBrandName());
@@ -3247,7 +3244,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         MemcachedUtils.put(shopDetail.getId() + "printList", printList);
         return print;
     }
-
 
 
     public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems) {
@@ -3502,9 +3498,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = null;
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     ticket = printTicketPosNew(order, child, shopDetail, printer);
-                }else{
+                } else {
                     ticket = printTicket(order, child, shopDetail, printer);
                 }
 
@@ -3531,9 +3527,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             child.addAll(items);
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = null;
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     ticket = printTicketPosNew(order, child, shopDetail, printer);
-                }else{
+                } else {
                     ticket = printTicket(order, child, shopDetail, printer);
                 }
                 if (ticket != null) {
@@ -3554,9 +3550,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = null;
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     ticket = printTicketPosNew(order, child, shopDetail, printer);
-                }else{
+                } else {
                     ticket = printTicket(order, child, shopDetail, printer);
                 }
                 if (ticket != null) {
@@ -3573,9 +3569,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
             for (Printer printer : packagePrinter) {
                 Map<String, Object> packageTicket = null;
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     packageTicket = printTicketPosNew(order, items, shopDetail, printer);
-                }else{
+                } else {
                     packageTicket = printTicket(order, items, shopDetail, printer);
                 }
                 if (packageTicket != null) {
@@ -4432,17 +4428,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         items.addAll(child);
 //        }
         List<OrderItem> list = new ArrayList<>();
-        if(order.getPrintKitchenFlag() == Common.YES){
-            for(OrderItem item : items){
-                if(item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT){
+        if (order.getPrintKitchenFlag() == Common.YES) {
+            for (OrderItem item : items) {
+                if (item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT) {
                     list.add(item);
                 }
             }
-        }else{
+        } else {
             list.addAll(items);
         }
 
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, list);
 
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
