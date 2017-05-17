@@ -13,7 +13,7 @@
     .checkbox-inline {
         padding: inherit;
         position: relative;
-        top: -18px;
+        top: -7px;
     }
 </style>
 <div id="control">
@@ -106,7 +106,7 @@
                                         <span class="textInCenter">{{shopowner.name}}</span>
                                         <span class="textInCenter">{{bonusLog.shopownerBonusRatio}}</span>
                                         <span class="textInCenter"><font color="red">￥{{bonusLog.shopownerBonusAmount}}</font></span>
-                                        <label class="checkbox-inline" style="padding: inherit;position: relative;top: -4px;">
+                                        <label class="checkbox-inline">
                                             <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-if="$index == 0" checked="checked">
                                             <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-else>
                                         </label>
@@ -120,7 +120,7 @@
                                         <span class="textInCenter">{{employee.name}}</span>
                                         <span class="textInCenter">{{bonusLog.employeeBonusRatio}}</span>
                                         <span class="textInCenter"><font color="red">￥{{bonusLog.employeeBonusAmount}}</font></span>
-                                        <label class="checkbox-inline" style="padding: inherit;position: relative;top: -4px;">
+                                        <label class="checkbox-inline">
                                             <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-if="$index == 0" checked="checked">
                                             <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-else>
                                         </label>
