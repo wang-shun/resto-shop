@@ -64,12 +64,15 @@
 
     <select id="selectAllBonusLog" resultType="java.util.Map">
         select
+            tbl.id,
             tal.shop_detail_id shopId,
             DATE_FORMAT(tal.finish_time,'%Y-%m-%d %H:%i:%s') chargeTime,
             IF(tal.type = 1, '微信充值', 'POS充值') chargeType,
             IFNULL(tc.telephone,'--') telephone,
             tal.charge_money chargeMoney,
             tbl.bonus_amount bonusMoney,
+            tbl.employee_bonus_amount employeeBonusAmount,
+            tbl.shopowner_bonus_amount shopownerBonusAmount,
             tbl.state,
             CASE tbl.state
                 WHEN 0 THEN '未分红'

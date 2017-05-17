@@ -46,9 +46,9 @@ public class BonusLogController extends GenericController{
                     for (String emName : emNames){
                         String[] name = emName.split(":");
                         if (Integer.valueOf(name[0]) == 1){
-                            bonusLog.put("employeeName", name[2]);
+                            bonusLog.put("employeeName", name[1]);
                         }else{
-                            bonusLog.put("shopownerName", name[2]);
+                            bonusLog.put("shopownerName", name[1]);
                         }
                     }
                 }

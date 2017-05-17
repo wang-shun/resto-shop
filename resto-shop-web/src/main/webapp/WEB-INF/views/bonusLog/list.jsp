@@ -1,70 +1,158 @@
 <%@ page language="java" pageEncoding="utf-8"%>
+<style>
+    .textRight {
+        width: 20%;
+        display: inline-block;
+        text-align: right;
+    }
+    .textInCenter {
+        width: 20%;
+        display: inline-block;
+        text-align: center;
+    }
+    .checkbox-inline {
+        padding: inherit;
+        position: relative;
+        top: -18px;
+    }
+</style>
 <div id="control">
-    <%--<div class="row form-div" v-if="showform">--%>
-        <%--<div class="col-md-offset-3 col-md-6" >--%>
-            <%--<div class="portlet light bordered">--%>
-                <%--<div class="portlet-title">--%>
-                    <%--<div class="caption">--%>
-                        <%--<span class="caption-subject bold font-blue-hoki">分红设置</span>--%>
-                    <%--</div>--%>
-                <%--</div>--%>
+    <div class="row form-div" v-if="showform">
+        <div class="col-md-offset-3 col-md-6" >
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject bold font-blue-hoki"> <font color="black">分红详情</font></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-body" style="font-size: 20px;font-family: 微软雅黑;border-bottom: 1px solid #eef1f5;">
+                            <div style="border-bottom: 1px solid #eef1f5;padding-left: 10%;">
+                                <p>
+                                    <span class="textRight">充值方式：</span>
+                                    <span>{{bonusLog.chargeType}}</span>
+                                </p>
+                                <p>
+                                    <span class="textRight">充值店铺：</span>
+                                    <span>{{bonusLog.shopName}}</span>
+                                </p>
+                                <p>
+                                    <span class="textRight">手机号：</span>
+                                    <span>{{bonusLog.telephone}}</span>
+                                </p>
+                                <p>
+                                    <span class="textRight">充值金额：</span>
+                                    <span><font color="#228b22">￥{{bonusLog.chargeMoney}}</font></span>
+                                </p>
+                                <p>
+                                    <span class="textRight">充值时间：</span>
+                                    <span>{{bonusLog.chargeTime}}</span>
+                                </p>
+                                <p>
+                                    <span class="textRight">分红比例：</span>
+                                    <span>{{bonusLog.chargeBonusRatio}}</span>
+                                </p>
+                                <p>
+                                    <span class="textRight">分红金额：</span>
+                                    <span><font color="red">￥{{bonusLog.bonusMoney}}</font></span>
+                                </p>
+                            </div>
+                            <div style="margin-top: 3%;padding-left: 10%;">
+                                <p>
+                                    <span class="textRight">状态：</span>
+                                    <span>
+                                        <i v-if="bonusLog.state == 0" style="color: red;font-style: normal;">{{bonusLog.stateValue}}</i>
+                                        <i v-if="bonusLog.state == 1" style="color: #0a6aa1;font-style: normal;">{{bonusLog.stateValue}}</i>
+                                        <i v-if="bonusLog.state == 2" style="color: #228b22;font-style: normal;">{{bonusLog.stateValue}}</i>
+                                    </span>
+                                </p>
+                                <p v-if="bonusLog.state == 1 || bonusLog.state == 2">
+                                    <span class="textRight">{{bonusLog.employeeName}}：</span>
+                                    <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
+                                </p>
+                                <p v-if="bonusLog.state == 1 || bonusLog.state == 2">
+                                    <span class="textRight">{{bonusLog.shopownerName}}：</span>
+                                    <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary">分红</button>
+                            <button v-if="bonusLog.state == 1" type="button" class="btn btn-primary">发放奖励</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-div">
+        <div class="col-md-offset-3 col-md-6" >
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject bold font-blue-hoki"> <font color="black">选择分红对象</font></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-body" style="font-size: 24px;font-family: 微软雅黑;border-bottom: 1px solid #eef1f5;">
+                            <div class="shopOwner">
+                                <p style="margin-left: 5%">选择店长</p>
 
-                <%--<div class="portlet-body">--%>
-                    <%--<form role="form" class="form-horizontal" @submit.prevent="save">--%>
-                        <%--<input type="hidden" name="id" v-model="bonusLog.id"/>--%>
-                        <%--<div class="form-body">--%>
-                            <%--<div class="form-group">--%>
-                                <%--<label  class="col-sm-2 control-label">分红比例：</label>--%>
-                                <%--<div class="col-sm-8">--%>
-                                    <%--<div class="input-group">--%>
-                                        <%--<input class="form-control" type="number" name="chargeBonusRatio" @keyup="setChargeBonusRatio" v-model="bonusLog.chargeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">--%>
-                                        <%--<div class="input-group-addon">%</div>--%>
-                                    <%--</div>--%>
-                                    <%--<span class="help-block">请输入0-100整数值</span>--%>
-                                <%--</div>--%>
-                            <%--</div>--%>
-                            <%--<div class="form-group">--%>
-                                <%--<label  class="col-sm-2 control-label">店长分红：</label>--%>
-                                <%--<div class="col-sm-8">--%>
-                                    <%--<div class="input-group">--%>
-                                        <%--<input class="form-control" type="number" name="shopownerBonusRatio" @keyup="setEmployeeBonusRatio" @change="setEmployeeBonusRatio" v-model="bonusLog.shopownerBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">--%>
-                                        <%--<div class="input-group-addon">%</div>--%>
-                                    <%--</div>--%>
-                                    <%--<span class="help-block">请输入0-100整数值</span>--%>
-                                <%--</div>--%>
-                            <%--</div>--%>
-                            <%--<div class="form-group">--%>
-                                <%--<label  class="col-sm-2 control-label">员工分红：</label>--%>
-                                <%--<div class="col-sm-8">--%>
-                                    <%--<div class="input-group">--%>
-                                        <%--<input class="form-control" type="number" name="employeeBonusRatio" @keyup="setShopownerBonusRatio" @change="setShopownerBonusRatio" v-model="bonusLog.employeeBonusRatio" min="0"  max="100" required placeholder="请输入1-100整数值">--%>
-                                        <%--<div class="input-group-addon">%</div>--%>
-                                    <%--</div>--%>
-                                    <%--<span class="help-block">请输入0-100整数值</span>--%>
-                                <%--</div>--%>
-                            <%--</div>--%>
-                            <%--<div class="form-group">--%>
-                                <%--<label class="col-md-2 control-label">是否启用：</label>--%>
-                                <%--<div  class="col-md-8">--%>
-                                    <%--<label class="radio-inline">--%>
-                                        <%--<input type="radio" name="state" value="1" v-model="bonusLog.state"> 启用--%>
-                                    <%--</label>--%>
-                                    <%--<label class="radio-inline">--%>
-                                        <%--<input type="radio" name="state" value="0" v-model="bonusLog.state"> 不启用--%>
-                                    <%--</label>--%>
-                                <%--</div>--%>
-                            <%--</div>--%>
-                        <%--</div>--%>
-                        <%--<div class="form-group text-center">--%>
-                            <%--<input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;--%>
-                            <%--<a class="btn default" @click="colseShowForm" >取消</a>--%>
-                        <%--</div>--%>
-                    <%--</form>--%>
-                <%--</div>--%>
-            <%--</div>--%>
-        <%--</div>--%>
-    <%--</div>--%>
-	
+                                <div style="margin-left: 10%">
+                                    <p>
+                                        <span class="textInCenter">老卷</span>
+                                        <span class="textInCenter">1222</span>
+                                        <span class="textInCenter">1222</span>
+                                        <label class="checkbox-inline">
+                                            <input type="radio" name="optionsRadiosinline" id="optionsRadios1" value="option1" checked>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <span class="textInCenter">老卷</span>
+                                        <span class="textInCenter">1222</span>
+                                        <span class="textInCenter">1222</span>
+                                        <label class="checkbox-inline">
+                                            <input type="radio" name="optionsRadiosinline" id="optionsRadios2" value="option2">
+                                        </label>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="staffOwner">
+                                <p style="margin-left: 5%">选择员工</p>
+                                <div style="margin-left: 10%">
+                                    <p>
+                                        <span class="textInCenter">老卷</span>
+                                        <span class="textInCenter">1222</span>
+                                        <span class="textInCenter">1222</span>
+                                        <label class="checkbox-inline">
+                                            <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" checked>
+                                        </label>
+                                    </p>
+                                    <p>
+                                        <span class="textInCenter">老卷</span>
+                                        <span class="textInCenter">1222</span>
+                                        <span class="textInCenter">1222</span>
+                                        <label class="checkbox-inline">
+                                            <input type="radio" name="optionsRadios" id="optionsRadios4" value="option4">
+                                        </label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button type="button" class="btn btn-default">上一步</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-primary">发放奖励</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 	<div class="table-div">
 		<div class="table-operator">
 		</div>
@@ -152,7 +240,7 @@
                                 var state = rowData.stateValue;
                                 var operatorButton = (state == "已分红" ? $("<button class='btn btn-primary btn-sm'>查看</button>") : $("<button class='btn btn-success btn-sm'>分红</button>"));
                                 operatorButton.click(function () {
-                                    that.operatorBonusLog(tdData);
+                                    that.openShowForm(rowData);
                                 });
                                 var operator = [operatorButton];
                                 $(td).html(operator);
@@ -210,6 +298,10 @@
                 }catch(e){
                     toastr.error("系统异常，请刷新重试");
                 }
+            },
+            openShowForm : function (bonusLog) {
+                this.showform = true;
+                this.bonusLog = bonusLog;
             },
             colseShowForm : function () {
                 this.showform = false;
