@@ -216,6 +216,16 @@ public class Order implements Serializable{
     //0-未打印 1-打印异常 2-异常修正 3打印正常
     private Integer printKitchenFlag;
 
+    private Integer failPrintCount;
+
+    public Integer getFailPrintCount() {
+        return failPrintCount;
+    }
+
+    public void setFailPrintCount(Integer failPrintCount) {
+        this.failPrintCount = failPrintCount;
+    }
+
     public Integer getPrintKitchenFlag() {
         return printKitchenFlag;
     }
