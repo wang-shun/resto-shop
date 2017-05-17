@@ -44,4 +44,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	public List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map);
 	
 	public List<OrderItem> selectRefundOrderItem(Map<String, Object> map);
+
+	List<OrderItem> getListByParentId(String parentId);
 }
