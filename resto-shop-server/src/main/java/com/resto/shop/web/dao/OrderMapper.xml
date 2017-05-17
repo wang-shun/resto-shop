@@ -1137,7 +1137,7 @@
         and order_state != 9
         and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
          || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
-        )
+
 
         and table_number is not null
         and parent_order_id is null
