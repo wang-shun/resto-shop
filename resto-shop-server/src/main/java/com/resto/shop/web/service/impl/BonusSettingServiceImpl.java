@@ -20,6 +20,11 @@ public class BonusSettingServiceImpl extends GenericServiceImpl<BonusSetting, St
     @Override
     public GenericDao<BonusSetting, String> getDao() {
         return bonussettingMapper;
-    } 
+    }
 
+
+    @Override
+    public BonusSetting selectByChargeSettingId(String chargeSettingId) {
+        return bonussettingMapper.selectByChargeSettingId(chargeSettingId);
+    }
 }
