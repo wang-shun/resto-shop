@@ -24,7 +24,9 @@ public class LogTemplateUtils {
 
   public static final String DAYSMSTYPE="daySmsAction";
 
-    //order模板map
+  public  static  final String THIRDTYPE = "thirdAction";
+
+    //模板map
     public static  Map getOrderBaseMap(String brandName,String id,String logType){
         //注:如果是id是customerId 则logType传userAction 如果是orderId则传orderActoin 如果是shopDetailId则传posAction
         //id是telephone传daySmsAction
@@ -35,7 +37,7 @@ public class LogTemplateUtils {
         return  map;
     }
 
-//--------------------记录orderAction begin
+//--------------------第一种 记录orderAction begin
    //createOrder创建订单时记录 记录订单项的数据 在orderserviceImpl中调用
    public static void getOrderItemLogByOrderType(String brandName, String orderId, List<OrderItem> orderItems){
        //yz 2017-03-27 orderAction 增加订单菜品项
@@ -346,8 +348,6 @@ public class LogTemplateUtils {
         map.put("content", "店铺:"+name+"在pos端执行拒绝订单:" + orderId + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPost(url,map);
     }
-
-
 
 
     //记录 posAction end---------------------------------------------------------
