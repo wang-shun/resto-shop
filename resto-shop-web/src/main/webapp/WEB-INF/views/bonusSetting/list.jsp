@@ -134,6 +134,7 @@
                         {
                             title : "启用分红",
                             data : "state",
+                            orderable : false,
                             createdCell: function (td, tdData) {
                                 var state = "";
                                 if (tdData == 0){

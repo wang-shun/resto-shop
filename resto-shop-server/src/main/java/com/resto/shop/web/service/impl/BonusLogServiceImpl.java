@@ -8,6 +8,9 @@ import com.resto.shop.web.model.BonusLog;
 import com.resto.shop.web.service.BonusLogService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  */
@@ -20,6 +23,10 @@ public class BonusLogServiceImpl extends GenericServiceImpl<BonusLog, String> im
     @Override
     public GenericDao<BonusLog, String> getDao() {
         return bonuslogMapper;
-    } 
+    }
 
+    @Override
+    public List<Map<String, Object>> selectAllBonusLog() {
+        return bonuslogMapper.selectAllBonusLog();
+    }
 }

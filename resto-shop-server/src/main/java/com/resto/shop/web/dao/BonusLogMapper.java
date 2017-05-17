@@ -3,6 +3,9 @@ package com.resto.shop.web.dao;
 import com.resto.shop.web.model.BonusLog;
 import com.resto.brand.core.generic.GenericDao;
 
+import java.util.List;
+import java.util.Map;
+
 public interface BonusLogMapper  extends GenericDao<BonusLog,String> {
     int deleteByPrimaryKey(String id);
 
@@ -15,4 +18,6 @@ public interface BonusLogMapper  extends GenericDao<BonusLog,String> {
     int updateByPrimaryKeySelective(BonusLog record);
 
     int updateByPrimaryKey(BonusLog record);
+
+    List<Map<String, Object>> selectAllBonusLog();
 }

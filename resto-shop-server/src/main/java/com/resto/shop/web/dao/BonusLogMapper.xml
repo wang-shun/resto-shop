@@ -61,4 +61,33 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log set charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, bonus_setting_id = #{bonusSettingId,jdbcType=VARCHAR}, bonus_amount = #{bonusAmount,jdbcType=INTEGER}, state = #{state,jdbcType=INTEGER}, shopowner_bonus_amount = #{shopownerBonusAmount,jdbcType=INTEGER}, employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER}, shopowner_id = #{shopownerId,jdbcType=VARCHAR}, employee_id = #{employeeId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="BonusLog">select * from tb_bonus_log</select>
+
+    <select id="selectAllBonusLog" resultType="java.util.Map">
+        select
+            tal.shop_detail_id shopId,
+            DATE_FORMAT(tal.finish_time,'%Y-%m-%d %H:%i:%s') chargeTime,
+            IF(tal.type = 1, '微信充值', 'POS充值') chargeType,
+            IFNULL(tc.telephone,'--') telephone,
+            tal.charge_money chargeMoney,
+            tbl.bonus_amount bonusMoney,
+            tbl.state,
+            CASE tbl.state
+                WHEN 0 THEN '未分红'
+                WHEN 1 THEN '审核中'
+                WHEN 2 THEN '已分红'
+            END stateValue,
+            CONCAT(tbs.charge_bonus_ratio,'%') chargeBonusRatio,
+            GROUP_CONCAT(CONCAT_WS(':',tne.role_type,tne.`name`)) emNames
+        from tb_bonus_log tbl
+        inner join tb_charge_order tal
+        on tbl.charge_order_id = tal.id
+        inner join tb_customer tc
+        on tal.customer_id = tc.id
+        inner join tb_bonus_setting tbs
+        on tbs.id = tbl.bonus_setting_id
+        left join tb_new_employee tne
+        on tbl.shopowner_id = tne.id
+        or tbl.employee_id = tne.id
+        GROUP BY tbl.id
+    </select>
 </mapper>
