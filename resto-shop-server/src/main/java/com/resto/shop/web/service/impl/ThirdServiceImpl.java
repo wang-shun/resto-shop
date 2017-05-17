@@ -32,7 +32,7 @@ import java.text.Format;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
@@ -223,7 +223,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         MemcachedUtils.put(print_id, print);
         List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
         if (printList == null) {
@@ -360,7 +360,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return printTask;
     }
 
@@ -517,7 +517,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return printTask;
     }
 
@@ -642,7 +642,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         MemcachedUtils.put(print_id, print);
         List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
         if (printList == null) {
@@ -679,6 +679,18 @@ public class ThirdServiceImpl implements ThirdService {
                         result = hungerPush(map, brandSetting, brandId);
                     }
                     break;
+                case PushType.HUNGER_VERSION_2:
+                    check = false;
+                    for (Platform platform : platformList) {
+                        if (platform.getName().equals(PlatformName.E_LE_ME)) {
+                            check = true;
+                            break;
+                        }
+                    }
+                    if (check) {
+                        result = hungerPushVersion2(map, brandSetting);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -686,6 +698,25 @@ public class ThirdServiceImpl implements ThirdService {
             return false;
         }
         return result;
+    }
+
+    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting) throws Exception {
+        Integer type;
+        if(StringUtils.isEmpty(map.get("type"))){
+            return false;
+        } else {
+            type = Integer.parseInt(map.get("type").toString());
+        }
+        if(type == ElemeType.NEW_ORDER){
+            Map m = new HashMap();
+            String message = map.get("message").toString();
+            message = message.replaceAll("\\\\","");
+            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
+            String orderId = messageJson.getString("orderId");
+            m.put("eleme_order_ids", orderId);
+            addHungerOrder(m,brandSetting);
+        }
+        return true;
     }
 
     private Boolean hungerPush(Map map, BrandSetting brandSetting, String brandId) throws Exception {
@@ -840,7 +871,7 @@ public class ThirdServiceImpl implements ThirdService {
                 addHungermap.put("fileName", shopDetail.getName());
                 addHungermap.put("type", "posAction");
                 addHungermap.put("content", "店铺:" + shopDetail.getName() + "接收到新增的饿了么订单:" + hungerOrder.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, addHungermap);
+                doPostAnsc(url, addHungermap);
             }
 
         }

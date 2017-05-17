@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
@@ -57,7 +57,7 @@ public class LogTemplateUtils {
            }
        }
        map.put("content", "订单:" + orderId + "订单菜品项为:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-       doPost(url, map);
+       doPostAnsc(url, map);
    }
 
     //记录订单支付项 2017-03-27
@@ -65,35 +65,35 @@ public class LogTemplateUtils {
       public  static  void getWaitMoneyLogByOrderType(String brandName, String orderId, BigDecimal payValue){
           Map waitPayMap=getOrderBaseMap(brandName,orderId,ORDERTYPE);
           waitPayMap.put("content", "订单:"+orderId+"使用等位红包支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
-          doPost(url, waitPayMap);
+          doPostAnsc(url, waitPayMap);
       }
 
       //支付项---优惠券
     public static void getCouponByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:"+id+"订单使用优惠卷支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //支付项---红包(余额)支付 在AccountServeImpl中payOrder
     public static void getAccountByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:" + id + "订单使用余额(红包)支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //支付项---银联
     public static void getBankByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:" + id + "订单使用银行卡支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //现金支付
     public static void getMoneyByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:" + id + "订单使用现金卡支付了:"+payValue+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //充值余额支付
@@ -124,7 +124,7 @@ public class LogTemplateUtils {
         }else {
             map.put("content", "订单:" + id + "打印成功，订单为主订单，允许加菜---是结账单"+",请求服务器地址为:" + MQSetting.getLocalIP());
         }
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //子订单打印
@@ -136,7 +136,7 @@ public class LogTemplateUtils {
             map.put("content", "订单:" + id + "打印成功，订单为子订单---是结账清单"+",请求服务器地址为:" + MQSetting.getLocalIP());
         }
 
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     /**
@@ -152,7 +152,7 @@ public class LogTemplateUtils {
           }else {
               map.put("content", "订单:" + id + "取消订单成功--是用户自己取消未支付"+",请求服务器地址为:" + MQSetting.getLocalIP());
           }
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     /**
@@ -175,7 +175,7 @@ public class LogTemplateUtils {
             sb.append("退菜总额为:"+temp);
         }
         map.put("content", "订单:" + id + "在pos端执行退菜:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     /**
@@ -186,7 +186,7 @@ public class LogTemplateUtils {
     public static void cancelOrderByOrderType(String brandName, String orderId) {
         Map map=getOrderBaseMap(brandName,orderId,ORDERTYPE);
         map.put("content", "订单:" +orderId + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     /**
@@ -197,7 +197,7 @@ public class LogTemplateUtils {
     public static void getCallNumber(String brandName, String id) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:" +id + "订单被叫号,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     /**
@@ -211,7 +211,7 @@ public class LogTemplateUtils {
         StringBuilder sb = new StringBuilder();
         sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
         map.put("content", "订单:" +appraise.getOrderId() + sb.toString() +"服务器地址"+ MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     /**
@@ -233,7 +233,7 @@ public class LogTemplateUtils {
     public  static  void getWaitMoneyLogByUserType(String brandName, String orderId, BigDecimal payValue,String nickName){
         Map map=getOrderBaseMap(brandName,orderId,USERTYPE);
         map.put("content", "用户:"+nickName+"使用等位红包支付了：" +payValue +"订单Id为:"+orderId+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //优惠券支付
@@ -241,28 +241,28 @@ public class LogTemplateUtils {
         // CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
         Map map = getOrderBaseMap(brandName,id,USERTYPE);
         map.put("content", "用户:"+nickname+"使用优惠卷支付了：" +payValue +"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
     }
 
     //余额(红包)支付
     public static void getAccountByUserType(String brandName, String id, String nickname, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,USERTYPE);
         map.put("content", "用户:"+nickname+"使用余额(红包)支付了:"+payValue+"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     //银行卡支付
     public static void getBankByUserType(String brandName, String id, String nickname, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,USERTYPE);
         map.put("content", "用户:"+nickname+"使用银行卡支付了:"+payValue+"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     //现金支付
     public static void getMoneyByUserType(String brandName, String id, String nickname, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,USERTYPE);
         map.put("content", "用户:"+nickname+"使用现金支付了:"+payValue+"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     //充值余额支付
@@ -290,7 +290,7 @@ public class LogTemplateUtils {
                 .append(articleTypeName).append("菜品名字为:")
                 .append(article.getName()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     public  static  void getUpdateShopcartTwo(String brandName,Customer customer,String shopName,Integer type,String articelId,String articleName){
@@ -301,7 +301,7 @@ public class LogTemplateUtils {
                 .append("将菜品类型为:").append(OrderItemType.getPayModeName(type))
                 .append("菜品名字为:").append(articleName).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     /**
@@ -312,7 +312,7 @@ public class LogTemplateUtils {
         StringBuilder sb = new StringBuilder();
         sb.append("评论的菜品为:"+appraise.getFeedback()+"评论等级:"+appraise.getLevel()+"★"+"评论返还红包"+appraise.getRedMoney()+"评论内容:"+content);
         map.put("content", "用户:" +customer.getNickname() + sb.toString() +"服务器地址"+ MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     public static void getRefundWechatByUserType(Order order, Brand brand, String name) {
@@ -340,13 +340,13 @@ public class LogTemplateUtils {
         }else {
             map.put("content", "订单:" + id + "打印成功，订单为子订单---是结账清单"+",请求服务器地址为:" + MQSetting.getLocalIP());
         }
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
     public static void cancleOrderByPosType(String brandName, String name,String orderId) {
         Map map=getOrderBaseMap(brandName,name,POSTYPE);
         map.put("content", "店铺:"+name+"在pos端执行拒绝订单:" + orderId + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
 
@@ -356,7 +356,7 @@ public class LogTemplateUtils {
     public static void  dayMessageSms(String brandName,String shopName,String telephone,String result){
         Map map=getOrderBaseMap(brandName,telephone,DAYSMSTYPE);
         map.put("content","发送日结短信短信推送店铺为:"+shopName+"发送短信返回的内容为:"+result+"请求服务器地址:"+MQSetting.getLocalIP());
-        doPost(url,map);
+        doPostAnsc(url,map);
     }
 
 }
