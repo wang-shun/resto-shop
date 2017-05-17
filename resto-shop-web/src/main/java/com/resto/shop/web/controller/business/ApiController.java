@@ -1,6 +1,5 @@
 package com.resto.shop.web.controller.business;
 
-import cn.restoplus.rpc.common.util.StringUtil;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.StringNameUtil;
@@ -10,12 +9,12 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.config.SessionKey;
-import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -32,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.resto.brand.core.util.OrderCountUtils.addKey;
-import static com.resto.brand.core.util.OrderCountUtils.getPayDetail;
 
 /**
  * 用于同步第三方数据库的Controller(以及用来查询不正常的订单存到品牌)
@@ -95,8 +93,9 @@ public class ApiController extends GenericController {
          * 2,.将3个参数字符串拼接成一个字符串进行sha1加密
          */
         if (ThirdPatyUtils.checkSignature(signature, timestamp, nonce, appidList)) {
-            //定位数据库
             BrandSetting brandSetting = brandSettingService.selectByAppid(appid);
+            //定位数据库
+            request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
             if (null == brandSetting || "0".equals(brandSetting.getOpenThirdInterface().toString())) {
                 result.setSuccess(false);
                 result.setMessage("参数非法");
@@ -104,14 +103,13 @@ public class ApiController extends GenericController {
             }
             //判断是需要店铺数据还是品牌数据
             List<Order> orderList = new ArrayList<>();
+            ShopDetail shopDetail = null;
             if (StringUtils.isEmpty(thirdAppid)) {//说明需要的是品牌数据
-                //定位数据库
-                request.getSession().setAttribute(SessionKey.CURRENT_BRAND_ID, brandSetting.getBrandId());
                 orderList = orderService.selectBaseToThirdList(brandSetting.getBrandId(), beginDate, endDate);
             } else {
                 //说明需要的是店铺端的数据
                 //判断是否是
-                ShopDetail shopDetail = shopDetailService.selectByThirdAppId(thirdAppid);
+                 shopDetail = shopDetailService.selectByThirdAppId(thirdAppid);
                 if (null == shopDetail) {
                     result.setSuccess(false);
                     result.setMessage("参数非法");
@@ -130,6 +128,7 @@ public class ApiController extends GenericController {
                     map.put("posDate", DateUtil.formatDate(o.getPrintOrderTime(),"yyyy-MM-dd HH:mm:ss"));//订单推送时间
                     map.put("tableNumber", o.getTableNumber());//座号
                     map.put("serialNumber", o.getSerialNumber());//
+                    map.put("shopName",shopDetail.getName());
                     //订单支付项
                     List<Map<Integer,BigDecimal>> payList = new ArrayList<>();
                     if (!o.getOrderPaymentItems().isEmpty()) {
@@ -146,8 +145,8 @@ public class ApiController extends GenericController {
                             Map<String, Object> itemMap = new HashedMap();
                             //对名字进行截取存规格
                             String str =StringNameUtil.getName(orderItem.getArticleName());
-                            itemMap.put("menuName", str);
-                            itemMap.put("attr", StringNameUtil.getAttr(orderItem.getArticleName()));
+                            itemMap.put("menuName", str+"R+");
+                           // itemMap.put("attr", StringNameUtil.getAttr(orderItem.getArticleName()));
                             itemMap.put("menuType", orderItem.getType());//订单菜品类型
                             itemMap.put("menuCode", orderItem.getArticleId());//菜品id
                             itemMap.put("number", orderItem.getCount());//个数
@@ -165,6 +164,7 @@ public class ApiController extends GenericController {
             return getSuccessResult(ThirdData);
             //查询地方报表需要的数据
         }
+
         return  result;
     }
 
