@@ -1063,6 +1063,8 @@
         order_money,
         order_mode,
         pay_type,
+        print_fail_flag,
+        print_kitchen_flag,
         amount_with_children,
         ifnull(count_with_child,article_count) as
         totalCount,
@@ -1126,6 +1128,8 @@
         pay_type,
         pay_mode,
         amount_with_children,
+        print_fail_flag,
+        print_kitchen_flag,
         ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
