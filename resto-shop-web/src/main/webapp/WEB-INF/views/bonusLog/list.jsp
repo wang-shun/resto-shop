@@ -78,7 +78,7 @@
                             </div>
                         </div>
                         <div class="form-group text-center">
-                            <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary">分红</button>
+                            <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary" @click="openShowEmployee">分红</button>
                             <button v-if="bonusLog.state == 1" type="button" class="btn btn-primary">发放奖励</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
@@ -88,7 +88,7 @@
             </div>
         </div>
     </div>
-    <div class="row form-div">
+    <div class="row form-div" v-show="showEmployee">
         <div class="col-md-offset-3 col-md-6" >
             <div class="portlet light bordered">
                 <div class="portlet-title">
@@ -101,22 +101,14 @@
                         <div class="form-body" style="font-size: 24px;font-family: 微软雅黑;border-bottom: 1px solid #eef1f5;">
                             <div class="shopOwner">
                                 <p style="margin-left: 5%">选择店长</p>
-
                                 <div style="margin-left: 10%">
-                                    <p>
-                                        <span class="textInCenter">老卷</span>
-                                        <span class="textInCenter">1222</span>
-                                        <span class="textInCenter">1222</span>
-                                        <label class="checkbox-inline">
-                                            <input type="radio" name="optionsRadiosinline" id="optionsRadios1" value="option1" checked>
-                                        </label>
-                                    </p>
-                                    <p>
-                                        <span class="textInCenter">老卷</span>
-                                        <span class="textInCenter">1222</span>
-                                        <span class="textInCenter">1222</span>
-                                        <label class="checkbox-inline">
-                                            <input type="radio" name="optionsRadiosinline" id="optionsRadios2" value="option2">
+                                    <p v-for="shopowner in shopowners">
+                                        <span class="textInCenter">{{shopowner.name}}</span>
+                                        <span class="textInCenter">{{bonusLog.shopownerBonusRatio}}</span>
+                                        <span class="textInCenter"><font color="red">￥{{bonusLog.shopownerBonusAmount}}</font></span>
+                                        <label class="checkbox-inline" style="padding: inherit;position: relative;top: -4px;">
+                                            <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-if="$index == 0" checked="checked">
+                                            <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-else>
                                         </label>
                                     </p>
                                 </div>
@@ -124,27 +116,20 @@
                             <div class="staffOwner">
                                 <p style="margin-left: 5%">选择员工</p>
                                 <div style="margin-left: 10%">
-                                    <p>
-                                        <span class="textInCenter">老卷</span>
-                                        <span class="textInCenter">1222</span>
-                                        <span class="textInCenter">1222</span>
-                                        <label class="checkbox-inline">
-                                            <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" checked>
-                                        </label>
-                                    </p>
-                                    <p>
-                                        <span class="textInCenter">老卷</span>
-                                        <span class="textInCenter">1222</span>
-                                        <span class="textInCenter">1222</span>
-                                        <label class="checkbox-inline">
-                                            <input type="radio" name="optionsRadios" id="optionsRadios4" value="option4">
+                                    <p v-for="employee in employees">
+                                        <span class="textInCenter">{{employee.name}}</span>
+                                        <span class="textInCenter">{{bonusLog.employeeBonusRatio}}</span>
+                                        <span class="textInCenter"><font color="red">￥{{bonusLog.employeeBonusAmount}}</font></span>
+                                        <label class="checkbox-inline" style="padding: inherit;position: relative;top: -4px;">
+                                            <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-if="$index == 0" checked="checked">
+                                            <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-else>
                                         </label>
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group text-center">
-                            <button type="button" class="btn btn-default">上一步</button>
+                            <button type="button" class="btn btn-default" @click="previousStep">上一步</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-primary">发放奖励</button>
                         </div>
@@ -171,8 +156,11 @@
         el : "#control",
         data : {
             showform : false,
+            showEmployee : false,
             bonusLogTable : {},
-            bonusLog : {}
+            bonusLog : {},
+            shopowners :[],
+            employees : []
         },
         created : function() {
             this.initDataTables();
@@ -240,7 +228,7 @@
                                 var state = rowData.stateValue;
                                 var operatorButton = (state == "已分红" ? $("<button class='btn btn-primary btn-sm'>查看</button>") : $("<button class='btn btn-success btn-sm'>分红</button>"));
                                 operatorButton.click(function () {
-                                    that.openShowForm(rowData);
+                                    that.operatorBonusLog(rowData);
                                 });
                                 var operator = [operatorButton];
                                 $(td).html(operator);
@@ -260,6 +248,8 @@
                 try{
                     $.post("bonusLog/list_all",function (result) {
                         if (result.success){
+                            that.employees = result.data.employees;
+                            that.shopowners = result.data.shopowners;
                             var api = bonusTableAPI;
                             api.search('');
                             var column1 = api.column(1);
@@ -269,7 +259,7 @@
                             var column6 = api.column(6);
                             column6.search('', true, false);
                             that.bonusLogTable.clear();
-                            that.bonusLogTable.rows.add(result.data).draw();
+                            that.bonusLogTable.rows.add(result.data.bonusLogs).draw();
                             that.bonusTable();
                             toastr.clear();
                             toastr.success("查询成功");
@@ -299,15 +289,26 @@
                     toastr.error("系统异常，请刷新重试");
                 }
             },
-            openShowForm : function (bonusLog) {
+            openShowForm : function () {
                 this.showform = true;
-                this.bonusLog = bonusLog;
             },
             colseShowForm : function () {
                 this.showform = false;
             },
-            operatorBonusLog : function () {
-
+            operatorBonusLog : function (bonusLog) {
+                this.bonusLog = bonusLog;
+                this.openShowForm();
+            },
+            openShowEmployee : function () {
+                this.showform = false;
+                this.showEmployee = true;
+            },
+            colseShowEmployee : function () {
+                this.showEmployee = false;
+            },
+            previousStep : function () {
+                this.colseShowEmployee();
+                this.openShowForm();
             },
             bonusTable : function () {
                 var api = bonusTableAPI;

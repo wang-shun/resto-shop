@@ -1,5 +1,7 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +9,8 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.shop.web.model.NewEmployee;
+import com.resto.shop.web.service.NewEmployeeService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +27,9 @@ public class BonusLogController extends GenericController{
 
 	@Resource
 	BonusLogService bonusLogService;
+
+    @Resource
+    NewEmployeeService newEmployeeService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -32,6 +39,7 @@ public class BonusLogController extends GenericController{
 	@ResponseBody
 	public Result listData(){
 	    try {
+            Map<String, Object> map = new HashMap<>();
             List<Map<String, Object>> bonusLogs = bonusLogService.selectAllBonusLog();
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             for (Map bonusLog : bonusLogs){
@@ -42,18 +50,33 @@ public class BonusLogController extends GenericController{
                     }
                 }
                 if (bonusLog.get("emNames") != null){
-                    String[] emNames = bonusLog.get("emNames").toString().split(",");
-                    for (String emName : emNames){
-                        String[] name = emName.split(":");
-                        if (Integer.valueOf(name[0]) == 1){
-                            bonusLog.put("employeeName", name[1]);
-                        }else{
-                            bonusLog.put("shopownerName", name[1]);
+                    if (StringUtils.isNotBlank(bonusLog.get("emNames").toString())) {
+                        String[] emNames = bonusLog.get("emNames").toString().split(",");
+                        for (String emName : emNames) {
+                            String[] name = emName.split(":");
+                            if (Integer.valueOf(name[0]) == 1) {
+                                bonusLog.put("employeeName", name[1]);
+                            } else {
+                                bonusLog.put("shopownerName", name[1]);
+                            }
                         }
                     }
                 }
             }
-            return getSuccessResult(bonusLogs);
+            List<NewEmployee> newEmployees = newEmployeeService.selectList();
+            List<NewEmployee> employees = new ArrayList<>();
+            List<NewEmployee> shopowners = new ArrayList<>();
+            for (NewEmployee newEmployee : newEmployees){
+                if (newEmployee.getRoleType() == 1){
+                    employees.add(newEmployee);
+                }else{
+                    shopowners.add(newEmployee);
+                }
+            }
+            map.put("employees",employees);
+            map.put("shopowners",shopowners);
+            map.put("bonusLogs",bonusLogs);
+            return getSuccessResult(map);
         }catch (Exception e){
             e.printStackTrace();
             log.error("查看所有分红记录出错！");

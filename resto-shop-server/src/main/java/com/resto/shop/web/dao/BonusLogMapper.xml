@@ -80,6 +80,8 @@
                 WHEN 2 THEN '已分红'
             END stateValue,
             CONCAT(tbs.charge_bonus_ratio,'%') chargeBonusRatio,
+            CONCAT(tbs.shopowner_bonus_ratio,'%') shopownerBonusRatio,
+            CONCAT(tbs.employee_bonus_ratio,'%') employeeBonusRatio,
             GROUP_CONCAT(CONCAT_WS(':',tne.role_type,tne.`name`)) emNames
         from tb_bonus_log tbl
         inner join tb_charge_order tal
