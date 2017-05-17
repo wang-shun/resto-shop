@@ -103,13 +103,13 @@ public class ApiController extends GenericController {
             }
             //判断是需要店铺数据还是品牌数据
             List<Order> orderList = new ArrayList<>();
-
+            ShopDetail shopDetail = null;
             if (StringUtils.isEmpty(thirdAppid)) {//说明需要的是品牌数据
                 orderList = orderService.selectBaseToThirdList(brandSetting.getBrandId(), beginDate, endDate);
             } else {
                 //说明需要的是店铺端的数据
                 //判断是否是
-                ShopDetail shopDetail = shopDetailService.selectByThirdAppId(thirdAppid);
+                 shopDetail = shopDetailService.selectByThirdAppId(thirdAppid);
                 if (null == shopDetail) {
                     result.setSuccess(false);
                     result.setMessage("参数非法");
@@ -128,6 +128,7 @@ public class ApiController extends GenericController {
                     map.put("posDate", DateUtil.formatDate(o.getPrintOrderTime(),"yyyy-MM-dd HH:mm:ss"));//订单推送时间
                     map.put("tableNumber", o.getTableNumber());//座号
                     map.put("serialNumber", o.getSerialNumber());//
+                    map.put("shopName",shopDetail.getName());
                     //订单支付项
                     List<Map<Integer,BigDecimal>> payList = new ArrayList<>();
                     if (!o.getOrderPaymentItems().isEmpty()) {
