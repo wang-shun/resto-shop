@@ -742,7 +742,7 @@ public class ThirdServiceImpl implements ThirdService {
             message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = messageJson.getString("orderId");
-            addHungerOrderVersion2(orderId,brandSetting);
+            addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
             String message = map.get("message").toString();
@@ -829,14 +829,14 @@ public class ThirdServiceImpl implements ThirdService {
 
     }
 
-    private void addHungerOrderVersion2(String orderId, BrandSetting brandSetting) throws ServiceException {
-        token.setAccessToken("5e031281b4122f34dfdcdb480a74dcc7");
-        token.setRefreshToken("b530d03d419d01bc7f58048e95a0f201");
+    private void addHungerOrderVersion2(String orderId) throws ServiceException {
+        token.setAccessToken("bd4825722750e8d20cbe8427401eb141");
+        token.setRefreshToken("753676044889597ad647d139ff47f4ce");
         token.setExpires(86400);
         token.setTokenType("bearer");
 
         eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
-        OOrder order = orderService.getOrder("1207114860465139715");
+        OOrder order = orderService.getOrder(orderId);
         String shopId = shopDetailService.selectByOOrderShopId(order.getShopId()).getId();
         PlatformOrder platformOrder = new PlatformOrder(order,shopId);
         platformorderMapper.insertSelective(platformOrder);

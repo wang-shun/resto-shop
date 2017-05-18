@@ -185,6 +185,6 @@ public class PlatformOrder {
         createTime = new Date();
         payType = "已在线支付";
         remark = order.getDescription();
-        sourceText = order.toString();
+//        sourceText = order.toString();
     }
 }
