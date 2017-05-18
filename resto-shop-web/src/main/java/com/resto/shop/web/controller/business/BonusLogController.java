@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.model.WxServerConfig;
@@ -16,10 +19,7 @@ import com.resto.brand.web.service.WxServerConfigService;
 import com.resto.shop.web.model.BonusSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewEmployee;
-import com.resto.shop.web.service.BonusSettingService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.NewEmployeeService;
-import org.apache.commons.lang3.ObjectUtils;
+import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,17 +28,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.model.BonusLog;
-import com.resto.shop.web.service.BonusLogService;
 
-@Controller
+ @Controller
 @RequestMapping("bonusLog")
 public class BonusLogController extends GenericController{
 
 	@Resource
 	BonusLogService bonusLogService;
-
-    @Resource
-    NewEmployeeService newEmployeeService;
 
     @Resource
     CustomerService customerService;
@@ -57,6 +53,12 @@ public class BonusLogController extends GenericController{
 
     @Resource
     WechatConfigService wechatConfigService;
+
+    @Resource
+    ChargePaymentService chargePaymentService;
+
+    @Resource
+    OrderPaymentItemService orderPaymentItemService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -125,6 +127,10 @@ public class BonusLogController extends GenericController{
             if (bonusLog.getEmployeeBonusAmount() > 0){
                 grantRewards(employeeId, wechatConfig, shopDetail);
             }
+            bonusLog.setShopownerId(shopownerId);
+            bonusLog.setEmployeeId(employeeId);
+            bonusLog.setState(2);
+            bonusLogService.update(bonusLog);
             return getSuccessResult();
         }catch (Exception e){
             e.printStackTrace();
@@ -133,14 +139,45 @@ public class BonusLogController extends GenericController{
         }
 	}
 
-	public void grantRewards(String employeeId, WechatConfig wechatConfig, ShopDetail shopDetail){
+	public void grantRewards(String employeeId, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
         NewEmployee employee = newEmployeeService.selectById(employeeId);
         Customer customer = customerService.selectByTelePhone(employee.getTelephone());
-        if (shopDetail.getWxServerId() == null){
-            WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-
-        }else{
-
+        String resultData = chargePaymentService.selectPayData(shopDetail.getId());
+        if (StringUtils.isBlank(resultData)){
+            resultData = orderPaymentItemService.selectWeChatPayResultData(shopDetail.getId());
+        }
+        JSONObject resultObject = JSON.parseObject(resultData);
+        JSONObject object = new JSONObject();
+//        if (shopDetail.getWxServerId() == null){
+            object.put("mch_billno",resultObject.get("transaction_id"));
+            object.put("mch_id",wechatConfig.getMchid());
+            object.put("wxappid",wechatConfig.getAppid());
+            object.put("send_name","上海餐加");
+            object.put("re_openid",customer.getWechatId());
+            object.put("total_amount",100);
+            object.put("wishing","恭喜你获得充值分红！");
+            object.put("act_name","充值返利");
+            object.put("remark","餐加的充值分红");
+            object.put("mch_key",wechatConfig.getMchkey());
+            object.put("cert_path","F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
+//        }else{
+//            WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+//            object.put("mch_billno",resultObject.get("transaction_id"));
+//            object.put("mch_id",serverConfig.getMchid());
+//            object.put("wxappid",serverConfig.getAppid());
+//            object.put("send_name","上海餐加");
+//            object.put("re_openid",customer.getWechatId());
+//            object.put("total_amount",100);
+//            object.put("wishing","恭喜你获得充值分红！");
+//            object.put("act_name","充值返利");
+//            object.put("remark","餐加的充值分红");
+//            object.put("mch_key",serverConfig.getMchkey());
+//            object.put("cert_path","F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
+//            object.put("consume_mch_id",shopDetail.getMchid());
+//        }
+        Map<String, String> result = WeChatPayUtils.sendredpack(object);
+        if (result.containsKey("ERROR")){
+            throw new RuntimeException(result.toString());
         }
     }
 }

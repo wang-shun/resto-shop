@@ -67,11 +67,11 @@
                                         <i v-if="bonusLog.state == 2" style="color: #228b22;font-style: normal;">{{bonusLog.stateValue}}</i>
                                     </span>
                                 </p>
-                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && bonusLog.employeeBonusAmount > 0">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && (bonusLog.employeeBonusAmount > 0 || bonusLog.bonusAmount == 0)">
                                     <span class="textRight">{{bonusLog.employeeName}}：</span>
                                     <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
                                 </p>
-                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && bonusLog.shopownerBonusAmount > 0">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && (bonusLog.shopownerBonusAmount > 0 || bonusLog.bonusAmount == 0)">
                                     <span class="textRight">{{bonusLog.shopownerName}}：</span>
                                     <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
                                 </p>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="form-group text-center">
                             <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary" @click="openShowEmployee">分红</button>
-                            <button v-if="bonusLog.state == 1" type="button" class="btn btn-primary">发放奖励</button>
+                            <button v-if="bonusLog.state == 1" type="button" class="btn btn-primary" @click="save">发放奖励</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
                         </div>
@@ -141,7 +141,7 @@
                         <div class="form-group text-center">
                             <button type="button" class="btn btn-default" @click="previousStep">上一步</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <button type="button" class="btn btn-primary" v-if="!disabled">发放奖励</button>
+                            <button type="button" class="btn btn-primary" v-if="!disabled" @click="save">发放奖励</button>
                             <button type="button" class="btn btn-default" :disabled="disabled" v-else>发放奖励</button>
                         </div>
                     </form>
