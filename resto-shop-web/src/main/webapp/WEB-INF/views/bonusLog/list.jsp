@@ -99,7 +99,7 @@
                 <div class="portlet-body">
                     <form role="form" class="form-horizontal">
                         <div class="form-body" style="font-size: 24px;font-family: 微软雅黑;border-bottom: 1px solid #eef1f5;">
-                            <div class="shopOwner">
+                            <div class="shopOwner" v-if="shopowners.length > 0">
                                 <p style="margin-left: 5%">选择店长</p>
                                 <div style="margin-left: 10%">
                                     <p v-for="shopowner in shopowners">
@@ -107,13 +107,15 @@
                                         <span class="textInCenter">{{bonusLog.shopownerBonusRatio}}</span>
                                         <span class="textInCenter"><font color="red">￥{{bonusLog.shopownerBonusAmount}}</font></span>
                                         <label class="checkbox-inline">
-                                            <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-if="$index == 0" checked="checked">
-                                            <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId" v-else>
+                                            <input type="radio" name="shopownerId" :value="shopowner.id" v-model="bonusLog.shopownerId">
                                         </label>
                                     </p>
                                 </div>
                             </div>
-                            <div class="staffOwner">
+                            <div v-else>
+                                <p style="margin-left: 5%">暂无店长相关人员，无法发放奖励</p>
+                            </div>
+                            <div class="staffOwner" v-if="employees.length > 0">
                                 <p style="margin-left: 5%">选择员工</p>
                                 <div style="margin-left: 10%">
                                     <p v-for="employee in employees">
@@ -121,17 +123,19 @@
                                         <span class="textInCenter">{{bonusLog.employeeBonusRatio}}</span>
                                         <span class="textInCenter"><font color="red">￥{{bonusLog.employeeBonusAmount}}</font></span>
                                         <label class="checkbox-inline">
-                                            <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-if="$index == 0" checked="checked">
-                                            <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId" v-else>
+                                            <input type="radio" name="employeeId" :value="employee.id" v-model="bonusLog.employeeId">
                                         </label>
                                     </p>
                                 </div>
+                            </div>
+                            <div v-else>
+                                <p style="margin-left: 5%">暂无员工相关人员，无法发放奖励</p>
                             </div>
                         </div>
                         <div class="form-group text-center">
                             <button type="button" class="btn btn-default" @click="previousStep">上一步</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <button type="button" class="btn btn-primary">发放奖励</button>
+                            <button type="button" class="btn btn-primary" :disabled="disabled">发放奖励</button>
                         </div>
                     </form>
                 </div>
@@ -160,7 +164,8 @@
             bonusLogTable : {},
             bonusLog : {},
             shopowners :[],
-            employees : []
+            employees : [],
+            disabled : false
         },
         created : function() {
             this.initDataTables();
@@ -300,6 +305,18 @@
                 this.openShowForm();
             },
             openShowEmployee : function () {
+                if (this.bonusLog.state == 0){
+                    if (this.employees.length > 0){
+                        this.bonusLog.employeeId = this.employees[0].id;
+                    }else{
+                        this.disabled = true;
+                    }
+                    if (this.shopowners.length > 0){
+                        this.bonusLog.shopownerId = this.shopowners[0].id;
+                    }else{
+                        this.disabled = true;
+                    }
+                }
                 this.showform = false;
                 this.showEmployee = true;
             },
