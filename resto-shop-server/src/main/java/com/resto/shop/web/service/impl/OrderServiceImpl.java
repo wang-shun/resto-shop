@@ -1734,6 +1734,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                         }
                         kitchenArticleMap.get(kitchenId).add(item);
+                    }else{
+                        item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                        orderItemService.update(item);
                     }
 
 
@@ -1753,6 +1756,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
                 } else {
+                    item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                    orderItemService.update(item);
                     continue;
                 }
             } else {
@@ -1782,6 +1787,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 }
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
+                            if(CollectionUtils.isEmpty(kitchenList)){
+                                item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                                orderItemService.update(item);
+                            }
                         }
                     } else {
                         List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
@@ -1794,6 +1803,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                             }
                             kitchenArticleMap.get(kitchenId).add(item);
+                        }
+                        if(CollectionUtils.isEmpty(kitchenList)){
+                            item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                            orderItemService.update(item);
                         }
 
                     }
