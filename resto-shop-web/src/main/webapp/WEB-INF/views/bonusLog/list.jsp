@@ -289,14 +289,18 @@
                 toastr.clear();
                 var that = this;
                 try{
-//                    $.post("",that.bonusLog,function (result) {
-//                        if (result.success){
-//                            that.colseShowForm();
-//                            that.searchInfo();
-//                        } else{
-//                            toastr.error("网络异常，请刷新重试");
-//                        }
-//                    });
+                    $.post("bonusLog/modify",{id : that.bonusLog.id, shopownerId : that.bonusLog.shopownerId, employeeId : that.bonusLog.employeeId},function (result) {
+                        if (result.success){
+                            if (that.bonusLog.state == 1){
+                                that.colseShowForm();
+                            }else if (that.bonusLog.state == 0){
+                                that.colseShowEmployee();
+                            }
+                            that.searchInfo();
+                        } else{
+                            toastr.error("网络异常，请刷新重试");
+                        }
+                    });
                 }catch(e){
                     toastr.error("系统异常，请刷新重试");
                 }

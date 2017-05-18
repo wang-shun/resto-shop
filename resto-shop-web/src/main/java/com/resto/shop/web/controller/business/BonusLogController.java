@@ -6,11 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.model.WxServerConfig;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.service.WxServerConfigService;
+import com.resto.shop.web.model.BonusSetting;
+import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.NewEmployee;
+import com.resto.shop.web.service.BonusSettingService;
+import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewEmployeeService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +39,24 @@ public class BonusLogController extends GenericController{
 
     @Resource
     NewEmployeeService newEmployeeService;
+
+    @Resource
+    CustomerService customerService;
+
+    @Resource
+    ShopDetailService shopDetailService;
+
+    @Resource
+    BonusSettingService bonusSettingService;
+
+    @Resource
+    NewEmployeeService newEmployeeService;
+
+    @Resource
+    WxServerConfigService wxServerConfigService;
+
+    @Resource
+    WechatConfigService wechatConfigService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -84,17 +111,36 @@ public class BonusLogController extends GenericController{
         }
 	}
 	
-	@RequestMapping("list_one")
-	@ResponseBody
-	public Result list_one(String id){
-		BonusLog bonuslog = bonusLogService.selectById(id);
-		return getSuccessResult(bonuslog);
-	}
-	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid BonusLog bonuslog){
-        bonusLogService.update(bonuslog);
-		return Result.getSuccess();
+	public Result modify(String id, String shopownerId, String employeeId){
+	    try{
+	        BonusLog bonusLog = bonusLogService.selectById(id);
+            BonusSetting bonusSetting = bonusSettingService.selectById(bonusLog.getBonusSettingId());
+            WechatConfig wechatConfig = wechatConfigService.selectByBrandId(bonusSetting.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectById(bonusSetting.getShopDetailId());
+            if (bonusLog.getShopownerBonusAmount() > 0){
+                grantRewards(shopownerId, wechatConfig, shopDetail);
+            }
+            if (bonusLog.getEmployeeBonusAmount() > 0){
+                grantRewards(employeeId, wechatConfig, shopDetail);
+            }
+            return getSuccessResult();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("发放奖励出错！");
+            return new Result(false);
+        }
 	}
+
+	public void grantRewards(String employeeId, WechatConfig wechatConfig, ShopDetail shopDetail){
+        NewEmployee employee = newEmployeeService.selectById(employeeId);
+        Customer customer = customerService.selectByTelePhone(employee.getTelephone());
+        if (shopDetail.getWxServerId() == null){
+            WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+
+        }else{
+
+        }
+    }
 }
