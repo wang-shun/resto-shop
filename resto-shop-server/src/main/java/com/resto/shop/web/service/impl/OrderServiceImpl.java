@@ -1815,6 +1815,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
+        Boolean check = true;
+        for(OrderItem item : articleList){
+            if(item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT){
+                check = false;
+            }
+        }
+        if(check){
+            order.setPrintKitchenFlag(PrintStatus.PRINT_SUCCESS);
+            update(order);
+        }
+
 
         //打印线程集合
         List<Map<String, Object>> printTask = new ArrayList<Map<String, Object>>();
