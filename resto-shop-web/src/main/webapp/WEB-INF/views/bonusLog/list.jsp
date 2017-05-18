@@ -67,11 +67,11 @@
                                         <i v-if="bonusLog.state == 2" style="color: #228b22;font-style: normal;">{{bonusLog.stateValue}}</i>
                                     </span>
                                 </p>
-                                <p v-if="bonusLog.state == 1 || bonusLog.state == 2">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && bonusLog.employeeBonusAmount > 0">
                                     <span class="textRight">{{bonusLog.employeeName}}：</span>
                                     <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
                                 </p>
-                                <p v-if="bonusLog.state == 1 || bonusLog.state == 2">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && bonusLog.shopownerBonusAmount > 0">
                                     <span class="textRight">{{bonusLog.shopownerName}}：</span>
                                     <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
                                 </p>
