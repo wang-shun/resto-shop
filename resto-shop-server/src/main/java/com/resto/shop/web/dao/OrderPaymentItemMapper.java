@@ -113,5 +113,5 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
     OrderPaymentItem insertByBeforePay(OrderPaymentItem record);
 
-    String selectWeChatPayResultData(@Param("shopId") String shopId);
+    OrderPaymentItem selectWeChatPayResultData(@Param("shopId") String shopId);
 }

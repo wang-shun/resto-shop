@@ -264,7 +264,7 @@
     </insert>
 
     <select id="selectWeChatPayResultData" parameterType="java.lang.String" resultType="java.lang.String">
-        select top.result_data from tb_order_payment_item top
+        select top.* from tb_order_payment_item top
         inner join tb_order td
         on top.order_id = td.id
         where top.payment_mode_id = 1 and top.is_use_bonus = 0

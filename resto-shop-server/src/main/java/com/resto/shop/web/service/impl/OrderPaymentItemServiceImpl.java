@@ -153,7 +153,7 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
 
     @Override
-    public String selectWeChatPayResultData(String shopId) {
+    public OrderPaymentItem selectWeChatPayResultData(String shopId) {
         return orderpaymentitemMapper.selectWeChatPayResultData(shopId);
     }
 }

@@ -15,5 +15,5 @@ public interface ChargePaymentService extends GenericService<ChargePayment, Stri
 
 	RechargeLogDto selectShopRechargeLog(String beginDate,String endDate,String shopId);
 
-    String selectPayData(String shopId);
+    ChargePayment selectPayData(String shopId);
 }

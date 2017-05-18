@@ -174,8 +174,8 @@
 				shop_detail_id = #{shopId} 
 	</select>
 
-    <select id="selectPayData" parameterType="java.lang.String" resultType="java.lang.String">
-        select tcp.pay_data from tb_charge_payment tcp
+    <select id="selectPayData" parameterType="java.lang.String" resultType="com.resto.shop.web.model.ChargePayment">
+        select tcp.* from tb_charge_payment tcp
         inner join tb_charge_order tco
         on tcp.charge_order_id = tco.id
         where tcp.is_use_bonus = 0
