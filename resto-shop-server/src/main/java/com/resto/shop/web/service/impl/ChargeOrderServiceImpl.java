@@ -116,13 +116,13 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
                 bonusLog.setId(ApplicationUtils.randomUUID());
                 bonusLog.setChargeOrderId(chargeOrder.getId());
                 bonusLog.setBonusSettingId(bonusSetting.getId());
-                BigDecimal bonusAmount = chargeMoney.multiply(new BigDecimal(bonusSetting.getChargeBonusRatio()).divide(new BigDecimal(100)));
-                BigDecimal shopownerBonusAmount = bonusAmount.multiply(new BigDecimal(bonusSetting.getShopownerBonusRatio()).divide(new BigDecimal(100)));
-                BigDecimal employeeBonusAmount = bonusAmount.subtract(shopownerBonusAmount);
-                bonusLog.setBonusAmount(bonusAmount.intValue());
+                Integer bonusAmount = chargeMoney.multiply(new BigDecimal(bonusSetting.getChargeBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer shopownerBonusAmount = new BigDecimal(bonusAmount).multiply(new BigDecimal(bonusSetting.getShopownerBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer employeeBonusAmount = bonusAmount - shopownerBonusAmount;
+                bonusLog.setBonusAmount(bonusAmount);
                 bonusLog.setState(0);
-                bonusLog.setShopownerBonusAmount(shopownerBonusAmount.intValue());
-                bonusLog.setEmployeeBonusAmount(employeeBonusAmount.intValue());
+                bonusLog.setShopownerBonusAmount(shopownerBonusAmount);
+                bonusLog.setEmployeeBonusAmount(employeeBonusAmount);
                 bonusLog.setCreateTime(new Date());
                 bonusLogService.insert(bonusLog);
             }
