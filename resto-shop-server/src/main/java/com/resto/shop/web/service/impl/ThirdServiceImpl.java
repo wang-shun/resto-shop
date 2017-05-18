@@ -17,6 +17,13 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
+import eleme.openapi.sdk.api.entity.order.OGoodsItem;
+import eleme.openapi.sdk.api.entity.order.OOrder;
+import eleme.openapi.sdk.api.exception.ServiceException;
+import eleme.openapi.sdk.config.Config;
+import eleme.openapi.sdk.oauth.OAuthClient;
+import eleme.openapi.sdk.oauth.response.Token;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -49,6 +56,29 @@ public class ThirdServiceImpl implements ThirdService {
     private static final Map<String, Map<String, Integer>> NUMBER_ORDER_MAP = new ConcurrentHashMap<>();
 
     private static final Map<String, Map<String, Integer>> NUMBER_SHOP_MAP = new ConcurrentHashMap<>();
+
+    private static Config config = null;
+
+    private static Token token = null;
+
+    private static OAuthClient client = null;
+    // 设置是否沙箱环境
+    private static final boolean isSandbox = true;
+
+    // 设置APP KEY
+    private static final String key = "o6ph8ACwrY";
+
+    // 设置APP SECRET
+    private static final String secret = "11b1d008b10ecb1510dbdf100d1c97e1";
+
+    // 回调地址
+    private static String callbackUrl = "https://ecosystem.restoplus.cn/wechat/order/new/third/version2.0/test";
+
+    static {
+        config = new Config(isSandbox, key, secret);
+        client = new OAuthClient(config);
+        token = client.getTokenByCode("", "");
+    }
 
     @Resource
     OrderPaymentItemService orderPaymentItemService;
@@ -688,7 +718,7 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                     if (check) {
-                        result = hungerPushVersion2(map, brandSetting);
+                        result = hungerPushVersion2(map, brandSetting, brandId);
                     }
                     break;
                 default:
@@ -700,7 +730,7 @@ public class ThirdServiceImpl implements ThirdService {
         return result;
     }
 
-    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting) throws Exception {
+    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting, String brandId) throws Exception {
         Integer type;
         if(StringUtils.isEmpty(map.get("type"))){
             return false;
@@ -708,13 +738,14 @@ public class ThirdServiceImpl implements ThirdService {
             type = Integer.parseInt(map.get("type").toString());
         }
         if(type == ElemeType.NEW_ORDER){
-            Map m = new HashMap();
             String message = map.get("message").toString();
             message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = messageJson.getString("orderId");
-            m.put("eleme_order_ids", orderId);
-            addHungerOrder(m,brandSetting);
+            addHungerOrderVersion2(orderId,brandSetting);
+        }else if(type == ElemeType.RECEIVE_ORDER){
+            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
+            MQMessageProducer.sendPlatformOrderMessage(map.get("eleme_order_id").toString(), PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
     }
@@ -794,6 +825,39 @@ public class ThirdServiceImpl implements ThirdService {
 
     }
 
+    private void addHungerOrderVersion2(String orderId, BrandSetting brandSetting) throws ServiceException {
+        token.setAccessToken("2b49be460fcdff4a3611c3059734dc55");
+        token.setRefreshToken("c79bf841fe53991b37422afc4c8e010d");
+        token.setExpires(86400);
+        token.setTokenType("bearer");
+
+        eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
+        OOrder order = orderService.getOrder("1207114860465139715");
+        String shopId = shopDetailService.selectByOOrderShopId(order.getShopId()).getId();
+        PlatformOrder platformOrder = new PlatformOrder(order,shopId);
+        platformorderMapper.insertSelective(platformOrder);
+
+        List<OGoodsGroup> group = order.getGroups();
+        if (group != null) {
+            for (int i = 0; i < group.size(); i++) {
+                OGoodsGroup g = group.get(i);
+                for(int j = 0; j < g.getItems().size(); j++){
+                    OGoodsItem detail = g.getItems().get(j);
+                    PlatformOrderDetail platformOrderDetail = new PlatformOrderDetail(detail, order.getId());
+                    platformorderdetailMapper.insertSelective(platformOrderDetail);
+                }
+
+            }
+        }
+        if(order.getServiceFee() > 0){
+            PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 1);
+            platformorderextraMapper.insertSelective(platformOrderExtra);
+        }
+        if(order.getPackageFee() > 0){
+            PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 2);
+            platformorderextraMapper.insertSelective(platformOrderExtra);
+        }
+    }
 
     private String[] addHungerOrder(Map map, BrandSetting brandSetting) throws Exception {
         String orderIds = map.get("eleme_order_ids").toString();

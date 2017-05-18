@@ -1,6 +1,10 @@
 package com.resto.shop.web.model;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
+import eleme.openapi.sdk.api.entity.order.OGoodsItem;
+import eleme.openapi.sdk.api.entity.order.OGroupItemAttribute;
+import eleme.openapi.sdk.api.entity.order.OGroupItemSpec;
 
 import java.math.BigDecimal;
 
@@ -78,6 +82,27 @@ public class PlatformOrderDetail {
             showName = detail.getName() + detail.getSpecs();
         }else{
             showName = detail.getName();
+        }
+
+    }
+
+    public PlatformOrderDetail(OGoodsItem detail, String orderId) {
+        id = ApplicationUtils.randomUUID();
+        platformOrderId = orderId;
+        name = detail.getName();
+        price = new BigDecimal(detail.getPrice());
+        quantity = detail.getQuantity();
+        if(detail.getNewSpecs().size() > 0){
+            for (int i = 0; i < detail.getNewSpecs().size(); i++) {
+                OGroupItemSpec spec = detail.getNewSpecs().get(i);
+                showName = detail.getName() + spec.getName();
+            }
+        }
+        if(detail.getAttributes().size() > 0){
+            for (int j = 0; j < detail.getAttributes().size(); j++) {
+                OGroupItemAttribute attribute = detail.getAttributes().get(j);
+                showName = detail.getName() + attribute.getName();
+            }
         }
 
     }
