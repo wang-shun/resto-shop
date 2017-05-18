@@ -150,29 +150,22 @@ public class BonusLogController extends GenericController{
         }
         JSONObject resultObject = JSON.parseObject(resultData);
         JSONObject object = new JSONObject();
+        object.put("mch_billno",resultObject.get("transaction_id"));
+        object.put("re_openid",customer.getWechatId());
+        object.put("send_name","上海餐加");
+        object.put("wishing","恭喜你获得充值分红！");
+        object.put("act_name","充值返利");
+        object.put("remark","餐加的充值分红");
+        object.put("total_amount",100);
         if (shopDetail.getWxServerId() == null){
-            object.put("mch_billno",resultObject.get("transaction_id"));
             object.put("mch_id",wechatConfig.getMchid());
             object.put("wxappid",wechatConfig.getAppid());
-            object.put("send_name","上海餐加");
-            object.put("re_openid",customer.getWechatId());
-            object.put("total_amount",100);
-            object.put("wishing","恭喜你获得充值分红！");
-            object.put("act_name","充值返利");
-            object.put("remark","餐加的充值分红");
             object.put("mch_key",wechatConfig.getMchkey());
             object.put("cert_path","F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
         }else{
             WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-            object.put("mch_billno",resultObject.get("transaction_id"));
             object.put("mch_id",serverConfig.getMchid());
             object.put("wxappid",serverConfig.getAppid());
-            object.put("send_name","上海餐加");
-            object.put("re_openid",customer.getWechatId());
-            object.put("total_amount",100);
-            object.put("wishing","恭喜你获得充值分红！");
-            object.put("act_name","充值返利");
-            object.put("remark","餐加的充值分红");
             object.put("mch_key",serverConfig.getMchkey());
             object.put("cert_path","F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
             object.put("consume_mch_id",shopDetail.getMchid());
@@ -181,13 +174,17 @@ public class BonusLogController extends GenericController{
         if (result.containsKey("ERROR")){
             throw new RuntimeException(result.toString());
         }
-        if (resultData.equalsIgnoreCase(paymentItem.getResultData())) {
-            paymentItem.setIsUseBonus(1);
-            orderPaymentItemService.update(paymentItem);
+        if (paymentItem != null) {
+            if (resultData.equalsIgnoreCase(paymentItem.getResultData())) {
+                paymentItem.setIsUseBonus(1);
+                orderPaymentItemService.update(paymentItem);
+            }
         }
-        if (resultData.equalsIgnoreCase(chargePayment.getPayData())){
-            chargePayment.setIsUseBonus(1);
-            chargePaymentService.update(chargePayment);
+        if (chargePayment != null) {
+            if (resultData.equalsIgnoreCase(chargePayment.getPayData())) {
+                chargePayment.setIsUseBonus(1);
+                chargePaymentService.update(chargePayment);
+            }
         }
     }
 }
