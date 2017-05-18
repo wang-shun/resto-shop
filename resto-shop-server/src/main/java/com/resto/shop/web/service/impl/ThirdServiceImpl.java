@@ -745,7 +745,11 @@ public class ThirdServiceImpl implements ThirdService {
             addHungerOrderVersion2(orderId,brandSetting);
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
-            MQMessageProducer.sendPlatformOrderMessage(map.get("eleme_order_id").toString(), PlatformType.E_LE_ME, brandId, shopId);
+            String message = map.get("message").toString();
+            message = message.replaceAll("\\\\","");
+            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
+            String orderId = messageJson.getString("orderId");
+            MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
     }
@@ -826,8 +830,8 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     private void addHungerOrderVersion2(String orderId, BrandSetting brandSetting) throws ServiceException {
-        token.setAccessToken("2b49be460fcdff4a3611c3059734dc55");
-        token.setRefreshToken("c79bf841fe53991b37422afc4c8e010d");
+        token.setAccessToken("5e031281b4122f34dfdcdb480a74dcc7");
+        token.setRefreshToken("b530d03d419d01bc7f58048e95a0f201");
         token.setExpires(86400);
         token.setTokenType("bearer");
 
