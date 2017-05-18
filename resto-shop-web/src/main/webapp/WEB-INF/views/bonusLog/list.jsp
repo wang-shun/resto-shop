@@ -113,7 +113,10 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <p style="margin-left: 5%">暂无店长相关人员，无法发放奖励</p>
+                                <p style="margin-left: 5%">选择店长</p>
+                                <div style="margin-left: 10%">
+                                    暂无店长，无法发放奖励
+                                </div>
                             </div>
                             <div class="staffOwner" v-if="employees.length > 0">
                                 <p style="margin-left: 5%">选择员工</p>
@@ -129,13 +132,17 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <p style="margin-left: 5%">暂无员工相关人员，无法发放奖励</p>
+                                <p style="margin-left: 5%">选择员工</p>
+                                <div style="margin-left: 10%">
+                                    暂无员工，无法发放奖励
+                                </div>
                             </div>
                         </div>
                         <div class="form-group text-center">
                             <button type="button" class="btn btn-default" @click="previousStep">上一步</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <button type="button" class="btn btn-primary" :disabled="disabled">发放奖励</button>
+                            <button type="button" class="btn btn-primary" v-if="!disabled">发放奖励</button>
+                            <button type="button" class="btn btn-default" :disabled="disabled" v-else>发放奖励</button>
                         </div>
                     </form>
                 </div>
