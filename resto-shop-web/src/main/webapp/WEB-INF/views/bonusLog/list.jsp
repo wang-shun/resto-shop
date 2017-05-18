@@ -99,7 +99,7 @@
                 <div class="portlet-body">
                     <form role="form" class="form-horizontal">
                         <div class="form-body" style="font-size: 24px;font-family: 微软雅黑;border-bottom: 1px solid #eef1f5;">
-                            <div class="shopOwner" v-if="shopowners.length > 0">
+                            <div class="shopOwner" v-if="shopowners.length > 0 && bonusLog.shopownerBonusRatio !='0%'">
                                 <p style="margin-left: 5%">选择店长</p>
                                 <div style="margin-left: 10%">
                                     <p v-for="shopowner in shopowners">
@@ -112,13 +112,13 @@
                                     </p>
                                 </div>
                             </div>
-                            <div v-else>
+                            <div v-if="shopowners.length == 0 && bonusLog.shopownerBonusRatio !='0%'">
                                 <p style="margin-left: 5%">选择店长</p>
                                 <div style="margin-left: 10%">
                                     暂无店长，无法发放奖励
                                 </div>
                             </div>
-                            <div class="staffOwner" v-if="employees.length > 0">
+                            <div class="staffOwner" v-if="employees.length > 0 && bonusLog.employeeBonusRatio !='0%'">
                                 <p style="margin-left: 5%">选择员工</p>
                                 <div style="margin-left: 10%">
                                     <p v-for="employee in employees">
@@ -131,7 +131,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div v-else>
+                            <div v-if="employees.length == 0 && bonusLog.employeeBonusRatio !='0%'">
                                 <p style="margin-left: 5%">选择员工</p>
                                 <div style="margin-left: 10%">
                                     暂无员工，无法发放奖励
@@ -315,12 +315,12 @@
                 if (this.bonusLog.state == 0){
                     if (this.employees.length > 0){
                         this.bonusLog.employeeId = this.employees[0].id;
-                    }else{
+                    }else if (this.bonusLog.employeeBonusRatio != "0%"){
                         this.disabled = true;
                     }
                     if (this.shopowners.length > 0){
                         this.bonusLog.shopownerId = this.shopowners[0].id;
-                    }else{
+                    }else if (this.bonusLog.shopownerBonusRatio != "0%"){
                         this.disabled = true;
                     }
                 }
