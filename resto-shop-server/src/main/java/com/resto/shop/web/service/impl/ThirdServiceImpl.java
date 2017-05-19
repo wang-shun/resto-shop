@@ -828,8 +828,8 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     private void addHungerOrderVersion2(String orderId) throws ServiceException {
-        token.setAccessToken("9ef5b47416af3f8f14e33ab4755eaa2f");
-        token.setRefreshToken("8be14d0d777f84316afecfd8c5096138");
+        token.setAccessToken("f01f8379092888b7b894502e9ab8b07a");
+        token.setRefreshToken("2028796f1bb87a70d915c67cd263cc95");
         token.setExpires(86400);
         token.setTokenType("bearer");
 
