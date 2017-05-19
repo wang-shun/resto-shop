@@ -951,4 +951,8 @@ GROUP BY article_id
         order by a.sort
     </select>
 
+    <select id="selectHasResourcePhotoList" resultType="Article">
+      SELECT * FROM tb_article WHERE photo_small like '%http://%'
+    </select>
+
 </mapper>
