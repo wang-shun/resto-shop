@@ -17,6 +17,7 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import eleme.openapi.sdk.api.entity.message.OMessage;
 import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
 import eleme.openapi.sdk.api.entity.order.OGoodsItem;
 import eleme.openapi.sdk.api.entity.order.OOrder;
@@ -738,18 +739,12 @@ public class ThirdServiceImpl implements ThirdService {
             type = Integer.parseInt(map.get("type").toString());
         }
         if(type == ElemeType.NEW_ORDER){
-            String message = map.get("message").toString();
-            message = message.replaceAll("\\\\","");
-            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
-            String orderId = messageJson.getString("orderId");
-            addHungerOrderVersion2(orderId);
+            OMessage oMessage = (OMessage) map.get("oMessage");
+            addHungerOrderVersion2(oMessage.getOrderId());
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
-            String message = map.get("message").toString();
-            message = message.replaceAll("\\\\","");
-            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
-            String orderId = messageJson.getString("orderId");
-            MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
+            OMessage oMessage = (OMessage) map.get("oMessage");
+            MQMessageProducer.sendPlatformOrderMessage(oMessage.getOrderId(), PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
     }
