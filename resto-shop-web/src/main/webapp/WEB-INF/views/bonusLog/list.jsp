@@ -288,6 +288,7 @@
             },
             save : function () {
                 toastr.clear();
+                toastr.success("发放中，请稍后...");
                 var that = this;
                 that.disabled = true;
                 try{
