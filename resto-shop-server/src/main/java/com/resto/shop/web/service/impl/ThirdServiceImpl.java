@@ -742,6 +742,7 @@ public class ThirdServiceImpl implements ThirdService {
             String oMessage =  map.get("oMessage").toString();
             com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
             String message = messageJson.getString("message");
+            message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = mj.getString("orderId");
             addHungerOrderVersion2(orderId);
@@ -750,6 +751,7 @@ public class ThirdServiceImpl implements ThirdService {
             String oMessage =  map.get("oMessage").toString();
             com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
             String message = messageJson.getString("message");
+            message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = mj.getString("orderId");
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
