@@ -733,24 +733,17 @@ public class ThirdServiceImpl implements ThirdService {
 
     private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting, String brandId) throws Exception {
         Integer type;
-        if(StringUtils.isEmpty(map.get("type"))){
-            return false;
-        } else {
-            type = Integer.parseInt(map.get("type").toString());
-        }
+        String oMessage =  map.get("oMessage").toString();
+        oMessage = oMessage.replaceAll("\\\\","");
+        com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
+        type = Integer.parseInt(messageJson.getString("type"));
         if(type == ElemeType.NEW_ORDER){
-            String oMessage =  map.get("oMessage").toString();
-            oMessage = oMessage.replaceAll("\\\\","");
-            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
             String message = messageJson.getString("message");
             com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
             String orderId = mj.getString("orderId");
             addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
-            String oMessage =  map.get("oMessage").toString();
-            oMessage = oMessage.replaceAll("\\\\","");
-            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
             String message = messageJson.getString("message");
             message = message.replaceAll("\\\\","");
             com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
