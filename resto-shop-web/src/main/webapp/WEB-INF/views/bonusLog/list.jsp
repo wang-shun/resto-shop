@@ -302,6 +302,7 @@
                             that.searchInfo();
                             that.disabled = false;
                         } else{
+                            toastr.clear();
                             that.disabled = false;
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);
@@ -312,6 +313,7 @@
                     });
                 }catch(e){
                     that.disabled = false;
+                    toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
             },
