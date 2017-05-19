@@ -719,7 +719,7 @@ public class ThirdServiceImpl implements ThirdService {
                         }
                     }
                     if (check) {
-                        result = hungerPushVersion2(map, brandSetting, brandId);
+                        result = hungerPushVersion2(map, brandId);
                     }
                     break;
                 default:
@@ -731,23 +731,17 @@ public class ThirdServiceImpl implements ThirdService {
         return result;
     }
 
-    private Boolean hungerPushVersion2(Map map, BrandSetting brandSetting, String brandId) throws Exception {
-        Integer type;
+    private Boolean hungerPushVersion2(Map map, String brandId) throws ServiceException {
         String oMessage =  map.get("oMessage").toString();
-        oMessage = oMessage.replaceAll("\\\\","");
         com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
-        type = Integer.parseInt(messageJson.getString("type"));
+        Integer type = Integer.parseInt(messageJson.getString("type"));
+        String message = messageJson.getString("message");
+        com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
+        String orderId = mj.getString("orderId");
         if(type == ElemeType.NEW_ORDER){
-            String message = messageJson.getString("message");
-            com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
-            String orderId = mj.getString("orderId");
             addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
-            String message = messageJson.getString("message");
-            message = message.replaceAll("\\\\","");
-            com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
-            String orderId = mj.getString("orderId");
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
