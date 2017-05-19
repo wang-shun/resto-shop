@@ -237,4 +237,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     public Customer selectByTelePhone(String telePhone) {
         return customerMapper.selectByTelePhone(telePhone);
     }
+
+    @Override
+    public List<Customer> selectByTelePhones(List<String> telePhones) {
+        return customerMapper.selectByTelePhones(telePhones);
+    }
 }

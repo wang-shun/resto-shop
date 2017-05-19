@@ -3,6 +3,8 @@ package com.resto.shop.web.dao;
 import com.resto.shop.web.model.NewEmployee;
 import com.resto.brand.core.generic.GenericDao;
 
+import java.util.List;
+
 public interface NewEmployeeMapper  extends GenericDao<NewEmployee,String> {
     int deleteByPrimaryKey(String id);
 
@@ -15,4 +17,6 @@ public interface NewEmployeeMapper  extends GenericDao<NewEmployee,String> {
     int updateByPrimaryKeySelective(NewEmployee record);
 
     int updateByPrimaryKey(NewEmployee record);
+
+    List<NewEmployee> selectByIds(List<String> ids);
 }

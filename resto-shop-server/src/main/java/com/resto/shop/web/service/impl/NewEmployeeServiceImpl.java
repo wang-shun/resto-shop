@@ -8,6 +8,8 @@ import com.resto.shop.web.model.NewEmployee;
 import com.resto.shop.web.service.NewEmployeeService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+
 /**
  *
  */
@@ -20,6 +22,10 @@ public class NewEmployeeServiceImpl extends GenericServiceImpl<NewEmployee, Stri
     @Override
     public GenericDao<NewEmployee, String> getDao() {
         return newemployeeMapper;
-    } 
+    }
 
+    @Override
+    public List<NewEmployee> selectByIds(List<String> ids) {
+        return newemployeeMapper.selectByIds(ids);
+    }
 }

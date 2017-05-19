@@ -303,7 +303,11 @@
                             that.disabled = false;
                         } else{
                             that.disabled = false;
-                            toastr.error("网络异常，请刷新重试");
+                            if (result.message != null && result.message != ""){
+                                toastr.error(result.message);
+                            }else {
+                                toastr.error("网络异常，请刷新重试");
+                            }
                         }
                     });
                 }catch(e){

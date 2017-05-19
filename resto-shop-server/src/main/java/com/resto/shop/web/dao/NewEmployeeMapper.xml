@@ -57,4 +57,10 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.NewEmployee">update tb_new_employee set role_type = #{roleType,jdbcType=INTEGER}, name = #{name,jdbcType=VARCHAR}, nick_name = #{nickName,jdbcType=VARCHAR}, sex = #{sex,jdbcType=INTEGER}, telephone = #{telephone,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="NewEmployee">select * from tb_new_employee</select>
+    <select id="selectByIds" resultType="com.resto.shop.web.model.NewEmployee">
+        select * from tb_new_employee where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

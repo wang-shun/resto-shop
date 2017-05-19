@@ -602,4 +602,12 @@
         SELECT * FROM  tb_customer
         WHERE telephone=#{telePhone}
     </select>
+
+    <select id="selectByTelePhones" resultType="com.resto.shop.web.model.Customer">
+        SELECT * FROM  tb_customer
+        WHERE telephone in
+        <foreach collection="list" item="telephone" open="(" separator="," close=")">
+            #{telephone}
+        </foreach>
+    </select>
 </mapper>
