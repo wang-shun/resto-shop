@@ -740,11 +740,19 @@ public class ThirdServiceImpl implements ThirdService {
         }
         if(type == ElemeType.NEW_ORDER){
             OMessage oMessage = (OMessage) map.get("oMessage");
-            addHungerOrderVersion2(oMessage.getOrderId());
+            String message = oMessage.getMessage();
+            message = message.replaceAll("\\\\","");
+            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
+            String orderId = messageJson.getString("orderId");
+            addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
             String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
             OMessage oMessage = (OMessage) map.get("oMessage");
-            MQMessageProducer.sendPlatformOrderMessage(oMessage.getOrderId(), PlatformType.E_LE_ME, brandId, shopId);
+            String message = oMessage.getMessage();
+            message = message.replaceAll("\\\\","");
+            com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(message);
+            String orderId = messageJson.getString("orderId");
+            MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
     }
