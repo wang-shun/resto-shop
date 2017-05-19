@@ -1734,6 +1734,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                         }
                         kitchenArticleMap.get(kitchenId).add(item);
+                    }else{
+                        item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                        orderItemService.update(item);
                     }
 
 
@@ -1753,6 +1756,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
                 } else {
+                    item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                    orderItemService.update(item);
                     continue;
                 }
             } else {
@@ -1782,6 +1787,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 }
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
+                            if(CollectionUtils.isEmpty(kitchenList)){
+                                item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                                orderItemService.update(item);
+                            }
                         }
                     } else {
                         List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
@@ -1795,6 +1804,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                             kitchenArticleMap.get(kitchenId).add(item);
                         }
+                        if(CollectionUtils.isEmpty(kitchenList)){
+                            item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+                            orderItemService.update(item);
+                        }
 
                     }
                 }
@@ -1802,6 +1815,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
+        Boolean check = true;
+        for(OrderItem item : articleList){
+            if(item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT){
+                check = false;
+            }
+        }
+        if(check){
+            order.setPrintKitchenFlag(PrintStatus.PRINT_SUCCESS);
+            update(order);
+        }
+
 
         //打印线程集合
         List<Map<String, Object>> printTask = new ArrayList<Map<String, Object>>();
