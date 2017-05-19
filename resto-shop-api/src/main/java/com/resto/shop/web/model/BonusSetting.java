@@ -25,6 +25,16 @@ public class BonusSetting {
 
     private String chargeName;
 
+    private String wishing;
+
+    public String getWishing() {
+        return wishing;
+    }
+
+    public void setWishing(String wishing) {
+        this.wishing = wishing;
+    }
+
     public String getId() {
         return id;
     }

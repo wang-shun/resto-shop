@@ -23,6 +23,36 @@ public class BonusLog {
 
     private Date createTime;
 
+    private String wishing;
+
+    private Integer shopownerIssuingState;
+
+    private Integer employeeIssuingState;
+
+    public Integer getEmployeeIssuingState() {
+        return employeeIssuingState;
+    }
+
+    public void setEmployeeIssuingState(Integer employeeIssuingState) {
+        this.employeeIssuingState = employeeIssuingState;
+    }
+
+    public Integer getShopownerIssuingState() {
+        return shopownerIssuingState;
+    }
+
+    public void setShopownerIssuingState(Integer shopownerIssuingState) {
+        this.shopownerIssuingState = shopownerIssuingState;
+    }
+
+    public String getWishing() {
+        return wishing;
+    }
+
+    public void setWishing(String wishing) {
+        this.wishing = wishing;
+    }
+
     public String getId() {
         return id;
     }

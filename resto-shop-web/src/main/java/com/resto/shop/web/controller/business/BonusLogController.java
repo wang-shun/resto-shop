@@ -141,15 +141,15 @@ public class BonusLogController extends GenericController{
             }
             List<Customer> customers = customerService.selectByTelePhones(telePhones);
             if (customers.size() == 1) {
-                grantRewards(customers.get(0), bonusLog.getBonusAmount(), wechatConfig, shopDetail);
+                grantRewards(customers.get(0), bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
             }else{
                 for (Customer customer : customers){
                     for (NewEmployee employee : employees){
                         if (customer.getTelephone().equalsIgnoreCase(employee.getTelephone())){
                             if (employee.getId().equalsIgnoreCase(shopownerId)){
-                                grantRewards(customer, bonusLog.getShopownerBonusAmount(), wechatConfig, shopDetail);
+                                grantRewards(customer, bonusLog.getShopownerBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
                             }else{
-                                grantRewards(customer, bonusLog.getEmployeeBonusAmount(), wechatConfig, shopDetail);
+                                grantRewards(customer, bonusLog.getEmployeeBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
                             }
                             break;
                         }
@@ -168,7 +168,7 @@ public class BonusLogController extends GenericController{
         }
 	}
 
-	public void grantRewards(Customer customer, Integer bonusAmount, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
+	public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
         ChargePayment chargePayment = chargePaymentService.selectPayData(shopDetail.getId());
         String resultData = chargePayment.getPayData();
         boolean isUseChargePay = true;
@@ -182,24 +182,25 @@ public class BonusLogController extends GenericController{
             throw new RuntimeException("无微信支付订单作为载体发放现金红包");
         }
         JSONObject resultObject = JSON.parseObject(resultData);
+        Object mch_billno = resultObject.get("transaction_id");
         JSONObject object = new JSONObject();
-        object.put("mch_billno",resultObject.get("transaction_id"));
-        object.put("re_openid",customer.getWechatId());
-        object.put("send_name","上海餐加");
-        object.put("wishing","恭喜你获得充值分红");
-        object.put("total_amount",100);
+        object.put("mch_billno", mch_billno);
+        object.put("re_openid", customer.getWechatId());
+        object.put("send_name", getBrandName());
+        object.put("wishing", wishing);
+        object.put("total_amount", "100");
         if (shopDetail.getWxServerId() == null){
-            object.put("mch_id",wechatConfig.getMchid());
-            object.put("wxappid",wechatConfig.getAppid());
-            object.put("mch_key",wechatConfig.getMchkey());
-            object.put("cert_path","F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
+            object.put("mch_id", wechatConfig.getMchid());
+            object.put("wxappid", wechatConfig.getAppid());
+            object.put("mch_key", wechatConfig.getMchkey());
+            object.put("cert_path", wechatConfig.getPayCertPath());
         }else{
             WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-            object.put("mch_id",serverConfig.getMchid());
-            object.put("wxappid",serverConfig.getAppid());
-            object.put("mch_key",serverConfig.getMchkey());
-            object.put("cert_path","F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
-            object.put("consume_mch_id",shopDetail.getMchid());
+            object.put("mch_id", serverConfig.getMchid());
+            object.put("wxappid", serverConfig.getAppid());
+            object.put("mch_key", serverConfig.getMchkey());
+            object.put("cert_path", serverConfig.getPayCertPath());
+            object.put("consume_mch_id", shopDetail.getMchid());
         }
         Map<String, String> result = WeChatPayUtils.sendredpack(object);
         if (result.containsKey("ERROR")){

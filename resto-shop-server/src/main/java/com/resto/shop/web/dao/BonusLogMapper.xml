@@ -13,13 +13,16 @@
     <result column="shopowner_id" property="shopownerId" jdbcType="VARCHAR"/>
     <result column="employee_id" property="employeeId" jdbcType="VARCHAR"/>
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="wishing" property="wishing"/>
+    <result column="shopowner_issuing_state" property="shopownerIssuingState"/>
+    <result column="employee_issuing_state" property="employeeIssuingState"/>
   </resultMap>
-  <sql id="Base_Column_List">id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time</sql>
+  <sql id="Base_Column_List">id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time, wishing, shopowner_issuing_state, employee_issuing_state</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_bonus_log where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_bonus_log where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.BonusLog">insert into tb_bonus_log (id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time) values (#{id,jdbcType=VARCHAR}, #{chargeOrderId,jdbcType=VARCHAR}, #{bonusSettingId,jdbcType=VARCHAR}, #{bonusAmount,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{shopownerBonusAmount,jdbcType=INTEGER}, #{employeeBonusAmount,jdbcType=INTEGER}, #{shopownerId,jdbcType=VARCHAR}, #{employeeId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.BonusLog">insert into tb_bonus_log (id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time, wishing, shopowner_issuing_state, employee_issuing_state) values (#{id,jdbcType=VARCHAR}, #{chargeOrderId,jdbcType=VARCHAR}, #{bonusSettingId,jdbcType=VARCHAR}, #{bonusAmount,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{shopownerBonusAmount,jdbcType=INTEGER}, #{employeeBonusAmount,jdbcType=INTEGER}, #{shopownerId,jdbcType=VARCHAR}, #{employeeId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{wishing}, #{shopownerIssuingState}, #{employeeIssuingState})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.BonusLog">insert into tb_bonus_log 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
@@ -31,7 +34,10 @@
       <if test="employeeBonusAmount != null">employee_bonus_amount,</if>  
       <if test="shopownerId != null">shopowner_id,</if>  
       <if test="employeeId != null">employee_id,</if>  
-      <if test="createTime != null">create_time,</if> 
+      <if test="createTime != null">create_time,</if>
+      <if test="wishing != null">wishing,</if>
+      <if test="shopownerIssuingState != null">shopowner_issuing_state,</if>
+      <if test="employeeIssuingState != null">employee_issuing_state,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -43,7 +49,10 @@
       <if test="employeeBonusAmount != null">#{employeeBonusAmount,jdbcType=INTEGER},</if>  
       <if test="shopownerId != null">#{shopownerId,jdbcType=VARCHAR},</if>  
       <if test="employeeId != null">#{employeeId,jdbcType=VARCHAR},</if>  
-      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if> 
+      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+      <if test="wishing != null">#{wishing},</if>
+      <if test="shopownerIssuingState != null">#{shopownerIssuingState},</if>
+      <if test="employeeIssuingState != null">#{employeeIssuingState},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log 
@@ -56,10 +65,13 @@
       <if test="employeeBonusAmount != null">employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER},</if>  
       <if test="shopownerId != null">shopowner_id = #{shopownerId,jdbcType=VARCHAR},</if>  
       <if test="employeeId != null">employee_id = #{employeeId,jdbcType=VARCHAR},</if>  
-      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if> 
+      <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>
+      <if test="wishing != null">wishing = #{wishing},</if>
+      <if test="shopownerIssuingState != null">shopowner_issuing_state = #{shopownerIssuingState},</if>
+      <if test="employeeIssuingState != null">employee_issuing_state = #{employeeIssuingState},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log set charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, bonus_setting_id = #{bonusSettingId,jdbcType=VARCHAR}, bonus_amount = #{bonusAmount,jdbcType=INTEGER}, state = #{state,jdbcType=INTEGER}, shopowner_bonus_amount = #{shopownerBonusAmount,jdbcType=INTEGER}, employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER}, shopowner_id = #{shopownerId,jdbcType=VARCHAR}, employee_id = #{employeeId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log set charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, bonus_setting_id = #{bonusSettingId,jdbcType=VARCHAR}, bonus_amount = #{bonusAmount,jdbcType=INTEGER}, state = #{state,jdbcType=INTEGER}, shopowner_bonus_amount = #{shopownerBonusAmount,jdbcType=INTEGER}, employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER}, shopowner_id = #{shopownerId,jdbcType=VARCHAR}, employee_id = #{employeeId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, wishing = #{wishing}, shopowner_issuing_state = #{shopownerIssuingState}, employee_issuing_state = #{employeeIssuingState} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="BonusLog">select * from tb_bonus_log</select>
 
     <select id="selectAllBonusLog" resultType="java.util.Map">
