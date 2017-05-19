@@ -733,10 +733,14 @@ public class ThirdServiceImpl implements ThirdService {
 
     private Boolean hungerPushVersion2(Map map, String brandId) throws ServiceException {
         String oMessage =  map.get("oMessage").toString();
+        log.info("oMessage   信息：" + oMessage);
         com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
         Integer type = Integer.parseInt(messageJson.getString("type"));
+        log.info("type  信息：" + type);
         String message = messageJson.getString("message");
+        log.info("message   信息：" + message);
         message = message.replaceAll("\\\\","");
+        log.info("message 2222  信息：" + message);
         com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
         String orderId = mj.getString("orderId");
         if(type == ElemeType.NEW_ORDER){
