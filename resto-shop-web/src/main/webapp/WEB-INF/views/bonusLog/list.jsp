@@ -80,7 +80,7 @@
                         <div class="form-group text-center">
                             <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary" @click="openShowEmployee">分红</button>
                             <button v-if="bonusLog.state == 1 && !disabled" type="button" class="btn btn-primary" @click="save">发放奖励</button>
-                            <button type="button" class="btn btn-default" :disabled="disabled" v-else>发放奖励</button>
+                            <button v-if="bonusLog.state == 1 && disabled" type="button" class="btn btn-default" :disabled="disabled">发放奖励</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
                         </div>
@@ -289,6 +289,7 @@
             save : function () {
                 toastr.clear();
                 var that = this;
+                that.disabled = true;
                 try{
                     $.post("bonusLog/modify",{id : that.bonusLog.id, shopownerId : that.bonusLog.shopownerId, employeeId : that.bonusLog.employeeId},function (result) {
                         if (result.success){
@@ -298,11 +299,14 @@
                                 that.colseShowEmployee();
                             }
                             that.searchInfo();
+                            that.disabled = false;
                         } else{
+                            that.disabled = false;
                             toastr.error("网络异常，请刷新重试");
                         }
                     });
                 }catch(e){
+                    that.disabled = false;
                     toastr.error("系统异常，请刷新重试");
                 }
             },
