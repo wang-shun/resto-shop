@@ -736,6 +736,7 @@ public class ThirdServiceImpl implements ThirdService {
         com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
         Integer type = Integer.parseInt(messageJson.getString("type"));
         String message = messageJson.getString("message");
+        message = message.replaceAll("\\\\","");
         com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
         String orderId = mj.getString("orderId");
         if(type == ElemeType.NEW_ORDER){
