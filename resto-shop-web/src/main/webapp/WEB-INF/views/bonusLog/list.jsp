@@ -314,7 +314,6 @@
                                 toastr.error("网络异常，请刷新重试");
                             }
                         }
-                        that.disabled = false;
                     });
                 }catch(e){
                     that.disabled = false;
@@ -327,6 +326,7 @@
             },
             colseShowForm : function () {
                 this.showform = false;
+                this.disabled = false;
                 this.searchInfo();
             },
             operatorBonusLog : function (bonusLog) {
@@ -351,6 +351,7 @@
             },
             colseShowEmployee : function (flg) {
                 this.showEmployee = false;
+                this.disabled = false;
                 if (flg) {
                     this.searchInfo();
                 }
