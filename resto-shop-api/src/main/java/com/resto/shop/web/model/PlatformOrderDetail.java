@@ -92,16 +92,17 @@ public class PlatformOrderDetail {
         name = detail.getName();
         price = new BigDecimal(detail.getPrice());
         quantity = detail.getQuantity();
+        showName = detail.getName();
         if(detail.getNewSpecs().size() > 0){
             for (int i = 0; i < detail.getNewSpecs().size(); i++) {
                 OGroupItemSpec spec = detail.getNewSpecs().get(i);
-                showName = detail.getName() + spec.getName();
+                showName += spec.getName();
             }
         }
         if(detail.getAttributes().size() > 0){
             for (int j = 0; j < detail.getAttributes().size(); j++) {
                 OGroupItemAttribute attribute = detail.getAttributes().get(j);
-                showName = detail.getName() + attribute.getName();
+                showName += detail.getName() + attribute.getName();
             }
         }
 
