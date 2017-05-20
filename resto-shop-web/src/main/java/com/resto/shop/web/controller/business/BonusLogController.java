@@ -121,6 +121,8 @@ public class BonusLogController extends GenericController{
 	public Result modify(String id, String shopownerId, String employeeId){
 	    boolean isOneCustomer = false;
         boolean isEmployee = true;
+        boolean isOneGrant = true;
+        boolean isTwoEmpliyee = true;
         BonusLog bonusLog = bonusLogService.selectById(id);
         bonusLog.setShopownerId(shopownerId);
         bonusLog.setEmployeeId(employeeId);
@@ -130,58 +132,87 @@ public class BonusLogController extends GenericController{
             ShopDetail shopDetail = shopDetailService.selectById(bonusSetting.getShopDetailId());
             List<String> employeeIds = new ArrayList<>();
             if (bonusLog.getShopownerBonusAmount() > 0){
+                isEmployee = false;
                 employeeIds.add(shopownerId);
             }
             if (bonusLog.getEmployeeBonusAmount() > 0){
                 employeeIds.add(employeeId);
             }
-            List<NewEmployee> employees = newEmployeeService.selectByIds(employeeIds);
-            if (employees.isEmpty()){
-                throw new RuntimeException("未找到发放对象");
-            }
-            List<String> telePhones = new ArrayList<>();
-            for (NewEmployee employee : employees){
-                telePhones.add(employee.getTelephone());
-            }
-            List<Customer> customers = customerService.selectByTelePhones(telePhones);
-            if (customers.size() == 1) {
-                isOneCustomer = true;
-                grantRewards(customers.get(0), bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
-            }else{
-                for (Customer customer : customers){
-                    for (NewEmployee employee : employees){
-                        if (customer.getTelephone().equalsIgnoreCase(employee.getTelephone())){
-                            if (employee.getId().equalsIgnoreCase(shopownerId)){
-                                isEmployee = false;
-                                grantRewards(customer, bonusLog.getShopownerBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
-                            }else{
-                                isEmployee = true;
-                                grantRewards(customer, bonusLog.getEmployeeBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
+            if (!employeeIds.isEmpty()) {
+                List<NewEmployee> employees = newEmployeeService.selectByIds(employeeIds);
+                if (employees.isEmpty()) {
+                    throw new RuntimeException("未找到发放对象");
+                }
+                List<String> telePhones = new ArrayList<>();
+                for (NewEmployee employee : employees) {
+                    telePhones.add(employee.getTelephone());
+                }
+                List<Customer> customers = customerService.selectByTelePhones(telePhones);
+                if (customers.size() == 1) {
+                    isOneCustomer = true;
+                    if (employeeIds.size() != 2){
+                        isTwoEmpliyee = false;
+                    }
+                    grantRewards(customers.get(0), bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
+                } else {
+                    int i = 0;
+                    for (Customer customer : customers) {
+                        for (NewEmployee employee : employees) {
+                            if (customer.getTelephone().equalsIgnoreCase(employee.getTelephone())) {
+                                if (i != 0){
+                                    isOneGrant = false;
+                                }
+                                if (employee.getId().equalsIgnoreCase(shopownerId)) {
+                                    isEmployee = false;
+                                    grantRewards(customer, bonusLog.getShopownerBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
+                                } else {
+                                    isEmployee = true;
+                                    grantRewards(customer, bonusLog.getEmployeeBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
+                                }
+                                break;
                             }
-                            break;
                         }
+                        i++;
                     }
                 }
             }
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
             return getSuccessResult();
-        }catch (Exception e){
-            if (isOneCustomer){
-                bonusLog.setShopownerIssuingState(1);
-                bonusLog.setEmployeeIssuingState(1);
-            }else{
-                if (isEmployee){
-                    bonusLog.setEmployeeIssuingState(1);
-                }else{
-                    bonusLog.setShopownerIssuingState(1);
+        }catch (Exception ex){
+            try {
+                if (isOneCustomer) {
+                    if (isTwoEmpliyee) {
+                        bonusLog.setShopownerIssuingState(1);
+                        bonusLog.setEmployeeIssuingState(1);
+                    }else{
+                        if (isEmployee) {
+                            bonusLog.setEmployeeIssuingState(1);
+                        } else {
+                            bonusLog.setShopownerIssuingState(1);
+                        }
+                    }
+                } else {
+                    if (!isOneGrant) {
+                        if (isEmployee) {
+                            bonusLog.setEmployeeIssuingState(1);
+                        } else {
+                            bonusLog.setShopownerIssuingState(1);
+                        }
+                    } else {
+                        bonusLog.setShopownerIssuingState(1);
+                        bonusLog.setEmployeeIssuingState(1);
+                    }
                 }
+                bonusLog.setState(3);
+                bonusLogService.update(bonusLog);
+            }catch (Exception e){
+                e.printStackTrace();
+                log.error("红包发放异常，修改发放记录出错");
             }
-            bonusLog.setState(3);
-            bonusLogService.update(bonusLog);
-            e.printStackTrace();
+            ex.printStackTrace();
             log.error("发放奖励出错");
-            return new Result(e.getMessage(),false);
+            return new Result(ex.getMessage(),false);
         }
 	}
 

@@ -97,7 +97,9 @@
             CONCAT(tbs.employee_bonus_ratio,'%') employeeBonusRatio,
             GROUP_CONCAT(CONCAT_WS(':',tne.role_type,tne.`name`)) emNames,
             tbl.shopowner_id shopownerId,
-            tbl.employee_id employeeId
+            tbl.employee_id employeeId,
+            tbl.shopowner_issuing_state shopownerIssuingState,
+            tbl.employee_issuing_state employeeIssuingState
         from tb_bonus_log tbl
         inner join tb_charge_order tal
         on tbl.charge_order_id = tal.id

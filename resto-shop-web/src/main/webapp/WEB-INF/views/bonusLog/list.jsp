@@ -65,15 +65,18 @@
                                         <i v-if="bonusLog.state == 0" style="color: red;font-style: normal;">{{bonusLog.stateValue}}</i>
                                         <i v-if="bonusLog.state == 1" style="color: #0a6aa1;font-style: normal;">{{bonusLog.stateValue}}</i>
                                         <i v-if="bonusLog.state == 2" style="color: #228b22;font-style: normal;">{{bonusLog.stateValue}}</i>
+                                        <i v-if="bonusLog.state == 3" style="color: #c69f07; font-style: normal;">{{bonusLog.stateValue}}</i>
                                     </span>
                                 </p>
-                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && (bonusLog.employeeBonusAmount > 0 || bonusLog.bonusAmount == 0)">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.employeeBonusAmount > 0 || bonusLog.bonusAmount == 0)">
                                     <span class="textRight">{{bonusLog.employeeName}}：</span>
-                                    <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
+                                    <span v-if="bonusLog.employeeIssuingState == 1"><i style="color: #c69f07;font-style: normal;">发放异常</i></span>
+                                    <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
                                 </p>
-                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2) && (bonusLog.shopownerBonusAmount > 0 || bonusLog.bonusAmount == 0)">
+                                <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.shopownerBonusAmount > 0 || bonusLog.bonusAmount == 0)">
                                     <span class="textRight">{{bonusLog.shopownerName}}：</span>
-                                    <span><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
+                                    <span v-if="bonusLog.shopownerIssuingState == 1"><i style="color: #c69f07;font-style: normal;">发放异常</i></span>
+                                    <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
                                 </p>
                             </div>
                         </div>
@@ -81,6 +84,8 @@
                             <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary" @click="openShowEmployee">分红</button>
                             <button v-if="bonusLog.state == 1 && !disabled" type="button" class="btn btn-primary" @click="save">发放奖励</button>
                             <button v-if="bonusLog.state == 1 && disabled" type="button" class="btn btn-default" :disabled="disabled">发放奖励</button>
+                            <button v-if="bonusLog.state == 3 && !disabled" type="button" class="btn btn-primary">补发奖励</button>
+                            <button v-if="bonusLog.state == 3 && disabled" type="button" class="btn btn-default" :disabled="disabled">补发奖励</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
                         </div>
