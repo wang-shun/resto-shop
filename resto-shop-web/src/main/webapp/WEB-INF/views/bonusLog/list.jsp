@@ -306,17 +306,15 @@
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee();
                             }
-                            that.searchInfo();
-                            that.disabled = false;
                         } else{
                             toastr.clear();
-                            that.disabled = false;
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);
                             }else {
                                 toastr.error("网络异常，请刷新重试");
                             }
                         }
+                        that.disabled = false;
                     });
                 }catch(e){
                     that.disabled = false;
@@ -329,6 +327,7 @@
             },
             colseShowForm : function () {
                 this.showform = false;
+                this.searchInfo();
             },
             operatorBonusLog : function (bonusLog) {
                 this.bonusLog = bonusLog;
