@@ -90,6 +90,7 @@
                 WHEN 0 THEN '未分红'
                 WHEN 1 THEN '审核中'
                 WHEN 2 THEN '已分红'
+                WHEN 3 THEN '发放异常'
             END stateValue,
             CONCAT(tbs.charge_bonus_ratio,'%') chargeBonusRatio,
             CONCAT(tbs.shopowner_bonus_ratio,'%') shopownerBonusRatio,

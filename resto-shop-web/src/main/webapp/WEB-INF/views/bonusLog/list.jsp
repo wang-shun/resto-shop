@@ -227,8 +227,10 @@
                                     state = "<span class='label label-success'>"+tdData+"</span>";
                                 }else if (tdData == "未分红"){
                                     state = "<span class='label label-danger'>"+tdData+"</span>";
-                                }else{
+                                }else if (tdData == "审核中"){
                                     state = "<span class='label label-primary'>"+tdData+"</span>";
+                                }else{
+                                    state = "<span class='label label-warning'>"+tdData+"</span>";
                                 }
                                 $(td).html(state);
                             }
