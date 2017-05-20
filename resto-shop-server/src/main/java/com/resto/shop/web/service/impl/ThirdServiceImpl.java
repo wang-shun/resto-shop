@@ -177,21 +177,25 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        for (PlatformOrderDetail orderDetail : orderDetailList) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
-            item.put("ARTICLE_NAME", orderDetail.getShowName());
-            item.put("ARTICLE_COUNT", orderDetail.getQuantity());
-            sum += orderDetail.getQuantity();
-            items.add(item);
+        if(orderDetailList != null) {
+            for (PlatformOrderDetail orderDetail : orderDetailList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
+                item.put("ARTICLE_NAME", orderDetail.getShowName());
+                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+                sum += orderDetail.getQuantity();
+                items.add(item);
+            }
         }
 
-        for (PlatformOrderExtra orderExtra : orderExtraList) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("ARTICLE_NAME", orderExtra.getName());
-            item.put("ARTICLE_COUNT", orderExtra.getQuantity());
-            item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
-            items.add(item);
+        if(orderExtraList != null){
+            for (PlatformOrderExtra orderExtra : orderExtraList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("ARTICLE_NAME", orderExtra.getName());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+                items.add(item);
+            }
         }
 
         Map<String, Object> print = new HashMap<>();
@@ -271,26 +275,28 @@ public class ThirdServiceImpl implements ThirdService {
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        for (PlatformOrderDetail detail : orderDetailList) {
-            //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-            if (article == null) {
-                continue;
-            }
-            String articleId = article.getId();
-            List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
-
-            for (Kitchen kitchen : kitchenList) {
-                String kitchenId = kitchen.getId().toString();
-                kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-                //判断 厨房集合中 是否已经包含当前厨房信息
-                if (!kitchenArticleMap.containsKey(kitchenId)) {
-                    //如果没有 则新建
-                    kitchenArticleMap.put(kitchenId, new ArrayList<PlatformOrderDetail>());
+        if(orderDetailList != null){
+            for (PlatformOrderDetail detail : orderDetailList) {
+                //得到当前菜品 所关联的厨房信息
+                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (article == null) {
+                    continue;
                 }
-                kitchenArticleMap.get(kitchenId).add(detail);
-            }
+                String articleId = article.getId();
+                List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
+                for (Kitchen kitchen : kitchenList) {
+                    String kitchenId = kitchen.getId().toString();
+                    kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                    //判断 厨房集合中 是否已经包含当前厨房信息
+                    if (!kitchenArticleMap.containsKey(kitchenId)) {
+                        //如果没有 则新建
+                        kitchenArticleMap.put(kitchenId, new ArrayList<PlatformOrderDetail>());
+                    }
+                    kitchenArticleMap.get(kitchenId).add(detail);
+                }
+
+            }
         }
 
         //打印线程集合
