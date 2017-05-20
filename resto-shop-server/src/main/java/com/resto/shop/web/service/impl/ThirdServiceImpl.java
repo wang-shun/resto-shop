@@ -834,11 +834,12 @@ public class ThirdServiceImpl implements ThirdService {
         token.setTokenType("bearer");
 
         eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
-        log.info("当前orderId：" + orderId);
         OOrder order = orderService.getOrder(orderId);
-        log.info("当前order信息获取成功：" + order.getOriginalPrice());
+        log.info("当前order信息获取成功：" + order.getShopId());
         String shopId = shopDetailService.selectByOOrderShopId(order.getShopId()).getId();
+        log.info("当前餐加系统shopId：" + shopId);
         PlatformOrder platformOrder = new PlatformOrder(order,shopId);
+        log.info("init初始化PlatformOrder成功！");
         platformorderMapper.insertSelective(platformOrder);
 
         List<OGoodsGroup> group = order.getGroups();
