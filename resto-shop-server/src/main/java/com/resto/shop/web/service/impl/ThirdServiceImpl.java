@@ -748,9 +748,7 @@ public class ThirdServiceImpl implements ThirdService {
         if(type == ElemeType.NEW_ORDER){
             addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
-            System.out.println("eleme订单orderId：" + orderId);
-            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(map.get("shopId").toString())).getId();
-            System.out.println("eleme订单下单对面餐加系统店铺：" + shopId);
+            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.get("shopId").toString())).getId();
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
