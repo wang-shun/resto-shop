@@ -268,8 +268,6 @@
                 try{
                     $.post("bonusLog/list_all",function (result) {
                         if (result.success){
-                            that.employees = result.data.employees;
-                            that.shopowners = result.data.shopowners;
                             var api = bonusTableAPI;
                             api.search('');
                             var column1 = api.column(1);
@@ -279,7 +277,7 @@
                             var column6 = api.column(6);
                             column6.search('', true, false);
                             that.bonusLogTable.clear();
-                            that.bonusLogTable.rows.add(result.data.bonusLogs).draw();
+                            that.bonusLogTable.rows.add(result.data).draw();
                             that.bonusTable();
                             toastr.clear();
                             toastr.success("查询成功");
@@ -307,6 +305,7 @@
                                 that.colseShowEmployee(true);
                             }
                         } else{
+                            that.disabled = false;
                             toastr.clear();
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);
@@ -334,20 +333,33 @@
                 this.openShowForm();
             },
             openShowEmployee : function () {
-                if (this.bonusLog.state == 0){
-                    if (this.employees.length > 0){
-                        this.bonusLog.employeeId = this.employees[0].id;
-                    }else if (this.bonusLog.employeeBonusRatio != "0%"){
-                        this.disabled = true;
-                    }
-                    if (this.shopowners.length > 0){
-                        this.bonusLog.shopownerId = this.shopowners[0].id;
-                    }else if (this.bonusLog.shopownerBonusRatio != "0%"){
-                        this.disabled = true;
-                    }
+                var that = this;
+                try{
+                    $.post("bonusLog/getShopEmployees",{shopId : that.bonusLog.shopId},function (result) {
+                        if (result.success){
+                            that.employees = result.data.employees;
+                            that.shopowners = result.data.shopowners;
+                            if (that.employees.length > 0){
+                                that.bonusLog.employeeId = that.employees[0].id;
+                            }else if (that.bonusLog.employeeBonusRatio != "0%"){
+                                that.disabled = true;
+                            }
+                            if (that.shopowners.length > 0){
+                                that.bonusLog.shopownerId = that.shopowners[0].id;
+                            }else if (that.bonusLog.shopownerBonusRatio != "0%"){
+                                that.disabled = true;
+                            }
+                            that.showform = false;
+                            that.showEmployee = true;
+                        } else{
+                            toastr.clear();
+                            toastr.error("网络异常，请刷新重试");
+                        }
+                    });
+                }catch(e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
                 }
-                this.showform = false;
-                this.showEmployee = true;
             },
             colseShowEmployee : function (flg) {
                 this.showEmployee = false;

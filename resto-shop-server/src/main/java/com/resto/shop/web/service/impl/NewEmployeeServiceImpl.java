@@ -28,4 +28,9 @@ public class NewEmployeeServiceImpl extends GenericServiceImpl<NewEmployee, Stri
     public List<NewEmployee> selectByIds(List<String> ids) {
         return newemployeeMapper.selectByIds(ids);
     }
+
+    @Override
+    public List<NewEmployee> selectByShopId(String shopId) {
+        return newemployeeMapper.selectByShopId(shopId);
+    }
 }

@@ -8,5 +8,6 @@ import java.util.List;
 public interface NewEmployeeService extends GenericService<NewEmployee, String> {
 
     List<NewEmployee> selectByIds(List<String> ids);
-    
+
+    List<NewEmployee> selectByShopId(String shopId);
 }

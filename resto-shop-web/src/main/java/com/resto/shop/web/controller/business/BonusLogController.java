@@ -65,7 +65,6 @@ public class BonusLogController extends GenericController{
 	@ResponseBody
 	public Result listData(){
 	    try {
-            Map<String, Object> map = new HashMap<>();
             List<Map<String, Object>> bonusLogs = bonusLogService.selectAllBonusLog();
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             for (Map bonusLog : bonusLogs){
@@ -95,7 +94,20 @@ public class BonusLogController extends GenericController{
                     bonusLog.put("shopownerId", "");
                 }
             }
-            List<NewEmployee> newEmployees = newEmployeeService.selectList();
+            return getSuccessResult(bonusLogs);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("查看所有分红记录出错");
+            return new Result(false);
+        }
+	}
+
+	@RequestMapping("/getShopEmployees")
+    @ResponseBody
+	public Result getShopEmployees(String shopId){
+	    try{
+            Map<String, Object> map = new HashMap<>();
+            List<NewEmployee> newEmployees = newEmployeeService.selectByShopId(shopId);
             List<NewEmployee> employees = new ArrayList<>();
             List<NewEmployee> shopowners = new ArrayList<>();
             for (NewEmployee newEmployee : newEmployees){
@@ -107,16 +119,15 @@ public class BonusLogController extends GenericController{
             }
             map.put("employees",employees);
             map.put("shopowners",shopowners);
-            map.put("bonusLogs",bonusLogs);
-            return getSuccessResult(map);
+	        return getSuccessResult(map);
         }catch (Exception e){
             e.printStackTrace();
-            log.error("查看所有分红记录出错");
+            log.error("查看店铺下的员工和店长出错");
             return new Result(false);
         }
-	}
+    }
 	
-	@RequestMapping("modify")
+	@RequestMapping("/modify")
 	@ResponseBody
 	public Result modify(String id, String shopownerId, String employeeId){
 	    boolean isOneCustomer = false;
@@ -219,12 +230,13 @@ public class BonusLogController extends GenericController{
 	}
 
 	public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
-        ChargePayment chargePayment = chargePaymentService.selectPayData(shopDetail.getId());
-        String resultData = chargePayment.getPayData();
         boolean isUseChargePay = true;
-        OrderPaymentItem paymentItem = null;
-        if (StringUtils.isBlank(resultData)){
-            paymentItem = orderPaymentItemService.selectWeChatPayResultData(shopDetail.getId());
+        String resultData = "";
+	    ChargePayment chargePayment = chargePaymentService.selectPayData(shopDetail.getId());
+        OrderPaymentItem paymentItem = orderPaymentItemService.selectWeChatPayResultData(shopDetail.getId());;
+        if (chargePayment != null){
+            resultData = chargePayment.getPayData();
+        } else if (paymentItem != null){
             resultData = paymentItem.getResultData();
             isUseChargePay = false;
         }
