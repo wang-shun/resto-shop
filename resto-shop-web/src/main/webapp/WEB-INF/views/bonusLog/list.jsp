@@ -304,7 +304,7 @@
                             if (that.bonusLog.state == 1){
                                 that.colseShowForm();
                             }else if (that.bonusLog.state == 0){
-                                that.colseShowEmployee();
+                                that.colseShowEmployee(true);
                             }
                         } else{
                             toastr.clear();
@@ -349,11 +349,14 @@
                 this.showform = false;
                 this.showEmployee = true;
             },
-            colseShowEmployee : function () {
+            colseShowEmployee : function (flg) {
                 this.showEmployee = false;
+                if (flg) {
+                    this.searchInfo();
+                }
             },
             previousStep : function () {
-                this.colseShowEmployee();
+                this.colseShowEmployee(false);
                 this.openShowForm();
             },
             bonusTable : function () {
