@@ -176,6 +176,8 @@ public class BonusLogController extends GenericController{
                     }
                 }
             }
+            bonusLog.setShopownerIssuingState(0);
+            bonusLog.setEmployeeIssuingState(0);
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
             return getSuccessResult();
