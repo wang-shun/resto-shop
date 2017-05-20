@@ -119,8 +119,12 @@ public class BonusLogController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(String id, String shopownerId, String employeeId){
+	    boolean isOneCustomer = false;
+        boolean isEmployee = true;
+        BonusLog bonusLog = bonusLogService.selectById(id);
+        bonusLog.setShopownerId(shopownerId);
+        bonusLog.setEmployeeId(employeeId);
 	    try{
-	        BonusLog bonusLog = bonusLogService.selectById(id);
             BonusSetting bonusSetting = bonusSettingService.selectById(bonusLog.getBonusSettingId());
             WechatConfig wechatConfig = wechatConfigService.selectByBrandId(bonusSetting.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(bonusSetting.getShopDetailId());
@@ -141,14 +145,17 @@ public class BonusLogController extends GenericController{
             }
             List<Customer> customers = customerService.selectByTelePhones(telePhones);
             if (customers.size() == 1) {
+                isOneCustomer = true;
                 grantRewards(customers.get(0), bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
             }else{
                 for (Customer customer : customers){
                     for (NewEmployee employee : employees){
                         if (customer.getTelephone().equalsIgnoreCase(employee.getTelephone())){
                             if (employee.getId().equalsIgnoreCase(shopownerId)){
+                                isEmployee = false;
                                 grantRewards(customer, bonusLog.getShopownerBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
                             }else{
+                                isEmployee = true;
                                 grantRewards(customer, bonusLog.getEmployeeBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
                             }
                             break;
@@ -156,12 +163,22 @@ public class BonusLogController extends GenericController{
                     }
                 }
             }
-            bonusLog.setShopownerId(shopownerId);
-            bonusLog.setEmployeeId(employeeId);
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
             return getSuccessResult();
         }catch (Exception e){
+            if (isOneCustomer){
+                bonusLog.setShopownerIssuingState(1);
+                bonusLog.setEmployeeIssuingState(1);
+            }else{
+                if (isEmployee){
+                    bonusLog.setEmployeeIssuingState(1);
+                }else{
+                    bonusLog.setShopownerIssuingState(1);
+                }
+            }
+            bonusLog.setState(3);
+            bonusLogService.update(bonusLog);
             e.printStackTrace();
             log.error("发放奖励出错");
             return new Result(e.getMessage(),false);
