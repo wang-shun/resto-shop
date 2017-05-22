@@ -17,6 +17,14 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import eleme.openapi.sdk.api.entity.other.OMessage;
+import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
+import eleme.openapi.sdk.api.entity.order.OGoodsItem;
+import eleme.openapi.sdk.api.entity.order.OOrder;
+import eleme.openapi.sdk.api.exception.ServiceException;
+import eleme.openapi.sdk.config.Config;
+import eleme.openapi.sdk.oauth.OAuthClient;
+import eleme.openapi.sdk.oauth.response.Token;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,7 +40,7 @@ import java.text.Format;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
@@ -49,6 +57,29 @@ public class ThirdServiceImpl implements ThirdService {
     private static final Map<String, Map<String, Integer>> NUMBER_ORDER_MAP = new ConcurrentHashMap<>();
 
     private static final Map<String, Map<String, Integer>> NUMBER_SHOP_MAP = new ConcurrentHashMap<>();
+
+    private static Config config = null;
+
+    private static Token token = null;
+
+    private static OAuthClient client = null;
+    // 设置是否沙箱环境
+    private static final boolean isSandbox = true;
+
+    // 设置APP KEY
+    private static final String key = "o6ph8ACwrY";
+
+    // 设置APP SECRET
+    private static final String secret = "11b1d008b10ecb1510dbdf100d1c97e1";
+
+    // 回调地址
+    private static String callbackUrl = "https://ecosystem.restoplus.cn/wechat/order/new/third/version2.0/test";
+
+    static {
+        config = new Config(isSandbox, key, secret);
+        client = new OAuthClient(config);
+        token = client.getTokenByCode("", "");
+    }
 
     @Resource
     OrderPaymentItemService orderPaymentItemService;
@@ -146,21 +177,25 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        for (PlatformOrderDetail orderDetail : orderDetailList) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
-            item.put("ARTICLE_NAME", orderDetail.getShowName());
-            item.put("ARTICLE_COUNT", orderDetail.getQuantity());
-            sum += orderDetail.getQuantity();
-            items.add(item);
+        if(orderDetailList != null) {
+            for (PlatformOrderDetail orderDetail : orderDetailList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
+                item.put("ARTICLE_NAME", orderDetail.getShowName());
+                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+                sum += orderDetail.getQuantity();
+                items.add(item);
+            }
         }
 
-        for (PlatformOrderExtra orderExtra : orderExtraList) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("ARTICLE_NAME", orderExtra.getName());
-            item.put("ARTICLE_COUNT", orderExtra.getQuantity());
-            item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
-            items.add(item);
+        if(orderExtraList != null){
+            for (PlatformOrderExtra orderExtra : orderExtraList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("ARTICLE_NAME", orderExtra.getName());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+                items.add(item);
+            }
         }
 
         Map<String, Object> print = new HashMap<>();
@@ -223,7 +258,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         MemcachedUtils.put(print_id, print);
         List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
         if (printList == null) {
@@ -240,26 +275,28 @@ public class ThirdServiceImpl implements ThirdService {
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        for (PlatformOrderDetail detail : orderDetailList) {
-            //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-            if (article == null) {
-                continue;
-            }
-            String articleId = article.getId();
-            List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
-
-            for (Kitchen kitchen : kitchenList) {
-                String kitchenId = kitchen.getId().toString();
-                kitchenMap.put(kitchenId, kitchen);//保存厨房信息
-                //判断 厨房集合中 是否已经包含当前厨房信息
-                if (!kitchenArticleMap.containsKey(kitchenId)) {
-                    //如果没有 则新建
-                    kitchenArticleMap.put(kitchenId, new ArrayList<PlatformOrderDetail>());
+        if(orderDetailList != null){
+            for (PlatformOrderDetail detail : orderDetailList) {
+                //得到当前菜品 所关联的厨房信息
+                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (article == null) {
+                    continue;
                 }
-                kitchenArticleMap.get(kitchenId).add(detail);
-            }
+                String articleId = article.getId();
+                List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
+                for (Kitchen kitchen : kitchenList) {
+                    String kitchenId = kitchen.getId().toString();
+                    kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                    //判断 厨房集合中 是否已经包含当前厨房信息
+                    if (!kitchenArticleMap.containsKey(kitchenId)) {
+                        //如果没有 则新建
+                        kitchenArticleMap.put(kitchenId, new ArrayList<PlatformOrderDetail>());
+                    }
+                    kitchenArticleMap.get(kitchenId).add(detail);
+                }
+
+            }
         }
 
         //打印线程集合
@@ -360,7 +397,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return printTask;
     }
 
@@ -517,7 +554,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         return printTask;
     }
 
@@ -642,7 +679,7 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        doPostAnsc(url, map);
         MemcachedUtils.put(print_id, print);
         List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
         if (printList == null) {
@@ -679,6 +716,18 @@ public class ThirdServiceImpl implements ThirdService {
                         result = hungerPush(map, brandSetting, brandId);
                     }
                     break;
+                case PushType.HUNGER_VERSION_2:
+                    check = false;
+                    for (Platform platform : platformList) {
+                        if (platform.getName().equals(PlatformName.E_LE_ME)) {
+                            check = true;
+                            break;
+                        }
+                    }
+                    if (check) {
+                        result = hungerPushVersion2(map, brandId);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -686,6 +735,23 @@ public class ThirdServiceImpl implements ThirdService {
             return false;
         }
         return result;
+    }
+
+    private Boolean hungerPushVersion2(Map map, String brandId) throws ServiceException {
+        String oMessage =  map.get("oMessage").toString();
+        com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
+        Integer type = Integer.parseInt(messageJson.getString("type"));
+        String message = messageJson.getString("message");
+        message = message.replaceAll("\\\\","");
+        com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
+        String orderId = mj.getString("orderId");
+        if(type == ElemeType.NEW_ORDER){
+            addHungerOrderVersion2(orderId);
+        }else if(type == ElemeType.RECEIVE_ORDER){
+            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.getString("shopId"))).getId();
+            MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
+        }
+        return true;
     }
 
     private Boolean hungerPush(Map map, BrandSetting brandSetting, String brandId) throws Exception {
@@ -763,6 +829,39 @@ public class ThirdServiceImpl implements ThirdService {
 
     }
 
+    private void addHungerOrderVersion2(String orderId) throws ServiceException {
+        token.setAccessToken("9298323a28d096bea2564c1a8527ed62");
+        token.setRefreshToken("8db12491e26826aad5d67551da32b104");
+        token.setExpires(86400);
+        token.setTokenType("bearer");
+
+        eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
+        OOrder order = orderService.getOrder(orderId);
+        String shopId = shopDetailService.selectByOOrderShopId(order.getShopId()).getId();
+        PlatformOrder platformOrder = new PlatformOrder(order,shopId);
+        platformorderMapper.insertSelective(platformOrder);
+
+        List<OGoodsGroup> group = order.getGroups();
+        if (group != null) {
+            for (int i = 0; i < group.size(); i++) {
+                OGoodsGroup g = group.get(i);
+                for(int j = 0; j < g.getItems().size(); j++){
+                    OGoodsItem detail = g.getItems().get(j);
+                    PlatformOrderDetail platformOrderDetail = new PlatformOrderDetail(detail, order.getId());
+                    platformorderdetailMapper.insertSelective(platformOrderDetail);
+                }
+
+            }
+        }
+        if(order.getServiceFee() > 0){
+            PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 1);
+            platformorderextraMapper.insertSelective(platformOrderExtra);
+        }
+        if(order.getPackageFee() > 0){
+            PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 2);
+            platformorderextraMapper.insertSelective(platformOrderExtra);
+        }
+    }
 
     private String[] addHungerOrder(Map map, BrandSetting brandSetting) throws Exception {
         String orderIds = map.get("eleme_order_ids").toString();
@@ -840,7 +939,7 @@ public class ThirdServiceImpl implements ThirdService {
                 addHungermap.put("fileName", shopDetail.getName());
                 addHungermap.put("type", "posAction");
                 addHungermap.put("content", "店铺:" + shopDetail.getName() + "接收到新增的饿了么订单:" + hungerOrder.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(url, addHungermap);
+                doPostAnsc(url, addHungermap);
             }
 
         }

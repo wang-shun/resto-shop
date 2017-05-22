@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 /**
  * Created by carl on 2016/10/16.
@@ -65,7 +65,7 @@ public class GetNumberAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
             	log.info("发送就餐提示");
                 StringBuffer msg = new StringBuffer();
@@ -77,7 +77,7 @@ public class GetNumberAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
             } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
             	log.info("发送过号提示");
                 StringBuffer msg = new StringBuffer();
@@ -88,7 +88,7 @@ public class GetNumberAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }

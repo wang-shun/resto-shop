@@ -30,6 +30,13 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
+
+		<!-- 饿了么2.0 sdk接口 -->
+		<dependency>
+			<groupId>me.ele.openapi</groupId>
+			<artifactId>eleme-openapi-sdk</artifactId>
+			<version>1.0.8</version>
+		</dependency>
         <!--<dependency>-->
             <!--<groupId>redis.clients</groupId>-->
             <!--<artifactId>jedis</artifactId>-->

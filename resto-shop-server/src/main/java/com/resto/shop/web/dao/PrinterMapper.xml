@@ -88,6 +88,8 @@
   </select>
 
   <select id="getCashPrinter" resultType="Printer">
-    select * from tb_printer where receive_money = 1 order by id desc limit 1
+    select * from tb_printer where receive_money = 1
+     and shop_detail_id = #{shopId}
+     order by id desc limit 1
   </select>
 </mapper>

@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
@@ -93,9 +93,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectList(String currentShopId) {
         Map<String, Article> discountMap = selectAllSupportArticle(currentShopId);
-        List<Article> articleList =  articleMapper.selectList(currentShopId);
-        for (Article article : articleList ) {
-            if(discountMap.containsKey(article.getId())){
+        List<Article> articleList = articleMapper.selectList(currentShopId);
+        for (Article article : articleList) {
+            if (discountMap.containsKey(article.getId())) {
                 article.setDiscount(discountMap.get(article.getId()).getDiscount());
             }
         }
@@ -148,9 +148,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
-        for(Article article : articleList){
-            Integer count = (Integer)MemcachedUtils.get(article.getId()+Common.KUCUN);
-            if(count != null){
+        for (Article article : articleList) {
+            Integer count = (Integer) MemcachedUtils.get(article.getId() + Common.KUCUN);
+            if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
         }
@@ -180,15 +180,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.selectArticleList();
     }
 
-    public void getArticleDiscount(String shopId, List<Article> articles, String show){
+    public void getArticleDiscount(String shopId, List<Article> articles, String show) {
         Map<String, Article> articleMap = selectAllSupportArticle(shopId);
         for (Article a : articles) {
             if (a.getArticleType() == Article.ARTICLE_TYPE_SIGNLE) {//单品
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
-                    for(ArticlePrice price : prices){
-                        Integer ck = (Integer) MemcachedUtils.get(price.getId()+Common.KUCUN);
-                        if(ck != null){
+                    for (ArticlePrice price : prices) {
+                        Integer ck = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+                        if (ck != null) {
                             price.setCurrentWorkingStock(ck);
                         }
                     }
@@ -200,7 +200,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             if (!articleMap.containsKey(a.getId())) {
                 a.setIsEmpty(true);
-            }else{
+            } else {
                 //设置菜品的折扣百分比
                 a.setDiscount(articleMap.get(a.getId()).getDiscount());
             }
@@ -264,9 +264,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             freeDay = 1;
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
-        for(ArticleStock articleStock : result){
-            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId()+ Common.KUCUN);
-            if(ck != null){
+        for (ArticleStock articleStock : result) {
+            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId() + Common.KUCUN);
+            if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
         }
@@ -279,13 +279,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = "【手动沽清】";
-        MemcachedUtils.put(articleId+Common.KUCUN,0);
-        if(articleId.indexOf("@")> -1){
-            String aid = articleId.substring(0,articleId.indexOf("@"));
+        MemcachedUtils.put(articleId + Common.KUCUN, 0);
+        if (articleId.indexOf("@") > -1) {
+            String aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
             articleMapper.clearPriceStock(articleId, emptyRemark);
 
-        }else{
+        } else {
             article = articleMapper.selectByPrimaryKey(articleId);
             articleMapper.clearStock(articleId, emptyRemark);
             articleMapper.clearPriceTotal(articleId, emptyRemark);
@@ -308,8 +308,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 //        }
 
 
-
-
 //        articleMapper.cleanPriceAll(articleId,emptyRemark);//方法重复
         //如果有规格的
 
@@ -321,8 +319,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "店铺:"+shopDetail.getName()+"在pos端沽清了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        map.put("content", "店铺:" + shopDetail.getName() + "在pos端沽清了菜品(" + article.getName() + ")Id为:" + articleId + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
         return true;
     }
 
@@ -330,27 +328,27 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean editStock(String articleId, Integer count, String shopId) {
         Article article = null;
         Boolean moreType = false;
-        if(articleId.indexOf("@")> -1){
+        if (articleId.indexOf("@") > -1) {
             moreType = true;
-            String aid = articleId.substring(0,articleId.indexOf("@"));
+            String aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
-        }else{
+        } else {
             article = articleMapper.selectByPrimaryKey(articleId);
         }
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
-        MemcachedUtils.put(articleId+Common.KUCUN,count);
-        if(article.getIsEmpty()){
-            if(moreType && count > 0){
+        MemcachedUtils.put(articleId + Common.KUCUN, count);
+        if (article.getIsEmpty()) {
+            if (moreType && count > 0) {
                 orderMapper.setArticlePriceEmptyFail(articleId);
-            }else if (!moreType && count > 0){
+            } else if (!moreType && count > 0) {
                 orderMapper.setEmptyFail(articleId);
             }
-        }else{
-            if(moreType && count == 0){
+        } else {
+            if (moreType && count == 0) {
                 orderMapper.setArticlePriceEmpty(articleId);
-            }else if (!moreType && count == 0){
+            } else if (!moreType && count == 0) {
                 orderMapper.setEmpty(articleId);
             }
         }
@@ -379,8 +377,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "店铺:"+shopDetail.getName()+"修改菜品("+article.getName()+")Id为:"+articleId+"的库存为:"+count+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map);
+        map.put("content", "店铺:" + shopDetail.getName() + "修改菜品(" + article.getName() + ")Id为:" + articleId + "的库存为:" + count + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
         return true;
     }
 
@@ -394,12 +392,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        if (activated.equals(0)){
-            map.put("content", "店铺:"+shopDetail.getName()+"在pos端下架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
-        }else{
-            map.put("content", "店铺:"+shopDetail.getName()+"在pos端上架了菜品("+article.getName()+")Id为:"+articleId+",请求服务器地址为:" + MQSetting.getLocalIP());
+        if (activated.equals(0)) {
+            map.put("content", "店铺:" + shopDetail.getName() + "在pos端下架了菜品(" + article.getName() + ")Id为:" + articleId + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        } else {
+            map.put("content", "店铺:" + shopDetail.getName() + "在pos端上架了菜品(" + article.getName() + ")Id为:" + articleId + ",请求服务器地址为:" + MQSetting.getLocalIP());
         }
-        doPost(url, map);
+        doPostAnsc(url, map);
         return row > 0 ? true : false;
     }
 
@@ -440,7 +438,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     articleFamily.setShopDetailId(shopId);
                     articleFamilyService.copyBrandArticleFamily(articleFamily);
                     article.setArticleFamilyId(familyId);
-                }else{
+                } else {
                     //如果有,那么覆盖
                     //todo
                     articleFamily.setId(family.getId());
@@ -487,12 +485,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             hasUnit.append(articleUnit.getId()).append(",");
 
                             ArticlePrice copy = articlePriceServer.selectById(article.getId() + "@" + articlePrice.getUnitIds());
-                            if(copy != null){
+                            if (copy != null) {
                                 articlePrice.setArticleId(article.getId());
                                 articlePrice.setUnitIds(articleUnit.getId().toString());
                                 articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
                                 articlePriceServer.update(articlePrice);
-                            }else{
+                            } else {
                                 articlePrice.setArticleId(article.getId());
                                 articlePrice.setUnitIds(articleUnit.getId().toString());
                                 articlePrice.setId(article.getId() + "@" + articlePrice.getUnitIds());
@@ -512,7 +510,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     //todo
                     article.setId(copy.getId());
                     articleMapper.updateByPrimaryKeySelective(article);
-                }else{
+                } else {
                     articleMapper.insert(article);
                 }
             }
@@ -541,7 +539,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             family.setShopDetailId(shopId);
                             articleFamilyService.copyBrandArticleFamily(family);
                             art.setArticleFamilyId(familyId);
-                        }else{
+                        } else {
                             articleFamily.setId(articleFamily.getId());
                             articleFamily.setShopDetailId(shopId);
                             articleFamilyService.update(articleFamily);
@@ -556,22 +554,22 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                             art.setId(copy.getId());
                             articleMapper.updateByPrimaryKeySelective(art);
 
-                        }else{
+                        } else {
                             art.setId(ApplicationUtils.randomUUID());
                             articleMapper.insert(art);
                         }
                     }
 //                    //得到要复制的套餐属性
-                    List<MealAttr> attrs =  mealAttrService.selectList(articleId);
-                    for(MealAttr attr : attrs){
+                    List<MealAttr> attrs = mealAttrService.selectList(articleId);
+                    for (MealAttr attr : attrs) {
                         //循环旧的套餐属性
-                        List<MealItem> mealItems =  mealItemService.selectByAttrId(attr.getId());
+                        List<MealItem> mealItems = mealItemService.selectByAttrId(attr.getId());
                         attr.setId(null);
-                        attr.setArticleId(articleMapper.selectByPid(article.getId(),shopId).getId());
+                        attr.setArticleId(articleMapper.selectByPid(article.getId(), shopId).getId());
                         mealAttrService.insert(attr);
-                        for(MealItem mealItem : mealItems){
+                        for (MealItem mealItem : mealItems) {
                             mealItem.setMealAttrId(attr.getId());
-                            mealItem.setArticleId(articleMapper.selectByPid(mealItem.getArticleId(),shopId).getId());
+                            mealItem.setArticleId(articleMapper.selectByPid(mealItem.getArticleId(), shopId).getId());
                             mealItem.setId(null);
                             mealItemService.insert(mealItem);
                         }
@@ -638,10 +636,16 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             return null;
         }
         List<Integer> list = new ArrayList<>(ApplicationUtils.convertCollectionToMap(Integer.class, supportTime).keySet());
-        PageHelper.startPage(page,size);
-        List<Article> articleList = articleMapper.selectnewPosListByFamillyId(list,shopId,familyId);
+        PageHelper.startPage(page, size);
+        List<Article> articleList = articleMapper.selectnewPosListByFamillyId(list, shopId, familyId);
         PageInfo<Article> pageInfo = new PageInfo<>(articleList);
         return pageInfo.getList();
 
     }
+
+    @Override
+    public List<Article> selectHasResourcePhotoList(String currentBrandId) {
+        return articleMapper.selectHasResourcePhotoList(currentBrandId);
+    }
+
 }

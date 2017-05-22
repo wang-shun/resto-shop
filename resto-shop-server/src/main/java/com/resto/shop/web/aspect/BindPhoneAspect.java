@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 @Component
 @Aspect
@@ -115,7 +115,7 @@ public class BindPhoneAspect {
                 map.put("fileName", sc.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
 			}
 			log.info("首次绑定手机，执行指定动作");
 

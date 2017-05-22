@@ -170,5 +170,12 @@
             <artifactId>pagehelper</artifactId>
             <version>5.0.0</version>
         </dependency>
+
+		<!-- 饿了么2.0 sdk接口 -->
+		<dependency>
+			<groupId>me.ele.openapi</groupId>
+			<artifactId>eleme-openapi-sdk</artifactId>
+			<version>1.0.8</version>
+		</dependency>
 	</dependencies>
 </project>
