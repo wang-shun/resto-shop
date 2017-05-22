@@ -155,7 +155,7 @@
                             s_filter: true,
                             createdCell: function (td, tdData) {
                                 var state = "";
-                                if (tdData == 0){
+                                if (tdData == "未启用"){
                                     state = "<span class='label label-danger'>未启用</span>";
                                 }else {
                                     state = "<span class='label label-primary'>启用</span>";
