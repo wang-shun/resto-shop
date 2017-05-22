@@ -4725,7 +4725,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             pushMessage(xunMap, shopDetail,brand);
         }
 
-        //3发短信推送/微信推送
+        //3发腾讯短信推送/微信推送
         pushMessage(dayMap, shopDetail, brand);
         //  pushMessage(xunMap,shopDetail,wechatConfig);
     }
@@ -5046,6 +5046,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 smsLog.setCreateTime(new Date());
                 smsLog.setPhone(s);
                 smsLog.setSmsResult(smsResult);
+                //发腾讯云短信(先发腾讯云是 因为阿里云短信 top10模板无法通过)
                 if(com.alibaba.fastjson.JSONObject.parseObject(smsResult).getBoolean("success")){//阿里短信发送成功
                     smsLog.setIsSuccess(true);
                 }else {
@@ -7472,34 +7473,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    @Override
-    public void cleanShopOrderFix(ShopDetail shopDetail, WechatConfig wechatConfig, String telephone) {
-        //2.查询数据
-        Map<String, String> querryMap = querryDateData(shopDetail, null, 2);
-        //3发短信推送/微信推送
-        pushMessageFix(querryMap, shopDetail, wechatConfig, telephone);
-    }
-
-
-    private void pushMessageFix(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, String telephone) {
-        //截取电话号码
-        String telephones = telephone.replaceAll("，", ",");
-        SMSUtils.sendMessage(telephones, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
-        String[] tels = telephones.split(",");
-        for (String s : tels) {
-            Customer c = customerService.selectByTelePhone(s);
-            /**
-             发送客服消息
-             */
-            if (null != c) {
-                try {
-                    WeChatUtils.sendCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
-                } catch (Exception e) {
-                    System.err.println("发给" + c.getNickname() + "失败了");
-                }
-            }
-        }
-    }
 
     @Override
     public Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {

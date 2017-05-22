@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.txsms.SmsSingleSenderResult;
+import com.resto.brand.core.qroud.SmsSingleSenderResult;
 import com.resto.brand.core.util.TXSMSUtils;
 import org.json.JSONObject;
 
@@ -95,7 +95,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
                 SmsSingleSenderResult txRestul = null;
                 smsLog.setSmsType(SmsLogType.TX_AUTO_CODE);
                 try {
-                    txRestul = TXSMSUtils.sendCode(params,phone,TXSMSUtils.IDENTIFYING_CODE);
+                    txRestul = TXSMSUtils.sendTmpSingle(phone,TXSMSUtils.IDENTIFYING_CODE,params);
                     smsLog.setSmsResult(com.alibaba.fastjson.JSONObject.toJSONString(txRestul));
                     if(txRestul.result==0){//腾讯云返回result=0成功
                         smsLog.setIsSuccess(true);
