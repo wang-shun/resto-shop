@@ -95,7 +95,6 @@
             CONCAT(tbs.charge_bonus_ratio,'%') chargeBonusRatio,
             CONCAT(tbs.shopowner_bonus_ratio,'%') shopownerBonusRatio,
             CONCAT(tbs.employee_bonus_ratio,'%') employeeBonusRatio,
-            GROUP_CONCAT(CONCAT_WS(':',tne.role_type,tne.`name`)) emNames,
             tbl.shopowner_id shopownerId,
             tbl.employee_id employeeId,
             tbl.shopowner_issuing_state shopownerIssuingState,
@@ -107,9 +106,6 @@
         on tal.customer_id = tc.id
         inner join tb_bonus_setting tbs
         on tbs.id = tbl.bonus_setting_id
-        left join tb_new_employee tne
-        on tbl.shopowner_id = tne.id
-        or tbl.employee_id = tne.id
         GROUP BY tbl.id
     </select>
 </mapper>

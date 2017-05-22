@@ -9,7 +9,9 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.NewEmployee;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.NewEmployeeService;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
 import org.springframework.stereotype.Controller;
@@ -18,15 +20,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
 import com.resto.brand.core.entity.Result;
-import com.resto.shop.web.model.NewEmployee;
-import com.resto.shop.web.service.NewEmployeeService;
 
 @Controller
 @RequestMapping("newEmployee")
 public class NewEmployeeController extends GenericController{
 
 	@Resource
-	NewEmployeeService newEmployeeService;
+    NewEmployeeService newEmployeeService;
 
     @Resource
     CustomerService customerService;
@@ -40,7 +40,7 @@ public class NewEmployeeController extends GenericController{
 	public Result listData(){
 	    try{
             Map<String, Object> map = new HashMap<>();
-            List<NewEmployee> newEmployees = newEmployeeService.selectList();
+            List<NewEmployee> newEmployees = newEmployeeService.selectByBrandId(getCurrentBrandId());
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             for (NewEmployee newEmployee : newEmployees){
                 for (ShopDetail shopDetail : shopDetails){
@@ -58,6 +58,11 @@ public class NewEmployeeController extends GenericController{
                     newEmployee.setSexValue("男");
                 }else{
                     newEmployee.setSexValue("女");
+                }
+                if (newEmployee.getState().equals(1)){
+                    newEmployee.setStateValue("开启");
+                }else {
+                    newEmployee.setStateValue("未开启");
                 }
             }
             map.put("newEmployees",newEmployees);

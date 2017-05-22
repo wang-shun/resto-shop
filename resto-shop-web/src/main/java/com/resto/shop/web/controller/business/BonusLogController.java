@@ -10,9 +10,11 @@ import javax.annotation.Resource;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.util.WeChatPayUtils;
+import com.resto.brand.web.model.NewEmployee;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.model.WxServerConfig;
+import com.resto.brand.web.service.NewEmployeeService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.brand.web.service.WxServerConfigService;
@@ -66,6 +68,7 @@ public class BonusLogController extends GenericController{
 	public Result listData(){
 	    try {
             List<Map<String, Object>> bonusLogs = bonusLogService.selectAllBonusLog();
+            List<NewEmployee> newEmployees = newEmployeeService.selectByBrandId(getCurrentBrandId());
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             for (Map bonusLog : bonusLogs){
                 for (ShopDetail shopDetail : shopDetails){
@@ -74,24 +77,25 @@ public class BonusLogController extends GenericController{
                         break;
                     }
                 }
-                if (bonusLog.get("emNames") != null){
-                    if (StringUtils.isNotBlank(bonusLog.get("emNames").toString())) {
-                        String[] emNames = bonusLog.get("emNames").toString().split(",");
-                        for (String emName : emNames) {
-                            String[] name = emName.split(":");
-                            if (Integer.valueOf(name[0]) == 1) {
-                                bonusLog.put("employeeName", name[1]);
-                            } else {
-                                bonusLog.put("shopownerName", name[1]);
-                            }
+                if (bonusLog.get("employeeId") == null){
+                    bonusLog.put("employeeId", "");
+                }else {
+                    for (NewEmployee employee : newEmployees){
+                        if (employee.getId().equalsIgnoreCase(bonusLog.get("employeeId").toString())){
+                            bonusLog.put("employeeName", employee.getName());
+                            break;
                         }
                     }
                 }
-                if (bonusLog.get("employeeId") == null){
-                    bonusLog.put("employeeId", "");
-                }
                 if (bonusLog.get("shopownerId") == null){
                     bonusLog.put("shopownerId", "");
+                }else {
+                    for (NewEmployee employee : newEmployees){
+                        if (employee.getId().equalsIgnoreCase(bonusLog.get("shopownerId").toString())){
+                            bonusLog.put("shopownerName", employee.getName());
+                            break;
+                        }
+                    }
                 }
             }
             return getSuccessResult(bonusLogs);

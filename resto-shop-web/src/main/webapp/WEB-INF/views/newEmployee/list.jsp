@@ -48,6 +48,17 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-md-2 control-label">是否启用：</label>
+                                <div  class="col-md-8">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="state" value="1" v-model="newEmployee.state"> 启用
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="state" value="0" v-model="newEmployee.state"> 不启用
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label  class="col-sm-2 control-label">所属门店：</label>
                                 <div class="col-sm-8">
                                     <select class="form-control" v-model="newEmployee.shopDetailId">
@@ -138,6 +149,12 @@
                             orderable : false
                         },
                         {
+                            title : "状态",
+                            data : "stateValue",
+                            orderable : false,
+                            s_filter: true
+                        },
+                        {
                             title : "操作",
                             data : "id",
                             orderable : false,
@@ -173,10 +190,12 @@
                             api.search('');
                             var column1 = api.column(0);
                             column1.search('', true, false);
-                            var column1 = api.column(1);
-                            column1.search('', true, false);
-                            var column1 = api.column(3);
-                            column1.search('', true, false);
+                            var column2 = api.column(1);
+                            column2.search('', true, false);
+                            var column3 = api.column(3);
+                            column3.search('', true, false);
+                            var column4 = api.column(6);
+                            column4.search('', true, false);
                             that.newEmployeeTable.clear();
                             that.newEmployeeTable.rows.add(result.data.newEmployees).draw();
                             that.getSearchColumns();
@@ -249,7 +268,7 @@
                 this.showform = false;
             },
             getOpenShowForm : function () {
-                this.newEmployee = {sex : 1, roleType : 1, shopDetailId : "0"};
+                this.newEmployee = {sex : 1, roleType : 1, state : 1, shopDetailId : "0"};
             },
             updateNewEmployee : function (newEmployee) {
                 this.showform = true;
