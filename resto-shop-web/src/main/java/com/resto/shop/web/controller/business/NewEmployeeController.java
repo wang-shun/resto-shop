@@ -60,9 +60,9 @@ public class NewEmployeeController extends GenericController{
                     newEmployee.setSexValue("女");
                 }
                 if (newEmployee.getState().equals(1)){
-                    newEmployee.setStateValue("开启");
+                    newEmployee.setStateValue("启用");
                 }else {
-                    newEmployee.setStateValue("未开启");
+                    newEmployee.setStateValue("未启用");
                 }
             }
             map.put("newEmployees",newEmployees);
