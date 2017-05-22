@@ -142,12 +142,27 @@ public class BonusLogController extends GenericController{
             WechatConfig wechatConfig = wechatConfigService.selectByBrandId(bonusSetting.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(bonusSetting.getShopDetailId());
             List<String> employeeIds = new ArrayList<>();
-            if (bonusLog.getShopownerBonusAmount() > 0){
-                isEmployee = false;
-                employeeIds.add(shopownerId);
-            }
-            if (bonusLog.getEmployeeBonusAmount() > 0){
-                employeeIds.add(employeeId);
+            Integer reissueAmount = 0;
+            if (bonusLog.getState() == 0 || bonusLog.getState() == 1) {
+                if (bonusLog.getShopownerBonusAmount() > 0) {
+                    isEmployee = false;
+                    employeeIds.add(shopownerId);
+                }
+                if (bonusLog.getEmployeeBonusAmount() > 0) {
+                    employeeIds.add(employeeId);
+                }
+            }else{
+                if (bonusLog.getShopownerIssuingState() == 1 && bonusLog.getEmployeeIssuingState() == 1){
+                    employeeIds.add(shopownerId);
+                    employeeIds.add(employeeId);
+                }else if (bonusLog.getShopownerIssuingState() == 1){
+                    isEmployee = false;
+                    employeeIds.add(shopownerId);
+                    reissueAmount = bonusLog.getShopownerBonusAmount();
+                }else if (bonusLog.getEmployeeIssuingState() == 1){
+                    employeeIds.add(employeeId);
+                    reissueAmount = bonusLog.getEmployeeBonusAmount();
+                }
             }
             if (!employeeIds.isEmpty()) {
                 List<NewEmployee> employees = newEmployeeService.selectByIds(employeeIds);
@@ -161,16 +176,16 @@ public class BonusLogController extends GenericController{
                 List<Customer> customers = customerService.selectByTelePhones(telePhones);
                 if (customers.size() == 1) {
                     isOneCustomer = true;
-                    if (employeeIds.size() != 2){
+                    if (employeeIds.size() != 2) {
                         isTwoEmpliyee = false;
                     }
-                    grantRewards(customers.get(0), bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
+                    grantRewards(customers.get(0), reissueAmount != 0 ? reissueAmount : bonusLog.getBonusAmount(), bonusLog.getWishing(), wechatConfig, shopDetail);
                 } else {
                     int i = 0;
                     for (Customer customer : customers) {
                         for (NewEmployee employee : employees) {
                             if (customer.getTelephone().equalsIgnoreCase(employee.getTelephone())) {
-                                if (i != 0){
+                                if (i != 0) {
                                     isOneGrant = false;
                                 }
                                 if (employee.getId().equalsIgnoreCase(shopownerId)) {
