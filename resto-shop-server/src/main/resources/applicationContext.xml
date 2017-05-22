@@ -29,6 +29,7 @@
 			<list>
 				<value>file:${resources.config.path}/shop-rpc.properties</value>
 				<value>file:${resources.config.path}/shop.properties</value>
+				<value>file:${resources.config.path}/redis.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -38,7 +39,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:config.properties</value>
-				<value>classpath:redis.properties</value>
+
 			</list>
 		</property>
 	</bean>
@@ -70,10 +71,7 @@
 		</property>
 	</bean >
 
-	<!-- cache配置 -->
-	<bean id="methodCacheInterceptor" class="com.mucfc.msm.common.MethodCacheInterceptor" >
-		<property name="redisUtil" ref="redisUtil" />
-	</bean >
+
 	<bean id="redisUtil" class="com.resto.shop.web.util.RedisUtil" >
 		<property name="redisTemplate" ref="redisTemplate" />
 	</bean >

@@ -6,9 +6,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import static net.spy.memcached.ops.StoreType.set;
 
 /**
  * Created by KONATA on 2017/5/22.
@@ -80,7 +77,7 @@ public class RedisUtil {
      * @param value
      * @return
      */
-    public static boolean set(final String key, Object value) {
+    public boolean set(final String key, Object value) {
         boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate

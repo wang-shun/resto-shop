@@ -22,6 +22,8 @@ import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.RedisUtil;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +151,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
         for (Article article : articleList) {
-            Integer count = (Integer) MemcachedUtils.get(article.getId() + Common.KUCUN);
+//            Integer count = (Integer) MemcachedUtils.get(article.getId() + Common.KUCUN);
+            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
@@ -187,7 +190,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
                     for (ArticlePrice price : prices) {
-                        Integer ck = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+//                        Integer ck = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+                        Integer ck = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         if (ck != null) {
                             price.setCurrentWorkingStock(ck);
                         }
@@ -265,7 +269,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
         for (ArticleStock articleStock : result) {
-            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId() + Common.KUCUN);
+//            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId() + Common.KUCUN);
+            Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
@@ -279,7 +284,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = "【手动沽清】";
-        MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//        MemcachedUtils.put(articleId + Common.KUCUN, 0);
+        RedisUtil.set(articleId + Common.KUCUN, 0);
         if (articleId.indexOf("@") > -1) {
             String aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
@@ -338,7 +344,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
-        MemcachedUtils.put(articleId + Common.KUCUN, count);
+//        MemcachedUtils.put(articleId + Common.KUCUN, count);
+        RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
                 orderMapper.setArticlePriceEmptyFail(articleId);

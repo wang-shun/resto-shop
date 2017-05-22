@@ -23,6 +23,7 @@ import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -5099,55 +5100,45 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem orderItem : order.getOrderItems()) {
             String articleId = orderItem.getArticleId();
             Article article = articleService.selectById(articleId);
-            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+//            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+            Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             switch (orderItem.getType()) {
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
                     List<ArticlePrice> articlePrices = articlePriceMapper.selectByArticleId(articlePrice.getArticleId());
 
-//                    Integer base = (Integer) MemcachedUtils.get(articlePrice.getArticleId() + Common.KUCUN);
-//                    Article baseArticle = articleService.selectById(articlePrice.getArticleId());
-//                    if (base != null) {
-//                        if (base > 1) {
-//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base - 1);
-//                        } else {
-//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
-//                            orderMapper.setEmpty(articlePrice.getArticleId());
-//                        }
-//                    } else {
-//                        if (baseArticle.getCurrentWorkingStock() > 1) {
-//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle.getCurrentWorkingStock() - 1);
-//                        } else {
-//                            MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, 0);
-//                            orderMapper.setEmpty(articlePrice.getArticleId());
-//                        }
-//                    }
                     if (articleCount == null) {
                         if (articlePrice.getCurrentWorkingStock() > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
                         } else {
-                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     } else {
                         if (articleCount > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                         } else {
-                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     }
                     int sum = 0;
                     for (ArticlePrice price : articlePrices) {
-                        Integer count = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+//                        Integer count = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+                        Integer count = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         if (count != null) {
                             sum += count;
                         } else {
                             sum += price.getCurrentWorkingStock();
                         }
                     }
-                    MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, sum);
+//                    MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, sum);
+                    RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     if (sum == 0) {
                         orderMapper.setEmpty(articlePrice.getArticleId());
                     }
@@ -5164,16 +5155,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount == null) {
                         if (article.getCurrentWorkingStock() > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
                         } else {
-                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setEmpty(orderItem.getArticleId());
                         }
                     } else {
                         if (articleCount > 1) {
-                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                         } else {
-                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setEmpty(orderItem.getArticleId());
                         }
 
@@ -5209,32 +5204,37 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem orderItem : order.getOrderItems()) {
             String articleId = orderItem.getArticleId();
             Article article = articleService.selectById(articleId);
-            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+//            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+            Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             switch (orderItem.getType()) {
 
                 case OrderItemType.UNITPRICE:
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
                     if (articleCount != null) {
-                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+//                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         if (articleCount == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
-                        MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
+//                        MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
                         if (articlePrice.getCurrentWorkingStock() == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
                     Integer baseArticle = (Integer) MemcachedUtils.get(articlePrice.getArticleId() + Common.KUCUN);
                     if (baseArticle != null) {
-                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
+//                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
+                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
                         if (baseArticle == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
                         Article base = articleService.selectById(articlePrice.getArticleId());
-                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
+//                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
                         if (base.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
                         }
@@ -5249,12 +5249,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNIT_NEW:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount != null) {
-                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+//                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         if (articleCount == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
                         }
                     } else {
-                        MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
+//                        MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
                         if (article.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
                         }

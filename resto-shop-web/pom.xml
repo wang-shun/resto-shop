@@ -302,7 +302,19 @@
             <version>2.6.0</version>
         </dependency>
 
- 
+        <!--Redis start -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>1.6.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+        <!--Redis end -->
+
 
     </dependencies>
 </project>
