@@ -2613,13 +2613,13 @@ INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
 </select>
 
 
     <!-- 每日短信报表数据 用户总数 -->
     <select id="selectOrderHistoryList" resultMap="selectOrderHistoryListMap">
-        SELECT
+        SELECTselectListsmsByShopId
         o.id,
         o.order_state,
         o.production_status,
