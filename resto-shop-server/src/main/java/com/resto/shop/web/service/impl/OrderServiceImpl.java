@@ -24,6 +24,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import javafx.application.Application;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -2511,7 +2512,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_STATUS", order.getPrintKitchenFlag());
-        print.put("PRINT_TASK_ID", article.getId());
+        print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
+        print.put("TASK_ID", article.getId());
         print.put("TASK_ORDER_ID", article.getOrderId());
         print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
         print.put("ADD_TIME", new Date().getTime());
