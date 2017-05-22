@@ -2066,7 +2066,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_STATUS", order.getPrintKitchenFlag());
         ArticleRecommend articleRecommend = articleRecommendMapper.getRecommendById(recommendId);
-        print.put("PRINT_TASK_ID", recommendId);
+        print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
+        print.put("TASK_ID", recommendId);
 
         print.put("TASK_ORDER_ID", order.getId());
         print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
@@ -2262,7 +2263,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String modeText = getModeText(order);//就餐模式
         Map<String, Object> print = new HashMap<String, Object>();
         print.put("PRINT_STATUS", order.getPrintKitchenFlag());
-        print.put("PRINT_TASK_ID", article.getId());
+        print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
+        print.put("TASK_ID", article.getId());
         print.put("TASK_ORDER_ID", article.getOrderId());
         print.put("TABLE_NO", tableNumber);
         print.put("OID", order.getId());
