@@ -84,7 +84,7 @@
                             <button v-if="bonusLog.state == 0" type="button" class="btn btn-primary" @click="openShowEmployee">分红</button>
                             <button v-if="bonusLog.state == 1 && !disabled" type="button" class="btn btn-primary" @click="save">发放奖励</button>
                             <button v-if="bonusLog.state == 1 && disabled" type="button" class="btn btn-default" :disabled="disabled">发放奖励</button>
-                            <button v-if="bonusLog.state == 3 && !disabled" type="button" class="btn btn-primary">补发奖励</button>
+                            <button v-if="bonusLog.state == 3 && !disabled" type="button" class="btn btn-primary" @click="save">补发奖励</button>
                             <button v-if="bonusLog.state == 3 && disabled" type="button" class="btn btn-default" :disabled="disabled">补发奖励</button>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" @click="colseShowForm">关闭</button>
