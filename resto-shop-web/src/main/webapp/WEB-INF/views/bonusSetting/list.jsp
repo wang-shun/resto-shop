@@ -44,6 +44,17 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label  class="col-sm-2 control-label">红包祝福语：</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input v-if="bonusSetting.id == null" class="form-control" type="text" value="充值返利，再接再厉！" name="wishing" v-model="bonusSetting.wishing" required placeholder="请输入红包祝福语">
+                                        <input v-else class="form-control" type="text" name="wishing" v-model="bonusSetting.wishing" required placeholder="请输入红包祝福语">
+                                        <div class="input-group-addon"></div>
+                                    </div>
+                                    <span class="help-block">请输入红包祝福语默认为"充值返利，再接再厉！"</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-md-2 control-label">是否启用：</label>
                                 <div  class="col-md-8">
                                     <label class="radio-inline">
