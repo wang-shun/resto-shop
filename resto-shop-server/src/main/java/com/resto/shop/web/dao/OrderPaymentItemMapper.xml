@@ -263,7 +263,7 @@
         </trim>
     </insert>
 
-    <select id="selectWeChatPayResultData" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="selectWeChatPayResultData" parameterType="java.lang.String" resultType="com.resto.shop.web.model.OrderPaymentItem">
         select top.* from tb_order_payment_item top
         inner join tb_order td
         on top.order_id = td.id
