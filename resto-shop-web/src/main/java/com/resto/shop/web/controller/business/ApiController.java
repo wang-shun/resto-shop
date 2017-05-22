@@ -158,6 +158,7 @@ public class ApiController extends GenericController {
                         }
                     }
                     map.put("itemList", itemList);
+                    map.put("payList",payList);
                     ThirdData.add(map);
                 }
             }
