@@ -101,7 +101,7 @@ public class NewCustomCouponController extends GenericController{
         newCustomCoupon.setCreateTime(new Date());
         newcustomcouponService.insertNewCustomCoupon(newCustomCoupon);
         if(RedisUtil.get(getCurrentBrandId()+"newCustomCoupon") != null){
-            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+            RedisUtil.remove(getCurrentBrandId()+"newCustomCoupon");
         }
 
         return Result.getSuccess();
@@ -142,7 +142,7 @@ public class NewCustomCouponController extends GenericController{
 
         newcustomcouponService.update(newCustomCoupon);
         if(RedisUtil.get(getCurrentBrandId()+"newCustomCoupon") != null){
-            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+            RedisUtil.remove(getCurrentBrandId()+"newCustomCoupon");
         }
         return Result.getSuccess();
     }
@@ -152,7 +152,7 @@ public class NewCustomCouponController extends GenericController{
     public Result delete(Long id){
         newcustomcouponService.delete(id);
         if(RedisUtil.get(getCurrentBrandId()+"newCustomCoupon") != null){
-            MemcachedUtils.delete(getCurrentBrandId()+"newCustomCoupon");
+            RedisUtil.remove(getCurrentBrandId()+"newCustomCoupon");
         }
         return Result.getSuccess();
     }

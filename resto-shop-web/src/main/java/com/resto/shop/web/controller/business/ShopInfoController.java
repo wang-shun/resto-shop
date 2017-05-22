@@ -97,7 +97,7 @@ public class ShopInfoController extends GenericController{
         shopDetailService.update(shopDetail);
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
         if(shopDetail != null){
-            MemcachedUtils.delete(getCurrentShopId()+"info");
+            RedisUtil.remove(getCurrentShopId()+"info");
         }
 
         return Result.getSuccess();

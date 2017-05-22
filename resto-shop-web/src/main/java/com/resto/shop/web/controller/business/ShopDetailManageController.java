@@ -50,7 +50,7 @@
          }
          shopDetailService.update(shopDetail);
          if(RedisUtil.get(getCurrentShopId()+"info") != null){
-             MemcachedUtils.delete(getCurrentShopId()+"info");
+             RedisUtil.remove(getCurrentShopId()+"info");
          }
 
          return Result.getSuccess();

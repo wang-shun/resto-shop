@@ -83,6 +83,7 @@ public class RedisUtil {
             ValueOperations<Serializable, Object> operations = redisTemplate
                     .opsForValue();
             operations.set(key, value);
+            redisTemplate.expire(key, 3600 * 24, TimeUnit.SECONDS);
             result = true;
         } catch (Exception e) {
             e.printStackTrace();

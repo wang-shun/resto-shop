@@ -54,7 +54,7 @@ public class ArticleFamilyController extends GenericController{
 		articleFamily.setId(ApplicationUtils.randomUUID());
 		articlefamilyService.insert(articleFamily);
 		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
-			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+			RedisUtil.remove(getCurrentShopId()+"articleFamily");
 		}
 
 		return Result.getSuccess();
@@ -65,7 +65,7 @@ public class ArticleFamilyController extends GenericController{
 	public Result modify(@Valid ArticleFamily articleFamily){
 		articlefamilyService.update(articleFamily);
 		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
-			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+			RedisUtil.remove(getCurrentShopId()+"articleFamily");
 		}
 		return Result.getSuccess();
 	}
@@ -75,7 +75,7 @@ public class ArticleFamilyController extends GenericController{
 	public Result delete(String id){
 		articlefamilyService.delete(id);
 		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
-			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
+			RedisUtil.remove(getCurrentShopId()+"articleFamily");
 		}
 		return Result.getSuccess();
 	}

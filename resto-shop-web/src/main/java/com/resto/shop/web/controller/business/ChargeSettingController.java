@@ -52,7 +52,7 @@ public class ChargeSettingController extends GenericController{
 	    brand.setId(UUID.randomUUID().toString());
 	    chargesettingService.insert(brand);
 	    if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 
 		return Result.getSuccess();
@@ -64,7 +64,7 @@ public class ChargeSettingController extends GenericController{
 		brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 		chargesettingService.update(brand);
 		if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 		return Result.getSuccess();
 	}
@@ -74,7 +74,7 @@ public class ChargeSettingController extends GenericController{
 	public Result delete(String id){
 		chargesettingService.delete(id);
 		if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 		return Result.getSuccess();
 	}

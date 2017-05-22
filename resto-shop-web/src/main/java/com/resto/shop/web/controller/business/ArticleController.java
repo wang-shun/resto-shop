@@ -141,7 +141,7 @@ public class ArticleController extends GenericController {
         articleService.initStock();
 //        List<Article> articles = (List<Article>) RedisUtil.get(getCurrentShopId()+"articles");
         if(RedisUtil.get(getCurrentShopId()+"articles") != null){
-            MemcachedUtils.delete(getCurrentShopId()+"articles");
+            RedisUtil.remove(getCurrentShopId()+"articles");
         }
 
         return Result.getSuccess();
@@ -170,7 +170,7 @@ public class ArticleController extends GenericController {
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
         if(RedisUtil.get(getCurrentShopId()+"articles") != null){
-            MemcachedUtils.delete(getCurrentShopId()+"articles");
+            RedisUtil.remove(getCurrentShopId()+"articles");
         }
 
         return Result.getSuccess();

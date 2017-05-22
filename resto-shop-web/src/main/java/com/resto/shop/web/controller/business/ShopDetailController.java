@@ -41,7 +41,7 @@ public class ShopDetailController extends GenericController{
 	    shopDetail.setId(getCurrentShopId());
 	    shopDetailService.update(shopDetail);
 	    if(RedisUtil.get(shopDetail.getId()+"info") != null){
-			MemcachedUtils.delete(shopDetail.getId()+"info");
+			RedisUtil.remove(shopDetail.getId()+"info");
 		}
 
 	    return Result.getSuccess();

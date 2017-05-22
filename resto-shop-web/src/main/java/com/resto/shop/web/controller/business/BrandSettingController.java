@@ -47,7 +47,7 @@ public class BrandSettingController extends GenericController{
 		
 		brandSettingService.update(brandSetting);
 		if(RedisUtil.get(getCurrentBrandId()+"setting") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"setting");
+			RedisUtil.remove(getCurrentBrandId()+"setting");
 		}
 
 		return Result.getSuccess();
