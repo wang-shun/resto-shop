@@ -77,7 +77,7 @@
     <select id="selectAllBonusLog" resultType="java.util.Map">
         select
             tbl.id,
-            tal.shop_detail_id shopId,
+            tbs.shop_detail_id shopId,
             DATE_FORMAT(tal.finish_time,'%Y-%m-%d %H:%i:%s') chargeTime,
             IF(tal.type = 1, '微信充值', 'POS充值') chargeType,
             IFNULL(tc.telephone,'--') telephone,
