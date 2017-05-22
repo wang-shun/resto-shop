@@ -6,6 +6,7 @@ import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Unit;
 import com.resto.shop.web.service.UnitService;
+import com.resto.shop.web.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,7 +59,7 @@ public class UnitController extends GenericController {
         unitService.insert(unit);
         //创建属性
         unitService.insertDetail(unit);
-        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+        if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             MemcachedUtils.delete(getCurrentShopId()+"unit");
         }
 
@@ -75,7 +76,7 @@ public class UnitController extends GenericController {
 
         //同步更新 使用该规格包的菜品信息
         unitService.modifyUnit(u);
-        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+        if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             MemcachedUtils.delete(getCurrentShopId()+"unit");
         }
         return new Result(true);
@@ -86,7 +87,7 @@ public class UnitController extends GenericController {
     public Result delete(String id) {
         unitService.delete(id);
         unitService.deleteUnit(id);
-        if(MemcachedUtils.get(getCurrentShopId()+"unit") != null){
+        if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             MemcachedUtils.delete(getCurrentShopId()+"unit");
         }
         return Result.getSuccess();

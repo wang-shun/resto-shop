@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -52,7 +53,7 @@ public class ArticleFamilyController extends GenericController{
 		articleFamily.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
 		articleFamily.setId(ApplicationUtils.randomUUID());
 		articlefamilyService.insert(articleFamily);
-		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
 			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
 		}
 
@@ -63,7 +64,7 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleFamily articleFamily){
 		articlefamilyService.update(articleFamily);
-		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
 			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
 		}
 		return Result.getSuccess();
@@ -73,7 +74,7 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result delete(String id){
 		articlefamilyService.delete(id);
-		if(MemcachedUtils.get(getCurrentShopId()+"articleFamily") != null){
+		if(RedisUtil.get(getCurrentShopId()+"articleFamily") != null){
 			MemcachedUtils.delete(getCurrentShopId()+"articleFamily");
 		}
 		return Result.getSuccess();

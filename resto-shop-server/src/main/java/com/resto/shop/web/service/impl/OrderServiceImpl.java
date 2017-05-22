@@ -1951,7 +1951,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
 
-        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
@@ -2019,17 +2019,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                print.put("TABLE_NO", tableNumber);
         //添加到 打印集合
         printTask.add(print);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", sb.toString());
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(print_id + "article", sb.toString());
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
     }
 
     private void getRecommendModelNew(String recommendId, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
@@ -2076,7 +2076,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
 
-        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
@@ -2145,17 +2145,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                print.put("TABLE_NO", tableNumber);
         //添加到 打印集合
         printTask.add(print);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", sb.toString());
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(print_id + "article", sb.toString());
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
     }
 
 
@@ -2219,17 +2219,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.RESTAURANTLABEL);
         printTask.add(print);
-        MemcachedUtils.put(print_id, print);
+        RedisUtil.set(print_id, print);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", article.getArticleName());
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id + "article", article.getArticleName());
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
 
     }
 
@@ -2297,17 +2297,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketTypeNew.LABEL);
         print.put("TICKET_MODE", TicketTypeNew.RESTAURANT_LABEL);
         printTask.add(print);
-        MemcachedUtils.put(print_id, print);
+        RedisUtil.set(print_id, print);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", article.getArticleName());
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id + "article", article.getArticleName());
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
 
     }
 
@@ -2375,7 +2375,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             data.put("MEMO", "备注：" + order.getRemark());
         }
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
@@ -2443,17 +2443,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //添加到 打印集合
         printTask.add(print);
 
-        MemcachedUtils.put(print_id, print);
+        RedisUtil.set(print_id, print);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", sb.toString());
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id + "article", sb.toString());
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
     }
 
 
@@ -2525,7 +2525,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             data.put("MEMO", "备注：" + order.getRemark());
         }
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
-        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
         data.put("ITEMS", items);
         Appraise appraise = appraiseService.selectAppraiseByCustomerId(order.getCustomerId(), order.getShopDetailId());
         StringBuilder star = new StringBuilder();
@@ -2594,17 +2594,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //添加到 打印集合
         printTask.add(print);
 
-        MemcachedUtils.put(print_id, print);
+        RedisUtil.set(print_id, print);
         if (customer != null) {
-            MemcachedUtils.put(print_id + "customer", customer);
+            RedisUtil.set(print_id + "customer", customer);
         }
-        MemcachedUtils.put(print_id + "article", sb.toString());
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id + "article", sb.toString());
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
     }
 
 
@@ -2777,14 +2777,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             data.put("MEMO", "备注：" + order.getRemark());
         }
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
-        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId() + "orderCount");
+        String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCount");
         if (orderTotal == null) {
             orderTotal = 0;
         } else if (orderNumber == null) {
             orderTotal++;
         }
-        MemcachedUtils.put(order.getShopDetailId() + "orderCount", orderTotal);
+        RedisUtil.set(order.getShopDetailId() + "orderCount", orderTotal);
 
 
         String number;
@@ -2799,7 +2799,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (StringUtils.isEmpty(orderNumber)) {
             orderNumber = number;
         }
-        MemcachedUtils.put(order.getId() + "orderNumber", orderNumber);
+        RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 //        nextNumber(order.getShopDetailId(), order.getId())
         data.put("ORDER_NUMBER", orderNumber);
@@ -2961,13 +2961,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "返回打印总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, logMap);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
         return print;
     }
 
@@ -3076,14 +3076,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             data.put("MEMO", "备注：" + order.getRemark());
         }
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
-        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId() + "orderCount");
+        String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCount");
         if (orderTotal == null) {
             orderTotal = 0;
         } else if (orderNumber == null) {
             orderTotal++;
         }
-        MemcachedUtils.put(order.getShopDetailId() + "orderCount", orderTotal);
+        RedisUtil.set(order.getShopDetailId() + "orderCount", orderTotal);
 
 
         String number;
@@ -3098,7 +3098,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (StringUtils.isEmpty(orderNumber)) {
             orderNumber = number;
         }
-        MemcachedUtils.put(order.getId() + "orderNumber", orderNumber);
+        RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 //        nextNumber(order.getShopDetailId(), order.getId())
         data.put("ORDER_NUMBER", orderNumber);
@@ -3260,13 +3260,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "返回打印总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, logMap);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
         return print;
     }
 
@@ -4988,7 +4988,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String msg = "";
         int min = 0;
         int endMin = 10000;
-        Integer ck = (Integer) MemcachedUtils.get(orderItem.getArticleId() + Common.KUCUN);
+        Integer ck = (Integer) RedisUtil.get(orderItem.getArticleId() + Common.KUCUN);
         switch (orderItem.getType()) {
             case OrderItemType.ARTICLE:
                 //如果是单品无规格，直接判断菜品是否有库存
@@ -5024,7 +5024,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Map<String, Integer> order_items_map = new HashMap<String, Integer>();//用于保存套餐内的子菜品（防止套餐内出现同样餐品，检查库存出现异常）
                 for (OrderItem oi : orderItem.getChildren()) {
                     //查询当前菜品，剩余多少份
-                    Integer cck = (Integer) MemcachedUtils.get(oi.getArticleId() + Common.KUCUN);
+                    Integer cck = (Integer) RedisUtil.get(oi.getArticleId() + Common.KUCUN);
                     if (cck != null) {
                         min = cck;
                     } else {
@@ -5100,7 +5100,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem orderItem : order.getOrderItems()) {
             String articleId = orderItem.getArticleId();
             Article article = articleService.selectById(articleId);
-//            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+//            Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             switch (orderItem.getType()) {
                 case OrderItemType.UNITPRICE:
@@ -5110,26 +5110,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                     if (articleCount == null) {
                         if (articlePrice.getCurrentWorkingStock() > 1) {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
+//                            RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
                             RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
                         } else {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     } else {
                         if (articleCount > 1) {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+//                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                             RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                         } else {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     }
                     int sum = 0;
                     for (ArticlePrice price : articlePrices) {
-//                        Integer count = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+//                        Integer count = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         Integer count = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         if (count != null) {
                             sum += count;
@@ -5137,7 +5137,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             sum += price.getCurrentWorkingStock();
                         }
                     }
-//                    MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, sum);
+//                    RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     if (sum == 0) {
                         orderMapper.setEmpty(articlePrice.getArticleId());
@@ -5155,19 +5155,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount == null) {
                         if (article.getCurrentWorkingStock() > 1) {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+//                            RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
                             RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
                         } else {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setEmpty(orderItem.getArticleId());
                         }
                     } else {
                         if (articleCount > 1) {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, articleCount - 1);
+//                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                             RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
                         } else {
-//                            MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setEmpty(orderItem.getArticleId());
                         }
@@ -5183,7 +5183,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //同时更新套餐库存(套餐库存为 最小库存的单品)
 //        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
 //        for(Article article : taocan){
-//            MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//            RedisUtil.set(article.getId()+Common.KUCUN,article.getCount());
 //            if(article.getCount() == 0){
 //                orderMapper.setEmpty(article.getId());
 //            }
@@ -5204,7 +5204,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem orderItem : order.getOrderItems()) {
             String articleId = orderItem.getArticleId();
             Article article = articleService.selectById(articleId);
-//            Integer articleCount = (Integer) MemcachedUtils.get(articleId + Common.KUCUN);
+//            Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             Integer articleCount = (Integer) RedisUtil.get(articleId + Common.KUCUN);
             switch (orderItem.getType()) {
 
@@ -5212,28 +5212,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是有规格的单品信息，那么更新该规格的单品库存以及该单品的库存
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
                     if (articleCount != null) {
-//                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+//                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         if (articleCount == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
-//                        MemcachedUtils.put(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
+//                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
                         if (articlePrice.getCurrentWorkingStock() == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
-                    Integer baseArticle = (Integer) MemcachedUtils.get(articlePrice.getArticleId() + Common.KUCUN);
+                    Integer baseArticle = (Integer) RedisUtil.get(articlePrice.getArticleId() + Common.KUCUN);
                     if (baseArticle != null) {
-//                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
+//                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
                         if (baseArticle == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
                         Article base = articleService.selectById(articlePrice.getArticleId());
-//                        MemcachedUtils.put(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
+//                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
                         if (base.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
@@ -5249,13 +5249,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.UNIT_NEW:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount != null) {
-//                        MemcachedUtils.put(articleId + Common.KUCUN, articleCount + 1);
+//                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         if (articleCount == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
                         }
                     } else {
-//                        MemcachedUtils.put(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
+//                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
                         if (article.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
@@ -5271,17 +5271,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //同时更新套餐库存(套餐库存为 最小库存的单品)
 //        List<Article> taocan = orderMapper.getStockBySuit(order.getShopDetailId());
 //        for(Article article : taocan){
-//            Integer suit = (Integer) MemcachedUtils.get(article.getId()+Common.KUCUN);
+//            Integer suit = (Integer) RedisUtil.get(article.getId()+Common.KUCUN);
 //            if(suit != null){
 //                if(suit == 0 && article.getCount() > 0){
 //                    orderMapper.setEmptyFail(article.getId());
 //                }
-//                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//                RedisUtil.set(article.getId()+Common.KUCUN,article.getCount());
 //            }else{
 //                if(article.getIsEmpty() && article.getCount() > 0){
 //                    orderMapper.setEmptyFail(article.getId());
 //                }
-//                MemcachedUtils.put(article.getId()+Common.KUCUN,article.getCount());
+//                RedisUtil.set(article.getId()+Common.KUCUN,article.getCount());
 //            }
 //        }
         return true;
@@ -6982,7 +6982,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ADD_TIME", new Date());
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", (String) MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", (String) RedisUtil.get(order.getId() + "orderNumber"));
         data.put("ITEMS", orderItems);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         data.put("PAYMENT_ITEMS", patMentItems);
@@ -7911,7 +7911,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber() + "-" + order.getVerCode());
-        data.put("ORDER_NUMBER", (String) MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", (String) RedisUtil.get(order.getId() + "orderNumber"));
         data.put("ITEMS", refundItems);
         List<Map<String, Object>> patMentItems = new ArrayList<Map<String, Object>>();
         Map<String, Object> payMentItem = new HashMap<String, Object>();

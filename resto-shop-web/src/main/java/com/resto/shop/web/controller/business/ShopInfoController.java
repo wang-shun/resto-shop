@@ -10,6 +10,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -94,7 +95,7 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
         shopDetailService.update(shopDetail);
-        ShopDetail shopDetail1 =(ShopDetail) MemcachedUtils.get(getCurrentShopId()+"info");
+        ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
         if(shopDetail != null){
             MemcachedUtils.delete(getCurrentShopId()+"info");
         }

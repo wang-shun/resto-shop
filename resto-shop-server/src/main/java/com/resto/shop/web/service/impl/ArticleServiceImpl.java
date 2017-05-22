@@ -8,7 +8,6 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -23,7 +22,6 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +149,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
         for (Article article : articleList) {
-//            Integer count = (Integer) MemcachedUtils.get(article.getId() + Common.KUCUN);
+//            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {
                 article.setCurrentWorkingStock(count);
@@ -190,7 +188,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 if (!StringUtil.isEmpty(a.getHasUnit())) {
                     List<ArticlePrice> prices = articlePriceServer.selectByArticleId(a.getId());
                     for (ArticlePrice price : prices) {
-//                        Integer ck = (Integer) MemcachedUtils.get(price.getId() + Common.KUCUN);
+//                        Integer ck = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         Integer ck = (Integer) RedisUtil.get(price.getId() + Common.KUCUN);
                         if (ck != null) {
                             price.setCurrentWorkingStock(ck);
@@ -269,7 +267,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
         for (ArticleStock articleStock : result) {
-//            Integer ck = (Integer) MemcachedUtils.get(articleStock.getId() + Common.KUCUN);
+//            Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
@@ -284,7 +282,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = "【手动沽清】";
-//        MemcachedUtils.put(articleId + Common.KUCUN, 0);
+//        RedisUtil.set(articleId + Common.KUCUN, 0);
         RedisUtil.set(articleId + Common.KUCUN, 0);
         if (articleId.indexOf("@") > -1) {
             String aid = articleId.substring(0, articleId.indexOf("@"));
@@ -299,17 +297,17 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
-//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            Integer suit = (Integer) RedisUtil.get(tc.getId()+Common.KUCUN);
 //            if(suit != null){
 //                if(suit == 0 && tc.getCount() > 0){
 //                    orderMapper.setEmptyFail(tc.getId());
 //                }
-//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//                RedisUtil.set(tc.getId()+Common.KUCUN,tc.getCount());
 //            }else{
 //                if(tc.getIsEmpty() && tc.getCount() > 0){
 //                    orderMapper.setEmptyFail(tc.getId());
 //                }
-//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//                RedisUtil.set(tc.getId()+Common.KUCUN,tc.getCount());
 //            }
 //        }
 
@@ -344,7 +342,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
-//        MemcachedUtils.put(articleId + Common.KUCUN, count);
+//        RedisUtil.set(articleId + Common.KUCUN, count);
         RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
@@ -361,17 +359,17 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
-//            Integer suit = (Integer) MemcachedUtils.get(tc.getId()+Common.KUCUN);
+//            Integer suit = (Integer) RedisUtil.get(tc.getId()+Common.KUCUN);
 //            if(suit != null){
 //                if(suit == 0 && tc.getCount() > 0){
 //                    orderMapper.setEmptyFail(tc.getId());
 //                }
-//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//                RedisUtil.set(tc.getId()+Common.KUCUN,tc.getCount());
 //            }else{
 //                if(tc.getIsEmpty() && tc.getCount() > 0){
 //                    orderMapper.setEmptyFail(tc.getId());
 //                }
-//                MemcachedUtils.put(tc.getId()+Common.KUCUN,tc.getCount());
+//                RedisUtil.set(tc.getId()+Common.KUCUN,tc.getCount());
 //            }
 //        }
 //        articleMapper.editStock(articleId, count, emptyRemark);

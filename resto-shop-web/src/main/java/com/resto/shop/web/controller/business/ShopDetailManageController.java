@@ -5,6 +5,7 @@
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.util.RedisUtil;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,7 +49,7 @@
                  break;
          }
          shopDetailService.update(shopDetail);
-         if(MemcachedUtils.get(getCurrentShopId()+"info") != null){
+         if(RedisUtil.get(getCurrentShopId()+"info") != null){
              MemcachedUtils.delete(getCurrentShopId()+"info");
          }
 

@@ -14,6 +14,7 @@ import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -138,8 +139,8 @@ public class ArticleController extends GenericController {
             unitService.updateArticleRelation(id, article.getUnits());
         }
         articleService.initStock();
-//        List<Article> articles = (List<Article>) MemcachedUtils.get(getCurrentShopId()+"articles");
-        if(MemcachedUtils.get(getCurrentShopId()+"articles") != null){
+//        List<Article> articles = (List<Article>) RedisUtil.get(getCurrentShopId()+"articles");
+        if(RedisUtil.get(getCurrentShopId()+"articles") != null){
             MemcachedUtils.delete(getCurrentShopId()+"articles");
         }
 
@@ -168,7 +169,7 @@ public class ArticleController extends GenericController {
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
-        if(MemcachedUtils.get(getCurrentShopId()+"articles") != null){
+        if(RedisUtil.get(getCurrentShopId()+"articles") != null){
             MemcachedUtils.delete(getCurrentShopId()+"articles");
         }
 

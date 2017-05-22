@@ -17,6 +17,7 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.RedisUtil;
 import eleme.openapi.sdk.api.entity.other.OMessage;
 import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
 import eleme.openapi.sdk.api.entity.order.OGoodsItem;
@@ -210,7 +211,7 @@ public class ThirdServiceImpl implements ThirdService {
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
-        data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
@@ -259,13 +260,13 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
         return print;
     }
 
@@ -322,7 +323,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     data.put("TABLE_NUMBER", PlatformKey.getPlatformName(order.getType()));
-                    data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+                    data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getQuantity());
@@ -335,13 +336,13 @@ public class ThirdServiceImpl implements ThirdService {
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketType.KITCHEN);
                     printTask.add(print);
-                    MemcachedUtils.put(print_id, print);
-                    List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                    RedisUtil.set(print_id, print);
+                    List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
                     if (printList == null) {
                         printList = new ArrayList<>();
                     }
                     printList.add(print_id);
-                    MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+                    RedisUtil.set(shopDetail.getId() + "printList", printList);
                 }
             } else {
                 for (PlatformOrderDetail article : kitchenArticleMap.get(kitchenId)) {
@@ -373,13 +374,13 @@ public class ThirdServiceImpl implements ThirdService {
                         print.put("STATUS", 0);
                         print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
                         printTask.add(print);
-                        MemcachedUtils.put(print_id, print);
-                        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                        RedisUtil.set(print_id, print);
+                        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
                         if (printList == null) {
                             printList = new ArrayList<>();
                         }
                         printList.add(print_id);
-                        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+                        RedisUtil.set(shopDetail.getId() + "printList", printList);
                     }
 
                 }
@@ -479,7 +480,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     data.put("TABLE_NUMBER", "饿了么");
-                    data.put("ORDER_NUMBER", MemcachedUtils.get(order.getId() + "orderNumber"));
+                    data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //                    data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getQuantity());
@@ -492,13 +493,13 @@ public class ThirdServiceImpl implements ThirdService {
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketType.KITCHEN);
                     printTask.add(print);
-                    MemcachedUtils.put(print_id, print);
-                    List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                    RedisUtil.set(print_id, print);
+                    List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
                     if (printList == null) {
                         printList = new ArrayList<>();
                     }
                     printList.add(print_id);
-                    MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+                    RedisUtil.set(shopDetail.getId() + "printList", printList);
                 }
             } else {
                 for (HungerOrderDetail article : kitchenArticleMap.get(kitchenId)) {
@@ -530,13 +531,13 @@ public class ThirdServiceImpl implements ThirdService {
                         print.put("STATUS", 0);
                         print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
                         printTask.add(print);
-                        MemcachedUtils.put(print_id, print);
-                        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+                        RedisUtil.set(print_id, print);
+                        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
                         if (printList == null) {
                             printList = new ArrayList<>();
                         }
                         printList.add(print_id);
-                        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+                        RedisUtil.set(shopDetail.getId() + "printList", printList);
                     }
 
                 }
@@ -603,14 +604,14 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ORDER_ID", order.getOrderId());
 
 
-        String orderNumber = (String) MemcachedUtils.get(order.getId() + "orderNumber");
-        Integer orderTotal = (Integer) MemcachedUtils.get(order.getShopDetailId()+"deliveryCount");
+        String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId()+"deliveryCount");
         if(orderTotal == null){
             orderTotal = 0;
         }else if (orderNumber == null){
             orderTotal++;
         }
-        MemcachedUtils.put(order.getShopDetailId()+"deliveryCount",orderTotal);
+        RedisUtil.set(order.getShopDetailId()+"deliveryCount",orderTotal);
 
 
         String number;
@@ -625,7 +626,7 @@ public class ThirdServiceImpl implements ThirdService {
         if(org.apache.commons.lang3.StringUtils.isEmpty(orderNumber)){
             orderNumber = number;
         }
-        MemcachedUtils.put(order.getId()+"orderNumber",orderNumber);
+        RedisUtil.set(order.getId()+"orderNumber",orderNumber);
 
 
 
@@ -680,13 +681,13 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
-        MemcachedUtils.put(print_id, print);
-        List<String> printList = (List<String>) MemcachedUtils.get(shopDetail.getId() + "printList");
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
         if (printList == null) {
             printList = new ArrayList<>();
         }
         printList.add(print_id);
-        MemcachedUtils.put(shopDetail.getId() + "printList", printList);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
         return print;
     }
 
