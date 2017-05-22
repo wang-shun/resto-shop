@@ -365,7 +365,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if (brandSetting.getIsUseServicePrice() == Common.YES && shopDetail.getIsUseServicePrice() == Common.YES
-                && (order.getCustomerCount() == 0 || order.getCustomerCount() == null)
+                && (order.getCustomerCount() == null || order.getCustomerCount() == 0)
                 && order.getDistributionModeId() == DistributionType.RESTAURANT_MODE_ID) {
             jsonResult.setSuccess(false);
             jsonResult.setMessage("请输入就餐人数！");
@@ -1347,7 +1347,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                     }
                     if (result.containsKey("ERROR")) {
-                        throw new RuntimeException("微信退款异常！");
+                        throw new RuntimeException("微信退款异常！"+result.toString());
                     }
                     item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
@@ -1368,7 +1368,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("out_request_no", newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     if (new JSONObject(resultJson).toString().indexOf("ERROR") != -1) {
-                        throw new RuntimeException("支付宝退款异常！");
+                        throw new RuntimeException("支付宝退款异常！"+resultJson.toString());
                     }
                     item.setResultData(new JSONObject(resultJson).toString());
                     item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
@@ -6826,7 +6826,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
-            order.setOriginalAmount(order.getOriginalAmount().subtract(orderItem.getFinalPrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(new BigDecimal(orderItem.getCount()).multiply(orderItem.getOriginalPrice())));
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
@@ -6844,7 +6844,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setArticleCount(order.getArticleCount() + orderItem.getCount());
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
-            order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getFinalPrice()));
+            order.setOriginalAmount(order.getOriginalAmount().add(new BigDecimal(orderItem.getCount()).multiply(orderItem.getOriginalPrice())));
             order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
@@ -8311,5 +8311,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Order> selectMonthIncomeDto(Map<String, Object> selectMap) {
         return orderMapper.selectMonthIncomeDto(selectMap);
+    }
+
+    @Override
+    public Order colseOrder(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order.getOrderState() == OrderState.SUBMIT){
+            orderMapper.colseOrder(orderId);
+            order.setOrderState(OrderState.CANCEL);
+        }
+        return order;
     }
 }

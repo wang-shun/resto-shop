@@ -1976,7 +1976,7 @@
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
         sum(customer_count) as customer_count
         from ( select t.id,t.parent_order_id,
-        if(t.amount_with_children = 0,t.order_money,t.amount_with_children) as orderTotal,
+        SUM(t2.pay_value) as orderTotal,
         if(t.parent_order_id
         is null,t.customer_count,0) customer_count
         from tb_order t
@@ -1985,6 +1985,7 @@
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
         and parent_order_id is null
+        and t2.payment_mode_id not in (13,14,15)
         GROUP BY t.id
         ) as r
     </select>
@@ -2642,13 +2643,13 @@ INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
 </select>
 
 
     <!-- 每日短信报表数据 用户总数 -->
     <select id="selectOrderHistoryList" resultMap="selectOrderHistoryListMap">
-        SELECT
+        SELECTselectListsmsByShopId
         o.id,
         o.order_state,
         o.production_status,
@@ -3073,4 +3074,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         </if>
         ORDER BY td.create_time ASC
     </select>
+
+    <update id="colseOrder">
+        update tb_order set order_state = 9 where id=#{orderId}
+    </update>
 </mapper>
