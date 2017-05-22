@@ -748,7 +748,7 @@ public class ThirdServiceImpl implements ThirdService {
         if(type == ElemeType.NEW_ORDER){
             addHungerOrderVersion2(orderId);
         }else if(type == ElemeType.RECEIVE_ORDER){
-            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.get("shopId").toString())).getId();
+            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.getString("shopId"))).getId();
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
