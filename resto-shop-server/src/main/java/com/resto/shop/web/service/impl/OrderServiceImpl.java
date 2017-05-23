@@ -357,12 +357,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         Customer customer = customerService.selectById(order.getCustomerId());
+
+        if (customer == null && "wechat".equals(order.getCreateOrderByAddress())) {
+            throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
+        } else if (order.getOrderItems().isEmpty()) {
+            throw new AppException(AppException.ORDER_ITEMS_EMPTY);
+        }
+
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        if (order.getOrderItems().isEmpty()) {
-            throw new AppException(AppException.ORDER_ITEMS_EMPTY);
-        }
 
         if (brandSetting.getIsUseServicePrice() == Common.YES && shopDetail.getIsUseServicePrice() == Common.YES
                 && (order.getCustomerCount() == null || order.getCustomerCount() == 0)
