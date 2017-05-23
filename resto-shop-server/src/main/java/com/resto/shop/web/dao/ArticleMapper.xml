@@ -644,7 +644,7 @@ where t.id = t2.article_id
         ) as r
         <where>
             <if test="empty == 1">
-                r.currentStock = 0
+                r.is_empty = 1
             </if>
 
         </where>
