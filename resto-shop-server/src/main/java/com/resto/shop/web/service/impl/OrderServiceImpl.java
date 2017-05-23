@@ -4708,9 +4708,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("type", PayMode.BANK_CART_PAY);
         BigDecimal bankPay = orderMapper.getPayment(selectMap);
         bankPay = bankPay == null ? BigDecimal.ZERO : bankPay;
+        selectMap.put("type", PayMode.GIVE_CHANGE);
+        BigDecimal givePay = orderMapper.getPayment(selectMap);
+        givePay = givePay == null ? BigDecimal.ZERO : givePay;
         selectMap.put("type", PayMode.CRASH_PAY);
         BigDecimal crashPay = orderMapper.getPayment(selectMap);
-        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay;
+        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay.add(givePay);
         selectMap.put("type", PayMode.SHANHUI_PAY);
         BigDecimal shanhuiPay = orderMapper.getPayment(selectMap);
         shanhuiPay = shanhuiPay == null ? BigDecimal.ZERO : shanhuiPay;
@@ -4759,10 +4762,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             incomeAmount = incomeAmount.add(integralPay);
             incomeItems.add(integralPayMent);
         }
-        selectMap.put("type", PayMode.GIVE_CHANGE);
-        BigDecimal givePay = orderMapper.getPayment(selectMap);
-        givePay = givePay == null ? BigDecimal.ZERO : givePay;
-        incomeAmount = incomeAmount.add(givePay);
         data.put("INCOME_AMOUNT", incomeAmount);
         data.put("INCOME_ITEMS", incomeItems);
         selectMap.put("type", PayMode.ACCOUNT_PAY);
