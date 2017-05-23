@@ -4759,6 +4759,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             incomeAmount = incomeAmount.add(integralPay);
             incomeItems.add(integralPayMent);
         }
+        selectMap.put("type", PayMode.GIVE_CHANGE);
+        BigDecimal givePay = orderMapper.getPayment(selectMap);
+        givePay = givePay == null ? BigDecimal.ZERO : givePay;
+        incomeAmount = incomeAmount.add(givePay);
         data.put("INCOME_AMOUNT", incomeAmount);
         data.put("INCOME_ITEMS", incomeItems);
         selectMap.put("type", PayMode.ACCOUNT_PAY);
@@ -4776,10 +4780,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("type", PayMode.ARTICLE_BACK_PAY);
         BigDecimal articlePay = orderMapper.getPayment(selectMap);
         articlePay = articlePay == null ? BigDecimal.ZERO : articlePay;
-        selectMap.put("type", PayMode.GIVE_CHANGE);
-        BigDecimal givePay = orderMapper.getPayment(selectMap);
-        givePay = givePay == null ? BigDecimal.ZERO : givePay;
-        BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay).subtract(givePay);
+        BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay);
         data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         Map<String, Object> accountPayItem = new HashMap<>();
