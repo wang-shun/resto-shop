@@ -112,4 +112,9 @@ public class ServerConfig {
     @Bean
     public OrderRemarkService boOrderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
 
+    @Bean
+    public  WetherService wetherService(){
+        return proxy.create(WetherService.class);
+    }
+
 }

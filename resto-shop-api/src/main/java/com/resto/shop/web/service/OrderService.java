@@ -445,7 +445,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
+    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder,Brand brand);
 
     public boolean cancelExceptionOrder(String orderId);
 
