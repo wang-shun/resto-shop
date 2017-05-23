@@ -2787,7 +2787,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
         Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCount");
         if (orderTotal == null) {
-            orderTotal = 0;
+            orderTotal = 1;
         } else if (orderNumber == null) {
             orderTotal++;
         }
@@ -3086,7 +3086,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
         Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCount");
         if (orderTotal == null) {
-            orderTotal = 0;
+            orderTotal = 1;
         } else if (orderNumber == null) {
             orderTotal++;
         }
