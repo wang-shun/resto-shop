@@ -908,7 +908,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setArticleCount(articleCount); // 订单餐品总数
             order.setClosed(false); // 订单是否关闭 否
             order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-            order.setOriginalAmount(originMoney);// 原价
+            order.setOriginalAmount(originMoney.add(extraMoney));// 原价
             order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
             order.setOrderMoney(totalMoney); // 订单实际金额
             order.setPrintTimes(0);
@@ -2250,10 +2250,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (article.getType() == OrderItemType.SETMEALS
-                    && orderItem.getParentId().equals(article.getId())) {
+                    && article.getId().equals(orderItem.getParentId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
-                    && article.getParentId().equals(orderItem.getParentId())) {
+                    && article.getParentId() != null && article.getParentId().equals(orderItem.getParentId())) {
                 i++;
             } else if (article.getType() != OrderItemType.SETMEALS
                     && article.getType() != OrderItemType.MEALS_CHILDREN && article.getArticleId().equals(orderItem.getArticleId())) {
@@ -4708,9 +4708,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("type", PayMode.BANK_CART_PAY);
         BigDecimal bankPay = orderMapper.getPayment(selectMap);
         bankPay = bankPay == null ? BigDecimal.ZERO : bankPay;
+        selectMap.put("type", PayMode.GIVE_CHANGE);
+        BigDecimal givePay = orderMapper.getPayment(selectMap);
+        givePay = givePay == null ? BigDecimal.ZERO : givePay;
         selectMap.put("type", PayMode.CRASH_PAY);
         BigDecimal crashPay = orderMapper.getPayment(selectMap);
-        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay;
+        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay.add(givePay);
         selectMap.put("type", PayMode.SHANHUI_PAY);
         BigDecimal shanhuiPay = orderMapper.getPayment(selectMap);
         shanhuiPay = shanhuiPay == null ? BigDecimal.ZERO : shanhuiPay;
