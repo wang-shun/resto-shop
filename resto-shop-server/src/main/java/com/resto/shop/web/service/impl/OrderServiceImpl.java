@@ -4708,9 +4708,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("type", PayMode.BANK_CART_PAY);
         BigDecimal bankPay = orderMapper.getPayment(selectMap);
         bankPay = bankPay == null ? BigDecimal.ZERO : bankPay;
+        selectMap.put("type", PayMode.GIVE_CHANGE);
+        BigDecimal givePay = orderMapper.getPayment(selectMap);
+        givePay = givePay == null ? BigDecimal.ZERO : givePay;
         selectMap.put("type", PayMode.CRASH_PAY);
         BigDecimal crashPay = orderMapper.getPayment(selectMap);
-        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay;
+        crashPay = crashPay == null ? BigDecimal.ZERO : crashPay.add(givePay);
         selectMap.put("type", PayMode.SHANHUI_PAY);
         BigDecimal shanhuiPay = orderMapper.getPayment(selectMap);
         shanhuiPay = shanhuiPay == null ? BigDecimal.ZERO : shanhuiPay;
@@ -5116,18 +5119,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     List<ArticlePrice> articlePrices = articlePriceMapper.selectByArticleId(articlePrice.getArticleId());
 
                     if (articleCount == null) {
-                        if (articlePrice.getCurrentWorkingStock() > 1) {
+                        if (articlePrice.getCurrentWorkingStock() > orderItem.getCount()) {
 //                            RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
-                            RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() - orderItem.getCount());
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     } else {
-                        if (articleCount > 1) {
+                        if (articleCount > orderItem.getCount()) {
 //                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
-                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articleCount - orderItem.getCount());
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
@@ -5161,18 +5164,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.RECOMMEND:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount == null) {
-                        if (article.getCurrentWorkingStock() > 1) {
+                        if (article.getCurrentWorkingStock() > orderItem.getCount()) {
 //                            RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
-                            RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() - orderItem.getCount());
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
                             orderMapper.setEmpty(orderItem.getArticleId());
                         }
                     } else {
-                        if (articleCount > 1) {
+                        if (articleCount > orderItem.getCount()) {
 //                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
-                            RedisUtil.set(articleId + Common.KUCUN, articleCount - 1);
+                            RedisUtil.set(articleId + Common.KUCUN, articleCount - orderItem.getCount());
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
@@ -5220,13 +5223,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     ArticlePrice articlePrice = articlePriceMapper.selectByPrimaryKey(orderItem.getArticleId());
                     if (articleCount != null) {
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
-                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
-                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + orderItem.getCount());
                         if (articlePrice.getCurrentWorkingStock() == 0) {
                             orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
@@ -5234,14 +5237,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Integer baseArticle = (Integer) RedisUtil.get(articlePrice.getArticleId() + Common.KUCUN);
                     if (baseArticle != null) {
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
-                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
+                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + orderItem.getCount());
                         if (baseArticle == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
                         Article base = articleService.selectById(articlePrice.getArticleId());
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
-                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + orderItem.getCount());
                         if (base.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(articlePrice.getArticleId());
                         }
@@ -5257,13 +5260,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是没有规格的单品信息,那么更新该单品的库存
                     if (articleCount != null) {
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
-                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
-                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
+                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + orderItem.getCount());
                         if (article.getCurrentWorkingStock() == 0) {
                             orderMapper.setEmptyFail(orderItem.getArticleId());
                         }

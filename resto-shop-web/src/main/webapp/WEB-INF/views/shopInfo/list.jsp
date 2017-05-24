@@ -355,8 +355,9 @@
                     <div class="form-group" v-show="m.shopMode == 2 && b.posOpenTable == 1 && m.posOpenTable == 1">
                         <label class="col-md-4 control-label formBox">POS端支付项：</label>
                         <div  class="col-md-6 radio-list checkbox">
-                            <label style="margin-left: 16px;" class="formBox">
-                                <input type="checkbox" checked="checked" disabled="disabled">
+                            <label style="margin-left: 16px;" :class="{ formBox : m.openPosWeChatPay == 1}">
+                                <input type="checkbox" id="openPosWeChatPay" @change="posPaySetting('openPosWeChatPay')" v-model="m.openPosWeChatPay" value="1">
+                                <input type="hidden" name="openPosWeChatPay" v-model="m.openPosWeChatPay">
                                 &nbsp;&nbsp;微信支付
                             </label>
                             <label style="margin-left: 16px;" v-show="b.aliPay == 1" :class="{ formBox : m.openPosAliPay == 1}">
@@ -675,6 +676,9 @@
                         },
                         setPosPaySetting : function (name,value) {
                             switch (name){
+                                case "openPosWeChatPay":
+                                    this.m.openPosWeChatPay = value;
+                                    break;
                                 case "openPosAliPay":
                                     this.m.openPosAliPay = value;
                                     break;
