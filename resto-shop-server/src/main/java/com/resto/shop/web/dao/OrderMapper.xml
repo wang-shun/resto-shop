@@ -2935,7 +2935,7 @@ GROUP BY oi.article_name
         totalCount
         from tb_order where shop_detail_id = #{shopId}
 --         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and order_state = 1 and pay_type = 0 if(pay_type = 1,pay_mode in (2,3,4,5,6),pay_mode in (3,4,5,6)) and parent_order_id is not null
+        and order_state = 1 and pay_type = 0 and if(pay_type = 1,pay_mode in (2,3,4,5,6),pay_mode in (3,4,5,6)) and parent_order_id is not null
         ORDER BY create_time ASC
     </select>
 
