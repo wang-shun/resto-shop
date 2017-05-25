@@ -330,12 +330,6 @@
             <if test="customerDetailId != null">
                 customer_detail_id = #{customerDetailId},
             </if>
-            <if test="bindPhoneTime != null">
-                bind_phone_time = #{bindPhoneTime},
-            </if>
-            <if test="bindPhoneShop != null">
-                bind_phone_shop = #{bindPhoneShop},
-            </if>
             <if test="realTimeCouponIds != null">
                 real_time_coupon_ids = #{realTimeCouponIds},
             </if>
