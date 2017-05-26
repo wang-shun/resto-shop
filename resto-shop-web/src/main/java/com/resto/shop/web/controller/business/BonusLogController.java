@@ -282,6 +282,7 @@ public class BonusLogController extends GenericController{
             object.put("mch_key", serverConfig.getMchkey());
             object.put("cert_path", serverConfig.getPayCertPath());
             object.put("consume_mch_id", shopDetail.getMchid());
+            object.put("msgappid", shopDetail.getAppid());
         }
         Map<String, String> result = WeChatPayUtils.sendredpack(object);
         if (result.containsKey("ERROR")){
