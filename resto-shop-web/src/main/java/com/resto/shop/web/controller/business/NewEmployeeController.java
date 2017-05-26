@@ -87,6 +87,7 @@ public class NewEmployeeController extends GenericController{
             newemployee.setBrandId(getCurrentBrandId());
             newemployee.setCreateTime(new Date());
             newemployee.setNickName(customer.getNickname());
+            newemployee.setWechatAvatar(customer.getHeadPhoto());
             newEmployeeService.insert(newemployee);
             return getSuccessResult();
         }catch (Exception e){
