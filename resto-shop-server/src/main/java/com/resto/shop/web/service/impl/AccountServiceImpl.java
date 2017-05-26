@@ -284,6 +284,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
                 bonusLog.setShopownerBonusAmount(shopownerBonusAmount);
                 bonusLog.setEmployeeBonusAmount(employeeBonusAmount);
                 bonusLog.setCreateTime(new Date());
+                bonusLog.setWishing(bonusSetting.getWishing());
                 bonusLogService.insert(bonusLog);
             }
             Map map = new HashMap(4);

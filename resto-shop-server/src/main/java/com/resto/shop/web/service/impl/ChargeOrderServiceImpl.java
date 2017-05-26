@@ -124,6 +124,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
                 bonusLog.setShopownerBonusAmount(shopownerBonusAmount);
                 bonusLog.setEmployeeBonusAmount(employeeBonusAmount);
                 bonusLog.setCreateTime(new Date());
+                bonusLog.setWishing(bonusSetting.getWishing());
                 bonusLogService.insert(bonusLog);
             }
 		}
