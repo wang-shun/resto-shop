@@ -166,10 +166,10 @@
             and is_used= #{status}
         </if>
         <if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
-            <![CDATA[AND (begin_date<=current_date()  AND end_date >=current_date() )]]>
+            <![CDATA[AND ((begin_date<=current_date()  AND end_date >=current_date()) OR begin_date > current_date())]]>
         </if>
         <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
-            <![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
+            <![CDATA[AND end_date <current_date()]]>
         </if>
         order by VALUE DESC
     </select>
