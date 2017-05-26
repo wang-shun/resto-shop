@@ -4,11 +4,9 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.enums.PlatformKey;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.Platform;
-import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.ElemeTokenService;
 import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
@@ -18,7 +16,6 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
-import eleme.openapi.sdk.api.entity.other.OMessage;
 import eleme.openapi.sdk.api.entity.order.OGoodsGroup;
 import eleme.openapi.sdk.api.entity.order.OGoodsItem;
 import eleme.openapi.sdk.api.entity.order.OOrder;
@@ -126,6 +123,8 @@ public class ThirdServiceImpl implements ThirdService {
     private PlatformOrderDetailService platformOrderDetailService;
     @Resource
     private PlatformOrderExtraService platformOrderExtraService;
+    @Resource
+    private ElemeTokenService elemeTokenService;
 
 
     @Override
@@ -746,10 +745,10 @@ public class ThirdServiceImpl implements ThirdService {
         message = message.replaceAll("\\\\","");
         com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
         String orderId = mj.getString("orderId");
+        String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.getString("shopId"))).getId();
         if(type == ElemeType.NEW_ORDER){
-            addHungerOrderVersion2(orderId);
+            addHungerOrderVersion2(orderId,shopId);
         }else if(type == ElemeType.RECEIVE_ORDER){
-            String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.getString("shopId"))).getId();
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
@@ -830,15 +829,15 @@ public class ThirdServiceImpl implements ThirdService {
 
     }
 
-    private void addHungerOrderVersion2(String orderId) throws ServiceException {
-        token.setAccessToken("9298323a28d096bea2564c1a8527ed62");
-        token.setRefreshToken("8db12491e26826aad5d67551da32b104");
-        token.setExpires(86400);
-        token.setTokenType("bearer");
+    private void addHungerOrderVersion2(String orderId,String shopId) throws ServiceException {
+        ElemeToken elemeToken = elemeTokenService.getTokenByShopId(shopId);
+        token.setAccessToken(elemeToken.getAccessToken());
+        token.setRefreshToken(elemeToken.getRefreshToken());
+        token.setExpires(elemeToken.getExpiresIn());
+        token.setTokenType(elemeToken.getTokenType());
 
         eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
         OOrder order = orderService.getOrder(orderId);
-        String shopId = shopDetailService.selectByOOrderShopId(order.getShopId()).getId();
         PlatformOrder platformOrder = new PlatformOrder(order,shopId);
         platformorderMapper.insertSelective(platformOrder);
 
