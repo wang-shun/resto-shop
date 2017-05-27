@@ -73,6 +73,7 @@ public class ThirdServiceImpl implements ThirdService {
     static {
         config = new Config(isSandbox, key, secret);
         client = new OAuthClient(config);
+        token = client.getTokenByCode("", "");
     }
 
     @Resource
