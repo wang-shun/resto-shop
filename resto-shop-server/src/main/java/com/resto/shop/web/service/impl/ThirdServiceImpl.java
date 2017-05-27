@@ -65,10 +65,10 @@ public class ThirdServiceImpl implements ThirdService {
     private static final boolean isSandbox = true;
 
     // 设置APP KEY
-    private static final String key = "o6ph8ACwrY";
+    private static final String key = "kVB8WfIMAp";
 
     // 设置APP SECRET
-    private static final String secret = "11b1d008b10ecb1510dbdf100d1c97e1";
+    private static final String secret = "03014c7cb99aebd09a94639f08225e13";
 
     // 回调地址
     private static String callbackUrl = "https://ecosystem.restoplus.cn/wechat/order/new/third/version2.0/test";
