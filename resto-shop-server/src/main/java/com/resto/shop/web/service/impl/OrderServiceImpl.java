@@ -8332,4 +8332,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         return order;
     }
+
+    @Override
+    public List<Map<String, Object>> reminder(String orderItemId) {
+        OrderItem orderItem = orderitemMapper.selectByPrimaryKey(orderItemId);
+        Order order = orderMapper.selectByPrimaryKey(orderItem.getOrderId());
+        order.setDistributionModeId(DistributionType.REMINDER_ORDER);
+        List<OrderItem> zpOrderItem = orderitemMapper.getListBySort(orderItemId, orderItem.getArticleId());
+        orderItem.setChildren(zpOrderItem);
+        List<OrderItem> orderItemList = new ArrayList<>();
+        orderItemList.add(orderItem);
+        return printKitchen(order, orderItemList);
+    }
 }

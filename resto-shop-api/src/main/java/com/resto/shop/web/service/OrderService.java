@@ -652,4 +652,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
 	Order colseOrder(String orderId);
+
+    List<Map<String, Object>> reminder(String orderItemId);
 }
