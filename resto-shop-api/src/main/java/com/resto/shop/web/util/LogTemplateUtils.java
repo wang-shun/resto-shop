@@ -26,6 +26,8 @@ public class LogTemplateUtils {
 
   public  static  final String THIRDTYPE = "thirdAction";
 
+  public static final String SHOPTYPE="shopAction";      //记录shop端操作记录
+
     //模板map
     public static  Map getOrderBaseMap(String brandName,String id,String logType){
         //注:如果是id是customerId 则logType传userAction 如果是orderId则传orderActoin 如果是shopDetailId则传posAction
@@ -359,4 +361,16 @@ public class LogTemplateUtils {
         doPostAnsc(url,map);
     }
 
+    //记录 shopAction  start ---------------------------------------
+    public static void  shopDeatilEdit(String brandName,String shopName,String result){
+        Map map=getOrderBaseMap(brandName,shopName,SHOPTYPE);
+        map.put("content","当前登录账号为"+result+"，修改了" + shopName + "店铺设置信息。请求服务器地址:"+MQSetting.getLocalIP());
+        doPostAnsc(url,map);
+    }
+
+    public static void  brandSettingEdit(String brandName,String shopName,String result){
+        Map map=getOrderBaseMap(brandName, shopName,SHOPTYPE);
+        map.put("content","当前登录账号为"+result+"，修改了" + shopName + "品牌参数设置信息。请求服务器地址:"+MQSetting.getLocalIP());
+        doPostAnsc(url,map);
+    }
 }

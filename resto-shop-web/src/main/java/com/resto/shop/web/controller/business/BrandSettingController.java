@@ -5,6 +5,9 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +29,9 @@ public class BrandSettingController extends GenericController{
 	
 	@Resource
 	BrandService brandService;
+
+	@Resource
+	ShopDetailService shopDetailService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -49,6 +55,9 @@ public class BrandSettingController extends GenericController{
 		if(RedisUtil.get(getCurrentBrandId()+"setting") != null){
 			RedisUtil.remove(getCurrentBrandId()+"setting");
 		}
+		Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+		ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+		LogTemplateUtils.brandSettingEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
 
 		return Result.getSuccess();
 	}
