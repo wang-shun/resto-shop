@@ -1234,7 +1234,9 @@ public class ThirdServiceImpl implements ThirdService {
 
 //        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
 //        order.setDetails(orderDetail);
-        order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+        if(order.getShopDetailId() != null){
+            order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+        }
         return order;
     }
 
