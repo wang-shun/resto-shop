@@ -8,6 +8,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.qroud.SmsMultiSenderResult;
+import com.resto.brand.core.qroud.SmsSingleSenderResult;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
@@ -4719,24 +4720,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
         //查询天气
-        Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(),DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-
-        if(wether==null){
-
+        Wether wether =wetherService.selectDateAndShopId(shopDetail.getId(),DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        if(wether==null){//说明没有调用定时任务 ---
+            wether = new Wether();
+            wether.setDayWeather("---");
+            wether.setDayTemperature(-1);
+            wether.setWeekady(-1);
         }
 
         //判断是否需要发送旬短信
         int temp = DateUtil.getEarlyMidLate();
         //1.结店退款
         refundShopDetailOrder(shopDetail);
-       // Map<String, Object> dayMap = querryDateData(shopDetail, offLineOrder,wether);
+        Map<String, Object> dayMap = querryDateData(shopDetail, offLineOrder,wether);
        // Map<String, Object> xunMap = querryXunData(shopDetail, offLineOrder, wether);
-        Map<String, Object> monthMap = querryXunData(shopDetail, offLineOrder, wether);
+       // Map<String, Object> monthMap = querryMonthData(shopDetail, offLineOrder, wether);
 
         //3发短信推送/微信推送
-        //pushMessage(dayMap, shopDetail, wechatConfig, brand.getBrandName(),MessageType.DAY_MESSAGE);
+        pushMessage(dayMap, shopDetail, wechatConfig, brand.getBrandName(),MessageType.DAY_MESSAGE);
         // pushMessage(xunMap,shopDetail,wechatConfig,brand.getBrandName(),MessageType.XUN_MESSAGE);
-        pushMessage(monthMap,shopDetail,wechatConfig,brand.getBrandName(),MessageType.MONTH_MESSAGE);
+        //pushMessage(monthMap,shopDetail,wechatConfig,brand.getBrandName(),MessageType.MONTH_MESSAGE);
     }
 
     private Map<String, Object> querryDateData(ShopDetail shopDetail, OffLineOrder offLineOrder, Wether wether) {
@@ -5091,7 +5094,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("店铺名称：").append(shopDetail.getName()).append("\n")
                 .append("时间：").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
                 .append("星期：").append(WeekName.getName(wether.getWeekady())).append("\n")
-                .append("天气：").append(wether.getDayWeather()).append(" ").append("温度：").append(wether.getDayTemperature())
+                .append("天气：").append(wether.getDayWeather()).append(" ").append("温度：").append(wether.getDayTemperature()+"℃").append("\n")
                 .append("---------------------").append("\n")
                 .append("本日五星评论：").append(todayFiveStar).append("\n")
                 .append("本日更改意见：").append(todayFourStar).append("\n")
@@ -5129,6 +5132,53 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("wxData",sbData);
         map.put("wxScore",sbScore);
 
+        //封装本日结店分数短信
+        //本日信息
+        StringBuilder dayScore = new StringBuilder();
+
+        dayScore.append("{")
+                .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
+                .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
+                .append("weekDay:").append("'").append(WeekName.getName(wether.getWeekady())).append("'").append(",")//星期
+                .append("wether:").append("'").append(wether.getDayWeather()).append("'").append(",")//天气
+                .append("temperature:").append("'").append(wether.getDayTemperature()).append("'").append(",")//温度
+                //五星评论
+                .append("dayFiveStar:").append("'").append(todayFiveStar).append("'").append(",")
+                //本日改进意见
+                .append("dayFourStar:").append("'").append(todayFourStar).append("'").append(",")
+                //本日差评投诉
+                .append("dayOneToThree:").append("'").append(todayOneToThreeStar).append("'").append(",")
+                //本日满意度
+                .append("daySatisfied:").append("'").append(todaySatisfaction).append("'").append(",")
+                //本旬满意度
+                .append("xunSatisfied:").append("'").append(theTenDaySatisfaction).append("'").append(",")
+                //本月满意度
+                .append("monthSatisfied:").append("'").append(monthSatisfaction).append("'").append(",")
+                //红榜top10
+                .append("goodTopOne:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopTwo:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopThree:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopFour:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopFive:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopSix:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopSeven:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopEight:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopNine:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("goodTopTen:").append("'").append(monthSatisfaction).append("'").append(",")
+                //badtop10
+                .append("badTopOne:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopTwo:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopThree:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopFour:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopFive:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopSix:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopSeven:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopEight:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopNine:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("badTopTen:").append("'").append(monthSatisfaction).append("'").append(",")
+                .append("}");
+
+        map.put("aliScore",dayScore);
         //封装日结短信数据  (腾讯云)
         //封装日结短信数据  (腾讯云)
         ArrayList<String> txList = new ArrayList<>();
@@ -6037,39 +6087,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            for(String str:tels){
 //                telephoneList.add(str);
 //            }
-           telephoneList.add("13317182430");
+         //  telephoneList.add("13817420832");
+            telephoneList.add("13317182430");
         //   telephoneList.add("13627626221");
-
-
+           String result = SMSUtils.sendMessage("13317182430",querryMap.get("aliScore").toString(),"餐加","SMS_68935023",null);
+            System.err.println(result);
             ArrayList<String> qlist = (ArrayList<String>) querryMap.get("txDayData");
             ArrayList<String> gList = (ArrayList<String>) querryMap.get("txDayScore");
             String wxData = querryMap.get("wxData").toString();
             String wxScore = querryMap.get("wxScore").toString();
-            for(String s :telephoneList){
-                Customer c = customerService.selectByTelePhone(s);
+//            for(String s :telephoneList){
+//                SmsSingleSenderResult dataResult =  TXSMSUtils.sendTmpSingle(s,txTempDataId,qlist);
+//                if(dataResult.result==0){
+//                    System.err.println("发送数据短信成功"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(dataResult));
+//                }else {
+//                    System.out.println("发送数据短信失败"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(dataResult));
+//                }
+//
+//                SmsSingleSenderResult scoreResult =  TXSMSUtils.sendTmpSingle(s,txTempScoreId,gList);
+//                if(scoreResult.result==0){
+//                    System.err.println("发送评分短信成功"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(scoreResult));
+//                }else {
+//                    System.out.println("发送评分短信失败"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(scoreResult));
+//                }
+
+               // Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
                  */
-                if (null != c) {
-                    WeChatUtils.sendDayCustomerMsgASync(wxData, c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
-                    WeChatUtils.sendDayCustomerMsgASync(wxScore, c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
-                }
-            }
-
-            SmsMultiSenderResult dataResult =  TXSMSUtils.sendTmpQun(telephoneList,txTempDataId,qlist);
-            if(dataResult.result==0){
-                System.err.println("发送数据短信成功"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(dataResult));
-            }else {
-                System.out.println("发送数据短信失败"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(dataResult));
-            }
-
-            SmsMultiSenderResult scoreResult =  TXSMSUtils.sendTmpQun(telephoneList,txTempScoreId,gList);
-            if(scoreResult.result==0){
-                System.err.println("发送评分短信成功"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(scoreResult));
-            }else {
-                System.out.println("发送评分短信失败"+MessageType.getName(messageType)+com.alibaba.fastjson.JSONObject.toJSONString(scoreResult));
-            }
-
+//                if (null != c) {
+//                    WeChatUtils.sendDayCustomerMsgASync(wxData, c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
+//                    WeChatUtils.sendDayCustomerMsgASync(wxScore, c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
+//                }
+//            }
         }
     }
 
