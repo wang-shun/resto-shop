@@ -5586,7 +5586,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //2定义resto订单
         //本旬resto订单总数
-        Set<String> xunRestoCount = new HashSet<>();
+//        Set<String> xunRestoCount = new HashSet<>();
+         int xunRestoCount = newCustomerOrderNum+backCustomerOrderNum;
+
         //本旬resto订单总额
         BigDecimal xunRestoTotal = BigDecimal.ZERO;
 
@@ -5620,7 +5622,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                  */
                 //1.resto订单总额
                 xunRestoTotal = xunRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-                xunRestoCount.add(o.getId());
                 //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                 if (!o.getOrderPaymentItems().isEmpty()) {
                     //订单支付项
@@ -5641,10 +5642,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //本旬用户消费比率 R+线下+外卖
         //到店总笔数 线上+线下
-        double dmax = xunEnterCount + xunRestoCount.size();
+        double dmax = xunEnterCount + xunRestoCount;
         if (dmax != 0) {
             //本旬用户消费比率
-            xunCustomerRatio = formatDouble((xunRestoCount.size() / dmax) * 100);
+            xunCustomerRatio = formatDouble((xunRestoCount / dmax) * 100);
             //本旬新增用户利率
             xunNewCustomerRatio = formatDouble((newCustomerOrderNum / dmax) * 100);
             //本日回头用户的消费比率
@@ -5719,10 +5720,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("店铺名称:").append(shopDetail.getName()).append("\n")
                 .append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
                 .append("本旬总结").append("\n")
-                .append("到店总笔数:").append(xunEnterCount + xunRestoCount.size()).append("\n")
+                .append("到店总笔数:").append(xunEnterCount + xunRestoCount).append("\n")
                 .append("到店消费总额:").append(xunEnterTotal.add(xunRestoTotal)).append("\n")
                 .append("---------------------").append("\n")
-                .append("Resto+用户消费比数:").append(xunRestoCount.size()).append("\n")
+                .append("Resto+用户消费比数:").append(xunRestoCount).append("\n")
                 .append("Resto+用户消费金额").append(xunRestoTotal).append("\n")
                 .append("---------------------").append("\n")
                 .append("Resto+用户消费比率:").append(xunCustomerRatio).append("%").append("\n")
@@ -5827,9 +5828,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date todayEnd = DateUtil.getDateEnd(new Date());
         //本月的开始时间 本月结束时间
         String beginMonth = DateUtil.getMonthBegin();
-        String endMonth = DateUtil.getMonthEnd();
         Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));
-        Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endMonth));
+        Date end = todayEnd;
         //三.定义线下订单
         //本日线下订单总数(堂吃)
         int todayEnterCount = 0;
@@ -5946,8 +5946,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         //2定义resto订单
-        //本日resto订单总数
-        Set<String> todayRestoCount = new HashSet<>();
+        //本日resto订单总数 新增+回头
+        int todayRestoCount = backCustomerOrderNum+newCustomerOrderNum;
         //本日resto订单总额
         BigDecimal todayRestoTotal = BigDecimal.ZERO;
         //本月resto订单总数
@@ -5991,7 +5991,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    if (o.getParentOrderId() == null) {
 //                        todayRestoCount.add(o.getId());
 //                    }
-                    todayRestoCount.add(o.getId());
+                 //   todayRestoCount.add(o.getId());
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         //订单支付项
@@ -6020,10 +6020,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //本日用户消费比率 R+线下+外卖
         //到店总笔数 线上+线下
-        double dmax = todayEnterCount + todayRestoCount.size();
+        double dmax = todayEnterCount + todayRestoCount;
         if (dmax != 0) {
             //本日用户消费比率
-            todayCustomerRatio = formatDouble((todayRestoCount.size() / dmax) * 100);
+            todayCustomerRatio = formatDouble((todayRestoCount / dmax) * 100);
             //本日新增用户利率
             todayNewCustomerRatio = formatDouble((newCustomerOrderNum / dmax) * 100);
             //本日回头用户的消费比率
@@ -6116,11 +6116,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
                 .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
                 //到店总笔数(r+线下)-----
-                .append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount.size()).append("'").append(",")
+                .append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
                 //到店消费总额 我们的总额+线下的总额，不包含外卖金额
                 .append("arriveTotalAmount:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
                 //用户消费笔数  R+订单总数
-                .append("customerPayCount:").append("'").append(todayRestoCount.size()).append("'").append(",")
+                .append("customerPayCount:").append("'").append(todayRestoCount).append("'").append(",")
                 //用户消费金额: (r+订单总额)
                 .append("customerPayAmount:").append("'").append(todayRestoTotal).append("'").append(",")
                 //用户消费比率  今日 R+订单总数/（R+订单总数+线下堂吃订单数+外卖订单数））
@@ -6176,10 +6176,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         sb
                 .append("店铺名称:").append(shopDetail.getName()).append("\n")
                 .append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
-                .append("到店总笔数:").append(todayEnterCount + todayRestoCount.size()).append("\n")
+                .append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
                 .append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
                 .append("---------------------").append("\n")
-                .append("用户消费比数:").append(todayRestoCount.size()).append("\n")
+                .append("用户消费比数:").append(todayRestoCount).append("\n")
                 .append("用户消费金额").append(todayRestoTotal).append("\n")
                 .append("---------------------").append("\n")
                 .append("用户消费比率:").append(todayCustomerRatio).append("%").append("\n")
