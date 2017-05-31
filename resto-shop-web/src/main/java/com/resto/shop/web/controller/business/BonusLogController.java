@@ -67,7 +67,7 @@ public class BonusLogController extends GenericController{
 	@ResponseBody
 	public Result listData(){
 	    try {
-            List<Map<String, Object>> bonusLogs = bonusLogService.selectAllBonusLog();
+            List<Map<String, Object>> bonusLogs = bonusLogService.selectAllBonusLog(null);
             List<NewEmployee> newEmployees = newEmployeeService.selectByBrandId(getCurrentBrandId());
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             for (Map bonusLog : bonusLogs){

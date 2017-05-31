@@ -74,7 +74,7 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log set charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, bonus_setting_id = #{bonusSettingId,jdbcType=VARCHAR}, bonus_amount = #{bonusAmount,jdbcType=INTEGER}, state = #{state,jdbcType=INTEGER}, shopowner_bonus_amount = #{shopownerBonusAmount,jdbcType=INTEGER}, employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER}, shopowner_id = #{shopownerId,jdbcType=VARCHAR}, employee_id = #{employeeId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, wishing = #{wishing}, shopowner_issuing_state = #{shopownerIssuingState}, employee_issuing_state = #{employeeIssuingState} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="BonusLog">select * from tb_bonus_log</select>
 
-    <select id="selectAllBonusLog" resultType="java.util.Map">
+    <select id="selectAllBonusLog" parameterType="java.lang.String" resultType="java.util.Map">
         select
             tbl.id,
             tbs.shop_detail_id shopId,
@@ -106,6 +106,43 @@
         on tal.customer_id = tc.id
         inner join tb_bonus_setting tbs
         on tbs.id = tbl.bonus_setting_id
+        <where>
+            <if test="id != null">
+              tbl.id = #{id}
+            </if>
+        </where>
         GROUP BY tbl.id
+    </select>
+
+    <select id="selectBonusLogBySelectMap" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+            tbl.id,
+            tbs.shop_detail_id shopId,
+            DATE_FORMAT(tbl.create_time,'%Y-%m-%d %H:%i:%s') chargeTime,
+            tco.charge_money chargeMoney,
+            IF(tco.type = 1, '微信充值', 'POS充值') chargeType,
+            CASE tbl.state
+            WHEN 0 THEN '未分红'
+            WHEN 1 THEN '审核中'
+            WHEN 2 THEN '已分红'
+            WHEN 3 THEN '发放异常'
+            END stateValue
+        from tb_bonus_log tbl
+        inner join tb_charge_order tco
+        on tbl.charge_order_id = tco.id
+        inner join tb_bonus_setting tbs
+        on tbs.id = tbl.bonus_setting_id
+        <where>
+            <if test="shopId != null">
+                and tbs.shop_detail_id = #{shopId}
+            </if>
+            <if test="state != null">
+                and tbl.state = #{state}
+            </if>
+            and tbl.create_time &gt;= CONCAT(#{date}, ' 00:00:00')
+            and tbl.create_time &lt;= CONCAT(#{date}, ' 23:59:59')
+        </where>
+        ORDER BY tbl.create_time ASC
+        LIMIT #{pageNo},10
     </select>
 </mapper>

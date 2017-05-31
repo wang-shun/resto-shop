@@ -8,6 +8,7 @@ import java.util.Map;
 
 public interface BonusLogService extends GenericService<BonusLog, String> {
 
-    List<Map<String, Object>> selectAllBonusLog();
-    
+    List<Map<String, Object>> selectAllBonusLog(String id);
+
+    List<Map<String, Object>> selectBonusLogBySelectMap(Map<String, Object> selectMap);
 }

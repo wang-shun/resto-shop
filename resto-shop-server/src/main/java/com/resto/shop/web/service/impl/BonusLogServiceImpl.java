@@ -26,7 +26,12 @@ public class BonusLogServiceImpl extends GenericServiceImpl<BonusLog, String> im
     }
 
     @Override
-    public List<Map<String, Object>> selectAllBonusLog() {
-        return bonuslogMapper.selectAllBonusLog();
+    public List<Map<String, Object>> selectAllBonusLog(String id) {
+        return bonuslogMapper.selectAllBonusLog(id);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectBonusLogBySelectMap(Map<String, Object> selectMap) {
+        return bonuslogMapper.selectBonusLogBySelectMap(selectMap);
     }
 }
