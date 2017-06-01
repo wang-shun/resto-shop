@@ -153,6 +153,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
+    @Resource
+    private OrderRefundRemarkMapper orderRefundRemarkMapper;
+
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -7305,6 +7308,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
+                OrderRefundRemark orderRefundRemark = new OrderRefundRemark();
+                orderRefundRemark.setOrderId(order.getId());
+                orderRefundRemark.setArticleId(orderItem.getId());
+                orderRefundRemark.setRefundRemarkId(refundOrder.getRefundRemark().getId());
+                orderRefundRemark.setRefundRemark(refundOrder.getRefundRemark().getName());
+                orderRefundRemark.setRemarkSupply(refundOrder.getRemarkSupply());
+                orderRefundRemark.setCreateTime(new Date());
+                orderRefundRemark.setRefundCount(orderItem.getCount());
+                orderRefundRemark.setShopId(order.getShopDetailId());
+                orderRefundRemark.setBrandId(order.getBrandId());
+                orderRefundRemarkMapper.insertSelective(orderRefundRemark);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单退了" + orderItem.getCount() + "份" + item.getArticleName());
                 Map articleMap = new HashMap(4);
