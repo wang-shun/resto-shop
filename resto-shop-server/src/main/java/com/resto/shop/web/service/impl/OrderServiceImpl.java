@@ -1354,7 +1354,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                     }
                     if (result.containsKey("ERROR")) {
-                        throw new RuntimeException("微信退款异常！"+result.toString());
+                        throw new RuntimeException("微信退款异常！" + new JSONObject(result).toString());
                     }
                     item.setPayValue(new BigDecimal(refund).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(-1)));
                     item.setResultData(new JSONObject(result).toString());
