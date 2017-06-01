@@ -30,6 +30,8 @@ public interface UnitMapper extends GenericDao<Unit, String> {
 
     List<Unit> getUnitByArticleid(String articleId);
 
+    List<Unit> getUnitByArticleidWechat(String articleId);
+
     int insertArticleRelation(@Param("articleId") String articleId,@Param("id") String id,
                               @Param("unit") Unit unit);
 
