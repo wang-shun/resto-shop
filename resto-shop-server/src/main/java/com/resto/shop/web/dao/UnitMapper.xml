@@ -94,7 +94,7 @@ left join tb_article_unit_new t2 on t2.article_id = t.id
 left join tb_article_unit_detail t3 on t3.article_unit_id = t2.id
 left join tb_unit t4 on t2.unit_id = t4.id
 left join tb_unit_detail t5 on t5.id = t3.unit_detail_id
-where t.id = #{articleId} order by t3.sort
+where t.id = #{articleId} and t3.is_used = 1 order by t3.sort
     </select>
 
     <insert id="insertArticleRelation">
