@@ -7310,7 +7310,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
                 OrderRefundRemark orderRefundRemark = new OrderRefundRemark();
                 orderRefundRemark.setOrderId(order.getId());
-                orderRefundRemark.setArticleId(orderItem.getId());
+                orderRefundRemark.setArticleId(orderItem.getArticleId());
                 orderRefundRemark.setRefundRemarkId(refundOrder.getRefundRemark().getId());
                 orderRefundRemark.setRefundRemark(refundOrder.getRefundRemark().getName());
                 orderRefundRemark.setRemarkSupply(refundOrder.getRemarkSupply());
