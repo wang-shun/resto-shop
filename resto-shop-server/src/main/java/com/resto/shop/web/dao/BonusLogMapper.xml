@@ -150,7 +150,7 @@
                 and tbl.create_time &lt;= CONCAT(#{date}, ' 23:59:59')
             </if>
             <if test="userId != null">
-                and (shopowner_id = #{userId} or employee_id = #{userId}) and state = 2
+                and (tbl.shopowner_id = #{userId} or tbl.employee_id = #{userId}) and tbl.state = 2
             </if>
         </where>
         ORDER BY tbl.create_time ASC
