@@ -237,7 +237,7 @@
                             data : "aliPayment"
                         }
                         ,{
-                            title : "现金支付",
+                            title : "现金实收",
                             data : "moneyPay"
                         },
                         {
@@ -256,10 +256,10 @@
                             title : "退菜返还红包",
                             data : "articleBackPay"
                         },
-                        {
-                            title : "找零",
-                            data : "giveChangePayment"
-                        },
+//                        {
+//                            title : "找零",
+//                            data : "giveChangePayment"
+//                        },
                         {
                             title : "营销撬动率",
                             data : 'incomePrize'
