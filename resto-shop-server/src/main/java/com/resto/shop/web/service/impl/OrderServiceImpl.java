@@ -4747,7 +4747,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if ((setting.getOpenMoneyPay().equals(Common.YES) && shopDetail.getOpenMoneyPay().equals(Common.YES)) || crashPay.compareTo(BigDecimal.ZERO) > 0) {
             Map<String, Object> crashPayment = new HashMap<>();
             crashPayment.put("SUBTOTAL", crashPay);
-            crashPayment.put("PAYMENT_MODE", "现金支付");
+            crashPayment.put("PAYMENT_MODE", "现金实收");
             incomeAmount = incomeAmount.add(crashPay);
             incomeItems.add(crashPayment);
         }
