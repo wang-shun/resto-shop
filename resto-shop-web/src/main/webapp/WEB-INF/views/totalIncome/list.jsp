@@ -225,7 +225,7 @@
                 data : "backCartPay"
             },
             {
-                title : "现金支付(元)",
+                title : "现金实收(元)",
                 data : "moneyPay"
             },
             {
@@ -240,10 +240,10 @@
                 title : "退菜返还红包(元)",
                 data:"articleBackPay"
             },
-            {
-                title : "找零(元)",
-                data:"giveChangePayment"
-            },
+//            {
+//                title : "找零(元)",
+//                data:"giveChangePayment"
+//            },
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment",
@@ -301,7 +301,7 @@
                 data : "backCartPay"
             },
             {
-                title : "现金支付(元)",
+                title : "现金实收(元)",
                 data : "moneyPay"
             },
             {
@@ -316,10 +316,10 @@
                 title : "退菜返还红包(元)",
                 data:"articleBackPay"
             },
-            {
-                title : "找零(元)",
-                data:"giveChangePayment"
-            },
+//            {
+//                title : "找零(元)",
+//                data:"giveChangePayment"
+//            },
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment"
