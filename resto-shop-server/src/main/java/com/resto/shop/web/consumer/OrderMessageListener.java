@@ -151,7 +151,7 @@ public class OrderMessageListener implements MessageListener {
     	StringBuffer str=new StringBuffer();
         String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
         str.append("优惠券到期提醒"+"\n");
-        str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，快来尝尝我们的新菜吧~</a>");
+        str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，别浪费啊~</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
         Map map = new HashMap(4);
         map.put("brandName", setting.getBrandName());

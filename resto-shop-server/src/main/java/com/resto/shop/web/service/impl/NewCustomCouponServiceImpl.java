@@ -292,7 +292,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         customerService.update(newCustomer);
         String url = setting.getWechatWelcomeUrl()+"?dialog=myCoupon&subpage=my&shopId="+shopDetail.getId();
         StringBuffer str=new StringBuffer();
-        str.append("亲，"+brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
+        str.append(brand.getBrandName()+"提前祝您生日快乐，特送您价值"+coupon.getValue().intValue()+"元的现金券"+customCoupon.getCouponNumber()+"张，" +
                 "有效期至"+DateUtil.formatDate(coupon.getEndDate(),"MM月dd日")+"，");
         str.append("<a href='"+url+"'>点击查看</a>");
         WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
@@ -320,7 +320,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 	    			StringBuffer str=new StringBuffer();
 	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId()+"";
 	            	str.append("优惠券到期提醒\n");
-	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
+	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>别浪费啊~</a>");
 	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
                     Map map = new HashMap(4);
                     map.put("brandName", setting.getBrandName());
