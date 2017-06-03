@@ -3505,7 +3505,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         List<Printer> ticketPrinter = new ArrayList<>();
-        if (tableQrcode == null) {
+        if (tableQrcode == null || order.getDistributionModeId() == DistributionType.TAKE_IT_SELF) {
             ticketPrinter = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         } else {
             if (tableQrcode.getAreaId() == null) {
@@ -7790,7 +7790,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         List<Printer> printer = new ArrayList<>();
         TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
-        if (tableQrcode == null) {
+        if (tableQrcode == null || order.getDistributionModeId() == DistributionType.TAKE_IT_SELF) {
             printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         } else {
             if (tableQrcode.getAreaId() == null) {
