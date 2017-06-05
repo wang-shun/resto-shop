@@ -266,14 +266,24 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             freeDay = 1;
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
+        List<ArticleStock> array = new ArrayList<>();
         for (ArticleStock articleStock : result) {
 //            Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
+            if(empty != null && empty == Common.YES){
+                //售罄
+                if(articleStock.getCurrentStock() == 0){
+                    array.add(articleStock);
+                }
+            }else{
+                array.add(articleStock);
+            }
+
         }
-        return result;
+        return array;
     }
 
     @Override

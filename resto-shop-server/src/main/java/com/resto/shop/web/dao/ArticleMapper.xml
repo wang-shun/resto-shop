@@ -643,12 +643,12 @@ where t.id = t2.article_id
         </if>
         and t.shop_detail_id = #{shopId}
         ) as r
-        <where>
-            <if test="empty == 1">
-                r.is_empty = 1
-            </if>
+        <!--<where>-->
+            <!--<if test="empty == 1">-->
+                <!--r.is_empty = 1-->
+            <!--</if>-->
 
-        </where>
+        <!--</where>-->
         order by articleType DESC
     </select>
 
