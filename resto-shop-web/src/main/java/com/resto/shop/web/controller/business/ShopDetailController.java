@@ -50,6 +50,7 @@ public class ShopDetailController extends GenericController{
 			RedisUtil.remove(shopDetail.getId()+"info");
 		}
 		Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+		shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
 		LogTemplateUtils.shopDeatilEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
 
 	    return Result.getSuccess();
