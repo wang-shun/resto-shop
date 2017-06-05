@@ -373,4 +373,22 @@ public class LogTemplateUtils {
         map.put("content","当前登录账号为"+result+"，修改了" + shopName + "品牌参数设置信息。请求服务器地址:"+MQSetting.getLocalIP());
         doPostAnsc(url,map);
     }
+
+    public static void  articleEdit(String brandName,String shopName,String result){
+        Map map=getOrderBaseMap(brandName, shopName,SHOPTYPE);
+        map.put("content","当前登录账号为"+result+"，修改了" + shopName + "店铺下菜品设置。请求服务器地址:"+MQSetting.getLocalIP());
+        doPostAnsc(url,map);
+    }
+
+    public static void  shopUserLogin(String brandName,String shopName,String result){
+        Map map=getOrderBaseMap(brandName, shopName,SHOPTYPE);
+        map.put("content","当前登录账号为"+result+"，登录了" + shopName + "店铺。请求服务器地址:"+MQSetting.getLocalIP());
+        doPostAnsc(url,map);
+    }
+
+    public static void  shopUserLogout(String brandName,String shopName,String result){
+        Map map=getOrderBaseMap(brandName, shopName,SHOPTYPE);
+        map.put("content","当前登录账号为"+result+"，退出了" + shopName + "店铺。请求服务器地址:"+MQSetting.getLocalIP());
+        doPostAnsc(url,map);
+    }
 }

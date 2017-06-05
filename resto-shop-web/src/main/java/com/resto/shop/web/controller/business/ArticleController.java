@@ -4,9 +4,12 @@ package com.resto.shop.web.controller.business;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.core.util.PinyinUtil;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.PlatformService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
@@ -14,6 +17,7 @@ import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +51,9 @@ public class ArticleController extends GenericController {
 
     @Resource
     BrandService brandService;
+
+    @Resource
+    ShopDetailService shopDetailService;
 
     @Autowired
     private UnitService unitService;
@@ -144,6 +151,9 @@ public class ArticleController extends GenericController {
             RedisUtil.remove(getCurrentShopId()+"articles");
         }
 
+        Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+        LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
         return Result.getSuccess();
     }
 
@@ -172,7 +182,9 @@ public class ArticleController extends GenericController {
         if(RedisUtil.get(getCurrentShopId()+"articles") != null){
             RedisUtil.remove(getCurrentShopId()+"articles");
         }
-
+        Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+        LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
         return Result.getSuccess();
     }
 
