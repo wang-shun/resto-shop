@@ -4122,7 +4122,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order o : list) {
             //封装品牌的数据
             //1.订单金额
-            d = d.add(o.getOrderMoney());
+//            d = d.add(o.getOrderMoney());
             //品牌订单数目 加菜订单和父订单算一个订单
 
             if (o.getParentOrderId() == null) {
@@ -4139,6 +4139,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         //品牌虚拟支付(加上等位红包支付)
                         else {
                             d2 = d2.add(oi.getPayValue());
+                        }
+                        //订单总额等于所有支付项相加之和
+                        if (!oi.getPaymentModeId().equals(PayMode.APPRAISE_RED_PAY) || !oi.getPaymentModeId().equals(PayMode.SHARE_RED_PAY)
+                                || !oi.getPaymentModeId().equals(PayMode.REFUND_ARTICLE_RED_PAY)) {
+                            d = d.add(oi.getPayValue());
                         }
                     }
                 }
@@ -4199,6 +4204,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                     ds3 = ds3.add(oi.getPayValue());
                                 }
+                                //计算店铺订单总额， 等于所有支付项相加之和
+                                if (!oi.getPaymentModeId().equals(PayMode.APPRAISE_RED_PAY) || !oi.getPaymentModeId().equals(PayMode.SHARE_RED_PAY)
+                                        || !oi.getPaymentModeId().equals(PayMode.REFUND_ARTICLE_RED_PAY)) {
+                                    ds1 = ds1.add(oi.getPayValue());
+                                }
                             }
                         }
                     }
@@ -4211,7 +4221,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    }
 
                     //计算店铺订单金额
-                    ds1 = ds1.add(os.getOrderMoney());
+//                    ds1 = ds1.add(os.getOrderMoney());
                     //计算店铺的订单数目
                     if (os.getParentOrderId() == null) {
                         sids.add(os.getId());
