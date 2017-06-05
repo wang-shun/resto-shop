@@ -16,7 +16,7 @@
 							<div class="form-group">
 			           			<label class="col-sm-3 control-label">备注名称：</label>
 							    <div class="col-sm-8">
-						    		<input type="text" class="form-control" maxlength="50" placeholder="建议输入五十个字以内" required v-model="orderRemark.remarkName">
+						    		<input type="text" class="form-control" maxlength="50" placeholder="建议输入四个字以内" required v-model="orderRemark.remarkName">
 							    </div>
 							</div>
 							<div class="form-group">
