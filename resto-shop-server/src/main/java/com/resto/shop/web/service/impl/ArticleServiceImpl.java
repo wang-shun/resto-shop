@@ -266,14 +266,24 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             freeDay = 1;
         }
         List<ArticleStock> result = articleMapper.getStock(shopId, familyId, empty, freeDay, activated);
+        List<ArticleStock> array = new ArrayList<>();
         for (ArticleStock articleStock : result) {
 //            Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
+            if(empty != null && empty == Common.YES){
+                //售罄
+                if(articleStock.getCurrentStock() == 0){
+                    array.add(articleStock);
+                }
+            }else{
+                array.add(articleStock);
+            }
+
         }
-        return result;
+        return array;
     }
 
     @Override
@@ -284,16 +294,40 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         String emptyRemark = "【手动沽清】";
 //        RedisUtil.set(articleId + Common.KUCUN, 0);
         RedisUtil.set(articleId + Common.KUCUN, 0);
+        String baseArticleId = articleId;
         if (articleId.indexOf("@") > -1) {
             String aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
             articleMapper.clearPriceStock(articleId, emptyRemark);
+            baseArticleId = aid;
 
         } else {
             article = articleMapper.selectByPrimaryKey(articleId);
             articleMapper.clearStock(articleId, emptyRemark);
             articleMapper.clearPriceTotal(articleId, emptyRemark);
         }
+
+
+        List<ArticlePrice> articlePrices = articlePriceServer.selectByArticleId(baseArticleId);
+        int sum = 0 ;
+        if(!CollectionUtils.isEmpty(articlePrices)){
+            for(ArticlePrice articlePrice : articlePrices){
+                Integer ck = (Integer) RedisUtil.get(articlePrice.getId() + Common.KUCUN);
+                if (ck != null) {
+                    sum += ck;
+                } else {
+                    sum += articlePrice.getCurrentWorkingStock();
+                }
+            }
+            RedisUtil.set(baseArticleId+Common.KUCUN,sum);
+            if(sum == 0){
+                orderMapper.setEmpty(baseArticleId);
+            }else{
+                orderMapper.setEmptyFail(baseArticleId);
+            }
+        }
+
+
 
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
@@ -331,10 +365,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public Boolean editStock(String articleId, Integer count, String shopId) {
         Article article = null;
+        String baseArticleId = articleId;
         Boolean moreType = false;
+        String aid = articleId;
         if (articleId.indexOf("@") > -1) {
             moreType = true;
-            String aid = articleId.substring(0, articleId.indexOf("@"));
+            aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
         } else {
             article = articleMapper.selectByPrimaryKey(articleId);
@@ -346,17 +382,43 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
-                orderMapper.setArticlePriceEmptyFail(articleId);
+                orderMapper.setArticlePriceEmptyFail(baseArticleId);
             } else if (!moreType && count > 0) {
                 orderMapper.setEmptyFail(articleId);
             }
         } else {
             if (moreType && count == 0) {
-                orderMapper.setArticlePriceEmpty(articleId);
+                orderMapper.setArticlePriceEmpty(baseArticleId);
             } else if (!moreType && count == 0) {
                 orderMapper.setEmpty(articleId);
+            }else if (moreType && count > 0){
+                orderMapper.setArticlePriceEmptyFail(baseArticleId);
+            }else if (!moreType && count >0 ){
+                orderMapper.setEmptyFail(articleId);
             }
         }
+
+        List<ArticlePrice> articlePrices = articlePriceServer.selectByArticleId(aid);
+        int sum = 0 ;
+        if(!CollectionUtils.isEmpty(articlePrices)){
+            for(ArticlePrice articlePrice : articlePrices){
+                Integer ck = (Integer) RedisUtil.get(articlePrice.getId() + Common.KUCUN);
+                if (ck != null) {
+                    sum += ck;
+                } else {
+                    sum += articlePrice.getCurrentWorkingStock();
+                }
+            }
+            RedisUtil.set(aid+Common.KUCUN,sum);
+            if(sum == 0){
+                orderMapper.setEmpty(aid);
+            }else{
+                orderMapper.setEmptyFail(aid);
+            }
+        }
+
+
+
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
 //        for(Article tc : taocan){
 //            Integer suit = (Integer) RedisUtil.get(tc.getId()+Common.KUCUN);
