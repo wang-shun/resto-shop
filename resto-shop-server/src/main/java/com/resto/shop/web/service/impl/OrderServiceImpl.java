@@ -4140,6 +4140,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         else {
                             d2 = d2.add(oi.getPayValue());
                         }
+                        //订单总额等于所有支付项相加之和
+//                        if (!oi.getPaymentModeId().equals(PayMode.APPRAISE_RED_PAY) || !oi.getPaymentModeId().equals(PayMode.SHARE_RED_PAY)
+//                                || !oi.getPaymentModeId().equals(PayMode.REFUND_ARTICLE_RED_PAY)) {
+//                            d = d.add(oi.getPayValue());
+//                        }
                     }
                 }
             }
@@ -4199,6 +4204,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 if (oi.getPaymentModeId() == 2 || oi.getPaymentModeId() == 3 || oi.getPaymentModeId() == 7 || oi.getPaymentModeId() == 8) {
                                     ds3 = ds3.add(oi.getPayValue());
                                 }
+                                //计算店铺订单总额， 等于所有支付项相加之和
+//                                if (!oi.getPaymentModeId().equals(PayMode.APPRAISE_RED_PAY) || !oi.getPaymentModeId().equals(PayMode.SHARE_RED_PAY)
+//                                        || !oi.getPaymentModeId().equals(PayMode.REFUND_ARTICLE_RED_PAY)) {
+//                                    ds1 = ds1.add(oi.getPayValue());
+//                                }
                             }
                         }
                     }
