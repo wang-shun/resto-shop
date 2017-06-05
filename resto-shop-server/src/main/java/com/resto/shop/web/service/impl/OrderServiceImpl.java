@@ -8350,12 +8350,42 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Map<String, Object>> reminder(String orderItemId) {
         OrderItem orderItem = orderitemMapper.selectByPrimaryKey(orderItemId);
+        List<OrderItem> orderItems = orderitemMapper.getListByParentId(orderItemId);
+        orderItems.add(orderItem);
         Order order = orderMapper.selectByPrimaryKey(orderItem.getOrderId());
         order.setDistributionModeId(DistributionType.REMINDER_ORDER);
-        List<OrderItem> zpOrderItem = orderitemMapper.getListBySort(orderItemId, orderItem.getArticleId());
-        orderItem.setChildren(zpOrderItem);
-        List<OrderItem> orderItemList = new ArrayList<>();
-        orderItemList.add(orderItem);
+        List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
         return printKitchen(order, orderItemList);
+    }
+
+    List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
+        log.debug("这里查看套餐子项: ");
+        Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
+        for (OrderItem item : orderItems) {
+            if (item.getType() == OrderItemType.MEALS_CHILDREN) {
+                OrderItem parent = idItems.get(item.getParentId());
+                if (parent.getChildren() == null) {
+                    parent.setChildren(new ArrayList<OrderItem>());
+                }
+                parent.getChildren().add(item);
+                idItems.remove(item.getId());
+            }
+        }
+        List<OrderItem> items = new ArrayList<>();
+        for (OrderItem orderItem : idItems.values()) {
+            items.add(orderItem);
+            if (orderItem.getChildren() != null && !orderItem.getChildren().isEmpty()) {
+//				for (OrderItem childItem:orderItem.getChildren()) {
+                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId(),orderItem.getArticleId());
+                for(OrderItem obj : item){
+                    obj.setArticleName("|_" + obj.getArticleName());
+                    items.add(obj);
+                }
+//                childItem.setArticleName("|__" + childItem.getArticleName());
+//                items.add(childItem);
+//				}
+            }
+        }
+        return items;
     }
 }
