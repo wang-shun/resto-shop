@@ -2853,6 +2853,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
             }
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
+            }
         }
         String modeText = getModeText(order);
         data.put("DISTRIBUTION_MODE", modeText);
