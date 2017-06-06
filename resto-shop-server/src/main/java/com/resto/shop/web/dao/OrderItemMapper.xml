@@ -346,12 +346,12 @@ order by t.print_sort asc
         select t.article_name articleName, SUM(t.refund_count) refundCount,SUM(count) count from tb_order_item t
         LEFT JOIN tb_article t1 ON t.article_id = t1.id
         LEFT JOIN tb_article_family t2 ON t1.article_family_id = t2.id
-        where order_id in
+        where t.order_id in
         <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
             #{orderId}
         </foreach>
-        and `status` = 1 and ${count}
---         group by t.article_id
+        and t.`status` = 1 and ${count}
+        group by t.article_name
         order by t2.peference,t1.create_time
     </select>
 
