@@ -351,7 +351,8 @@ order by t.print_sort asc
             #{orderId}
         </foreach>
         and `status` = 1 and ${count}
-        group by t2.peference,t1.create_time
+        group by t.article_id
+        order by t2.peference,t1.create_time
     </select>
 
     <select id="selectOrderItemByOrderId" parameterType="java.util.Map" resultMap="BaseResultMap">
