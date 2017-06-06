@@ -242,7 +242,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             }
             long begin = coupon.getBeginDate().getTime();
             long end = coupon.getEndDate().getTime();
-            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
+//            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
         }
     }
 
@@ -305,44 +305,44 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         long begin=coupon.getBeginDate().getTime();
         long end=coupon.getEndDate().getTime();
         map.put("content", "系统向用户:"+customer.getNickname()+"生日优惠券发短信提醒:"+",请求服务器地址为:" + MQSetting.getLocalIP());
-        timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail,map);
+//        timedPush(begin,end,coupon.getCustomerId(),coupon.getName(),coupon.getValue(),shopDetail,map);
     }
 
     //得到优惠券的时间，然后做定时任务
-	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail,Map<String,String>logMap){
-            Integer pushDay = shopDetail.getRecommendTime();
-	    	Customer customer=customerService.selectById(customerId);
-	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-	        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
-	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-	    	if(BeginDate !=0 && EndDate !=0){
-	    		if((EndDate-BeginDate)<=(1000*60*60*24*pushDay)){
-	    			StringBuffer str=new StringBuffer();
-	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId()+"";
-	            	str.append("优惠券到期提醒\n");
-	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
-	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
-                    Map map = new HashMap(4);
-                    map.put("brandName", setting.getBrandName());
-                    map.put("fileName", customer.getId());
-                    map.put("type", "UserAction");
-                    map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, map);
-                    String pr=price+"";//将BigDecimal类型转换成String
-
-                    if(setting.getIsSendCouponMsg() == Common.YES){
-                        sendNote(shopDetail.getName(),pr,name,pushDay,customerId,logMap);//发送短信
-                    }
-
-	    		}else{
-	    			Calendar calendar = Calendar.getInstance();
-	    			calendar.setTime(new Date());
-	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
-	    			String pr=price+"";
-	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay,shopDetail.getName());
-	    		}
-	    	}
-	    }
+//	    public void timedPush(long BeginDate,long EndDate,String customerId,String name,BigDecimal price,ShopDetail shopDetail,Map<String,String>logMap){
+//            Integer pushDay = shopDetail.getRecommendTime();
+//	    	Customer customer=customerService.selectById(customerId);
+//	        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+//	        BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
+//	        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+//	    	if(BeginDate !=0 && EndDate !=0){
+//	    		if((EndDate-BeginDate)<=(1000*60*60*24*pushDay)){
+//	    			StringBuffer str=new StringBuffer();
+//	                String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi&shopId="+shopDetail.getId()+"";
+//	            	str.append("优惠券到期提醒\n");
+//	            	str.append(""+shopDetail.getName()+"温馨提醒您：您价值"+price+"元的\""+name+"\""+pushDay+"天后即将到期，<a href='"+jumpurl+"'>快来尝尝我们的新菜吧~</a>");
+//	                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+//                    Map map = new HashMap(4);
+//                    map.put("brandName", setting.getBrandName());
+//                    map.put("fileName", customer.getId());
+//                    map.put("type", "UserAction");
+//                    map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    doPostAnsc(LogUtils.url, map);
+//                    String pr=price+"";//将BigDecimal类型转换成String
+//
+//                    if(setting.getIsSendCouponMsg() == Common.YES){
+//                        sendNote(shopDetail.getName(),pr,name,pushDay,customerId,logMap);//发送短信
+//                    }
+//
+//	    		}else{
+//	    			Calendar calendar = Calendar.getInstance();
+//	    			calendar.setTime(new Date());
+//	    			calendar.set(Calendar.DATE,calendar.get(Calendar.DATE) + pushDay);
+//	    			String pr=price+"";
+//	    			MQMessageProducer.autoSendRemmend(customer.getBrandId(), calendar, customer.getId(),pr,name,pushDay,shopDetail.getName());
+//	    		}
+//	    	}
+//	    }
 	  //发送短信
 	    private void sendNote(String shop,String price,String name,Integer pushDay,String customerId,Map<String,String>logMap){
 	        Customer customer=customerService.selectById(customerId);

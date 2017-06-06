@@ -185,6 +185,12 @@
 							<label>等位提示</label>
 							<input type="text" class="form-control" name="queueNotice" v-model="m.queueNotice">
 						</div>
+						<div class="form-group">
+							<label>优惠券到期提醒时间：</label>
+							<input type="number" class="form-control"
+								   name="recommendTime" placeholder="(输入整数)"
+								   v-model="m.recommendTime" required="required" min="0">
+						</div>
 					</div>
 					<input type="hidden" name="id" v-model="m.id" />
 					<input class="btn green"  type="submit"  value="保存"/>
