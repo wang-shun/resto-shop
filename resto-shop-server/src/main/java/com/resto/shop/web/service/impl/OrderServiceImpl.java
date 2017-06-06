@@ -4915,6 +4915,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("orderIds", orderIds);
             selectOrderMap.put("count", "count != 0");
             List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
+            //排序菜品销售   按照菜品分类进行排序
             for(OrderItem oi : saledOrderItems){
                 String aid = oi.getArticleId();
                 if (oi.getArticleId().indexOf("@") > -1) {
