@@ -113,5 +113,8 @@ public class ServerConfig {
     public OrderRemarkService boOrderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
 
     @Bean
+    public com.resto.shop.web.service.OrderRemarkService orderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
+
+    @Bean
     public ElemeTokenService elemeTokenService(){ return  proxy.create(ElemeTokenService.class); }
 }
