@@ -242,7 +242,7 @@
             and brand_id = #{shopId}
         </if>
         <if test="type == 1">
-            and shop_id = #{shopId}
+            and shop_detail_id = #{shopId}
         </if>
     </select>
 </mapper>
