@@ -343,7 +343,7 @@ order by t.print_sort asc
 
     <select id="selectOrderItemByOrderIds" parameterType="java.util.Map"
             resultType="com.resto.shop.web.model.OrderItem">
-        select article_name articleName, SUM(refund_count) refundCount,SUM(count) count from tb_order_item t
+        select t.article_name articleName, SUM(t.refund_count) refundCount,SUM(count) count from tb_order_item t
         LEFT JOIN tb_article t1 ON t.article_id = t1.id
         LEFT JOIN tb_article_family t2 ON t1.article_family_id = t2.id
         where order_id in
@@ -351,7 +351,7 @@ order by t.print_sort asc
             #{orderId}
         </foreach>
         and `status` = 1 and ${count}
-        group by t.article_id
+--         group by t.article_id
         order by t2.peference,t1.create_time
     </select>
 
