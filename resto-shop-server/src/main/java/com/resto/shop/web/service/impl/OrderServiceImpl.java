@@ -12,7 +12,6 @@ import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.model.TableQrcode;
 import com.resto.brand.web.service.*;
-import com.resto.brand.web.service.OrderRemarkService;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
@@ -179,9 +178,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     ArticleTopService articleTopService;
-
-    @Resource
-    OrderRemarkService orderRemarkService;
 
     @Autowired
     private TableQrcodeService tableQrcodeService;
