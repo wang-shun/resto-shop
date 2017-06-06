@@ -15,15 +15,45 @@
     <!-- 自动扫描resto包 ,将带有注解的类 纳入spring容器管理 -->
     <context:component-scan base-package="com.resto.shop.web"></context:component-scan>
 
-    <!-- 引入配置文件 -->
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!-- 对JDBC配置进行解密  -->
+    <bean id="placeholderConfigurer" class="com.resto.brand.core.util.DecryptPropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath*:rpc.properties</value>
+                <value>file:${resources.config.path}/rpc.properties</value>
+                <value>file:${resources.config.path}/redis.properties</value>
             </list>
         </property>
     </bean>
+
+
+    <!-- jedis 配置 -->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig" >
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxWaitMillis" value="${redis.maxWait}" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean >
+    <!-- redis服务器中心 -->
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" >
+        <property name="poolConfig" ref="poolConfig" />
+        <property name="port" value="${redis.port}" />
+        <property name="hostName" value="${redis.host}" />
+        <property name="password" value="${redis.password}" />
+        <property name="timeout" value="${redis.timeout}" ></property>
+    </bean >
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" >
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="keySerializer" >
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer" >
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+    </bean >
+
+
+    <bean id="redisUtil" class="com.resto.shop.web.util.RedisUtil" >
+        <property name="redisTemplate" ref="redisTemplate" />
+    </bean >
 
 
     <bean id="serviceDiscovery" class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceDiscovery">

@@ -629,7 +629,8 @@ where t.id = t2.article_id
         ifnull(t2.stock_working_day,t.stock_working_day) as stockWorkingDay,
         t.article_type articleType,
         ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
-        t.activated
+        t.activated,
+        t.is_empty
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
@@ -642,31 +643,31 @@ where t.id = t2.article_id
         </if>
         and t.shop_detail_id = #{shopId}
         ) as r
-        <where>
-            <if test="empty == 1">
-                r.currentStock = 0
-            </if>
+        <!--<where>-->
+            <!--<if test="empty == 1">-->
+                <!--r.is_empty = 1-->
+            <!--</if>-->
 
-        </where>
+        <!--</where>-->
         order by articleType DESC
     </select>
 
     <update id="clearStock">
     update tb_article
-        set is_empty = 1  , current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set is_empty = 1  , empty_remark = #{emptyRemark}
         where id = #{articleId}
 
   </update>
 
     <update id="clearPriceStock">
     update tb_article_price
-        set current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set  empty_remark = #{emptyRemark}
         where id = #{articleId}
   </update>
 
     <update id="clearPriceTotal">
         update tb_article_price
-        set current_working_stock = 0 , empty_remark = #{emptyRemark}
+        set  empty_remark = #{emptyRemark}
         where article_id = #{articleId}
     </update>
 
@@ -812,7 +813,7 @@ GROUP BY article_id
 		and ar.id not in (select article_id from tb_article_unit_new group by article_id)
 		and ar.shop_detail_id = #{shopId}
     </select>
-    
+
     <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
         select
             ta.id articleId,
@@ -848,7 +849,7 @@ GROUP BY article_id
 		</if>
         group by ta.id
     </select>
-    
+
     <select id="queryArticleMealAttr" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
 		select tma.`name` articleFamilyName, tmi.article_name articleName,
 		IFNULL(
@@ -949,6 +950,10 @@ GROUP BY article_id
         where a.activated = 1 and a.state = 1 and a.shop_detail_id = #{shopId}
         and a.article_family_id = #{articleFamilyId} and discount is not null
         order by a.sort
+    </select>
+
+    <select id="selectHasResourcePhotoList" resultType="Article">
+      SELECT * FROM tb_article WHERE photo_small like '%http://%'
     </select>
 
 </mapper>

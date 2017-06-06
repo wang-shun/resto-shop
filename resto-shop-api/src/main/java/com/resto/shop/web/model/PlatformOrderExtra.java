@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import eleme.openapi.sdk.api.entity.order.OOrder;
 
 import java.math.BigDecimal;
 
@@ -64,5 +65,19 @@ public class PlatformOrderExtra {
         name = extra.getName();
         price = extra.getPrice();
         quantity = extra.getQuantity();
+    }
+
+    public PlatformOrderExtra(OOrder order, Integer type) {
+        if(type == 1){
+            id = ApplicationUtils.randomUUID();
+            platformOrderId = order.getId();
+            name = "饿了么服务费";
+            price = new BigDecimal(order.getServiceFee());
+        }else if(type == 2){
+            id = ApplicationUtils.randomUUID();
+            platformOrderId = order.getId();
+            name = "餐盒费";
+            price = new BigDecimal(order.getPackageFee());
+        }
     }
 }

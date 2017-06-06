@@ -2,11 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-	<div class="table-div">
-		<div class="table-body">
-			<table class="table table-striped table-hover table-bordered" id = "orderRemarkTable"></table>
-		</div>
-	</div>
+    <div class="table-div">
+        <div class="table-body">
+            <table class="table table-striped table-hover table-bordered" id = "orderRemarkTable"></table>
+        </div>
+    </div>
 </div>
 
 

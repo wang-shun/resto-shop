@@ -39,7 +39,7 @@
                 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
                 <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
                 <button type="button" class="btn btn-primary" @click="week">本周</button>
-                <button type="button" class="btn btn-primary" @click="month">本月</button>
+                <%--<button type="button" class="btn btn-primary" @click="month">本月</button>--%>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" @click="downloadShopOrder" v-if="state == 1">下载报表</button>
                 <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
@@ -237,7 +237,7 @@
                             data : "aliPayment"
                         }
                         ,{
-                            title : "现金支付",
+                            title : "现金实收",
                             data : "moneyPay"
                         },
                         {
@@ -256,10 +256,10 @@
                             title : "退菜返还红包",
                             data : "articleBackPay"
                         },
-                        {
-                            title : "找零",
-                            data : "giveChangePayment"
-                        },
+//                        {
+//                            title : "找零",
+//                            data : "giveChangePayment"
+//                        },
                         {
                             title : "营销撬动率",
                             data : 'incomePrize'
@@ -283,9 +283,19 @@
                 });
             },
             searchInfo : function() {
+                var that = this;
+                var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+                if(timeCha < 0){
+                    toastr.clear();
+                    toastr.error("开始时间应该少于结束时间！");
+                    return false;
+                }else if(timeCha > 604800000){
+                    toastr.clear();
+                    toastr.error("暂时未开放大于一周以内的查询！");
+                    return false;
+                }
                 toastr.clear();
                 toastr.success("查询中...");
-                var that = this;
                 try {
                     $.post("orderReport/AllOrder", this.getDate(), function (result) {
                         if(result.success) {

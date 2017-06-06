@@ -41,6 +41,10 @@
        values(#{id},#{count},#{name},#{shopId},#{printType},#{kitchenId})
     </insert>
 
+    <select id="selectByPrimaryKey" resultType="ArticleRecommend">
+        select * from tb_recommend where id = #{id}
+    </select>
+
     <insert id="insertRecommendArticle">
 
         insert into tb_recommend_article

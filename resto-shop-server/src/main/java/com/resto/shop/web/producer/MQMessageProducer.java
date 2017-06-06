@@ -7,6 +7,7 @@ import com.resto.shop.web.constant.OrderPosStatus;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,13 +197,13 @@ public class MQMessageProducer {
 		obj.put("amountWithChildren",order.getAmountWithChildren());
 		obj.put("printOrderTime",order.getPrintOrderTime());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
-		MemcachedUtils.put(order.getId()+"status", OrderPosStatus.SEND_MSG_SUCCESS);
-		List<String> orderList = (List<String>) MemcachedUtils.get(order.getShopDetailId()+"sendMsgList");
+		RedisUtil.set(order.getId()+"status", OrderPosStatus.SEND_MSG_SUCCESS);
+		List<String> orderList = (List<String>) RedisUtil.get(order.getShopDetailId()+"sendMsgList");
 		if(CollectionUtils.isEmpty(orderList)){
 			orderList = new ArrayList<>();
 		}
 		orderList.add(order.getId());
-		MemcachedUtils.put(order.getShopDetailId()+"sendMsgList",orderList);
+		RedisUtil.set(order.getShopDetailId()+"sendMsgList",orderList);
 		sendMessageASync(message);
 	}
 

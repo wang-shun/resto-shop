@@ -67,6 +67,11 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     }
 
     @Override
+    public List<Unit> getUnitByArticleidWechat(String articleId) {
+        return unitMapper.getUnitByArticleidWechat(articleId);
+    }
+
+    @Override
     public void insertArticleRelation(String articleId, List<Unit> units) {
         for(Unit unit : units){
             String id = ApplicationUtils.randomUUID();

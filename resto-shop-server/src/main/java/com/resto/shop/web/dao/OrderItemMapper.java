@@ -75,4 +75,6 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
      * 得到套餐下的子品
      */
     List<OrderItem> getListByParentId(String parentId);
+
+    List<OrderItem> getListByRecommendId(@Param("recommendId") String recommendId,@Param("orderId") String orderId);
 }

@@ -6,4 +6,6 @@ package com.resto.shop.web.constant;
  */
 public class PushType {
     public static final String HUNGER = "1";
+
+    public static final String HUNGER_VERSION_2 = "2";        //饿了么第二版对接
 }

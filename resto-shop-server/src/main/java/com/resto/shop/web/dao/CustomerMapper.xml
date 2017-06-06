@@ -32,6 +32,7 @@
         <result column="last_table_number" property="lastTableNumber"/>
         <result column="birthday_coupon_ids" property="birthdayCouponIds"/>
         <result column="share_coupon_ids" property="shareCouponIds"/>
+        <result column="serial_number" property="serialNumber"/>
         <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
             <id column="id" property="id"/>
             <result column="birth_date" property="birthDate"/>
@@ -45,17 +46,14 @@
         </association>
     </resultMap>
     <sql id="Base_Column_List">
-    id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone, 
-    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province, 
+    id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone,
+    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
     city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
     bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,
-    share_coupon_ids
+    share_coupon_ids,serial_number
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
-        select
-        <include refid="Base_Column_List"/>
-        from tb_customer
-        where id = #{id,jdbcType=VARCHAR}
+        select <include refid="Base_Column_List"/> from tb_customer where id = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from tb_customer
@@ -332,12 +330,6 @@
             <if test="customerDetailId != null">
                 customer_detail_id = #{customerDetailId},
             </if>
-            <if test="bindPhoneTime != null">
-                bind_phone_time = #{bindPhoneTime},
-            </if>
-            <if test="bindPhoneShop != null">
-                bind_phone_shop = #{bindPhoneShop},
-            </if>
             <if test="realTimeCouponIds != null">
                 real_time_coupon_ids = #{realTimeCouponIds},
             </if>
@@ -601,5 +593,10 @@
     <select id="selectByTelePhone" resultType="Customer">
         SELECT * FROM  tb_customer
         WHERE telephone=#{telePhone}
+    </select>
+
+    <select id="selectBySerialNumber" resultType="Customer">
+        SELECT * FROM  tb_customer
+        WHERE serial_number = #{number}
     </select>
 </mapper>

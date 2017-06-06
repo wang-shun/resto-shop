@@ -178,6 +178,17 @@
 							</label>
 						</div>
 						<div class="form-group">
+							<div class="control-label">是否开启进入店铺选择页面</div>
+							<label>
+								<input type="radio" name="openShoplist" v-model="m.openShoplist" value="0">
+								否
+							</label>
+							<label>
+								<input type="radio" name="openShoplist" v-model="m.openShoplist" value="1">
+								是
+							</label>
+						</div>
+						<div class="form-group">
 							<label>品牌标语</label>
 							<input type="text" class="form-control" name="slogan" v-model="m.slogan">
 						</div>
