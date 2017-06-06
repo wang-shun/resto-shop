@@ -3,6 +3,8 @@ package com.resto.shop.web.config;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.service.DayAppraiseMessageService;
+import com.resto.shop.web.service.DayDataMessageService;
 import com.resto.shop.web.service.LogBaseService;
 import com.resto.shop.web.service.ThirdService;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -115,6 +117,16 @@ public class ServerConfig {
     @Bean
     public  WetherService wetherService(){
         return proxy.create(WetherService.class);
+    }
+
+    @Bean
+    public DayDataMessageService dayDataMessageService(){
+        return proxy.create(DayDataMessageService.class);
+    }
+
+    @Bean
+    public DayAppraiseMessageService dayAppraiseMessageService(){
+        return proxy.create(DayAppraiseMessageService.class);
     }
 
 }

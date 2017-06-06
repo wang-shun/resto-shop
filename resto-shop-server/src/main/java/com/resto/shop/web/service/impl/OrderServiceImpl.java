@@ -158,6 +158,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
+    @Autowired
+    private DayDataMessageService dayDataMessageService;
+
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -186,6 +189,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private AreaService areaService;
+
+    @Autowired
+    private DayAppraiseMessageService dayAppraiseMessageService;
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -4731,13 +4737,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //判断是否需要发送旬短信
         int temp = DateUtil.getEarlyMidLate();
         //1.结店退款
-        refundShopDetailOrder(shopDetail);
+        //refundShopDetailOrder(shopDetail);
         Map<String, Object> dayMap = querryDateData(shopDetail, offLineOrder,wether);
        // Map<String, Object> xunMap = querryXunData(shopDetail, offLineOrder, wether);
        // Map<String, Object> monthMap = querryMonthData(shopDetail, offLineOrder, wether);
 
         //3发短信推送/微信推送
-        pushMessage(dayMap, shopDetail, wechatConfig, brand.getBrandName(),MessageType.DAY_MESSAGE);
+     //   pushMessage(dayMap, shopDetail, wechatConfig, brand.getBrandName(),MessageType.DAY_MESSAGE);
         // pushMessage(xunMap,shopDetail,wechatConfig,brand.getBrandName(),MessageType.XUN_MESSAGE);
         //pushMessage(monthMap,shopDetail,wechatConfig,brand.getBrandName(),MessageType.MONTH_MESSAGE);
     }
@@ -5087,7 +5093,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("---------------------").append("\n")
                 .append("今日外卖金额：").append(todayOrderBooks).append("\n")
                 .append("今日总营业额：").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-                .append("本月总额：").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("\n");
+                .append("本月总额：").append(monthEnterTotal.add(monthRestoTotal).add(monthOrderBooks)).append("\n");
 
         StringBuilder sbScore = new StringBuilder();
         sbScore
@@ -5132,126 +5138,93 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("wxData",sbData);
         map.put("wxScore",sbScore);
 
-        //封装本日结店分数短信
-        //本日信息
-        StringBuilder dayScore = new StringBuilder();
-
-        dayScore.append("{")
-                .append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
-                .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
-                .append("weekDay:").append("'").append(WeekName.getName(wether.getWeekady())).append("'").append(",")//星期
-                .append("wether:").append("'").append(wether.getDayWeather()).append("'").append(",")//天气
-                .append("temperature:").append("'").append(wether.getDayTemperature()).append("'").append(",")//温度
-                //五星评论
-                .append("dayFiveStar:").append("'").append(todayFiveStar).append("'").append(",")
-                //本日改进意见
-                .append("dayFourStar:").append("'").append(todayFourStar).append("'").append(",")
-                //本日差评投诉
-                .append("dayOneToThree:").append("'").append(todayOneToThreeStar).append("'").append(",")
-                //本日满意度
-                .append("daySatisfied:").append("'").append(todaySatisfaction).append("'").append(",")
-                //本旬满意度
-                .append("xunSatisfied:").append("'").append(theTenDaySatisfaction).append("'").append(",")
-                //本月满意度
-                .append("monthSatisfied:").append("'").append(monthSatisfaction).append("'").append(",")
-                //红榜top10
-                .append("goodTopOne:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopTwo:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopThree:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopFour:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopFive:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopSix:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopSeven:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopEight:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopNine:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("goodTopTen:").append("'").append(monthSatisfaction).append("'").append(",")
-                //badtop10
-                .append("badTopOne:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopTwo:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopThree:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopFour:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopFive:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopSix:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopSeven:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopEight:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopNine:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("badTopTen:").append("'").append(monthSatisfaction).append("'").append(",")
-                .append("}");
-
-        map.put("aliScore",dayScore);
-        //封装日结短信数据  (腾讯云)
-        //封装日结短信数据  (腾讯云)
-        ArrayList<String> txList = new ArrayList<>();
-        txList.add(shopDetail.getName());
-        txList.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-        txList.add(WeekName.getName(wether.getWeekady()));
-        txList.add(wether.getDayWeather());
-        txList.add(wether.getDayTemperature()+"℃");
-        txList.add(String.valueOf(todayEnterCount + todayRestoCount.size()));//到店总笔数
-        txList.add(String.valueOf(todayEnterTotal.add(todayRestoTotal)));//到店消费总额
-        txList.add(String.valueOf(todayRestoCount.size()));//用户消费笔数
-        txList.add(String.valueOf(todayRestoTotal));//用户消费金额
-        txList.add(todayCustomerRatio+"%");//用户消费比率
-        txList.add(todayBackCustomerRatio+"%");//回头消费比率
-        txList.add(todayNewCustomerRatio+"%");//新增用戶比率
-        txList.add(String.valueOf(todayNewCustomerOrderNum));
-        txList.add(String.valueOf(todayNewCustomerOrderTotal));
-        txList.add(String.valueOf(todayNewNormalCustomerOrderNum));
-        txList.add(String.valueOf(todayNewNormalCustomerOrderTotal));
-        txList.add(String.valueOf(todayNewShareCustomerOrderNum));
-        txList.add(String.valueOf(todayNewShareCustomerOrderTotal));
-        txList.add(String.valueOf(todayBackCustomerOrderNum));//回头用户消费
-        txList.add(String.valueOf(todayBackCustomerOrderTotal));
-        txList.add(String.valueOf(todayBackTwoCustomerOrderNum));
-        txList.add(String.valueOf( todayBackTwoCustomerOrderTotal));
-        txList.add(String.valueOf(todayBackTwoMoreCustomerOderNum));
-        txList.add(String.valueOf(todayBackTwoMoreCustomerOrderTotal));
-        txList.add(discountTotal.toString());//折扣合计
-        txList.add(redPackTotal.toString());
-        txList.add(couponTotal.toString());
-        txList.add(chargeReturn.toString());
-        txList.add(discountRatio);//折扣比率
-        txList.add(todayOrderBooks.toString());
-        txList.add(String.valueOf(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)));
-        txList.add(String.valueOf(todayOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)));
-        //封装日结短信的分数
-        ArrayList<String> scoreList = new ArrayList<>();
-        scoreList.add(shopDetail.getName());
-        scoreList.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-        scoreList.add(wether.getWeekady().toString());
-        scoreList.add(wether.getDayWeather());
-        scoreList.add(wether.getDayTemperature()+"℃");
-        scoreList.add(String.valueOf(todayFiveStar));
-        scoreList.add(String.valueOf(todayFourStar));
-        scoreList.add(String.valueOf(todayOneToThreeStar));
-        scoreList.add(todaySatisfaction);
-        scoreList.add(theTenDaySatisfaction);
-        scoreList.add(monthSatisfaction);
-        StringBuilder todayGoodSb = new StringBuilder();
-        StringBuilder todayBadSb = new StringBuilder();
-        todayGoodSb.append("\n");
-        todayBadSb.append("\n");
-        if(todayGoodList.isEmpty()){
-            todayGoodSb.append("----本日无好评----");
-            scoreList.add(todayGoodSb.toString());
-        }else {
-            for(int i =0;i<todayGoodList.size();i++){
-                todayGoodSb.append("top"+(i+1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName()).append("\n");
+        //存储结店数据
+        int times=1;//默认是今天第一次结店  次数存redis中 之后++
+        DayDataMessage ds = new DayDataMessage();
+        ds.setId(ApplicationUtils.randomUUID());
+        ds.setType(DayMessageType.DAY_TYPE);//日结
+        ds.setShopName(shopDetail.getName());
+        ds.setWeekDay(wether.getWeekady());
+        ds.setDate(new Date());
+        ds.setTimes(times);//当日结店次数
+        ds.setWether(wether.getDayWeather());
+        ds.setTemperature(wether.getDayTemperature());
+        ds.setOrderNumber(todayEnterCount + todayRestoCount.size());//到店总笔数
+        ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));//到店消费总额
+        ds.setCustomerOrderNumber(todayRestoCount.size());
+        ds.setCustomerOrderSum(todayRestoTotal);
+        ds.setCustomerOrderRatio(todayCustomerRatio+"%");
+        ds.setNewCustomerOrderRatio(todayNewCustomerRatio+"%");
+        ds.setBackCustomerOrderRatio(todayBackCustomerRatio+"%");
+        ds.setNewCuostomerOrderNum(todayNewCustomerOrderNum);//新用户订单数
+        ds.setNewCustomerOrderSum(todayNewCustomerOrderTotal);
+        ds.setNewNormalCustomerOrderNum(todayNewNormalCustomerOrderNum);
+        ds.setNewNormalCustomerOrderSum(todayNewNormalCustomerOrderTotal);
+        ds.setNewShareCustomerOrderNum(todayNewShareCustomerOrderNum);
+        ds.setNewShareCustomerOrderSum(todayNewShareCustomerOrderTotal);
+        ds.setBackCustomerOrderNum(todayBackCustomerOrderNum);
+        ds.setBackCustomerOrderSum(todayBackCustomerOrderTotal);
+        ds.setBackTwoCustomerOrderNum(todayBackTwoCustomerOrderNum);
+        ds.setBackTwoCustomerOrderSum(todayBackTwoCustomerOrderTotal);
+        ds.setBackTwoMoreCustomerOrderNum(todayBackTwoMoreCustomerOderNum);
+        ds.setBackTwoMoreCustomerOrderSum(todayBackTwoMoreCustomerOrderTotal);
+        ds.setDiscountTotal(discountTotal);
+        ds.setRedPack(redPackTotal);
+        ds.setCoupon(couponTotal);
+        ds.setChargeReward(chargeReturn);
+        ds.setDiscountRatio(discountRatio);
+        ds.setTakeawayTotal(todayOrderBooks);
+        ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
+        ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
+        dayDataMessageService.insert(ds);
+        //存评论数据
+        DayAppraiseMessageWithBLOBs dm = new DayAppraiseMessageWithBLOBs();
+        dm.setId(ApplicationUtils.randomUUID());
+        dm.setShopName(shopDetail.getName());
+        dm.setDate(new Date());
+        dm.setState(true);
+        dm.setWether(wether.getDayWeather());
+        dm.setWeekDay(wether.getWeekady());
+        dm.setTemperature(wether.getDayTemperature());
+        dm.setType(DayMessageType.DAY_TYPE);
+        dm.setFiveStar(todayFiveStar);
+        dm.setFourStar(todayFourStar);
+        dm.setOneThreeStar(todayOneToThreeStar);
+        dm.setDaySatisfaction(todaySatisfaction);
+        dm.setXunSatisfaction(theTenDaySatisfaction);
+        dm.setMonthSatisfaction(monthSatisfaction);
+        if (todayGoodNum == 0) {//无好评
+            dm.setRedList("----无好评----");
+        } else {
+            if (!todayGoodList.isEmpty()) {
+                com.alibaba.fastjson.JSONObject redJson = new com.alibaba.fastjson.JSONObject();
+                for (int i = 0; i < todayGoodList.size(); i++) {
+                    //1、27% 剁椒鱼头
+                   // sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName())
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName());
+                    redJson.put("top"+(i+1),sb.toString());
+                }
+                dm.setRedList(com.alibaba.fastjson.JSONObject.toJSONString(redJson));
             }
-            scoreList.add(todayGoodSb.toString());
         }
-        if(todayBadList.isEmpty()){
-            todayBadSb.append("---本日无差评--");
-            scoreList.add(todayBadSb.toString());
-        }else {
-            for(int i =0;i<todayGoodList.size();i++){
-                todayBadSb.append("top"+(i+1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName()).append("\n");
+        if (todayBadNum == 0) {//无差评
+            dm.setBadList("------无差评-----");
+        } else {
+            if (!todayBadList.isEmpty()) {
+                com.alibaba.fastjson.JSONObject bakcJson = new com.alibaba.fastjson.JSONObject();
+                for (int i = 0; i < todayBadList.size(); i++) {
+                    //1、27% 剁椒鱼头
+                    //sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName()).append("\n");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName());
+                    bakcJson.put("top"+(i+1),sb.toString());
+                }
+                dm.setBadList(com.alibaba.fastjson.JSONObject.toJSONString(bakcJson));
             }
-            scoreList.add(todayBadSb.toString());
         }
+        dayAppraiseMessageService.insert(dm);
 
-        map.put("txDayData",txList);
-        map.put("txDayScore",scoreList);
         return map;
 
     }
@@ -6147,152 +6120,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-
-//    public static void main(String[] args) {
-//        System.out.println("开时：");
-//        StringBuilder todayContent = new StringBuilder();
-//        todayContent.append("{")
-//                .append("shopName:").append("'").append("简厨[凌空soho]").append("'").append(",")
-//                .append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")).append("'").append(",")
-//                .append("arriveCount:").append("'").append(100).append("'").append(",")//到店总笔数(r+外带+线下)
-//                .append("arriveTotalAmount:").append("'").append(23158.00).append("'").append(",")//到店消费总额 r+线下，不包含外卖金额
-//                .append("customerPayCount:").append("'").append(98).append("'").append(",")//用户消费笔数  R+订单总数
-//                .append("customerPayAmount:").append("'").append(23020.00).append("'").append(",")//用户消费金额 r+订单总额
-//                //用户消费比率  今日 R+订单总数/（R+订单总数+线下堂吃订单数+外卖订单数））
-//                .append("userPayPercent:").append("'").append(99.4).append("%").append("'").append(",")
-//                //回头消费比率 R+多次消费用户数/R+消费用户数）
-//                .append("userBackPercent:").append("'").append("75.4").append("%").append("'").append(",")
-//                //新增用户比率 （今日 R+新增用户数/R+消费用户数）
-//                .append("newCustomerPercent:").append("'").append(92.8).append("%").append("'").append(",")
-//                //新用户消费
-//                .append("newCustomerPay:").append("'").append(26).append("位/").append(5660).append("'").append(",")
-//                // 其中自然用户
-//                .append("natureCustomerPay:").append("'").append(22).append("位/").append(4800.00).append("'").append(",")
-//                //其中分享用户
-//                .append("shareCustomerPay:").append("'").append(4).append("位/").append(860).append("'").append(",")
-//                //回头用户消费
-//                .append("customerBackPay:").append("'").append(72).append("位/").append(17360.00).append("'").append(",")
-//                //二次回头用户
-//                .append("secondBackPay:").append("'").append(15).append("位/").append(3260.00).append("'").append(",")
-//                //多次回头
-//                .append("moreBackPay:").append("'").append(57).append("位/").append(14100.00).append("'").append(",")
-//                //折扣合计:648.05（使用红包总额+使用优惠券总额+使用充值赠送总额）
-//                .append("discountTotal:").append("'").append(648.05).append("'").append(",")
-//                //红包
-//                .append("redPayTotal:").append("'").append(417.05).append("'").append(",")
-//                //优惠券
-//                .append("couponTotal:").append("'").append(126.00).append("'").append(",")
-//                //充值赠送
-//                .append("chargeTotal:").append("'").append(105.00).append("'").append(",")
-//                //折扣比率2.7%（折扣合计/(堂吃消费总额＋折扣合计)
-//                .append("discountPercent:").append("'").append(2.7).append("%").append("'").append(",")
-//                //五星评论
-//                .append("goodCount:").append("'").append(90).append("'").append(",")
-//                //本日改进意见
-//                .append("badCount:").append("'").append(5).append("'").append(",")
-//                //本日差评投诉
-//                .append("terribleCount:").append("'").append(3).append("'").append(",")
-//                //本日满意度
-//                .append("satisfied1:").append("'").append(96.53).append("'").append(",")
-//                //本旬满意度
-//                .append("satisfied2:").append("'").append(98.26).append("'").append(",")
-//                //本月满意度
-//                .append("satisfied3:").append("'").append(98.12).append("'").append(",")
-//                //外卖总额
-//                .append("outFoodTotal:").append("'").append(5530).append("'").append(",")
-//                //总营业额
-//                .append("totalOrderMoney:").append("'").append(28688.00).append("'").append(",")
-//                //本月总额
-//                .append("monthTotalMoney:").append("'").append(230655.00).append("'")
-//                .append("}");
-//        SMSUtils.sendMessage("13317182430", todayContent.toString(), "餐加", "SMS_46725122");//推送本日信息
-//
-//    }
-
-
-    public static void main(String[] args) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        StringBuilder content = new StringBuilder();
-        content
-                .append("门店:简厨凌空SHOH").append("\n")
-                .append("日报:2016.11.20").append("\n")
-                .append("堂吃支付金额:10000元").append("\n")
-                .append("商户录取").append("\n")
-                .append("堂吃消费笔数:64").append("\n")
-                .append("商户录入").append("\n")
-                .append("用户支付消费:62/9500").append("\n")
-                .append("----------------").append("\n")
-                .append("新增用户消费:12/2600").append("\n")
-                .append("其中：").append("\n")
-                .append("自然用户消费:9/1700").append("\n")
-                .append("分享用户消费:3/900").append("\n")
-                .append("-----------------").append("\n")
-                .append("回头用户消费:50/6900").append("\n")
-                .append("其中:").append("\n")
-                .append("二次回头用户:20/3000").append("\n")
-                .append("多次回头用户:30/3900").append("\n")
-                .append("-----------------").append("\n")
-                .append("用户消费占比:96.85%").append("\n")
-                .append("(用户交易笔数/堂吃交易笔数)").append("\n")
-                .append("新增用户比率:85.76%").append("\n")
-                .append("新增消费用户/(堂吃交易笔数-回头用户交易笔数)").append("\n")
-                .append("在线支付比例:95%").append("\n")
-                .append("在线支付金额/堂吃支付金额").append("\n")
-                .append("--------------------").append("\n")
-                .append("本日满意度:99.15分").append("\n")
-                .append("------上旬合计------").append("\n")
-                .append("上旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------中旬合计------").append("\n")
-                .append("中旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------下旬合计------").append("\n")
-                .append("下旬满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n")
-                .append("新增自然用户").append("\n")
-                .append("新增分享用户").append("\n")
-                .append("回头用户消费").append("\n")
-                .append("新增回头用户").append("\n")
-                .append("多次回头用户").append("\n")
-                .append("------本月合计------").append("\n")
-                .append("本月满意度:97.5").append("\n")
-                .append("用户消费占比:96.56%").append("\n")
-                .append("新增用户占比:80.03%").append("\n")
-                .append("在线支付占比:93%").append("\n")
-                .append("总支付金额:2000000").append("\n")
-                .append("用户支付金额:111111").append("\n")
-                .append("新增用户消费:121/18500").append("\n");
-        /**
-         发送客服消息
-         */
-        WeChatUtils.sendCustomerMsgASync(content.toString(), "oBHT9squwPUyTM-zwoWcWyey4PCM", "wx36bd5b9b7d264a8c", "807530431fe6e19e3f2c4a7d1a149465");
-
-    }
 
 
     public void sendWxRefundMsg(Order order) {
