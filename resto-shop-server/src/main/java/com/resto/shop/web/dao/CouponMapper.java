@@ -72,4 +72,6 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
     List<Coupon> usedCouponBeforeByOrderId(String orderId);
 
     Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
+
+    List<Coupon> getCouponByShopId(@Param("shopId") String shopId,@Param("time") Integer day,@Param("type") Integer type);
 }

@@ -234,4 +234,15 @@
         and customer_id = #{customerId}
         ORDER BY `value` desc LIMIT 1
     </select>
+
+    <select id="getCouponByShopId" resultType="Coupon">
+        select * from tb_coupon where is_used = 0
+        and #{time} = TIMESTAMPDIFF(DAY ,DATE_FORMAT(now(),"%y-%m-%d"),DATE_FORMAT(end_date,"%y-%m-%d"))
+        <if test="type == 0">
+            and brand_id = #{shopId}
+        </if>
+        <if test="type == 1">
+            and shop_detail_id = #{shopId}
+        </if>
+    </select>
 </mapper>
