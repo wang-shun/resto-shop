@@ -4915,6 +4915,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("orderIds", orderIds);
             selectOrderMap.put("count", "count != 0");
             List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
+            for(OrderItem oi : saledOrderItems){
+                String aid = oi.getArticleId();
+                if (oi.getArticleId().indexOf("@") > -1) {
+                    aid = oi.getArticleId().substring(0, oi.getArticleId().indexOf("@"));
+                    Article article = articleService.selectById(aid);
+                    ArticleFamily articleFamily = articleFamilyMapper.selectByPrimaryKey(article.getArticleFamilyId());
+                    oi.setPeference(articleFamily.getPeference());
+                }
+                oi.setArticleId(aid);
+            }
+            Collections.sort(saledOrderItems, new Comparator(){
+                @Override
+                public int compare(Object o1, Object o2) {
+                    OrderItem OrderItem1=(OrderItem)o1;
+                    OrderItem OrderItem2=(OrderItem)o2;
+                    if(OrderItem1.getPeference()>OrderItem2.getPeference()){
+                        return 1;
+                    }else if(OrderItem1.getPeference()==OrderItem2.getPeference()){
+                        return 0;
+                    }else{
+                        return -1;
+                    }
+                }
+            });
             if(saledOrderItems != null){
                 for (OrderItem orderItem : saledOrderItems) {
                     saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
