@@ -126,14 +126,14 @@
             WHEN 1 THEN '审核中'
             WHEN 2 THEN '已分红'
             WHEN 3 THEN '发放异常'
-            END stateValue
+            END stateValue,
             <if test="userId != null">
-            ,tbl.employee_bonus_amount employeeBonusAmount,
+            tbl.employee_bonus_amount employeeBonusAmount,
             tbl.shopowner_bonus_amount shopownerBonusAmount,
             tbl.shopowner_id shopownerId,
             tbl.employee_id employeeId,
-            tbl.state
             </if>
+            tbl.state
         from tb_bonus_log tbl
         inner join tb_charge_order tco
         on tbl.charge_order_id = tco.id
