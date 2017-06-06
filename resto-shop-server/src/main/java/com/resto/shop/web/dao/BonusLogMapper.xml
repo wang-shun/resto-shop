@@ -131,7 +131,8 @@
             ,tbl.employee_bonus_amount employeeBonusAmount,
             tbl.shopowner_bonus_amount shopownerBonusAmount,
             tbl.shopowner_id shopownerId,
-            tbl.employee_id employeeId
+            tbl.employee_id employeeId,
+            tbl.state
             </if>
         from tb_bonus_log tbl
         inner join tb_charge_order tco
