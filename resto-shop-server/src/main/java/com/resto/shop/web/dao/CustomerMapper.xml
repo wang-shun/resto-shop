@@ -599,4 +599,8 @@
         SELECT * FROM  tb_customer
         WHERE serial_number = #{number}
     </select>
+
+    <select id="getCustomerLimitOne" resultType="Customer">
+        select * from tb_customer limit 1
+    </select>
 </mapper>

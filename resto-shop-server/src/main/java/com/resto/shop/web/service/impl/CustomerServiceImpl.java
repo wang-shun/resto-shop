@@ -242,4 +242,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public Customer selectBySerialNumber(String number) {
 		return customerMapper.selectBySerialNumber(number);
 	}
+
+
+	@Override
+	public Customer getCustomerLimitOne() {
+		return customerMapper.getCustomerLimitOne();
+	}
 }

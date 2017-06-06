@@ -15,6 +15,8 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 	Customer login(String openid);
 
+	Customer getCustomerLimitOne();
+
 	Customer register(Customer customer);
     void updateCustomer(Customer customer);
 
