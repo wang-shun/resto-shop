@@ -1501,12 +1501,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
                     break;
-                case PayMode.COUPON_PAY:
-                    couponService.refundCoupon(item.getResultData());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
-                    break;
+
             }
 
         }
