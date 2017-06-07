@@ -7452,8 +7452,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             "订单使用优惠卷支付了：" + item.getPayValue());
                 } else {
                     Coupon coupon = couponService.selectById(couponId);
-                    pay = pay.add(price);
-                    price = price.subtract(coupon.getValue());
+
+                    pay = pay.subtract(coupon.getValue());
+//                    pay = pay.add(price);
+//                    price = price.subtract(coupon.getValue());
                 }
             }
             if (waitMoney.doubleValue() > 0) { //等位红包支付
@@ -7476,6 +7478,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (price.doubleValue() > 0) {  //余额支付
                 accountService.payOrder(order, price, customer, brand, shopDetail);
             }
+            log.info("后付的情况下还需支付" + pay);
             OrderPaymentItem item = new OrderPaymentItem();
             if (pay.doubleValue() > 0) { //还需要支付
 
