@@ -1479,15 +1479,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private void refundOrderHoufu(Order order) {
-        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectSumByOrderId(order.getId());
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
-            if(item.getPayValue().doubleValue() <= 0){
-                continue;
-            }
+
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
-
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 

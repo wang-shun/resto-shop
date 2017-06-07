@@ -43,10 +43,6 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
         return orderpaymentitemMapper.selectByOrderId(orderId);
     }
 
-    @Override
-    public List<OrderPaymentItem> selectSumByOrderId(String orderId) {
-        return orderpaymentitemMapper.selectSumByOrderId(orderId);
-    }
 
     @Override
     public List<OrderPaymentItem> selectByOrderIdList(String orderId) {

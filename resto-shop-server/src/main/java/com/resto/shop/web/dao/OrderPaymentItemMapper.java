@@ -28,7 +28,7 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
 
     List<OrderPaymentItem> selectByOrderId(String orderId);
 
-    List<OrderPaymentItem> selectSumByOrderId(String orderId);
+
 
 
     List<OrderPaymentItem> selectByOrderIdList(String orderId);
