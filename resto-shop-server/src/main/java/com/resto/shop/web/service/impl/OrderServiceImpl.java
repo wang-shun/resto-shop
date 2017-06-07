@@ -1489,6 +1489,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
                     break;
+                case PayMode.CHARGE_PAY:
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.REWARD_PAY:
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
             }
 
         }
