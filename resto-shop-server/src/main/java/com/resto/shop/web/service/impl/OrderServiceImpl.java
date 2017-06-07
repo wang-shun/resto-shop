@@ -7451,9 +7451,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                             "订单使用优惠卷支付了：" + item.getPayValue());
                 } else {
-                    Coupon coupon = couponService.selectById(couponId);
-
-                    pay = pay.subtract(coupon.getValue());
+//                    Coupon coupon = couponService.selectById(couponId);
+//                    pay = pay.subtract(coupon.getValue());
 //                    pay = pay.add(price);
 //                    price = price.subtract(coupon.getValue());
                 }
