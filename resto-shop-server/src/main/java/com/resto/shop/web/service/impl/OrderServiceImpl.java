@@ -1482,24 +1482,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
-
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-
+                    item.setId(newPayItemId);
+                    orderPaymentItemService.insert(item);
                     break;
                 case PayMode.CHARGE_PAY:
                     chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setId(newPayItemId);
+                    orderPaymentItemService.insert(item);
                     break;
                 case PayMode.REWARD_PAY:
                     chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    item.setId(newPayItemId);
+                    orderPaymentItemService.insert(item);
                     break;
             }
-            item.setId(newPayItemId);
-            orderPaymentItemService.insert(item);
+
         }
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
