@@ -401,6 +401,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("付款中的订单，请等待服务员确认后在进行加菜");
                 return jsonResult;
             }
+            if(farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayMode() == OrderPayMode.ALI_PAY){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("请先支付完选择支付宝支付的订单");
+                return jsonResult;
+            }
         }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
