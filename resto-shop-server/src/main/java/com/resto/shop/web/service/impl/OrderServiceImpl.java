@@ -1516,7 +1516,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public synchronized Order orderWxPaySuccess(OrderPaymentItem item) {
-
         Order order = selectById(item.getOrderId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if (historyItem == null) {
@@ -1529,6 +1528,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }
+        return order;
+    }
+
+    @Override
+    public synchronized Order orderAliPaySuccess(OrderPaymentItem item) {
+        Order order = selectById(item.getOrderId());
+        payOrderSuccess(order);
         return order;
     }
 

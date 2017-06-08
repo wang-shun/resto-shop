@@ -51,6 +51,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order orderWxPaySuccess(OrderPaymentItem item);
 
+	public Order orderAliPaySuccess(OrderPaymentItem item);
+
 	public Order pushOrder(String orderId) throws AppException;
 	
 	public Order callNumber(String orderId);
