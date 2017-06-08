@@ -2779,7 +2779,7 @@ AND o.brand_id = #{brandId}
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
     select sum(pay_value) from tb_order_payment_item
-    where order_id = #{orderId} and payment_mode_id in (3,8)
+    where order_id = #{orderId} and payment_mode_id not in (13,14,15)
 </select>
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
