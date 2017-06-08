@@ -20,7 +20,7 @@ public class DayAppraiseMessageController extends GenericController{
 
 	@Resource
 	DayAppraiseMessageService dayappraisemessageService;
-	
+
 	@RequestMapping("/list")
     public void list(){
     }
@@ -30,28 +30,28 @@ public class DayAppraiseMessageController extends GenericController{
 	public List<DayAppraiseMessage> listData(){
 		return dayappraisemessageService.selectList();
 	}
-	
+
 	@RequestMapping("list_one")
 	@ResponseBody
 	public Result list_one(String id){
 		DayAppraiseMessage dayappraisemessage = dayappraisemessageService.selectById(id);
 		return getSuccessResult(dayappraisemessage);
 	}
-	
+
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid DayAppraiseMessage dayappraisemessage){
 		dayappraisemessageService.insert(dayappraisemessage);
 		return Result.getSuccess();
 	}
-	
+
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid DayAppraiseMessage dayappraisemessage){
 		dayappraisemessageService.update(dayappraisemessage);
 		return Result.getSuccess();
 	}
-	
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(String id){

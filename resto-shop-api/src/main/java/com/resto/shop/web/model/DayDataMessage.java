@@ -6,6 +6,8 @@ import java.util.Date;
 public class DayDataMessage {
     private String id;
 
+    private String shopId;
+
     private Integer type;
 
     private String shopName;
@@ -77,6 +79,14 @@ public class DayDataMessage {
     private BigDecimal bussinessTotal;
 
     private BigDecimal monthTotal;
+
+    public String getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
 
     public String getId() {
         return id;

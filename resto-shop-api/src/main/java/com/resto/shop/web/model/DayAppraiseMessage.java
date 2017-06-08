@@ -33,6 +33,16 @@ public class DayAppraiseMessage {
 
     private String monthSatisfaction;
 
+    private String shopId;
+
+    public String getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
+
     public String getId() {
         return id;
     }

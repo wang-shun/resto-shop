@@ -24,7 +24,7 @@
     <result column="bad_list" jdbcType="LONGVARCHAR" property="badList"/>
   </resultMap>
 
-  <sql id="Base_Column_List">id, shop_name, date_time, date, state, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction</sql>
+  <sql id="Base_Column_List">id, shop_id,shop_name, date_time, date, state, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction</sql>
   <sql id="Blob_Column_List">red_list, bad_list</sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">select 
@@ -33,11 +33,12 @@
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_day_appraise_message where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">insert into tb_day_appraise_message (id, shop_name, date_time, date, state, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction, red_list, bad_list) values (#{id,jdbcType=VARCHAR}, #{shopName,jdbcType=VARCHAR}, #{dateTime,jdbcType=TIMESTAMP}, #{date,jdbcType=DATE}, #{state,jdbcType=BIT}, #{weekDay,jdbcType=INTEGER}, #{wether,jdbcType=VARCHAR}, #{temperature,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{fiveStar,jdbcType=INTEGER}, #{fourStar,jdbcType=INTEGER}, #{oneThreeStar,jdbcType=INTEGER}, #{daySatisfaction,jdbcType=VARCHAR}, #{xunSatisfaction,jdbcType=VARCHAR}, #{monthSatisfaction,jdbcType=VARCHAR}, #{redList,jdbcType=LONGVARCHAR}, #{badList,jdbcType=LONGVARCHAR})</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">insert into tb_day_appraise_message (id,shop_id,shop_name, date_time, date, state, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction, red_list, bad_list) values (#{id,jdbcType=VARCHAR}, #{shopName,jdbcType=VARCHAR}, #{dateTime,jdbcType=TIMESTAMP}, #{date,jdbcType=DATE}, #{state,jdbcType=BIT}, #{weekDay,jdbcType=INTEGER}, #{wether,jdbcType=VARCHAR}, #{temperature,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{fiveStar,jdbcType=INTEGER}, #{fourStar,jdbcType=INTEGER}, #{oneThreeStar,jdbcType=INTEGER}, #{daySatisfaction,jdbcType=VARCHAR}, #{xunSatisfaction,jdbcType=VARCHAR}, #{monthSatisfaction,jdbcType=VARCHAR}, #{redList,jdbcType=LONGVARCHAR}, #{badList,jdbcType=LONGVARCHAR})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">insert into tb_day_appraise_message 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
-      <if test="id != null">id,</if>  
-      <if test="shopName != null">shop_name,</if>  
+      <if test="id != null">id,</if>
+        <if test="shopId != null">shop_id,</if>
+        <if test="shopName != null">shop_name,</if>
       <if test="dateTime != null">date_time,</if>  
       <if test="date != null">date,</if>  
       <if test="state != null">state,</if>  
@@ -55,7 +56,8 @@
       <if test="badList != null">bad_list,</if> 
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
-      <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
+      <if test="id != null">#{id,jdbcType=VARCHAR},</if>
+        <if test="shopId != null">#{shopId,jdbcType=VARCHAR},</if>
       <if test="shopName != null">#{shopName,jdbcType=VARCHAR},</if>  
       <if test="dateTime != null">#{dateTime,jdbcType=TIMESTAMP},</if>  
       <if test="date != null">#{date,jdbcType=DATE},</if>  
@@ -75,7 +77,8 @@
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">update tb_day_appraise_message 
-    <set> 
+    <set>
+        <if test="shopName != null">shop_id = #{shopId,jdbcType=VARCHAR},</if>
       <if test="shopName != null">shop_name = #{shopName,jdbcType=VARCHAR},</if>  
       <if test="dateTime != null">date_time = #{dateTime,jdbcType=TIMESTAMP},</if>  
       <if test="date != null">date = #{date,jdbcType=DATE},</if>  
@@ -94,8 +97,8 @@
       <if test="badList != null">bad_list = #{badList,jdbcType=LONGVARCHAR},</if> 
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">update tb_day_appraise_message set shop_name = #{shopName,jdbcType=VARCHAR}, date_time = #{dateTime,jdbcType=TIMESTAMP}, date = #{date,jdbcType=DATE}, state = #{state,jdbcType=BIT}, week_day = #{weekDay,jdbcType=INTEGER}, wether = #{wether,jdbcType=VARCHAR}, temperature = #{temperature,jdbcType=INTEGER}, type = #{type,jdbcType=INTEGER}, five_star = #{fiveStar,jdbcType=INTEGER}, four_star = #{fourStar,jdbcType=INTEGER}, one_three_star = #{oneThreeStar,jdbcType=INTEGER}, day_satisfaction = #{daySatisfaction,jdbcType=VARCHAR}, xun_satisfaction = #{xunSatisfaction,jdbcType=VARCHAR}, month_satisfaction = #{monthSatisfaction,jdbcType=VARCHAR}, red_list = #{redList,jdbcType=LONGVARCHAR}, bad_list = #{badList,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.DayAppraiseMessage">update tb_day_appraise_message set shop_name = #{shopName,jdbcType=VARCHAR}, date_time = #{dateTime,jdbcType=TIMESTAMP}, date = #{date,jdbcType=DATE}, state = #{state,jdbcType=BIT}, week_day = #{weekDay,jdbcType=INTEGER}, wether = #{wether,jdbcType=VARCHAR}, temperature = #{temperature,jdbcType=INTEGER}, type = #{type,jdbcType=INTEGER}, five_star = #{fiveStar,jdbcType=INTEGER}, four_star = #{fourStar,jdbcType=INTEGER}, one_three_star = #{oneThreeStar,jdbcType=INTEGER}, day_satisfaction = #{daySatisfaction,jdbcType=VARCHAR}, xun_satisfaction = #{xunSatisfaction,jdbcType=VARCHAR}, month_satisfaction = #{monthSatisfaction,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.DayAppraiseMessageWithBLOBs">update tb_day_appraise_message set shop_id = #{shopId,jdbcType=VARCHAR}, shop_name = #{shopName,jdbcType=VARCHAR}, date_time = #{dateTime,jdbcType=TIMESTAMP}, date = #{date,jdbcType=DATE}, state = #{state,jdbcType=BIT}, week_day = #{weekDay,jdbcType=INTEGER}, wether = #{wether,jdbcType=VARCHAR}, temperature = #{temperature,jdbcType=INTEGER}, type = #{type,jdbcType=INTEGER}, five_star = #{fiveStar,jdbcType=INTEGER}, four_star = #{fourStar,jdbcType=INTEGER}, one_three_star = #{oneThreeStar,jdbcType=INTEGER}, day_satisfaction = #{daySatisfaction,jdbcType=VARCHAR}, xun_satisfaction = #{xunSatisfaction,jdbcType=VARCHAR}, month_satisfaction = #{monthSatisfaction,jdbcType=VARCHAR}, red_list = #{redList,jdbcType=LONGVARCHAR}, bad_list = #{badList,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.DayAppraiseMessage">update tb_day_appraise_message set   shop_id = #{shopId,jdbcType=VARCHAR} ,shop_name = #{shopName,jdbcType=VARCHAR}, date_time = #{dateTime,jdbcType=TIMESTAMP}, date = #{date,jdbcType=DATE}, state = #{state,jdbcType=BIT}, week_day = #{weekDay,jdbcType=INTEGER}, wether = #{wether,jdbcType=VARCHAR}, temperature = #{temperature,jdbcType=INTEGER}, type = #{type,jdbcType=INTEGER}, five_star = #{fiveStar,jdbcType=INTEGER}, four_star = #{fourStar,jdbcType=INTEGER}, one_three_star = #{oneThreeStar,jdbcType=INTEGER}, day_satisfaction = #{daySatisfaction,jdbcType=VARCHAR}, xun_satisfaction = #{xunSatisfaction,jdbcType=VARCHAR}, month_satisfaction = #{monthSatisfaction,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
 
     <select id="selectList" resultType="DayAppraiseMessage">select * from tb_day_appraise_message</select>
 </mapper>

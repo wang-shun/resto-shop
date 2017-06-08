@@ -432,6 +432,17 @@ public class SpringContextConfig {
         return proxy.create(WetherService.class);
     }
 
+
+    @Bean
+    public  DayDataMessageService dayDataMessageService(){
+        return proxy.create(DayDataMessageService.class);
+    }
+
+    @Bean
+    public  DayAppraiseMessageService dayAppraiseMessageService(){
+        return  proxy.create(DayAppraiseMessageService.class);
+    }
+
     @Bean
     public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
 

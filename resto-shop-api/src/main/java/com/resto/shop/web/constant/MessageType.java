@@ -11,6 +11,10 @@ public class MessageType {
 
     public  final static int MONTH_MESSAGE = 3; //月结短信
 
+    public final static int NORMAL = 1;//正常
+
+    public  final static  int DELETE=0;//删除
+
     public static String getName(int tmp){
         switch (tmp){
             case DAY_MESSAGE:
