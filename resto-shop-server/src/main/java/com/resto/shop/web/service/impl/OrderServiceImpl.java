@@ -1223,9 +1223,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderState() != OrderState.SUBMIT) {
             return new Result(false);
         }
-        order.setIsPay(OrderPayState.NOT_PAY);
+        if(order.getIsPay() != OrderPayState.ALIPAYING){
+            order.setIsPay(OrderPayState.NOT_PAY);
+        }
         if (order.getPayMode() == 2) {
-            order.setIsPay(0);
+            if(order.getIsPay() != OrderPayState.ALIPAYING){
+                order.setIsPay(OrderPayState.NOT_PAY);
+            }
             orderMapper.updateByPrimaryKeySelective(order);
             return new Result("支付宝订单更改为微信支付，支付时点击关闭不取消订单", false);
         }
