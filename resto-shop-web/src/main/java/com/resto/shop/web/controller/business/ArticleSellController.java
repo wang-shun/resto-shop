@@ -162,8 +162,14 @@ public class ArticleSellController extends GenericController{
                 if (familyMap.get("salles").toString().equalsIgnoreCase("0")){
                     articleFamilySellDto.setSalesRatio("0.00%");
                 }else{
-                    articleFamilySellDto.setSalesRatio(articleFamilySellDto.getSalles().divide(new BigDecimal(
-                            familyMap.get("salles").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                    if(new BigDecimal(
+                            familyMap.get("salles").toString()).doubleValue() <= 0){
+                        articleFamilySellDto.setSalesRatio("0%");
+                    }else{
+                        articleFamilySellDto.setSalesRatio(articleFamilySellDto.getSalles().divide(new BigDecimal(
+                                familyMap.get("salles").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
+                    }
+
                 }
                 for (ArticleSellDto articleSellDto : articleFamilySell){
                     if (articleSellDto.getArticleId().equalsIgnoreCase(articleFamilySellDto.getArticleId())){
