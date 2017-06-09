@@ -1,16 +1,18 @@
 package com.resto.shop.web.model;
 
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class DayDataMessage {
+public class DayDataMessage implements Serializable{
     private String id;
 
     private String shopId;
 
     private Integer type;
 
-    private String shopName;
+    private String shopName;//店铺名称
 
     private Date dateTime;
 
@@ -34,31 +36,43 @@ public class DayDataMessage {
 
     private BigDecimal customerOrderSum;
 
-    private String customerOrderRatio;
+    private String customerOrderRatio;//用户消费比率
 
-    private String backCustomerOrderRatio;
+    private String backCustomerOrderRatio;//回头消费比率
 
-    private String newCustomerOrderRatio;
+    private String newCustomerOrderRatio;//新增用户比率
 
     private Integer newCuostomerOrderNum;
 
     private BigDecimal newCustomerOrderSum;
 
+    private String newCustomerOrder;//新用户消费
+
     private Integer newNormalCustomerOrderNum;
 
     private BigDecimal newNormalCustomerOrderSum;
+
+    private  String newNormalCustomerOrder;//自然用户消费
 
     private Integer newShareCustomerOrderNum;
 
     private BigDecimal newShareCustomerOrderSum;
 
+    private String newShareCutomerOrder;//分享用户消费
+
     private Integer backCustomerOrderNum;
 
     private BigDecimal backCustomerOrderSum;
 
+    private  String backCustomerOrder;//回头用户消费
+
     private Integer backTwoCustomerOrderNum;
 
     private BigDecimal backTwoCustomerOrderSum;
+
+    private  String backTwoCustomerOrder;//二次回头用户消费
+
+    private String backTwoMoreCustomerOrder;//多次回头用户消费
 
     private Integer backTwoMoreCustomerOrderNum;
 
@@ -425,5 +439,53 @@ public class DayDataMessage {
         this.takeawayTotal = takeawayTotal;
         this.bussinessTotal = bussinessTotal;
         this.monthTotal = monthTotal;
+    }
+
+    public String getNewCustomerOrder() {
+        return newCustomerOrder;
+    }
+
+    public void setNewCustomerOrder(String newCustomerOrder) {
+        this.newCustomerOrder = newCustomerOrder;
+    }
+
+    public String getNewNormalCustomerOrder() {
+        return newNormalCustomerOrder;
+    }
+
+    public void setNewNormalCustomerOrder(String newNormalCustomerOrder) {
+        this.newNormalCustomerOrder = newNormalCustomerOrder;
+    }
+
+    public String getNewShareCutomerOrder() {
+        return newShareCutomerOrder;
+    }
+
+    public void setNewShareCutomerOrder(String newShareCutomerOrder) {
+        this.newShareCutomerOrder = newShareCutomerOrder;
+    }
+
+    public String getBackCustomerOrder() {
+        return backCustomerOrder;
+    }
+
+    public void setBackCustomerOrder(String backCustomerOrder) {
+        this.backCustomerOrder = backCustomerOrder;
+    }
+
+    public String getBackTwoCustomerOrder() {
+        return backTwoCustomerOrder;
+    }
+
+    public void setBackTwoCustomerOrder(String backTwoCustomerOrder) {
+        this.backTwoCustomerOrder = backTwoCustomerOrder;
+    }
+
+    public String getBackTwoMoreCustomerOrder() {
+        return backTwoMoreCustomerOrder;
+    }
+
+    public void setBackTwoMoreCustomerOrder(String backTwoMoreCustomerOrder) {
+        this.backTwoMoreCustomerOrder = backTwoMoreCustomerOrder;
     }
 }

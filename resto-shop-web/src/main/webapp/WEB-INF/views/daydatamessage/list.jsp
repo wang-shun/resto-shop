@@ -10,12 +10,12 @@
                     <label for="beginDate">选择日期{{type}}：</label>
                     <input type="text" class="form-control form_datetime" id="beginDate" v-model="date"  readonly="readonly" >
                 </div>
-                <button type="button" class="btn btn-primary" @click="today"> 今日</button>
+                <button type="button" class="btn btn-primary" @click="today"> 日结报表</button>
                 <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
-                <button type="button" class="btn btn-primary" @click="xun" v-if="key==2||key==3">本旬</button>
-                <button type="button" class="btn btn-primary" @click="month" v-if="key==3">本月</button>
+                <button type="button" class="btn btn-primary" @click="xun" v-if="key==2||key==3">旬结报表</button>
+                <button type="button" class="btn btn-primary" @click="month" v-if="key==3">月结报表</button>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-                <button type="button" class="btn btn-primary" @click="brandreportExcel">下载报表</button><br/>
+                <button type="button" class="btn btn-primary" @click="downLoadExcel">下载报表</button><br/>
             </form>
         </div>
     </div>
@@ -160,6 +160,31 @@
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
+            },
+            downLoadExcel: function () {
+                try {
+                    $.post("daydatamessage/create_dayMessage",this.getParam(),function (result) {//生成营运分析报表
+                        if(result.success){
+                            window.location.href = "orderReport/downloadBrandOrderExcel?path="+result.data+"";//下载营运分析报表
+                        }else{
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+
+                $.post("daydatamessage/downLoadExcel", this.getParam(), function (result) {
+                    if(result.success) {
+                        toastr.clear();
+                        toastr.success("下载成功");
+                    }else{
+                        toastr.clear();
+                        toastr.error("下载出错");
+                    }
+                });
             },
             getParam:function () {
                 var data = {
