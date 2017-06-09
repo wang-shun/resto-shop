@@ -331,7 +331,7 @@ public class OrderAspect {
         MQMessageProducer.sendPlaceOrderNoPayMessage(order);
     }
 
-    @AfterReturning(value = "orderWxPaySuccess()||orderAliPaySuccess()", returning = "order")
+    @AfterReturning(value = "orderWxPaySuccess()", returning = "order")
     public void orderPayAfter(Order order) {
 //        if (order != null && order.getOrderState().equals(OrderState.PAYMENT) &&
 //                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息

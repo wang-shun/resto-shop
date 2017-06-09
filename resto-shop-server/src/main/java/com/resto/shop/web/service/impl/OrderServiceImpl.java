@@ -401,7 +401,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("付款中的订单，请等待服务员确认后在进行加菜");
                 return jsonResult;
             }
-            if(farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY && farOrder.getPayMode() == OrderPayMode.ALI_PAY){
+            if(farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY && farOrder.getIsPay() == OrderPayState.ALIPAYING){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("请先支付完选择支付宝支付的订单，再进行加菜！");
                 return jsonResult;
@@ -1067,7 +1067,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 changePushOrder(order);
             }
         }
-        Brand brand = brandService.selectById(order.getBrandId());
         return order;
     }
 
@@ -1529,17 +1528,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setPaymentAmount(item.getPayValue());
                 update(order);
             }
+            if(order.getPayMode() == OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+                order.setIsPay(OrderPayState.ALIPAYED);
+                update(order);
+            }else if(order.getPayMode() != OrderPayMode.WX_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+                order.setIsPay(OrderPayState.PAYED);
+                update(order);
+            }else if(order.getPayMode() != OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+                order.setIsPay(OrderPayState.NOT_PAY);
+                update(order);
+            }
             payOrderSuccess(order);
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }
-        return order;
-    }
-
-    @Override
-    public synchronized Order orderAliPaySuccess(OrderPaymentItem item) {
-        Order order = selectById(item.getOrderId());
-        payOrderSuccess(order);
         return order;
     }
 
@@ -7500,6 +7502,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         break;
                     case OrderPayMode.ALI_PAY:
                         order.setPaymentAmount(pay);
+                        order.setIsPay(OrderPayState.ALIPAYING);
                         break;
                     case OrderPayMode.YL_PAY:
                         order.setPaymentAmount(pay);
