@@ -7440,8 +7440,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getPrintTimes() == 1) {
             return null;
         }
-        if (order.getPayType() == PayType.NOPAY && "sb".equals(order.getOperatorId())) {
-            order.setIsPay(0);
+        if (order.getPayType() == PayType.NOPAY && "sb".equals(order.getOperatorId()) && order.getIsPay() != OrderPayState.ALIPAYING) {
+            order.setIsPay(OrderPayState.NOT_PAY);
             orderMapper.updateByPrimaryKeySelective(order);
         }
         Brand brand = brandService.selectById(order.getBrandId());
