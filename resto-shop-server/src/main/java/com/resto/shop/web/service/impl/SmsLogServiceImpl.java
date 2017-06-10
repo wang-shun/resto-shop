@@ -115,7 +115,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		//判断是否需要提醒
 		if(this.isHave(arrs, remindNum+"")){
 			//提醒商家充值
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", b.getBrandName(),remindNum, brandUser.getPhone(),logMap);
+            //String brandName, int num, String phone, Map<String, String> logMap
+			SMSUtils.sendNoticeToBrand(b.getBrandName(),remindNum, brandUser.getPhone(),logMap);
 		}
 	}
 
@@ -132,7 +133,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			//我们提醒商家充值
             String content = sb.append(logMap.get("content")).append("商家剩余条数不足").toString();
             logMap.put("content",content);
-			SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName,smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
+			SMSUtils.sendNoticeToBrand(serviceName,smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
 			log.info("剩余短信为"+remindNum+"条无法发短信");
 			//返回false标记让商家无法发短信
 			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
@@ -142,7 +143,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
                 String content = sb.append(logMap.get("content")).append("在固定条数短信时发短信给商家").toString();
                 logMap.put("content",content);
 				//发短信提醒商家
-				SMSUtils.sendNoticeToBrand("餐加", "餐加咨询管理", serviceName, remindNum, brandUser.getPhone(),logMap);
+				SMSUtils.sendNoticeToBrand(serviceName, remindNum, brandUser.getPhone(),logMap);
 			}
 		}
 		//商家给客户发短信
@@ -151,7 +152,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			logMap.put("content",content);
 		}
 
-		return SMSUtils.sendCode(sign, serviceName, code, phone,logMap);
+		return SMSUtils.sendCode( serviceName, code, phone,logMap);
 	}
 
 	@Override
