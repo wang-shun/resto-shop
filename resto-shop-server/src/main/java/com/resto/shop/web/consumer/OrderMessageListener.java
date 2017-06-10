@@ -326,8 +326,8 @@ public class OrderMessageListener implements MessageListener {
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             orderService.updateAllowContinue(order.getId(), false);
-            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                    "订单加菜时间已过期，不允许继续加菜！");
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单加菜时间已过期，不允许继续加菜！");
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;
