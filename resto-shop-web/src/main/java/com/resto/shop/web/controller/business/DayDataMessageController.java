@@ -125,7 +125,14 @@ public class DayDataMessageController extends GenericController{
          Map<String,String> map = new HashMap<>();
          map.put("brandName", getBrandName());
          map.put("shops", shopName);
-         map.put("date", date);
+         map.put("endDate", date);
+         map.put("beginDate",date);
+         if(type==2){//说明是旬
+             map.put("beginDate",DateUtil.formatDate(DateUtil.getAfterDayDate(DateUtil.fomatDate(date),-10),"yyyy-MM-dd"));
+         }
+        if(type==3){//说明是月
+             map.put("beginDate",DateUtil.getMonthBegin());
+        }
          map.put("reportType", "店铺营运表");//表的头，第一行内容
          map.put("num", "9");//显示的位置
          map.put("reportTitle", "营运分析报表");//表的名字
