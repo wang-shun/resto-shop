@@ -22,6 +22,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
