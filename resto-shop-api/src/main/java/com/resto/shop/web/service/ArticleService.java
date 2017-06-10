@@ -138,4 +138,11 @@ public interface ArticleService extends GenericService<Article, String> {
      * @return
      */
     List<Article> selectnewPosListByFamillyId(String shopId,Integer page,Integer size,String familyId);
+
+    /**
+     * 查询资源服务器图片
+     * @param currentBrandId
+     * @return
+     */
+    List<Article> selectHasResourcePhotoList(String currentBrandId);
 }

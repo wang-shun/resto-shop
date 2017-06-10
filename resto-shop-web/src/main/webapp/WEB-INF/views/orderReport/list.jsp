@@ -18,7 +18,7 @@
                 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
                 <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
                 <button type="button" class="btn btn-primary" @click="week">本周</button>
-                <button type="button" class="btn btn-primary" @click="month">本月</button>
+                <%--<button type="button" class="btn btn-primary" @click="month">本月</button>--%>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" @click="createOrderExcel">下载报表</button><br/>
             </form>
@@ -161,9 +161,21 @@
                 });
             },
             searchInfo : function() {
+
+                var that = this;
+
+                var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+                if(timeCha < 0){
+                    toastr.clear();
+                    toastr.error("开始时间应该少于结束时间！");
+                    return false;
+                }else if(timeCha > 604800000){
+                    toastr.clear();
+                    toastr.error("暂时未开放大于一周以内的查询！");
+                    return false;
+                }
                 toastr.clear();
                 toastr.success("查询中...");
-                var that = this;
                 try {
                     $.post("orderReport/brand_data", this.getDate(), function (result) {
                         if(result.success) {

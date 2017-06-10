@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.brand.web.model.RefundRemark;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -152,14 +153,6 @@ public class Order implements Serializable{
 
     private  List<Order> childList; //子订单
 
-    public Integer getTag() {
-        return tag;
-    }
-
-    public void setTag(Integer tag) {
-        this.tag = tag;
-    }
-
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
 
@@ -209,6 +202,72 @@ public class Order implements Serializable{
     private BigDecimal giveChange;
 
     private Integer isPosPay;
+
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
+    private Integer printFailFlag;
+
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
+    private Integer printKitchenFlag;
+
+    private Integer failPrintCount;
+
+    /**
+     * 订单支付项
+     */
+    private List<OrderPaymentItem> orderPaymentItems;
+
+    private BigDecimal servicePrice;
+
+    private BigDecimal mealFeePrice;
+
+    private Integer mealAllNumber;
+
+    /**
+     * 原始餐盒总数（退菜前）
+     */
+    private Integer baseMealAllCount;
+
+    /**
+     * 退菜原因
+     */
+    private RefundRemark refundRemark;
+
+    /**
+     * 退菜原因补充
+     */
+    private String remarkSupply;
+
+    public Integer getTag() {
+        return tag;
+    }
+
+    public void setTag(Integer tag) {
+        this.tag = tag;
+    }
+
+    public Integer getFailPrintCount() {
+        return failPrintCount;
+    }
+
+    public void setFailPrintCount(Integer failPrintCount) {
+        this.failPrintCount = failPrintCount;
+    }
+
+    public Integer getPrintKitchenFlag() {
+        return printKitchenFlag;
+    }
+
+    public void setPrintKitchenFlag(Integer printKitchenFlag) {
+        this.printKitchenFlag = printKitchenFlag;
+    }
+
+    public Integer getPrintFailFlag() {
+        return printFailFlag;
+    }
+
+    public void setPrintFailFlag(Integer printFailFlag) {
+        this.printFailFlag = printFailFlag;
+    }
 
     public Integer getIsPosPay() {
         return isPosPay;
@@ -306,9 +365,6 @@ public class Order implements Serializable{
         this.needScan = needScan;
     }
     
-    //原始餐盒总数（退菜前）
-    private Integer baseMealAllCount;
-
     public Integer getBaseMealAllCount() {
 		return baseMealAllCount;
 	}
@@ -340,9 +396,6 @@ public class Order implements Serializable{
     public void setRefundMoney(BigDecimal refundMoney) {
         this.refundMoney = refundMoney;
     }
-    private BigDecimal mealFeePrice;
-
-    private Integer mealAllNumber;
 
     public Integer getMealAllNumber() {
         return mealAllNumber;
@@ -423,13 +476,6 @@ public class Order implements Serializable{
     final public void setPayMode(Integer payMode) {
         this.payMode = payMode;
     }
-
-    /**
-     * 订单支付项
-     */
-    private List<OrderPaymentItem> orderPaymentItems;
-
-    private BigDecimal servicePrice;
 
     final public BigDecimal getServicePrice() {
         return servicePrice;
@@ -894,6 +940,22 @@ public class Order implements Serializable{
 
     public void setShareCustomer(String shareCustomer) {
         this.shareCustomer = shareCustomer;
+    }
+
+    public RefundRemark getRefundRemark() {
+        return refundRemark;
+    }
+
+    public void setRefundRemark(RefundRemark refundRemark) {
+        this.refundRemark = refundRemark;
+    }
+
+    public String getRemarkSupply() {
+        return remarkSupply;
+    }
+
+    public void setRemarkSupply(String remarkSupply) {
+        this.remarkSupply = remarkSupply;
     }
 
     @Override

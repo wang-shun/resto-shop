@@ -17,7 +17,7 @@
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
-             <button type="button" class="btn btn-primary" @click="month">本月</button>
+             <%--<button type="button" class="btn btn-primary" @click="month">本月</button>--%>
              <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>
              <button type="button" class="btn btn-primary" @click="createBrnadArticleTotal" v-if="state == 1">下载报表</button>
              <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
@@ -410,10 +410,20 @@ var vueObj = new Vue({
           this.currentType= type;
         },
         searchInfo : function() {
+            var that = this;
+            var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+            if(timeCha < 0){
+                toastr.clear();
+                toastr.error("开始时间应该少于结束时间！");
+                return false;
+            }else if(timeCha > 604800000){
+                toastr.clear();
+                toastr.error("暂时未开放大于一周以内的查询！");
+                return false;
+            }
             toastr.clear();
             toastr.success("查询中...");
         	try{
-	            var that = this;
 	            var api1 = brandUnitAPI;
 	            var api2 = brandFamilyAPI;
                 var api3 = brandTypeAPI;

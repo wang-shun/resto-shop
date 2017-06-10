@@ -185,13 +185,9 @@
 						$("#validateMsg").show();
 					}
 				},
-				updateRange:function(){
-					this.m.range = 0;
-				}
+
 			},
-			watch:{
-				'm.printType': 'updateRange',
-			}
+
 		});
 		C.vue = vueObj;
 	}());

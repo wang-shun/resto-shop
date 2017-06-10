@@ -109,4 +109,6 @@ public class ServerConfig {
     @Bean
     public WeBrandScoreService weBrandScoreService(){ return  proxy.create(WeBrandScoreService.class); }
 
+    @Bean
+    public ElemeTokenService elemeTokenService(){ return  proxy.create(ElemeTokenService.class); }
 }

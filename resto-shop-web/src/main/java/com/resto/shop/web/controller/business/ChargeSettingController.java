@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,8 +51,8 @@ public class ChargeSettingController extends GenericController{
 	    brand.setCreateTime(new Date());
 	    brand.setId(UUID.randomUUID().toString());
 	    chargesettingService.insert(brand);
-	    if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+	    if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 
 		return Result.getSuccess();
@@ -62,8 +63,8 @@ public class ChargeSettingController extends GenericController{
 	public Result modify(@Valid ChargeSetting brand){
 		brand.setLabelText("充" + brand.getChargeMoney() + "送" + brand.getRewardMoney());
 		chargesettingService.update(brand);
-		if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 		return Result.getSuccess();
 	}
@@ -72,8 +73,8 @@ public class ChargeSettingController extends GenericController{
 	@ResponseBody
 	public Result delete(String id){
 		chargesettingService.delete(id);
-		if(MemcachedUtils.get(getCurrentBrandId()+"chargeList") != null){
-			MemcachedUtils.delete(getCurrentBrandId()+"chargeList");
+		if(RedisUtil.get(getCurrentBrandId()+"chargeList") != null){
+			RedisUtil.remove(getCurrentBrandId()+"chargeList");
 		}
 		return Result.getSuccess();
 	}

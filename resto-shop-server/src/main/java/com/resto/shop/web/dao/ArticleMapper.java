@@ -135,4 +135,11 @@ public interface ArticleMapper extends GenericDao<Article, String>{
      * @return
      */
     List<Article> selectnewPosListByFamillyId(@Param("times") List<Integer> supportTimes, @Param("shopId") String shopId,@Param("articleFamilyId") String familyId);
+
+    /**
+     * 查询菜品中图片是在资源服务器上的
+     * @param currentBrandId
+     * @return
+     */
+    List<Article> selectHasResourcePhotoList(String currentBrandId);
 }
