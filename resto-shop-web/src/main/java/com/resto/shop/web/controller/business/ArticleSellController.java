@@ -541,7 +541,7 @@ public class ArticleSellController extends GenericController{
             List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
             Map<String, Object> familyMap = articleService.selectArticleOrderCount(selectMap);
             for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos) {
-                if (familyMap.get("sellNum").toString().equalsIgnoreCase("0")) {
+                if (familyMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(familyMap.get("sellNum").toString()) == 0) {
                     articleFamilySellDto.setNumRatio("0.00%");
                 } else {
                     articleFamilySellDto.setNumRatio(new BigDecimal(articleFamilySellDto.getShopSellNum()).divide(new BigDecimal(
