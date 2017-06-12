@@ -1218,7 +1218,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Result refundPaymentByUnfinishedOrder(String orderId) {
+    public synchronized Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
         if (order.getOrderState() != OrderState.SUBMIT) {
