@@ -6,6 +6,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.shop.web.dao.CustomerAddressMapper;
 import com.resto.shop.web.model.CustomerAddress;
+import com.resto.shop.web.service.CustomerAddressService;
 
 import javax.annotation.Resource;
 import java.util.List;
