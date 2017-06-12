@@ -1218,7 +1218,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized Result refundPaymentByUnfinishedOrder(String orderId) {
+    public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
         if (order.getOrderState() != OrderState.SUBMIT) {
@@ -1234,8 +1234,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.updateByPrimaryKeySelective(order);
             return new Result("支付宝订单更改为微信支付，支付时点击关闭不取消订单", false);
         }
-        Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+//        Brand brand = brandService.selectById(order.getBrandId());
+//        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "微信点X取消订单！");
 //      LogTemplateUtils.getRefundWechatByUserType(order,brand,shopDetail.getName());
