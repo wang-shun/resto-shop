@@ -547,7 +547,7 @@ public class ArticleSellController extends GenericController{
                     articleFamilySellDto.setNumRatio(new BigDecimal(articleFamilySellDto.getShopSellNum()).divide(new BigDecimal(
                             familyMap.get("sellNum").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
                 }
-                if (familyMap.get("salles").toString().equalsIgnoreCase("0")) {
+                if (familyMap.get("salles").toString().equalsIgnoreCase("0") || Double.parseDouble(familyMap.get("salles").toString()) == 0) {
                     articleFamilySellDto.setSalesRatio("0.00%");
                 } else {
                     articleFamilySellDto.setSalesRatio(articleFamilySellDto.getSalles().divide(new BigDecimal(
