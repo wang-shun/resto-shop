@@ -9,6 +9,8 @@ import com.resto.shop.web.model.CustomerAddress;
 import com.resto.shop.web.service.CustomerAddressService;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -49,6 +51,7 @@ public class CustomerAddressServiceImpl extends GenericServiceImpl<CustomerAddre
         if(record.getState()==1){
             customerAddressMapper.updateState(record.getCustomerId());
         }
+        record.setUpdateTime(new java.sql.Date(System.currentTimeMillis()));
         return customerAddressMapper.updateByPrimaryKeySelective(record);
     }
     @Override
@@ -60,4 +63,5 @@ public class CustomerAddressServiceImpl extends GenericServiceImpl<CustomerAddre
     public List<CustomerAddress> selectOneList(String customer_id) {
         return customerAddressMapper.selectOneList(customer_id);
     }
+
 }
