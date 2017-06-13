@@ -54,7 +54,7 @@ public class CustomerAddressServiceImpl extends GenericServiceImpl<CustomerAddre
     }
 
     @Override
-    public List<CustomerAddress> selectOneList(String customer_id,Integer state) {
-        return customerAddressMapper.selectOneList(customer_id,state);
+    public List<CustomerAddress> selectOneList(String customer_id) {
+        return customerAddressMapper.selectOneList(customer_id);
     }
 }

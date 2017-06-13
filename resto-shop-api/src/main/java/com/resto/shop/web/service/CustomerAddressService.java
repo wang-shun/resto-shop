@@ -23,6 +23,6 @@ public interface CustomerAddressService  extends GenericService<CustomerAddress,
 
     int updateByPrimaryKey(CustomerAddress record);
 
-    List<CustomerAddress> selectOneList(String customer_id, Integer state);
+    List<CustomerAddress> selectOneList(String customer_id);
 
 }
