@@ -18,13 +18,7 @@ import com.resto.shop.web.constant.AccountLogType;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.AccountMapper;
 import com.resto.shop.web.dao.ChargeOrderMapper;
-import com.resto.shop.web.model.Account;
-import com.resto.shop.web.model.AccountLog;
-import com.resto.shop.web.model.ChargeOrder;
-import com.resto.shop.web.model.ChargeSetting;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
@@ -68,6 +62,12 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 
     @Resource
     RedPacketService redPacketService;
+
+    @Resource
+    BonusSettingService bonusSettingService;
+
+    @Resource
+    BonusLogService bonusLogService;
     
     @Override
     public GenericDao<Account, String> getDao() {
@@ -269,6 +269,24 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	    	addAccount(chargeOrder.getRewardBalance(), accountId, "充值赠送",AccountLog.SOURCE_CHARGE_REWARD,shopDetail.getId());
 	    	//微信推送
 			wxPush(chargeOrder);
+            BonusSetting bonusSetting = bonusSettingService.selectByChargeSettingId(chargeSetting.getId());
+            if (bonusSetting != null){
+                BonusLog bonusLog = new BonusLog();
+                bonusLog.setId(ApplicationUtils.randomUUID());
+                bonusLog.setChargeOrderId(chargeOrder.getId());
+                bonusLog.setBonusSettingId(bonusSetting.getId());
+                BigDecimal chargeMoney = chargeOrder.getChargeMoney();
+                Integer bonusAmount = chargeMoney.multiply(new BigDecimal(bonusSetting.getChargeBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer shopownerBonusAmount = new BigDecimal(bonusAmount).multiply(new BigDecimal(bonusSetting.getShopownerBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer employeeBonusAmount = bonusAmount - shopownerBonusAmount;
+                bonusLog.setBonusAmount(bonusAmount);
+                bonusLog.setState(0);
+                bonusLog.setShopownerBonusAmount(shopownerBonusAmount);
+                bonusLog.setEmployeeBonusAmount(employeeBonusAmount);
+                bonusLog.setCreateTime(new Date());
+                bonusLog.setWishing(bonusSetting.getWishing());
+                bonusLogService.insert(bonusLog);
+            }
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
             map.put("fileName", shopDetail.getName());

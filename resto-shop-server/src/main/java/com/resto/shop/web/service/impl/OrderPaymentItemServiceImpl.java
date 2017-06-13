@@ -151,4 +151,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public OrderPaymentItem insertByBeforePay(OrderPaymentItem orderPaymentItem) {
         return orderpaymentitemMapper.insertByBeforePay(orderPaymentItem);
     }
+
+    @Override
+    public OrderPaymentItem selectWeChatPayResultData(String shopId) {
+        return orderpaymentitemMapper.selectWeChatPayResultData(shopId);
+    }
 }

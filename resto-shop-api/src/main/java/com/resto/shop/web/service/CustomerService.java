@@ -95,4 +95,7 @@ public interface CustomerService extends GenericService<Customer, String> {
     Customer selectByTelePhone(String s);
 
 	Customer selectBySerialNumber(String number);
+
+
+    List<Customer> selectByTelePhones(List<String> telePhones);
 }
