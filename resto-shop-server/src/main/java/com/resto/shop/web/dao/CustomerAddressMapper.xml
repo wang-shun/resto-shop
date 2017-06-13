@@ -134,8 +134,8 @@
       <if test="addressReality != null" >
         address_reality = #{addressReality,jdbcType=VARCHAR},
       </if>
-      <if test="lable != null" >
-        lable = #{lable,jdbcType=VARCHAR},
+      <if test="label != null" >
+        lable = #{label,jdbcType=VARCHAR},
       </if>
       <if test="state != null" >
         state = #{state,jdbcType=INTEGER},
