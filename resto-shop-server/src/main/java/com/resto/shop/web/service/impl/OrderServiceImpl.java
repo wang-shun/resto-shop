@@ -4701,6 +4701,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("beginDate", beginDate);
         selectMap.put("endDate", endDate);
         String orderAccountId = "";
+        BigDecimal originalMoney = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
         BigDecimal orderCount = new BigDecimal(0);
         BigDecimal customerCount = new BigDecimal(0);
@@ -4708,6 +4709,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (Order orderAccount : orderList) {
             orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
             orderMoney = orderMoney.add(orderAccount.getOrderMoney());
+            originalMoney = originalMoney.add(orderAccount.getOriginalAmount());
             if (StringUtils.isBlank(orderAccount.getParentOrderId()) && orderAccount.getProductionStatus() != ProductionStatus.REFUND_ARTICLE) {
                 orderCount = orderCount.add(new BigDecimal(1));
                 customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
@@ -4730,6 +4732,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else {
             data.put("DATE", beginDate + "至" + endDate);
         }
+        data.put("ORIGINAL_AMOUNT", originalMoney);
         data.put("TOTAL_AMOUNT", orderMoney);
         data.put("ORDER_AMOUNT", orderCount);
         DecimalFormat df = new DecimalFormat("######0.00");
@@ -4824,7 +4827,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal articlePay = orderMapper.getPayment(selectMap);
         articlePay = articlePay == null ? BigDecimal.ZERO : articlePay;
         BigDecimal discountAmount = accountPay.add(couponPay).add(rewardPay).add(waitMoney).add(articlePay);
-        data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
         List<Map<String, Object>> discountItems = new ArrayList<>();
         Map<String, Object> accountPayItem = new HashMap<>();
         accountPayItem.put("SUBTOTAL", accountPay == null ? 0 : accountPay);
@@ -4846,6 +4848,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
         articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
+        if (originalMoney.compareTo(orderMoney) != 0){
+            Map<String, Object> discountMap = new HashMap<>();
+            discountAmount = discountAmount.add(originalMoney.subtract(orderMoney));
+            discountMap.put("SUBTOTAL", originalMoney.subtract(orderMoney));
+            discountMap.put("PAYMENT_MODE", "粉丝价折扣");
+            discountItems.add(discountMap);
+        }
+        data.put("DISCOUNT_AMOUNT", discountAmount == null ? 0 : discountAmount);
         data.put("DISCOUNT_ITEMS", discountItems);
         List<Map<String, Object>> chargeOrders = chargeOrderService.selectByShopToDay(selectMap);
         data.put("STORED_VALUE_COUNT", chargeOrders.size());

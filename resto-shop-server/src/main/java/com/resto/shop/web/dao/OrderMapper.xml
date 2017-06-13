@@ -2007,7 +2007,7 @@
     </select>
 
     <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
-        select t.id,
+        select t.id, t.original_amount,
         t.parent_order_id parentOrderId,
         t.order_money as orderMoney,
         IFNULL(t.customer_count,0) customerCount,
