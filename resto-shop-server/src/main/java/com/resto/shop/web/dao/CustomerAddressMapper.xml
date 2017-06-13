@@ -165,4 +165,10 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  <update id="updateState">
+    update tb_customer_address
+    set
+    state = null
+    where customer_id = #{customer_id,jdbcType=VARCHAR}
+  </update>
 </mapper>

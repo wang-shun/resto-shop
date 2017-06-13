@@ -46,6 +46,9 @@ public class CustomerAddressServiceImpl extends GenericServiceImpl<CustomerAddre
     }
     @Override
     public int updateByPrimaryKeySelective(CustomerAddress record){
+        if(record.getState()==1){
+            customerAddressMapper.updateState(record.getCustomerId());
+        }
         return customerAddressMapper.updateByPrimaryKeySelective(record);
     }
     @Override
