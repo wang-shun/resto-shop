@@ -369,7 +369,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        if(!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 4){
+        if(!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5){
             jsonResult.setSuccess(false);
             jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
             return jsonResult;
