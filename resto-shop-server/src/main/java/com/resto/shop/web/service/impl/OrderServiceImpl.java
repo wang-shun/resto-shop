@@ -368,6 +368,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
+
+        if(!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 4){
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
+            return jsonResult;
+        }
+
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
@@ -556,6 +563,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 default:
                     throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
+            }
+            if(!a.getShopDetailId().equals(order.getShopDetailId())){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("门店选择错误，请尝试扫描桌号二维码进行点餐！");
+                return jsonResult;
             }
             item.setMealFeeNumber(mealFeeNumber);
             item.setArticleDesignation(a.getDescription());
@@ -1036,7 +1048,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public synchronized Order payOrderSuccess(Order order) {
+    public  Order payOrderSuccess(Order order) {
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
@@ -1198,7 +1210,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized boolean autoRefundOrder(String orderId) {
+    public  boolean autoRefundOrder(String orderId) {
         Order order = selectById(orderId);
         if (order.getAllowCancel()) {
             order.setAllowCancel(false);
@@ -1218,7 +1230,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized Result refundPaymentByUnfinishedOrder(String orderId) {
+    public  Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
         if (order.getOrderState() != OrderState.SUBMIT) {
@@ -1524,7 +1536,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized Order orderWxPaySuccess(OrderPaymentItem item) {
+    public  Order orderWxPaySuccess(OrderPaymentItem item) {
         Order order = selectById(item.getOrderId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if (historyItem == null) {
