@@ -27,7 +27,7 @@
   <select id="selectOneList" resultMap="BaseResultMap">
     SELECT <include refid="Base_Column_List" /> FROM tb_customer_address WHERE state=1 AND customer_id = #{customer_id,jdbcType=VARCHAR}
     UNION ALL
-    SELECT <include refid="Base_Column_List" /> FROM tb_customer_address WHERE state IS NULL AND customer_id = #{customer_id,jdbcType=VARCHAR}
+    SELECT <include refid="Base_Column_List" /> FROM tb_customer_address WHERE state IS NULL AND customer_id = #{customer_id,jdbcType=VARCHAR} ORDER BY  create_time DESC
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from tb_customer_address
