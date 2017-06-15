@@ -4962,7 +4962,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<ArticleFamily> articleFamilies = articleFamilyMapper.selectArticleSort(articleIds);
             for (ArticleFamily articleFamily : articleFamilies){
                 List<Map<String, Object>> familyArticleMaps = new ArrayList<>();
-                BigDecimal familyCount = BigDecimal.ZERO;
+//                BigDecimal familyCount = BigDecimal.ZERO;
                 for (Article article : articleFamily.getArticleList()){
                     BigDecimal unitNewCount = BigDecimal.ZERO;
                     Map<String, Map<String, Integer>> unitMaps = new HashMap<>();
@@ -5014,18 +5014,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                             unitMaps.put(orderItem.getArticleId(), map);
                         }else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())){
-                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
+//                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
                             saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
                             itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                            itemMap.put("SUBTOTAL", orderItem.getCount());
-                            familyArticleMaps.add(itemMap);
-                            itemMap = new HashMap<>();
-                            itemMap.put("PRODUCT_NAME", "|_单品");
-                            itemMap.put("SUBTOTAL", orderItem.getCount() - orderItem.getPackageNumber());
-                            familyArticleMaps.add(itemMap);
-                            itemMap = new HashMap<>();
-                            itemMap.put("PRODUCT_NAME", "|_套餐");
-                            itemMap.put("SUBTOTAL", orderItem.getPackageNumber());
+                            itemMap.put("SUBTOTAL", orderItem.getCount() + "("+(orderItem.getCount() - orderItem.getPackageNumber())+"+"+orderItem.getPackageNumber()+")");
                             familyArticleMaps.add(itemMap);
                         }
                     }
@@ -5043,7 +5035,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                             maps.add(map);
                         }
-                        familyCount = familyCount.add(articleCount);
+//                        familyCount = familyCount.add(articleCount);
                         saledProductAmount = saledProductAmount.add(articleCount);
                         itemMap.put("PRODUCT_NAME", article.getName());
                         itemMap.put("SUBTOTAL", articleCount);
@@ -5052,8 +5044,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
                 Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("PRODUCT_NAME", "----------"+ articleFamily.getName() + "----------");
-                itemMap.put("SUBTOTAL", familyCount);
+                BigDecimal strLength = new BigDecimal(articleFamily.getName().length()).multiply(new BigDecimal(2));
+                Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                String string = "-";
+                for (int i = 1; i < length; i++){
+                    string = string.concat("-");
+                }
+                itemMap.put("PRODUCT_NAME", string.concat(articleFamily.getName()).concat(string));
+//                itemMap.put("SUBTOTAL", familyCount);
                 saledProducts.add(itemMap);
                 saledProducts.addAll(familyArticleMaps);
             }
