@@ -1,14 +1,11 @@
 package com.resto.shop.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.qroud.SmsSingleSenderResult;
-import com.resto.brand.core.util.TXSMSUtils;
 import org.json.JSONObject;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -87,26 +84,10 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 				}catch(Exception e){
 					log.error("发送短信失败:"+e.getMessage());
 				}
-			}else{ //阿里短信发送失败后使用腾讯云
-			    //使用腾讯云发短信验证码
-                ArrayList<String> params = new ArrayList<>();
-                params.add(code);
-                params.add(brandUser.getBrandName());
-                SmsSingleSenderResult txRestul = null;
-                smsLog.setSmsType(SmsLogType.TX_AUTO_CODE);
-                try {
-                    txRestul = TXSMSUtils.sendTmpSingle(phone,TXSMSUtils.IDENTIFYING_CODE,params);
-                    smsLog.setSmsResult(com.alibaba.fastjson.JSONObject.toJSONString(txRestul));
-                    if(txRestul.result==0){//腾讯云返回result=0成功
-                        smsLog.setIsSuccess(true);
-                    }
-                } catch (Exception e) {
-                    smsLog.setIsSuccess(false);//腾讯云发短信验证码失败
-                    e.printStackTrace();
-                }
+			}
                 //短信发送失败不更新短信账户
 				insert(smsLog);
-			}
+
 		log.info("短信发送结果:"+string);
 		return string;
 	}

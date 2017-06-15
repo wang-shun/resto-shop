@@ -94,6 +94,7 @@ public class DayDataMessage implements Serializable{
 
     private BigDecimal monthTotal;
 
+
     public String getShopId() {
         return shopId;
     }

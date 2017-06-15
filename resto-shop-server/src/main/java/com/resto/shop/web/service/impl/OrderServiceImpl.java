@@ -24,6 +24,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.util.JdbcSmsUtils;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -39,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -5178,9 +5180,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
         ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
         dayDataMessageService.insert(ds);
+        JdbcSmsUtils.saveDayDataMessage(ds);
         //存评论数据
         DayAppraiseMessageWithBLOBs dm = new DayAppraiseMessageWithBLOBs();
         dm.setId(ApplicationUtils.randomUUID());
+        dm.setShopId(shopDetail.getId());
         dm.setShopName(shopDetail.getName());
         dm.setDate(new Date());
         dm.setState(true);
@@ -5225,7 +5229,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         dayAppraiseMessageService.insert(dm);
-
+        JdbcSmsUtils.saveDayAppraise(dm);
         return map;
 
     }
@@ -6107,35 +6111,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         dayAppraiseMessageService.insert(dm);
 
 
-
         return map;
 
     }
 
     private void pushMessage(Map<String, Object> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, String brandName,int messageType) {
         //模板id
-        int txTempDataId=0 ;//腾讯数据模板
-        int txTempScoreId = 0;//腾讯分数模板
         String aliTempDataId;//阿里模板
         String aliTempScoreId;//阿里大鱼模板
 
-        //先用腾讯云发短信
-        switch (messageType){
-            case  MessageType.DAY_MESSAGE:
-                txTempDataId=TXSMSUtils.DAYDATAMESSAGE;
-                txTempScoreId=TXSMSUtils.DAYSCOREMESSAGE;
-                break;
-            case MessageType.XUN_MESSAGE:
-                txTempDataId = TXSMSUtils.XUNDATAMESSAGE;
-                txTempScoreId = TXSMSUtils.XUNSCOREMESSAGE;
-                break;
-            case MessageType.MONTH_MESSAGE:
-                txTempDataId = TXSMSUtils.MONTHDATAMESSAGE;
-                txTempScoreId = TXSMSUtils.MONTHSCOREMESSAGE;
-                break;
-                default:
-                    break;
-        }
         if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
             //截取电话号码
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");

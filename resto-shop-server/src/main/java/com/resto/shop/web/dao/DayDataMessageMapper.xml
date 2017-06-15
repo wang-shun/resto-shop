@@ -51,7 +51,7 @@
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.DayDataMessage">insert into tb_day_data_message 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>
-        <if test="shopId != null">shop_Id,</if>
+        <if test="shopId != null">shop_id,</if>
         <if test="type != null">type,</if>
       <if test="shopName != null">shop_name,</if>  
       <if test="dateTime != null">date_time,</if>  
