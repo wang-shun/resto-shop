@@ -5017,7 +5017,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
                             saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
                             itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                            itemMap.put("SUBTOTAL", orderItem.getCount() + "(单品:"+(orderItem.getCount() - orderItem.getPackageNumber())+" + 套餐:"+orderItem.getPackageNumber()+")");
+                            itemMap.put("SUBTOTAL", orderItem.getCount() + "("+(orderItem.getCount() - orderItem.getPackageNumber())+"+"+orderItem.getPackageNumber()+")");
                             familyArticleMaps.add(itemMap);
                         }
                     }
