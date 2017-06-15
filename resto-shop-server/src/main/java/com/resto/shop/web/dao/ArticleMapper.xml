@@ -876,17 +876,16 @@ GROUP BY article_id
 		from tb_meal_attr tma
 		inner join tb_meal_item tmi
 		on tma.id = tmi.meal_attr_id
-		<where>
+		where
             <if test="articleId != null">
-                and tma.article_id = #{articleId}
+                tma.artiscle_id = #{articleId}
             </if>
             <if test="articleIds != null">
-                and tma.article_id in
+                tma.article_id in
                 <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
                     #{articleId}
                 </foreach>
             </if>
-        </where>
 		order by tma.sort asc
     </select>
 
