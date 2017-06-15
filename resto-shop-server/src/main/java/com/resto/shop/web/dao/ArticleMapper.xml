@@ -868,6 +868,7 @@ GROUP BY article_id
         inner join tb_meal_item tmi
         on tma.id = tmi.meal_attr_id
         where tma.article_id = #{articleId}
+        GROUP BY tmi.article_id
         order by tma.sort asc
     </select>
 
