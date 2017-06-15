@@ -79,6 +79,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public Customer register(Customer customer) {
 		String customerId = ApplicationUtils.randomUUID();
+		Customer cus = customerMapper.selectByOpenId(customer.getWechatId());
+		if(cus != null){
+			return cus;
+		}
 		customer.setId(customerId);
 		Account account = new Account();
 		account.setId(ApplicationUtils.randomUUID());

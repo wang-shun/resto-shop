@@ -1585,14 +1585,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return true;
         }
 
-        if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
-            log.error("立即下单失败: " + order.getId());
-            throw new AppException(AppException.ORDER_STATE_ERR);
-        }
+
         switch (order.getOrderMode()) {
-            case 1:
-                if (order.getTableNumber() == null) {
-                    throw new AppException(AppException.ORDER_MODE_CHECK, "桌号不得为空");
+//            case 1:
+//                if (order.getTableNumber() == null) {
+//                    throw new AppException(AppException.ORDER_MODE_CHECK, "桌号不得为空");
+//                }
+//                break;
+            case ShopMode.BOSS_ORDER:
+                if(order.getPayType() == PayType.PAY){
+                    if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                        log.error("立即下单失败: " + order.getId());
+                        throw new AppException(AppException.ORDER_STATE_ERR);
+                    }
+                }else if (order.getPayType() == PayType.NOPAY){
+                    if (order.getOrderState() != OrderState.SUBMIT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                        log.error("立即下单失败: " + order.getId());
+                        throw new AppException(AppException.ORDER_STATE_ERR);
+                    }
+                }
+                break;
+            case ShopMode.CALL_NUMBER:
+                if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    log.error("立即下单失败: " + order.getId());
+                    throw new AppException(AppException.ORDER_STATE_ERR);
+                }
+                break;
+            case ShopMode.MANUAL_ORDER:
+                if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    log.error("立即下单失败: " + order.getId());
+                    throw new AppException(AppException.ORDER_STATE_ERR);
                 }
                 break;
         }
