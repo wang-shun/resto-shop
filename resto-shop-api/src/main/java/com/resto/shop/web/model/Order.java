@@ -64,6 +64,8 @@ public class Order implements Serializable{
 
     private String customerId;
 
+    private String customerAddressId;
+
     private Date distributionDate;
 
     private Integer distributionTimeId;
@@ -666,6 +668,14 @@ public class Order implements Serializable{
 
     final public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    final public String getCustomerAddressId() {
+        return customerAddressId;
+    }
+
+    final public void setCustomerAddressId(String customerAddressId) {
+        this.customerAddressId = customerAddressId;
     }
 
     final public Date getDistributionDate() {

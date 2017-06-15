@@ -510,6 +510,9 @@
             <if test="customerId != null">
                 customer_id,
             </if>
+            <if test="customerAddressId != null">
+                customer_address_id,
+            </if>
             <if test="distributionDate != null">
                 distribution_date,
             </if>
@@ -667,6 +670,10 @@
             </if>
             <if test="customerId != null">
                 #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerAddressId != null">
+
+                #{customerAddressId,jdbcType=VARCHAR},
             </if>
             <if test="distributionDate != null">
                 #{distributionDate,jdbcType=DATE},
