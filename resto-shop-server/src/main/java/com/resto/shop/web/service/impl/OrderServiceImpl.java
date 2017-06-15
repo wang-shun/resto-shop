@@ -4969,7 +4969,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     for (OrderItem orderItem : saledOrderItems) {
                         Map<String, Object> itemMap = new HashMap<>();
                         if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())){
-                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
                             itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                             itemMap.put("SUBTOTAL", orderItem.getCount());
                             familyArticleMaps.add(itemMap);
@@ -4986,7 +4985,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                     familyArticleMaps.add(itemMap);
                                 }
                             }
-                            break;
                         }else if (orderItem.getType().equals(OrderItemType.UNITPRICE) && orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")).equalsIgnoreCase(article.getId())){
                             Map<String, Integer> map = new HashMap<>();
                             if (unitMaps.containsKey(orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")))){
@@ -5029,7 +5027,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             itemMap.put("PRODUCT_NAME", "|_套餐");
                             itemMap.put("SUBTOTAL", orderItem.getPackageNumber());
                             familyArticleMaps.add(itemMap);
-                            break;
                         }
                     }
                     if (unitMaps.containsKey(article.getId())){
@@ -5055,22 +5052,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
                 Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("PRODUCT_NAME", "※"+ articleFamily.getName());
+                itemMap.put("PRODUCT_NAME", "----------"+ articleFamily.getName() + "----------");
                 itemMap.put("SUBTOTAL", familyCount);
                 saledProducts.add(itemMap);
                 saledProducts.addAll(familyArticleMaps);
             }
-//            selectOrderMap.clear();
-//            selectOrderMap.put("orderIds", orderIds);
-//            selectOrderMap.put("count", "refund_count != 0");
-//            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
-//            for (OrderItem orderItem : canceledOrderItems) {
-//                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
-//                Map<String, Object> itemMap = new HashMap<String, Object>();
-//                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-//                itemMap.put("SUBTOTAL", orderItem.getRefundCount());
-//                canceledProducts.add(itemMap);
-//            }
+            selectOrderMap.clear();
+            selectOrderMap.put("orderIds", orderIds);
+            selectOrderMap.put("count", "refund_count != 0");
+            List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
+            for (OrderItem orderItem : canceledOrderItems) {
+                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
+                Map<String, Object> itemMap = new HashMap<>();
+                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                itemMap.put("SUBTOTAL", orderItem.getRefundCount());
+                canceledProducts.add(itemMap);
+            }
             if (!nowService.equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<String, Object>();
                 itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
