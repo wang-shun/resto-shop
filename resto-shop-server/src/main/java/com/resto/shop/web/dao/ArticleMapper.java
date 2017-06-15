@@ -55,15 +55,15 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceTotal(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
+
+
+//	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
-	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
+//	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
 	void initSizeCurrent();
 
@@ -83,7 +83,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	int deleteRecommendId(String recommendId);
 
-	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
+//	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
 
 
 	int selectPidAndShopId(@Param("shopId") String shopId,@Param("articleId") String articleId);
@@ -110,7 +110,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
-	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
 
 	/**
 	 * 根据分类查询分类下的所有菜品

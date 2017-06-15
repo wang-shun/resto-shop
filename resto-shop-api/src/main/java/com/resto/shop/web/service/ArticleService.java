@@ -61,7 +61,6 @@ public interface ArticleService extends GenericService<Article, String> {
 
 	void deleteRecommendId(String recommendId);
 
-	void saveLog(Integer result,String taskId);
 
 
 	/**
@@ -93,7 +92,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
-	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
 
 	/**
 	 * 根据分类查询分类下的所有菜品

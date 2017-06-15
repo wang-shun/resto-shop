@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.model.MealAttr;
 import com.resto.shop.web.model.MealItem;
@@ -87,6 +88,8 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 		return list;
 	}
 
-
-
+	@Override
+	public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
+		return mealattrMapper.queryArticleMealAttr(selectMap);
+	}
 }

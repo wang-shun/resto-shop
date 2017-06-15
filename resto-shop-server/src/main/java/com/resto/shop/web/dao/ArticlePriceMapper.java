@@ -1,13 +1,12 @@
 package com.resto.shop.web.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.ArticlePrice;
+import org.apache.ibatis.annotations.Param;
 
-public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
+import java.util.List;
+
+public interface ArticlePriceMapper extends GenericDao<ArticlePrice, String> {
     int deleteByPrimaryKey(String id);
 
     int insert(ArticlePrice record);
@@ -20,11 +19,15 @@ public interface ArticlePriceMapper  extends GenericDao<ArticlePrice,String> {
 
     int updateByPrimaryKey(ArticlePrice record);
 
-	void deleteArticlePrices(String articleId);
+    void deleteArticlePrices(String articleId);
 
-	List<ArticlePrice> selectByArticleId(String articleId);
+    List<ArticlePrice> selectByArticleId(String articleId);
 
-	List<ArticlePrice> selectList(@Param("shopId") String shopDetailId);
+    List<ArticlePrice> selectList(@Param("shopId") String shopDetailId);
 
-    ArticlePrice selectByArticle(@Param("articleId") String articleId,@Param("unitId") int unitId);
+    ArticlePrice selectByArticle(@Param("articleId") String articleId, @Param("unitId") int unitId);
+
+    Integer clearPriceStock(@Param("articleId") String articleId, @Param("emptyRemark") String emptyRemark);
+
+    Integer clearPriceTotal(@Param("articleId") String articleId, @Param("emptyRemark") String emptyRemark);
 }
