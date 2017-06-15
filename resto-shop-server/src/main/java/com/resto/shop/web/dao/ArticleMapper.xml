@@ -859,14 +859,34 @@ GROUP BY article_id
 		inner join tb_order tr
 		on toi.order_id = tr.id
 		where tr.order_state in (2,10,11,12) and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3))
-		and toi.article_id = #{articleId}
+		and
+        <if test="articleId != null">
+            toi.article_id = #{articleId}
+        </if>
+        <if test="articleIds != null">
+            toi.article_id in
+            <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+                #{articleId}
+            </foreach>
+        </if>
 		and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00') 
 		and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-		) and ti.article_id = tmi.article_id),0) brandSellNum
+		) and ti.article_id = tmi.article_id),0) brandSellNum,
+        tma.article_id articleId
 		from tb_meal_attr tma
 		inner join tb_meal_item tmi
 		on tma.id = tmi.meal_attr_id
-		where tma.article_id = #{articleId}
+		<where>
+            <if test="articleId != null">
+                and tma.article_id = #{articleId}
+            </if>
+            <if test="articleIds != null">
+                and tma.article_id in
+                <foreach collection="articleIds" item="articleId" open="(" separator="," close=")">
+                    #{articleId}
+                </foreach>
+            </if>
+        </where>
 		order by tma.sort asc
     </select>
 
