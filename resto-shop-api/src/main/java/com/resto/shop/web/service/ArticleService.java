@@ -38,7 +38,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * 根据 菜品Id 设置谷清
 	 * @param articleId
 	 */
-	void setEmpty(Integer isEmpty,String articleId);
+	void changeEmpty(Integer isEmpty,String articleId);
     
 	void addLikes(String articleId);
 	

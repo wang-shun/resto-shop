@@ -40,7 +40,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	 * 根据菜品 Id 设置谷清
 	 * @param articleId
 	 */
-	void setEmpty(@Param("isEmpty") Integer isEmpty,@Param("articleId") String articleId);
+	void changeEmpty(@Param("isEmpty") Integer isEmpty,@Param("articleId") String articleId);
 
 	void updateLikes(String articleId, Long likes);
 

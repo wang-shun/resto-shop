@@ -233,8 +233,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public void setEmpty(Integer isEmpty, String articleId) {
-        articleMapper.setEmpty(isEmpty, articleId);
+    public void changeEmpty(Integer isEmpty, String articleId) {
+        articleMapper.changeEmpty(isEmpty, articleId);
     }
 
     @Override

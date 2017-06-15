@@ -574,7 +574,7 @@
 
 
     <!-- 根据菜品Id 设置谷清 -->
-    <update id="setEmpty">
+    <update id="changeEmpty">
 	update tb_article set is_empty = #{isEmpty} where id = #{articleId}
   </update>
 
