@@ -144,4 +144,18 @@ public interface ArticleService extends GenericService<Article, String> {
      * @return
      */
     List<Article> selectHasResourcePhotoList(String currentBrandId);
+
+	/**
+	 * 库存为0时设置沽清	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmpty(String articleId);
+
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmptyFail(String articleId);
 }

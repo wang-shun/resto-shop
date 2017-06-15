@@ -321,9 +321,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             RedisUtil.set(baseArticleId + Common.KUCUN, sum);
             if (sum == 0) {
-                orderMapper.setEmpty(baseArticleId);
+                articleMapper.setEmpty(baseArticleId);
             } else {
-                orderMapper.setEmptyFail(baseArticleId);
+                articleMapper.setEmptyFail(baseArticleId);
             }
         }
 
@@ -381,19 +381,19 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
-                orderMapper.setArticlePriceEmptyFail(baseArticleId);
+                articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
             } else if (!moreType && count > 0) {
-                orderMapper.setEmptyFail(articleId);
+                articleMapper.setEmptyFail(articleId);
             }
         } else {
             if (moreType && count == 0) {
-                orderMapper.setArticlePriceEmpty(baseArticleId);
+                articlePriceServer.setArticlePriceEmpty(baseArticleId);
             } else if (!moreType && count == 0) {
-                orderMapper.setEmpty(articleId);
+                articleMapper.setEmpty(articleId);
             } else if (moreType && count > 0) {
-                orderMapper.setArticlePriceEmptyFail(baseArticleId);
+                articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
             } else if (!moreType && count > 0) {
-                orderMapper.setEmptyFail(articleId);
+                articleMapper.setEmptyFail(articleId);
             }
         }
 
@@ -410,9 +410,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             RedisUtil.set(aid + Common.KUCUN, sum);
             if (sum == 0) {
-                orderMapper.setEmpty(aid);
+                articleMapper.setEmpty(aid);
             } else {
-                orderMapper.setEmptyFail(aid);
+                articleMapper.setEmptyFail(aid);
             }
         }
 
@@ -705,4 +705,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.selectHasResourcePhotoList(currentBrandId);
     }
 
+    @Override
+    public Boolean setEmpty(String articleId) {
+        return articleMapper.setEmpty(articleId);
+    }
+
+    @Override
+    public Boolean setEmptyFail(String articleId) {
+        return articleMapper.setEmptyFail(articleId);
+    }
 }

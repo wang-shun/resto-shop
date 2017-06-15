@@ -93,4 +93,33 @@
     set  empty_remark = #{emptyRemark}
     where article_id = #{articleId}
   </update>
+
+  <update id="updateArticlePriceStock">
+    update tb_article_price
+    <set>
+      <if test="type =='minus'">
+        current_working_stock = current_working_stock - #{count}
+      </if>
+      <if test="type =='add'">
+        current_working_stock = current_working_stock + #{count}
+      </if>
+    </set>
+    where id = #{articleId}
+    <if test="type=='minus'">
+      and current_working_stock - #{count} >= 0
+    </if>
+  </update>
+
+  <update id="setArticlePriceEmpty">
+    update tb_article_price
+    set empty_remark = '【系统自动沽清】菜品此规格已售馨'
+    where id = #{articleId}
+
+  </update>
+
+  <update id="setArticlePriceEmptyFail">
+    update tb_article_price
+    set empty_remark = NULL
+    where id = #{articleId}
+  </update>
 </mapper>

@@ -5242,7 +5242,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     } else {
                         if (articleCount > orderItem.getCount()) {
@@ -5251,7 +5251,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     }
                     int sum = 0;
@@ -5267,7 +5267,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     if (sum == 0) {
-                        orderMapper.setEmpty(articlePrice.getArticleId());
+                        articleService.setEmpty(articlePrice.getArticleId());
                     }
                     break;
                 case OrderItemType.SETMEALS:
@@ -5287,7 +5287,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setEmpty(orderItem.getArticleId());
+                            articleService.setEmpty(orderItem.getArticleId());
                         }
                     } else {
                         if (articleCount > orderItem.getCount()) {
@@ -5296,7 +5296,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setEmpty(orderItem.getArticleId());
+                            articleService.setEmpty(orderItem.getArticleId());
                         }
 
                     }
@@ -5342,13 +5342,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
-                            orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + orderItem.getCount());
                         if (articlePrice.getCurrentWorkingStock() == 0) {
-                            orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
                     Integer baseArticle = (Integer) RedisUtil.get(articlePrice.getArticleId() + Common.KUCUN);
@@ -5356,14 +5356,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + orderItem.getCount());
                         if (baseArticle == 0) {
-                            orderMapper.setEmptyFail(articlePrice.getArticleId());
+                            articleService.setEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
                         Article base = articleService.selectById(articlePrice.getArticleId());
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + orderItem.getCount());
                         if (base.getCurrentWorkingStock() == 0) {
-                            orderMapper.setEmptyFail(articlePrice.getArticleId());
+                            articleService.setEmptyFail(articlePrice.getArticleId());
                         }
                     }
                     break;
@@ -5379,13 +5379,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
-                            orderMapper.setEmptyFail(orderItem.getArticleId());
+                            articleService.setEmptyFail(orderItem.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + orderItem.getCount());
                         if (article.getCurrentWorkingStock() == 0) {
-                            orderMapper.setEmptyFail(orderItem.getArticleId());
+                            articleService.setEmptyFail(orderItem.getArticleId());
                         }
                     }
                     break;

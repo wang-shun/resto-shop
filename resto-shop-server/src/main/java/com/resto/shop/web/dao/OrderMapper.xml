@@ -2067,94 +2067,20 @@
     </select>
 
 
-    <update id="updateArticleStock">
-        update tb_article
-        <set>
-            <if test="type=='minus'">
-                current_working_stock = current_working_stock - #{count}
-            </if>
-            <if test="type == 'add'">
-                current_working_stock = current_working_stock + #{count}
-            </if>
-        </set>
-        where id = #{articleId}
-        <if test="type=='minus'">
-            and current_working_stock - #{count} >= 0
-        </if>
-    </update>
 
-    <update id="updateArticlePriceStock">
-        update tb_article_price
-        <set>
-            <if test="type =='minus'">
-                current_working_stock = current_working_stock - #{count}
-            </if>
-            <if test="type =='add'">
-                current_working_stock = current_working_stock + #{count}
-            </if>
-        </set>
-        where id = #{articleId}
-        <if test="type=='minus'">
-            and current_working_stock - #{count} >= 0
-        </if>
-    </update>
 
-    <update id="setEmpty">
-        update tb_article
-        set is_empty = 1 , empty_remark = '【系统自动沽清】菜品已售馨'
-        where id = #{articleId}
 
-    </update>
 
-    <update id="setArticlePriceEmpty">
-        update tb_article_price
-        set empty_remark = '【系统自动沽清】菜品此规格已售馨'
-        where id = #{articleId}
 
-    </update>
 
-    <update id="setEmptyFail">
-        update tb_article
-        set is_empty = 0 , empty_remark = NULL
-        where id = #{articleId}
-    </update>
 
-    <update id="setArticlePriceEmptyFail">
-        update tb_article_price
-        set empty_remark = NULL
-        where id = #{articleId}
-    </update>
 
-    <update id="setStockBySuit">
 
-update tb_article t ,
-(
-select min(count) as count,article_name,id from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id from tb_article t
-INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
-INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
-INNER JOIN tb_article t4 on t4.id = t3.article_id
-where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
-GROUP BY t2.id
-) as r
-GROUP BY article_name
-) as b
-set t.current_working_stock = b.count,
-t.is_empty = if(b.count = 0,1,0),t.empty_remark = if(b.count = 0,'【系统自动沽清】套餐某子菜品售罄',NULL)
-where t.id = b.id
 
-    </update>
 
-    <select id="getStockBySuit" resultType="com.resto.shop.web.model.Article">
-select min(count) as count,article_name,id,is_empty from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id
- ,t.is_empty from tb_article t
-INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
-INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
-INNER JOIN tb_article t4 on t4.id = t3.article_id
-where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
-GROUP BY t2.id
-) as r
-GROUP BY article_name
-    </select>
+
+
+
     
 
     <select id="getPayment" parameterType="java.util.Map" resultType="java.math.BigDecimal">
