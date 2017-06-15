@@ -4951,27 +4951,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("count", "count != 0");
             List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
             List<String> articleIds = new ArrayList<>();
-            List<String> mealArticleIds = new ArrayList<>();
             for (OrderItem item : saledOrderItems){
                 if (item.getArticleId().indexOf("@") != -1){
                     articleIds.add(item.getArticleId().substring(0, item.getArticleId().indexOf("@")));
                 }else{
                     articleIds.add(item.getArticleId());
                 }
-                if (item.getType().equals(OrderItemType.SETMEALS)){
-                    mealArticleIds.add(item.getArticleId());
-                }
             }
             //排序菜品销售   按照菜品分类进行排序
             List<ArticleFamily> articleFamilies = articleFamilyMapper.selectArticleSort(articleIds);
-            List<ArticleSellDto> articleSellDtos = new ArrayList<>();
-            if (!mealArticleIds.isEmpty()){
-                selectMap.clear();
-                selectMap.put("articleIds", mealArticleIds);
-                selectMap.put("beginDate", beginDate);
-                selectMap.put("endDate", endDate);
-                articleSellDtos = articleService.queryArticleMealAttr(selectMap);
-            }
             for (ArticleFamily articleFamily : articleFamilies){
                 List<Map<String, Object>> familyArticleMaps = new ArrayList<>();
                 BigDecimal familyCount = BigDecimal.ZERO;
@@ -4984,6 +4972,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                             itemMap.put("SUBTOTAL", orderItem.getCount());
                             familyArticleMaps.add(itemMap);
+                            selectMap.clear();
+                            selectMap.put("articleId", orderItem.getArticleId());
+                            selectMap.put("beginDate", beginDate);
+                            selectMap.put("endDate", endDate);
+                            List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
                             for (ArticleSellDto articleSellDto : articleSellDtos){
                                 if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0){
                                     itemMap = new HashMap<>();

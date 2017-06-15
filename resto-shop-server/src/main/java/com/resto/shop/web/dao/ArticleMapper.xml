@@ -862,7 +862,8 @@ GROUP BY article_id
         and toi.article_id = #{articleId}
         and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        ) and ti.article_id = tmi.article_id),0) brandSellNum
+        ) and ti.article_id = tmi.article_id),0) brandSellNum,
+        tma.article_id articleId
         from tb_meal_attr tma
         inner join tb_meal_item tmi
         on tma.id = tmi.meal_attr_id
