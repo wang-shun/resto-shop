@@ -48,7 +48,7 @@ public class CustomerAddressServiceImpl extends GenericServiceImpl<CustomerAddre
     }
     @Override
     public int updateByPrimaryKeySelective(CustomerAddress record){
-        if(record.getState()==1){
+        if(record.getState()!=null){
             customerAddressMapper.updateState(record.getCustomerId());
         }
         record.setUpdateTime(new java.sql.Date(System.currentTimeMillis()));
