@@ -362,4 +362,14 @@ public class OrderItem implements Serializable {
     public void setPeference(Integer peference) {
         this.peference = peference;
     }
+
+    private Integer packageNumber;
+
+    public Integer getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(Integer packageNumber) {
+        this.packageNumber = packageNumber;
+    }
 }

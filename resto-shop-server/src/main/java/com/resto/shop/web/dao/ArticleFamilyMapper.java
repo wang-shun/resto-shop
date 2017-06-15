@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.web.dto.ArticleSellDto;
 import org.apache.ibatis.annotations.Param;
@@ -42,4 +43,6 @@ public interface ArticleFamilyMapper  extends GenericDao<ArticleFamily,String> {
      * @return
      */
     List<ArticleFamily> selectnewPosListPage(@Param("shopId") String shopDetailId,  @Param("distributionModeId") Integer distributionModeId);
+
+    List<ArticleFamily> selectArticleSort(List<String> articleIds);
 }
