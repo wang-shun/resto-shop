@@ -532,7 +532,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     remark = a.getDiscount() + "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
+                    if(mealItemIds.length == 0){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("万分抱歉,您购买的套餐"+item.getName()+"已售罄,请重新下单");
+                        articleService.setEmpty(item.getArticleId());
+                        if(customer != null){
+                            shopCartService.deleteCustomerArticle(customer.getId(),item.getArticleId());
+                        }
+                        return jsonResult;
+                    }
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
+
                     item.setChildren(new ArrayList<OrderItem>());
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     for (MealItem mealItem : items) {

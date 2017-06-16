@@ -130,4 +130,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         return shopcartMapper.selectByUuId(uuid);
     }
 
+    @Override
+    public void deleteCustomerArticle(String customerId, String articleId) {
+        shopcartMapper.deleteCustomerArticle(customerId, articleId);
+    }
 }
