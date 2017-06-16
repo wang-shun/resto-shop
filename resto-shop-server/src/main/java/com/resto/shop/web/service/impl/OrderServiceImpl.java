@@ -555,7 +555,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                         }
                     }
-                    if(checkMeal){
+                    if(!checkMeal){
                         jsonResult.setSuccess(false);
                         jsonResult.setMessage("万分抱歉,您购买的套餐"+item.getName()+"已售罄,请重新下单");
                         articleService.setEmpty(item.getArticleId());
