@@ -7710,6 +7710,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
 
             } else { //支付完成
+                List<OrderPaymentItem> items = orderPaymentItemService.selectByOrderId(order.getId());
+                Double sum = 0.00;
+                for(OrderPaymentItem orderPaymentItem : items){
+                    sum += orderPaymentItem.getPayValue().doubleValue();
+                }
+                if(order.getAmountWithChildren().doubleValue() > 0 && sum < order.getAmountWithChildren().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
+                if(order.getAmountWithChildren().doubleValue() <= 0 && sum < order.getOrderMoney().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);
