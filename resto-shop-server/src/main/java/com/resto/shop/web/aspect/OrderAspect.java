@@ -373,7 +373,7 @@ public class OrderAspect {
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-//            MQMessageProducer.sendPlaceOrderMessage(order);
+            MQMessageProducer.sendPlaceOrderMessage(order);
             orderService.payOrderWXModeFive(order.getId());
         }
     }
