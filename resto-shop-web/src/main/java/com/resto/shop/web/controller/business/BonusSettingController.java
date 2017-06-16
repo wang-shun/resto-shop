@@ -139,6 +139,7 @@ public class BonusSettingController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid BonusSetting bonussetting){
         try{
+            bonussetting.setUpdateTime(new Date());
             bonussettingService.update(bonussetting);
             return getSuccessResult();
         }catch (Exception e){
