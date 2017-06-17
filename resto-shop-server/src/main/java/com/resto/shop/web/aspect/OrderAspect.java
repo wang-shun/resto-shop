@@ -13,6 +13,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -449,8 +451,9 @@ public class OrderAspect {
         
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
-    public void pushOrderAfter(Order order) throws Throwable {
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order",returning = "order")
+    public void pushOrderAfter(JoinPoint joinPoint,Order order) throws Throwable {
+        log.info("切面pushOrderAfter"+com.alibaba.fastjson.JSONObject.toJSONString(joinPoint));
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
