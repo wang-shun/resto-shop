@@ -1,11 +1,8 @@
 package com.resto.shop.web.producer;
 
 import java.util.*;
-
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.constant.OrderPosStatus;
 import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.util.RedisUtil;
 import org.slf4j.Logger;
@@ -18,7 +15,6 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Order;
 import org.springframework.util.CollectionUtils;
 
@@ -204,6 +200,7 @@ public class MQMessageProducer {
 		}
 		orderList.add(order.getId());
 		RedisUtil.set(order.getShopDetailId()+"sendMsgList",orderList);
+		log.info("test发送下单通知"+order.getId());
 		sendMessageASync(message);
 	}
 
