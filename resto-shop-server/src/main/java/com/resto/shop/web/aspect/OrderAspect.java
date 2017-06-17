@@ -69,13 +69,10 @@ public class OrderAspect {
     public void createOrder() {
     }
 
-    ;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrderByEmployee(..))")
     public void createOrderByEmployee() {
     }
-
-    ;
 
     @AfterReturning(value = "createOrderByEmployee()", returning = "jsonResult")
     public void createOrderByEmployeeAround(JSONResult jsonResult) throws Throwable {
@@ -95,13 +92,12 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate"+order.getOrderState()+"production"+order.getProductionStatus());
             if(order.getCustomerId().equals("0")){
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
                 return;
             }
-
-
 
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
