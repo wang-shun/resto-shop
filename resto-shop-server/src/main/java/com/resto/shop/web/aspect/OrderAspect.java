@@ -92,7 +92,7 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            log.info("(createOrderAround)创建订单时候订单状态为：orderstate"+order.getOrderState()+"production"+order.getProductionStatus());
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus());
             if(order.getCustomerId().equals("0")){
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
@@ -449,7 +449,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order",returning = "order")
     public void pushOrderAfter(JoinPoint joinPoint,Order order) throws Throwable {
-        log.info("切面pushOrderAfter"+com.alibaba.fastjson.JSONObject.toJSONString(joinPoint));
+        log.info("切面pushOrderAfter"+joinPoint.getSignature().getName());
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
