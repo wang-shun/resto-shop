@@ -1601,10 +1601,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = selectById(orderId);
         //如果是后付款模式 不验证直接进行修改模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            log.info("后付款模式：pushOrder修改生产状态："+ProductionStatus.HAS_ORDER);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
         } else if (validOrderCanPush(order)) {
+            log.info("pushOrder时候支付宝支付修改状态："+ProductionStatus.HAS_ORDER);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
@@ -6826,6 +6828,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setOrderState(order.getPayMode().toString().equals(PayMode.WEIXIN_PAY) ?
                 OrderState.SUBMIT : OrderState.PAYMENT);
 
+        log.info("服务员点餐时修改订单production："+ProductionStatus.HAS_ORDER);
         order.setProductionStatus(ProductionStatus.HAS_ORDER);
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         order.setOrderMode(detail.getShopMode());
