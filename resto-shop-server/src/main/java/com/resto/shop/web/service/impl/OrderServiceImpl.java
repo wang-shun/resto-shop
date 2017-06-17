@@ -533,7 +533,40 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     remark = a.getDiscount() + "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
+                    List<MealAttr> mealAttrs = mealAttrMapper.selectList(item.getArticleId());
+                    boolean checkMeal = true;
+                    for(MealAttr mealAttr : mealAttrs){
+                        if(mealAttr.getChoiceType() == 0){
+                            //必选
+                            List<MealItem> mealItems = mealItemService.selectByAttrId(mealAttr.getId());
+                            //找到这个属性下所有的菜品
+                            int count = 0;
+                            for(MealItem mealItem : mealItems){
+                                Integer redisCount = (Integer) RedisUtil.get(mealItem.getArticleId()+Common.KUCUN);
+                                if(redisCount == null){
+                                    Article article = articleService.selectById(mealItem.getArticleId());
+                                    redisCount = article.getCurrentWorkingStock();
+                                }
+                                if(redisCount > 0){
+                                    count++;
+                                }
+                            }
+                            if(count < mealAttr.getChoiceCount()){
+                                checkMeal = false;
+                            }
+                        }
+                    }
+                    if(!checkMeal){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("万分抱歉,您购买的套餐"+item.getName()+"已售罄,请重新下单");
+                        articleService.setEmpty(item.getArticleId());
+                        if(customer != null){
+                            shopCartService.deleteCustomerArticle(customer.getId(),item.getArticleId());
+                        }
+                        return jsonResult;
+                    }
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
+
                     item.setChildren(new ArrayList<OrderItem>());
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     for (MealItem mealItem : items) {
@@ -7721,6 +7754,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
 
             } else { //支付完成
+                List<OrderPaymentItem> items = orderPaymentItemService.selectByOrderId(order.getId());
+                Double sum = 0.00;
+                for(OrderPaymentItem orderPaymentItem : items){
+                    sum += orderPaymentItem.getPayValue().doubleValue();
+                }
+                if(order.getAmountWithChildren().doubleValue() > 0 && sum < order.getAmountWithChildren().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
+                if(order.getAmountWithChildren().doubleValue() <= 0 && sum < order.getOrderMoney().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);

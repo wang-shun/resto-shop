@@ -509,6 +509,12 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">本地电视IP：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="tvIp" :value="m.tvIp" >
+						</div>
+					</div>
 
 
 					<div class="text-center">
