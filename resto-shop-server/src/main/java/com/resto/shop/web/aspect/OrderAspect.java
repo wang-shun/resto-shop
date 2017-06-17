@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +91,10 @@ public class OrderAspect {
 
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
+        String time= DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus());
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus()+"订单id："+order.getId()+"当前时间为："+time);
             if(order.getCustomerId().equals("0")){
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
