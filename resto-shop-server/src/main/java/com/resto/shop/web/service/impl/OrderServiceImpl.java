@@ -1909,7 +1909,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 //如果没有 则新建
                                 kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                             }
-                            kitchenArticleMap.get(kitchenId).add(item);
+                            if(shopDetail.getSplitKitchen() == Common.YES){
+                                int count = item.getCount();
+                                for(int i = 0;i < count;i++){
+                                    item.setCount(1);
+                                    kitchenArticleMap.get(kitchenId).add(item);
+                                }
+                            }else{
+                                kitchenArticleMap.get(kitchenId).add(item);
+                            }
+
                         }
                         if (CollectionUtils.isEmpty(kitchenList)) {
                             item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
