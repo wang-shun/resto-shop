@@ -10,6 +10,10 @@
     <result column="level" property="level" jdbcType="INTEGER"/>
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
     <result column="distribution_mode_id" property="distributionModeId" jdbcType="INTEGER"/>
+    <collection property="articleList" javaType="java.util.List" ofType="com.resto.shop.web.model.Article">
+        <id column="articleId" property="id"/>
+        <result column="articleName" property="name"/>
+    </collection>
   </resultMap>
   <sql id="Base_Column_List">id, name, peference, parent_id, level, shop_detail_id, distribution_mode_id</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
@@ -96,6 +100,18 @@
     <select id="selectnewPosListPage" resultType="ArticleFamily">
         	select * from tb_article_family where shop_detail_id=#{shopId}
   		 and distribution_mode_id=#{distributionModeId} ORDER BY peference
+    </select>
+
+    <select id="selectArticleSort" parameterType="java.util.Map" resultMap="BaseResultMap">
+      select taf.id, taf.`name`, ta.id articleId, ta.`name` articleName
+      from tb_article_family taf
+      inner join tb_article ta
+      on ta.article_family_id = taf.id
+      where ta.id in
+      <foreach collection="list" item="articleId" open="(" separator="," close=")">
+        #{articleId}
+      </foreach>
+      ORDER BY taf.peference asc, ta.sort asc
     </select>
 
 </mapper>

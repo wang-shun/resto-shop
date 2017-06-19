@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.model.ChargePayment;
@@ -93,4 +94,9 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
     List<ChargeOrder> selectByCustomerIdAndBrandId(String customerId,String brandId);
 
     List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
+
+	RechargeLogDto selectRechargeLog(String beginDate, String endDate, String brandId);
+
+
+	RechargeLogDto selectShopRechargeLog(String beginDate,String endDate,String shopId);
 }

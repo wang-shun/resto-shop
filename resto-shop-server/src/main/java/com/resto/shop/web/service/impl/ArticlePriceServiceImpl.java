@@ -51,4 +51,32 @@ public class ArticlePriceServiceImpl extends GenericServiceImpl<ArticlePrice, St
 	public ArticlePrice selectByArticle(String articleId, int unitId) {
 		return articlepriceMapper.selectByArticle(articleId, unitId);
 	}
+
+	@Override
+	public Integer clearPriceStock(String articleId, String emptyRemark) {
+		return articlepriceMapper.clearPriceStock(articleId, emptyRemark);
+	}
+
+	@Override
+	public Integer clearPriceTotal(String articleId, String emptyRemark) {
+		return articlepriceMapper.clearPriceTotal(articleId, emptyRemark);
+	}
+
+	@Override
+	public Boolean updateArticlePriceStock(String articleId, String type, Integer count) {
+		articlepriceMapper.updateArticlePriceStock(articleId, type,count);
+		return true;
+	}
+
+	@Override
+	public Boolean setArticlePriceEmpty(String articleId) {
+		 articlepriceMapper.setArticlePriceEmpty(articleId);
+		 return true;
+	}
+
+	@Override
+	public Boolean setArticlePriceEmptyFail(String articleId) {
+		 articlepriceMapper.setArticlePriceEmptyFail(articleId);
+		 return true;
+	}
 }

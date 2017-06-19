@@ -410,6 +410,18 @@
                     </div>
 
 					<div class="form-group">
+						<label class="col-md-4 control-label">日结小票模板类型：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="templateType"v-model="m.templateType" value="0">经典版
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="templateType" v-model="m.templateType" value="1">升级版
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label class="col-md-4 control-label">是否开启美团外卖自动出单：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
@@ -470,6 +482,12 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">本地电视IP：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="tvIp" :value="m.tvIp" >
+						</div>
+					</div>
 
 
 					<div class="text-center">

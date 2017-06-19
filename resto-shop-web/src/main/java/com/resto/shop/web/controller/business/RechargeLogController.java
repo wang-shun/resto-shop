@@ -208,7 +208,7 @@ public class RechargeLogController extends GenericController{
 		BigDecimal initZero=BigDecimal.ZERO;
 		//初始化品牌充值记录
 		RechargeLogDto brandInit = new RechargeLogDto(getBrandName(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
-		RechargeLogDto rechargeLogDto=chargepaymentService.selectRechargeLog(beginDate, endDate,getCurrentBrandId());
+		RechargeLogDto rechargeLogDto=chargeorderService.selectRechargeLog(beginDate, endDate,getCurrentBrandId());
 		if(rechargeLogDto!=null){
 			brandInit.setBrandName(getBrandName());
 			//判断为空则为0
@@ -267,7 +267,7 @@ public class RechargeLogController extends GenericController{
         }
         for (ShopDetail shopDetail : shoplist) {
         	//初始化店铺充值记录
-        	RechargeLogDto shopRechargeLogDto=chargepaymentService.selectShopRechargeLog(beginDate, endDate, shopDetail.getId());
+        	RechargeLogDto shopRechargeLogDto=chargeorderService.selectShopRechargeLog(beginDate, endDate, shopDetail.getId());
         	if(shopRechargeLogDto == null){
         		shopRechargeLogDto=new RechargeLogDto(shopDetail.getId(),shopDetail.getName(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         	}

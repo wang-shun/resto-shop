@@ -4,6 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
+import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
@@ -321,4 +322,22 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     public List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap) {
         return chargeOrderMapper.selectMonthDto(selectMap);
     }
+
+    @Override
+    public RechargeLogDto selectRechargeLog(String beginDate, String endDate, String brandId) {
+        // TODO Auto-generated method stub
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return chargeOrderMapper.selectRechargeLog(begin,end,brandId);
+    }
+
+    @Override
+    public RechargeLogDto selectShopRechargeLog(String beginDate, String endDate, String shopId) {
+        // TODO Auto-generated method stub
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return chargeOrderMapper.selectShopRechargeLog(begin,end,shopId);
+    }
+
+
 }

@@ -38,6 +38,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -368,6 +369,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
+
+        if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
+            return jsonResult;
+        }
+
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
@@ -402,7 +410,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("付款中的订单，请等待服务员确认后在进行加菜");
                 return jsonResult;
             }
-            if(farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY && farOrder.getIsPay() == OrderPayState.ALIPAYING){
+            if (farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY && farOrder.getIsPay() == OrderPayState.ALIPAYING) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("请先支付完选择支付宝支付的订单，再进行加菜！");
                 return jsonResult;
@@ -525,7 +533,40 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                     remark = a.getDiscount() + "%";//设置菜品当前折扣
                     Integer[] mealItemIds = item.getMealItems();
+                    List<MealAttr> mealAttrs = mealAttrMapper.selectList(item.getArticleId());
+                    boolean checkMeal = true;
+                    for(MealAttr mealAttr : mealAttrs){
+                        if(mealAttr.getChoiceType() == 0){
+                            //必选
+                            List<MealItem> mealItems = mealItemService.selectByAttrId(mealAttr.getId());
+                            //找到这个属性下所有的菜品
+                            int count = 0;
+                            for(MealItem mealItem : mealItems){
+                                Integer redisCount = (Integer) RedisUtil.get(mealItem.getArticleId()+Common.KUCUN);
+                                if(redisCount == null){
+                                    Article article = articleService.selectById(mealItem.getArticleId());
+                                    redisCount = article.getCurrentWorkingStock();
+                                }
+                                if(redisCount > 0){
+                                    count++;
+                                }
+                            }
+                            if(count < mealAttr.getChoiceCount()){
+                                checkMeal = false;
+                            }
+                        }
+                    }
+                    if(!checkMeal){
+                        jsonResult.setSuccess(false);
+                        jsonResult.setMessage("万分抱歉,您购买的套餐"+item.getName()+"已售罄,请重新下单");
+                        articleService.setEmpty(item.getArticleId());
+                        if(customer != null){
+                            shopCartService.deleteCustomerArticle(customer.getId(),item.getArticleId());
+                        }
+                        return jsonResult;
+                    }
                     List<MealItem> items = mealItemService.selectByIds(mealItemIds);
+
                     item.setChildren(new ArrayList<OrderItem>());
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     for (MealItem mealItem : items) {
@@ -556,6 +597,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 default:
                     throw new AppException(AppException.UNSUPPORT_ITEM_TYPE, "不支持的餐品类型:" + item.getType());
+            }
+            if (!a.getShopDetailId().equals(order.getShopDetailId())) {
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("门店选择错误，请尝试扫描桌号二维码进行点餐！");
+                return jsonResult;
             }
             item.setMealFeeNumber(mealFeeNumber);
             item.setArticleDesignation(a.getDescription());
@@ -1036,7 +1082,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return new Result(msg, result);
     }
 
-    public synchronized Order payOrderSuccess(Order order) {
+    public Order payOrderSuccess(Order order) {
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
@@ -1198,7 +1244,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized boolean autoRefundOrder(String orderId) {
+    public boolean autoRefundOrder(String orderId) {
         Order order = selectById(orderId);
         if (order.getAllowCancel()) {
             order.setAllowCancel(false);
@@ -1218,17 +1264,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized Result refundPaymentByUnfinishedOrder(String orderId) {
+    public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
         if (order.getOrderState() != OrderState.SUBMIT) {
             return new Result(false);
         }
-        if(order.getIsPay() != OrderPayState.ALIPAYING){
+        if (order.getIsPay() != OrderPayState.ALIPAYING) {
             order.setIsPay(OrderPayState.NOT_PAY);
         }
         if (order.getPayMode() == 2) {
-            if(order.getIsPay() != OrderPayState.ALIPAYING){
+            if (order.getIsPay() != OrderPayState.ALIPAYING) {
                 order.setIsPay(OrderPayState.NOT_PAY);
             }
             orderMapper.updateByPrimaryKeySelective(order);
@@ -1384,7 +1430,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("out_request_no", newPayItemId);
                     String resultJson = AliPayUtils.refundPay(map);
                     if (new JSONObject(resultJson).toString().indexOf("ERROR") != -1) {
-                        throw new RuntimeException("支付宝退款异常！"+resultJson.toString());
+                        throw new RuntimeException("支付宝退款异常！" + resultJson.toString());
                     }
                     item.setResultData(new JSONObject(resultJson).toString());
                     item.setPayValue(aliPay.add(aliRefund).multiply(new BigDecimal(-1)));
@@ -1524,7 +1570,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public synchronized Order orderWxPaySuccess(OrderPaymentItem item) {
+    public Order orderWxPaySuccess(OrderPaymentItem item) {
         Order order = selectById(item.getOrderId());
         OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
         if (historyItem == null) {
@@ -1533,13 +1579,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setPaymentAmount(item.getPayValue());
                 update(order);
             }
-            if(order.getPayMode() == OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+            if (order.getPayMode() == OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING) {
                 order.setIsPay(OrderPayState.ALIPAYED);
                 update(order);
-            }else if(order.getPayMode() != OrderPayMode.WX_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+            } else if (order.getPayMode() != OrderPayMode.WX_PAY && order.getIsPay() == OrderPayState.ALIPAYING) {
                 order.setIsPay(OrderPayState.PAYED);
                 update(order);
-            }else if(order.getPayMode() != OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING){
+            } else if (order.getPayMode() != OrderPayMode.ALI_PAY && order.getIsPay() == OrderPayState.ALIPAYING) {
                 order.setIsPay(OrderPayState.NOT_PAY);
                 update(order);
             }
@@ -1552,18 +1598,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order pushOrder(String orderId) throws AppException {
+       String time= DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
         Order order = selectById(orderId);
         //如果是后付款模式 不验证直接进行修改模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            log.info("后付款模式：pushOrder修改生产状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-        } else if (validOrderCanPush(order)) {
-            order.setProductionStatus(ProductionStatus.HAS_ORDER);
-            order.setPushOrderTime(new Date());
-            update(order);
-            return order;
         }
+//        } else if (validOrderCanPush(order)) {
+//            log.info("pushOrder时候支付宝支付修改状态："+ProductionStatus.HAS_ORDER+"订单id为："+orderId+"当前时间为："+time);
+//            order.setProductionStatus(ProductionStatus.HAS_ORDER);
+//            order.setPushOrderTime(new Date());
+//            update(order);
+//            return order;
+//        }
         return order;
     }
 
@@ -1573,14 +1623,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return true;
         }
 
-        if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
-            log.error("立即下单失败: " + order.getId());
-            throw new AppException(AppException.ORDER_STATE_ERR);
-        }
+
         switch (order.getOrderMode()) {
-            case 1:
-                if (order.getTableNumber() == null) {
-                    throw new AppException(AppException.ORDER_MODE_CHECK, "桌号不得为空");
+//            case 1:
+//                if (order.getTableNumber() == null) {
+//                    throw new AppException(AppException.ORDER_MODE_CHECK, "桌号不得为空");
+//                }
+//                break;
+            case ShopMode.BOSS_ORDER:
+                if(order.getPayType() == PayType.PAY){
+                    if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                        log.error("立即下单失败: " + order.getId());
+                        throw new AppException(AppException.ORDER_STATE_ERR);
+                    }
+                }else if (order.getPayType() == PayType.NOPAY){
+                    if (order.getOrderState() != OrderState.SUBMIT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                        log.error("立即下单失败: " + order.getId());
+                        throw new AppException(AppException.ORDER_STATE_ERR);
+                    }
+                }
+                break;
+            case ShopMode.CALL_NUMBER:
+                if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    log.error("立即下单失败: " + order.getId());
+                    throw new AppException(AppException.ORDER_STATE_ERR);
+                }
+                break;
+            case ShopMode.MANUAL_ORDER:
+                if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    log.error("立即下单失败: " + order.getId());
+                    throw new AppException(AppException.ORDER_STATE_ERR);
                 }
                 break;
         }
@@ -1773,7 +1845,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                         }
                         kitchenArticleMap.get(kitchenId).add(item);
-                    }else{
+                    } else {
                         item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
                         orderItemService.update(item);
                     }
@@ -1826,7 +1898,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 }
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
-                            if(CollectionUtils.isEmpty(kitchenList)){
+                            if (CollectionUtils.isEmpty(kitchenList)) {
                                 item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
                                 orderItemService.update(item);
                             }
@@ -1843,7 +1915,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             }
                             kitchenArticleMap.get(kitchenId).add(item);
                         }
-                        if(CollectionUtils.isEmpty(kitchenList)){
+                        if (CollectionUtils.isEmpty(kitchenList)) {
                             item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
                             orderItemService.update(item);
                         }
@@ -1855,12 +1927,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         Boolean check = true;
-        for(OrderItem item : articleList){
-            if(item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT){
+        for (OrderItem item : articleList) {
+            if (item.getPrintFailFlag() == PrintStatus.PRINT_ERROR || item.getPrintFailFlag() == PrintStatus.UNPRINT) {
                 check = false;
             }
         }
-        if(check){
+        if (check) {
             order.setPrintKitchenFlag(PrintStatus.PRINT_SUCCESS);
             update(order);
         }
@@ -4848,7 +4920,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
         articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
-        if (originalMoney.compareTo(orderMoney) != 0){
+        if (originalMoney.compareTo(orderMoney) != 0 && shopDetail.getTemplateType().equals(Common.YES)){
             Map<String, Object> discountMap = new HashMap<>();
             discountAmount = discountAmount.add(originalMoney.subtract(orderMoney));
             discountMap.put("SUBTOTAL", originalMoney.subtract(orderMoney));
@@ -4950,35 +5022,116 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("orderIds", orderIds);
             selectOrderMap.put("count", "count != 0");
             List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
-            //排序菜品销售   按照菜品分类进行排序
-            for(OrderItem oi : saledOrderItems){
-                String aid = oi.getArticleId();
-                if (oi.getArticleId().indexOf("@") > -1) {
-                    aid = oi.getArticleId().substring(0, oi.getArticleId().indexOf("@"));
-                    Article article = articleService.selectById(aid);
-                    ArticleFamily articleFamily = articleFamilyMapper.selectByPrimaryKey(article.getArticleFamilyId());
-                    oi.setPeference(articleFamily.getPeference());
-                }
-                oi.setArticleId(aid);
-            }
-            Collections.sort(saledOrderItems, new Comparator(){
-                @Override
-                public int compare(Object o1, Object o2) {
-                    OrderItem OrderItem1=(OrderItem)o1;
-                    OrderItem OrderItem2=(OrderItem)o2;
-                    if(OrderItem1.getPeference()>OrderItem2.getPeference()){
-                        return 1;
-                    }else if(OrderItem1.getPeference()==OrderItem2.getPeference()){
-                        return 0;
-                    }else{
-                        return -1;
+            if (shopDetail.getTemplateType().equals(Common.YES)) {
+                List<String> articleIds = new ArrayList<>();
+                for (OrderItem item : saledOrderItems) {
+                    if (item.getArticleId().indexOf("@") != -1) {
+                        articleIds.add(item.getArticleId().substring(0, item.getArticleId().indexOf("@")));
+                    } else {
+                        articleIds.add(item.getArticleId());
                     }
                 }
-            });
-            if(saledOrderItems != null){
+                //排序菜品销售   按照菜品分类进行排序
+                List<ArticleFamily> articleFamilies = articleFamilyMapper.selectArticleSort(articleIds);
+                for (ArticleFamily articleFamily : articleFamilies) {
+                    List<Map<String, Object>> familyArticleMaps = new ArrayList<>();
+//                BigDecimal familyCount = BigDecimal.ZERO;
+                    for (Article article : articleFamily.getArticleList()) {
+                        BigDecimal unitNewCount = BigDecimal.ZERO;
+                        Map<String, Map<String, Integer>> unitMaps = new HashMap<>();
+                        for (OrderItem orderItem : saledOrderItems) {
+                            Map<String, Object> itemMap = new HashMap<>();
+                            if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                                itemMap.put("SUBTOTAL", orderItem.getCount());
+                                familyArticleMaps.add(itemMap);
+                                selectMap.clear();
+                                selectMap.put("articleId", orderItem.getArticleId());
+                                selectMap.put("beginDate", beginDate);
+                                selectMap.put("endDate", endDate);
+                                List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
+                                for (ArticleSellDto articleSellDto : articleSellDtos) {
+                                    if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
+                                        itemMap = new HashMap<>();
+                                        itemMap.put("PRODUCT_NAME", "|_" + articleSellDto.getArticleName());
+                                        itemMap.put("SUBTOTAL", articleSellDto.getBrandSellNum());
+                                        familyArticleMaps.add(itemMap);
+                                    }
+                                }
+                            } else if (orderItem.getType().equals(OrderItemType.UNITPRICE) && orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")).equalsIgnoreCase(article.getId())) {
+                                Map<String, Integer> map = new HashMap<>();
+                                if (unitMaps.containsKey(orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")))) {
+                                    map = unitMaps.get(orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")));
+                                }
+                                String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
+                                formName = formName.substring(1, formName.length() - 1);
+                                map.put(formName, orderItem.getCount());
+                                unitMaps.put(orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")), map);
+                            } else if (orderItem.getType().equals(OrderItemType.UNIT_NEW) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                unitNewCount = unitNewCount.add(new BigDecimal(orderItem.getCount()));
+                                Map<String, Integer> map = new HashMap<>();
+                                if (unitMaps.containsKey(orderItem.getArticleId())) {
+                                    map = unitMaps.get(orderItem.getArticleId());
+                                }
+                                String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
+                                String[] formNames = formName.split("\\)");
+                                for (String name : formNames) {
+                                    formName = name.substring(1);
+                                    if (map.containsKey(formName)) {
+                                        Integer count = map.get(formName);
+                                        count += orderItem.getCount();
+                                        map.put(formName, count);
+                                    } else {
+                                        map.put(formName, orderItem.getCount());
+                                    }
+                                }
+                                unitMaps.put(orderItem.getArticleId(), map);
+                            } else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+//                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+                                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                                itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
+                                familyArticleMaps.add(itemMap);
+                            }
+                        }
+                        if (unitMaps.containsKey(article.getId())) {
+                            Map<String, Object> itemMap = new HashMap<>();
+                            Map<String, Integer> unitPriceMap = unitMaps.get(article.getId());
+                            BigDecimal articleCount = unitNewCount.compareTo(BigDecimal.ZERO) > 0 ? unitNewCount : BigDecimal.ZERO;
+                            List<Map<String, Object>> maps = new ArrayList<>();
+                            for (Map.Entry<String, Integer> unitMap : unitPriceMap.entrySet()) {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("PRODUCT_NAME", "|_" + unitMap.getKey());
+                                map.put("SUBTOTAL", unitMap.getValue());
+                                if (unitNewCount.compareTo(BigDecimal.ZERO) == 0) {
+                                    articleCount = articleCount.add(new BigDecimal(unitMap.getValue()));
+                                }
+                                maps.add(map);
+                            }
+//                        familyCount = familyCount.add(articleCount);
+                            saledProductAmount = saledProductAmount.add(articleCount);
+                            itemMap.put("PRODUCT_NAME", article.getName());
+                            itemMap.put("SUBTOTAL", articleCount);
+                            familyArticleMaps.add(itemMap);
+                            familyArticleMaps.addAll(maps);
+                        }
+                    }
+                    Map<String, Object> itemMap = new HashMap<>();
+                    BigDecimal strLength = new BigDecimal(articleFamily.getName().length()).multiply(new BigDecimal(2));
+                    Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                    String string = "-";
+                    for (int i = 1; i < length; i++) {
+                        string = string.concat("-");
+                    }
+                    itemMap.put("PRODUCT_NAME", string.concat(articleFamily.getName()).concat(string));
+//                itemMap.put("SUBTOTAL", familyCount);
+                    saledProducts.add(itemMap);
+                    saledProducts.addAll(familyArticleMaps);
+                }
+            }else{
                 for (OrderItem orderItem : saledOrderItems) {
-                    saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
-                    Map<String, Object> itemMap = new HashMap<String, Object>();
+                    saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getType().equals(OrderItemType.SETMEALS) ? 0 : orderItem.getCount()));
+                    Map<String, Object> itemMap = new HashMap<>();
                     itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                     itemMap.put("SUBTOTAL", orderItem.getCount());
                     saledProducts.add(itemMap);
@@ -4988,14 +5141,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("orderIds", orderIds);
             selectOrderMap.put("count", "refund_count != 0");
             List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
-            if(canceledOrderItems != null){
-                for (OrderItem orderItem : canceledOrderItems) {
-                    canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
-                    Map<String, Object> itemMap = new HashMap<String, Object>();
-                    itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                    itemMap.put("SUBTOTAL", orderItem.getRefundCount());
-                    canceledProducts.add(itemMap);
-                }
+            for (OrderItem orderItem : canceledOrderItems) {
+                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
+                Map<String, Object> itemMap = new HashMap<>();
+                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                itemMap.put("SUBTOTAL", orderItem.getRefundCount());
+                canceledProducts.add(itemMap);
             }
             if (!nowService.equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<String, Object>();
@@ -5208,7 +5359,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     } else {
                         if (articleCount > orderItem.getCount()) {
@@ -5217,7 +5368,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setArticlePriceEmpty(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmpty(articlePrice.getArticleId());
                         }
                     }
                     int sum = 0;
@@ -5233,7 +5384,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, sum);
                     if (sum == 0) {
-                        orderMapper.setEmpty(articlePrice.getArticleId());
+                        articleService.setEmpty(articlePrice.getArticleId());
                     }
                     break;
                 case OrderItemType.SETMEALS:
@@ -5253,7 +5404,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setEmpty(orderItem.getArticleId());
+                            articleService.setEmpty(orderItem.getArticleId());
                         }
                     } else {
                         if (articleCount > orderItem.getCount()) {
@@ -5262,7 +5413,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         } else {
 //                            RedisUtil.set(articleId + Common.KUCUN, 0);
                             RedisUtil.set(articleId + Common.KUCUN, 0);
-                            orderMapper.setEmpty(orderItem.getArticleId());
+                            articleService.setEmpty(orderItem.getArticleId());
                         }
 
                     }
@@ -5308,13 +5459,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
-                            orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articlePrice.getCurrentWorkingStock() + orderItem.getCount());
                         if (articlePrice.getCurrentWorkingStock() == 0) {
-                            orderMapper.setArticlePriceEmptyFail(articlePrice.getArticleId());
+                            articlePriceService.setArticlePriceEmptyFail(articlePrice.getArticleId());
                         }
                     }
                     Integer baseArticle = (Integer) RedisUtil.get(articlePrice.getArticleId() + Common.KUCUN);
@@ -5322,14 +5473,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, baseArticle + orderItem.getCount());
                         if (baseArticle == 0) {
-                            orderMapper.setEmptyFail(articlePrice.getArticleId());
+                            articleService.setEmptyFail(articlePrice.getArticleId());
                         }
                     } else {
                         Article base = articleService.selectById(articlePrice.getArticleId());
 //                        RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articlePrice.getArticleId() + Common.KUCUN, base.getCurrentWorkingStock() + orderItem.getCount());
                         if (base.getCurrentWorkingStock() == 0) {
-                            orderMapper.setEmptyFail(articlePrice.getArticleId());
+                            articleService.setEmptyFail(articlePrice.getArticleId());
                         }
                     }
                     break;
@@ -5345,13 +5496,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        RedisUtil.set(articleId + Common.KUCUN, articleCount + 1);
                         RedisUtil.set(articleId + Common.KUCUN, articleCount + orderItem.getCount());
                         if (articleCount == 0) {
-                            orderMapper.setEmptyFail(orderItem.getArticleId());
+                            articleService.setEmptyFail(orderItem.getArticleId());
                         }
                     } else {
 //                        RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + 1);
                         RedisUtil.set(articleId + Common.KUCUN, article.getCurrentWorkingStock() + orderItem.getCount());
                         if (article.getCurrentWorkingStock() == 0) {
-                            orderMapper.setEmptyFail(orderItem.getArticleId());
+                            articleService.setEmptyFail(orderItem.getArticleId());
                         }
                     }
                     break;
@@ -5670,7 +5821,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //2定义resto订单
         //本旬resto订单总数
 //        Set<String> xunRestoCount = new HashSet<>();
-         int xunRestoCount = newCustomerOrderNum+backCustomerOrderNum;
+        int xunRestoCount = newCustomerOrderNum + backCustomerOrderNum;
 
         //本旬resto订单总额
         BigDecimal xunRestoTotal = BigDecimal.ZERO;
@@ -6030,7 +6181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //2定义resto订单
         //本日resto订单总数 新增+回头
-        int todayRestoCount = backCustomerOrderNum+newCustomerOrderNum;
+        int todayRestoCount = backCustomerOrderNum + newCustomerOrderNum;
         //本日resto订单总额
         BigDecimal todayRestoTotal = BigDecimal.ZERO;
         //本月resto订单总数
@@ -6074,7 +6225,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    if (o.getParentOrderId() == null) {
 //                        todayRestoCount.add(o.getId());
 //                    }
-                 //   todayRestoCount.add(o.getId());
+                    //   todayRestoCount.add(o.getId());
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         //订单支付项
@@ -6679,6 +6830,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setOrderState(order.getPayMode().toString().equals(PayMode.WEIXIN_PAY) ?
                 OrderState.SUBMIT : OrderState.PAYMENT);
 
+        log.info("服务员点餐时修改订单production："+ProductionStatus.HAS_ORDER);
         order.setProductionStatus(ProductionStatus.HAS_ORDER);
         ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
         order.setOrderMode(detail.getShopMode());
@@ -6902,6 +7054,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
+            if(count > orderItem.getCount()){
+                result.setSuccess(false);
+                result.setMessage("餐品修改数量有误");
+                return result;
+            }
             BigDecimal baseArticleCount = new BigDecimal(orderItem.getCount());
             if (orderItem.getType() == OrderItemType.MEALS_CHILDREN) {
                 result.setSuccess(false);
@@ -7387,6 +7544,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (OrderItem orderItem : refundOrder.getOrderItems()) {
             if (orderItem.getType().equals(ArticleType.ARTICLE)) {
                 OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
+                if (item.getCount() < orderItem.getCount()) {
+                    throw new RuntimeException("退菜数量有误！");
+                }
                 orderitemMapper.refundArticle(orderItem.getId(), orderItem.getCount());
                 OrderRefundRemark orderRefundRemark = new OrderRefundRemark();
                 orderRefundRemark.setOrderId(order.getId());
@@ -7599,6 +7759,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
 
             } else { //支付完成
+                List<OrderPaymentItem> items = orderPaymentItemService.selectByOrderId(order.getId());
+                BigDecimal sum = new BigDecimal(0);
+                for(OrderPaymentItem orderPaymentItem : items){
+                    sum = sum.add(orderPaymentItem.getPayValue());
+                }
+                if(order.getAmountWithChildren().doubleValue() > 0 && sum.doubleValue() < order.getAmountWithChildren().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
+                if(order.getAmountWithChildren().doubleValue() <= 0 && sum.doubleValue() < order.getOrderMoney().doubleValue()){
+                    throw new RuntimeException("支付异常,支付金额小于订单金额");
+                }
                 if (order.getOrderState() < OrderState.PAYMENT) {
                     order.setOrderState(OrderState.PAYMENT);
                     order.setAllowCancel(false);
@@ -8423,7 +8594,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order colseOrder(String orderId) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        if(order.getOrderState() == OrderState.SUBMIT){
+        if (order.getOrderState() == OrderState.SUBMIT) {
             orderMapper.colseOrder(orderId);
             order.setOrderState(OrderState.CANCEL);
         }
@@ -8459,8 +8630,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             items.add(orderItem);
             if (orderItem.getChildren() != null && !orderItem.getChildren().isEmpty()) {
 //				for (OrderItem childItem:orderItem.getChildren()) {
-                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId(),orderItem.getArticleId());
-                for(OrderItem obj : item){
+                List<OrderItem> item = orderitemMapper.getListBySort(orderItem.getId(), orderItem.getArticleId());
+                for (OrderItem obj : item) {
                     obj.setArticleName("|_" + obj.getArticleName());
                     items.add(obj);
                 }

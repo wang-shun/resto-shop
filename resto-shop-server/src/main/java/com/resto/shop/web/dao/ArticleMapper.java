@@ -40,7 +40,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	 * 根据菜品 Id 设置谷清
 	 * @param articleId
 	 */
-	void setEmpty(@Param("isEmpty") Integer isEmpty,@Param("articleId") String articleId);
+	void changeEmpty(@Param("isEmpty") Integer isEmpty,@Param("articleId") String articleId);
 
 	void updateLikes(String articleId, Long likes);
 
@@ -55,15 +55,15 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Integer clearStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceTotal(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer clearPriceStock(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
-	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
+
+
+//	Integer cleanPriceAll(@Param("articleId")String articleId,@Param("emptyRemark") String emptyRemark);
 
 	Integer editStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
-	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
+//	Integer editPriceStock(@Param("articleId")String articleId,@Param("count")Integer count,@Param("emptyRemark") String emptyRemark);
 
 	void initSizeCurrent();
 
@@ -83,7 +83,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	int deleteRecommendId(String recommendId);
 
-	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
+//	int saveLog(@Param("result") Integer result,@Param("taskId") String taskId);
 
 
 	int selectPidAndShopId(@Param("shopId") String shopId,@Param("articleId") String articleId);
@@ -110,7 +110,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
-	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
 
 	/**
 	 * 根据分类查询分类下的所有菜品
@@ -142,4 +142,34 @@ public interface ArticleMapper extends GenericDao<Article, String>{
      * @return
      */
     List<Article> selectHasResourcePhotoList(String currentBrandId);
+
+	/**
+	 * 更新该餐品库存 （-1）（无规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
+
+	/**
+	 * 库存为0时设置沽清	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmpty(String articleId);
+
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmptyFail(String articleId);
+
+	/**
+	 * 将单品最低库存设置为 套餐库存
+	 * @return
+	 */
+	Boolean setStockBySuit(@Param("shopId")String shopId);
+
+	List<Article> getStockBySuit(String shopId);
+
 }

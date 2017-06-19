@@ -574,7 +574,7 @@
 
 
     <!-- 根据菜品Id 设置谷清 -->
-    <update id="setEmpty">
+    <update id="changeEmpty">
 	update tb_article set is_empty = #{isEmpty} where id = #{articleId}
   </update>
 
@@ -659,17 +659,9 @@ where t.id = t2.article_id
 
   </update>
 
-    <update id="clearPriceStock">
-    update tb_article_price
-        set  empty_remark = #{emptyRemark}
-        where id = #{articleId}
-  </update>
 
-    <update id="clearPriceTotal">
-        update tb_article_price
-        set  empty_remark = #{emptyRemark}
-        where article_id = #{articleId}
-    </update>
+
+
 
     <update id="editStock">
         update tb_article
@@ -752,11 +744,6 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         where virtual_id = #{virtualId}
     </update>
 
-    <insert id="saveLog">
-        insert into tb_print_log
-        (taskId,result)
-        values (#{taskId},#{result})
-    </insert>
 
 
     <select id="selectPidAndShopId" resultType="java.lang.Integer">
@@ -850,25 +837,8 @@ GROUP BY article_id
         group by ta.id
     </select>
 
-    <select id="queryArticleMealAttr" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
-		select tma.`name` articleFamilyName, tmi.article_name articleName,
-		IFNULL(
-		(select SUM(ti.count) from tb_order_item ti 
-		where ti.parent_id in 
-		(select toi.id from tb_order_item toi 
-		inner join tb_order tr
-		on toi.order_id = tr.id
-		where tr.order_state in (2,10,11,12) and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3))
-		and toi.article_id = #{articleId}
-		and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00') 
-		and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-		) and ti.article_id = tmi.article_id),0) brandSellNum
-		from tb_meal_attr tma
-		inner join tb_meal_item tmi
-		on tma.id = tmi.meal_attr_id
-		where tma.article_id = #{articleId}
-		order by tma.sort asc
-    </select>
+
+
 
     <select id="getArticleListByFamily" resultType="Article">
         SELECT * from tb_article a
@@ -954,6 +924,66 @@ GROUP BY article_id
 
     <select id="selectHasResourcePhotoList" resultType="Article">
       SELECT * FROM tb_article WHERE photo_small like '%http://%'
+    </select>
+
+    <update id="updateArticleStock">
+        update tb_article
+        <set>
+            <if test="type=='minus'">
+                current_working_stock = current_working_stock - #{count}
+            </if>
+            <if test="type == 'add'">
+                current_working_stock = current_working_stock + #{count}
+            </if>
+        </set>
+        where id = #{articleId}
+        <if test="type=='minus'">
+            and current_working_stock - #{count} >= 0
+        </if>
+    </update>
+
+    <update id="setEmpty">
+        update tb_article
+        set is_empty = 1 , empty_remark = '【系统自动沽清】菜品已售馨'
+        where id = #{articleId}
+
+    </update>
+
+    <update id="setEmptyFail">
+        update tb_article
+        set is_empty = 0 , empty_remark = NULL
+        where id = #{articleId}
+    </update>
+
+    <update id="setStockBySuit">
+
+        update tb_article t ,
+        (
+        select min(count) as count,article_name,id from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id from tb_article t
+        INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+        INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+        INNER JOIN tb_article t4 on t4.id = t3.article_id
+        where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+        GROUP BY t2.id
+        ) as r
+        GROUP BY article_name
+        ) as b
+        set t.current_working_stock = b.count,
+        t.is_empty = if(b.count = 0,1,0),t.empty_remark = if(b.count = 0,'【系统自动沽清】套餐某子菜品售罄',NULL)
+        where t.id = b.id
+
+    </update>
+
+    <select id="getStockBySuit" resultType="com.resto.shop.web.model.Article">
+        select min(count) as count,article_name,id,is_empty from (select max(t4.current_working_stock) as count ,t2.id as attr_id, t2.name,t.name as article_name,t.id
+        ,t.is_empty from tb_article t
+        INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+        INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+        INNER JOIN tb_article t4 on t4.id = t3.article_id
+        where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+        GROUP BY t2.id
+        ) as r
+        GROUP BY article_name
     </select>
 
 </mapper>

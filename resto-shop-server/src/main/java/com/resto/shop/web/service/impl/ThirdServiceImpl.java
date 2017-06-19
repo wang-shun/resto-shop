@@ -11,7 +11,6 @@ import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.*;
-import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
@@ -155,9 +154,9 @@ public class ThirdServiceImpl implements ThirdService {
 
         for (Printer printer : ticketPrinter) {
             Map<String, Object> ticket = new HashMap<>();
-            if(shopDetail.getIsPosNew() == Common.YES){
+            if (shopDetail.getIsPosNew() == Common.YES) {
                 ticket = printPlatformOrderTicketNew(order, orderDetailList, orderExtraList, shopDetail, printer);
-            }else{
+            } else {
                 ticket = printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, printer);
             }
 
@@ -166,10 +165,10 @@ public class ThirdServiceImpl implements ThirdService {
             }
         }
         List<Map<String, Object>> kitchenTicket = new ArrayList<Map<String, Object>>();
-        if(shopDetail.getIsPosNew() == Common.YES){
-            kitchenTicket =  printPlatformOrderKitchenNew(order, orderDetailList, shopDetail);
-        }else{
-            kitchenTicket =  printPlatformOrderKitchen(order, orderDetailList, shopDetail);
+        if (shopDetail.getIsPosNew() == Common.YES) {
+            kitchenTicket = printPlatformOrderKitchenNew(order, orderDetailList, shopDetail);
+        } else {
+            kitchenTicket = printPlatformOrderKitchen(order, orderDetailList, shopDetail);
         }
 
         if (!kitchenTicket.isEmpty()) {
@@ -185,7 +184,7 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        if(orderDetailList != null) {
+        if (orderDetailList != null) {
             for (PlatformOrderDetail orderDetail : orderDetailList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
@@ -196,7 +195,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
         }
 
-        if(orderExtraList != null){
+        if (orderExtraList != null) {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("ARTICLE_NAME", orderExtra.getName());
@@ -278,15 +277,13 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-
-
     private Map<String, Object> printPlatformOrderTicketNew(PlatformOrder order, List<PlatformOrderDetail> orderDetailList, List<PlatformOrderExtra> orderExtraList, ShopDetail shopDetail, Printer printer) {
         if (printer == null) {
             return null;
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        if(orderDetailList != null) {
+        if (orderDetailList != null) {
             for (PlatformOrderDetail orderDetail : orderDetailList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
@@ -297,7 +294,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
         }
 
-        if(orderExtraList != null){
+        if (orderExtraList != null) {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("ARTICLE_NAME", orderExtra.getName());
@@ -381,14 +378,13 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-
     public List<Map<String, Object>> printPlatformOrderKitchen(PlatformOrder order, List<PlatformOrderDetail> orderDetailList, ShopDetail shopDetail) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<PlatformOrderDetail>> kitchenArticleMap = new HashMap<String, List<PlatformOrderDetail>>();
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        if(orderDetailList != null){
+        if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
                 Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
@@ -515,16 +511,13 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-
-
-
     public List<Map<String, Object>> printPlatformOrderKitchenNew(PlatformOrder order, List<PlatformOrderDetail> orderDetailList, ShopDetail shopDetail) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<PlatformOrderDetail>> kitchenArticleMap = new HashMap<String, List<PlatformOrderDetail>>();
         //厨房信息
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         //遍历 订单集合
-        if(orderDetailList != null){
+        if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
                 Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
@@ -653,7 +646,6 @@ public class ThirdServiceImpl implements ThirdService {
         doPostAnsc(url, map);
         return printTask;
     }
-
 
 
     private List<Map<String, Object>> printElemeOrder(String orderId) {
@@ -858,33 +850,31 @@ public class ThirdServiceImpl implements ThirdService {
 
 
         String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
-        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId()+"deliveryCount");
-        if(orderTotal == null){
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "deliveryCount");
+        if (orderTotal == null) {
             orderTotal = 0;
-        }else if (orderNumber == null){
+        } else if (orderNumber == null) {
             orderTotal++;
         }
-        RedisUtil.set(order.getShopDetailId()+"deliveryCount",orderTotal);
+        RedisUtil.set(order.getShopDetailId() + "deliveryCount", orderTotal);
 
 
         String number;
-        if(orderTotal < 10){
-            number = "00"+orderTotal;
-        }else if(orderTotal < 100){
-            number = "0"+orderTotal;
-        }else{
-            number = ""+orderTotal;
+        if (orderTotal < 10) {
+            number = "00" + orderTotal;
+        } else if (orderTotal < 100) {
+            number = "0" + orderTotal;
+        } else {
+            number = "" + orderTotal;
         }
 
-        if(org.apache.commons.lang3.StringUtils.isEmpty(orderNumber)){
+        if (org.apache.commons.lang3.StringUtils.isEmpty(orderNumber)) {
             orderNumber = number;
         }
-        RedisUtil.set(order.getId()+"orderNumber",orderNumber);
+        RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 
-
-
-        data.put("ORDER_NUMBER",orderNumber);
+        data.put("ORDER_NUMBER", orderNumber);
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");
@@ -992,17 +982,17 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     private Boolean hungerPushVersion2(Map map, String brandId) throws ServiceException {
-        String oMessage =  map.get("oMessage").toString();
+        String oMessage = map.get("oMessage").toString();
         com.alibaba.fastjson.JSONObject messageJson = com.alibaba.fastjson.JSONObject.parseObject(oMessage);
         Integer type = Integer.parseInt(messageJson.getString("type"));
         String message = messageJson.getString("message");
-        message = message.replaceAll("\\\\","");
+        message = message.replaceAll("\\\\", "");
         com.alibaba.fastjson.JSONObject mj = com.alibaba.fastjson.JSONObject.parseObject(message);
         String orderId = mj.getString("orderId");
         String shopId = shopDetailService.selectByOOrderShopId(Long.parseLong(mj.getString("shopId"))).getId();
-        if(type == ElemeType.NEW_ORDER){
-            addHungerOrderVersion2(orderId,shopId);
-        }else if(type == ElemeType.RECEIVE_ORDER){
+        if (type == ElemeType.NEW_ORDER) {
+            addHungerOrderVersion2(orderId, shopId);
+        } else if (type == ElemeType.RECEIVE_ORDER) {
             MQMessageProducer.sendPlatformOrderMessage(orderId, PlatformType.E_LE_ME, brandId, shopId);
         }
         return true;
@@ -1083,7 +1073,7 @@ public class ThirdServiceImpl implements ThirdService {
 
     }
 
-    private void addHungerOrderVersion2(String orderId,String shopId) throws ServiceException {
+    private void addHungerOrderVersion2(String orderId, String shopId) throws ServiceException {
         ElemeToken elemeToken = elemeTokenService.getTokenByShopId(shopId);
         token.setAccessToken(elemeToken.getAccessToken());
         token.setRefreshToken(elemeToken.getRefreshToken());
@@ -1092,14 +1082,14 @@ public class ThirdServiceImpl implements ThirdService {
 
         eleme.openapi.sdk.api.service.OrderService orderService = new eleme.openapi.sdk.api.service.OrderService(config, token);
         OOrder order = orderService.getOrder(orderId);
-        PlatformOrder platformOrder = new PlatformOrder(order,shopId);
+        PlatformOrder platformOrder = new PlatformOrder(order, shopId);
         platformorderMapper.insertSelective(platformOrder);
 
         List<OGoodsGroup> group = order.getGroups();
         if (group != null) {
             for (int i = 0; i < group.size(); i++) {
                 OGoodsGroup g = group.get(i);
-                for(int j = 0; j < g.getItems().size(); j++){
+                for (int j = 0; j < g.getItems().size(); j++) {
                     OGoodsItem detail = g.getItems().get(j);
                     PlatformOrderDetail platformOrderDetail = new PlatformOrderDetail(detail, order.getId());
                     platformorderdetailMapper.insertSelective(platformOrderDetail);
@@ -1107,11 +1097,11 @@ public class ThirdServiceImpl implements ThirdService {
 
             }
         }
-        if(order.getServiceFee() > 0){
+        if (order.getServiceFee() > 0) {
             PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 1);
             platformorderextraMapper.insertSelective(platformOrderExtra);
         }
-        if(order.getPackageFee() > 0){
+        if (order.getPackageFee() > 0) {
             PlatformOrderExtra platformOrderExtra = new PlatformOrderExtra(order, 2);
             platformorderextraMapper.insertSelective(platformOrderExtra);
         }
@@ -1201,18 +1191,18 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-    private Boolean updateStock(String name, String shopId, Integer count, String type) throws AppException {
-        Article article = articleMapper.selectByName(name, shopId);
-        if (article == null) {
-            return null;
-        }
-        orderMapper.updateArticleStock(article.getId(), type, count);
-        orderMapper.setEmpty(article.getId());
-
-        //同时更新套餐库存(套餐库存为 最小库存的单品)
-        orderMapper.setStockBySuit(shopId);
-        return true;
-    }
+//    private Boolean updateStock(String name, String shopId, Integer count, String type) throws AppException {
+//        Article article = articleMapper.selectByName(name, shopId);
+//        if (article == null) {
+//            return null;
+//        }
+//        orderMapper.updateArticleStock(article.getId(), type, count);
+//        orderMapper.setEmpty(article.getId());
+//
+//        //同时更新套餐库存(套餐库存为 最小库存的单品)
+//        orderMapper.setStockBySuit(shopId);
+//        return true;
+//    }
 
 
     @Override
@@ -1230,7 +1220,7 @@ public class ThirdServiceImpl implements ThirdService {
 
 //        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
 //        order.setDetails(orderDetail);
-        if(order.getShopDetailId() != null){
+        if (order.getShopDetailId() != null) {
             order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
         }
         return order;
@@ -1250,18 +1240,18 @@ public class ThirdServiceImpl implements ThirdService {
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
-                if(shopDetail.getIsPosNew() == Common.YES){
+                if (shopDetail.getIsPosNew() == Common.YES) {
                     return printPlatformOrderTicketNew(order, orderDetailList, orderExtraList, shopDetail, printer.get(0));
-                }else{
+                } else {
                     return printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, printer.get(0));
                 }
 
             }
         } else {
             Printer p = printerService.selectById(selectPrinterId);
-            if(shopDetail.getIsPosNew() == Common.YES){
+            if (shopDetail.getIsPosNew() == Common.YES) {
                 return printPlatformOrderTicketNew(order, orderDetailList, orderExtraList, shopDetail, p);
-            }else{
+            } else {
                 return printPlatformOrderTicket(order, orderDetailList, orderExtraList, shopDetail, p);
             }
 
@@ -1279,12 +1269,11 @@ public class ThirdServiceImpl implements ThirdService {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 
 
-
-        List<Map<String, Object>> kitchenTicket =  new ArrayList<>();
-        if(shopDetail.getIsPosNew() == Common.YES){
+        List<Map<String, Object>> kitchenTicket = new ArrayList<>();
+        if (shopDetail.getIsPosNew() == Common.YES) {
             kitchenTicket = printPlatformOrderKitchenNew(order, orderDetailList, shopDetail);
-        }else{
-            kitchenTicket =  printPlatformOrderKitchen(order, orderDetailList, shopDetail);
+        } else {
+            kitchenTicket = printPlatformOrderKitchen(order, orderDetailList, shopDetail);
         }
 
         if (!kitchenTicket.isEmpty()) {

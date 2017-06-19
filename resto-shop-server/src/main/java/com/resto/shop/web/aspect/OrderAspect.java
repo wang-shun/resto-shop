@@ -13,6 +13,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,13 +70,10 @@ public class OrderAspect {
     public void createOrder() {
     }
 
-    ;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrderByEmployee(..))")
     public void createOrderByEmployee() {
     }
-
-    ;
 
     @AfterReturning(value = "createOrderByEmployee()", returning = "jsonResult")
     public void createOrderByEmployeeAround(JSONResult jsonResult) throws Throwable {
@@ -91,15 +91,15 @@ public class OrderAspect {
 
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
+        String time= DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus()+"订单id："+order.getId()+"当前时间为："+time);
             if(order.getCustomerId().equals("0")){
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
                 return;
             }
-
-
 
             if(order.getPayMode() != PayMode.WEIXIN_PAY){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
@@ -373,7 +373,7 @@ public class OrderAspect {
 
 
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-//            MQMessageProducer.sendPlaceOrderMessage(order);
+            MQMessageProducer.sendPlaceOrderMessage(order);
             orderService.payOrderWXModeFive(order.getId());
         }
     }
@@ -449,8 +449,9 @@ public class OrderAspect {
         
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
-    public void pushOrderAfter(Order order) throws Throwable {
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order",returning = "order")
+    public void pushOrderAfter(JoinPoint joinPoint,Order order) throws Throwable {
+        log.info("切面pushOrderAfter"+joinPoint.getSignature().getName());
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){

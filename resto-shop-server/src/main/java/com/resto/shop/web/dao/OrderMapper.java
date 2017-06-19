@@ -303,55 +303,20 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 
-	/**
-	 * 更新该餐品库存 （-1）（无规格）
-	 * @param articleId 餐品id
-	 * @return
-	 */
-	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
-	/**
-	 * 更新该餐品库存 （-1）（有规格）
-	 * @param articleId 餐品id
-	 * @return
-	 */
-	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
-	/**
-	 * 库存为0时设置沽清	---	tb_article
-	 * @param articleId
-	 * @return
-	 */
-	Boolean setEmpty(String articleId);
+
+
 
 	
-	/**
-	 * 库存为0时设置沽清	---	tb_article_price
-	 * @param articleId
-	 * @return
-	 */
-	Boolean setArticlePriceEmpty(String articleId);
-	
-	
-	/**
-	 * 还原库存时重置售罄状态	---	tb_article	
-	 * @param articleId
-	 * @return
-     */
-	Boolean setEmptyFail(String articleId);
-	
-	/**
-	 * 还原库存时重置售罄状态	---	tb_article_price	
-	 * @param articleId
-	 * @return
-     */
-	Boolean setArticlePriceEmptyFail(String articleId);
 
-	/**
-	 * 将单品最低库存设置为 套餐库存
-	 * @return
-	 */
-	Boolean setStockBySuit(@Param("shopId")String shopId);
+	
+	
+
+	
+
+
+
 
 	BigDecimal getPayment(Map<String, Object> selectMap);
 
@@ -673,7 +638,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
 
-    List<Article> getStockBySuit(String shopId);
+
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 

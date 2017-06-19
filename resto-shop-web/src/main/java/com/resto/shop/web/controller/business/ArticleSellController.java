@@ -19,7 +19,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.AppendToExcelUtil;
+import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,12 +38,8 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.service.ArticleFamilyService;
-import com.resto.shop.web.service.ArticleService;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderService;
 
-/**
+ /**
  * 菜品销售报表
  * @author lmx
  */
@@ -66,6 +64,9 @@ public class ArticleSellController extends GenericController{
 	
 	@Resource
 	ArticleService articleService;
+
+	@Autowired
+    MealAttrService mealAttrService;
 	
 	
 	@RequestMapping("/list")
@@ -270,7 +271,7 @@ public class ArticleSellController extends GenericController{
 		selectMap.put("articleId", articleId);
 		selectMap.put("beginDate", beginDate);
 		selectMap.put("endDate", endDate);
-		List<ArticleSellDto> articleSellDtos = articleService.queryArticleMealAttr(selectMap);
+		List<ArticleSellDto> articleSellDtos = mealAttrService.queryArticleMealAttr(selectMap);
 		return getSuccessResult(articleSellDtos);
 	}
 	

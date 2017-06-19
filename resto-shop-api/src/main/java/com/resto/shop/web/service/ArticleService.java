@@ -38,7 +38,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * 根据 菜品Id 设置谷清
 	 * @param articleId
 	 */
-	void setEmpty(Integer isEmpty,String articleId);
+	void changeEmpty(Integer isEmpty,String articleId);
     
 	void addLikes(String articleId);
 	
@@ -61,7 +61,6 @@ public interface ArticleService extends GenericService<Article, String> {
 
 	void deleteRecommendId(String recommendId);
 
-	void saveLog(Integer result,String taskId);
 
 
 	/**
@@ -93,7 +92,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
 	
-	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
+
 
 	/**
 	 * 根据分类查询分类下的所有菜品
@@ -145,4 +144,18 @@ public interface ArticleService extends GenericService<Article, String> {
      * @return
      */
     List<Article> selectHasResourcePhotoList(String currentBrandId);
+
+	/**
+	 * 库存为0时设置沽清	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmpty(String articleId);
+
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmptyFail(String articleId);
 }

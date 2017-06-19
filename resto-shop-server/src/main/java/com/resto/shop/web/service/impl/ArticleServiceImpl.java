@@ -233,8 +233,8 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public void setEmpty(Integer isEmpty, String articleId) {
-        articleMapper.setEmpty(isEmpty, articleId);
+    public void changeEmpty(Integer isEmpty, String articleId) {
+        articleMapper.changeEmpty(isEmpty, articleId);
     }
 
     @Override
@@ -273,12 +273,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
-            if(empty != null && empty == Common.YES){
+            if (empty != null && empty == Common.YES) {
                 //售罄
-                if(articleStock.getCurrentStock() == 0){
+                if (articleStock.getCurrentStock() == 0) {
                     array.add(articleStock);
                 }
-            }else{
+            } else {
                 array.add(articleStock);
             }
 
@@ -298,20 +298,20 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         if (articleId.indexOf("@") > -1) {
             String aid = articleId.substring(0, articleId.indexOf("@"));
             article = articleMapper.selectByPrimaryKey(aid);
-            articleMapper.clearPriceStock(articleId, emptyRemark);
+            articlePriceServer.clearPriceStock(articleId, emptyRemark);
             baseArticleId = aid;
 
         } else {
             article = articleMapper.selectByPrimaryKey(articleId);
             articleMapper.clearStock(articleId, emptyRemark);
-            articleMapper.clearPriceTotal(articleId, emptyRemark);
+            articlePriceServer.clearPriceTotal(articleId, emptyRemark);
         }
 
 
         List<ArticlePrice> articlePrices = articlePriceServer.selectByArticleId(baseArticleId);
-        int sum = 0 ;
-        if(!CollectionUtils.isEmpty(articlePrices)){
-            for(ArticlePrice articlePrice : articlePrices){
+        int sum = 0;
+        if (!CollectionUtils.isEmpty(articlePrices)) {
+            for (ArticlePrice articlePrice : articlePrices) {
                 Integer ck = (Integer) RedisUtil.get(articlePrice.getId() + Common.KUCUN);
                 if (ck != null) {
                     sum += ck;
@@ -319,14 +319,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     sum += articlePrice.getCurrentWorkingStock();
                 }
             }
-            RedisUtil.set(baseArticleId+Common.KUCUN,sum);
-            if(sum == 0){
-                orderMapper.setEmpty(baseArticleId);
-            }else{
-                orderMapper.setEmptyFail(baseArticleId);
+            RedisUtil.set(baseArticleId + Common.KUCUN, sum);
+            if (sum == 0) {
+                articleMapper.setEmpty(baseArticleId);
+            } else {
+                articleMapper.setEmptyFail(baseArticleId);
             }
         }
-
 
 
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
@@ -382,26 +381,26 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
-                orderMapper.setArticlePriceEmptyFail(baseArticleId);
+                articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
             } else if (!moreType && count > 0) {
-                orderMapper.setEmptyFail(articleId);
+                articleMapper.setEmptyFail(articleId);
             }
         } else {
             if (moreType && count == 0) {
-                orderMapper.setArticlePriceEmpty(baseArticleId);
+                articlePriceServer.setArticlePriceEmpty(baseArticleId);
             } else if (!moreType && count == 0) {
-                orderMapper.setEmpty(articleId);
-            }else if (moreType && count > 0){
-                orderMapper.setArticlePriceEmptyFail(baseArticleId);
-            }else if (!moreType && count >0 ){
-                orderMapper.setEmptyFail(articleId);
+                articleMapper.setEmpty(articleId);
+            } else if (moreType && count > 0) {
+                articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
+            } else if (!moreType && count > 0) {
+                articleMapper.setEmptyFail(articleId);
             }
         }
 
         List<ArticlePrice> articlePrices = articlePriceServer.selectByArticleId(aid);
-        int sum = 0 ;
-        if(!CollectionUtils.isEmpty(articlePrices)){
-            for(ArticlePrice articlePrice : articlePrices){
+        int sum = 0;
+        if (!CollectionUtils.isEmpty(articlePrices)) {
+            for (ArticlePrice articlePrice : articlePrices) {
                 Integer ck = (Integer) RedisUtil.get(articlePrice.getId() + Common.KUCUN);
                 if (ck != null) {
                     sum += ck;
@@ -409,14 +408,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     sum += articlePrice.getCurrentWorkingStock();
                 }
             }
-            RedisUtil.set(aid+Common.KUCUN,sum);
-            if(sum == 0){
-                orderMapper.setEmpty(aid);
-            }else{
-                orderMapper.setEmptyFail(aid);
+            RedisUtil.set(aid + Common.KUCUN, sum);
+            if (sum == 0) {
+                articleMapper.setEmpty(aid);
+            } else {
+                articleMapper.setEmptyFail(aid);
             }
         }
-
 
 
 //        List<Article> taocan = orderMapper.getStockBySuit(shopDetail.getId());
@@ -478,10 +476,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         articleMapper.deleteRecommendId(recommendId);
     }
 
-    @Override
-    public void saveLog(Integer result, String taskId) {
-        articleMapper.saveLog(result, taskId);
-    }
 
     @Override
     public void assignArticle(String[] shopList, String[] articleList) {
@@ -676,10 +670,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.queryOrderArtcile(selectMap);
     }
 
-    @Override
-    public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
-        return articleMapper.queryArticleMealAttr(selectMap);
-    }
 
     @Override
     public List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap) {
@@ -715,4 +705,13 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.selectHasResourcePhotoList(currentBrandId);
     }
 
+    @Override
+    public Boolean setEmpty(String articleId) {
+        return articleMapper.setEmpty(articleId);
+    }
+
+    @Override
+    public Boolean setEmptyFail(String articleId) {
+        return articleMapper.setEmptyFail(articleId);
+    }
 }

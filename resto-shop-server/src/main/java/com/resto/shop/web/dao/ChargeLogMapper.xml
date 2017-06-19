@@ -45,12 +45,6 @@
   </insert>
 
 
-    <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ChargeLog" >
-        update tb_charge_order
-        <set >
-        </set>
-        where id = #{id,jdbcType=VARCHAR}
-    </update>
 
 
 </mapper>
