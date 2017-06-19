@@ -158,7 +158,8 @@
         IFNULL(tc.telephone,'--') telephone,
         td.order_money orderMoney,
         ta.red_money redMoney,
-        ta.content
+        ta.content,
+        td.table_number tablenumber
         from tb_appraise ta
         inner join tb_order td
         on ta.order_id = td.id
