@@ -654,4 +654,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order colseOrder(String orderId);
 
     List<Map<String, Object>> reminder(String orderItemId);
+
+	Order customerByOrderForMyPage(String customerId, String shopId);
 }

@@ -2959,11 +2959,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         String modeText = getModeText(order);
@@ -7556,6 +7561,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
     }
 
+    public void refundArticleNoPay(Order order){
+        OrderPaymentItem back = new OrderPaymentItem();
+        back.setId(ApplicationUtils.randomUUID());
+        back.setOrderId(order.getId());
+        back.setPaymentModeId(PayMode.REFUND_CRASH);
+        back.setPayTime(new Date());
+        back.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
+        back.setRemark("现金退款:" + order.getRefundMoney());
+
+        back.setResultData("线下现金退款总金额：" + order.getRefundMoney());
+        orderPaymentItemService.insert(back);
+    }
+
     @Override
     public void refundItem(Order refundOrder) {
         //修改菜品数量
@@ -8664,5 +8682,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         return items;
+    }
+
+    @Override
+    public Order customerByOrderForMyPage(String customerId, String shopId) {
+        Order order = orderMapper.customerByOrderForMyPage(customerId, shopId);
+        return order;
     }
 }

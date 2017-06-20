@@ -510,6 +510,9 @@
             <if test="customerId != null">
                 customer_id,
             </if>
+            <if test="customerAddressId != null">
+                customer_address_id,
+            </if>
             <if test="distributionDate != null">
                 distribution_date,
             </if>
@@ -667,6 +670,10 @@
             </if>
             <if test="customerId != null">
                 #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerAddressId != null">
+
+                #{customerAddressId,jdbcType=VARCHAR},
             </if>
             <if test="distributionDate != null">
                 #{distributionDate,jdbcType=DATE},
@@ -2577,7 +2584,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
 
     <!-- 每日短信报表数据 用户总数 -->
     <select id="selectOrderHistoryList" resultMap="selectOrderHistoryListMap">
-        SELECTselectListsmsByShopId
+        SELECT
         o.id,
         o.order_state,
         o.production_status,
@@ -3006,4 +3013,9 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <update id="colseOrder">
         update tb_order set order_state = 9 where id=#{orderId}
     </update>
+
+    <select id="customerByOrderForMyPage" resultMap="BaseResultMap">
+        select * from tb_order where customer_id = #{customerId} and shop_detail_id = #{shopId} and
+        if(order_state = 1,order_state = 1 and (43200 >= (now() - create_time)),order_state = 10 and allow_appraise = 1) order by order_state , create_time desc limit 0,1;
+    </select>
 </mapper>

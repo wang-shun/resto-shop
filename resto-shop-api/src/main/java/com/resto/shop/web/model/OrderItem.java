@@ -38,22 +38,22 @@ public class OrderItem implements Serializable {
     private String articleId;
 
     private Integer type;
-
+    
     private Integer[] mealItems;
 
     private Integer[] recommendList;
-
+    
     private String parentId;
 
     private Date createTime;
-
+    
     private List<OrderItem> children;
-
+    
     private Integer articleSum;
-
+    
     //关联菜品类别
     private ArticleFamily articleFamily;
-
+    
     //关联店铺ID 用于中间数据库 报表问题
     private String shopId;
     //关联   用户电话 用于中间数据库 报表问题

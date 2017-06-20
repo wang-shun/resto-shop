@@ -363,6 +363,7 @@ public class SpringContextConfig {
         return proxy.create(ExperienceService.class);
     }
 
+
     @Bean
     public com.resto.brand.web.service.EmployeeService employeeBrandService() {
         return proxy.create(com.resto.brand.web.service.EmployeeService.class);
@@ -425,6 +426,12 @@ public class SpringContextConfig {
 
     @Bean
     public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
+
+    @Bean
+    public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
+
+    @Bean
+    public CustomerAddressService customerAddressService() {return  proxy.create(CustomerAddressService.class);}
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

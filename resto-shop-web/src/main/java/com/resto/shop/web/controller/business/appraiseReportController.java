@@ -1,45 +1,39 @@
  package com.resto.shop.web.controller.business;
 
 
+ import com.alibaba.fastjson.JSON;
+ import com.alibaba.fastjson.JSONObject;
+ import com.alibaba.fastjson.TypeReference;
+ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+ import com.resto.brand.core.entity.Result;
+ import com.resto.brand.core.util.AppendToExcelUtil;
+ import com.resto.brand.core.util.ExcelUtil;
+ import com.resto.brand.web.dto.AppraiseDto;
+ import com.resto.brand.web.dto.AppraiseShopDto;
+ import com.resto.brand.web.model.Brand;
+ import com.resto.brand.web.model.TableQrcode;
+ import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.service.BrandService;
+ import com.resto.brand.web.service.ShopDetailService;
+ import com.resto.brand.web.service.TableQrcodeService;
+ import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.model.Order;
+ import com.resto.shop.web.service.AppraiseService;
+ import com.resto.shop.web.service.OrderService;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.resto.brand.core.util.AppendToExcelUtil;
-import com.resto.shop.web.service.AppraiseService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.web.dto.AppraiseDto;
-import com.resto.brand.web.dto.AppraiseShopDto;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.service.OrderService;
+ import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ import javax.swing.*;
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.OutputStream;
+ import java.math.BigDecimal;
+ import java.text.NumberFormat;
+ import java.util.*;
 
 @Controller
 @RequestMapping("appraiseReport")
@@ -50,8 +44,12 @@ public class appraiseReportController extends GenericController{
 	
 	@Resource
 	private BrandService brandService;
+
 	@Resource
 	private ShopDetailService shopDetailService;
+
+	@Resource
+	private TableQrcodeService tableQrcodeService;
 
     @Resource
     private AppraiseService appraiseService;
@@ -320,6 +318,16 @@ public class appraiseReportController extends GenericController{
             selectMap.put("endDate",endDate);
             selectMap.put("shopId",shopId);
             List<AppraiseShopDto> appraiseShopDtos = appraiseService.selectAppraiseShopDto(selectMap);
+			for(AppraiseShopDto ignored :appraiseShopDtos){
+				TableQrcode tableQrcode=tableQrcodeService.selectByTableNumberShopId(shopId,ignored.getTablenumber());
+				if(tableQrcode!=null){
+					ignored.setAreaname(tableQrcode.getAreaName());
+					ignored.setTablenumber(ignored.getTablenumber());
+				}else{
+					ignored.setAreaname(null);
+					ignored.setTablenumber(null);
+				}
+			}
             object.put("appraiseShopDtos",appraiseShopDtos);
         }catch (Exception e){
             log.error("查看店铺评论报表出错！");

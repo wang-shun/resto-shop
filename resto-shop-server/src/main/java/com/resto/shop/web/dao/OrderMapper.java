@@ -642,5 +642,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
+	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
+
 	void colseOrder(String orderId);
 }
