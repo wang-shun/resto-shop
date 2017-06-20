@@ -5083,7 +5083,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
                                 String[] formNames = formName.split("\\)");
                                 for (String name : formNames) {
-                                    formName = name.substring(1);
+                                    if(name.length() > 1){
+                                        formName = name.substring(1);
+                                    }
+
                                     if (map.containsKey(formName)) {
                                         Integer count = map.get(formName);
                                         count += orderItem.getCount();
