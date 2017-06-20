@@ -8026,7 +8026,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 根据id查询订单
         List<Map<String, Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         order.setBaseCustomerCount(0);
         order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
@@ -8035,6 +8034,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
@@ -8085,13 +8085,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder) {
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
         if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
             order.setProductionStatus(ProductionStatus.PRINTED);
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //得到退掉的订单明细
         List<String> orderItemIds = new ArrayList<String>();
         for (OrderItem item : refundOrder.getOrderItems()) {
