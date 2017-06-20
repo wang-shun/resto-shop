@@ -39,4 +39,7 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
 	 * @return
 	 */
 	List<SmsLog> selecByBrandId(String brandId);
+
+
+    SmsLog selectByMap(Map<String, Object> selectMap);
 }

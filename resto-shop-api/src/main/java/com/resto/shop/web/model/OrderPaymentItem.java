@@ -32,6 +32,16 @@ public class OrderPaymentItem implements Serializable {
 
     private  String shopDetailId;
 
+    private Integer isUseBonus;
+
+    public Integer getIsUseBonus() {
+        return isUseBonus;
+    }
+
+    public void setIsUseBonus(Integer isUseBonus) {
+        this.isUseBonus = isUseBonus;
+    }
+
     public BigDecimal getOriginalAmount() {
         return originalAmount;
     }
