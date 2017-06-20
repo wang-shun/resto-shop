@@ -4771,6 +4771,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderAccountId = "";
         BigDecimal originalMoney = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
+        BigDecimal discountMoney = new BigDecimal(0);
         BigDecimal orderCount = new BigDecimal(0);
         BigDecimal customerCount = new BigDecimal(0);
         List<Order> orderList = orderMapper.getOrderAccountByTime(selectMap);
@@ -4778,6 +4779,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
             orderMoney = orderMoney.add(orderAccount.getOrderMoney());
             originalMoney = originalMoney.add(orderAccount.getOriginalAmount());
+            discountMoney = discountMoney.add(orderAccount.getDiscountMoney());
             if (StringUtils.isBlank(orderAccount.getParentOrderId()) && orderAccount.getProductionStatus() != ProductionStatus.REFUND_ARTICLE) {
                 orderCount = orderCount.add(new BigDecimal(1));
                 customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
