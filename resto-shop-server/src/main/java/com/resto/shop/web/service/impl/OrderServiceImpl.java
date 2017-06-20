@@ -1913,7 +1913,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 //如果没有 则新建
                                 kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                             }
-                            kitchenArticleMap.get(kitchenId).add(item);
+                            if(shopDetail.getSplitKitchen() == Common.YES){
+                                int count = item.getCount();
+                                for(int i = 0;i < count;i++){
+                                    item.setCount(1);
+                                    kitchenArticleMap.get(kitchenId).add(item);
+                                }
+                            }else{
+                                kitchenArticleMap.get(kitchenId).add(item);
+                            }
+
                         }
                         if (CollectionUtils.isEmpty(kitchenList)) {
                             item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
@@ -5148,19 +5157,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 itemMap.put("SUBTOTAL", orderItem.getRefundCount());
                 canceledProducts.add(itemMap);
             }
-            if (!nowService.equals(BigDecimal.ZERO)) {
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
-                itemMap.put("SUBTOTAL", nowService);
+            if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)){
+                String other = "其他销量";
+                BigDecimal strLength = new BigDecimal(other.length()).multiply(new BigDecimal(2));
+                Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                String string = "-";
+                for (int i = 1; i < length; i++) {
+                    string = string.concat("-");
+                }
+                Map<String, Object> itemMap = new HashMap<>();
+                itemMap.put("PRODUCT_NAME", string.concat(other).concat(string));
                 saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowService);
-            }
-            if (!nowMeal.equals(BigDecimal.ZERO)) {
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
-                itemMap.put("SUBTOTAL", nowMeal);
-                saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowMeal);
+                if (!nowService.equals(BigDecimal.ZERO)) {
+                    itemMap = new HashMap<>();
+                    itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
+                    itemMap.put("SUBTOTAL", nowService);
+                    saledProducts.add(itemMap);
+                    //服务费不计入总销量
+//                saledProductAmount = saledProductAmount.add(nowService);
+                }
+                if (!nowMeal.equals(BigDecimal.ZERO)) {
+                    itemMap = new HashMap<>();
+                    itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
+                    itemMap.put("SUBTOTAL", nowMeal);
+                    saledProducts.add(itemMap);
+                    //餐盒费不计入总销量
+//                saledProductAmount = saledProductAmount.add(nowMeal);
+                }
             }
             if (!oldService.subtract(nowService).equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<String, Object>();
