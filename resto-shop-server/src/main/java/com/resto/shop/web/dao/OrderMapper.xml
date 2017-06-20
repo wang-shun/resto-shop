@@ -2009,7 +2009,7 @@
     <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
         select t.id, SUM(toi.original_price * toi.count) originalAmount,
         t.parent_order_id parentOrderId,
-        SUM(toi.final_price) as orderMoney,
+        SUM(toi.final_price) + service_price + meal_fee_price as orderMoney,
         IFNULL(t.customer_count,0) customerCount,
         t.production_status productionStatus
         from tb_order t
