@@ -45,10 +45,6 @@ public class ArticleAttrController extends GenericController {
     public Result create(@Valid ArticleAttr articleAttr) {
         articleAttr.setShopDetailId(getCurrentShopId());
         articleattrService.create(articleAttr);
-        if (RedisUtil.get(getCurrentShopId() + "articleAttr") != null) {
-            RedisUtil.remove(getCurrentShopId() + "articleAttr");
-        }
-
         return Result.getSuccess();
     }
 
@@ -56,9 +52,6 @@ public class ArticleAttrController extends GenericController {
     @ResponseBody
     public Result modify(@Valid ArticleAttr brand) {
         articleattrService.updateInfo(brand);
-        if (RedisUtil.get(getCurrentShopId() + "articleAttr") != null) {
-            RedisUtil.remove(getCurrentShopId() + "articleAttr");
-        }
         return Result.getSuccess();
     }
 
@@ -66,9 +59,6 @@ public class ArticleAttrController extends GenericController {
     @ResponseBody
     public Result delete(Integer id) {
         articleattrService.deleteInfo(id);
-        if (RedisUtil.get(getCurrentShopId() + "articleAttr") != null) {
-            RedisUtil.remove(getCurrentShopId() + "articleAttr");
-        }
         return Result.getSuccess();
     }
 }
