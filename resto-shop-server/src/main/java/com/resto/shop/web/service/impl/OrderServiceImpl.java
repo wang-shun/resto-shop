@@ -5168,16 +5168,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 canceledProducts.add(itemMap);
             }
             if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)){
-                String other = "其他销量";
-                BigDecimal strLength = new BigDecimal(other.length()).multiply(new BigDecimal(2));
-                Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
-                String string = "-";
-                for (int i = 1; i < length; i++) {
-                    string = string.concat("-");
-                }
                 Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("PRODUCT_NAME", string.concat(other).concat(string));
-                saledProducts.add(itemMap);
+                if (shopDetail.getTemplateType().equals(Common.YES)) {
+                    String other = "其他销量";
+                    BigDecimal strLength = new BigDecimal(other.length()).multiply(new BigDecimal(2));
+                    Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                    String string = "-";
+                    for (int i = 1; i < length; i++) {
+                        string = string.concat("-");
+                    }
+                    itemMap.put("PRODUCT_NAME", string.concat(other).concat(string));
+                    saledProducts.add(itemMap);
+                }
                 if (!nowService.equals(BigDecimal.ZERO)) {
                     itemMap = new HashMap<>();
                     itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
