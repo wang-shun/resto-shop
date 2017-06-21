@@ -5040,6 +5040,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         for (OrderItem orderItem : saledOrderItems) {
                             Map<String, Object> itemMap = new HashMap<>();
                             if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount());
                                 familyArticleMaps.add(itemMap);
@@ -5086,7 +5087,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 unitMaps.put(orderItem.getArticleId(), map);
                             } else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
 //                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
-                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount() - orderItem.getPackageNumber()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
                                 familyArticleMaps.add(itemMap);
