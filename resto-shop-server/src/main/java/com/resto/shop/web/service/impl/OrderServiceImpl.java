@@ -4789,6 +4789,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderAccountId = "";
         BigDecimal originalMoney = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
+        BigDecimal discountMoney = new BigDecimal(0);
         BigDecimal orderCount = new BigDecimal(0);
         BigDecimal customerCount = new BigDecimal(0);
         List<Order> orderList = orderMapper.getOrderAccountByTime(selectMap);
@@ -4796,6 +4797,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
             orderMoney = orderMoney.add(orderAccount.getOrderMoney());
             originalMoney = originalMoney.add(orderAccount.getOriginalAmount());
+            discountMoney = discountMoney.add(orderAccount.getDiscountMoney());
             if (StringUtils.isBlank(orderAccount.getParentOrderId()) && orderAccount.getProductionStatus() != ProductionStatus.REFUND_ARTICLE) {
                 orderCount = orderCount.add(new BigDecimal(1));
                 customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
@@ -5090,7 +5092,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
                                 String[] formNames = formName.split("\\)");
                                 for (String name : formNames) {
-                                    formName = name.substring(1);
+                                    if(name.length() > 1){
+                                        formName = name.substring(1);
+                                    }
+
                                     if (map.containsKey(formName)) {
                                         Integer count = map.get(formName);
                                         count += orderItem.getCount();
@@ -8056,7 +8061,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 根据id查询订单
         List<Map<String, Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         order.setBaseCustomerCount(0);
         order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
@@ -8065,6 +8069,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
@@ -8115,13 +8120,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder) {
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
         if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
             order.setProductionStatus(ProductionStatus.PRINTED);
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //得到退掉的订单明细
         List<String> orderItemIds = new ArrayList<String>();
         for (OrderItem item : refundOrder.getOrderItems()) {

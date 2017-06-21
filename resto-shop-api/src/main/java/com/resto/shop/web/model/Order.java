@@ -1055,4 +1055,14 @@ public class Order implements Serializable{
                 .append("servicePrice", servicePrice)
                 .toString();
     }
+
+    private BigDecimal discountMoney;
+
+    public BigDecimal getDiscountMoney() {
+        return discountMoney;
+    }
+
+    public void setDiscountMoney(BigDecimal discountMoney) {
+        this.discountMoney = discountMoney;
+    }
 }

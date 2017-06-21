@@ -761,9 +761,9 @@ public class OrderAspect {
 //                "订单发送推送：" + msg.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
-        map.put("fileName", customer.getId());
+        map.put("fileName", shareCustomer.getId());
         map.put("type", "UserAction");
-        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "系统向用户:"+shareCustomer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, map);
     }
 
