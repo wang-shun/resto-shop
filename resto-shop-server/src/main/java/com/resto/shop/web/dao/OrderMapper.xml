@@ -1166,38 +1166,16 @@
     <select id="selectOrderByBossTakeout" resultType="Order">
          SELECT
          *
---         push_order_time,
---         id,
---         ver_code,
---         article_count,
---         table_number,
---         parent_order_id,
---         order_money,
---         order_mode,
---         order_state,
---         pay_type,
---         pay_mode,
---         customer_address_id,
---         amount_with_children,
---         print_fail_flag,
---         print_kitchen_flag,
---         ifnull(count_with_child,article_count) as totalCount,
---         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
         tb_order
         WHERE
-        shop_detail_id=#{shopId}
---         AND
---         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
---         and order_state != 9
---         and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
---          || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
-
-
---         and table_number is not null
+        shop_detail_id=#{shopId} AND
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state != 9
+        and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
+         || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
         and parent_order_id is null
         and distribution_mode_id = 2
-
         order by create_time ASC;
 
     </select>
