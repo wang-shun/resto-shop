@@ -1148,8 +1148,7 @@
         tb_order
         WHERE
         shop_detail_id=#{shopId}
---         AND
---         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+--         AND DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
         and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
          || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
@@ -1169,8 +1168,8 @@
         FROM
         tb_order
         WHERE
-        shop_detail_id=#{shopId} AND
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        shop_detail_id=#{shopId}
+--         AND DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
         and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
          || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
