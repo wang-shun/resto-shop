@@ -28,25 +28,54 @@
 								关闭
 							</label>
 						</div>
-						<div  class="form-group">
-							<label>等位红包每秒增加价</label>
-							<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney">
+						<%--<div  class="form-group">--%>
+							<%--<label>等位红包每秒增加价</label>--%>
+							<%--<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney">--%>
+						<%--</div>--%>
+						<%--<div  class="form-group">--%>
+							<%--<label>等位红包上限价格</label>--%>
+							<%--<input type="text" class="form-control" name="highMoney" :value="m.highMoney">--%>
+						<%--</div>--%>
+
+						<%--<div  class="form-group">--%>
+							<%--<label style="float:left" >等位红包失效时间</label>--%>
+							<%--<div style="clear:both"></div>--%>
+							<%--<input v-if="showWaitTime" type="number" name="waitTime"  id="waitTime" min="1" class="form-control" style="width:20%;float:left;margin-right: 5px"  :value="m.waitTime">--%>
+							<%--<select class="form-control" style="width:30%;float:left" id="waitUnit"  name="waitUnit" @click="selectWaitUnit" v-model="m.waitUnit">--%>
+								<%--<option  value="1">小时</option>--%>
+								<%--<option selected="selected" value="2">天</option>--%>
+								<%--<option value="3">无限制</option>--%>
+							<%--</select>--%>
+						<%--</div>--%>
+
+						<!--    Geek叫号功能    begin-->
+						<div class="form-group">
+							<label class="col-md-4 control-label">店铺标语：</label>
+							<div  class="col-md-6">
+								<input type="text" class="form-control" name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
+									   v-model="m.slogan">
+							</div>
 						</div>
-						<div  class="form-group">
-							<label>等位红包上限价格</label>
-							<input type="text" class="form-control" name="highMoney" :value="m.highMoney">
+						<div class="form-group">
+							<label class="col-md-4 control-label">等位提示：</label>
+							<div  class="col-md-6 ">
+								<textarea rows="3" class="form-control" name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
+										  v-model="m.queueNotice"></textarea>
+							</div>
+						</div>
+						<!--    Geek叫号功能    end-->
+						<div class="form-group">
+							<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
+							<div  class="col-md-6 radio-list">
+								<label class="radio-inline">
+									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否
+								</label>
+							</div>
 						</div>
 
-						<div  class="form-group">
-							<label style="float:left" >等位红包失效时间</label>
-							<div style="clear:both"></div>
-							<input v-if="showWaitTime" type="number" name="waitTime"  id="waitTime" min="1" class="form-control" style="width:20%;float:left;margin-right: 5px"  :value="m.waitTime">
-							<select class="form-control" style="width:30%;float:left" id="waitUnit"  name="waitUnit" @click="selectWaitUnit" v-model="m.waitUnit">
-								<option  value="1">小时</option>
-								<option selected="selected" value="2">天</option>
-								<option value="3">无限制</option>
-							</select>
-						</div>
 						<div style="clear:both"></div>
 						<br/>
 					</div>
