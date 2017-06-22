@@ -2286,7 +2286,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (article.getType() == OrderItemType.SETMEALS
-                    && orderItem.getParentId().equals(article.getId())) {
+                   && orderItem.getParentId() != null && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
                     && article.getParentId().equals(orderItem.getParentId())) {
