@@ -5575,6 +5575,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
+    @Override
+    public List<Order> selectByOrderSatesAndProductionStatesTakeout(String shopId, String[] orderStates,
+                                                             String[] productionStates) {
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
+            return orderMapper.listHoufuUnFinishedOrder(shopId);
+
+        } else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER) {
+            List<Order> order=orderMapper.selectOrderByBossTakeout(shopId);
+            //return orderMapper.selectOrderByBossTakeout(shopId);
+            return order;
+        } else {
+            List<Order> order=orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            //return orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            return order;
+        }
+
+
+    }
+
 
     @Override
     public Order payOrderModeFive(String orderId) {
