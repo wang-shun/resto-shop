@@ -911,7 +911,7 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (OrderItem detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                Article article = articleMapper.selectByPrimaryKey(detail.getArticleId());
                 if (article == null) {
                     continue;
                 }
