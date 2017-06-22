@@ -441,19 +441,18 @@ public class ThirdServiceImpl implements ThirdService {
             orderTotal++;
         }
         RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
-
-
-        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
+        //RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        data.put("ORDER_NUMBER", orderT);
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
-        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-        data.put("DISTRIBUTION_MODE", "外卖--00"+orderT);
+        data.put("DISTRIBUTION_MODE", "外卖");
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
         data.put("RESTAURANT_TEL", shopDetail.getPhone());
-        data.put("TABLE_NUMBER", "");
+        data.put("TABLE_NUMBER", "111");
         data.put("CUSTOMER_COUNT", 0);
         data.put("PAYMENT_AMOUNT",  order.getOrderMoney());
         data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -566,12 +565,12 @@ public class ThirdServiceImpl implements ThirdService {
         }
         RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
 
-        data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
+        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        data.put("ORDER_NUMBER", orderT);
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
-        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-        data.put("DISTRIBUTION_MODE", "外卖--00"+orderT);
+        data.put("DISTRIBUTION_MODE", "外卖");
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
@@ -955,7 +954,8 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
-                    data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
+                    Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+                    data.put("ORDER_NUMBER", orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getCount());
@@ -1090,7 +1090,8 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DISTRIBUTION_MODE", "外卖");
                     print.put("LINE_WIDTH", 42);
                     data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
-                    data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
+                    Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+                    data.put("ORDER_NUMBER", orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getCount());
