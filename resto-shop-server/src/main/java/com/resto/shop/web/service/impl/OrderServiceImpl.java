@@ -5175,8 +5175,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
                     itemMap.put("SUBTOTAL", nowMeal);
                     saledProducts.add(itemMap);
-                    //餐盒费不计入总销量
-//                saledProductAmount = saledProductAmount.add(nowMeal);
+                    //餐盒费不计入总销量    小确幸SB又改了， 又要加上去。 妈的！  拿来怎么多B事 -- 2017-06-22改为计入
+                    saledProductAmount = saledProductAmount.add(nowMeal);
                 }
             }
             if (!oldService.subtract(nowService).equals(BigDecimal.ZERO)) {
