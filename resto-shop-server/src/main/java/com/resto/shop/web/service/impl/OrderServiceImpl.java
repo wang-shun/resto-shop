@@ -7343,6 +7343,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(o.getCustomerId());
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
 
+        //如果退菜订单是  后付情况下加菜后统一支付  则支付项是在主订单下    修改退菜金额改变的逻辑
+        if(o.getParentOrderId() != null && o.getPayType() == PayType.NOPAY){
+            payItemsList = orderPaymentItemService.selectByOrderId(o.getParentOrderId());
+        }
+
         BigDecimal maxWxRefund = new BigDecimal(0);
         for (OrderPaymentItem item : payItemsList) {
             if (item.getPaymentModeId() == PayMode.WEIXIN_PAY) {
