@@ -489,6 +489,17 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label" >厨打是否拆分打印：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="splitKitchen"v-model="m.splitKitchen" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="splitKitchen" v-model="m.splitKitchen" value="0">否
+							</label>
+						</div>
+					</div>
 
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;

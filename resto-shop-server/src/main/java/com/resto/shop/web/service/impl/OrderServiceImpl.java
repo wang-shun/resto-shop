@@ -1913,7 +1913,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 //如果没有 则新建
                                 kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                             }
-                            kitchenArticleMap.get(kitchenId).add(item);
+                            if(shopDetail.getSplitKitchen() == Common.YES){
+                                int count = item.getCount();
+                                for(int i = 0;i < count;i++){
+                                    item.setCount(1);
+                                    kitchenArticleMap.get(kitchenId).add(item);
+                                }
+                            }else{
+                                kitchenArticleMap.get(kitchenId).add(item);
+                            }
+
                         }
                         if (CollectionUtils.isEmpty(kitchenList)) {
                             item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
@@ -2281,7 +2290,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (article.getType() == OrderItemType.SETMEALS
-                    && orderItem.getParentId().equals(article.getId())) {
+                   && orderItem.getParentId() != null && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
                     && article.getParentId().equals(orderItem.getParentId())) {
@@ -4775,6 +4784,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderAccountId = "";
         BigDecimal originalMoney = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
+        BigDecimal discountMoney = new BigDecimal(0);
         BigDecimal orderCount = new BigDecimal(0);
         BigDecimal customerCount = new BigDecimal(0);
         List<Order> orderList = orderMapper.getOrderAccountByTime(selectMap);
@@ -4782,6 +4792,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderAccountId = orderAccountId.concat(orderAccount.getId()).concat(",");
             orderMoney = orderMoney.add(orderAccount.getOrderMoney());
             originalMoney = originalMoney.add(orderAccount.getOriginalAmount());
+            discountMoney = discountMoney.add(orderAccount.getDiscountMoney());
             if (StringUtils.isBlank(orderAccount.getParentOrderId()) && orderAccount.getProductionStatus() != ProductionStatus.REFUND_ARTICLE) {
                 orderCount = orderCount.add(new BigDecimal(1));
                 customerCount = customerCount.add(new BigDecimal(orderAccount.getCustomerCount()));
@@ -5042,6 +5053,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         for (OrderItem orderItem : saledOrderItems) {
                             Map<String, Object> itemMap = new HashMap<>();
                             if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount());
                                 familyArticleMaps.add(itemMap);
@@ -5076,7 +5088,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
                                 String[] formNames = formName.split("\\)");
                                 for (String name : formNames) {
-                                    formName = name.substring(1);
+                                    if (name.length() > 1) {
+                                        formName = name.substring(1);
+                                    }
                                     if (map.containsKey(formName)) {
                                         Integer count = map.get(formName);
                                         count += orderItem.getCount();
@@ -5088,7 +5102,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 unitMaps.put(orderItem.getArticleId(), map);
                             } else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
 //                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
-                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount() - orderItem.getPackageNumber()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
                                 familyArticleMaps.add(itemMap);
@@ -5148,19 +5162,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 itemMap.put("SUBTOTAL", orderItem.getRefundCount());
                 canceledProducts.add(itemMap);
             }
-            if (!nowService.equals(BigDecimal.ZERO)) {
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
-                itemMap.put("SUBTOTAL", nowService);
-                saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowService);
-            }
-            if (!nowMeal.equals(BigDecimal.ZERO)) {
-                Map<String, Object> itemMap = new HashMap<String, Object>();
-                itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
-                itemMap.put("SUBTOTAL", nowMeal);
-                saledProducts.add(itemMap);
-                saledProductAmount = saledProductAmount.add(nowMeal);
+            if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)){
+                Map<String, Object> itemMap = new HashMap<>();
+                if (shopDetail.getTemplateType().equals(Common.YES)) {
+                    String other = "其他销量";
+                    BigDecimal strLength = new BigDecimal(other.length()).multiply(new BigDecimal(2));
+                    Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                    String string = "-";
+                    for (int i = 1; i < length; i++) {
+                        string = string.concat("-");
+                    }
+                    itemMap.put("PRODUCT_NAME", string.concat(other).concat(string));
+                    saledProducts.add(itemMap);
+                }
+                if (!nowService.equals(BigDecimal.ZERO)) {
+                    itemMap = new HashMap<>();
+                    itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
+                    itemMap.put("SUBTOTAL", nowService);
+                    saledProducts.add(itemMap);
+                    //服务费不计入总销量
+//                saledProductAmount = saledProductAmount.add(nowService);
+                }
+                if (!nowMeal.equals(BigDecimal.ZERO)) {
+                    itemMap = new HashMap<>();
+                    itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
+                    itemMap.put("SUBTOTAL", nowMeal);
+                    saledProducts.add(itemMap);
+                    //餐盒费不计入总销量    小确幸SB又改了， 又要加上去。 妈的！  拿来怎么多B事 -- 2017-06-22改为计入
+                    saledProductAmount = saledProductAmount.add(nowMeal);
+                }
             }
             if (!oldService.subtract(nowService).equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<String, Object>();
@@ -8015,7 +8045,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 根据id查询订单
         List<Map<String, Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         order.setBaseCustomerCount(0);
         order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
@@ -8024,6 +8053,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         // 查询订单菜品
@@ -8074,13 +8104,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public List<Map<String, Object>> refundOrderPrintKitChen(Order refundOrder) {
         Order order = selectById(refundOrder.getId());
-        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
         if (ProductionStatus.HAS_ORDER == order.getProductionStatus() || ProductionStatus.NOT_PRINT == order.getProductionStatus()) {
             order.setProductionStatus(ProductionStatus.PRINTED);
             order.setPrintOrderTime(new Date());
             orderMapper.updateByPrimaryKeySelective(order);
         }
+        order.setDistributionModeId(DistributionType.REFUND_ORDER);
         //得到退掉的订单明细
         List<String> orderItemIds = new ArrayList<String>();
         for (OrderItem item : refundOrder.getOrderItems()) {

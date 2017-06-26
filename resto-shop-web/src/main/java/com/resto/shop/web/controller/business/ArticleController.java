@@ -2,7 +2,6 @@ package com.resto.shop.web.controller.business;
 
 
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.core.util.PinyinUtil;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -14,11 +13,9 @@ import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
-import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
-import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -109,10 +106,10 @@ public class ArticleController extends GenericController {
             article.setInitials(PinyinUtil.getPinYinHeadChar(article.getName()));
             articleService.update(article);
             //修改单品的时候如果存在推荐餐包 联动修改
-            if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+            if (article.getArticleType() == ArticleType.SIMPLE_ARTICLE) {
                 List<ArticleRecommendPrice> articleRecommendPrice = articleRecommendService.selectByRecommendArticleInfo(article.getId());
-                for(ArticleRecommendPrice ar : articleRecommendPrice){
-                    articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(),ar.getId());
+                for (ArticleRecommendPrice ar : articleRecommendPrice) {
+                    articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(), ar.getId());
                 }
             }
 
@@ -146,11 +143,6 @@ public class ArticleController extends GenericController {
             unitService.updateArticleRelation(id, article.getUnits());
         }
         articleService.initStock();
-//        List<Article> articles = (List<Article>) RedisUtil.get(getCurrentShopId()+"articles");
-        if(RedisUtil.get(getCurrentShopId()+"articles") != null){
-            RedisUtil.remove(getCurrentShopId()+"articles");
-        }
-
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
@@ -161,17 +153,17 @@ public class ArticleController extends GenericController {
     @ResponseBody
     public Result delete(String id) {
         Article article = articleService.selectById(id);
-        if(article.getArticleType() == ArticleType.SIMPLE_ARTICLE){
+        if (article.getArticleType() == ArticleType.SIMPLE_ARTICLE) {
             //单品时校验
             List<Article> articles = articleService.delCheckArticle(id);
-            if(articles.size() != 0){
+            if (articles.size() != 0) {
                 StringBuffer mess = new StringBuffer();
-                for(Article art : articles){
-                    mess.append(art.getName()+"，");
+                for (Article art : articles) {
+                    mess.append(art.getName() + "，");
                 }
                 Result result = new Result();
                 result.setSuccess(false);
-                result.setMessage("删除失败，在"+mess.toString().substring(0,mess.toString().length()-1)+"套餐存在！");
+                result.setMessage("删除失败，在" + mess.toString().substring(0, mess.toString().length() - 1) + "套餐存在！");
                 result.setStatusCode(100);
                 return result;
             }
@@ -179,9 +171,6 @@ public class ArticleController extends GenericController {
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
-        if(RedisUtil.get(getCurrentShopId()+"articles") != null){
-            RedisUtil.remove(getCurrentShopId()+"articles");
-        }
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
@@ -209,17 +198,17 @@ public class ArticleController extends GenericController {
         List<Article> result = articleService.getSingoArticle(getCurrentShopId());
         return result;
     }
-    
+
     @RequestMapping("/selectsingleItem")
     @ResponseBody
-    public Result selectsingleItem(){
-    	List<Article> list = null;
-    	try{
-    		list = articleService.selectsingleItem(getCurrentShopId());
-    		return getSuccessResult(list);
-    	}catch (Exception ex) {
-			log.error(ex.getMessage());
-			return new Result(false);
-		}
+    public Result selectsingleItem() {
+        List<Article> list = null;
+        try {
+            list = articleService.selectsingleItem(getCurrentShopId());
+            return getSuccessResult(list);
+        } catch (Exception ex) {
+            log.error(ex.getMessage());
+            return new Result(false);
+        }
     }
 }

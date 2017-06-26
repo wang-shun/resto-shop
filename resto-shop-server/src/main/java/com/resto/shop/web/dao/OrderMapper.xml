@@ -2007,12 +2007,15 @@
     </select>
 
     <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
-        select t.id, t.original_amount,
+        select t.id, SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
         t.parent_order_id parentOrderId,
-        t.order_money as orderMoney,
+        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price orderMoney,
+        SUM((toi.original_price - toi.unit_price) * toi.count) discountMoney,
         IFNULL(t.customer_count,0) customerCount,
         t.production_status productionStatus
         from tb_order t
+        inner join tb_order_item toi
+        on t.id = toi.order_id
         where
         shop_detail_id = #{shopId}
         and IF(t.production_status = 6,t.production_status = 6,t.order_state in (2,10,11,12)
