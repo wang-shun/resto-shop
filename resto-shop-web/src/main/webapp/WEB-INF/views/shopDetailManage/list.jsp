@@ -58,7 +58,7 @@
 						</div>
 
 						<div class="form-group">
-							<label>按钮颜色</label>
+							<label>字体颜色</label>
 							<div>
 								<input type="text" class="form-control color-mini" name="tvTextColor"
 									   data-position="bottom left" v-model="m.tvTextColor">
@@ -66,7 +66,7 @@
 						</div>
 
 						<div class="form-group">
-							<label>餐品图片</label>
+							<label>背景图片</label>
 							<div>
 								<input type="hidden" name="tvBackground" v-model="m.tvBackground">
 								<img-file-upload class="form-control" @success="uploadSuccess"
