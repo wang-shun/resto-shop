@@ -3,6 +3,8 @@ package com.resto.shop.web.model;
 import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class Printer implements Serializable {
     private Integer id;
@@ -28,6 +30,16 @@ public class Printer implements Serializable {
 
     //是否关联钱箱 0-否 1-是
     private Integer receiveMoney;
+
+    private List<Map<String,Object>> taskList;
+
+    public List<Map<String, Object>> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<Map<String, Object>> taskList) {
+        this.taskList = taskList;
+    }
 
     public Integer getReceiveMoney() {
         return receiveMoney;

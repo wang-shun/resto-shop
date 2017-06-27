@@ -24,4 +24,6 @@ public interface PrinterService extends GenericService<Printer, Integer> {
 
 	Map<String, Object> openCashDrawerNew(String orderId,String shopId);
 
+	List<Printer> selectListNotSame(String shopId);
+
 }
