@@ -95,7 +95,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);
 
-
+	public List<Order> selectErrorOrder( Date date);
 
 	public List<Order> getOrderNoPayList(String currentShopId, Date date);
 

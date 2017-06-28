@@ -863,18 +863,10 @@ public class OrderAspect {
 //				log.info("库存还原失败:"+order.getId());
 //			}
 
-            String shopId = order.getShopDetailId();
-            Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
-            BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
-            if (order.getParentOrderId() == null) {
-                orderCount--;
-                orderTotal = orderTotal.subtract(order.getAmountWithChildren());
-            } else {
-                orderTotal = orderTotal.subtract(order.getOrderMoney());
-            }
-            RedisUtil.set(shopId + "shopOrderCount", orderCount);
-            RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
-            MQMessageProducer.sendPrintSuccess(shopId);
+            Order o = orderService.getOrderAccount(order.getShopDetailId());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+            MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 
         }
     }

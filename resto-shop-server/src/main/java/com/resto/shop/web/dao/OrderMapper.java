@@ -103,6 +103,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
 
+	List<Order> selectErrorOrder(@Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
+
+
 	/**
 	 * 查询未付款的订单（后付模式）
 	 * @param currentShopId

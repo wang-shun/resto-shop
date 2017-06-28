@@ -3007,4 +3007,31 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <update id="colseOrder">
         update tb_order set order_state = 9 where id=#{orderId}
     </update>
+
+
+    <select id="selectErrorOrder" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        serial_number,
+        ver_code,
+        article_count,
+        table_number,
+        order_money,
+        shop_detail_id
+        FROM
+        tb_order
+        WHERE
+        <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
+        and( (production_status = 5 and order_state != 9 and print_times = 0) or
+        (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 40  )
+        or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
+        or (production_status = 0 and order_state = 1 and order_mode = 6 and pay_type = 1 and print_times = 0 and now() - create_time > 120 )
+        or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
+        or (production_status = 1 and order_state = 10 and print_times = 0 and now() - create_time > 40 )
+        )
+        and order_mode != 3
+        order by push_order_time DESC;
+    </select>
+
 </mapper>
