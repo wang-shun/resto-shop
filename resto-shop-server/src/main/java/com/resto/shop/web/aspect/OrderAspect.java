@@ -113,6 +113,9 @@ public class OrderAspect {
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
+            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            }
 
             //自动取消订单，大boss模式下  先付2小时未付款 自动取消订单
 //            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {//未支付和未完全支付的订单，不包括后付款模式
@@ -128,6 +131,12 @@ public class OrderAspect {
             }
         }
     }
+
+   /* public static void main(String[] args) {
+        System.out.println("------------------------------>1");
+        MQMessageProducer.sendPlatformOrderMessage("02d3ccee0c5e421fa6fc61a5f5bf47d6", 4, "2f83afee7a0e4822a6729145dd53af33", "0cb1c82b647642f38dd62bd54ac2414c");
+        System.out.println("------------------------------>2");
+    }*/
 
     private void sendPaySuccessMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
@@ -344,7 +353,11 @@ public class OrderAspect {
                 order.setPrintTimes(1);
                 orderService.update(order);
             }
-            MQMessageProducer.sendPlaceOrderMessage(order);
+            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            }else{
+                MQMessageProducer.sendPlaceOrderMessage(order);
+            }
         }
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
@@ -367,7 +380,11 @@ public class OrderAspect {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
         if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
-            MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
+            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            }else{
+                MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
+            }
 //            orderService.confirmOrder(order);
         }
 
@@ -465,7 +482,12 @@ public class OrderAspect {
                         if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
                         }else{
-                            MQMessageProducer.sendPlaceOrderMessage(order);
+                            /*if(order.getDistributionModeId() == DistributionType.DELIVERY_MODE_ID){
+                                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+                            }else{*/
+                                MQMessageProducer.sendPlaceOrderMessage(order);
+                            /*}*/
+
                         }
                     }
 				} else {

@@ -142,6 +142,9 @@ public class ThirdServiceImpl implements ThirdService {
             case PlatformKey.MEITUAN:
                 result = printPlatformOrder(platformId, type);
                 break;
+            case PlatformKey.CANJIA:
+                result = printPlatformOrder(platformId, type);
+                break;
             default:
                 break;
         }
@@ -154,6 +157,40 @@ public class ThirdServiceImpl implements ThirdService {
     private List<Map<String, Object>> printPlatformOrder(String platformOrderId, int type) {
         List<Map<String, Object>> printTask = new ArrayList<>();
         PlatformOrder order = platformOrderService.selectByPlatformOrderId(platformOrderId, type);
+
+        if(order==null){
+            //R+外卖打印总单
+            Order oder = orderService.selectById(platformOrderId);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(platformOrderId);
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
+            List<Printer> ticketPrinter = printerService.selectByShopAndType(oder.getShopDetailId(), PrinterType.RECEPTION);
+
+            for (Printer printer : ticketPrinter) {
+                Map<String, Object> ticket = new HashMap<>();
+                if (shopDetail.getIsPosNew() == Common.YES) {
+                    ticket = printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer);
+                } else {
+                    ticket = printPlatformOrderTicketNo(oder, orderItems,shopDetail, printer);
+                }
+
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
+            }
+            //R+外卖厨打
+            List<Map<String, Object>> kitchenTicket = new ArrayList<Map<String, Object>>();
+            if (shopDetail.getIsPosNew() == Common.YES) {
+                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail);
+            } else {
+                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail);
+            }
+            if (!kitchenTicket.isEmpty()) {
+                printTask.addAll(kitchenTicket);
+            }
+
+            return printTask;
+        }
+
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
 
@@ -443,11 +480,11 @@ public class ThirdServiceImpl implements ThirdService {
         RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
         //RedisUtil.get(order.getId() + "orderNumber");
         Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-        data.put("ORDER_NUMBER", orderT);
+        data.put("ORDER_NUMBER", "00"+orderT);
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
-        data.put("DISTRIBUTION_MODE", "外卖");
+        data.put("DISTRIBUTION_MODE", "外卖   "+order.getVerCode());
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
@@ -469,7 +506,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("CUSTOMER_SATISFACTION", "");
         data.put("CUSTOMER_PROPERTY", "");
         data.put("ALREADY_PAYED", "已在线支付");
-        data.put("DELIVERY_SOURCE", "R+");
+        data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
         data.put("DELIVERY_ADDRESS", customerAddress.getAddressReality() + "\n\n【备注】：");
 
@@ -566,11 +603,11 @@ public class ThirdServiceImpl implements ThirdService {
         RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
 
         Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-        data.put("ORDER_NUMBER", orderT);
+        data.put("ORDER_NUMBER", "00"+orderT);
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
 //
-        data.put("DISTRIBUTION_MODE", "外卖");
+        data.put("DISTRIBUTION_MODE", "外卖   "+order.getVerCode());
         data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
         data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
@@ -592,7 +629,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("CUSTOMER_SATISFACTION", "");
         data.put("CUSTOMER_PROPERTY", "");
         data.put("ALREADY_PAYED", "已在线支付");
-        data.put("DELIVERY_SOURCE", "R+");
+        data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
         data.put("DELIVERY_ADDRESS", customerAddress.getAddressReality() + "\n\n【备注】：");
 
@@ -953,9 +990,10 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_ID", order.getSerialNumber());
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
-                    data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    //data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    data.put("TABLE_NUMBER", order.getVerCode());
                     Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-                    data.put("ORDER_NUMBER", orderT);
+                    data.put("ORDER_NUMBER", "00"+orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getCount());
@@ -1089,9 +1127,10 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
                     data.put("DISTRIBUTION_MODE", "外卖");
                     print.put("LINE_WIDTH", 42);
-                    data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    //data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    data.put("TABLE_NUMBER", order.getVerCode());
                     Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
-                    data.put("ORDER_NUMBER", orderT);
+                    data.put("ORDER_NUMBER", "00"+orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
                     items.put("ARTICLE_COUNT", article.getCount());

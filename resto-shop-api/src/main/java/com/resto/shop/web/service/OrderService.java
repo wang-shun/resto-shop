@@ -59,6 +59,8 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public Order printSuccess(String orderId) throws AppException;
 
+	public int printUpdate(String orderId);
+
 	Order getOrderAccount(String shopId);
 
 	/**
