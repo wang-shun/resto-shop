@@ -183,27 +183,27 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
-//		obj.put("tableNumber", order.getTableNumber());
+		obj.put("tableNumber", order.getTableNumber());
 		obj.put("shopDetailId", order.getShopDetailId());
-//		obj.put("articleCount", order.getArticleCount());
-//		obj.put("orderMode",order.getOrderMode());
-//		obj.put("productionStatus", order.getProductionStatus());
-//		obj.put("verCode", order.getVerCode());
-//		obj.put("parentOrderId", order.getParentOrderId());
-//		obj.put("originalAmount", order.getOriginalAmount());
-//		obj.put("orderMoney", order.getOrderMoney());
-//		obj.put("serialNumber",order.getSerialNumber());
-//		obj.put("printTimes",order.getPrintTimes());
-//		obj.put("amountWithChildren",order.getAmountWithChildren());
-//		obj.put("printOrderTime",order.getPrintOrderTime());
+		obj.put("articleCount", order.getArticleCount());
+		obj.put("orderMode",order.getOrderMode());
+		obj.put("productionStatus", order.getProductionStatus());
+		obj.put("verCode", order.getVerCode());
+		obj.put("parentOrderId", order.getParentOrderId());
+		obj.put("originalAmount", order.getOriginalAmount());
+		obj.put("orderMoney", order.getOrderMoney());
+		obj.put("serialNumber",order.getSerialNumber());
+		obj.put("printTimes",order.getPrintTimes());
+		obj.put("amountWithChildren",order.getAmountWithChildren());
+		obj.put("printOrderTime",order.getPrintOrderTime());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PLACE_ORDER,obj.toJSONString().getBytes());
-//		RedisUtil.set(order.getId()+"status", OrderPosStatus.SEND_MSG_SUCCESS);
-//		List<String> orderList = (List<String>) RedisUtil.get(order.getShopDetailId()+"sendMsgList");
-//		if(CollectionUtils.isEmpty(orderList)){
-//			orderList = new ArrayList<>();
-//		}
-//		orderList.add(order.getId());
-//		RedisUtil.set(order.getShopDetailId()+"sendMsgList",orderList);
+		RedisUtil.set(order.getId()+"status", OrderPosStatus.SEND_MSG_SUCCESS);
+		List<String> orderList = (List<String>) RedisUtil.get(order.getShopDetailId()+"sendMsgList");
+		if(CollectionUtils.isEmpty(orderList)){
+			orderList = new ArrayList<>();
+		}
+		orderList.add(order.getId());
+		RedisUtil.set(order.getShopDetailId()+"sendMsgList",orderList);
 		sendMessageASync(message);
 	}
 
