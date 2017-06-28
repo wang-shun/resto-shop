@@ -12,6 +12,7 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -571,6 +572,19 @@ public class OrderAspect {
 
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
+        if(order.getPayType() == PayType.PAY){
+            String shopId = order.getShopDetailId();
+            Integer orderCount = (Integer) RedisUtil.get(shopId+"shopOrderCount");
+            BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId+"shopOrderTotal");
+            if(order.getParentOrderId() == null){
+                orderCount++;
+            }
+            orderTotal = orderTotal.add(order.getOrderMoney());
+            RedisUtil.set(shopId+"shopOrderCount",orderCount);
+            RedisUtil.set(shopId+"shopOrderTotal",orderTotal);
+            MQMessageProducer.sendPrintSuccess(shopId);
+        }
+
         if (order != null
                 && (order.getOrderMode() == ShopMode.HOUFU_ORDER )
                 && order.getOrderState() == OrderState.SUBMIT
