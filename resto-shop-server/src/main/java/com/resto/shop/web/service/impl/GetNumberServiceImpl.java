@@ -155,6 +155,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Override
     public Integer selectWaitCountByCodeId(String shopId, String codeId) {
-        return getNumberMapper.selectWaitCountByCodeId(shopId, codeId);
+        return getNumberMapper.selectWaitCountByCodeId(shopId, codeId).size();
     }
 }
