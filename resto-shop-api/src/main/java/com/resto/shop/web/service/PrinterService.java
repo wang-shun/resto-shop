@@ -22,4 +22,6 @@ public interface PrinterService extends GenericService<Printer, Integer> {
 
 	Map<String, Object> openCashDrawer(String orderId,String shopId);
 
+	Map<String, Object> openCashDrawerNew(String orderId,String shopId);
+
 }

@@ -115,6 +115,10 @@ public class ServerConfig {
     public OrderRemarkService boOrderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
 
     @Bean
+    public ElemeTokenService elemeTokenService(){ return  proxy.create(ElemeTokenService.class); }
+
+
+    @Bean
     public  WetherService wetherService(){
         return proxy.create(WetherService.class);
     }
@@ -128,5 +132,4 @@ public class ServerConfig {
     public DayAppraiseMessageService dayAppraiseMessageService(){
         return proxy.create(DayAppraiseMessageService.class);
     }
-
 }

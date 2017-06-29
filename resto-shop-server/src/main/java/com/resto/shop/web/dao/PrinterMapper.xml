@@ -71,7 +71,7 @@
   
   <select id="selectByShopAndType" resultType="Printer">
   	select * from tb_printer
-		where shop_detail_id = #{shopDetailId} and print_type=#{printType}
+		where shop_detail_id = #{shopDetailId} and print_type=#{printType} and `range` = 0
   </select>
 
 
@@ -88,6 +88,8 @@
   </select>
 
   <select id="getCashPrinter" resultType="Printer">
-    select * from tb_printer where receive_money = 1 order by id desc limit 1
+    select * from tb_printer where receive_money = 1
+     and shop_detail_id = #{shopId}
+     order by id desc limit 1
   </select>
 </mapper>

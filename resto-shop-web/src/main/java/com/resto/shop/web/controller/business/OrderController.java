@@ -1,47 +1,48 @@
 package com.resto.shop.web.controller.business;
 
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.*;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.OrderDetailDto;
+import com.resto.brand.web.dto.OrderPayDto;
 import com.resto.brand.web.model.OrderException;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.OrderExceptionService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.DistributionType;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Appraise;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
+import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.service.WeItemService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ExcelUtil;
-import com.resto.brand.web.dto.OrderDetailDto;
-import com.resto.brand.web.dto.OrderPayDto;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.service.OrderService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("orderReport")
@@ -49,15 +50,8 @@ public class OrderController extends GenericController{
 
 	@Resource
 	private OrderService orderService;
-
-	@Resource
-	private BrandService brandService;
 	@Resource
 	private ShopDetailService shopDetailService;
-
-   @Resource
-	private WeItemService weItemService;
-
 	@Resource
 	private OrderExceptionService orderExceptionService;
 
@@ -283,6 +277,7 @@ public class OrderController extends GenericController{
 			}
 			//订单金额
 			ot.setOrderMoney(o.getOrderMoney());
+			ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));
 			listDto.add(ot);
 		}
 		return listDto;
@@ -349,7 +344,7 @@ public class OrderController extends GenericController{
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","createTime","telephone","orderState","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay",
-                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","giveChangePayment","incomePrize"};
+                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","incomePrize"};
 		//定义数据
 		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
@@ -382,8 +377,8 @@ public class OrderController extends GenericController{
 
 		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
                 {"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},
-                {"现金支付(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}
-                ,{"找零(元)","25"},{"营销撬动率","25"}};
+                {"现金实收(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}
+                ,{"营销撬动率","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{
@@ -419,7 +414,7 @@ public class OrderController extends GenericController{
             String[][] items = new String[orderDetailDto.getShopOrderList().size()][];
             int i = 0;
             for (Map map : orderDetailDto.getShopOrderList()){
-                items[i] = new String[19];
+                items[i] = new String[18];
                 items[i][0] = map.get("shopName").toString();
                 items[i][1] = map.get("createTime").toString();
                 items[i][2] = map.get("telephone").toString();
@@ -437,8 +432,7 @@ public class OrderController extends GenericController{
                 items[i][14] = map.get("shanhuiPay").toString();
                 items[i][15] = map.get("integralPay").toString();
                 items[i][16] = map.get("articleBackPay").toString();
-                items[i][17] = map.get("giveChangePayment").toString();
-                items[i][18] = map.get("incomePrize").toString();
+                items[i][17] = map.get("incomePrize").toString();
                 i++;
             }
             AppendToExcelUtil.insertRows(path,startPosition,items);

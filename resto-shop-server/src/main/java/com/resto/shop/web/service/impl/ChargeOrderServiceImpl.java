@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 /**
  *
@@ -39,29 +39,35 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     @Resource
     private ChargeSettingMapper chargeSettingMapper;
 
-	@Resource
-	private ChargeOrderMapper chargeorderMapper;
+    @Resource
+    private ChargeOrderMapper chargeorderMapper;
 
-	@Resource
-	private ChargePaymentService chargePaymentService;
+    @Resource
+    private ChargePaymentService chargePaymentService;
 
-	@Resource
-	private AccountService accountService;
-	@Resource
-	CustomerService customerService;
-	@Resource
+    @Resource
+    private AccountService accountService;
+    @Resource
+    CustomerService customerService;
+    @Resource
     OrderPaymentItemService orderPaymentItemService;
-	@Resource
-	BrandService brandService;
+    @Resource
+    BrandService brandService;
 
-	@Resource
-	ChargeOrderMapper chargeOrderMapper;
+    @Resource
+    ChargeOrderMapper chargeOrderMapper;
+
+    @Resource
+    BonusSettingService bonusSettingService;
+
+    @Resource
+    BonusLogService bonusLogService;
 
 
-	@Override
-	public GenericDao<ChargeOrder, String> getDao() {
-		return chargeorderMapper;
-	}
+    @Override
+    public GenericDao<ChargeOrder, String> getDao() {
+        return chargeorderMapper;
+    }
 
 	@Override
 	public ChargeOrder createChargeOrder(String settingId, String customerId, String shopId, String brandId) {
@@ -69,6 +75,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 		byte orderState = 0;
 		ChargeOrder chargeOrder = new ChargeOrder(ApplicationUtils.randomUUID(),chargeSetting.getChargeMoney(),
 				chargeSetting.getRewardMoney(),orderState,new Date(),customerId,shopId,brandId);
+        chargeOrder.setChargeSettingId(settingId);
 		chargeOrder.setChargeBalance(BigDecimal.ZERO);
 		chargeOrder.setRewardBalance(BigDecimal.ZERO);
 		chargeOrder.setTotalBalance(BigDecimal.ZERO);
@@ -103,9 +110,24 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			update(chargeOrder);// 只能更新状态和结束时间
 			//微信推送
 			wxPush(chargeOrder);
+            BonusSetting bonusSetting = bonusSettingService.selectByChargeSettingId(chargeOrder.getChargeSettingId());
+            if (bonusSetting != null){
+                BonusLog bonusLog = new BonusLog();
+                bonusLog.setId(ApplicationUtils.randomUUID());
+                bonusLog.setChargeOrderId(chargeOrder.getId());
+                bonusLog.setBonusSettingId(bonusSetting.getId());
+                Integer bonusAmount = chargeMoney.multiply(new BigDecimal(bonusSetting.getChargeBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer shopownerBonusAmount = new BigDecimal(bonusAmount).multiply(new BigDecimal(bonusSetting.getShopownerBonusRatio()).divide(new BigDecimal(100))).intValue();
+                Integer employeeBonusAmount = bonusAmount - shopownerBonusAmount;
+                bonusLog.setBonusAmount(bonusAmount);
+                bonusLog.setState(0);
+                bonusLog.setShopownerBonusAmount(shopownerBonusAmount);
+                bonusLog.setEmployeeBonusAmount(employeeBonusAmount);
+                bonusLog.setCreateTime(new Date());
+                bonusLog.setWishing(bonusSetting.getWishing());
+                bonusLogService.insert(bonusLog);
+            }
 		}
-
-
 	}
 
 	@Override
@@ -287,26 +309,26 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msgFrist.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
-		}
-		StringBuffer msg = new StringBuffer();
-		msg.append("今日充值余额已到账，快去看看吧~");
-		String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
-		msg.append("<a href='" + jumpurl+ "'>查看账户</a>");
-		WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, map);
+        }
+        StringBuffer msg = new StringBuffer();
+        msg.append("今日充值余额已到账，快去看看吧~");
+        String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+        msg.append("<a href='" + jumpurl + "'>查看账户</a>");
+        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", customer.getId());
         map.put("type", "UserAction");
-        map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
-	}
-	
-	@Override
-	public List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap) {
-		return chargeorderMapper.selectByShopToDay(selectMap);
-	}
+        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(LogUtils.url, map);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap) {
+        return chargeorderMapper.selectByShopToDay(selectMap);
+    }
 
     @Override
     public List<ChargeOrder> selectListByDateAndShopId(String zuoriDay, String zuoriDay1, String id) {

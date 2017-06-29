@@ -214,6 +214,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		  }
 		  return false;//没找到返回false
 		 }
-	
-	
+
+    @Override
+    public SmsLog selectByMap(Map<String, Object> selectMap) {
+        return smslogMapper.selectByMap(selectMap);
+    }
 }

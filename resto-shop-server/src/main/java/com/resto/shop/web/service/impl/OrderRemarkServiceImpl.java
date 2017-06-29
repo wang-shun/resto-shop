@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RpcService
-public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, String> implements OrderRemarkService{
+public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, String> implements OrderRemarkService {
 
 	@Resource
 	private OrderRemarkMapper orderRemarkMapper;

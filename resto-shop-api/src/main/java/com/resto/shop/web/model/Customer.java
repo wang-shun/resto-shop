@@ -83,6 +83,20 @@ public class Customer implements Serializable{
 
     private String shareCouponIds;
 
+    //是否关注
+    private Integer subscribe;
+
+    //会员序号
+    private Long serialNumber;
+
+    public Long getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(Long serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
     public String getShareCouponIds() {
         return shareCouponIds;
     }
@@ -90,9 +104,6 @@ public class Customer implements Serializable{
     public void setShareCouponIds(String shareCouponIds) {
         this.shareCouponIds = shareCouponIds;
     }
-
-    //是否关注
-    private Integer subscribe;
 
     public Integer getSubscribe() {
         return subscribe;

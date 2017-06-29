@@ -40,4 +40,6 @@ public interface CouponService extends GenericService<Coupon, String> {
     List<Coupon> addRealTimeCoupon(List<NewCustomCoupon> newCustomCoupons, Customer customer);
 
     Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
+
+    List<Coupon> getCouponByShopId(String shopId,Integer day,Integer type);
 }

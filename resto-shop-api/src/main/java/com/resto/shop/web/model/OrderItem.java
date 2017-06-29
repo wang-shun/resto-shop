@@ -94,6 +94,19 @@ public class OrderItem implements Serializable {
      */
     private Integer discount;
 
+    //0-未打印 1-打印异常 2-异常修正 3打印正常
+    private Integer printFailFlag;
+
+    private Integer peference;
+
+    public Integer getPrintFailFlag() {
+        return printFailFlag;
+    }
+
+    public void setPrintFailFlag(Integer printFailFlag) {
+        this.printFailFlag = printFailFlag;
+    }
+
     final public BigDecimal getExtraPrice() {
         return extraPrice;
     }
@@ -340,5 +353,13 @@ public class OrderItem implements Serializable {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
+    }
+
+    public Integer getPeference() {
+        return peference;
+    }
+
+    public void setPeference(Integer peference) {
+        this.peference = peference;
     }
 }

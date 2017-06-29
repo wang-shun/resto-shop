@@ -41,6 +41,8 @@ public class ChargeOrder implements Serializable {
 
     private String telephone;
 
+    private String chargeSettingId;
+
     public String getTelephone() {
         return telephone;
     }
@@ -207,5 +209,13 @@ public class ChargeOrder implements Serializable {
             type=1;
         }
         this.type = type;
+    }
+
+    public String getChargeSettingId() {
+        return chargeSettingId;
+    }
+
+    public void setChargeSettingId(String chargeSettingId) {
+        this.chargeSettingId = chargeSettingId;
     }
 }

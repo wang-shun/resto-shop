@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.Wether;
-import com.resto.brand.web.service.WetherService;
 import com.resto.shop.web.config.SessionKey;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -48,6 +47,9 @@ public class BrandUserController extends GenericController{
     
     @Resource
     private ShopDetailService shopDetailService;
+
+    @Resource
+    private BrandService brandService;
 
     @Resource
     private RoleService roleService;
@@ -92,6 +94,7 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+            session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
             Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
             session.setAttribute(SessionKey.WETHERINFO,wether);
 
@@ -103,6 +106,10 @@ public class BrandUserController extends GenericController{
 //            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());//存当前店铺的名字
 //            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
 //            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAMES, JsonUtils.objectToJson(shopDetailList));//存当前品牌所有的店铺
+
+            Brand brand = brandService.selectByPrimaryKey(authUserInfo.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(authUserInfo.getShopDetailId());
+            LogTemplateUtils.shopUserLogin(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
         } catch (AuthenticationException e) {
             // 身份验证失败
             model.addAttribute("error", e.getMessage());
@@ -121,6 +128,10 @@ public class BrandUserController extends GenericController{
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(HttpSession session) {
+        Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+        LogTemplateUtils.shopUserLogout(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
+
         session.invalidate();
         // 登出操作
         Subject subject = SecurityUtils.getSubject();

@@ -10,4 +10,9 @@ public class Common {
     public static final Integer NO = 0;
 
     public static final String KUCUN = "ck";
+
+    public static final int POS_NEW = 1;
+
+    public static  final int POS_OLD = 0;
 }
+

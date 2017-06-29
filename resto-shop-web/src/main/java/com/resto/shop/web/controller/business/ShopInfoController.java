@@ -10,6 +10,8 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.util.LogTemplateUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -94,12 +96,13 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
         shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
-
         ShopDetail shopDetail1 =(ShopDetail) MemcachedUtils.get(getCurrentShopId()+"info");
         if(shopDetail != null){
-            MemcachedUtils.delete(getCurrentShopId()+"info");
+            RedisUtil.remove(getCurrentShopId()+"info");
         }
-
+        Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+        shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+        LogTemplateUtils.shopDeatilEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
         return Result.getSuccess();
     }
 

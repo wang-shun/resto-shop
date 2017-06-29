@@ -73,4 +73,7 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     void updateByShanhuiPayOrder(String orderId, String param);
 
     OrderPaymentItem insertByBeforePay(OrderPaymentItem orderPaymentItem);
+
+
+    OrderPaymentItem selectWeChatPayResultData(String shopId);
 }

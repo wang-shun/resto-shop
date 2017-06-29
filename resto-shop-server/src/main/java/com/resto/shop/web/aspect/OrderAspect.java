@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
 @Component
 @Aspect
@@ -115,10 +115,10 @@ public class OrderAspect {
             }
 
             //自动取消订单，大boss模式下  先付2小时未付款 自动取消订单
-            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {//未支付和未完全支付的订单，不包括后付款模式
-                long delay = 1000*60*60*2;//两个小时后自动取消订单
-                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
-            }
+//            if (order.getOrderState().equals(OrderState.SUBMIT) && order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {//未支付和未完全支付的订单，不包括后付款模式
+//                long delay = 1000*60*60*2;//两个小时后自动取消订单
+//                MQMessageProducer.sendAutoCloseMsg(order.getId(),order.getBrandId(),delay);
+//            }
 
             //出单时减少库存
             Boolean updateStockSuccess = false;
@@ -191,7 +191,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
         }
@@ -430,7 +430,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
 
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -611,7 +611,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
     }
 
@@ -647,7 +647,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
         }
     }
 
@@ -694,7 +694,7 @@ public class OrderAspect {
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("您有一个红包未领取，红包来自"+brand.getBrandName()+"给您的消费返利，");
+                msg.append("您有一个红包未领取，红包是"+brand.getBrandName()+"送您的一片心意xoxo");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -705,7 +705,7 @@ public class OrderAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPost(LogUtils.url, map);
+                doPostAnsc(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
                 scanaQRcode(config, customer, setting, order);
             }
@@ -757,7 +757,7 @@ public class OrderAspect {
         map.put("fileName", customer.getId());
         map.put("type", "UserAction");
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(LogUtils.url, map);
+        doPostAnsc(LogUtils.url, map);
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.cancelOrderPos(..))")
@@ -820,7 +820,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
             MQMessageProducer.sendNoticeOrderMessage(order);
 
             if (order.getParentOrderId() != null) {  //子订单
@@ -852,7 +852,7 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPost(LogUtils.url, map);
+            doPostAnsc(LogUtils.url, map);
 //        log.info("发送取餐信息成功:" + result);
         }
     }
@@ -866,5 +866,41 @@ public class OrderAspect {
     public void insertByBeforePay(OrderPaymentItem orderPaymentItem) {
         Order order = orderService.selectById(orderPaymentItem.getOrderId());
         MQMessageProducer.sendPlaceOrderNoPayMessage(order);
+    }
+
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.colseOrder(..))")
+    public void colseOrder() {
+
+    };
+
+    @AfterReturning(value = "colseOrder()", returning = "order")
+    public void colseOrder(Order order) {
+        Brand brand = brandService.selectById(order.getBrandId());
+        Customer customer = customerService.selectById(order.getCustomerId());
+        WechatConfig config = wechatConfigService.selectByBrandId(brand.getId());
+        StringBuilder sb = new StringBuilder("亲,今日未完成支付的订单已被系统自动取消,欢迎下次再来本店消费\n");
+        sb.append("订单编号:"+order.getSerialNumber()+"\n");
+        if(order.getOrderMode()!=null){
+            switch (order.getOrderMode()) {
+                case ShopMode.TABLE_MODE:
+                    sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                    break;
+                default:
+                    sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                    break;
+            }
+        }
+        if( order.getShopName()==null||"".equals(order.getShopName())){
+            order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
+        }
+        sb.append("就餐店铺："+order.getShopName()+"\n");
+        sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+        sb.append("订单明细：\n");
+        List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
+        for(OrderItem item : orderItem){
+            sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+        }
+        sb.append("订单金额："+order.getOrderMoney()+"\n");
+        WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 }
