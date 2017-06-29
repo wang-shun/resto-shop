@@ -490,6 +490,14 @@
 					</div>
 
 					<div class="form-group">
+						<label class="col-md-4 control-label">等位叫号本地电视IP：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="waitIp" :value="m.waitIp" >
+						</div>
+					</div>
+
+
+					<div class="form-group">
 						<label class="col-md-4 control-label" >厨打是否拆分打印：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
