@@ -4205,6 +4205,71 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
             shopPayDto.add(ot);
         }
+        //用来接收分段查询出来的订单金额信息
+        List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
+        //用来累加分段查询出来的订单金额信息
+        List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
+        //用来接收分段查询出来的订单支付项信息
+        List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
+        //用来累加分段查询出来的订单支付项信息
+        List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
+        for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
+                || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
+            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(beginDate, endDate,pageNo);
+            shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(beginDate, endDate, pageNo * 1000);
+            shopIncomeDtosItems.addAll(shopIncomeDtosItem);
+            shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
+        }
+        BigDecimal brandActualPayment = BigDecimal.ZERO;
+        BigDecimal brandVirtualPayment = BigDecimal.ZERO;
+        BigDecimal shopActualPayment = BigDecimal.ZERO;
+        BigDecimal shopVirtualPayment = BigDecimal.ZERO;
+        for (OrderPayDto shopOrderPayDto : shopPayDto){
+            //循环累加店铺订单总额、订单数
+            for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems){
+                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())){
+                    shopOrderPayDto.setOrderMoney(shopOrderPayDto.getOrderMoney().add(shopIncomeDtoItem.getTotalIncome()));
+                    if (StringUtils.isBlank(shopIncomeDtoItem.getParentOrderId())){
+                        shopOrderPayDto.setNumber(shopOrderPayDto.getNumber() + 1);
+                    }
+                }
+            }
+            //循环累加得到店铺的实际支付、虚拟支付的值
+            for (ShopIncomeDto shopIncomeDtoPayMent : shopIncomeDtosPayMents){
+                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoPayMent.getShopDetailId())){
+                    shopActualPayment = shopActualPayment.add(shopIncomeDtoPayMent.getWechatIncome()).add(shopIncomeDtoPayMent.getAliPayment())
+                            .add(shopIncomeDtoPayMent.getChargeAccountIncome()).add(shopIncomeDtoPayMent.getBackCartPay()).add(shopIncomeDtoPayMent.getMoneyPay());
+                    shopVirtualPayment = shopVirtualPayment.add(shopIncomeDtoPayMent.getRedIncome()).add(shopIncomeDtoPayMent.getCouponIncome()).add(shopIncomeDtoPayMent.getChargeGifAccountIncome())
+                            .add(shopIncomeDtoPayMent.getWaitNumberIncome());
+                }
+            }
+            //计算店铺订单平均金额
+            if (shopOrderPayDto.getNumber().equals(0)){
+                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney());
+            }else {
+                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney().divide(new BigDecimal(shopOrderPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
+            }
+            //计算店铺营销撬动率
+            if (shopVirtualPayment.equals(BigDecimal.ZERO)){
+                shopOrderPayDto.setMarketPrize("0");
+            }else {
+                shopOrderPayDto.setMarketPrize((shopActualPayment.divide(shopVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+            }
+            //累加得到品牌实际支付的值
+            brandActualPayment = brandActualPayment.add(shopActualPayment);
+            //累加得到品牌虚拟支付的值
+            brandVirtualPayment = brandVirtualPayment.add(shopVirtualPayment);
+            //店铺虚拟、实际支付的值归零
+            shopActualPayment = BigDecimal.ZERO;
+            shopVirtualPayment = BigDecimal.ZERO;
+            brandPayDto.setOrderMoney(brandPayDto.getOrderMoney().add(shopOrderPayDto.getOrderMoney()));
+            brandPayDto.setNumber(brandPayDto.getNumber() + shopOrderPayDto.getNumber());
+        }
+        brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
+        //计算店铺营销撬动率
+        brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+        //累加得到品牌实际支付的值
+        //封装返回Map集
         Map<String, Object> map = new HashMap<>();
         map.put("shopId", shopPayDto);
         map.put("brandId", brandPayDto);

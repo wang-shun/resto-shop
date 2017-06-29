@@ -644,5 +644,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	void colseOrder(String orderId);
 
-	List<Order> selectDayAllOrder(Map<String, Object> selectMap);
+	List<ShopIncomeDto> selectDayAllOrderItem(@Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("pageNo") Integer pageNo);
+
+	List<ShopIncomeDto> selectDayAllOrderPayMent(@Param("beginDate") String beginDate, @Param("endDate") String endDate, @Param("pageNo") Integer pageNo);
 }

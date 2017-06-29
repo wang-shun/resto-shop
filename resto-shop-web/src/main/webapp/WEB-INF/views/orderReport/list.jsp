@@ -164,16 +164,16 @@
 
                 var that = this;
 
-                var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
-                if(timeCha < 0){
-                    toastr.clear();
-                    toastr.error("开始时间应该少于结束时间！");
-                    return false;
-                }else if(timeCha > 604800000){
-                    toastr.clear();
-                    toastr.error("暂时未开放大于一周以内的查询！");
-                    return false;
-                }
+//                var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+//                if(timeCha < 0){
+//                    toastr.clear();
+//                    toastr.error("开始时间应该少于结束时间！");
+//                    return false;
+//                }else if(timeCha > 604800000){
+//                    toastr.clear();
+//                    toastr.error("暂时未开放大于一周以内的查询！");
+//                    return false;
+//                }
                 toastr.clear();
                 toastr.success("查询中...");
                 try {
