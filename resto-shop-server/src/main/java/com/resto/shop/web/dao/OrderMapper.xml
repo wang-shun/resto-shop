@@ -3009,7 +3009,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     </update>
 
     <select id="selectDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        select td.shop_detail_id shopDetailId, td.parent_order_id parentOrderId,
+        select td.shop_detail_id shopDetailId, td.parent_order_id parentOrderId, td.create_time createTime,
         SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
         SUM(toi.unit_price * toi.count) + service_price + meal_fee_price totalIncome from tb_order td
         inner join tb_order_item toi
@@ -3027,7 +3027,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     </select>
 
     <select id="selectDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        select td.shop_detail_id shopDetailId,td.id orderId,
+        select td.shop_detail_id shopDetailId,td.id orderId, td.create_time createTime,
         SUM(IF(top.payment_mode_id = 1, top.pay_value, 0)) wechatIncome,
         SUM(IF(top.payment_mode_id = 2, top.pay_value, 0)) redIncome,
         SUM(IF(top.payment_mode_id = 3, top.pay_value, 0)) couponIncome,

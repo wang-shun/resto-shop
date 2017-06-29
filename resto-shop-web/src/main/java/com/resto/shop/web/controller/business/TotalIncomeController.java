@@ -282,68 +282,51 @@ public class TotalIncomeController extends GenericController {
                 int j = 0;
                 for (ShopDetail shopDetail : shopDetails) {
                     selectMap.put("shopId", shopDetail.getId());
-                    List<Order> orders = orderService.selectMonthIncomeDto(selectMap);
+                    //用来接收分段查询出来的订单金额信息
+                    List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
+                    shopIncomeDtosItem.add(new ShopIncomeDto());
+                    //用来累加分段查询出来的订单金额信息
+                    List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
+                    //用来接收分段查询出来的订单支付项信息
+                    List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
+                    shopIncomeDtosPayMent.add(new ShopIncomeDto());
+                    //用来累加分段查询出来的订单支付项信息
+                    List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
+                    for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
+                            || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
+                        selectMap.put("pageNo", pageNo * 1000);
+                        shopIncomeDtosItem = orderService.selectDayAllOrderItem(selectMap);
+                        shopIncomeDtosPayMent = orderService.selectDayAllOrderPayMent(selectMap);
+                        shopIncomeDtosItems.addAll(shopIncomeDtosItem);
+                        shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
+                    }
                     for (int day = 0; day < monthDay; day++) {
                         Date beginDate = getBeginDay(year, month, day);
                         Date endDate = getEndDay(year, month, day);
                         ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
-                        for (Order order : orders) {
-                            if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
-                                shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
-                                shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(order.getOrderMoney()));
-                                if (order.getOrderPaymentItems() != null) {
-                                    for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()) {
-                                        switch (paymentItem.getPaymentModeId()) {
-                                            case PayMode.WEIXIN_PAY:
-                                                shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.CHARGE_PAY:
-                                                shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.ACCOUNT_PAY:
-                                                shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.COUPON_PAY:
-                                                shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.REWARD_PAY:
-                                                shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.WAIT_MONEY:
-                                                shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.ALI_PAY:
-                                                shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.BANK_CART_PAY:
-                                                shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.CRASH_PAY:
-                                                shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.SHANHUI_PAY:
-                                                shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.INTEGRAL_PAY:
-                                                shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.ARTICLE_BACK_PAY:
-                                                shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(paymentItem.getPayValue()).abs());
-                                                break;
-                                            case PayMode.MONEY_PAY:
-                                                shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
-                                                break;
-                                            case PayMode.GIVE_CHANGE:
-                                                shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue().abs()));
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                }
+                        for (ShopIncomeDto incomeDto : shopIncomeDtosItems){
+                            if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
+                                shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(incomeDto.getOriginalAmount()));
+                                shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(incomeDto.getTotalIncome()));
                             }
                         }
-                        shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().subtract(shopIncomeDto.getGiveChangePayment()));
+                        for (ShopIncomeDto incomeDto : shopIncomeDtosPayMents){
+                            if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
+                                shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(incomeDto.getWechatIncome()));
+                                shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(incomeDto.getChargeAccountIncome()));
+                                shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(incomeDto.getRedIncome()));
+                                shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(incomeDto.getCouponIncome()));
+                                shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(incomeDto.getChargeGifAccountIncome()));
+                                shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(incomeDto.getWaitNumberIncome()));
+                                shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(incomeDto.getAliPayment()));
+                                shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(incomeDto.getBackCartPay()));
+                                shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(incomeDto.getMoneyPay()));
+                                shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(incomeDto.getShanhuiPayment()));
+                                shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(incomeDto.getIntegralPayment()));
+                                shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(incomeDto.getArticleBackPay()));
+                                shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(incomeDto.getOtherPayment()));
+                            }
+                        }
                         result[i][j] = shopIncomeDto;
                         j++;
                     }
@@ -358,69 +341,52 @@ public class TotalIncomeController extends GenericController {
                 }
                 shopName = shopName.substring(0, shopName.length() - 1);
                 shopNames[0] = shopName;
-                List<Order> orders = orderService.selectMonthIncomeDto(selectMap);
+                //用来接收分段查询出来的订单金额信息
+                List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
+                shopIncomeDtosItem.add(new ShopIncomeDto());
+                //用来累加分段查询出来的订单金额信息
+                List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
+                //用来接收分段查询出来的订单支付项信息
+                List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
+                shopIncomeDtosPayMent.add(new ShopIncomeDto());
+                //用来累加分段查询出来的订单支付项信息
+                List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
+                for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
+                        || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
+                    selectMap.put("pageNo", pageNo * 1000);
+                    shopIncomeDtosItem = orderService.selectDayAllOrderItem(selectMap);
+                    shopIncomeDtosPayMent = orderService.selectDayAllOrderPayMent(selectMap);
+                    shopIncomeDtosItems.addAll(shopIncomeDtosItem);
+                    shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
+                }
                 int j = 0;
                 for (int day = 0; day < monthDay; day++) {
                     Date beginDate = getBeginDay(year, month, day);
                     Date endDate = getEndDay(year, month, day);
                     ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
-                    for (Order order : orders) {
-                        if (endDate.getTime() >= order.getCreateTime().getTime() && beginDate.getTime() <= order.getCreateTime().getTime()) {
-                            shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(order.getOriginalAmount()));
-                            shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(order.getOrderMoney()));
-                            if (order.getOrderPaymentItems() != null) {
-                                for (OrderPaymentItem paymentItem : order.getOrderPaymentItems()) {
-                                    switch (paymentItem.getPaymentModeId()) {
-                                        case PayMode.WEIXIN_PAY:
-                                            shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.CHARGE_PAY:
-                                            shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.ACCOUNT_PAY:
-                                            shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.COUPON_PAY:
-                                            shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.REWARD_PAY:
-                                            shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.WAIT_MONEY:
-                                            shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.ALI_PAY:
-                                            shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.BANK_CART_PAY:
-                                            shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.CRASH_PAY:
-                                            shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.SHANHUI_PAY:
-                                            shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.INTEGRAL_PAY:
-                                            shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.ARTICLE_BACK_PAY:
-                                            shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(paymentItem.getPayValue()).abs());
-                                            break;
-                                        case PayMode.MONEY_PAY:
-                                            shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(paymentItem.getPayValue()));
-                                            break;
-                                        case PayMode.GIVE_CHANGE:
-                                            shopIncomeDto.setGiveChangePayment(shopIncomeDto.getGiveChangePayment().add(paymentItem.getPayValue().abs()));
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
+                    for (ShopIncomeDto incomeDto : shopIncomeDtosItems){
+                        if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
+                            shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(incomeDto.getOriginalAmount()));
+                            shopIncomeDto.setTotalIncome(shopIncomeDto.getTotalIncome().add(incomeDto.getTotalIncome()));
                         }
                     }
-                    shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().subtract(shopIncomeDto.getGiveChangePayment()));
+                    for (ShopIncomeDto incomeDto : shopIncomeDtosPayMents){
+                        if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
+                            shopIncomeDto.setWechatIncome(shopIncomeDto.getWechatIncome().add(incomeDto.getWechatIncome()));
+                            shopIncomeDto.setChargeAccountIncome(shopIncomeDto.getChargeAccountIncome().add(incomeDto.getChargeAccountIncome()));
+                            shopIncomeDto.setRedIncome(shopIncomeDto.getRedIncome().add(incomeDto.getRedIncome()));
+                            shopIncomeDto.setCouponIncome(shopIncomeDto.getCouponIncome().add(incomeDto.getCouponIncome()));
+                            shopIncomeDto.setChargeGifAccountIncome(shopIncomeDto.getChargeGifAccountIncome().add(incomeDto.getChargeGifAccountIncome()));
+                            shopIncomeDto.setWaitNumberIncome(shopIncomeDto.getWaitNumberIncome().add(incomeDto.getWaitNumberIncome()));
+                            shopIncomeDto.setAliPayment(shopIncomeDto.getAliPayment().add(incomeDto.getAliPayment()));
+                            shopIncomeDto.setBackCartPay(shopIncomeDto.getBackCartPay().add(incomeDto.getBackCartPay()));
+                            shopIncomeDto.setMoneyPay(shopIncomeDto.getMoneyPay().add(incomeDto.getMoneyPay()));
+                            shopIncomeDto.setShanhuiPayment(shopIncomeDto.getShanhuiPayment().add(incomeDto.getShanhuiPayment()));
+                            shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(incomeDto.getIntegralPayment()));
+                            shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(incomeDto.getArticleBackPay()));
+                            shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(incomeDto.getOtherPayment()));
+                        }
+                    }
                     result[0][j] = shopIncomeDto;
                     j++;
                 }
