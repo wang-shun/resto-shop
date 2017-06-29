@@ -159,4 +159,9 @@
     <select id="selectGetNumberInfo" resultType="GetNumber">
         select * from tb_get_number where id = #{id}
     </select>
+
+    <select id="selectWaitCountByCodeId" resultType="GetNumber">
+        select id from tb_get_number where shop_detail_id = #{shopId} and code_id = #{codeId} and state in (0,1)
+        and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
+    </select>
 </mapper>

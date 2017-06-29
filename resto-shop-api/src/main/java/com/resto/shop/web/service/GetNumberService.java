@@ -33,4 +33,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     int insertGetNumber(GetNumber getNumber);
 
     GetNumber selectGetNumberInfo(String id);
+
+    Integer selectWaitCountByCodeId(String shopId, String codeId);
 }

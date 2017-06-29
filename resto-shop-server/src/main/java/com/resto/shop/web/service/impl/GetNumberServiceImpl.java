@@ -134,9 +134,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         item.setRemark("退还等位红包:" + order.getWaitMoney());
         item.setResultData(getNumber.getId());
         orderPaymentItemService.insert(item);
-
-
-
     }
 
     @Override
@@ -154,5 +151,10 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     @Override
     public GetNumber selectGetNumberInfo(String id) {
         return getNumberMapper.selectGetNumberInfo(id);
+    }
+
+    @Override
+    public Integer selectWaitCountByCodeId(String shopId, String codeId) {
+        return getNumberMapper.selectWaitCountByCodeId(shopId, codeId);
     }
 }
