@@ -648,4 +648,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
 	void colseOrder(String orderId);
+
+	void fixAllowContinueOrder(@Param("beginDate") Date begin);
+
+	List<Order> getAllowAppraise();
 }

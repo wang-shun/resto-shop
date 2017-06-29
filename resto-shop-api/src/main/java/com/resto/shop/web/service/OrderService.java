@@ -654,4 +654,8 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order colseOrder(String orderId);
 
     List<Map<String, Object>> reminder(String orderItemId);
+
+    //修复加菜时间过后 任然允许加菜的bug
+    void fixErrorOrder();
+
 }

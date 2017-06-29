@@ -3034,4 +3034,15 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         order by push_order_time DESC;
     </select>
 
+    <update id="fixAllowContinueOrder">
+        update tb_order
+        set allow_continue_order = 1
+        where now() > create_time
+        and parent_order_id is null
+    </update>
+
+    <select id="getAllowAppraise" resultType="Order">
+        select * from tb_order where order_state = 2  and production_status in (2,3)
+        and create_time >= '2017-06-29'
+    </select>
 </mapper>
