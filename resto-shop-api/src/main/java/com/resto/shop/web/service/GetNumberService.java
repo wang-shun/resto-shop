@@ -31,4 +31,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap);
 
     int insertGetNumber(GetNumber getNumber);
+
+    GetNumber selectGetNumberInfo(String id);
 }

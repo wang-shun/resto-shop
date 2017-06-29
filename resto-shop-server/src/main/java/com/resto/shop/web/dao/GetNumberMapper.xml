@@ -155,4 +155,8 @@
         and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
         GROUP BY tgn.shop_detail_id
     </select>
+
+    <select id="selectGetNumberInfo" resultType="GetNumber">
+        select * from tb_get_number where id = #{id}
+    </select>
 </mapper>

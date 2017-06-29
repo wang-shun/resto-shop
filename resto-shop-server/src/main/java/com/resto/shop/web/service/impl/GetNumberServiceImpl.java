@@ -150,4 +150,9 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         MQMessageProducer.sendQueueOrder(getNumber);
         return count;
     }
+
+    @Override
+    public GetNumber selectGetNumberInfo(String id) {
+        return getNumberMapper.selectGetNumberInfo(id);
+    }
 }
