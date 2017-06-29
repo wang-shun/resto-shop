@@ -74,6 +74,14 @@
 								<img v-if="m.tvBackground" :src="m.tvBackground" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label>文本框底色</label>
+							<div>
+								<input type="text" class="form-control color-mini-textbox" name="tvTextBoxBackground"
+									   data-position="bottom left" v-model="m.tvTextBoxBackground">
+							</div>
+						</div>
 						<%--<div class="form-group">--%>
 							<%--<label class="col-md-4 control-label">等位提示：</label>--%>
 							<%--<div  class="col-md-6 ">--%>
@@ -144,6 +152,21 @@
 				this.$watch("m", function () {
 					if (this.m.id) {
 						$('.color-mini').minicolors("value", this.m.tvTextColor);
+					}
+				});
+
+				var n = $('.color-mini-textbox').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-textbox').minicolors("value", this.m.tvTextBoxBackground);
 					}
 				});
 			},
