@@ -21,8 +21,9 @@
         <result column="final_money" property="finalMoney" />
         <result column="high_money" property="highMoney" />
         <result column="code_value" property="codeValue" />
+        <result column="code_id" property="codeId" />
     </resultMap>
-    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money,code_value</sql>
+    <sql id="Base_Column_List">id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money,code_value,code_id</sql>
 
     <insert id="insert" parameterType="com.resto.shop.web.model.GetNumber">insert into tb_get_number (id, shop_detail_id, brand_id, state, create_time, eat_time, pass_number_time, person_number,phone,wait_number,table_type,call_number,flow_money,call_number_time,customer_id,final_money,high_money)
       values (#{id},#{shopDetailId},#{brandId},#{state},#{createTime},#{eatTime},#{passNumberTime},#{personNumber},#{phone},#{waitNumber},#{tableType},#{callNumber},#{flowMoney},#{callNumberTime},#{customerId},#{finalMoney},#{highMoney})
@@ -48,6 +49,7 @@
             <if test="finalMoney != null">final_money,</if>
             <if test="highMoney != null">high_money,</if>
             <if test="codeValue != null">code_value,</if>
+            <if test="codeId != null">code_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -68,6 +70,7 @@
             <if test="finalMoney != null">#{finalMoney},</if>
             <if test="highMoney != null">#{highMoney},</if>
             <if test="codeValue != null">#{codeValue},</if>
+            <if test="codeId != null">#{codeId},</if>
         </trim>
     </insert>
 
@@ -89,10 +92,11 @@
             <if test="customerId != null">customer_id = #{customerId},</if>
             <if test="finalMoney != null">final_money = #{finalMoney},</if>
             <if test="highMoney != null">high_money = #{highMoney},</if>
+            <if test="codeId != null">code_id = #{codeId},</if>
         </set> where id = #{id}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number set shop_detail_id = #{shopDetailId},brand_id = #{brandId},state = #{state},create_time = #{createTime},eat_time = #{eatTime},pass_number_time = #{passNumberTime},person_number = #{personNumber},phone = #{phone},wait_number = #{waitNumber},table_type = #{tableType},call_number = #{callNumber},flow_money = #{flowMoney},call_number_time = #{callNumberTime},customer_id = #{customerId},final_money=#{finalMoney},high_money=#{highMoney} where id = #{id}</update>
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.GetNumber">update tb_get_number set shop_detail_id = #{shopDetailId},brand_id = #{brandId},state = #{state},create_time = #{createTime},eat_time = #{eatTime},pass_number_time = #{passNumberTime},person_number = #{personNumber},phone = #{phone},wait_number = #{waitNumber},table_type = #{tableType},call_number = #{callNumber},flow_money = #{flowMoney},call_number_time = #{callNumberTime},customer_id = #{customerId},final_money=#{finalMoney},high_money=#{highMoney},code_id = #{codeId} where id = #{id}</update>
 
     <select id="selectByTableTypeShopId" resultType="GetNumber">
         SELECT <include refid="Base_Column_List" /> FROM tb_get_number

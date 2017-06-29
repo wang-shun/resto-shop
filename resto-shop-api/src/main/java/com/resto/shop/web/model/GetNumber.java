@@ -52,6 +52,8 @@ public class GetNumber implements Serializable {
     //当前取的号码
     private String codeValue;
 
+    private String codeId;
+
     public BigDecimal getHighMoney() {
         return highMoney;
     }
@@ -219,4 +221,12 @@ public class GetNumber implements Serializable {
 	public void setCodeValue(String codeValue) {
 		this.codeValue = codeValue;
 	}
+
+    public String getCodeId() {
+        return codeId;
+    }
+
+    public void setCodeId(String codeId) {
+        this.codeId = codeId;
+    }
 }
