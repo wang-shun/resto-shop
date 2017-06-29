@@ -3018,7 +3018,9 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and td.production_status in (2,3)
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        GROUP BY td.id LIMIT LIMIT #{pageNo},1000
+        GROUP BY td.id
+        ORDER BY td.create_time asc
+        LIMIT #{pageNo},1000
     </select>
 
     <select id="selectDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
@@ -3044,6 +3046,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         and top.payment_mode_id not in (13,14,15)
-        GROUP BY td.id LIMIT #{pageNo},1000
+        GROUP BY td.id
+        ORDER BY td.create_time asc
+        LIMIT #{pageNo},1000
     </select>
 </mapper>

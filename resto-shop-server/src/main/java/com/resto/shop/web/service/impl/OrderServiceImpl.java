@@ -4193,9 +4193,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    /**
-     * 2016-11-2
-     */
     public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
         OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
@@ -4207,15 +4204,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //用来接收分段查询出来的订单金额信息
         List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
+        shopIncomeDtosItem.add(new ShopIncomeDto());
         //用来累加分段查询出来的订单金额信息
         List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
         //用来接收分段查询出来的订单支付项信息
         List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
+        shopIncomeDtosPayMent.add(new ShopIncomeDto());
         //用来累加分段查询出来的订单支付项信息
         List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                 || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
-            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(beginDate, endDate,pageNo);
+            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(beginDate, endDate, pageNo * 1000);
             shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(beginDate, endDate, pageNo * 1000);
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
