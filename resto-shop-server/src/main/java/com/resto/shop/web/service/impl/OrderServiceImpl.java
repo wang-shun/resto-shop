@@ -4265,10 +4265,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             brandPayDto.setOrderMoney(brandPayDto.getOrderMoney().add(shopOrderPayDto.getOrderMoney()));
             brandPayDto.setNumber(brandPayDto.getNumber() + shopOrderPayDto.getNumber());
         }
-        brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
-        //计算店铺营销撬动率
-        brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
-        //累加得到品牌实际支付的值
+        //计算品牌订单平均金额
+        if (brandPayDto.getNumber().equals(0)){
+            brandPayDto.setAverage(brandPayDto.getOrderMoney());
+        }else {
+            brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
+        }
+        //计算品牌营销撬动率
+        if (brandVirtualPayment.equals(BigDecimal.ZERO)){
+            brandPayDto.setMarketPrize("0");
+        }else {
+            brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+        }
         //封装返回Map集
         Map<String, Object> map = new HashMap<>();
         map.put("shopId", shopPayDto);
