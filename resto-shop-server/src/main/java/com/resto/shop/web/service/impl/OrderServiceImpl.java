@@ -2920,7 +2920,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 //        nextNumber(order.getShopDetailId(), order.getId())
-        data.put("ORDER_NUMBER", orderNumber);
+        if (!brand.getId().equals("da7ffe9e6f74447f880d82a284a11cae")){
+            data.put("ORDER_NUMBER", orderNumber);
+        }
         if (refundItems.size() != 0) {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < refundItems.size(); i++) {
