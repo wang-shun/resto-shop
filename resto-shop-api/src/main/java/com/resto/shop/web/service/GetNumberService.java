@@ -29,4 +29,6 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     void refundWaitMoney(Order order);
 
     List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap);
+
+    int insertGetNumber(GetNumber getNumber);
 }

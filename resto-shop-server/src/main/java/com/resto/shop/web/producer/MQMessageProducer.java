@@ -4,6 +4,7 @@ import java.util.*;
 import com.resto.shop.web.constant.OrderPosStatus;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,14 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendQueueOrder(GetNumber getNumber){
+		JSONObject obj = new JSONObject();
+		obj.put("id", getNumber.getId());
+		obj.put("shopId", getNumber.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_QUEUE_ORDER, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(new Date().getTime());
+		sendMessageASync(message);
+	}
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
