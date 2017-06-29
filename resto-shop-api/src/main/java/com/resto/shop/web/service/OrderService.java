@@ -654,4 +654,8 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order colseOrder(String orderId);
 
     List<Map<String, Object>> reminder(String orderItemId);
+
+	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+
+	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
 }

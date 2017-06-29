@@ -4212,10 +4212,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         shopIncomeDtosPayMent.add(new ShopIncomeDto());
         //用来累加分段查询出来的订单支付项信息
         List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
+        Map<String, Object> selectMap = new HashMap<>();
+        selectMap.put("beginDate", beginDate);
+        selectMap.put("endDate", endDate);
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                 || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
-            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(beginDate, endDate, pageNo * 1000);
-            shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(beginDate, endDate, pageNo * 1000);
+            selectMap.put("pageNo", pageNo * 1000);
+            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(selectMap);
+            shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(selectMap);
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
         }
@@ -8581,5 +8585,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         return items;
+    }
+
+    @Override
+    public List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap) {
+        return orderMapper.selectDayAllOrderItem(selectMap);
+    }
+
+    @Override
+    public List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap) {
+        return orderMapper.selectDayAllOrderPayMent(selectMap);
     }
 }
