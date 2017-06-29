@@ -178,12 +178,29 @@
 							</label>
 						</div>
 						<div class="form-group">
+							<div class="control-label">是否开启进入店铺选择页面</div>
+							<label>
+								<input type="radio" name="openShoplist" v-model="m.openShoplist" value="0">
+								否
+							</label>
+							<label>
+								<input type="radio" name="openShoplist" v-model="m.openShoplist" value="1">
+								是
+							</label>
+						</div>
+						<div class="form-group">
 							<label>品牌标语</label>
 							<input type="text" class="form-control" name="slogan" v-model="m.slogan">
 						</div>
 						<div class="form-group">
 							<label>等位提示</label>
 							<input type="text" class="form-control" name="queueNotice" v-model="m.queueNotice">
+						</div>
+						<div class="form-group">
+							<label>优惠券到期提醒时间：</label>
+							<input type="number" class="form-control"
+								   name="recommendTime" placeholder="(输入整数)"
+								   v-model="m.recommendTime" required="required" min="0">
 						</div>
 					</div>
 					<input type="hidden" name="id" v-model="m.id" />

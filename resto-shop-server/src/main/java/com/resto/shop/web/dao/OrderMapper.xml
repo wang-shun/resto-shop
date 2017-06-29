@@ -182,6 +182,8 @@
         <result column="is_refund_order" property="isRefundOrder"/>
         <result column="is_get_share_coupon" property="isGetShareCoupon"/>
         <result column="is_pos_pay" property="isPosPay"/>
+        <result column="print_fail_flag" property="printFailFlag"/>
+        <result column="print_kitchen_flag" property="printKitchenFlag"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -373,7 +375,8 @@
         parent_order_id, allow_continue_order,
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
-        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay
+        ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
+        print_fail_flag,print_kitchen_flag
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -594,6 +597,12 @@
             <if test="isPosPay != null">
                 is_pos_pay,
             </if>
+            <if test="printFailFlag != null">
+                print_fail_flag,
+            </if>
+            <if test="printKitchenFlag != null">
+                print_kitchen_flag,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -745,6 +754,12 @@
             </if>
             <if test="isPosPay != null">
                 #{isPosPay},
+            </if>
+            <if test="printFailFlag != null">
+                #{printFailFlag},
+            </if>
+            <if test="printKitchenFlag != null">
+                #{printKitchenFlag},
             </if>
         </trim>
     </insert>
@@ -899,6 +914,12 @@
             <if test="giveChange != null">
                 give_change = #{giveChange},
             </if>
+            <if test="printFailFlag != null">
+                print_fail_flag = #{printFailFlag},
+            </if>
+            <if test="printKitchenFlag != null">
+                print_kitchen_flag = #{printKitchenFlag},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -1042,9 +1063,12 @@
         order_money,
         order_mode,
         pay_type,
+        print_fail_flag,
+        print_kitchen_flag,
         amount_with_children,
         ifnull(count_with_child,article_count) as
         totalCount,
+
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id and t2.order_state not in (1,9) ) as childCount
         FROM
         tb_order
@@ -1105,6 +1129,8 @@
         pay_type,
         pay_mode,
         amount_with_children,
+        print_fail_flag,
+        print_kitchen_flag,
         ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
@@ -1114,9 +1140,13 @@
 --         AND
 --         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
-        and (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
+        and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
+         || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
+
+
         and table_number is not null
         and parent_order_id is null
+
         order by create_time ASC;
 
     </select>
@@ -1946,7 +1976,7 @@
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
         sum(customer_count) as customer_count
         from ( select t.id,t.parent_order_id,
-        if(t.amount_with_children = 0,t.order_money,t.amount_with_children) as orderTotal,
+        SUM(t2.pay_value) as orderTotal,
         if(t.parent_order_id
         is null,t.customer_count,0) customer_count
         from tb_order t
@@ -1955,6 +1985,7 @@
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
         and parent_order_id is null
+        and t2.payment_mode_id not in (13,14,15)
         GROUP BY t.id
         ) as r
     </select>
@@ -2612,7 +2643,7 @@ INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
 </select>
 
 
@@ -2904,7 +2935,7 @@ GROUP BY oi.article_name
         totalCount
         from tb_order where shop_detail_id = #{shopId}
 --         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and order_state = 1 and pay_type = 0 and pay_mode in (2,3,4,5,6) and parent_order_id is not null
+        and order_state = 1 and pay_type = 0 and if(pay_type = 1,pay_mode in (2,3,4,5,6),pay_mode in (3,4,5,6)) and parent_order_id is not null
         ORDER BY create_time ASC
     </select>
 
@@ -3043,6 +3074,10 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         </if>
         ORDER BY td.create_time ASC
     </select>
+
+    <update id="colseOrder">
+        update tb_order set order_state = 9 where id=#{orderId}
+    </update>
 
     <select id="customerByOrderForMyPage" resultMap="BaseResultMap">
         select * from tb_order where customer_id = #{customerId} and shop_detail_id = #{shopId} and

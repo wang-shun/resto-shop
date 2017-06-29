@@ -159,4 +159,14 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	public List<OrderItem> selectRefundOrderItem(Map<String, Object> map) {
 		return orderitemMapper.selectRefundOrderItem(map);
 	}
+
+    @Override
+    public List<OrderItem> getListByParentId(String parentId) {
+        return orderitemMapper.getListByParentId(parentId);
+    }
+
+    @Override
+    public List<OrderItem> getListByRecommendId(String recommendId,String orderId) {
+        return orderitemMapper.getListByRecommendId(recommendId,orderId);
+    }
 }

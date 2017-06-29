@@ -132,10 +132,16 @@
 	 				var beginDate = $("#beginDate").val();
 	 				var endDate = $("#endDate").val();
 	 				//判断 时间范围是否合法
-	 				if(beginDate>endDate){
-	 					toastr.error("开始时间不能大于结束时间");
-	 					return ;
-	 				}
+					var timeCha = new Date(endDate).getTime() - new Date(beginDate).getTime();
+					if(timeCha < 0){
+						toastr.clear();
+						toastr.error("开始时间应该少于结束时间！");
+						return ;
+					}else if(timeCha > 604800000){
+						toastr.clear();
+						toastr.error("暂时未开放大于一周以内的查询！");
+						return ;
+					}
 	 				tb.ajax.reload();
 	 			}
 			},

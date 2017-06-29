@@ -14,14 +14,32 @@
 	            	<form role="form"  action="{{m.id?'branduser/modify':'branduser/create'}}" @submit.prevent="save">
 						<div class="form-body">
 							<div class="form-group">
-						    <label>用户名</label>
+						    <label>登录账号</label>
 						    <input type="text" class="form-control" name="username" v-model="m.username" @blur="checkname(m.username)" required="required">
 						</div>
 						<div class="form-group" v-if="!m.id">
 						    <label>密码</label>
 						    <input type="password" class="form-control" name="password" v-model="m.password" required="required" >
 						</div>
-						
+                        <div class="form-group">
+                            <label>姓名</label>
+                            <input type="text" class="form-control" name="name" v-model="m.name">
+                        </div>
+                        <div class="form-group">
+                            <label>性别</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" v-model="m.sex" value="1" checked>男
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" v-model="m.sex" value="2">女
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>电话号码</label>
+                            <input type="text" class="form-control" name="phone" v-model="m.phone">
+                        </div>
 						<div class="form-group">
 							<div label for="shopDetailId" class="control-label">选择店铺</div>
 							<div>
@@ -79,7 +97,7 @@
 			},
 			columns : [
                 {
-                    title : "用户名",
+                    title : "登录账号",
                     data : "username",
 		    	},
                 {

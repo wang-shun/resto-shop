@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import com.resto.brand.core.enums.PlatformKey;
 import com.resto.brand.core.util.ApplicationUtils;
+import eleme.openapi.sdk.api.entity.order.OOrder;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -164,5 +165,26 @@ public class PlatformOrder {
         payType = "已在线支付";
         remark = order.getDescription();
         sourceText = order.toString();
+    }
+
+    public PlatformOrder(OOrder order, String shopId){
+        id = ApplicationUtils.randomUUID();
+        type = PlatformKey.ELEME;
+        platformOrderId = order.getId();
+        shopDetailId = shopId;
+        originalPrice = new BigDecimal(order.getOriginalPrice());
+        totalPrice = new BigDecimal(order.getTotalPrice());
+        address = order.getAddress();
+        String phoneList = "";
+        for(int i = 0; i < order.getPhoneList().size(); i++){
+            phoneList = order.getPhoneList().get(i) + ",";
+        }
+        phone = phoneList;
+        name = order.getConsignee();
+        orderCreateTime = order.getCreatedAt();
+        createTime = new Date();
+        payType = "已在线支付";
+        remark = order.getDescription();
+//        sourceText = order.toString();
     }
 }

@@ -15,6 +15,10 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.model.PutObjectRequest;
+import com.aliyun.oss.model.PutObjectResult;
+import com.resto.brand.core.util.OssPictureUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,6 +74,11 @@ public class UploadController extends GenericController {
 		systemPath = systemPath.substring(0, lastR) + "/";
 		String filePath = "upload/files/" + DateFormatUtils.format(new Date(), "yyyy-MM-dd");
 		File finalFile = FileUpload.fileUp(file, systemPath + filePath, UUID.randomUUID().toString(), type);
+//        //测试
+//        OSSClient ossClient = new OSSClient("https://oss-cn-shanghai.aliyuncs.com", "LTAIRTuAQCP1sqDG", "jPC6yvVyqX1vFcSTeyjgLrRmSIh46W");
+//        PutObjectResult putObjectResult =  ossClient.putObject(new PutObjectRequest("canjia", "test.jpg", finalFile));
+//        putObjectResult.getETag();
+
 		PictureResult picResult = UploadFilesUtil.uploadPic(finalFile);
 		if(picResult.getError() == 0){
 			return getSuccessResult(picResult.getUrl());
@@ -77,6 +86,7 @@ public class UploadController extends GenericController {
 			return new Result(false);
 		}
 	}
+
 
 //	@RequestMapping("moveFile")
 //	@ResponseBody
@@ -110,8 +120,8 @@ public class UploadController extends GenericController {
 						}
 					}
 				} else {
-					System.out.println("\n【该菜品没有上传图片】Id：" + article.getId());
-				}
+	                    System.out.println("\n【该菜品没有上传图片】Id：" + article.getId());
+                }
 			}
 			for (Article article : newList) {
 				try {
@@ -127,7 +137,44 @@ public class UploadController extends GenericController {
 		return new Result("上传成功！", true);
 	}
 
-	public static String download(String id,String urlString) throws Exception {
+	@RequestMapping("moveResourceFile")
+  @ResponseBody
+    public Result moveResourceFile() throws Exception {
+	    String baseUrl = "C:/Users/yz/Desktop/picture/";
+        List<Article> list = articleService.selectHasResourcePhotoList(getCurrentBrandId());//查询菜品中有 资源服务器的图片
+        OSSClient ossClient = new OSSClient(OssPictureUtils.ENDPOINT, OssPictureUtils.ACCESSKEYID, OssPictureUtils.ACCESSKEYSECRET);
+        //        //测试
+        if(!list.isEmpty()){
+            for(Article article :list){
+                String oldpath = article.getPhotoSmall().replace("http://106.14.44.167/group1/M00/",""); //oldpath=00/06/ag4sp1hQsYyAZjt5AABv9qtrYEI785.jpg
+                String key = article.getPhotoSmall().substring(38,article.getPhotoSmall().length());
+                //拼接文件
+                File finalFile = new File(baseUrl+oldpath);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    System.out.println("睡眠失败");
+                }
+                if(!finalFile.exists()){
+                    //说明是5-19后上传的图片
+                    System.out.println(article.getPhotoSmall());
+                }else{
+                    //上传到Oss上
+//                    PutObjectResult putObjectResult =  ossClient.putObject(new PutObjectRequest("articlepicture", key, finalFile));
+//                    System.out.println("是否是上传的图片"+putObjectResult.getETag().equals(key));
+                    //更新url
+                    article.setPhotoSmall("https://articlepicture.oss-cn-shanghai.aliyuncs.com/"+key);
+                    articleService.update(article);
+                }
+            }
+        }
+
+        return Result.getSuccess();
+    }
+
+
+
+    public static String download(String id,String urlString) throws Exception {
 		String localPath = "";
 		try {
 			URL url = new URL(urlString);
@@ -165,4 +212,7 @@ public class UploadController extends GenericController {
 		}
 		return localPath;
 	}
+
+
+
 }

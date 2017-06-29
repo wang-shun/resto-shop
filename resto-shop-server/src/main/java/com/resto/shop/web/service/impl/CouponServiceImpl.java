@@ -267,4 +267,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap) {
         return couponMapper.selectPosPayOrderCanUseCoupon(selectMap);
     }
+
+    @Override
+    public List<Coupon> getCouponByShopId(String shopId, Integer day, Integer type) {
+        return couponMapper.getCouponByShopId(shopId,day,type);
+    }
 }

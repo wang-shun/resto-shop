@@ -202,6 +202,10 @@
 		#{brandId}
 	</select>
 	
-
+    <select id="selectByMap" parameterType="java.util.Map" resultType="com.resto.shop.web.model.SmsLog">
+        select * from tb_sms_log where phone = #{phone} and content = #{content}
+        and sms_type = 1 and brand_id = #{brandId}
+        and shop_detail_id = #{shopId}
+    </select>
 
 </mapper>
