@@ -406,7 +406,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 
     /**
-     * 根据订单状态和生产状态查询指定店铺的订单
+     * 根据订单状态和生产状态查询指定店铺的订单 (不包含外卖)
      * @param shopId
      * @param orderStates
      * @param productionStates
@@ -414,6 +414,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
 
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单  (包含外卖)
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStatesTakeout(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
     /**
      * 查询所有不正常的订单(并非异常订单)
      * 原因：所有支付的订单(2,10,11,12) 都会去打印，如果打印机有问题或连结不上最终也只会到异常订单里面 不会出现 0,1的情况
@@ -551,10 +559,16 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     Double selectAppraiseSumByShopId(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
 
 	/**
-	 * 大boss模式下查询新增订单
+	 * 大boss模式下查询新增订单(不包含外卖订单)
 	 */
 
 	List<Order> selectOrderByBoss(String shopId);
+
+	/**
+	 * 大boss模式下查询新增订单(包含外卖订单)
+	 */
+
+	List<Order> selectOrderByBossTakeout(String shopId);
 
 	/**
 	 * 返回用户的最后一比订单时间

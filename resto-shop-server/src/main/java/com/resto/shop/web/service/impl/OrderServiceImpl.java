@@ -906,6 +906,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.NO) {
                 order.setTableNumber(order.getVerCode());
             }
+            if (order.getDistributionModeId() == DistributionType.DELIVERY_MODE_ID) {
+                order.setTableNumber(order.getVerCode());
+            }
 
             if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.YES) {
                 order.setNeedScan(Common.YES);
@@ -1740,6 +1743,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //Customer customer = customerService.selectById(order.getCustomerId());
         //logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
         return order;
+    }
+    @Override
+    public int printUpdate(String orderId){
+        Order o=new Order();
+        o.setId(orderId);
+        o.setProductionStatus(4);
+        int count=orderMapper.updateByPrimaryKeySelective(o);
+        return count;
     }
 
     @Override
@@ -5577,6 +5588,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return orderMapper.selectOrderByBoss(shopId);
         } else {
             return orderMapper.selectByOrderSatesAndProductionStates(shopId, orderStates, productionStates);
+        }
+
+
+    }
+
+    @Override
+    public List<Order> selectByOrderSatesAndProductionStatesTakeout(String shopId, String[] orderStates,
+                                                             String[] productionStates) {
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
+            return orderMapper.listHoufuUnFinishedOrder(shopId);
+
+        } else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER) {
+            List<Order> order=orderMapper.selectOrderByBossTakeout(shopId);
+            //return orderMapper.selectOrderByBossTakeout(shopId);
+            return order;
+        } else {
+            List<Order> order=orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            //return orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            return order;
         }
 
 

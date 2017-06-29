@@ -152,6 +152,7 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="operator_id" property="operatorId" jdbcType="VARCHAR"/>
         <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
+        <result column="customer_address_id" property="customerAddressId" jdbcType="VARCHAR"/>
         <result column="distribution_date" property="distributionDate"  jdbcType="DATE"/>
         <result column="distribution_time_id" property="distributionTimeId"  jdbcType="INTEGER"/>
         <result column="delivery_point_id" property="deliveryPointId"  jdbcType="INTEGER"/>
@@ -217,6 +218,8 @@
         <result column="service_price" property="servicePrice"/>
         <result column="parent_order_id" property="parentOrderId"/>
         <result column="order_mode" property="orderMode"/>
+        <result column="customer_address_id" property="customerAddressId"/>
+        <result column="serial_number" property="serialNumber"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -366,7 +369,7 @@
         confirm_time, print_times, allow_cancel, allow_appraise, closed,
         remark,
         create_time,
-        operator_id, customer_id, distribution_date,
+        operator_id, customer_id,customer_address_id, distribution_date,
         distribution_time_id,
         delivery_point_id,
         shop_detail_id,
@@ -1089,6 +1092,7 @@
         <if test="shopMode == 6">
             and ((pay_mode in (3,4,5,6) and is_confirm = 1) or (pay_mode not in (3,4,5,6) ))
         </if>
+        and distribution_mode_id != 2
         order by pay_type desc,create_time DESC
 
     </select>
@@ -1121,7 +1125,7 @@
 
     </select>
 
-
+    <!--不包含外卖订单-->
     <select id="selectOrderByBoss" resultType="Order">
         SELECT
         push_order_time,
@@ -1144,8 +1148,7 @@
         tb_order
         WHERE
         shop_detail_id=#{shopId}
---         AND
---         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+--         AND DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state != 9
         and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
          || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))
@@ -1153,7 +1156,25 @@
 
         and table_number is not null
         and parent_order_id is null
+        and distribution_mode_id != 2
 
+        order by create_time ASC;
+
+    </select>
+    <!--外卖订单-->
+    <select id="selectOrderByBossTakeout" resultType="Order">
+         SELECT
+         *
+        FROM
+        tb_order
+        WHERE
+        shop_detail_id=#{shopId}
+        AND DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state != 9
+        /*and ( (((order_state = 1  and pay_type = 1 ) or (order_state = 1 and pay_mode in (3,4,5,6) and pay_type = 0)) or (order_state >= 2 and pay_mode in (3,4,5,6) and is_confirm = 0))
+        || (print_fail_flag = 1 || print_kitchen_flag = 1 ) || (order_state = 2 and production_status = 1))*/
+        and parent_order_id is null
+        and distribution_mode_id = 2
         order by create_time ASC;
 
     </select>
@@ -1929,6 +1950,8 @@
         o.order_money,
         o.service_price,
         o.order_mode,
+        o.customer_address_id,
+        o.serial_number,
         oi.id orderItem_id,
         oi.article_name,
         oi.count,
@@ -2335,7 +2358,7 @@ GROUP BY r.table_number
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
 
-    <!-- 根据订单状态和生产状态查询指定店铺的订单   -->
+    <!-- 根据订单状态和生产状态查询指定店铺的订单   不包含包含外卖订单-->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
         SELECT tb_order.*,
         ifnull(count_with_child,article_count) as
@@ -2356,6 +2379,32 @@ GROUP BY r.table_number
             </foreach>
         </if>
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and distribution_mode_id!=2
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- 根据订单状态和生产状态查询指定店铺的订单   包含外卖订单-->
+    <select id="selectByOrderSatesAndProductionStatesTakeout" resultType="Order">
+        SELECT tb_order.*,
+        ifnull(count_with_child,article_count) as
+        totalCount
+        from tb_order where shop_detail_id = #{shopId}
+        <if test="orderStates != null and orderStates != '' ">
+            and ORDER_STATE in
+            <foreach collection="orderStates" item="state" open="("
+                     separator="," close=")">
+                #{state}
+            </foreach>
+        </if>
+        <if test="productionStates != null and productionStates != '' ">
+            and production_status in
+            <foreach collection="productionStates" item="state" open="("
+                     separator="," close=")">
+                #{state}
+            </foreach>
+        </if>
+        and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and distribution_mode_id=2
         ORDER BY create_time ASC
     </select>
 

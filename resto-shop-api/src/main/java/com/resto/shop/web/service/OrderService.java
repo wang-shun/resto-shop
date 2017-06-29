@@ -59,6 +59,8 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public Order printSuccess(String orderId) throws AppException;
 
+	public int printUpdate(String orderId);
+
 	Order getOrderAccount(String shopId);
 
 	/**
@@ -414,7 +416,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 
 	/**
-	 * 根据订单状态和生产状态查询指定店铺的订单
+	 * 根据订单状态和生产状态查询指定店铺的订单(不包含外卖)
 	 * @param shopId
 	 * @param orderStates
 	 * @param productionStates
@@ -422,6 +424,14 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 */
 	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
 
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单(包含外卖)
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStatesTakeout(String shopId, String[] orderStates,String[] productionStates);
 	Order payOrderModeFive(String orderId);
 
 	Order payOrderWXModeFive(String orderId);
