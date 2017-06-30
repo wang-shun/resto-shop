@@ -100,11 +100,11 @@
             tbl.shopowner_issuing_state shopownerIssuingState,
             tbl.employee_issuing_state employeeIssuingState
         from tb_bonus_log tbl
-        inner join tb_charge_order tal
+        left join tb_charge_order tal
         on tbl.charge_order_id = tal.id
-        inner join tb_customer tc
+        left join tb_customer tc
         on tal.customer_id = tc.id
-        inner join tb_bonus_setting tbs
+        left join tb_bonus_setting tbs
         on tbs.id = tbl.bonus_setting_id
         <where>
             <if test="id != null">
