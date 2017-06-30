@@ -1571,7 +1571,7 @@
         sum(t.refund_count)refundCount,
         SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
-        SUM(t.count) shopSellNum,
+        SUM(IF(t.type != 4, t.count, 0)) shopSellNum,
         t.article_name,
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
