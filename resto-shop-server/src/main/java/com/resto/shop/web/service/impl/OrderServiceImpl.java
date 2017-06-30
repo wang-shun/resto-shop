@@ -4005,14 +4005,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         /**
          * 菜品总数单独算是因为 要出去套餐的数量
          */
-        totalNum = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        List<Integer> totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
-        brandArticleReportDto bo = orderMapper.selectConfirmMoney(begin, end, brandId);
-        if (bo == null) {
-            bo.setSellIncome(sellIncome);
-            bo.setRefundCount(refundCount);
-            bo.setDiscountTotal(discountTotal);
-            bo.setRefundTotal(refundTotal);
+        brandArticleReportDto bo = new brandArticleReportDto();
+        bo.setSellIncome(sellIncome);
+        bo.setRefundCount(refundCount);
+        bo.setDiscountTotal(discountTotal);
+        bo.setRefundTotal(refundTotal);
+        List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
+        if (articleReportDto != null && !articleReportDto.isEmpty()) {
+            for (brandArticleReportDto reportDto : articleReportDto){
+                bo.setSellIncome(bo.getSellIncome().add(reportDto.getSellIncome()));
+                bo.setRefundCount(bo.getRefundCount() + reportDto.getRefundCount());
+                bo.setDiscountTotal(bo.getDiscountTotal().add(reportDto.getDiscountTotal()));
+                bo.setRefundTotal(bo.getRefundTotal().add(reportDto.getRefundTotal()));
+            }
+        }
+        if (totalNums != null && !totalNums.isEmpty()){
+            for (Integer num : totalNums){
+                totalNum += num;
+            }
         }
         bo.setTotalNum(totalNum == null ? 0 : totalNum);
         bo.setBrandName(brandName);
@@ -4027,58 +4039,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (shopDetails.isEmpty()) {
             shopDetails = shopDetailService.selectByBrandId(brandId);
         }
-        //查询品牌下每个店铺的菜品销量，菜品销售额 和占品牌销售的比率(和品牌一样需要分开计算数量和总价--套餐问题)
-
-        //查询每个店铺的菜品销量的和
-        List<ShopArticleReportDto> listShopNum = orderMapper.selectShopArticleSum(begin, end, brandId);
-
         //查询每个店铺的菜品销售的和
         List<ShopArticleReportDto> list = orderMapper.selectShopArticleSell(begin, end, brandId);
-
-        if (!list.isEmpty()) {
-            for (ShopArticleReportDto s1 : list) {
-                for (ShopArticleReportDto s2 : listShopNum) {
-                    if (s2.getShopId().equals(s1.getShopId())) {
-                        s1.setTotalNum(s2.getTotalNum());
-                    }
-                }
-            }
-        }
-
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
-
         for (ShopDetail shop : shopDetails) {
             ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%", 0, BigDecimal.ZERO, BigDecimal.ZERO);
             listArticles.add(st);
         }
-
         //计算所有店铺的菜品销售的和
         BigDecimal sum = new BigDecimal(0);
         //计算所有店铺的菜品销售的和
         if (!list.isEmpty()) {
             for (ShopArticleReportDto shopArticleReportDto2 : list) {
                 //计算减去退菜销售额
-                sum = sum.add(shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal()));
+                sum = sum.add(shopArticleReportDto2.getSellIncome());
             }
-
             for (ShopArticleReportDto shopArticleReportDto : listArticles) {
                 for (ShopArticleReportDto shopArticleReportDto2 : list) {
                     if (shopArticleReportDto2.getShopId().equals(shopArticleReportDto.getShopId())) {
-                        shopArticleReportDto.setSellIncome(shopArticleReportDto2.getSellIncome());
-                        shopArticleReportDto.setDiscountTotal(shopArticleReportDto2.getDiscountTotal());
-                        shopArticleReportDto.setTotalNum(shopArticleReportDto2.getTotalNum());
-                        shopArticleReportDto.setRefundCount(shopArticleReportDto2.getRefundCount());
-                        shopArticleReportDto.setRefundTotal(shopArticleReportDto2.getRefundTotal());
-                        //当前店铺的销售总额 同样减去退菜的总数
-                        BigDecimal current = shopArticleReportDto2.getSellIncome().subtract(shopArticleReportDto2.getRefundTotal());
-
-                        String occupy = current == null ? "0" : current.divide(sum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP)
-                                .toString();
-                        shopArticleReportDto.setOccupy(occupy + "%");
+                        shopArticleReportDto.setSellIncome(shopArticleReportDto.getSellIncome().add(shopArticleReportDto2.getSellIncome()));
+                        shopArticleReportDto.setDiscountTotal(shopArticleReportDto.getDiscountTotal().add(shopArticleReportDto2.getDiscountTotal()));
+                        shopArticleReportDto.setTotalNum(shopArticleReportDto.getTotalNum() + shopArticleReportDto2.getTotalNum());
+                        shopArticleReportDto.setRefundCount(shopArticleReportDto.getRefundCount() + shopArticleReportDto2.getRefundCount());
+                        shopArticleReportDto.setRefundTotal(shopArticleReportDto.getRefundTotal().add(shopArticleReportDto2.getRefundTotal()));
                     }
                 }
+                String occupy = shopArticleReportDto.getSellIncome() == null ? "0" : shopArticleReportDto.getSellIncome().divide(sum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP)
+                                .toString();
+                shopArticleReportDto.setOccupy(occupy + "%");
             }
-
         }
         return listArticles;
     }

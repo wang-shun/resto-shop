@@ -1365,8 +1365,8 @@
     <!--</select>-->
 
     <!--查询品牌菜品的总数 -->
-    <select id="selectBrandArticleNum" resultType="integer">
-        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_article ta
+    <select id="selectBrandArticleNum" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(oi.count) + o.meal_all_number,0)totalNum from tb_article ta
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
@@ -1374,6 +1374,7 @@
         and oi.type != 4
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
+        GROUP BY o.id
     </select>
 
     <!--查询品牌菜品销售的总价-->
@@ -1396,7 +1397,7 @@
     <!--查询品牌下每个店铺的菜品数目卖的和 2016-11-3 -->
     <select id="selectShopArticleSum" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
         SELECT
-        SUM(oi.count)totalNum,
+        SUM(oi.count) + o.meal_all_number totalNum,
         o.shop_detail_id shop_id
         from tb_article ta
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
@@ -1404,14 +1405,15 @@
         INNER JOIN  tb_order o ON o.id=oi.order_id
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND oi.type != 4 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
-        GROUP BY o.shop_detail_id
+        GROUP BY o.id
     </select>
 
 
     <!--查询品牌下每个店铺所有菜品卖的钱的和-->
     <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
         SELECT
-        IFNULL(SUM(oi.final_price),0.00) sellIncome,
+        IFNULL(SUM(IF(oi.type != 4, oi.count, 0)) + o.meal_all_number,0) totalNum,
+        IFNULL(SUM(oi.final_price) + o.meal_fee_price,0.00) sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
@@ -1424,13 +1426,13 @@
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
-        GROUP BY o.shop_detail_id
+        GROUP BY o.id
     </select>
 
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
         SELECT
-        IFNULL(sum(oi.final_price),0.00) sellIncome,
+        IFNULL(sum(oi.final_price) + o.meal_fee_price,0.00) sellIncome,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
@@ -1444,6 +1446,7 @@
         AND o.production_status IN (2, 3)
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
+        GROUP BY o.id
     </select>
 
     <!-- 品牌菜品销售 -->
