@@ -3036,9 +3036,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
     <update id="fixAllowContinueOrder">
         update tb_order
-        set allow_continue_order = 1
+        set allow_continue_order = 0
         where now() > create_time
-        and parent_order_id is null
     </update>
 
     <select id="getAllowAppraise" resultType="Order">
