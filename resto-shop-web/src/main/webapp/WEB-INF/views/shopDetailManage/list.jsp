@@ -84,7 +84,7 @@
 						</div>
 
 						<div class="form-group">
-							<label>标头字体</label>
+							<label>标头颜色</label>
 							<div>
 								<input type="text" class="form-control color-mini-head" name="tvHeadTextColor"
 									   data-position="bottom left" v-model="m.tvHeadTextColor">
@@ -92,7 +92,7 @@
 						</div>
 
 						<div class="form-group">
-							<label>标头字体</label>
+							<label>数字颜色</label>
 							<div>
 								<input type="text" class="form-control color-mini-number" name="tvNumberColor"
 									   data-position="bottom left" v-model="m.tvNumberColor">
