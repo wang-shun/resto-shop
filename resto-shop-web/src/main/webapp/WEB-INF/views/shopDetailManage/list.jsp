@@ -82,6 +82,22 @@
 									   data-position="bottom left" v-model="m.tvTextBoxBackground">
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label>标头字体</label>
+							<div>
+								<input type="text" class="form-control color-mini-head" name="tvHeadTextColor"
+									   data-position="bottom left" v-model="m.tvHeadTextColor">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>标头字体</label>
+							<div>
+								<input type="text" class="form-control color-mini-number" name="tvNumberColor"
+									   data-position="bottom left" v-model="m.tvNumberColor">
+							</div>
+						</div>
 						<%--<div class="form-group">--%>
 							<%--<label class="col-md-4 control-label">等位提示：</label>--%>
 							<%--<div  class="col-md-6 ">--%>
@@ -167,6 +183,36 @@
 				this.$watch("m", function () {
 					if (this.m.id) {
 						$('.color-mini-textbox').minicolors("value", this.m.tvTextBoxBackground);
+					}
+				});
+
+				var n = $('.color-mini-head').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-head').minicolors("value", this.m.tvHeadTextColor);
+					}
+				});
+
+				var n = $('.color-mini-number').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-number').minicolors("value", this.m.tvNumberColor);
 					}
 				});
 			},

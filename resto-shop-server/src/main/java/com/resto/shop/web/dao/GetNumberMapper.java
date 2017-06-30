@@ -37,4 +37,8 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
     GetNumber selectGetNumberInfo(String id);
 
     List<GetNumber> selectWaitCountByCodeId(@Param("shopId") String shopId, @Param("codeId") String codeId);
+
+    List<GetNumber> selectBeforeNumberByCodeId(@Param("shopId") String shopId, @Param("codeId") String codeId, @Param("time") Date time);
+
+    GetNumber selectNowNumberByCodeId(@Param("shopId") String shopId, @Param("codeId") String codeId);
 }

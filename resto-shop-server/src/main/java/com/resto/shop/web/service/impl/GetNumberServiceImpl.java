@@ -157,4 +157,14 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     public Integer selectWaitCountByCodeId(String shopId, String codeId) {
         return getNumberMapper.selectWaitCountByCodeId(shopId, codeId).size();
     }
+
+    @Override
+    public List<GetNumber> selectBeforeNumberByCodeId(String shopId, String codeId, Date time) {
+        return getNumberMapper.selectBeforeNumberByCodeId(shopId, codeId, time);
+    }
+
+    @Override
+    public GetNumber selectNowNumberByCodeId(String shopId, String codeId) {
+        return getNumberMapper.selectNowNumberByCodeId(shopId, codeId);
+    }
 }
