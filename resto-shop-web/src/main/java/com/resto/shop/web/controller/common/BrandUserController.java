@@ -11,8 +11,11 @@ import javax.validation.Valid;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.Wether;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.config.SessionKey;
+import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -29,9 +32,6 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.RoleService;
-import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 
 
