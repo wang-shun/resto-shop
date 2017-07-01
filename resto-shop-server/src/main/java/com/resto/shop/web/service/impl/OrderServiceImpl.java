@@ -2924,7 +2924,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 //        nextNumber(order.getShopDetailId(), order.getId())
-        data.put("ORDER_NUMBER", orderNumber);
+        if (!brand.getId().equals("da7ffe9e6f74447f880d82a284a11cae")){
+            data.put("ORDER_NUMBER", orderNumber);
+        }
         if (refundItems.size() != 0) {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < refundItems.size(); i++) {
@@ -7347,6 +7349,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
+
+        //如果退菜订单是  后付情况下加菜后统一支付  则支付项是在主订单下    修改退菜金额改变的逻辑
+        if(o.getParentOrderId() != null && o.getPayType() == PayType.NOPAY){
+            payItemsList = orderPaymentItemService.selectByOrderId(o.getParentOrderId());
+        }
 
         BigDecimal maxWxRefund = new BigDecimal(0);
         for (OrderPaymentItem item : payItemsList) {
