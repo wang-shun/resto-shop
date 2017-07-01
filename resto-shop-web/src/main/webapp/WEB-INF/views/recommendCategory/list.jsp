@@ -6,6 +6,13 @@
         min-height: 34px;
         margin-left: 16px;
     }
+   	table thead tr th,table tbody tr td {
+   		text-align: center;
+   		vertical-align: middle;
+   	}
+   	.table>tbody>tr>td, .table>tbody>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+	    vertical-align: middle;
+	}
 </style>
 <div id="control">
     <div class="row form-div" v-if="showform">
@@ -22,8 +29,8 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">推荐类型:</label>
                                 <div class="col-sm-8">
-                                    <input type="radio" class="form-control"  name="type" required v-model="m.type" value="0">热销
-                                    <input type="radio" class="form-control"  name="type" required v-model="m.type" value="1">新品
+                                    <input type="radio" class="form-control"  name="type" v-model="m.type" >热销
+                                    <input type="radio" class="form-control"  name="type" v-model="m.type" >新品
                                 </div>
                             </div>
                             <div class="form-group">
@@ -40,8 +47,38 @@
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">添加餐品:</label>
-                                <div v-for="unit in articleUnits">
-                                    <input type="hidden" name="unitIds" value="{{unit.id}}"/>
+                                
+                                <div class="col-sm-8" style="border: 1px solid #c2cad8;padding: initial;overflow-y: scroll;max-height: 200px;">
+                                	<table class="table">
+									    <thead>
+									      	<tr>
+									         	<th>编号</th>
+									         	<th>品名</th>
+									         	<th>排序</th>
+									         	<th>操作</th>
+									      	</tr>
+								    	</thead>
+								    	<tbody>
+								      		<tr>
+								         		<td>1</td>
+								         		<td>红烧牛肉面</td>
+								         		<td>1</td>
+								         		<td><button type="button" class="btn btn-danger" @click="removeUnit(unit)">移除</button></td>
+								      		</tr>
+								      		<tr>
+								         		<td>1</td>
+								         		<td>红烧牛肉面</td>
+								         		<td>1</td>
+								         		<td><button type="button" class="btn btn-danger" @click="removeUnit(unit)">移除</button></td>
+								      		</tr>
+									    </tbody>
+								    </table>
+								    <div style="position: relative;text-align: center;padding: 15px 0px;">
+								    	<button type="button" class="btn btn-primary" @click="addUnit">+添加餐品</button>
+								    </div>                              	                                	
+                                </div>
+                                <!--<div v-for="unit in articleUnits">
+                                    <input type="text" name="unitIds" value="{{unit.id}}"/>
                                     <label class="col-sm-2 control-label">规 格{{$index+1}}：</label>
                                     <div class="col-sm-3">
                                         <input type="text" class="form-control" name="units" value="{{unit.name}}" required>
@@ -56,8 +93,8 @@
                                     <div class="col-sm-8 col-md-offset-2">
                                         <a class="btn blue btn-block" @click="addUnit">添加规格</a>
                                     </div>
-                                </div>
-                             </div>
+                                </div>-->
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">是否启用:</label>
                                 <div class="col-sm-8">
@@ -152,6 +189,7 @@
             mixins:[C.formVueMix],
             data:{
                 articleUnits:[],
+                m:{}
             },
             methods:{
                 addUnit:function(e){
@@ -167,7 +205,6 @@
                 },
                 create:function(){
                     this.articleUnits = [];
-                    this.m={};
                     this.openForm();
                 },
             }
