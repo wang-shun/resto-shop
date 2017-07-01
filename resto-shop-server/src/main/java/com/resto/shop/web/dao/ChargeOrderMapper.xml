@@ -451,4 +451,17 @@ AND u.id =#{customerId}
         and finish_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and finish_time &lt;= CONCAT(#{endDate},' 23:59:59')
     </select>
+
+  <select id="getChargeSumInfo" parameterType="java.util.Map" resultType="java.util.Map">
+    select shop_detail_id shopId, COUNT(1) chargeCount, SUM(charge_money) chargeMoney from tb_charge_order where order_state = 1 and finish_time &gt;= CONCAT(#{beginDate}, ' 00:00:00') and finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+    <if test="shopId != null">
+      and shop_detail_id = #{shopId}
+    </if>
+    <if test="chart != null">
+      GROUP BY shop_detail_id,customer_id
+    </if>
+    <if test="chart == null">
+      GROUP BY customer_id
+    </if>
+  </select>
 </mapper>

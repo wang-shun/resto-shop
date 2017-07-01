@@ -93,4 +93,6 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
     List<ChargeOrder> selectByCustomerIdAndBrandId(String customerId,String brandId);
 
     List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
+
+	List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
 }

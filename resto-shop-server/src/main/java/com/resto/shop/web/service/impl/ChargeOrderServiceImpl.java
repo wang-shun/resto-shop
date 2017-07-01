@@ -352,4 +352,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     public List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap) {
         return chargeOrderMapper.selectMonthDto(selectMap);
     }
+
+	@Override
+	public List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap) {
+		return chargeOrderMapper.getChargeSumInfo(selectMap);
+	}
 }
