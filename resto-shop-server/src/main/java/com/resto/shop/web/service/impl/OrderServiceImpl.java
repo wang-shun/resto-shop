@@ -2290,7 +2290,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (article.getType() == OrderItemType.SETMEALS
-                    && orderItem.getParentId().equals(article.getId())) {
+                   && orderItem.getParentId() != null && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
                     && article.getParentId().equals(orderItem.getParentId())) {
@@ -2924,7 +2924,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         RedisUtil.set(order.getId() + "orderNumber", orderNumber);
 
 //        nextNumber(order.getShopDetailId(), order.getId())
-        data.put("ORDER_NUMBER", orderNumber);
+        if (!brand.getId().equals("da7ffe9e6f74447f880d82a284a11cae")){
+            data.put("ORDER_NUMBER", orderNumber);
+        }
         if (refundItems.size() != 0) {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < refundItems.size(); i++) {
@@ -5058,6 +5060,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         for (OrderItem orderItem : saledOrderItems) {
                             Map<String, Object> itemMap = new HashMap<>();
                             if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount());
                                 familyArticleMaps.add(itemMap);
@@ -5092,10 +5095,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 String formName = orderItem.getArticleName().substring(orderItem.getArticleName().indexOf(article.getName().substring(article.getName().length() - 1)) + 1);
                                 String[] formNames = formName.split("\\)");
                                 for (String name : formNames) {
-                                    if(name.length() > 1){
+                                    if (name.length() > 1) {
                                         formName = name.substring(1);
                                     }
-
                                     if (map.containsKey(formName)) {
                                         Integer count = map.get(formName);
                                         count += orderItem.getCount();
@@ -5107,7 +5109,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 unitMaps.put(orderItem.getArticleId(), map);
                             } else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
 //                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
-                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
+                                saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount() - orderItem.getPackageNumber()));
                                 itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
                                 itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
                                 familyArticleMaps.add(itemMap);
@@ -5193,8 +5195,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
                     itemMap.put("SUBTOTAL", nowMeal);
                     saledProducts.add(itemMap);
-                    //餐盒费不计入总销量
-//                saledProductAmount = saledProductAmount.add(nowMeal);
+                    //餐盒费不计入总销量    小确幸SB又改了， 又要加上去。 妈的！  拿来怎么多B事 -- 2017-06-22改为计入
+                    saledProductAmount = saledProductAmount.add(nowMeal);
                 }
             }
             if (!oldService.subtract(nowService).equals(BigDecimal.ZERO)) {
@@ -7352,6 +7354,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
+
+        //如果退菜订单是  后付情况下加菜后统一支付  则支付项是在主订单下    修改退菜金额改变的逻辑
+        if(o.getParentOrderId() != null && o.getPayType() == PayType.NOPAY){
+            payItemsList = orderPaymentItemService.selectByOrderId(o.getParentOrderId());
+        }
 
         BigDecimal maxWxRefund = new BigDecimal(0);
         for (OrderPaymentItem item : payItemsList) {
