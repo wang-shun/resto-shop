@@ -675,7 +675,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayValue(order.getWaitMoney());
                 item.setRemark("等位红包支付:" + order.getWaitMoney());
                 item.setResultData(order.getWaitId());
-                orderPaymentItemService.insert(item);
+                if(order.getWaitMoney().doubleValue() > 0){
+                    orderPaymentItemService.insert(item);
+                }
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单使用等位红包支付了：" + item.getPayValue());
 //                Map waitPayMap = new HashMap(4);
