@@ -1988,7 +1988,7 @@
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
-        and parent_order_id is null
+--         and parent_order_id is null
         and t2.payment_mode_id not in (13,14,15)
         GROUP BY t.id
         ) as r
@@ -3011,6 +3011,43 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <update id="colseOrder">
         update tb_order set order_state = 9 where id=#{orderId}
     </update>
+
+
+    <select id="selectErrorOrder" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        serial_number,
+        ver_code,
+        article_count,
+        table_number,
+        order_money,
+        shop_detail_id
+        FROM
+        tb_order
+        WHERE
+        <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
+        and( (production_status = 5 and order_state != 9 and print_times = 0) or
+        (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 40  )
+        or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
+        or (production_status = 0 and order_state = 1 and order_mode = 6 and pay_type = 1 and print_times = 0 and now() - create_time > 120 )
+        or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
+        or (production_status = 1 and order_state = 10 and print_times = 0 and now() - create_time > 40 )
+        )
+        and order_mode != 3
+        order by push_order_time DESC;
+    </select>
+
+    <update id="fixAllowContinueOrder">
+        update tb_order
+        set allow_continue_order = 0
+        where now() > create_time
+    </update>
+
+    <select id="getAllowAppraise" resultType="Order">
+        select * from tb_order where order_state = 2  and production_status in (2,3)
+        and create_time >= '2017-06-29'
+    </select>
 
     <select id="selectDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
         select td.shop_detail_id shopDetailId, td.parent_order_id parentOrderId, td.create_time createTime,

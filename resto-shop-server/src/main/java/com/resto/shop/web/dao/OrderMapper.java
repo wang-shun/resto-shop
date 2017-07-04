@@ -103,6 +103,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
 
+	List<Order> selectErrorOrder(@Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
+
+
 	/**
 	 * 查询未付款的订单（后付模式）
 	 * @param currentShopId
@@ -647,4 +652,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
 
 	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+
+	void fixAllowContinueOrder(@Param("beginDate") Date begin);
+
+	List<Order> getAllowAppraise();
 }

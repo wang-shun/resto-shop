@@ -95,7 +95,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);
 
-
+	public List<Order> selectErrorOrder( Date date);
 
 	public List<Order> getOrderNoPayList(String currentShopId, Date date);
 
@@ -658,4 +658,8 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
 
 	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+
+    //修复加菜时间过后 任然允许加菜的bug
+    void fixErrorOrder();
+
 }
