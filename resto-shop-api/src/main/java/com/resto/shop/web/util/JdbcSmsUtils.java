@@ -1,6 +1,7 @@
 package com.resto.shop.web.util;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.DayAppraiseMessageWithBLOBs;
 import com.resto.shop.web.model.DayDataMessage;
 import org.slf4j.Logger;
@@ -148,58 +149,89 @@ public class JdbcSmsUtils {
 
 
     /**
-     * 日结分数短信存储
-     * @param ds
+     * 存今日评论数据
+     * @param a
      */
-    public  static void  saveDayAppraise(DayAppraiseMessageWithBLOBs ds){
-        init(ds);
+    public static void saveTodayAppraise(Appraise a,String brandId) {
         //初始化连接
         getConnection();
-        String sql = "insert into tb_day_appraise_message (id,shop_id,shop_name, date, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction, red_list, bad_list) values (?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name) values (?,?,?,?,?,?,?,?,?,?,?,?)";
         List<Object> params = new ArrayList<>();
         params.add(ApplicationUtils.randomUUID());
-        params.add(ds.getShopId());
-        params.add(ds.getShopName());
-        params.add(ds.getDate());
-        params.add(ds.getWeekDay());
-        params.add(ds.getWether());
-        params.add(ds.getTemperature());
-        params.add(ds.getType());
-        params.add(ds.getFiveStar());
-        params.add(ds.getFourStar());
-        params.add(ds.getOneThreeStar());
-        params.add(ds.getDaySatisfaction());
-        params.add(ds.getXunSatisfaction());
-        params.add(ds.getMonthSatisfaction());
-        params.add(ds.getRedList());
-        params.add(ds.getBadList());
-        try {
-            updateByPreparedStatement(sql,params);
-        } catch (SQLException e) {
+        params.add(a.getPictureUrl());
+        params.add(a.getLevel());
+        params.add(a.getCreateTime());
+        params.add(a.getContent());
+        params.add(a.getStatus());
+        params.add(a.getType());
+        params.add(a.getFeedback());
+        params.add(a.getShopDetailId());
+        params.add(brandId);
+        params.add(a.getHeadPhoto());
+        params.add(a.getNickName());
+        try{
+
+          updateByPreparedStatement(sql,params);
+
+        }catch (SQLException e){
             e.printStackTrace();
         }
-        close();//释放连接
+        close();
     }
 
-    private static void init(DayAppraiseMessageWithBLOBs ds) {
-        if(ds.getDaySatisfaction()==null){
-            ds.setDaySatisfaction("无");
-        }
-        if(ds.getXunSatisfaction()==null){
-            ds.setXunSatisfaction("无");
-        }
 
-    }
+    /**
+     * 日结分数短信存储
+     * @param
+     */
+//    public  static void  saveDayAppraise(DayAppraiseMessageWithBLOBs ds){
+//        init(ds);
+//        //初始化连接
+//        getConnection();
+//        String sql = "insert into tb_day_appraise_message (id,shop_id,shop_name, date, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction, red_list, bad_list) values (?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?)";
+//        List<Object> params = new ArrayList<>();
+//        params.add(ApplicationUtils.randomUUID());
+//        params.add(ds.getShopId());
+//        params.add(ds.getShopName());
+//        params.add(ds.getDate());
+//        params.add(ds.getWeekDay());
+//        params.add(ds.getWether());
+//        params.add(ds.getTemperature());
+//        params.add(ds.getType());
+//        params.add(ds.getFiveStar());
+//        params.add(ds.getFourStar());
+//        params.add(ds.getOneThreeStar());
+//        params.add(ds.getDaySatisfaction());
+//        params.add(ds.getXunSatisfaction());
+//        params.add(ds.getMonthSatisfaction());
+//        params.add(ds.getRedList());
+//        params.add(ds.getBadList());
+//        try {
+//            updateByPreparedStatement(sql,params);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        close();//释放连接
+//    }
+//
+//    private static void init(DayAppraiseMessageWithBLOBs ds) {
+//        if(ds.getDaySatisfaction()==null){
+//            ds.setDaySatisfaction("无");
+//        }
+//        if(ds.getXunSatisfaction()==null){
+//            ds.setXunSatisfaction("无");
+//        }
+//
+//    }
+
+
+
+
 
 
     public static void main(String[] args) throws SQLException {
         saveDayDataMessage(null);
     }
-
-
-
-
-
 
 
 }

@@ -137,10 +137,29 @@
   </select>
 
  <select id="selectByTimeAndShopId" resultType="Appraise">
-     select <include refid="Base_Column_List"/> from tb_appraise
+     SELECT
+     a.id,
+     a.picture_url,
+     a.LEVEL,
+     a.create_time,
+     a.content,
+     a.STATUS,
+     a.type,
+     a.feedback,
+     a.red_money,
+     a.customer_id,
+     a.order_id,
+     a.article_id,
+     a.shop_detail_id,
+     c.nickname,
+     c.head_photo
+     FROM
+     tb_appraise a
+     LEFT JOIN tb_customer c
+     on a.customer_id = c.id;
      WHERE
-     shop_detail_id =#{shopId} AND
-     <![CDATA[ create_time >= #{beginDate} AND create_time <= #{endDate}]]>
+     a.shop_detail_id =#{shopId} AND
+     <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
  </select>
 
     <select id="selectAppraiseShopDto" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.AppraiseShopDto">

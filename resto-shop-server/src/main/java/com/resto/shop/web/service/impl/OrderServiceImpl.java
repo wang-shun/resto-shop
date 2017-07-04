@@ -6236,25 +6236,41 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             todayBackCustomerRatio = formatDouble((todayBackCustomerOrderNum / dmax) * 100);
         }
 
-        //五星
+        //本日五星
         int todayFiveStar = 0;
-        //四星
+        //本日四星
         int todayFourStar = 0;
-        //3星-1星
+        //本日3星-1星
         int todayOneToThreeStar = 0;
+
+        //本旬五星
+        int xunFiveStar = 0;
+        //本旬四星
+        int xunFourStar = 0;
+        //本旬3星-1星
+        int xunOneToThreeStar = 0;
+
+        //本月五星
+        int monthFiveStar = 0;
+        //本月四星
+        int monthFourStar = 0;
+        //本月3星-1星
+        int monthOneToThreeStar = 0;
+
+
         //3定义满意度
         //本日满意度
         String todaySatisfaction = "";
         //本旬满意度
-        String theTenDaySatisfaction = "";
+        String xunSatisfaction = "";
         //本月满意度
         String monthSatisfaction = "";
 
-        int dayAppraiseNum = 0;//当日评价的总单数
+        int todayAppraiseNum = 0;//当日评价的总单数
         int xunAppraiseNum = 0;//本旬评价的总单数
         int monthAppraiseSum = 0;//本月评价的单数
 
-        double dayAppraiseSum = 0;//当日所有评价的总分数
+        double todayAppraiseSum = 0;//当日所有评价的总分数
         double xunAppraiseSum = 0;//上旬所有评价的总分数
         double monthAppraiseNum = 0;//本月所有评价的总分数
 
@@ -6267,55 +6283,89 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //单独查询评价和分数
 
-        List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), monthBegin, monthEnd);
+        //查本日
+        List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
+        //存评论数据
+        if(todayAppraises.isEmpty()){
+            for(Appraise a:todayAppraises){
+                JdbcSmsUtils.saveTodayAppraise(a,brand.getId());
+            }
 
-        if (!appraises.isEmpty()) {
-            for (Appraise a : appraises) {
+        }
+
+
+        if (!todayAppraises.isEmpty()) {
+            for (Appraise a : todayAppraises) {
                 //本日 begin-----------------------
-                if (DateUtil.getDayByToday(a.getCreateTime()).contains(2)) {
-                    dayAppraiseNum++;
-                    dayAppraiseSum += a.getLevel() * 20;
-                    if (a.getLevel() == 5) {
-                        todayFiveStar++;
-                    } else if (a.getLevel() == 4) {
-                        todayFourStar++;
-                    } else {
-                        todayOneToThreeStar++;
-                    }
+                todayAppraiseNum++;
+                todayAppraiseSum += a.getLevel() * 20;
+                if (a.getLevel() == 5) {
+                    todayFiveStar++;
+                } else if (a.getLevel() == 4) {
+                    todayFourStar++;
+                } else {
+                    todayOneToThreeStar++;
                 }
-                //本旬开始
-                if (DateUtil.getDayByToday(a.getCreateTime()).contains(12)) {
-                    //2.满意度
-                    xunAppraiseNum++;
-                    xunAppraiseSum += a.getLevel() * 20;
+            }
+
+            //循环完之后操作--
+            if (todayAppraiseNum != 0) {
+                todaySatisfaction = formatDouble(todayAppraiseSum / todayAppraiseNum);
+            }
+
+        }
+
+        //查本旬
+        List<Appraise> xunAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), xunBegin, xunEnd);
+
+        if (!xunAppraises.isEmpty()) {
+            for (Appraise a : xunAppraises) {
+                //本旬 begin-----------------------
+                xunAppraiseNum++;
+                xunAppraiseSum += a.getLevel() * 20;
+                if (a.getLevel() == 5) {
+                    xunFiveStar++;
+                } else if (a.getLevel() == 4) {
+                    xunFourStar++;
+                } else {
+                    xunOneToThreeStar++;
                 }
-                //本旬结束
+            }
 
-                //本月开始------
-                //.满意度
+            //循环完之后操作--
+            if (xunAppraiseNum != 0) {
+                xunSatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
+            }
 
+        }
+
+        //查本月
+        List<Appraise> monthAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), monthBegin, monthEnd);
+
+        if (!monthAppraises.isEmpty()) {
+            for (Appraise a : monthAppraises) {
+                //本月 begin-----------------------
                 monthAppraiseNum++;
                 monthAppraiseSum += a.getLevel() * 20;
-
-                //本月结束
+                if (a.getLevel() == 5) {
+                    monthFiveStar++;
+                } else if (a.getLevel() == 4) {
+                    monthFourStar++;
+                } else {
+                    monthOneToThreeStar++;
+                }
             }
+
             //循环完之后操作--
-            if (dayAppraiseNum != 0) {
-                todaySatisfaction = formatDouble(dayAppraiseSum / dayAppraiseNum);
-            }
-            if (xunAppraiseNum != 0) {
-                theTenDaySatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
-            }
-
             if (monthAppraiseNum != 0) {
                 monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
             }
 
-            //评论结束------------------------
         }
 
-        //查询菜品top10
-        //1.查询好评的总数(旬内)
+
+    //查询菜品top10
+        //1.查询好评的总数(本日)
         int  todayGoodNum = 0;
         todayGoodNum = articleTopService.selectSumGoodByTime(todayBegin, todayEnd, shopDetail.getId());
         //查询差评总数
@@ -6327,84 +6377,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //查询差评top10
         List<ArticleTopDto> todayBadList = articleTopService.selectListByTimeAndBadType(todayBegin, todayEnd, shopDetail.getId());
-
-        Map<String,Object> map = new HashMap<>();
-        //封装日结短信  微信推送需要的数据
-        StringBuilder sbData = new StringBuilder();
-        sbData
-                .append("店铺名称：").append(shopDetail.getName()).append("\n")
-                .append("时间：").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("\n")
-                .append("星期：").append(WeekName.getName(wether.getWeekady())).append("\n")
-                .append("天气：").append(wether.getDayWeather()).append(" ").append("温度：").append(wether.getDayTemperature()+"°C").append("\n")
-                .append("到店总笔数：").append(todayEnterCount + todayRestoCount.size()).append("\n")
-                .append("到店消费总额：").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
-                .append("---------------------").append("\n")
-                .append("用户消费比数：").append(todayRestoCount.size()).append("\n")
-                .append("用户消费金额：").append(todayRestoTotal).append("\n")
-                .append("---------------------").append("\n")
-                .append("用户消费比率：").append(todayCustomerRatio).append("%").append("\n")
-                .append("回头消费比率：").append(todayBackCustomerRatio).append("%").append("\n")
-                .append("新增用户比率：").append(todayNewCustomerRatio).append("%").append("\n")
-                .append("---------------------").append("\n")
-                .append("新用户消费：").append(todayNewCustomerOrderNum).append("笔/").append(todayNewCustomerOrderTotal).append("\n")
-                .append("其中自然用户：").append(todayNewNormalCustomerOrderNum).append("笔/").append(todayNewNormalCustomerOrderTotal).append("\n")
-                .append("其中分享用户：").append(todayNewShareCustomerOrderNum).append("笔/").append(todayNewShareCustomerOrderTotal).append("\n")
-                .append("回头用户消费：").append(todayBackCustomerOrderNum).append("笔/").append(todayBackCustomerOrderTotal).append("\n")
-                .append("二次回头用户：").append(todayBackTwoCustomerOrderNum).append("笔/").append(todayBackTwoCustomerOrderTotal).append("\n")
-                .append("多次回头用户：").append(todayBackTwoMoreCustomerOderNum).append("笔/").append(todayBackTwoMoreCustomerOrderTotal).append("\n")
-                .append("---------------------").append("\n")
-                .append("折扣合计：").append(discountTotal).append("\n")
-                .append("红包：").append(redPackTotal).append("\n")
-                .append("优惠券：").append(couponTotal).append("\n")
-                .append("充值赠送：").append(chargeReturn).append("\n")
-                .append("折扣比率：").append(discountRatio).append("\n")
-                .append("---------------------").append("\n")
-                .append("今日外卖金额：").append(todayOrderBooks).append("\n")
-                .append("今日总营业额：").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-                .append("本月总额：").append(monthEnterTotal.add(monthRestoTotal).add(monthOrderBooks)).append("\n");
-
-        StringBuilder sbScore = new StringBuilder();
-        sbScore
-                .append("店铺名称：").append(shopDetail.getName()).append("\n")
-                .append("时间：").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
-                .append("星期：").append(WeekName.getName(wether.getWeekady())).append("\n")
-                .append("天气：").append(wether.getDayWeather()).append(" ").append("温度：").append(wether.getDayTemperature()+"℃").append("\n")
-                .append("---------------------").append("\n")
-                .append("本日五星评论：").append(todayFiveStar).append("\n")
-                .append("本日更改意见：").append(todayFourStar).append("\n")
-                .append("本日差评投诉：").append(todayOneToThreeStar).append("\n")
-                .append("本日满意度：").append(todaySatisfaction).append("\n")
-                .append("本旬满意度：").append(theTenDaySatisfaction).append("\n")
-                .append("本月满意度：").append(monthSatisfaction).append("\n")
-                .append("---------------------").append("\n")
-                .append("本日红榜top10：").append("\n");
-        //封装好评top10
-        if (todayGoodNum == 0) {//无好评
-            sbScore.append("------无好评-----");
-        } else {
-            if (!todayGoodList.isEmpty()) {//
-                for (int i = 0; i < todayGoodList.size(); i++) {
-                    //1、27% 剁椒鱼头
-                    sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName()).append("\n");
-                }
-            }
-        }
-
-        sbScore.append("本日黑榜top10：").append("\n");
-        //封装差评top10
-        if (todayBadNum == 0) {//无差评
-            sbScore.append("------无差评-----");
-        } else {
-            if (!todayBadList.isEmpty()) {//
-                for (int i = 0; i < todayBadList.size(); i++) {
-                    //1、27% 剁椒鱼头
-                    sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName()).append("\n");
-                }
-            }
-        }
-
-        map.put("wxData",sbData);
-        map.put("wxScore",sbScore);
 
         //存储结店数据
         int times=1;//默认是今天第一次结店  次数存redis中 之后++
@@ -6462,7 +6434,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         dm.setFourStar(todayFourStar);
         dm.setOneThreeStar(todayOneToThreeStar);
         dm.setDaySatisfaction(todaySatisfaction);
-        dm.setXunSatisfaction(theTenDaySatisfaction);
+        dm.setXunSatisfaction(xunSatisfaction);
         dm.setMonthSatisfaction(monthSatisfaction);
         if (todayGoodNum == 0) {//无好评
             dm.setRedList("----无好评----");
@@ -6495,8 +6467,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         dayAppraiseMessageService.insert(dm);
-        JdbcSmsUtils.saveDayAppraise(dm);
-        return map;
+        //JdbcSmsUtils.saveDayAppraise(dm);
+        return null;
 
     }
 
