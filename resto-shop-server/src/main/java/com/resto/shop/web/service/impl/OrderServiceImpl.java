@@ -666,7 +666,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (customer != null) {
             ShopDetail detail = shopDetailService.selectById(order.getShopDetailId());
-            if (order.getWaitMoney().doubleValue() > 0 || (order.getWaitMoney() != null && !"".equals(order.getWaitMoney()))) {
+            if (order.getWaitMoney() != null && !"".equals(order.getWaitMoney())) {
                 OrderPaymentItem item = new OrderPaymentItem();
                 item.setId(ApplicationUtils.randomUUID());
                 item.setOrderId(orderId);
