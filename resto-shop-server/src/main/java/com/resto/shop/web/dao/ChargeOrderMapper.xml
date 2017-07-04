@@ -442,7 +442,7 @@ AND u.id =#{customerId}
     </select>
 
     <select id="selectMonthDto" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time
+        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time, customer_id
         from tb_charge_order
         where order_state = 1
         <if test="shopId != null">
