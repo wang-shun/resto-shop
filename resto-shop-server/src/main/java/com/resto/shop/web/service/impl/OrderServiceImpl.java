@@ -38,7 +38,6 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -535,33 +534,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Integer[] mealItemIds = item.getMealItems();
                     List<MealAttr> mealAttrs = mealAttrMapper.selectList(item.getArticleId());
                     boolean checkMeal = true;
-                    for(MealAttr mealAttr : mealAttrs){
-                        if(mealAttr.getChoiceType() == 0){
+                    for (MealAttr mealAttr : mealAttrs) {
+                        if (mealAttr.getChoiceType() == 0) {
                             //必选
                             List<MealItem> mealItems = mealItemService.selectByAttrId(mealAttr.getId());
                             //找到这个属性下所有的菜品
                             int count = 0;
-                            for(MealItem mealItem : mealItems){
-                                Integer redisCount = (Integer) RedisUtil.get(mealItem.getArticleId()+Common.KUCUN);
-                                if(redisCount == null){
+                            for (MealItem mealItem : mealItems) {
+                                Integer redisCount = (Integer) RedisUtil.get(mealItem.getArticleId() + Common.KUCUN);
+                                if (redisCount == null) {
                                     Article article = articleService.selectById(mealItem.getArticleId());
                                     redisCount = article.getCurrentWorkingStock();
                                 }
-                                if(redisCount > 0){
+                                if (redisCount > 0) {
                                     count++;
                                 }
                             }
-                            if(count < mealAttr.getChoiceCount()){
+                            if (count < mealAttr.getChoiceCount()) {
                                 checkMeal = false;
                             }
                         }
                     }
-                    if(!checkMeal){
+                    if (!checkMeal) {
                         jsonResult.setSuccess(false);
-                        jsonResult.setMessage("万分抱歉,您购买的套餐"+item.getName()+"已售罄,请重新下单");
+                        jsonResult.setMessage("万分抱歉,您购买的套餐" + item.getName() + "已售罄,请重新下单");
                         articleService.setEmpty(item.getArticleId());
-                        if(customer != null){
-                            shopCartService.deleteCustomerArticle(customer.getId(),item.getArticleId());
+                        if (customer != null) {
+                            shopCartService.deleteCustomerArticle(customer.getId(), item.getArticleId());
                         }
                         return jsonResult;
                     }
@@ -1633,12 +1632,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                }
 //                break;
             case ShopMode.BOSS_ORDER:
-                if(order.getPayType() == PayType.PAY){
+                if (order.getPayType() == PayType.PAY) {
                     if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
                         log.error("立即下单失败: " + order.getId());
                         throw new AppException(AppException.ORDER_STATE_ERR);
                     }
-                }else if (order.getPayType() == PayType.NOPAY){
+                } else if (order.getPayType() == PayType.NOPAY) {
                     if (order.getOrderState() != OrderState.SUBMIT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
                         log.error("立即下单失败: " + order.getId());
                         throw new AppException(AppException.ORDER_STATE_ERR);
@@ -1915,13 +1914,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 //如果没有 则新建
                                 kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
                             }
-                            if(shopDetail.getSplitKitchen() == Common.YES){
+                            if (shopDetail.getSplitKitchen() == Common.YES) {
                                 int count = item.getCount();
-                                for(int i = 0;i < count;i++){
+                                for (int i = 0; i < count; i++) {
                                     item.setCount(1);
                                     kitchenArticleMap.get(kitchenId).add(item);
                                 }
-                            }else{
+                            } else {
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
 
@@ -2292,7 +2291,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (article.getType() == OrderItemType.SETMEALS
-                   && orderItem.getParentId() != null && orderItem.getParentId().equals(article.getId())) {
+                    && orderItem.getParentId() != null && orderItem.getParentId().equals(article.getId())) {
                 i++;
             } else if (article.getType() == OrderItemType.MEALS_CHILDREN
                     && article.getParentId().equals(orderItem.getParentId())) {
@@ -3548,6 +3547,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectErrorOrderList(currentShopId, begin, end);
     }
 
+    @Override
+    public List<Order> selectErrorOrder(Date date) {
+        Date begin = DateUtil.getDateBegin(date);
+        Date end = DateUtil.getDateEnd(date);
+        return orderMapper.selectErrorOrder(begin, end);
+    }
 
     @Override
     public List<Order> getOrderNoPayList(String currentShopId, Date date) {
@@ -4852,7 +4857,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         articleBackPay.put("SUBTOTAL", articlePay == null ? 0 : articlePay.abs());
         articleBackPay.put("PAYMENT_MODE", "退菜返还红包");
         discountItems.add(articleBackPay);
-        if (originalMoney.compareTo(orderMoney) != 0 && shopDetail.getTemplateType().equals(Common.YES)){
+        if (originalMoney.compareTo(orderMoney) != 0 && shopDetail.getTemplateType().equals(Common.YES)) {
             Map<String, Object> discountMap = new HashMap<>();
             discountAmount = discountAmount.add(originalMoney.subtract(orderMoney));
             discountMap.put("SUBTOTAL", originalMoney.subtract(orderMoney));
@@ -5063,7 +5068,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     saledProducts.add(itemMap);
                     saledProducts.addAll(familyArticleMaps);
                 }
-            }else{
+            } else {
                 for (OrderItem orderItem : saledOrderItems) {
                     saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getType().equals(OrderItemType.SETMEALS) ? 0 : orderItem.getCount()));
                     Map<String, Object> itemMap = new HashMap<>();
@@ -5083,7 +5088,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 itemMap.put("SUBTOTAL", orderItem.getRefundCount());
                 canceledProducts.add(itemMap);
             }
-            if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)){
+            if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<>();
                 if (shopDetail.getTemplateType().equals(Common.YES)) {
                     String other = "其他销量";
@@ -7006,7 +7011,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
-            if(count > orderItem.getCount()){
+            if (count > orderItem.getCount()) {
                 result.setSuccess(false);
                 result.setMessage("餐品修改数量有误");
                 return result;
@@ -7274,7 +7279,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
 
         //如果退菜订单是  后付情况下加菜后统一支付  则支付项是在主订单下    修改退菜金额改变的逻辑
-        if(o.getParentOrderId() != null && o.getPayType() == PayType.NOPAY){
+        if (o.getParentOrderId() != null && o.getPayType() == PayType.NOPAY) {
             payItemsList = orderPaymentItemService.selectByOrderId(o.getParentOrderId());
         }
 
@@ -7721,13 +7726,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             } else { //支付完成
                 List<OrderPaymentItem> items = orderPaymentItemService.selectByOrderId(order.getId());
                 BigDecimal sum = new BigDecimal(0);
-                for(OrderPaymentItem orderPaymentItem : items){
+                for (OrderPaymentItem orderPaymentItem : items) {
                     sum = sum.add(orderPaymentItem.getPayValue());
                 }
-                if(order.getAmountWithChildren().doubleValue() > 0 && sum.doubleValue() < order.getAmountWithChildren().doubleValue()){
+                if (order.getAmountWithChildren().doubleValue() > 0 && sum.doubleValue() < order.getAmountWithChildren().doubleValue()) {
                     throw new RuntimeException("支付异常,支付金额小于订单金额");
                 }
-                if(order.getAmountWithChildren().doubleValue() <= 0 && sum.doubleValue() < order.getOrderMoney().doubleValue()){
+                if (order.getAmountWithChildren().doubleValue() <= 0 && sum.doubleValue() < order.getOrderMoney().doubleValue()) {
                     throw new RuntimeException("支付异常,支付金额小于订单金额");
                 }
                 if (order.getOrderState() < OrderState.PAYMENT) {
@@ -8609,6 +8614,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         return items;
+    }
+
+    @Override
+    public void fixErrorOrder() {
+        orderMapper.fixAllowContinueOrder(new Date());
+        List<Order> orders = orderMapper.getAllowAppraise();
+        for(Order order : orders){
+            confirmOrder(order);
+        }
     }
 
     @Override
