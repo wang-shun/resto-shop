@@ -4,14 +4,14 @@
   <resultMap id="BaseResultMap" type="com.resto.shop.web.model.RecommendCategoryArticle" >
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="article_name" property="articleName" jdbcType="VARCHAR" />
-    <result column="sort" property="sort" jdbcType="INTEGER" />
-    <result column="recommend_category _id" property="recommendCategoryId" jdbcType="VARCHAR" />
-    <result column="article _id" property="articleId" jdbcType="VARCHAR" />
+    <result column="recommend_sort" property="recommendSort" jdbcType="INTEGER" />
+    <result column="recommend_category_id" property="recommendCategoryId" jdbcType="VARCHAR" />
+    <result column="article_id" property="articleId" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, article_name, sort, "recommend_category _id", "article _id", create_time, update_time
+    id, article_name, recommend_sort, "recommend_category_id", "article_id", create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -28,11 +28,15 @@
     delete from tb_recommend_category_article
     where id = #{id,jdbcType=VARCHAR}
   </delete>
+  <delete id="deleteRecommendCategoryId" parameterType="java.lang.String" >
+    delete from tb_recommend_category_article
+    where recommend_category_id = #{recommendCategoryId,jdbcType=VARCHAR}
+  </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.RecommendCategoryArticle" >
-    insert into tb_recommend_category_article (id, article_name, sort, 
+    insert into tb_recommend_category_article (id, article_name, recommend_sort,
       "recommend_category _id", "article _id", create_time, 
       update_time)
-    values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{recommendSort,jdbcType=INTEGER},
       #{recommendCategoryId,jdbcType=VARCHAR}, #{articleId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -45,14 +49,14 @@
       <if test="articleName != null" >
         article_name,
       </if>
-      <if test="sort != null" >
-        sort,
+      <if test="recommendSort != null" >
+        recommend_sort,
       </if>
       <if test="recommendCategoryId != null" >
-        "recommend_category _id",
+        recommend_category_id,
       </if>
       <if test="articleId != null" >
-        "article _id",
+        article_id,
       </if>
       <if test="createTime != null" >
         create_time,
@@ -68,8 +72,8 @@
       <if test="articleName != null" >
         #{articleName,jdbcType=VARCHAR},
       </if>
-      <if test="sort != null" >
-        #{sort,jdbcType=INTEGER},
+      <if test="recommendSort != null" >
+        #{recommendSort,jdbcType=INTEGER},
       </if>
       <if test="recommendCategoryId != null" >
         #{recommendCategoryId,jdbcType=VARCHAR},
@@ -91,8 +95,8 @@
       <if test="articleName != null" >
         article_name = #{articleName,jdbcType=VARCHAR},
       </if>
-      <if test="sort != null" >
-        sort = #{sort,jdbcType=INTEGER},
+      <if test="recommendSort != null" >
+        recommend_sort = #{recommendSort,jdbcType=INTEGER},
       </if>
       <if test="recommendCategoryId != null" >
         "recommend_category _id" = #{recommendCategoryId,jdbcType=VARCHAR},
@@ -112,7 +116,7 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.RecommendCategoryArticle" >
     update tb_recommend_category_article
     set article_name = #{articleName,jdbcType=VARCHAR},
-      sort = #{sort,jdbcType=INTEGER},
+      recommend_sort = #{recommendSort,jdbcType=INTEGER},
       "recommend_category _id" = #{recommendCategoryId,jdbcType=VARCHAR},
       "article _id" = #{articleId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},

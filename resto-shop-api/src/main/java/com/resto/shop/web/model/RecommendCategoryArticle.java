@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class RecommendCategoryArticle {
@@ -7,7 +8,7 @@ public class RecommendCategoryArticle {
 
     private String articleName;
 
-    private Integer sort;
+    private Integer recommendSort;
 
     private String recommendCategoryId;
 
@@ -33,12 +34,12 @@ public class RecommendCategoryArticle {
         this.articleName = articleName == null ? null : articleName.trim();
     }
 
-    public Integer getSort() {
-        return sort;
+    public Integer getRecommendSort() {
+        return recommendSort;
     }
 
-    public void setSort(Integer sort) {
-        this.sort = sort;
+    public void setRecommendSort(Integer recommendSort) {
+        this.recommendSort = recommendSort;
     }
 
     public String getRecommendCategoryId() {

@@ -3,6 +3,9 @@ package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.RecommendCategory;
+import com.resto.shop.web.model.RecommendCategoryArticle;
+
+import java.util.List;
 
 public interface RecommendCategoryMapper extends GenericDao<RecommendCategory,String> {
 
@@ -17,4 +20,6 @@ public interface RecommendCategoryMapper extends GenericDao<RecommendCategory,St
     int updateByPrimaryKeySelective(RecommendCategory record);
 
     int updateByPrimaryKey(RecommendCategory record);
+
+    List<RecommendCategory> getRecommendCategoryList(String shopId);
 }

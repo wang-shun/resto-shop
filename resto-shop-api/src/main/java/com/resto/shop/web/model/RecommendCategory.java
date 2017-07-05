@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class RecommendCategory {
     private String id;
@@ -18,6 +19,8 @@ public class RecommendCategory {
     private Date createTime;
 
     private Date updateTime;
+
+    private List<RecommendCategoryArticle> articles;
 
     public String getId() {
         return id;
@@ -81,5 +84,13 @@ public class RecommendCategory {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public List<RecommendCategoryArticle> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<RecommendCategoryArticle> articles) {
+        this.articles = articles;
     }
 }
