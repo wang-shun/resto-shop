@@ -1,15 +1,21 @@
 package com.resto.shop.web.util;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.NumberUtil;
+import com.resto.brand.web.dto.ArticleTopDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.DayAppraiseMessageWithBLOBs;
 import com.resto.shop.web.model.DayDataMessage;
+import javafx.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Date;
 
 /**
  * Created by yz on 2017-06-12.
@@ -98,9 +104,20 @@ public class JdbcSmsUtils {
      * @return
      * 插入日结短信数据
      */
-    public  static  void saveDayDataMessage(DayDataMessage dayDataMessage) {
+    public  static  void saveDayDataMessage(DayDataMessage dayDataMessage,String shopId) {
         //初始化连接
         getConnection();
+        //删除今日数据
+        String deleteSql = "delete from tb_day_data_message where shop_id = ? and date = ?";
+        List<Object> deleteParams = new ArrayList<>();
+        deleteParams.add(shopId);
+        deleteParams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        try{
+            updateByPreparedStatement(deleteSql,deleteParams);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
         String sql = "INSERT INTO tb_day_data_message(id,shop_id,type,shop_name,week_day,date,times,wether,temperature,order_number,order_sum,customer_order_number,customer_order_sum,customer_order_ratio,back_customer_order_ratio,new_customer_order_ratio,new_cuostomer_order_num,new_customer_order_sum,new_normal_customer_order_num,new_normal_customer_order_sum,new_share_customer_order_num,new_share_customer_order_sum,back_customer_order_num,back_customer_order_sum,back_two_customer_order_num,back_two_customer_order_sum,back_two_more_customer_order_num,back_two_more_customer_order_sum,discount_total,red_pack,coupon,charge_reward,discount_ratio,takeaway_total,bussiness_total,month_total)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         List<Object> params = new ArrayList<>();
         params.add(ApplicationUtils.randomUUID());//id
@@ -152,77 +169,187 @@ public class JdbcSmsUtils {
      * 存今日评论数据
      * @param a
      */
-    public static void saveTodayAppraise(Appraise a,String brandId) {
+    public static void saveTodayAppraise(Appraise a,String brandId,String shopId) {
         //初始化连接
+        log.info("开始存当日评论数据---");
         getConnection();
+        //首先删除今日店铺的评论数据(防止多次结店)
+        String deleteSql = "DELETE FROM tb_sms_appraise WHERE shop_detail_id = ? and create_time > ? and create_time<?";
+        List<Object> dparams = new ArrayList<>();
+        dparams.add(shopId);
+        dparams.add(DateUtil.getDateBegin(new Date()));
+        dparams.add(DateUtil.getDateEnd(new Date()));
+        try {
+            updateByPreparedStatement(deleteSql,dparams);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
         String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name) values (?,?,?,?,?,?,?,?,?,?,?,?)";
         List<Object> params = new ArrayList<>();
         params.add(ApplicationUtils.randomUUID());
         params.add(a.getPictureUrl());
         params.add(a.getLevel());
         params.add(a.getCreateTime());
-        params.add(a.getContent());
+        params.add(EmojiFilter.filterEmoji(a.getContent()));
         params.add(a.getStatus());
         params.add(a.getType());
         params.add(a.getFeedback());
         params.add(a.getShopDetailId());
         params.add(brandId);
+        if(a.getHeadPhoto()==null){
+            a.setHeadPhoto("");
+        }
         params.add(a.getHeadPhoto());
-        params.add(a.getNickName());
+        if(a.getNickName()==null){
+            a.setNickName("");
+        }
+        params.add(EmojiFilter.filterEmoji(a.getNickName()));
         try{
-
           updateByPreparedStatement(sql,params);
 
         }catch (SQLException e){
             e.printStackTrace();
         }
+        log.info("存评论数据成功");
         close();
     }
 
+    public static void saveStations(String todaySatisfaction, String xunSatisfaction, String monthSatisfaction,String brandId,String shopId) {
+
+        //初始化连接
+        getConnection();
+
+        //先删除今日的数据
+        String deleteSql = "DELETE from tb_statisfaction where shop_id = ? and date = ?";
+        List<Object> dParams = new ArrayList<>();
+        dParams.add(shopId);
+        dParams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        try {
+            updateByPreparedStatement(deleteSql,dParams);
+            log.info("删除今日满意度成功------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //新增数据
+        String sql = "INSERT into tb_statisfaction (id ,shop_id,brand_id ,date ,today_stations ,xun_stations ,month_stations) values (?,?,?,?,?,?,?)";
+        List<Object> params = new ArrayList<>();
+        params.add(ApplicationUtils.randomUUID());
+        params.add(shopId);
+        params.add(brandId);
+        params.add(new Date());
+        params.add(todaySatisfaction+"%");
+        params.add(xunSatisfaction+"%");
+        params.add(monthSatisfaction+"%");
+
+        try {
+            updateByPreparedStatement(sql,params);
+            log.info("存满意度数据。。。");
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        close();
+
+    }
 
     /**
-     * 日结分数短信存储
-     * @param
+     *存goodTop 10
+     * @param articleTopDto
+     * @param b
+     * @param s
+     * @param type
+     * @param sum
+     * @param sort
      */
-//    public  static void  saveDayAppraise(DayAppraiseMessageWithBLOBs ds){
-//        init(ds);
-//        //初始化连接
-//        getConnection();
-//        String sql = "insert into tb_day_appraise_message (id,shop_id,shop_name, date, week_day, wether, temperature, type, five_star, four_star, one_three_star, day_satisfaction, xun_satisfaction, month_satisfaction, red_list, bad_list) values (?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?)";
-//        List<Object> params = new ArrayList<>();
-//        params.add(ApplicationUtils.randomUUID());
-//        params.add(ds.getShopId());
-//        params.add(ds.getShopName());
-//        params.add(ds.getDate());
-//        params.add(ds.getWeekDay());
-//        params.add(ds.getWether());
-//        params.add(ds.getTemperature());
-//        params.add(ds.getType());
-//        params.add(ds.getFiveStar());
-//        params.add(ds.getFourStar());
-//        params.add(ds.getOneThreeStar());
-//        params.add(ds.getDaySatisfaction());
-//        params.add(ds.getXunSatisfaction());
-//        params.add(ds.getMonthSatisfaction());
-//        params.add(ds.getRedList());
-//        params.add(ds.getBadList());
-//        try {
-//            updateByPreparedStatement(sql,params);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        close();//释放连接
-//    }
-//
-//    private static void init(DayAppraiseMessageWithBLOBs ds) {
-//        if(ds.getDaySatisfaction()==null){
-//            ds.setDaySatisfaction("无");
-//        }
-//        if(ds.getXunSatisfaction()==null){
-//            ds.setXunSatisfaction("无");
-//        }
-//
-//    }
+    public static void saveGoodTop(ArticleTopDto articleTopDto, Brand b, ShopDetail s ,int type,int sum,int sort) {
+        //初始化连接
+        getConnection();
+        //删除数据(防止多次结店数据多)
+        String dsql = "delete from tb_good_top where shop_id = ? and date = ? and type = ?";
+        List<Object> dparams = new ArrayList<>();
+        dparams.add(s.getId());
+        dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        dparams.add(type);
+        try {
+            updateByPreparedStatement(dsql,dparams);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        //新增数据
+        String sql = "insert into tb_good_top (id ,name ,precent, sort,shop_id,brand_id,shop_name,brand_name,date,type)values(?,?,?,?,?,?,?,?,?,?)";
+        List<Object> params = new ArrayList<>();
+        params.add(ApplicationUtils.randomUUID());
+        params.add(articleTopDto.getName());
+        params.add(NumberUtil.getFormat(articleTopDto.getNum(),sum));
+        params.add(sort);
+        params.add(s.getId());
+        params.add(b.getId());
+        params.add(s.getName());
+        params.add(b.getBrandName());
+        params.add(new Date());
+        params.add(type);
+        try {
+            updateByPreparedStatement(sql,params);
+        }catch (SQLException e){
+
+            e.printStackTrace();
+        }
+        close();
+
+    }
+
+    /**
+     * 存badTop10
+     * @param articleTopDto
+     * @param b
+     * @param s
+     * @param type
+     * @param sum
+     * @param sort
+     */
+    public static void saveBadTop(ArticleTopDto articleTopDto, Brand b, ShopDetail s, int type, int sum, int sort) {
+
+        //初始化连接
+        getConnection();
+        //删除数据(防止多次结店数据多)
+        String dsql = "delete from tb_bad_top where shop_id = ? and date = ? and type = ?";
+        List<Object> dparams = new ArrayList<>();
+        dparams.add(s.getId());
+        dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        dparams.add(type);
+        try {
+            updateByPreparedStatement(dsql,dparams);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        //新增数据
+        String sql = "insert into tb_bad_top (id ,name ,precent, sort,shop_id,brand_id,shop_name,brand_name,date,type)values(?,?,?,?,?,?,?,?,?,?)";
+        List<Object> params = new ArrayList<>();
+        params.add(ApplicationUtils.randomUUID());
+        params.add(articleTopDto.getName());
+        params.add(NumberUtil.getFormat(articleTopDto.getNum(),sum));
+        params.add(sort);
+        params.add(s.getId());
+        params.add(b.getId());
+        params.add(s.getName());
+        params.add(b.getBrandName());
+        params.add(new Date());
+        params.add(type);
+        try {
+            updateByPreparedStatement(sql,params);
+        }catch (SQLException e){
+
+            e.printStackTrace();
+        }
+        close();
+
+
+    }
+
+
 
 
 
@@ -230,8 +357,24 @@ public class JdbcSmsUtils {
 
 
     public static void main(String[] args) throws SQLException {
-        saveDayDataMessage(null);
+        //初始化连接
+        getConnection();
+
+        //先删除今日的数据
+        String deleteSql = "DELETE from tb_statisfaction where shop_id = ? and date = ?";
+        List<Object> dParams = new ArrayList<>();
+        dParams.add("123456");
+        dParams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+        try {
+            updateByPreparedStatement(deleteSql,dParams);
+            log.info("删除今日满意度成功------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        close();
+
     }
+
 
 
 }

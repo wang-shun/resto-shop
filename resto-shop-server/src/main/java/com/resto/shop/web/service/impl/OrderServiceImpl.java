@@ -5539,13 +5539,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //短信第一版用来发日结短信
         Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
         //第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
-        Map<String,Object> dayMap = querryDateData(shopDetail,offLineOrder,wether,brand);
+        insertDateData(shopDetail,offLineOrder,wether,brand);
         //3判断是否需要发送旬短信
         int temp = DateUtil.getEarlyMidLate();
         switch (temp){
             default:
                 //3发短信推送/微信推送
-                pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+                //pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
             case  1:
                 //第一版旬结短信
                 Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
@@ -5975,7 +5975,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return map;
     }
 
-    private Map<String, Object> querryDateData(ShopDetail shopDetail, OffLineOrder offLineOrder, Wether wether,Brand brand) {
+    private void insertDateData(ShopDetail shopDetail, OffLineOrder offLineOrder, Wether wether,Brand brand) {
         // 查询该店铺是否结过店
         OffLineOrder offLineOrder1 = offLineOrderMapper.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
         if (null != offLineOrder1) {
@@ -6286,9 +6286,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //查本日
         List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
         //存评论数据
-        if(todayAppraises.isEmpty()){
+        if(!todayAppraises.isEmpty()){
             for(Appraise a:todayAppraises){
-                JdbcSmsUtils.saveTodayAppraise(a,brand.getId());
+                JdbcSmsUtils.saveTodayAppraise(a,brand.getId(),shopDetail.getId());
             }
 
         }
@@ -6363,8 +6363,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         }
 
+        //存满意度
+        JdbcSmsUtils.saveStations(todaySatisfaction,xunSatisfaction,monthSatisfaction,brand.getId(),shopDetail.getId());
 
-    //查询菜品top10
+
+        //查询菜品今日top10
         //1.查询好评的总数(本日)
         int  todayGoodNum = 0;
         todayGoodNum = articleTopService.selectSumGoodByTime(todayBegin, todayEnd, shopDetail.getId());
@@ -6378,97 +6381,82 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //查询差评top10
         List<ArticleTopDto> todayBadList = articleTopService.selectListByTimeAndBadType(todayBegin, todayEnd, shopDetail.getId());
 
-        //存储结店数据
-        int times=1;//默认是今天第一次结店  次数存redis中 之后++
-        DayDataMessage ds = new DayDataMessage();
-        ds.setId(ApplicationUtils.randomUUID());
-        ds.setShopId(shopDetail.getId());
-        ds.setType(DayMessageType.DAY_TYPE);//日结
-        ds.setShopName(shopDetail.getName());
-        ds.setWeekDay(wether.getWeekady());
-        ds.setDate(new Date());
-        ds.setTimes(times);//当日结店次数
-        ds.setWether(wether.getDayWeather());
-        ds.setTemperature(wether.getDayTemperature());
-        ds.setOrderNumber(todayEnterCount + todayRestoCount.size());//到店总笔数
-        ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));//到店消费总额
-        ds.setCustomerOrderNumber(todayRestoCount.size());
-        ds.setCustomerOrderSum(todayRestoTotal);
-        ds.setCustomerOrderRatio(todayCustomerRatio+"%");
-        ds.setNewCustomerOrderRatio(todayNewCustomerRatio+"%");
-        ds.setBackCustomerOrderRatio(todayBackCustomerRatio+"%");
-        ds.setNewCuostomerOrderNum(todayNewCustomerOrderNum);//新用户订单数
-        ds.setNewCustomerOrderSum(todayNewCustomerOrderTotal);
-        ds.setNewNormalCustomerOrderNum(todayNewNormalCustomerOrderNum);
-        ds.setNewNormalCustomerOrderSum(todayNewNormalCustomerOrderTotal);
-        ds.setNewShareCustomerOrderNum(todayNewShareCustomerOrderNum);
-        ds.setNewShareCustomerOrderSum(todayNewShareCustomerOrderTotal);
-        ds.setBackCustomerOrderNum(todayBackCustomerOrderNum);
-        ds.setBackCustomerOrderSum(todayBackCustomerOrderTotal);
-        ds.setBackTwoCustomerOrderNum(todayBackTwoCustomerOrderNum);
-        ds.setBackTwoCustomerOrderSum(todayBackTwoCustomerOrderTotal);
-        ds.setBackTwoMoreCustomerOrderNum(todayBackTwoMoreCustomerOderNum);
-        ds.setBackTwoMoreCustomerOrderSum(todayBackTwoMoreCustomerOrderTotal);
-        ds.setDiscountTotal(discountTotal);
-        ds.setRedPack(redPackTotal);
-        ds.setCoupon(couponTotal);
-        ds.setChargeReward(chargeReturn);
-        ds.setDiscountRatio(discountRatio);
-        ds.setTakeawayTotal(todayOrderBooks);
-        ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
-        ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
-        dayDataMessageService.insert(ds);
-        JdbcSmsUtils.saveDayDataMessage(ds);
-        //存评论数据
-        DayAppraiseMessageWithBLOBs dm = new DayAppraiseMessageWithBLOBs();
-        dm.setId(ApplicationUtils.randomUUID());
-        dm.setShopId(shopDetail.getId());
-        dm.setShopName(shopDetail.getName());
-        dm.setDate(new Date());
-        dm.setState(true);
-        dm.setWether(wether.getDayWeather());
-        dm.setWeekDay(wether.getWeekady());
-        dm.setTemperature(wether.getDayTemperature());
-        dm.setType(DayMessageType.DAY_TYPE);
-        dm.setFiveStar(todayFiveStar);
-        dm.setFourStar(todayFourStar);
-        dm.setOneThreeStar(todayOneToThreeStar);
-        dm.setDaySatisfaction(todaySatisfaction);
-        dm.setXunSatisfaction(xunSatisfaction);
-        dm.setMonthSatisfaction(monthSatisfaction);
-        if (todayGoodNum == 0) {//无好评
-            dm.setRedList("----无好评----");
-        } else {
-            if (!todayGoodList.isEmpty()) {
-                com.alibaba.fastjson.JSONObject redJson = new com.alibaba.fastjson.JSONObject();
-                for (int i = 0; i < todayGoodList.size(); i++) {
-                    //1、27% 剁椒鱼头
-                    // sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName())
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName());
-                    redJson.put("top"+(i+1),sb.toString());
-                }
-                dm.setRedList(com.alibaba.fastjson.JSONObject.toJSONString(redJson));
+        //存今日goodTop10
+        if(todayGoodList!=null&&!todayGoodList.isEmpty()){
+            for(int i=0;i<todayGoodList.size();i++){
+                JdbcSmsUtils.saveGoodTop(todayGoodList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayGoodNum,(i+1));
             }
+
         }
-        if (todayBadNum == 0) {//无差评
-            dm.setBadList("------无差评-----");
-        } else {
-            if (!todayBadList.isEmpty()) {
-                com.alibaba.fastjson.JSONObject bakcJson = new com.alibaba.fastjson.JSONObject();
-                for (int i = 0; i < todayBadList.size(); i++) {
-                    //1、27% 剁椒鱼头
-                    //sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName()).append("\n");
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName());
-                    bakcJson.put("top"+(i+1),sb.toString());
-                }
-                dm.setBadList(com.alibaba.fastjson.JSONObject.toJSONString(bakcJson));
+
+        //存今日BadTop10
+        if(todayBadList!=null&&!todayBadList.isEmpty()){
+            for(int i=0;i<todayBadList.size();i++){
+                JdbcSmsUtils.saveBadTop(todayBadList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayBadNum,(i+1));
             }
+
         }
-        dayAppraiseMessageService.insert(dm);
-        //JdbcSmsUtils.saveDayAppraise(dm);
-        return null;
+
+        //查询菜品本旬top10
+        //1.查询好评的总数(本日)
+        int  xunGoodNum = 0;
+        xunGoodNum = articleTopService.selectSumGoodByTime(xunBegin, xunEnd, shopDetail.getId());
+        //查询差评总数
+        int xunBadNum = 0;
+        xunBadNum = articleTopService.selectSumBadByTime(xunBegin, xunEnd, shopDetail.getId());
+
+        //查询好评top10
+        List<ArticleTopDto> xunGoodList = articleTopService.selectListByTimeAndGoodType(xunBegin, xunEnd, shopDetail.getId());
+
+        //查询差评top10
+        List<ArticleTopDto> xunBadList = articleTopService.selectListByTimeAndBadType(xunBegin, xunEnd, shopDetail.getId());
+
+        //存本旬goodTop10
+        if(xunGoodList!=null&&!xunGoodList.isEmpty()){
+            for(int i=0;i<xunGoodList.size();i++){
+                JdbcSmsUtils.saveGoodTop(xunGoodList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunGoodNum,(i+1));
+            }
+
+        }
+
+        //存本旬BadTop10
+        if(xunBadList!=null&&!xunBadList.isEmpty()){
+            for(int i=0;i<xunBadList.size();i++){
+                JdbcSmsUtils.saveBadTop(xunBadList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunBadNum,(i+1));
+            }
+
+        }
+
+
+        //查询菜品本月top10
+        //1.查询好评的总数(本月)
+        int  monthGoodNum = 0;
+        monthGoodNum = articleTopService.selectSumGoodByTime(monthBegin, monthEnd, shopDetail.getId());
+        //查询差评总数
+        int monthBadNum = 0;
+        monthBadNum = articleTopService.selectSumBadByTime(monthBegin, monthEnd, shopDetail.getId());
+
+        //查询好评top10
+        List<ArticleTopDto> monthGoodList = articleTopService.selectListByTimeAndGoodType(monthBegin, monthEnd, shopDetail.getId());
+
+        //查询差评top10
+        List<ArticleTopDto> monthBadList = articleTopService.selectListByTimeAndBadType(monthBegin, monthEnd, shopDetail.getId());
+
+        //存本月goodTop10
+        if(monthGoodList!=null&&!monthGoodList.isEmpty()){
+            for(int i=0;i<monthGoodList.size();i++){
+                JdbcSmsUtils.saveGoodTop(monthGoodList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthGoodNum,(i+1));
+            }
+
+        }
+
+        //存本月BadTop10
+        if(monthBadList!=null&&!monthBadList.isEmpty()){
+            for(int i=0;i<monthBadList.size();i++){
+                JdbcSmsUtils.saveBadTop(monthBadList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthBadNum,(i+1));
+            }
+
+        }
 
     }
 

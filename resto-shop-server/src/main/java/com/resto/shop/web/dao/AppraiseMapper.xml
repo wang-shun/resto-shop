@@ -140,10 +140,10 @@
      SELECT
      a.id,
      a.picture_url,
-     a.LEVEL,
+     a.level,
      a.create_time,
      a.content,
-     a.STATUS,
+     a.status,
      a.type,
      a.feedback,
      a.red_money,
@@ -156,7 +156,7 @@
      FROM
      tb_appraise a
      LEFT JOIN tb_customer c
-     on a.customer_id = c.id;
+     on a.customer_id = c.id
      WHERE
      a.shop_detail_id =#{shopId} AND
      <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
