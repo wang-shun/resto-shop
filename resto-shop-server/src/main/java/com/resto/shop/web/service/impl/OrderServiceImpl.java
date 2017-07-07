@@ -7980,7 +7980,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 根据id查询订单
         List<Map<String, Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
-        Integer oldDistributionModeId = order.getDistributionModeId();
+//        Integer oldDistributionModeId = order.getDistributionModeId();
         order.setBaseCustomerCount(0);
         order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
@@ -8034,9 +8034,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 printTask.add(ticket);
             }
         }
-        order = selectById(refundOrder.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+//        order = selectById(refundOrder.getId());
+//        order.setDistributionModeId(oldDistributionModeId);
+//        orderMapper.updateByPrimaryKeySelective(order);
         return printTask;
     }
 
