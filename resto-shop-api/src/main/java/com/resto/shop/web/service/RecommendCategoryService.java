@@ -18,6 +18,12 @@ public interface RecommendCategoryService extends GenericService<RecommendCatego
     List<RecommendCategory> selectListByShopId(String shopId);
 
     /**
+     * 根据店铺ID查询信息,并进行排序，微信端接口
+     * @return
+     */
+    List<RecommendCategory> selectListSortShopId(String shopId);
+
+    /**
      * 添加信息
      * @param recommendCategory
      */

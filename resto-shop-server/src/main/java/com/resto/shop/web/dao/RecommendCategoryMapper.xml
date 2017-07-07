@@ -41,6 +41,14 @@
     where t1.shop_detail_id = #{shopId}
     order by t1.create_time desc
   </select>
+  <select id="selectListSortShopId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_recommend_category
+    where shop_detail_id = #{shopId}
+    and state=1
+    order by sort
+  </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />

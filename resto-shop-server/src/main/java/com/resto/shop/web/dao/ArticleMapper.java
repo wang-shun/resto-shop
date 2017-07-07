@@ -27,6 +27,14 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	List<Article> selectListByShopIdAndDistributionId(String currentShopId, Integer distributionModeId);
 
+	/**
+	 * 根据店铺id，推荐类型id查询所有推荐菜品
+	 * @param currentShopId
+	 * @param recommendCcategoryId
+	 * @return
+	 */
+	List<Article> selectListByShopIdRecommendCategory(String currentShopId, String recommendCcategoryId);
+
 	List<Article> selectBySupportTimeId(@Param("times") List<Integer> supportTimes,@Param("shopId") String currentShopId);
 	
 	/**

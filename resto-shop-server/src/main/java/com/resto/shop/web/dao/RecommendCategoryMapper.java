@@ -22,4 +22,6 @@ public interface RecommendCategoryMapper extends GenericDao<RecommendCategory,St
     int updateByPrimaryKey(RecommendCategory record);
 
     List<RecommendCategory> getRecommendCategoryList(String shopId);
+
+    List<RecommendCategory> selectListSortShopId(String shopId);
 }

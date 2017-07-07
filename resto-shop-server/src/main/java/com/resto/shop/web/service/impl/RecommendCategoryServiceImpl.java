@@ -4,6 +4,8 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.dao.RecommendCategoryArticleMapper;
 import com.resto.shop.web.dao.RecommendCategoryMapper;
 import com.resto.shop.web.model.ArticleAttr;
@@ -28,6 +30,9 @@ public class RecommendCategoryServiceImpl extends GenericServiceImpl<RecommendCa
     @Resource
     private RecommendCategoryArticleMapper recommendCategoryArticleMapper;
 
+    @Resource
+    ShopDetailService shopDetailService;
+
     @Override
     public GenericDao<RecommendCategory, String> getDao() {
         return recommendCategoryMapper;
@@ -40,6 +45,19 @@ public class RecommendCategoryServiceImpl extends GenericServiceImpl<RecommendCa
     public List<RecommendCategory> selectListByShopId(String shopId) {
         List<RecommendCategory> recommendCategorys = recommendCategoryMapper.getRecommendCategoryList(shopId);
         return recommendCategorys;
+    }
+
+    /**
+     * 根据店铺ID查询信息,并进行排序
+     */
+    @Override
+    public List<RecommendCategory> selectListSortShopId(String shopId) {
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        if(shopDetail.getIsRecommendCategory()==1){
+            List<RecommendCategory> recommendCategorys = recommendCategoryMapper.selectListSortShopId(shopId);
+            return recommendCategorys;
+        }
+        return null;
     }
 
     /**
