@@ -7145,9 +7145,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("type", "UserAction");
         customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, customerMap);
-        order = selectById(order.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return result;
     }
 
@@ -8006,9 +8007,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 printTask.add(ticket);
             }
         }
-        order = selectById(refundOrder.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(refundOrder.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return printTask;
     }
 
@@ -8046,9 +8048,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
-        order = selectById(refundOrder.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(refundOrder.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return printTask;
     }
 
