@@ -7168,9 +7168,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("type", "UserAction");
         customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, customerMap);
-        order = selectById(order.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return result;
     }
 
@@ -7980,7 +7981,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         // 根据id查询订单
         List<Map<String, Object>> printTask = new ArrayList<>();
         Order order = selectById(refundOrder.getId());
-//        Integer oldDistributionModeId = order.getDistributionModeId();
+        Integer oldDistributionModeId = order.getDistributionModeId();
         order.setBaseCustomerCount(0);
         order.setRefundMoney(refundOrder.getRefundMoney());
         //如果是 未打印状态 或者  异常状态则改变 生产状态和打印时间
@@ -8034,9 +8035,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 printTask.add(ticket);
             }
         }
-//        order = selectById(refundOrder.getId());
-//        order.setDistributionModeId(oldDistributionModeId);
-//        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(refundOrder.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return printTask;
     }
 
@@ -8074,9 +8076,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
-        order = selectById(refundOrder.getId());
-        order.setDistributionModeId(oldDistributionModeId);
-        orderMapper.updateByPrimaryKeySelective(order);
+        Order newOrder = new Order();
+        newOrder.setId(refundOrder.getId());
+        newOrder.setDistributionModeId(oldDistributionModeId);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
         return printTask;
     }
 
