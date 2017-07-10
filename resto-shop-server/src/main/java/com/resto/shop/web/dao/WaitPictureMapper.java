@@ -15,4 +15,6 @@ public interface WaitPictureMapper  extends GenericDao<WaitPicture,Integer> {
     int updateByPrimaryKeySelective(WaitPicture record);
 
     int updateByPrimaryKey(WaitPicture record);
+
+    int updateStateById(WaitPicture record);
 }

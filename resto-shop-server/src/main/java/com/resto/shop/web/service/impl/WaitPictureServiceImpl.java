@@ -20,6 +20,10 @@ public class WaitPictureServiceImpl extends GenericServiceImpl<WaitPicture, Inte
     @Override
     public GenericDao<WaitPicture, Integer> getDao() {
         return waitpictureMapper;
-    } 
+    }
 
+    @Override
+    public int updateStateById(WaitPicture record) {
+        return waitpictureMapper.updateStateById(record);
+    }
 }

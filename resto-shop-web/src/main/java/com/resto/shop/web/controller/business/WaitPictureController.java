@@ -41,6 +41,8 @@ public class WaitPictureController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid WaitPicture waitpicture){
+		waitpicture.setBrandId(getCurrentBrandId());
+		waitpicture.setShopDetailId(getCurrentShopId());
 		waitpictureService.insert(waitpicture);
 		return Result.getSuccess();
 	}
@@ -55,7 +57,8 @@ public class WaitPictureController extends GenericController{
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Integer id){
-		waitpictureService.delete(id);
+		WaitPicture waitPicture = waitpictureService.selectById(id);
+		waitpictureService.updateStateById(waitPicture);
 		return Result.getSuccess();
 	}
 }
