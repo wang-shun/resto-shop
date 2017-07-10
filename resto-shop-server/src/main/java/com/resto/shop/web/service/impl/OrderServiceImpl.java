@@ -416,7 +416,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("请先支付完选择支付宝支付的订单，再进行加菜！");
                 return jsonResult;
             }
-            if(farOrder.getOrderState() == OrderState.PAYMENT && farOrder.getPayType() == PayType.NOPAY && order.getPayType() == PayType.NOPAY){
+            if((farOrder.getOrderState() == OrderState.PAYMENT ||  farOrder.getOrderState() == OrderState.CONFIRM ||
+                    farOrder.getOrderState() == OrderState.HASAPPRAISE || farOrder.getOrderState() == OrderState.SHARED)
+                    && farOrder.getPayType() == PayType.NOPAY && order.getPayType() == PayType.NOPAY){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("下单失败，订单金额变动，请重新下单！");
                 return jsonResult;
