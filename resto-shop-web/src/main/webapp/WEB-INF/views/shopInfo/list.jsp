@@ -501,6 +501,18 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label" >推荐菜品是否开启：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="isRecommendCategory"v-model="m.isRecommendCategory" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="isRecommendCategory" v-model="m.isRecommendCategory" value="0">否
+							</label>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>

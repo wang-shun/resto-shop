@@ -160,6 +160,19 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
+    public List<Article> selectListByShopIdRecommendCategory(String currentShopId, String recommendCcategoryId, String show) {
+        List<Article> articleList = articleMapper.selectListByShopIdRecommendCategory(currentShopId, recommendCcategoryId);
+        for (Article article : articleList) {
+            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
+            if (count != null) {
+                article.setCurrentWorkingStock(count);
+            }
+        }
+        getArticleDiscount(currentShopId, articleList, show);
+        return articleList;
+    }
+
+    @Override
     public List<Article> getArticleListByFamily(String shopId, String articleFamilyId, Integer currentPage, Integer showCount) {
         List<SupportTime> supportTime = supportTimeService.selectNowSopport(shopId);
         if (supportTime.isEmpty()) {

@@ -434,6 +434,12 @@ public class SpringContextConfig {
     public CustomerAddressService customerAddressService() {return  proxy.create(CustomerAddressService.class);}
 
     @Bean
+    public RecommendCategoryArticleService recommendCategoryArticleService() {return  proxy.create(RecommendCategoryArticleService.class);}
+
+    @Bean
+    public RecommendCategoryService recommendCategoryService() {return  proxy.create(RecommendCategoryService.class);}
+
+    @Bean
     public BonusSettingService bonusSettingService() {return  proxy.create(BonusSettingService.class);}
 
     @Bean
