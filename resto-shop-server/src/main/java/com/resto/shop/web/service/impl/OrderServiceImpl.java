@@ -1847,8 +1847,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                         kitchenArticleMap.get(kitchenId).add(item);
                     } else {
-                        item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
-                        orderItemService.update(item);
+//                        item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+//                        orderItemService.update(item);
                     }
 
 
@@ -1868,8 +1868,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         kitchenArticleMap.get(kitchenId).add(item);
                     }
                 } else {
-                    item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
-                    orderItemService.update(item);
+//                    item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+//                    orderItemService.update(item);
                     continue;
                 }
             } else {
@@ -1900,8 +1900,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 kitchenArticleMap.get(kitchenId).add(item);
                             }
                             if (CollectionUtils.isEmpty(kitchenList)) {
-                                item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
-                                orderItemService.update(item);
+//                                item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+//                                orderItemService.update(item);
                             }
                         }
                     } else {
@@ -1926,8 +1926,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                         }
                         if (CollectionUtils.isEmpty(kitchenList)) {
-                            item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
-                            orderItemService.update(item);
+//                            item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
+//                            orderItemService.update(item);
                         }
 
                     }
