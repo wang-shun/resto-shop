@@ -6,16 +6,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.shop.web.model.Customer;
 import org.json.JSONObject;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.BrandService;
@@ -134,7 +130,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
                 logMap.put("content",content);
 				//发短信提醒商家
 				SMSUtils.sendNoticeToBrand(brandUser.getBrandName(), remindNum, brandUser.getPhone(),logMap);
-				SMSUtils.sendNoticeToBrand(serviceName, remindNum, brandUser.getPhone(),logMap);
 			}
 		}
 		//商家给客户发短信

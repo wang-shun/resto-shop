@@ -355,14 +355,6 @@ public class OrderItem implements Serializable {
         this.discount = discount;
     }
 
-    public Integer getPeference() {
-        return peference;
-    }
-
-    public void setPeference(Integer peference) {
-        this.peference = peference;
-    }
-
     private Integer packageNumber;
 
     public Integer getPackageNumber() {
