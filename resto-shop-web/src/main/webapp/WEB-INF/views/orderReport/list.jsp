@@ -39,8 +39,7 @@
                 <div class="panel-body">
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
-                        <tr>
-                            <th>品牌</th>
+                        <tr><th>品牌</th>
                             <th>订单总额(元)</th>
                             <th>订单总数(份)</th>
                             <th>订单平均金额(元)</th>
@@ -161,9 +160,7 @@
                 });
             },
             searchInfo : function() {
-
                 var that = this;
-
                 var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
                 if(timeCha < 0){
                     toastr.clear();

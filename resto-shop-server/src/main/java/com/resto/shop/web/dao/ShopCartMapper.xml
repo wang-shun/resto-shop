@@ -143,4 +143,8 @@
       delete from tb_shop_cart where  pid = #{0}
     </delete>
 
+
+    <delete id="deleteCustomerArticle">
+        delete from tb_shop_cart where customer_id = #{customerId} and article_id = #{articleId}
+    </delete>
 </mapper>

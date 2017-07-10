@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import com.resto.brand.web.dto.*;
 import com.resto.shop.web.model.Article;
 import org.apache.ibatis.annotations.Param;
+
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
@@ -87,6 +89,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order>listHoufuFinishedOrder(@Param("shopId") String shopId,@Param("shopMode") Integer shopMode);
 
 
+
+
 	List<Order>listHoufuUnFinishedOrder(String shopId);
 
 	/**
@@ -97,6 +101,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
+	List<Order> selectErrorOrder(@Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
 
 
 	/**
@@ -467,9 +476,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
 
-    Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    List<Integer>  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
-    brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    List<brandArticleReportDto> selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -673,6 +682,15 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
+	void colseOrder(String orderId);
+
+	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+
+	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+
+	void fixAllowContinueOrder(@Param("beginDate") Date begin);
+
+	List<Order> getAllowAppraise();
 	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
     void colseOrder(String orderId);
 }

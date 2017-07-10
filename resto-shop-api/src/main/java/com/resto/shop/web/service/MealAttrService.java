@@ -1,8 +1,10 @@
 package com.resto.shop.web.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.model.MealAttr;
 
 public interface MealAttrService extends GenericService<MealAttr, Integer> {
@@ -17,4 +19,5 @@ public interface MealAttrService extends GenericService<MealAttr, Integer> {
 	List<MealAttr> selectFullByArticleId(String articleId,String show);
 
 
+	List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
 }

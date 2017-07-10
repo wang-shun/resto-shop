@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class ArticleFamily implements Serializable{
     private String id;
@@ -23,6 +24,16 @@ public class ArticleFamily implements Serializable{
     
     @NotNull(message="{就餐模式   不能为空}")
     private Integer distributionModeId;
+
+    private List<Article> articleList;
+
+    public List<Article> getArticleList() {
+        return articleList;
+    }
+
+    public void setArticleList(List<Article> articleList) {
+        this.articleList = articleList;
+    }
 
     public String getId() {
         return id;

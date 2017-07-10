@@ -1,12 +1,10 @@
 package com.resto.shop.web.producer;
 
 import java.util.*;
-
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.constant.OrderPosStatus;
 import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,6 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Order;
 import org.springframework.util.CollectionUtils;
 
@@ -83,6 +80,14 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendQueueOrder(GetNumber getNumber){
+		JSONObject obj = new JSONObject();
+		obj.put("id", getNumber.getId());
+		obj.put("shopId", getNumber.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_QUEUE_ORDER, obj.toJSONString().getBytes());
+		message.setStartDeliverTime(new Date().getTime());
+		sendMessageASync(message);
+	}
 
 	public static void sendAutoConfirmOrder(final Order order, final long delayTime) {
 		JSONObject obj = new JSONObject();
@@ -204,6 +209,7 @@ public class MQMessageProducer {
 		}
 		orderList.add(order.getId());
 		RedisUtil.set(order.getShopDetailId()+"sendMsgList",orderList);
+		log.info("test发送下单通知"+order.getId());
 		sendMessageASync(message);
 	}
 
@@ -305,6 +311,12 @@ public class MQMessageProducer {
         obj.put("serialNumber",order.getSerialNumber());
         Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_DELETE_ORDER,obj.toJSONString().getBytes());
         sendMessageASync(message);
-
     }
+
+	public static void sendPrintSuccess(String shopId) {
+		JSONObject obj  = new JSONObject();
+		obj.put("shopId",shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
 }

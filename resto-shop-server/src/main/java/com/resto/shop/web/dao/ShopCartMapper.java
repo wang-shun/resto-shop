@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.ShopCart;
+import org.apache.ibatis.annotations.Param;
 
 public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     int deleteByPrimaryKey(Integer id);
@@ -38,4 +39,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     void delMealItem(String articleId);
 
     ShopCart selectByUuId(String uuid);
+
+    void deleteCustomerArticle(@Param("customerId") String customerId,@Param("articleId") String articleId);
 }

@@ -5,8 +5,8 @@ import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
-import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
+import com.resto.shop.web.service.PosUserService;
 import com.resto.shop.web.service.ShowPhotoService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
@@ -425,6 +425,9 @@ public class SpringContextConfig {
 
     @Bean
     public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
+
+    @Bean
+    public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
 
     //天气
     @Bean

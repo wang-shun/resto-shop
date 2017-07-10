@@ -50,7 +50,9 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
 		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return chargepaymentMapper.selectShopRechargeLog(begin,end,shopId);
-	}
+	} 
+    
+    
 
     @Override
     public ChargePayment selectPayData(String shopId) {

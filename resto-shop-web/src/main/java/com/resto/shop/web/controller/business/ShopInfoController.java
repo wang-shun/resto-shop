@@ -65,7 +65,7 @@ public class ShopInfoController extends GenericController{
     @ResponseBody
     public Result modify(ShopDetail shopDetail){
         shopDetail.setId(getCurrentShopId());
-        if(shopDetail.getIsUserIdentity()!=0){
+        if(shopDetail.getIsUserIdentity()!=null && shopDetail.getIsUserIdentity()!=0){
             switch (shopDetail.getConsumeConfineUnit()){
                 case 1 :
                     shopDetail.setConsumeConfineTime(shopDetail.getConsumeConfineTime());

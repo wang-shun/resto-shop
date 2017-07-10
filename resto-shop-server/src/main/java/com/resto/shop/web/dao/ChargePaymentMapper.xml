@@ -101,7 +101,7 @@
 				AND brand_id = #{brandId}
 			) AS rechargePos,
 			SUM(charge_money) - SUM(charge_balance) AS rechargeCsNum,
-		
+
 			IF (
 				number_day_now > 0,
 				SUM(
@@ -123,7 +123,7 @@
 			 GROUP BY
 				brand_id = #{brandId}
 	</select>
-	
+
 	<!-- 得到品牌下所有店铺的充值记录 -->
 	<select id="selectShopRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
 		SELECT COUNT(1) AS shopCount,
@@ -137,7 +137,7 @@
 				WHERE
 					order_state = 1
 				AND type = 1
-				AND 
+				AND
 				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
 				AND shop_detail_id = #{shopId}
 			) AS shopWeChat,
@@ -149,7 +149,7 @@
 				WHERE
 					order_state = 1
 				AND type = 0
-				AND 
+				AND
 				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
 				AND shop_detail_id = #{shopId}
 			) AS shopPos,
@@ -163,17 +163,16 @@
 					reward_money - reward_balance
 				)
 			) AS shopGaCsNum
-			FROM 
-					tb_charge_order 
+			FROM
+					tb_charge_order
 			WHERE
 				order_state = 1
-			AND 
+			AND
 				<![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
-				AND shop_detail_id = #{shopId} 
+				AND shop_detail_id = #{shopId}
 		GROUP BY
-				shop_detail_id = #{shopId} 
+				shop_detail_id = #{shopId}
 	</select>
-
     <select id="selectPayData" parameterType="java.lang.String" resultType="com.resto.shop.web.model.ChargePayment">
         select tcp.* from tb_charge_payment tcp
         inner join tb_charge_order tco
@@ -182,4 +181,7 @@
         and shop_detail_id = #{shopId}
         LIMIT 1
     </select>
+
+
+
 </mapper>

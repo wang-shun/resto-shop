@@ -154,33 +154,6 @@
 									   v-model="m.recommendTime" required="required" min="0">
 							</div>
 						</div>
-                        <!--    Geek叫号功能    begin-->
-						<div class="form-group">
-							<label class="col-md-4 control-label">店铺标语：</label>
-							<div  class="col-md-6">
-								<input type="text" class="form-control" name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
-									   v-model="m.slogan">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-4 control-label">等位提示：</label>
-							<div  class="col-md-6 ">
-								<textarea rows="3" class="form-control" name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
-										  v-model="m.queueNotice"></textarea>
-							</div>
-						</div>
-                        <!--    Geek叫号功能    end-->
-						<div class="form-group">
-							<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
-							<div  class="col-md-6 radio-list">
-								<label class="radio-inline">
-									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是
-								</label>
-								<label class="radio-inline">
-									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否
-								</label>
-							</div>
-						</div>
 						<div  class="form-group" v-if="m.isUserIdentity==1">
 							<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">高频条件：</label>
 							<div  class="col-md-6">
@@ -437,6 +410,18 @@
                     </div>
 
 					<div class="form-group">
+						<label class="col-md-4 control-label">日结小票模板类型：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="templateType"v-model="m.templateType" value="0">经典版
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="templateType" v-model="m.templateType" value="1">升级版
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label class="col-md-4 control-label">是否开启美团外卖自动出单：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
@@ -497,7 +482,32 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">本地电视IP：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="tvIp" :value="m.tvIp" >
+						</div>
+					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">等位叫号本地电视IP：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="waitIp" :value="m.waitIp" >
+						</div>
+					</div>
+
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" >厨打是否拆分打印：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="splitKitchen"v-model="m.splitKitchen" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="splitKitchen" v-model="m.splitKitchen" value="0">否
+							</label>
+						</div>
+					</div>
 
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;

@@ -180,14 +180,14 @@ public class OrderItem implements Serializable {
     }
 
     public ArticleFamily getArticleFamily() {
-		return articleFamily;
-	}
+        return articleFamily;
+    }
 
-	public void setArticleFamily(ArticleFamily articleFamily) {
-		this.articleFamily = articleFamily;
-	}
+    public void setArticleFamily(ArticleFamily articleFamily) {
+        this.articleFamily = articleFamily;
+    }
 
-	public String getId() {
+    public String getId() {
         return id;
     }
 
@@ -283,13 +283,13 @@ public class OrderItem implements Serializable {
         this.articleId = articleId == null ? null : articleId.trim();
     }
 
-	public Integer getType() {
-		return type;
-	}
+    public Integer getType() {
+        return type;
+    }
 
-	public void setType(Integer type) {
-		this.type = type;
-	}
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
     public Integer[] getMealItems() {
         return mealItems;
@@ -300,52 +300,52 @@ public class OrderItem implements Serializable {
     }
 
     public String getParentId() {
-		return parentId;
-	}
+        return parentId;
+    }
 
-	public String getCreateTime() {
-		return DateUtil.formatDate(this.createTime, "yyyy-MM-dd HH:mm:ss");
-	}
+    public String getCreateTime() {
+        return DateUtil.formatDate(this.createTime, "yyyy-MM-dd HH:mm:ss");
+    }
 
-	public void setParentId(String parentId) {
-		this.parentId = parentId;
-	}
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public List<OrderItem> getChildren() {
-		return children;
-	}
+    public List<OrderItem> getChildren() {
+        return children;
+    }
 
-	public void setChildren(List<OrderItem> children) {
-		this.children = children;
-	}
+    public void setChildren(List<OrderItem> children) {
+        this.children = children;
+    }
 
-	public Integer getArticleSum() {
-		return articleSum;
-	}
+    public Integer getArticleSum() {
+        return articleSum;
+    }
 
-	public void setArticleSum(Integer articleSum) {
-		this.articleSum = articleSum;
-	}
+    public void setArticleSum(Integer articleSum) {
+        this.articleSum = articleSum;
+    }
 
-	public String getShopId() {
-		return shopId;
-	}
+    public String getShopId() {
+        return shopId;
+    }
 
-	public void setShopId(String shopId) {
-		this.shopId = shopId;
-	}
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
+    }
 
-	public String getTelephone() {
-		return telephone;
-	}
+    public String getTelephone() {
+        return telephone;
+    }
 
-	public void setTelephone(String telephone) {
-		this.telephone = telephone;
-	}
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
     public Integer getDiscount() {
         return discount;
@@ -353,6 +353,24 @@ public class OrderItem implements Serializable {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
+    }
+
+    public Integer getPeference() {
+        return peference;
+    }
+
+    public void setPeference(Integer peference) {
+        this.peference = peference;
+    }
+
+    private Integer packageNumber;
+
+    public Integer getPackageNumber() {
+        return packageNumber;
+    }
+
+    public void setPackageNumber(Integer packageNumber) {
+        this.packageNumber = packageNumber;
     }
 
     public Integer getPeference() {
