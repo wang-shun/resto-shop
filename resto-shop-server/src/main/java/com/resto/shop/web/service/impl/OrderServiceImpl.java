@@ -5538,14 +5538,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
         //短信第一版用来发日结短信
         Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
-        //第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
-        insertDateData(shopDetail,offLineOrder,wether,brand);
+        //3发短信推送/微信推送
+        pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
         //3判断是否需要发送旬短信
         int temp = DateUtil.getEarlyMidLate();
         switch (temp){
-            default:
-                //3发短信推送/微信推送
-                //pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
             case  1:
                 //第一版旬结短信
                 Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
@@ -5566,6 +5563,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                break;
 
         }
+
+        //第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
+        insertDateData(shopDetail,offLineOrder,wether,brand);
 
 
     }
@@ -6467,6 +6467,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String[] tels = telephones.split(",");
             for (String s : tels) {
                 String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+
+                System.err.println("短信返回内容："+smsResult);
                 //记录日志
                 LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
                 Customer c = customerService.selectByTelePhone(s);

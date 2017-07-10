@@ -266,11 +266,12 @@ public class JdbcSmsUtils {
         //初始化连接
         getConnection();
         //删除数据(防止多次结店数据多)
-        String dsql = "delete from tb_good_top where shop_id = ? and date = ? and type = ?";
+        String dsql = "delete from tb_good_top where shop_id = ? and date = ? and type = ? and sort = ?";
         List<Object> dparams = new ArrayList<>();
         dparams.add(s.getId());
         dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
         dparams.add(type);
+        dparams.add(sort);
         try {
             updateByPreparedStatement(dsql,dparams);
         }catch (SQLException e){
@@ -314,11 +315,13 @@ public class JdbcSmsUtils {
         //初始化连接
         getConnection();
         //删除数据(防止多次结店数据多)
-        String dsql = "delete from tb_bad_top where shop_id = ? and date = ? and type = ?";
+        String dsql = "delete from tb_bad_top where shop_id = ? and date = ? and type = ? and sort = ?";
         List<Object> dparams = new ArrayList<>();
         dparams.add(s.getId());
         dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
         dparams.add(type);
+        dparams.add(sort);
+
         try {
             updateByPreparedStatement(dsql,dparams);
         }catch (SQLException e){
