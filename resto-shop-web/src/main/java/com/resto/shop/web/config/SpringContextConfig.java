@@ -427,6 +427,9 @@ public class SpringContextConfig {
     @Bean
     public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
 
+    @Bean
+    public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
