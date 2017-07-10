@@ -1,6 +1,8 @@
 package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.RecommendCategory;
 import com.resto.shop.web.model.RecommendCategoryArticle;
@@ -25,9 +27,20 @@ public class RecommendedCategoryController extends GenericController {
     @Autowired
     private RecommendCategoryService recommendCategoryService;
 
+    @Autowired
+    private BrandSettingService brandSettingService;
+
     @RequestMapping("/list")
     public ModelAndView index(){
-        return new ModelAndView("recommendCategory/list");
+        BrandSetting setting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        if(setting != null && setting.getRecommendCategory().equals(new Integer(1))){ //开启推荐餐包功能
+            return new ModelAndView("recommendCategory/list");
+        }else{
+            return new ModelAndView("recommendCategory/none");
+        }
+
+
+
     }
 
     @RequestMapping("/list_all")
