@@ -4,8 +4,10 @@ import com.resto.brand.core.util.LogUtils;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.WaitModerState;
 import com.resto.shop.web.model.Customer;
@@ -43,6 +45,9 @@ public class GetNumberAspect {
     @Resource
     private WechatConfigService wechatConfigService;
 
+    @Resource
+    private ShopDetailService shopDetailService;
+
     @Pointcut("execution(* com.resto.shop.web.service.GetNumberService.updateGetNumber(..))")
     public void updateGetNumber(){};
 
@@ -52,6 +57,7 @@ public class GetNumberAspect {
 //        WechatConfig config = null;
 //        BrandSetting setting = null;
         if(getNumber.getCustomerId() != null){
+            ShopDetail shop = shopDetailService.selectByPrimaryKey(getNumber.getShopDetailId());
             Customer customer = customerService.selectById(getNumber.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
@@ -59,7 +65,7 @@ public class GetNumberAspect {
             	log.info("发送叫号提示");
                 StringBuffer msg = new StringBuffer();
 //                msg.append(customer.getNickname() + "，请至餐厅就餐，您一共获得" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元的等位红包。\n");
-                msg.append( "感谢您的耐心等待，现已为您准备好舒适餐位，请前往就餐！");
+                msg.append(shop.getWaitJiaohao());
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", setting.getBrandName());
@@ -72,7 +78,7 @@ public class GetNumberAspect {
                 StringBuffer msg = new StringBuffer();
 //                msg.append("亲，您一共获得"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将直接使用哦。\n");
 //                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
-                msg.append("终于等到您，赶紧就坐下单吧！");
+                msg.append(shop.getWaitJiucan());
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", setting.getBrandName());
@@ -84,7 +90,7 @@ public class GetNumberAspect {
             	log.info("发送过号提示");
                 StringBuffer msg = new StringBuffer();
 //                msg.append(customer.getNickname() + "已过号，谢谢您的支持与谅解，" + getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP) + "元等位红包已失效，期待您的下次光临。\n");
-                msg.append("您的号码已过号，欢迎下次再来");
+                msg.append(shop.getWaitGuohao());
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", setting.getBrandName());
