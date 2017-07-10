@@ -110,17 +110,17 @@
 							<%--</div>--%>
 						<%--</div>--%>
 						<!--    Geek叫号功能    end-->
-						<%--<div class="form-group">--%>
-							<%--<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>--%>
-							<%--<div  class="col-md-6 radio-list">--%>
-								<%--<label class="radio-inline">--%>
-									<%--<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是--%>
-								<%--</label>--%>
-								<%--<label class="radio-inline">--%>
-									<%--<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否--%>
-								<%--</label>--%>
-							<%--</div>--%>
-						<%--</div>--%>
+						<div class="form-group">
+							<label :class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
+							<div>
+								<label class="radio-inline">
+									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否
+								</label>
+							</div>
+						</div>
 
 						<div class="form-group">
 							<label>叫号推送模板：</label>
