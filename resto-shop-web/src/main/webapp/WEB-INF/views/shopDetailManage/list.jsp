@@ -1,8 +1,12 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
-
-<div id="control">
+<style>
+	.formBox{
+		color: #5bc0de;
+	}
+</style>
+<div id="control" class="row">
 	<div class="col-md-offset-3 col-md-6">
 		<div class="portlet light bordered">
 			<div class="portlet-title">
@@ -106,15 +110,61 @@
 							<%--</div>--%>
 						<%--</div>--%>
 						<!--    Geek叫号功能    end-->
+						<%--<div class="form-group">--%>
+							<%--<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>--%>
+							<%--<div  class="col-md-6 radio-list">--%>
+								<%--<label class="radio-inline">--%>
+									<%--<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是--%>
+								<%--</label>--%>
+								<%--<label class="radio-inline">--%>
+									<%--<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否--%>
+								<%--</label>--%>
+							<%--</div>--%>
+						<%--</div>--%>
+
 						<div class="form-group">
-							<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
-							<div  class="col-md-6 radio-list">
+							<label>叫号推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitJiaohao" v-model="m.waitJiaohao">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>就餐推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitJiucan" v-model="m.waitJiucan">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>过号推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitGuohao" v-model="m.waitGuohao">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">是否开启等位提醒：</label>
+							<div>
 								<label class="radio-inline">
-									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是
+									<input type="radio" name="waitRemindSwitch" v-model="m.waitRemindSwitch" value="1"> 是
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否
+									<input type="radio" name="waitRemindSwitch" v-model="m.waitRemindSwitch" value="0"> 否
 								</label>
+							</div>
+						</div>
+						<div class="form-group" v-if="m.waitRemindSwitch==1">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">提前提醒桌数：</label>
+							<div>
+								<input type="number" class="form-control" name="waitRemindNumber" v-model="m.waitRemindNumber">
+							</div>
+						</div>
+
+						<div class="form-group" v-if="m.waitRemindSwitch==1">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">提醒推送文案：</label>
+							<div>
+								<input type="text" class="form-control" name="waitRemindText" v-model="m.waitRemindText">
 							</div>
 						</div>
 
