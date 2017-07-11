@@ -167,6 +167,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
+            article.setRecommendCategoryId(recommendCcategoryId);
         }
         getArticleDiscount(currentShopId, articleList, show);
         return articleList;

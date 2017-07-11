@@ -148,6 +148,8 @@ public class Article implements Serializable{
 
     private  Integer count;
 
+    private String recommendCategoryId;
+
     public Integer getCount() {
         return count;
     }
@@ -603,5 +605,13 @@ public class Article implements Serializable{
 
     public void setDiscount(int discount) {
         this.discount = discount;
+    }
+
+    public String getRecommendCategoryId() {
+        return recommendCategoryId;
+    }
+
+    public void setRecommendCategoryId(String recommendCategoryId) {
+        this.recommendCategoryId = recommendCategoryId;
     }
 }
