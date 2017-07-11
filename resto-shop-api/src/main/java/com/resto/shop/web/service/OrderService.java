@@ -455,9 +455,9 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig,String brandName);
+	void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
 
-    public boolean cancelExceptionOrder(String orderId);
+	public boolean cancelExceptionOrder(String orderId);
 
     /**
      * 查询所有已提交单位支付的订单
@@ -647,11 +647,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	void changeOrderMode(String orderId);
 
-    /**
-     * 每日短信fix查看
-     * @param s
-     */
-    void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
+
 
     Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
 
