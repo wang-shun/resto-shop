@@ -92,4 +92,14 @@
      and shop_detail_id = #{shopId}
      order by id desc limit 1
   </select>
+
+  <select id="selectTicketNotSame" resultType="Printer">
+     select * from tb_printer where shop_detail_id = #{shopId} and ticket_type = 0
+     GROUP BY ip
+  </select>
+
+  <select id="selectLabelNotSame" resultType="Printer">
+    select * from tb_printer where shop_detail_id = #{shopId} and ticket_type = 1
+    GROUP BY port
+  </select>
 </mapper>

@@ -13,6 +13,7 @@ import com.resto.shop.web.dao.GetNumberMapper;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.GetNumberService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,13 +134,37 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         item.setRemark("退还等位红包:" + order.getWaitMoney());
         item.setResultData(getNumber.getId());
         orderPaymentItemService.insert(item);
-
-
-
     }
 
     @Override
     public List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap) {
         return getNumberMapper.selectGetNumberRed(selectMap);
+    }
+
+    @Override
+    public int insertGetNumber(GetNumber getNumber) {
+        int count = getNumberMapper.insertSelective(getNumber);
+        MQMessageProducer.sendQueueOrder(getNumber);
+        return count;
+    }
+
+    @Override
+    public GetNumber selectGetNumberInfo(String id) {
+        return getNumberMapper.selectGetNumberInfo(id);
+    }
+
+    @Override
+    public Integer selectWaitCountByCodeId(String shopId, String codeId) {
+        return getNumberMapper.selectWaitCountByCodeId(shopId, codeId).size();
+    }
+
+    @Override
+    public List<GetNumber> selectBeforeNumberByCodeId(String shopId, String codeId, Date time) {
+        return getNumberMapper.selectBeforeNumberByCodeId(shopId, codeId, time);
+    }
+
+    @Override
+    public GetNumber selectNowNumberByCodeId(String shopId, String codeId) {
+        return getNumberMapper.selectNowNumberByCodeId(shopId, codeId);
     }
 }

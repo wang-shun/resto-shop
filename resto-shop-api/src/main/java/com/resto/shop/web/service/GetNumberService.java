@@ -6,6 +6,7 @@ import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.model.Order;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -29,4 +30,14 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     void refundWaitMoney(Order order);
 
     List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap);
+
+    int insertGetNumber(GetNumber getNumber);
+
+    GetNumber selectGetNumberInfo(String id);
+
+    Integer selectWaitCountByCodeId(String shopId, String codeId);
+
+    List<GetNumber> selectBeforeNumberByCodeId(String shopId, String codeId, Date time);
+
+    GetNumber selectNowNumberByCodeId(String shopId, String codeId);
 }

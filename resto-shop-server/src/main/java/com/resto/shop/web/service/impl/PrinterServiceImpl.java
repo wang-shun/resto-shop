@@ -1,9 +1,6 @@
 package com.resto.shop.web.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -94,6 +91,16 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
 			result.put("TICKET_TYPE", TicketTypeNew.COMMAND);
 			result.put("TICKET_MODE", TicketTypeNew.OPEN_CASH_DRAWER);
 		}
+		return result;
+	}
+
+	@Override
+	public List<Printer> selectListNotSame(String shopId) {
+		List<Printer> ticket =  printerMapper.selectTicketNotSame(shopId);
+		List<Printer> label =  printerMapper.selectLabelNotSame(shopId);
+		List<Printer> result = new ArrayList<>();
+		result.addAll(ticket);
+		result.addAll(label);
 		return result;
 	}
 }
