@@ -172,7 +172,7 @@
     </select>
 
     <select id="selectAfterNumberByCodeId" resultType="GetNumber">
-        select id from tb_get_number where shop_detail_id = #{shopId} and code_id = #{codeId} and state = 0
+        select * from tb_get_number where shop_detail_id = #{shopId} and code_id = #{codeId} and state = 0
         and DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(#{time},'%Y-%m-%d %H:%i:%s')
         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
     </select>
