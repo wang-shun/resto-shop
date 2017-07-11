@@ -8,6 +8,8 @@ import com.resto.shop.web.model.WaitPicture;
 import com.resto.shop.web.service.WaitPictureService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+
 /**
  *
  */
@@ -25,5 +27,10 @@ public class WaitPictureServiceImpl extends GenericServiceImpl<WaitPicture, Inte
     @Override
     public int updateStateById(WaitPicture record) {
         return waitpictureMapper.updateStateById(record);
+    }
+
+    @Override
+    public List<WaitPicture> getWaitPictureList(String shopId) {
+        return waitpictureMapper.getWaitPictureList(shopId);
     }
 }

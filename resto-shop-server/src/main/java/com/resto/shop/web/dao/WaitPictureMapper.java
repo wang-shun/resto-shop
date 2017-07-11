@@ -1,7 +1,9 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.WaitPicture;
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.WaitPicture;
+
+import java.util.List;
 
 public interface WaitPictureMapper  extends GenericDao<WaitPicture,Integer> {
     int deleteByPrimaryKey(Integer id);
@@ -17,4 +19,6 @@ public interface WaitPictureMapper  extends GenericDao<WaitPicture,Integer> {
     int updateByPrimaryKey(WaitPicture record);
 
     int updateStateById(WaitPicture record);
+
+    List<WaitPicture> getWaitPictureList(String shopId);
 }

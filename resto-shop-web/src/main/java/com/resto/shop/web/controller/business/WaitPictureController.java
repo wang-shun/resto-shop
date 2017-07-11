@@ -28,7 +28,7 @@ public class WaitPictureController extends GenericController{
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public List<WaitPicture> listData(){
-		return waitpictureService.selectList();
+		return waitpictureService.getWaitPictureList(getCurrentShopId());
 	}
 	
 	@RequestMapping("list_one")

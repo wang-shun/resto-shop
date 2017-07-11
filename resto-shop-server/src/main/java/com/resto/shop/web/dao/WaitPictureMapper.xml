@@ -44,7 +44,9 @@
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.WaitPicture">update tb_wait_picture set picture_url = #{pictureUrl,jdbcType=VARCHAR}, sort = #{sort,jdbcType=INTEGER}, state = #{state,jdbcType=TINYINT}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, brand_id = #{brandId,jdbcType=VARCHAR} where id = #{id,jdbcType=INTEGER}</update>
-  <select id="selectList" resultType="WaitPicture">select * from tb_wait_picture where state = 1</select>
+  <select id="selectList" resultType="WaitPicture">select * from tb_wait_picture where state = 1 order by sort</select>
+
+  <select id="getWaitPictureList" resultType="WaitPicture">select * from tb_wait_picture where state = 1 and shop_detail_id = #{shopId} order by sort</select>
 
   <update id="updateStateById" parameterType="com.resto.shop.web.model.WaitPicture">update tb_wait_picture set state = 0  where id = #{id,jdbcType=INTEGER}</update>
 
