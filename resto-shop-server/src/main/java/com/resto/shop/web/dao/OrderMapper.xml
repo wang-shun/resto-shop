@@ -1365,14 +1365,16 @@
     <!--</select>-->
 
     <!--查询品牌菜品的总数 -->
-    <select id="selectBrandArticleNum" resultType="integer">
-        SELECT IFNULL(SUM(oi.count),0)totalNum from tb_article ta
+    <select id="selectBrandArticleNum" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(oi.count) + o.meal_all_number,0)totalNum from tb_article ta
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
-        WHERE o.order_state in (10,2,11,12) AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3)) and ta.article_type = 1
+        WHERE o.order_state in (10,2,11,12) AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3))
+        and oi.type != 4
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
+        GROUP BY o.id
     </select>
 
     <!--查询品牌菜品销售的总价-->
@@ -1395,22 +1397,23 @@
     <!--查询品牌下每个店铺的菜品数目卖的和 2016-11-3 -->
     <select id="selectShopArticleSum" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
         SELECT
-        SUM(oi.count)totalNum,
+        SUM(oi.count) + o.meal_all_number totalNum,
         o.shop_detail_id shop_id
         from tb_article ta
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
-        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND ta.article_type = 1 AND
+        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND oi.type != 4 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
-        GROUP BY o.shop_detail_id
+        GROUP BY o.id
     </select>
 
 
     <!--查询品牌下每个店铺所有菜品卖的钱的和-->
     <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
         SELECT
-        IFNULL(SUM(oi.final_price),0.00) sellIncome,
+        IFNULL(SUM(IF(oi.type != 4, oi.count, 0)) + o.meal_all_number,0) totalNum,
+        IFNULL(SUM(oi.final_price) + o.meal_fee_price,0.00) sellIncome,
         o.shop_detail_id shop_id,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(sum(oi.refund_count*oi.unit_price),0.00)refundTotal,
@@ -1423,13 +1426,13 @@
         o.order_state IN (10,2, 11, 12) AND  o.production_status in (2,3)
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
-        GROUP BY o.shop_detail_id
+        GROUP BY o.id
     </select>
 
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
         SELECT
-        IFNULL(sum(oi.final_price),0.00) sellIncome,
+        IFNULL(sum(oi.final_price) + o.meal_fee_price,0.00) sellIncome,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
@@ -1443,6 +1446,7 @@
         AND o.production_status IN (2, 3)
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
+        GROUP BY o.id
     </select>
 
     <!-- 品牌菜品销售 -->
@@ -1567,7 +1571,7 @@
         sum(t.refund_count)refundCount,
         SUM(t.unit_price*t.refund_count) as refundTotal,
         LEFT (t.article_id, 32) AS articleId,
-        SUM(t.count) shopSellNum,
+        SUM(IF(t.type != 4, t.count, 0)) shopSellNum,
         t.article_name,
         t5.id AS articleFamilyId,
         t5. NAME AS articleFamilyName,
@@ -1983,8 +1987,9 @@
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
-        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
-        and parent_order_id is null
+        DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
+--         and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
+--         and parent_order_id is null
         and t2.payment_mode_id not in (13,14,15)
         GROUP BY t.id
         ) as r
@@ -3007,4 +3012,90 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <update id="colseOrder">
         update tb_order set order_state = 9 where id=#{orderId}
     </update>
+
+
+    <select id="selectErrorOrder" resultType="Order">
+        SELECT
+        push_order_time,
+        id,
+        serial_number,
+        ver_code,
+        article_count,
+        table_number,
+        order_money,
+        shop_detail_id
+        FROM
+        tb_order
+        WHERE
+        <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
+        and( (production_status = 5 and order_state != 9 and print_times = 0) or
+        (production_status = 1 and order_state != 9 and pay_mode != 2 and print_times = 0 and now() - push_order_time > 40  )
+        or (production_status = 1 and order_state not in (1,9) and pay_mode = 2 and print_times = 0 and now() - push_order_time > 90  )
+        or (production_status = 0 and order_state = 1 and order_mode = 6 and pay_type = 1 and print_times = 0 and now() - create_time > 120 )
+        or (production_status = 0 and order_state = 2 and print_times = 0 and now() - create_time > 40 )
+        or (production_status = 1 and order_state = 10 and print_times = 0 and now() - create_time > 40 )
+        )
+        and order_mode != 3
+        order by push_order_time DESC;
+    </select>
+
+    <update id="fixAllowContinueOrder">
+        update tb_order
+        set allow_continue_order = 0
+        where now() > create_time
+    </update>
+
+    <select id="getAllowAppraise" resultType="Order">
+        select * from tb_order where order_state = 2  and production_status in (2,3)
+        and create_time >= '2017-06-29'
+    </select>
+
+    <select id="selectDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
+        select td.shop_detail_id shopDetailId, td.parent_order_id parentOrderId, td.create_time createTime,
+        SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
+        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price totalIncome from tb_order td
+        inner join tb_order_item toi
+        on td.id = toi.order_id
+        where td.order_state in (2,10,11,12)
+        and td.production_status in (2,3)
+        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        <if test="shopId != null">
+            and td.shop_detail_id = #{shopId}
+        </if>
+        GROUP BY td.id
+        ORDER BY td.create_time asc
+        LIMIT #{pageNo},1000
+    </select>
+
+    <select id="selectDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
+        select td.shop_detail_id shopDetailId,td.id orderId, td.create_time createTime,
+        SUM(IF(top.payment_mode_id = 1, top.pay_value, 0)) wechatIncome,
+        SUM(IF(top.payment_mode_id = 2, top.pay_value, 0)) redIncome,
+        SUM(IF(top.payment_mode_id = 3, top.pay_value, 0)) couponIncome,
+        SUM(IF(top.payment_mode_id = 4, top.pay_value, 0)) otherPayment,
+        SUM(IF(top.payment_mode_id = 5, top.pay_value, 0)) backCartPay,
+        SUM(IF(top.payment_mode_id = 6, top.pay_value, 0)) chargeAccountIncome,
+        SUM(IF(top.payment_mode_id = 7, top.pay_value, 0)) chargeGifAccountIncome,
+        SUM(IF(top.payment_mode_id = 8, top.pay_value, 0)) waitNumberIncome,
+        SUM(IF(top.payment_mode_id = 10, top.pay_value, 0)) aliPayment,
+        ABS(SUM(IF(top.payment_mode_id = 11, top.pay_value, 0))) articleBackPay,
+        SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) - SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
+        SUM(IF(top.payment_mode_id = 16, top.pay_value, 0)) shanhuiPayment,
+        SUM(IF(top.payment_mode_id = 17, top.pay_value, 0)) integralPayment
+        from tb_order td
+        left join tb_order_payment_item top
+        on td.id = top.order_id
+        where td.order_state in (2,10,11,12)
+        and td.production_status in (2,3)
+        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        and top.payment_mode_id not in (13,14,15)
+        <if test="shopId != null">
+            and td.shop_detail_id = #{shopId}
+        </if>
+        GROUP BY td.id
+        ORDER BY td.create_time asc
+        LIMIT #{pageNo},1000
+    </select>
 </mapper>

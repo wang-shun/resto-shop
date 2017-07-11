@@ -1,8 +1,10 @@
 package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
-import com.resto.brand.core.util.*;
-import com.resto.brand.web.dto.LogType;
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.LogUtils;
+import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -12,7 +14,10 @@ import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
+import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,13 +73,10 @@ public class OrderAspect {
     public void createOrder() {
     }
 
-    ;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrderByEmployee(..))")
     public void createOrderByEmployee() {
     }
-
-    ;
 
     @AfterReturning(value = "createOrderByEmployee()", returning = "jsonResult")
     public void createOrderByEmployeeAround(JSONResult jsonResult) throws Throwable {
@@ -91,25 +94,34 @@ public class OrderAspect {
 
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
+        String time= DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus()+"订单id："+order.getId()+"当前时间为："+time);
             if(order.getCustomerId().equals("0")){
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
+                String shopId = order.getShopDetailId();
+                Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
+                BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+                orderCount++;
+                orderTotal = orderTotal.add(order.getOrderMoney());
+                RedisUtil.set(shopId + "shopOrderCount", orderCount);
+                RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
+                MQMessageProducer.sendPrintSuccess(shopId);
                 return;
             }
 
 
-
-            if(order.getPayMode() != PayMode.WEIXIN_PAY){
+            if (order.getPayMode() != PayMode.WEIXIN_PAY) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
 //            现金银联闪惠支付应该在pos上确认订单已收款后在进行出单
-            if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
+            if (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
                 MQMessageProducer.sendPlaceOrderNoPayMessage(order);
             }
 
-            if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
+            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY) {
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
@@ -131,7 +143,7 @@ public class OrderAspect {
 
     private void sendPaySuccessMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
-        if(customer == null){
+        if (customer == null) {
             return;
         }
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -159,11 +171,11 @@ public class OrderAspect {
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1){
-            msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
+        if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1) {
+            msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
         }
-        if(setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-            msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+        if (setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
+            msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
         }
         msg.append("订单明细：\n");
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
@@ -171,15 +183,15 @@ public class OrderAspect {
             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
         msg.append("订单金额：" + order.getOrderMoney() + "\n");
-        if(order.getOrderMode() == ShopMode.BOSS_ORDER){
+        if (order.getOrderMode() == ShopMode.BOSS_ORDER) {
             String url = "";
-            if(order.getParentOrderId() == null){
-                url = setting.getWechatWelcomeUrl()+"?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
-            }else{
+            if (order.getParentOrderId() == null) {
+                url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+            } else {
                 Order o = orderService.selectById(order.getParentOrderId());
-                url = setting.getWechatWelcomeUrl()+"?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
+                url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
             }
-            msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
+            msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
         }
         try {
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -190,7 +202,7 @@ public class OrderAspect {
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
         } catch (Exception e) {
             log.error("发送客服消息失败:" + e.getMessage());
@@ -273,57 +285,58 @@ public class OrderAspect {
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.afterPay(..))")
     public void afterPay() {
 
-    };
+    }
+
+    ;
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmOrderPos(..))")
     public void confirmOrderPos() {
 
-    };
+    }
+
+    ;
 
 
     @AfterReturning(value = "confirmOrderPos()", returning = "order")
     public void confirmOrderPos(Order order) throws AppException {
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
+        Order o = orderService.getOrderAccount(order.getShopDetailId());
+        RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
+        RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+        MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 
-        if(order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
+        if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
             orderService.pushOrder(order.getId());
         }
     }
 
     @AfterReturning(value = "afterPay()", returning = "order")
     public void afterPay(Order order) {
-        if(order.getPayMode() != OrderPayMode.ALI_PAY ){ //已支付
+        if (order.getPayMode() != OrderPayMode.ALI_PAY) { //已支付
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
-//        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-//        Brand brand = brandService.selectById(order.getBrandId());
-//        Customer customer = customerService.selectById(order.getCustomerId());
-//        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-//        List<OrderPaymentItem> paymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-//        String money = "(";
-//        for (OrderPaymentItem orderPaymentItem : paymentItems) {
-//            money += PayMode.getPayModeName(orderPaymentItem.getPaymentModeId()) + "： " + orderPaymentItem.getPayValue() + " ";
-//        }
-//        StringBuffer msg = new StringBuffer();
-//        BigDecimal sum = order.getOrderMoney();
-//        List<Order> orders = orderService.selectByParentId(order.getId()); //得到子订单
-//        for (Order child : orders) { //遍历子订单
-//            sum = sum.add(child.getOrderMoney());
-//        }
-//        msg.append("您的订单").append(order.getSerialNumber()).append("已于").append(DateFormatUtils.format(paymentItems.get(0).getPayTime(), "yyyy-MM-dd HH:mm"));
-//        msg.append("支付成功。订单金额：").append(sum).append(money).append(") ");
-//        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-////            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-////                    "订单发送推送：" + msg.toString());
+        if (order.getOrderState() == OrderState.PAYMENT) {
+            String shopId = order.getShopDetailId();
+            Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
+            BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+            if (order.getParentOrderId() == null) {
+                orderCount++;
+            }
+            orderTotal = orderTotal.add(order.getOrderMoney());
+            RedisUtil.set(shopId + "shopOrderCount", orderCount);
+            RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
+            MQMessageProducer.sendPrintSuccess(shopId);
+        }
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.posPayOrder(..))")
     public void posPayOrder() {
 
-    };
+    }
+
+    ;
 
     @AfterReturning(value = "posPayOrder()", returning = "order")
     public void posPayOrder(Order order) {
@@ -337,10 +350,10 @@ public class OrderAspect {
 //                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息
 //            sendPaySuccessMsg(order);
 //        }
-        if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
+        if (order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
                 order.getOrderState().equals(OrderState.PAYMENT)
-                && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)){
-            if(order.getPayType() ==  PayType.NOPAY){
+                && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)) {
+            if (order.getPayType() == PayType.NOPAY) {
                 order.setPrintTimes(1);
                 orderService.update(order);
             }
@@ -348,34 +361,40 @@ public class OrderAspect {
         }
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        if(order != null  && order.getOrderState() == OrderState.PAYMENT
+        if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
-                && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER )){
-            if(order.getPayType() == PayType.NOPAY){
+                && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER)) {
+            if (order.getPayType() == PayType.NOPAY) {
                 order.setPrintTimes(1);
                 orderService.update(order);
             }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
-        if(order.getOrderMode() != ShopMode.HOUFU_ORDER){
+        if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
         }
 
-        if(order != null  && order.getOrderState() == OrderState.PAYMENT
-                && order.getOrderMode() == ShopMode.CALL_NUMBER){
+        if (order != null && order.getOrderState() == OrderState.PAYMENT
+                && order.getOrderMode() == ShopMode.CALL_NUMBER) {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-        if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
+        if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)) {
             MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
+            Order o = orderService.getOrderAccount(order.getShopDetailId());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+            MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 //            orderService.confirmOrder(order);
         }
+    }
 
-
-        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-            MQMessageProducer.sendPlaceOrderMessage(order);
-            orderService.payOrderWXModeFive(order.getId());
-        }
+    public static void main(String[] args) {
+        Order order = new Order();
+        order.setId("00b8a27437cf460c93910bdc2489d061");
+        order.setBrandId("31946c940e194311b117e3fff5327215");
+        order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+        MQMessageProducer.sendPlaceOrderMessage(order);
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
@@ -383,11 +402,9 @@ public class OrderAspect {
     }
 
 
-
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.callNumber(..))")
     public void callNumber() {
     }
-
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.printSuccess(..))")
@@ -395,18 +412,14 @@ public class OrderAspect {
     }
 
 
-
-
     @Pointcut("execution(* com.resto.shop.web.service.AccountService.houFuPayOrder(..))")
     public void houFuPayOrder() {
     }
 
 
-
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderModeFive(..))")
     public void payOrderModeFive() {
     }
-
 
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.payOrderWXModeFive(..))")
@@ -419,15 +432,14 @@ public class OrderAspect {
     }
 
 
-
-
     @AfterReturning(value = "callNumber()", returning = "order")
     public void createCallMessage(Order order) throws Throwable {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId()); ;//根据订单找到对应的店铺
-        if(customer != null){
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        ;//根据订单找到对应的店铺
+        if (customer != null) {
             WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
@@ -435,47 +447,48 @@ public class OrderAspect {
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
         }
 
 //        WeChatUtils.sendCustomerWaitNumberMsg("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 
-        LogTemplateUtils.getCallNumber(brand.getBrandName(),order.getId());
-        if(shopDetail.getIsPush() == Common.YES){ //开启就餐提醒
-        	MQMessageProducer.sendRemindMsg(order,shopDetail.getPushTime() * 1000);	
+        LogTemplateUtils.getCallNumber(brand.getBrandName(), order.getId());
+        if (shopDetail.getIsPush() == Common.YES) { //开启就餐提醒
+            MQMessageProducer.sendRemindMsg(order, shopDetail.getPushTime() * 1000);
         }
-        
+
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", returning = "order")
-    public void pushOrderAfter(Order order) throws Throwable {
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order",returning = "order")
+    public void pushOrderAfter(JoinPoint joinPoint,Order order) throws Throwable {
+        log.info("切面pushOrderAfter"+joinPoint.getSignature().getName());
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-                if(order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)){
+                if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)) {
                     return;
                 }
 //                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
-				if (order.getEmployeeId() == null) {
-                    if(order.getPrintOrderTime() == null){
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
+                if (order.getEmployeeId() == null) {
+                    if (order.getPrintOrderTime() == null) {
+                        if (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
-                        }else{
+                        } else {
                             MQMessageProducer.sendPlaceOrderMessage(order);
                         }
                     }
-				} else {
-					if (order.getOrderState().equals(OrderState.PAYMENT)) {
-                        if(order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY){
+                } else {
+                    if (order.getOrderState().equals(OrderState.PAYMENT)) {
+                        if (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
                             MQMessageProducer.sendPlaceOrderNoPayMessage(order);
-                        }else{
+                        } else {
                             MQMessageProducer.sendPlaceOrderMessage(order);
                         }
-					}
-				}
+                    }
+                }
 
 //				log.info("客户下单，添加自动拒绝5分钟未打印的订单");
 //				MQMessageProducer.sendNotPrintedMessage(order,1000*60*5); //延迟五分钟，检测订单是否已经打印
@@ -492,41 +505,41 @@ public class OrderAspect {
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
-                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY){
+                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {
 //                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
 //                    if(order.getOrderState() == OrderState.SUBMIT){
 //                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
 //                    }else{
 //                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
 //                    }
-                    if(setting.getAutoConfirmTime() <= setting.getCloseContinueTime()){    //加菜时间跟领取红包时间对比
-                        if(order.getOrderState() == OrderState.SUBMIT){   //是否买单
+                    if (setting.getAutoConfirmTime() <= setting.getCloseContinueTime()) {    //加菜时间跟领取红包时间对比
+                        if (order.getOrderState() == OrderState.SUBMIT) {   //是否买单
                             MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
-                        }else if(order.getOrderState() == OrderState.PAYMENT){
+                        } else if (order.getOrderState() == OrderState.PAYMENT) {
                             MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
                         }
-                    }else{
+                    } else {
                         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
-                } else if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY){
+                } else if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
-                }else {
+                } else {
                     if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
-                        if(order.getPrintTimes() == 0){
-                            order.setPrintTimes(order.getPrintTimes()+1);
+                        if (order.getPrintTimes() == 0) {
+                            order.setPrintTimes(order.getPrintTimes() + 1);
                             orderService.update(order);
-                            MQMessageProducer.sendPlaceOrderMessageAgain(order,6000);
+                            MQMessageProducer.sendPlaceOrderMessageAgain(order, 6000);
                         }
                     }
                 }
-                if(order.getPrintTimes() == 0){
+                if (order.getPrintTimes() == 0) {
                     sendPaySuccessMsg(order);
                 }
 
@@ -563,8 +576,22 @@ public class OrderAspect {
 
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
+        if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.WX_PAY
+                || order.getPayMode() == OrderPayMode.ALI_PAY)) {
+            String shopId = order.getShopDetailId();
+            Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
+            BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+            if (order.getParentOrderId() == null) {
+                orderCount++;
+            }
+            orderTotal = orderTotal.add(order.getOrderMoney());
+            RedisUtil.set(shopId + "shopOrderCount", orderCount);
+            RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
+            MQMessageProducer.sendPrintSuccess(shopId);
+        }
+
         if (order != null
-                && (order.getOrderMode() == ShopMode.HOUFU_ORDER )
+                && (order.getOrderMode() == ShopMode.HOUFU_ORDER)
                 && order.getOrderState() == OrderState.SUBMIT
                 && order.getProductionStatus() == ProductionStatus.PRINTED) {
             Customer customer = customerService.selectById(order.getCustomerId());
@@ -582,11 +609,11 @@ public class OrderAspect {
             msg.append("就餐店铺：" + shopDetail.getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
-                msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
+            if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
+                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
             }
-            if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+            if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
+                msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
             }
             BigDecimal sum = order.getOrderMoney();
             List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
@@ -599,15 +626,15 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + sum + "\n");
-            if(order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4){
+            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4) {
                 String url = "";
-                if(order.getParentOrderId() == null){
-                    url = setting.getWechatWelcomeUrl()+"?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
-                }else{
+                if (order.getParentOrderId() == null) {
+                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                } else {
                     Order o = orderService.selectById(order.getParentOrderId());
-                    url = setting.getWechatWelcomeUrl()+"?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" +order.getShopDetailId();
+                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                 }
-                msg.append("<a href='" + url+ "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
+                msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
             }
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
@@ -616,43 +643,43 @@ public class OrderAspect {
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
         }
     }
 
     //推送分享领红包，跳转到我的二维码界面
-    public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order){
-        StringBuffer str=new StringBuffer();
+    public void scanaQRcode(WechatConfig config, Customer customer, BrandSetting setting, Order order) {
+        StringBuffer str = new StringBuffer();
         Brand brand = brandService.selectById(order.getBrandId());
         ShareSetting shareSetting = shareSettingService.selectByBrandId(customer.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         List<NewCustomCoupon> coupons = newcustomcouponService.selectListByCouponType(customer.getBrandId(), 1, order.getShopDetailId());
-        if(coupons.size() > 0 ){
+        if (coupons.size() > 0) {
             BigDecimal money = new BigDecimal("0.00");
-            for(NewCustomCoupon coupon : coupons){
+            for (NewCustomCoupon coupon : coupons) {
                 money = money.add(coupon.getCouponValue().multiply(new BigDecimal(coupon.getCouponNumber())));
             }
             str.append("邀请朋友扫一扫，");
-            if(money.doubleValue() == 0.00 && shareSetting == null){
+            if (money.doubleValue() == 0.00 && shareSetting == null) {
                 str.append("送他/她红包，朋友到店消费后，您将获得红包返利\n");
-            }else if(money.doubleValue() == 0.00){
-                str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得红包返利\n");
-            }else if(shareSetting == null){
-                str.append("送他/她红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
-            }else{
-                str.append("送他/她"+money+"元红包，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
+            } else if (money.doubleValue() == 0.00) {
+                str.append("送他/她" + money + "元红包，朋友到店消费后，您将获得红包返利\n");
+            } else if (shareSetting == null) {
+                str.append("送他/她红包，朋友到店消费后，您将获得" + shareSetting.getMinMoney() + "元-" + shareSetting.getMaxMoney() + "元红包返利\n");
+            } else {
+                str.append("送他/她" + money + "元红包，朋友到店消费后，您将获得" + shareSetting.getMinMoney() + "元-" + shareSetting.getMaxMoney() + "元红包返利\n");
             }
-            String jumpurl = setting.getWechatWelcomeUrl()+"?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
-            str.append("<a href='"+jumpurl+"'>打开邀请二维码</a>");
-            String result = WeChatUtils.sendCustomerMsg(str.toString(),customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            String jumpurl = setting.getWechatWelcomeUrl() + "?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
+            str.append("<a href='" + jumpurl + "'>打开邀请二维码</a>");
+            String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + str.toString());
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+str.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + str.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
         }
     }
@@ -690,7 +717,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
-        if(order != null){
+        if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -700,7 +727,7 @@ public class OrderAspect {
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();
-                msg.append("您有一个红包未领取，红包是"+brand.getBrandName()+"送您的一片心意xoxo");
+                msg.append("您有一个红包未领取，红包是" + brand.getBrandName() + "送您的一片心意xoxo");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
@@ -710,7 +737,7 @@ public class OrderAspect {
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
-                map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
                 scanaQRcode(config, customer, setting, order);
@@ -726,10 +753,10 @@ public class OrderAspect {
                                 log.info("是被分享用户，并且分享设置已启用:" + customer.getId() + " oid:" + order.getId() + " setting:" + shareSetting.getId());
                                 BigDecimal rewardMoney = customerService.rewareShareCustomer(shareSetting, order, shareCustomer, customer);
                                 log.info("准备发送返利通知");
-                                sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney,order);
-                            } else{
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney, order);
+                            } else {
                                 log.info("准备发送返利通知  but品牌没有设置返利  so返利0元");
-                                sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO,order);
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO, order);
                             }
                         }
                     }
@@ -746,10 +773,10 @@ public class OrderAspect {
         StringBuffer msg = new StringBuffer();
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        if(rewardMoney.compareTo(BigDecimal.ZERO) != 0){
+        if (rewardMoney.compareTo(BigDecimal.ZERO) != 0) {
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("您邀请的好友"+customer.getNickname()+"已到店消费，您已获得"+rewardMoney+"元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
+        msg.append("您邀请的好友" + customer.getNickname() + "已到店消费，您已获得" + rewardMoney + "元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
 //        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
 //                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
 //                .append(rewardMoney).append("元红包返利").append("</a>");
@@ -762,7 +789,7 @@ public class OrderAspect {
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shareCustomer.getId());
         map.put("type", "UserAction");
-        map.put("content", "系统向用户:"+shareCustomer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "系统向用户:" + shareCustomer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, map);
     }
 
@@ -802,16 +829,16 @@ public class OrderAspect {
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
-            if(setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1){
-                msg.append(shopDetail.getServiceName()+"：" + order.getServicePrice() + "\n");
+            if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
+                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
             }
-            if(setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1){
-                msg.append(shopDetail.getMealFeeName()+"：" + order.getMealFeePrice() + "\n");
+            if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
+                msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
             }
             msg.append("订单明细：\n");
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             for (OrderItem item : orderItem) {
-                if(item.getCount() > 0){
+                if (item.getCount() > 0) {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
             }
@@ -825,7 +852,7 @@ public class OrderAspect {
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
             MQMessageProducer.sendNoticeOrderMessage(order);
 
@@ -838,12 +865,18 @@ public class OrderAspect {
 //			if(!addStockSuccess){
 //				log.info("库存还原失败:"+order.getId());
 //			}
+
+            Order o = orderService.getOrderAccount(order.getShopDetailId());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
+            RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+            MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
+
         }
     }
 
     private void sendVerCodeMsg(Order order) {
         Customer customer = customerService.selectById(order.getCustomerId());
-        if(customer != null){
+        if (customer != null) {
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Brand brand = brandService.selectById(order.getBrandId());
@@ -857,7 +890,7 @@ public class OrderAspect {
             map.put("brandName", brand.getBrandName());
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
-            map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
 //        log.info("发送取餐信息成功:" + result);
         }
@@ -866,7 +899,9 @@ public class OrderAspect {
     @Pointcut("execution(* com.resto.shop.web.service.OrderPaymentItemService.insertByBeforePay(..))")
     public void insertByBeforePay() {
 
-    };
+    }
+
+    ;
 
     @AfterReturning(value = "insertByBeforePay()", returning = "orderPaymentItem")
     public void insertByBeforePay(OrderPaymentItem orderPaymentItem) {
@@ -877,7 +912,9 @@ public class OrderAspect {
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.colseOrder(..))")
     public void colseOrder() {
 
-    };
+    }
+
+    ;
 
     @AfterReturning(value = "colseOrder()", returning = "order")
     public void colseOrder(Order order) {
@@ -885,28 +922,28 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(brand.getId());
         StringBuilder sb = new StringBuilder("亲,今日未完成支付的订单已被系统自动取消,欢迎下次再来本店消费\n");
-        sb.append("订单编号:"+order.getSerialNumber()+"\n");
-        if(order.getOrderMode()!=null){
+        sb.append("订单编号:" + order.getSerialNumber() + "\n");
+        if (order.getOrderMode() != null) {
             switch (order.getOrderMode()) {
                 case ShopMode.TABLE_MODE:
-                    sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
+                    sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
                     break;
                 default:
-                    sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                    sb.append("取餐码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
                     break;
             }
         }
-        if( order.getShopName()==null||"".equals(order.getShopName())){
+        if (order.getShopName() == null || "".equals(order.getShopName())) {
             order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
         }
-        sb.append("就餐店铺："+order.getShopName()+"\n");
-        sb.append("订单时间："+ DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm")+"\n");
+        sb.append("就餐店铺：" + order.getShopName() + "\n");
+        sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
         sb.append("订单明细：\n");
-        List<OrderItem> orderItem  = orderItemService.listByOrderId(order.getId());
-        for(OrderItem item : orderItem){
-            sb.append("  "+item.getArticleName()+"x"+item.getCount()+"\n");
+        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+        for (OrderItem item : orderItem) {
+            sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
-        sb.append("订单金额："+order.getOrderMoney()+"\n");
+        sb.append("订单金额：" + order.getOrderMoney() + "\n");
         WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 }

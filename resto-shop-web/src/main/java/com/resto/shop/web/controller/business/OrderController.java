@@ -271,7 +271,7 @@ public class OrderController extends GenericController{
 			}
 			//设置营销撬动率  实际/虚拟
 			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getAliPayment()).add(ot.getMoneyPay()).add(ot.getBackCartPay());
-			BigDecimal temp = o.getOrderMoney().subtract(real);
+			BigDecimal temp = ot.getAccountPay().add(ot.getCouponPay()).add(ot.getRewardPay());
 			if(temp.compareTo(BigDecimal.ZERO)>0){
                 ot.setIncomePrize(real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"");
 			}

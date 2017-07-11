@@ -808,13 +808,13 @@ GROUP BY article_id
             taf.id articleFamilyId,
             IFNULL(taf.`name`,'其他')articleFamilyName,
             ta.`name` articleName,
-            IFNULL(SUM(toi.count),0)
+            IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0)
             <if test="shopDetailId != null and shopDetailId !=''">shopSellNum</if>
             <if test="shopDetailId == null or shopDetailId ==''">brandSellNum</if>,
             IFNULL(SUM(toi.final_price),0) salles,
             IFNULL(SUM(toi.refund_count),0) refundCount,
             IFNULL(SUM(toi.refund_count * toi.unit_price),0) refundTotal,
-            IFNULL(SUM((toi.count * toi.original_price) - toi.final_price),0) discountMoney,
+            IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
             ta.likes likes
             from tb_article ta
             left join tb_article_family taf
@@ -878,7 +878,7 @@ GROUP BY article_id
 
     <select id="selectArticleOrderCount" parameterType="java.util.Map" resultType="java.util.Map">
         select
-        IFNULL(SUM(toi.count),0) sellNum,
+        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0) sellNum,
         IFNULL(SUM(toi.final_price),0) salles
         from tb_article ta
         left join tb_article_price tap
