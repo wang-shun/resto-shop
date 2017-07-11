@@ -13,6 +13,7 @@ import com.resto.shop.web.constant.WaitModerState;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.GetNumberService;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
@@ -47,6 +49,9 @@ public class GetNumberAspect {
 
     @Resource
     private ShopDetailService shopDetailService;
+
+    @Resource
+    private GetNumberService getNumberService;
 
     @Pointcut("execution(* com.resto.shop.web.service.GetNumberService.updateGetNumber(..))")
     public void updateGetNumber(){};
@@ -98,6 +103,17 @@ public class GetNumberAspect {
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
+            }
+
+            if(shop.getWaitRemindSwitch() == 1 && shop.getWaitRemindNumber() > 0){
+                List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
+                if((getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
+                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);
+                    Customer c = customerService.selectById(gn.getCustomerId());
+                    StringBuffer msg = new StringBuffer();
+                    msg.append(shop.getWaitRemindText());
+                    WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
+                }
             }
         }
     }
