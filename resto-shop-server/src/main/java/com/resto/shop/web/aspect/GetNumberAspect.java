@@ -83,7 +83,8 @@ public class GetNumberAspect {
                 StringBuffer msg = new StringBuffer();
 //                msg.append("亲，您一共获得"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将直接使用哦。\n");
 //                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
-                msg.append(shop.getWaitJiucan());
+                msg.append(shop.getWaitJiucan() + "\n");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&dialog=waitScan&shopId=" + getNumber.getShopDetailId() + " '>点击此处，扫一扫桌位二维码，开启美食之旅！</a>");
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", setting.getBrandName());
