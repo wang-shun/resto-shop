@@ -6,16 +6,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.shop.web.model.Customer;
 import org.json.JSONObject;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.BrandService;
@@ -61,52 +57,43 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
 	@Override
 	public String sendCode(String phone, String code, String brandId, String shopId, int smsLogType,Map<String,String> logMap) {
-		Brand b = brandService.selectById(brandId);
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
-		//查询
-		//BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
-        BrandUser brandUser = brandUserService.selectOneByBrandId(b.getId());
-
-		//发送短信返回
+        BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
+		//发送阿里短信返回 默认使用阿里发送短信
 		String string = null;
 		if(smsLogType == SmsLogType.AUTO_CODE){
-			string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser,logMap);
+			string = sendMsg(code, phone,brandUser,logMap);
 		}
-
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
 		smsLog.setContent(code);
-		smsLog.setSmsType(SmsLog.CODE);
+		smsLog.setSmsType(SmsLogType.AUTO_CODE);
 		smsLog.setCreateTime(new Date());
 		smsLog.setPhone(phone);
 		smsLog.setSmsResult(string);
 		JSONObject obj = new JSONObject(string);
 		
 		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
-		if(obj.optBoolean("success", true)){
-			//
-			if(obj.getBoolean("success")){
+			if(obj.getBoolean("success")){ //返回成功
 				try{
 					insert(smsLog);
 					//更新短信账户的信息
 					smsAcountService.updateByBrandId(brandId);
 					//判断是否要提醒商家充值短信账户
-					sendNotice(b,brandUser,logMap);
+					sendNotice(brandUser,logMap);
 				}catch(Exception e){
 					log.error("发送短信失败:"+e.getMessage());
 				}
-			}else{
-				//短信发送失败不更新短信账户
-				insert(smsLog);
 			}
-		}
+                //短信发送失败不更新短信账户
+				insert(smsLog);
+
 		log.info("短信发送结果:"+string);
 		return string;
 	}
 
-	private void sendNotice(Brand b,BrandUser brandUser,Map<String,String>logMap) {
-		SmsAcount smsAcount = smsAcountService.selectByBrandId(b.getId());
+	private void sendNotice(BrandUser brandUser,Map<String,String>logMap) {
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取短信账户短信提醒
 		String str = smsAcount.getSmsRemind();
 		String[] arrs = str.split(",");
@@ -115,13 +102,12 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		//判断是否需要提醒
 		if(this.isHave(arrs, remindNum+"")){
 			//提醒商家充值
-            //String brandName, int num, String phone, Map<String, String> logMap
-			SMSUtils.sendNoticeToBrand(b.getBrandName(),remindNum, brandUser.getPhone(),logMap);
+			SMSUtils.sendNoticeToBrand(brandUser.getBrandName(),remindNum, brandUser.getPhone(),logMap);
 		}
 	}
 
 	
-	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser,Map<String,String> logMap){
+	public String sendMsg(String code,String phone,BrandUser brandUser,Map<String,String> logMap){
 		//判断该品牌账户的余额是否充足
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取剩余短信条数
@@ -133,7 +119,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			//我们提醒商家充值
             String content = sb.append(logMap.get("content")).append("商家剩余条数不足").toString();
             logMap.put("content",content);
-			SMSUtils.sendNoticeToBrand(serviceName,smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
+			SMSUtils.sendNoticeToBrand(brandUser.getBrandName(),smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
 			log.info("剩余短信为"+remindNum+"条无法发短信");
 			//返回false标记让商家无法发短信
 			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
@@ -143,7 +129,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
                 String content = sb.append(logMap.get("content")).append("在固定条数短信时发短信给商家").toString();
                 logMap.put("content",content);
 				//发短信提醒商家
-				SMSUtils.sendNoticeToBrand(serviceName, remindNum, brandUser.getPhone(),logMap);
+				SMSUtils.sendNoticeToBrand(brandUser.getBrandName(), remindNum, brandUser.getPhone(),logMap);
 			}
 		}
 		//商家给客户发短信
@@ -152,7 +138,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			logMap.put("content",content);
 		}
 
-		return SMSUtils.sendCode( serviceName, code, phone,logMap);
+		return SMSUtils.sendCode(brandUser.getBrandName(), code, phone,logMap);
 	}
 
 	@Override

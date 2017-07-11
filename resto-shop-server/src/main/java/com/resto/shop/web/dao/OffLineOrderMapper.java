@@ -57,4 +57,6 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
      * @return
      */
     BigDecimal selectTotalMoney(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
+
+    OffLineOrder selectSumByTimeSourceAndShopId(@Param("orderType") int offlinePos, @Param("shopId") String id,@Param("beginDate") Date begin,@Param("endDate") Date end);
 }

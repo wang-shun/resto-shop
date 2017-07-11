@@ -76,6 +76,7 @@
     </bean>
     <!-- 支持返回json -->
 
+    <!--默认视图级别设置低点 -->
     <!-- 对模型视图添加前后缀 -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/views/" p:suffix=".jsp"/>
