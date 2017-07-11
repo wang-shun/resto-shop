@@ -207,6 +207,7 @@
                 var that = this;
                 try{
                     that.bonusSetting.createTime = new Date(that.bonusSetting.createTime);
+                    that.bonusSetting.updateTime = new Date(that.bonusSetting.updateTime);
                     $.post("bonusSetting/"+(that.bonusSetting.id != null ? "modify" : "create")+"",that.bonusSetting,function (result) {
                         if (result.success){
                             that.showform = false;
