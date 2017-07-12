@@ -21,11 +21,21 @@ public class BonusSetting {
 
     private Date createTime;
 
+    private Date updateTime;
+
     private String shopName;
 
     private String chargeName;
 
     private String wishing;
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public String getWishing() {
         return wishing;

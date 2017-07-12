@@ -371,4 +371,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     }
 
 
+
+	@Override
+	public List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap) {
+		return chargeOrderMapper.getChargeSumInfo(selectMap);
+	}
 }
