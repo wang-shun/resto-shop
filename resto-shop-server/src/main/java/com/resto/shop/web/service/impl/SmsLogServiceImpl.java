@@ -84,9 +84,10 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 				}catch(Exception e){
 					log.error("发送短信失败:"+e.getMessage());
 				}
-			}
-                //短信发送失败不更新短信账户
+			}else {
+				//短信发送失败不更新短信账户
 				insert(smsLog);
+			}
 
 		log.info("短信发送结果:"+string);
 		return string;
