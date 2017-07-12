@@ -3160,9 +3160,4 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         LIMIT #{pageNo},1000
     </select>
 
-    <select id="customerByOrderForMyPage" resultMap="BaseResultMap">
-        select * from tb_order where customer_id = #{customerId} and shop_detail_id = #{shopId} and
-        if(order_state = 1,order_state = 1 and (43200 >= (now() - create_time)),order_state = 10 and allow_appraise = 1) order by order_state , create_time desc limit 0,1;
-    </select>
-
 </mapper>
