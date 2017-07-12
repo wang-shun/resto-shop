@@ -4244,7 +4244,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectMap.put("beginDate", beginDate);
         selectMap.put("endDate", endDate);
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
-                || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo++) {
+                || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
             selectMap.put("pageNo", pageNo * 1000);
             shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(selectMap);
             shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(selectMap);
@@ -4255,19 +4255,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal brandVirtualPayment = BigDecimal.ZERO;
         BigDecimal shopActualPayment = BigDecimal.ZERO;
         BigDecimal shopVirtualPayment = BigDecimal.ZERO;
-        for (OrderPayDto shopOrderPayDto : shopPayDto) {
+        for (OrderPayDto shopOrderPayDto : shopPayDto){
             //循环累加店铺订单总额、订单数
-            for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems) {
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())) {
+            for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems){
+                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())){
                     shopOrderPayDto.setOrderMoney(shopOrderPayDto.getOrderMoney().add(shopIncomeDtoItem.getTotalIncome()));
-                    if (StringUtils.isBlank(shopIncomeDtoItem.getParentOrderId())) {
+                    if (StringUtils.isBlank(shopIncomeDtoItem.getParentOrderId())){
                         shopOrderPayDto.setNumber(shopOrderPayDto.getNumber() + 1);
                     }
                 }
             }
             //循环累加得到店铺的实际支付、虚拟支付的值
-            for (ShopIncomeDto shopIncomeDtoPayMent : shopIncomeDtosPayMents) {
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoPayMent.getShopDetailId())) {
+            for (ShopIncomeDto shopIncomeDtoPayMent : shopIncomeDtosPayMents){
+                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoPayMent.getShopDetailId())){
                     shopActualPayment = shopActualPayment.add(shopIncomeDtoPayMent.getWechatIncome()).add(shopIncomeDtoPayMent.getAliPayment())
                             .add(shopIncomeDtoPayMent.getChargeAccountIncome()).add(shopIncomeDtoPayMent.getBackCartPay()).add(shopIncomeDtoPayMent.getMoneyPay());
                     shopVirtualPayment = shopVirtualPayment.add(shopIncomeDtoPayMent.getRedIncome()).add(shopIncomeDtoPayMent.getCouponIncome()).add(shopIncomeDtoPayMent.getChargeGifAccountIncome())
@@ -4275,15 +4275,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
             //计算店铺订单平均金额
-            if (shopOrderPayDto.getNumber().equals(0)) {
+            if (shopOrderPayDto.getNumber().equals(0)){
                 shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney());
-            } else {
+            }else {
                 shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney().divide(new BigDecimal(shopOrderPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
             }
             //计算店铺营销撬动率
-            if (shopVirtualPayment.equals(BigDecimal.ZERO)) {
+            if (shopVirtualPayment.equals(BigDecimal.ZERO) || shopVirtualPayment.intValue() == 0){
                 shopOrderPayDto.setMarketPrize("0");
-            } else {
+            }else {
                 shopOrderPayDto.setMarketPrize((shopActualPayment.divide(shopVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
             }
             //累加得到品牌实际支付的值
@@ -4297,15 +4297,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             brandPayDto.setNumber(brandPayDto.getNumber() + shopOrderPayDto.getNumber());
         }
         //计算品牌订单平均金额
-        if (brandPayDto.getNumber().equals(0)) {
+        if (brandPayDto.getNumber().equals(0)){
             brandPayDto.setAverage(brandPayDto.getOrderMoney());
-        } else {
+        }else {
             brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
         }
         //计算品牌营销撬动率
-        if (brandVirtualPayment.equals(BigDecimal.ZERO)) {
+        if (brandVirtualPayment.equals(BigDecimal.ZERO) || brandVirtualPayment.intValue() == 0){
             brandPayDto.setMarketPrize("0");
-        } else {
+        }else {
             brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
         }
         //封装返回Map集
