@@ -494,13 +494,13 @@ public class ArticleSellController extends GenericController{
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
             Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos) {
-                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")) {
+                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("sellNum").toString()) == 0) {
                     articleUnitSellDto.setNumRatio("0.00%");
                 } else {
                     articleUnitSellDto.setNumRatio(new BigDecimal(articleUnitSellDto.getShopSellNum()).divide(new BigDecimal(
                             unitMap.get("sellNum").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
                 }
-                if (unitMap.get("salles").toString().equalsIgnoreCase("0")) {
+                if (unitMap.get("salles").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("salles").toString()) == 0) {
                     articleUnitSellDto.setSalesRatio("0.00%");
                 } else {
                     articleUnitSellDto.setSalesRatio(articleUnitSellDto.getSalles().divide(new BigDecimal(
@@ -586,12 +586,12 @@ public class ArticleSellController extends GenericController{
             }
             object.put("shopArticleFamilyDtos", articleFamilySellDtos);
             for (ArticleSellDto articleSellDto : shopArticleType){
-                if (shopSellNum.equals(BigDecimal.ZERO)){
+                if (shopSellNum.equals(BigDecimal.ZERO) || shopSellNum.intValue() == 0){
                     articleSellDto.setNumRatio("0.00%");
                 }else{
                     articleSellDto.setNumRatio(new BigDecimal(articleSellDto.getShopSellNum()).divide(shopSellNum,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString().concat("%"));
                 }
-                if (salles.equals(BigDecimal.ZERO)){
+                if (salles.equals(BigDecimal.ZERO) || salles.intValue() == 0){
                     articleSellDto.setSalesRatio("0.00%");
                 }else{
                     articleSellDto.setSalesRatio(articleSellDto.getSalles().divide(salles,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString().concat("%"));
