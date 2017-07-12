@@ -4264,7 +4264,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney().divide(new BigDecimal(shopOrderPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
             }
             //计算店铺营销撬动率
-            if (shopVirtualPayment.equals(BigDecimal.ZERO)){
+            if (shopVirtualPayment.equals(BigDecimal.ZERO) || shopVirtualPayment.intValue() == 0){
                 shopOrderPayDto.setMarketPrize("0");
             }else {
                 shopOrderPayDto.setMarketPrize((shopActualPayment.divide(shopVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
@@ -4286,7 +4286,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
         }
         //计算品牌营销撬动率
-        if (brandVirtualPayment.equals(BigDecimal.ZERO)){
+        if (brandVirtualPayment.equals(BigDecimal.ZERO) || brandVirtualPayment.intValue() == 0){
             brandPayDto.setMarketPrize("0");
         }else {
             brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
