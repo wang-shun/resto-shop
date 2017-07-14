@@ -41,16 +41,16 @@
 							<%--<input type="text" class="form-control" name="highMoney" :value="m.highMoney">--%>
 						<%--</div>--%>
 
-						<div  class="form-group">
-							<label style="float:left" >等位红包失效时间</label>
-							<div style="clear:both"></div>
-							<input v-if="showWaitTime" type="number" name="waitTime"  id="waitTime" min="1" class="form-control" style="width:20%;float:left;margin-right: 5px"  :value="m.waitTime">
-							<select class="form-control" style="width:30%;float:left" id="waitUnit"  name="waitUnit" @click="selectWaitUnit" v-model="m.waitUnit">
-								<option  value="1">小时</option>
-								<option selected="selected" value="2">天</option>
-								<option value="3">无限制</option>
-							</select>
-						</div>
+						<%--<div  class="form-group">--%>
+							<%--<label style="float:left" >等位红包失效时间</label>--%>
+							<%--<div style="clear:both"></div>--%>
+							<%--<input v-if="showWaitTime" type="number" name="waitTime"  id="waitTime" min="1" class="form-control" style="width:20%;float:left;margin-right: 5px"  :value="m.waitTime">--%>
+							<%--<select class="form-control" style="width:30%;float:left" id="waitUnit"  name="waitUnit" @click="selectWaitUnit" v-model="m.waitUnit">--%>
+								<%--<option  value="1">小时</option>--%>
+								<%--<option selected="selected" value="2">天</option>--%>
+								<%--<option value="3">无限制</option>--%>
+							<%--</select>--%>
+						<%--</div>--%>
 
 						<!--    Geek叫号功能    begin-->
 						<div class="form-group">
