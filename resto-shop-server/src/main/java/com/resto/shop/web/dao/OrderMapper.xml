@@ -3080,7 +3080,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         SUM(IF(top.payment_mode_id = 8, top.pay_value, 0)) waitNumberIncome,
         SUM(IF(top.payment_mode_id = 10, top.pay_value, 0)) aliPayment,
         ABS(SUM(IF(top.payment_mode_id = 11, top.pay_value, 0))) articleBackPay,
-        SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) - SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
+        SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) + SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
         SUM(IF(top.payment_mode_id = 16, top.pay_value, 0)) shanhuiPayment,
         SUM(IF(top.payment_mode_id = 17, top.pay_value, 0)) integralPayment
         from tb_order td
