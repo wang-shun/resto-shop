@@ -656,4 +656,12 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 
 	List<Order> getAllowAppraise();
+
+	/**
+	 * 查询退菜报表list
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<RefundArticleOrder> selectRefundArticleOrder(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
 }

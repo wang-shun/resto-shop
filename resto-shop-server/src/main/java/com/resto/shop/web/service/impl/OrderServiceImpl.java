@@ -8637,4 +8637,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap) {
         return orderMapper.selectDayAllOrderPayMent(selectMap);
     }
+
+    @Override
+    public List<RefundArticleOrder> selectRefundArticleOrder(String beginDate, String endDate) {
+        return orderMapper.selectRefundArticleOrder(beginDate, endDate);
+    }
 }
