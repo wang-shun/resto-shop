@@ -662,5 +662,5 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     //修复加菜时间过后 任然允许加菜的bug
     void fixErrorOrder();
 
-	List<RefundArticleOrder> selectRefundArticleOrder(String beginDate, String endDate);
+	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
 }

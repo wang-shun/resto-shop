@@ -8639,7 +8639,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<RefundArticleOrder> selectRefundArticleOrder(String beginDate, String endDate) {
-        return orderMapper.selectRefundArticleOrder(beginDate, endDate);
+    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
+        return orderMapper.addRefundArticleDto(beginDate, endDate);
     }
 }

@@ -49,7 +49,7 @@ public class RefundArticleController extends GenericController{
     public Result getRefundArticleList(String beginDate, String endDate){
         try{
             //得到所有退菜单信息
-            List<RefundArticleOrder> refundArticleOrders = orderService.selectRefundArticleOrder(beginDate, endDate);
+            List<RefundArticleOrder> refundArticleOrders = orderService.addRefundArticleDto(beginDate, endDate);
             for (RefundArticleOrder articleOrder : refundArticleOrders){
                 for (ShopDetail shopDetail : getCurrentShopDetails()){
                     if (articleOrder.getShopId().equalsIgnoreCase(shopDetail.getId())){
