@@ -7,15 +7,17 @@ import com.resto.brand.web.dto.ArticleTopDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.model.Appraise;
-import com.resto.shop.web.model.DayAppraiseMessageWithBLOBs;
 import com.resto.shop.web.model.DayDataMessage;
-import javafx.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yz on 2017-06-12.
