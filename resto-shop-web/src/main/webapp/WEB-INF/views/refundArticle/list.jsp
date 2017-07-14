@@ -110,8 +110,9 @@
             refundItem : []
         },
         created : function() {
-            this.searchDate.beginDate = beginDate;
-            this.searchDate.endDate = endDate;
+            var date = new Date().format("yyyy-MM-dd");
+            this.searchDate.beginDate = date;
+            this.searchDate.endDate = date;
             this.createRefundOrderTable();
             this.searchInfo();
         },
