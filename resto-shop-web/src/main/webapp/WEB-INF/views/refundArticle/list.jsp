@@ -57,18 +57,63 @@
                 </div>
                 <div class="modal-body">
                     <dl class="dl-horizontal">
-                        <dt></dt>
-                        <dd></dd>
+                        <dt>店铺：</dt>
+                        <dd>{{refundOrderDetail.shopName}}</dd>
+                        <dt>订单编号：</dt>
+                        <dd>{{refundOrderDetail.orderId}}</dd>
+                        <dt>下单时间：</dt>
+                        <dd>{{refundOrderDetail.pushOrderTime}}</dd>
+                        <dt>桌号：</dt>
+                        <dd>{{refundOrderDetail.tableNumber}}</dd>
+                        <dt>手机号：</dt>
+                        <dd>{{refundOrderDetail.telephone}}</dd>
+                        <dt>用户昵称：</dt>
+                        <dd>{{refundOrderDetail.nickName}}</dd>
+                        <dt>退菜数量：</dt>
+                        <dd>{{refundOrderDetail.refundCount}}</dd>
+                        <dt>退菜金额：</dt>
+                        <dd>{{refundOrderDetail.refundMoney}}</dd>
                     </dl>
                 </div>
                 <div class="table-scrollable">
                     <table class="table table-condensed table-hover">
                         <thead>
                             <tr>
-                                <th></th>
+                                <th>金额</th>
+                                <th>退款方式</th>
+                                <th>退款单号</th>
                             </tr>
                         </thead>
                         <tbody style="height: 300px;">
+                            <tr v-for="payment in refundPayment">
+                                <td>{{payment.payValue}}</td>
+                                <td>{{payment.paymentModeVal}}</td>
+                                <td>{{payment.id}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-scrollable">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                        <tr>
+                            <th>菜品名称</th>
+                            <th>单价</th>
+                            <th>退菜数量</th>
+                            <th>小计</th>
+                            <th>退菜时间</th>
+                            <th>退菜原因</th>
+                        </tr>
+                        </thead>
+                        <tbody style="height: 300px;">
+                            <tr v-for="item in refundItem">
+                                <td>{{item.articleName}}</td>
+                                <td>{{item.unitPrice}}</td>
+                                <td>{{item.refundCount}}</td>
+                                <td>{{item.refundMoney}}</td>
+                                <td>{{item.refundTime}}</td>
+                                <td>{{item.refundRemark}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
