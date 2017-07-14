@@ -102,7 +102,7 @@ public class RefundArticleController extends GenericController{
             }
             jsonObject = new JSONObject();
             jsonObject.put("refundPayment", orderPaymentItems);
-            jsonObject.put("refundItem", orderItems);
+            jsonObject.put("refundItem", array);
             return getSuccessResult(jsonObject);
         }catch (Exception e){
             e.printStackTrace();
