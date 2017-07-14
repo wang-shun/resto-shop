@@ -13,8 +13,11 @@
             </div>
 
 		</div>
-        <span style="color:#F00" >${wether_info.provinceName}/${wether_info.cityName}日期：${wether_info.dateTime} 星期：${wether_info.weekady} 天气:${wether_info.dayWeather}/${wether_info.dayTemperature}</span>
-        <img src=${wether_info.dayWeatherPic}>
+		<%--<div>--%>
+			<%--<span style="color:#F00" >${wether_info.provinceName}/${wether_info.cityName}日期：${wether_info.dateTime} 星期：${wether_info.weekady} 天气:${wether_info.dayWeather}/${wether_info.dayTemperature}℃</span>--%>
+			<%--<img src=${wether_info.dayWeatherPic}>--%>
+		<%--</div>--%>
+
 		<!-- END LOGO -->
 		<!-- BEGIN RESPONSIVE MENU TOGGLER -->
 		<a href="javascript:;" class="menu-toggler responsive-toggler"
