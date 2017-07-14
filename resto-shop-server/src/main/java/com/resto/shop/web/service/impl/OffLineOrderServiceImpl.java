@@ -44,4 +44,9 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
     public List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, Date begin, Date end, int offlinePos) {
         return offlineorderMapper.selectlistByTimeSourceAndShopId(id,begin,end,offlinePos);
     }
+
+    @Override
+    public OffLineOrder selectSumByTimeSourceAndShopId(int offlinePos, String id, Date begin, Date end) {
+        return offlineorderMapper.selectSumByTimeSourceAndShopId(offlinePos,id,begin,end);
+    }
 }

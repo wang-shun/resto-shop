@@ -380,6 +380,7 @@ order by t.print_sort asc
     set count = 0,
     refund_count = 1
     where parent_id = #{parentId}
+    or id = #{parentId}
   </update>
 
 

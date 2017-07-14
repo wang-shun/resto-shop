@@ -428,6 +428,26 @@ public class SpringContextConfig {
     public OrderRemarkService orderRemarkService() {return  proxy.create(OrderRemarkService.class);}
 
     @Bean
+    public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
+
+    //天气
+    @Bean
+    public  WetherService wetherService(){
+        return proxy.create(WetherService.class);
+    }
+
+
+    @Bean
+    public  DayDataMessageService dayDataMessageService(){
+        return proxy.create(DayDataMessageService.class);
+    }
+
+    @Bean
+    public  DayAppraiseMessageService dayAppraiseMessageService(){
+        return  proxy.create(DayAppraiseMessageService.class);
+    }
+
+    @Bean
     public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
 
     @Bean

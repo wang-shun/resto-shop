@@ -43,17 +43,17 @@
      @ResponseBody
      public Result modify(ShopDetail shopDetail){
          shopDetail.setId(getCurrentShopId());
-         switch (shopDetail.getWaitUnit()){
-             case 1 :
-                 shopDetail.setTimeOut(shopDetail.getWaitTime());
-                 break;
-             case 2 :
-                 shopDetail.setTimeOut(shopDetail.getWaitTime()  * 24);
-                 break;
-             case 3 :
-                 shopDetail.setTimeOut(Integer.MAX_VALUE);
-                 break;
-         }
+//         switch (shopDetail.getWaitUnit()){
+//             case 1 :
+//                 shopDetail.setTimeOut(shopDetail.getWaitTime());
+//                 break;
+//             case 2 :
+//                 shopDetail.setTimeOut(shopDetail.getWaitTime()  * 24);
+//                 break;
+//             case 3 :
+//                 shopDetail.setTimeOut(Integer.MAX_VALUE);
+//                 break;
+//         }
          shopDetailService.update(shopDetail);
          if(RedisUtil.get(getCurrentShopId()+"info") != null){
              RedisUtil.remove(getCurrentShopId()+"info");

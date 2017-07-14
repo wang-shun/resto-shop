@@ -5,6 +5,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
+import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.exception.AppException;
@@ -97,7 +98,7 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);
 
-
+	public List<Order> selectErrorOrder( Date date);
 
 	public List<Order> getOrderNoPayList(String currentShopId, Date date);
 
@@ -454,9 +455,9 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig,String brandName);
+	void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
 
-    public boolean cancelExceptionOrder(String orderId);
+	public boolean cancelExceptionOrder(String orderId);
 
     /**
      * 查询所有已提交单位支付的订单
@@ -646,11 +647,7 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	void changeOrderMode(String orderId);
 
-    /**
-     * 每日短信fix查看
-     * @param s
-     */
-    void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
+
 
     Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
 
@@ -664,6 +661,16 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order colseOrder(String orderId);
 
     List<Map<String, Object>> reminder(String orderItemId);
+
+
+
+	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+
+	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+
+    //修复加菜时间过后 任然允许加菜的bug
+    void fixErrorOrder();
+
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
 }

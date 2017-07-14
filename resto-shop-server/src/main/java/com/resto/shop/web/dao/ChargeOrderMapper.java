@@ -54,4 +54,6 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
     RechargeLogDto selectRechargeLog(@Param("begin")Date begin, @Param("end")Date end, @Param("brandId")String brandId);
 
     RechargeLogDto selectShopRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("shopId")String shopId);
+
+    List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
 }

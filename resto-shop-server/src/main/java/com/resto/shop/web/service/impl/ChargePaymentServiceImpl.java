@@ -52,6 +52,9 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
         return chargepaymentMapper.selectShopRechargeLog(begin,end,shopId);
 	}
 
+
+
+
     @Override
     public ChargePayment selectPayData(String shopId) {
         return chargepaymentMapper.selectPayData(shopId);

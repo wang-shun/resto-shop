@@ -1,8 +1,12 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
-
-<div id="control">
+<style>
+	.formBox{
+		color: #5bc0de;
+	}
+</style>
+<div id="control" class="row">
 	<div class="col-md-offset-3 col-md-6">
 		<div class="portlet light bordered">
 			<div class="portlet-title">
@@ -50,29 +54,117 @@
 
 						<!--    Geek叫号功能    begin-->
 						<div class="form-group">
-							<label class="col-md-4 control-label">店铺标语：</label>
-							<div  class="col-md-6">
+							<label>店铺标语：</label>
+							<div>
 								<input type="text" class="form-control" name="slogan" placeholder="请输入店铺标语,不填则取品牌设置的内容"
 									   v-model="m.slogan">
 							</div>
 						</div>
+
 						<div class="form-group">
-							<label class="col-md-4 control-label">等位提示：</label>
-							<div  class="col-md-6 ">
-								<textarea rows="3" class="form-control" name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"
-										  v-model="m.queueNotice"></textarea>
+							<label>字体颜色</label>
+							<div>
+								<input type="text" class="form-control color-mini" name="tvTextColor"
+									   data-position="bottom left" v-model="m.tvTextColor">
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label>背景图片</label>
+							<div>
+								<input type="hidden" name="tvBackground" v-model="m.tvBackground">
+								<img-file-upload class="form-control" @success="uploadSuccess"
+												 @error="uploadError"></img-file-upload>
+								<img v-if="m.tvBackground" :src="m.tvBackground" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>文本框底色</label>
+							<div>
+								<input type="text" class="form-control color-mini-textbox" name="tvTextBoxBackground"
+									   data-position="bottom left" v-model="m.tvTextBoxBackground">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>标头颜色</label>
+							<div>
+								<input type="text" class="form-control color-mini-head" name="tvHeadTextColor"
+									   data-position="bottom left" v-model="m.tvHeadTextColor">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>数字颜色</label>
+							<div>
+								<input type="text" class="form-control color-mini-number" name="tvNumberColor"
+									   data-position="bottom left" v-model="m.tvNumberColor">
+							</div>
+						</div>
+						<%--<div class="form-group">--%>
+							<%--<label class="col-md-4 control-label">等位提示：</label>--%>
+							<%--<div  class="col-md-6 ">--%>
+								<%--<textarea rows="3" class="form-control" name="queueNotice" placeholder="请输入等位提示,不填则取品牌设置的内容"--%>
+										  <%--v-model="m.queueNotice"></textarea>--%>
+							<%--</div>--%>
+						<%--</div>--%>
 						<!--    Geek叫号功能    end-->
 						<div class="form-group">
-							<label class="col-md-4 control-label":class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
-							<div  class="col-md-6 radio-list">
+							<label :class="{ formBox : m.isUserIdentity == 1}">开启显示用户标识功能：</label>
+							<div>
 								<label class="radio-inline">
 									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="1"> 是
 								</label>
 								<label class="radio-inline">
 									<input type="radio" name="isUserIdentity" v-model="m.isUserIdentity" value="0"> 否
 								</label>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>叫号推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitJiaohao" v-model="m.waitJiaohao">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>就餐推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitJiucan" v-model="m.waitJiucan">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>过号推送模板：</label>
+							<div>
+								<input type="text" class="form-control" name="waitGuohao" v-model="m.waitGuohao">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">是否开启等位提醒：</label>
+							<div>
+								<label class="radio-inline">
+									<input type="radio" name="waitRemindSwitch" v-model="m.waitRemindSwitch" value="1"> 是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="waitRemindSwitch" v-model="m.waitRemindSwitch" value="0"> 否
+								</label>
+							</div>
+						</div>
+						<div class="form-group" v-if="m.waitRemindSwitch==1">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">提前提醒桌数：</label>
+							<div>
+								<input type="number" class="form-control" name="waitRemindNumber" v-model="m.waitRemindNumber">
+							</div>
+						</div>
+
+						<div class="form-group" v-if="m.waitRemindSwitch==1">
+							<label :class="{ formBox : m.waitRemindSwitch == 1}">提醒推送文案：</label>
+							<div>
+								<input type="text" class="form-control" name="waitRemindText" v-model="m.waitRemindText">
 							</div>
 						</div>
 
@@ -112,6 +204,68 @@
 				m:{},
 				showWaitTime:true
 			},
+			created: function () {
+//				tb.search("").draw();
+				var n = $('.color-mini').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini').minicolors("value", this.m.tvTextColor);
+					}
+				});
+
+				var n = $('.color-mini-textbox').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-textbox').minicolors("value", this.m.tvTextBoxBackground);
+					}
+				});
+
+				var n = $('.color-mini-head').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-head').minicolors("value", this.m.tvHeadTextColor);
+					}
+				});
+
+				var n = $('.color-mini-number').minicolors({
+					change: function (hex, opacity) {
+						if (!hex) return;
+						if (typeof console === 'object') {
+							$(this).attr("value", hex);
+						}
+					},
+					theme: 'bootstrap'
+				});
+				this.$watch("m", function () {
+					if (this.m.id) {
+						$('.color-mini-number').minicolors("value", this.m.tvNumberColor);
+					}
+				});
+			},
 			methods:{
 				initTime :function(){
 					$(".timepicker-no-seconds").timepicker({
@@ -146,12 +300,19 @@
 							toastr.error("保存失败");
 						}
 					})
-					
 				},
 				cancel:function(){
 					initContent();
-					
-				}
+				},
+				uploadSuccess: function (url) {
+					console.log(url);
+					$("[name='tvBackground']").val(url).trigger("change");
+					C.simpleMsg("上传成功");
+					$("#tvBackground").attr("src", "/" + url);
+				},
+				uploadError: function (msg) {
+					C.errorMsg(msg);
+				},
 			}
 
 		});

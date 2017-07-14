@@ -103,6 +103,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 
 
+	List<Order> selectErrorOrder(@Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+
+
+
+
 	/**
 	 * 查询未付款的订单（后付模式）
 	 * @param currentShopId
@@ -303,20 +308,55 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 
+	/**
+	 * 更新该餐品库存 （-1）（无规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
+	/**
+	 * 更新该餐品库存 （-1）（有规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
 
-
-
+	/**
+	 * 库存为0时设置沽清	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmpty(String articleId);
 
 	
-
+	/**
+	 * 库存为0时设置沽清	---	tb_article_price
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setArticlePriceEmpty(String articleId);
 	
 	
-
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article	
+	 * @param articleId
+	 * @return
+     */
+	Boolean setEmptyFail(String articleId);
 	
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article_price	
+	 * @param articleId
+	 * @return
+     */
+	Boolean setArticlePriceEmptyFail(String articleId);
 
-
-
+	/**
+	 * 将单品最低库存设置为 套餐库存
+	 * @return
+	 */
+	Boolean setStockBySuit(@Param("shopId")String shopId);
 
 	BigDecimal getPayment(Map<String, Object> selectMap);
 
@@ -444,9 +484,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
 
-    Integer  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    List<Integer>  selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
-    brandArticleReportDto selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+    List<brandArticleReportDto> selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -652,11 +692,18 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
 
-
+    List<Article> getStockBySuit(String shopId);
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
-	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
 
-	void colseOrder(String orderId);
+	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+
+	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+
+	void fixAllowContinueOrder(@Param("beginDate") Date begin);
+
+	List<Order> getAllowAppraise();
+	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
+    void colseOrder(String orderId);
 }
