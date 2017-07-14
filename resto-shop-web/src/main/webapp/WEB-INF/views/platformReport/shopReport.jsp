@@ -48,13 +48,13 @@
                 <div class="modal-header" style="background-color:#E0EBF9;">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">×</span></button>
-                    <h4 class="modal-title" id="exampleModalLabel" style="text-align:center">New message</h4>
+                    <h4 class="modal-title" id="exampleModalLabel" style="text-align:center">外卖订单详情</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <ul class="list-unstyled">
                             <li>店铺名称：{{platformOrderk.shopName}}</li>
-                            <li v-if="platformOrderk.type == 1">订单来源：饿了吗订单</li>
+                            <li v-if="platformOrderk.type == 1">订单来源：饿了么订单</li>
                             <li v-if="platformOrderk.type == 2">订单来源：美团外卖订单</li>
                             <li v-if="platformOrderk.type == 3">订单来源：百度外卖订单</li>
                             <li>订单编号：{{platformOrderk.platformOrderId}}</li>

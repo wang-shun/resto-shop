@@ -48,11 +48,11 @@
                         <tr>
                             <th>品牌</th>
                             <th>外卖订单数</th>
-                            <th>饿了吗订单数</th>
+                            <th>饿了么订单数</th>
                             <th>美团外卖订单数</th>
                            <%-- <th>百度外卖订单数</th>--%>
                             <th>外卖订单额</th>
-                            <th>饿了吗订单额</th>
+                            <th>饿了么订单额</th>
                             <th>美团外卖订单额</th>
                             <%--<th>百度外卖订单额</th>--%>
                         </tr>
@@ -167,7 +167,7 @@
                             data : "allCount"
                         },
                         {
-                            title : "饿了吗订单数",
+                            title : "饿了么订单数",
                             data : "elmCount"
                         },
                         {
@@ -183,7 +183,7 @@
                             data : "allPrice"
                         },
                         {
-                            title : "饿了吗订单额",
+                            title : "饿了么订单额",
                             data : "elmPrice"
                         },
                         {
