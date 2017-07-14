@@ -6,6 +6,8 @@ import eleme.openapi.sdk.api.entity.order.OOrder;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class PlatformOrder {
     private String id;
@@ -35,6 +37,36 @@ public class PlatformOrder {
     private String remark;
 
     private String sourceText;
+
+    private List<PlatformOrderDetail> platformOrderDetails;
+
+    private List<Map<String, Object>> shopAppraises;
+
+    private  String shopName;
+
+    public List<Map<String, Object>> getShopAppraises() {
+        return shopAppraises;
+    }
+
+    public void setShopAppraises(List<Map<String, Object>> shopAppraises) {
+        this.shopAppraises = shopAppraises;
+    }
+
+    public List<PlatformOrderDetail> getPlatformOrderDetails() {
+        return platformOrderDetails;
+    }
+
+    public void setPlatformOrderDetails(List<PlatformOrderDetail> platformOrderDetails) {
+        this.platformOrderDetails = platformOrderDetails;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
+    }
 
     public String getId() {
         return id;

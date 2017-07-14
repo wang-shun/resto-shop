@@ -451,6 +451,10 @@ public class SpringContextConfig {
     @Bean
     public WxServerConfigService wxServerConfigService(){return  proxy.create(WxServerConfigService.class);}
 
+    @Bean
+    public PlatformOrderService platformOrderService(){return  proxy.create(PlatformOrderService.class);}
+
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
