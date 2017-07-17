@@ -203,7 +203,6 @@ public class ArticleController extends GenericController {
     @ResponseBody
     public List<Article> getSingoListAll() {
         List<Article> result = articleService.getSingoArticleAll(getCurrentShopId());
-        System.out.println("shopid----------------->"+getCurrentShopId()+"<>"+result.size());
         return result;
     }
 
