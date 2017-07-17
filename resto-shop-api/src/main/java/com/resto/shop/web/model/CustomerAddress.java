@@ -3,6 +3,7 @@ package com.resto.shop.web.model;
 import java.util.Date;
 
 public class CustomerAddress {
+
     private String id;
 
     private String name;
