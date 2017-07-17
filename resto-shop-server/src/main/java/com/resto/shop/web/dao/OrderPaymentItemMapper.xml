@@ -274,4 +274,8 @@
             <if test="resultData != null">#{resultData,jdbcType=LONGVARCHAR},</if>
         </trim>
     </insert>
+
+    <select id="selectRefundPayMent" resultType="com.resto.shop.web.model.OrderPaymentItem">
+        select * from tb_order_payment_item where order_id = #{orderId} and pay_value &lt; 0
+    </select>
 </mapper>

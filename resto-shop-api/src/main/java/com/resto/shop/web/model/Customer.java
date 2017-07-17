@@ -89,6 +89,16 @@ public class Customer implements Serializable{
     //会员序号
     private Long serialNumber;
 
+    private String shareLink;
+
+    public String getShareLink() {
+        return shareLink;
+    }
+
+    public void setShareLink(String shareLink) {
+        this.shareLink = shareLink;
+    }
+
     public Long getSerialNumber() {
         return serialNumber;
     }

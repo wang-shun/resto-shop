@@ -3098,4 +3098,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         ORDER BY td.create_time asc
         LIMIT #{pageNo},1000
     </select>
+
+    <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
+        call proc_refund_article_report(#{beginDate},#{endDate})
+    </select>
 </mapper>
