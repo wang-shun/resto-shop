@@ -4,11 +4,13 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.ShopTvConfig;
 import com.resto.brand.web.service.ShopTvConfigService;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.model.SmsLog;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * Created by carl on 2017/7/17.
@@ -31,4 +33,16 @@ public class ShopTvConfigController extends GenericController {
         return getSuccessResult(shopTvConfig);
     }
 
+    @RequestMapping("modify")
+    @ResponseBody
+    public Result modify(ShopTvConfig shopTvConfig){
+        if(shopTvConfig.getShopDetailId() == null || "".equals(shopTvConfig.getShopDetailId())){
+            shopTvConfig.setShopDetailId(getCurrentShopId());
+            shopTvConfig.setBrandId(getCurrentBrandId());
+            shopTvConfigService.insert(shopTvConfig);
+        }else{
+            shopTvConfigService.update(shopTvConfig);
+        }
+        return Result.getSuccess();
+    }
 }

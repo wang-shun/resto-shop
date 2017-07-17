@@ -17,6 +17,9 @@
 			<div class="portlet-body">
 				<form role="form" action="{{'shopTvConfig/modify'}}" @submit.prevent="save">
 					<div class="form-body">
+						<input type="hidden" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
+						<input type="hidden" class="form-control" name="id" v-model="m.id">
+
 						<div class="form-group">
 							<label>准备中底色</label>
 							<div>
@@ -24,7 +27,6 @@
 									   data-position="bottom left" v-model="m.readyBackColor">
 							</div>
 						</div>
-
 
 						<div style="clear:both"></div>
 						<br/>
@@ -63,7 +65,7 @@
 				showWaitTime:true
 			},
 			created: function () {
-				var n = $('.color-mini').minicolors({
+				var a = $('.color-mini').minicolors({
 					change: function (hex, opacity) {
 						if (!hex) return;
 						if (typeof console === 'object') {
@@ -82,7 +84,7 @@
 				save:function(e){
 					var formDom = e.target;
 					$.ajax({
-						url:"shopDetailManage/modify",
+						url:"shopTvConfig/modify",
 						data:$(formDom).serialize(),
 						success:function(result){
 							if(result.success){

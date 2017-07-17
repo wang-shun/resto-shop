@@ -221,7 +221,7 @@
 					}
 				});
 
-				var n = $('.color-mini-textbox').minicolors({
+				var m = $('.color-mini-textbox').minicolors({
 					change: function (hex, opacity) {
 						if (!hex) return;
 						if (typeof console === 'object') {
@@ -236,7 +236,7 @@
 					}
 				});
 
-				var n = $('.color-mini-head').minicolors({
+				var k = $('.color-mini-head').minicolors({
 					change: function (hex, opacity) {
 						if (!hex) return;
 						if (typeof console === 'object') {
@@ -251,7 +251,7 @@
 					}
 				});
 
-				var n = $('.color-mini-number').minicolors({
+				var l = $('.color-mini-number').minicolors({
 					change: function (hex, opacity) {
 						if (!hex) return;
 						if (typeof console === 'object') {
