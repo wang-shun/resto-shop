@@ -591,7 +591,12 @@
                 });
 
 
-                $.post("article/singo_article", null, function (data) {
+               /* $.post("article/singo_article", null, function (data) {
+                    that.articleList = data;
+                    articleList = data;
+                    all = data;
+                });*/
+                $.post("article/singo_article_all", null, function (data) {
                     that.articleList = data;
                     articleList = data;
                     all = data;
