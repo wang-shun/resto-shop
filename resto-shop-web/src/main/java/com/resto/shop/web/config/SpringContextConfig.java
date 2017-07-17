@@ -474,10 +474,6 @@ public class SpringContextConfig {
     @Bean
     public PlatformOrderService platformOrderService(){return  proxy.create(PlatformOrderService.class);}
 
-
-    @Bean
-    public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
-
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
