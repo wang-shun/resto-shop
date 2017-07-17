@@ -1,8 +1,12 @@
 package com.resto.shop.web.controller.business;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.RefundArticleOrder;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.PayMode;
@@ -18,9 +22,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("refundArticle")
@@ -108,6 +120,72 @@ public class RefundArticleController extends GenericController{
             e.printStackTrace();
             log.error("查询退菜明细出错" + e.getMessage());
             return new Result(false);
+        }
+    }
+
+    @RequestMapping("/createExcel")
+    @ResponseBody
+    public Result createExcel(String beginDate, String endDate, RefundArticleOrder refundArticleOrder, HttpServletRequest request){
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
+        // 导出文件名
+        String str = "退菜报表" + beginDate + "至" + endDate + ".xls";
+        String path = request.getSession().getServletContext().getRealPath(str);
+        String shopName = "";
+        for (ShopDetail shopDetail : shopDetailList) {
+            shopName += shopDetail.getName() + ",";
+        }
+        // 去掉最后一个逗号
+        shopName = shopName.substring(0, shopName.length() - 1);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", beginDate);
+        map.put("reportType", "退菜报表");// 表的头，第一行内容
+        map.put("endDate", endDate);
+        map.put("num", "6");// 显示的位置
+        map.put("reportTitle", "退菜报表");// 表的名字
+        map.put("timeType", "yyyy-MM-dd");
+
+        String[][] headers = {{"店铺", "20"},{"订单编号", "20"},{"桌号", "20"},{"手机号", "20"},{"用户名称", "20"},{"退菜数量", "20"},{"退菜金额", "20"}};
+        String[] columns = {"shopName", "orderId", "tableNumber", "telephone", "nickName", "refundCount", "refundMoney"};
+
+        List<RefundArticleOrder> result = new ArrayList<>();
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("refundArticleOrderList");
+        String json = JSON.toJSONString(refundArticleOrder.getRefundArticleOrderList(), filter);
+        List<RefundArticleOrder> brandIncomeDto = JSON.parseObject(json, new TypeReference<List<RefundArticleOrder>>(){});
+        result.addAll(brandIncomeDto);
+        ExcelUtil<RefundArticleOrder> excelUtil = new ExcelUtil<>();
+        try {
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportExcel(headers, columns, result, out, map);
+            out.close();
+        } catch (Exception e) {
+            log.error("生成退菜报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult(path);
+    }
+
+    /**
+     * 下载报表
+     * @param path
+     * @param response
+     */
+    @RequestMapping("/downloadExcel")
+    public void downloadExcel(String path, HttpServletResponse response){
+        ExcelUtil<RefundArticleOrder> excelUtil = new ExcelUtil<>();
+        try {
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch (Exception e){
+            log.error("下载退菜报表出错！");
+            JOptionPane.showMessageDialog(null, "导出失败！");
+            e.printStackTrace();
+            throw e;
         }
     }
 }

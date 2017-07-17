@@ -253,10 +253,11 @@
                 }
             },
             createExcel : function () {
+                var that = this;
                 toastr.clear();
                 toastr.success("下载中...");
                 try{
-                   $.post("refundArticle/createExcel", {refundArticleOrderList : refundArticleOrderList}, function (result) {
+                   $.post("refundArticle/createExcel", {refundArticleOrderList : that.refundArticleOrderList}, function (result) {
                         if (result.success){
                             location.href = "refundArticle/downloadExcel?path=" + result.data;
                         }else {
