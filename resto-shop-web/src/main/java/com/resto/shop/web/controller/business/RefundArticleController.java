@@ -151,11 +151,14 @@ public class RefundArticleController extends GenericController{
         String[] columns = {"shopName", "orderId", "tableNumber", "telephone", "nickName", "refundCount", "refundMoney"};
 
         List<RefundArticleOrder> result = new ArrayList<>();
-        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-        filter.getExcludes().add("refundArticleOrderList");
-        String json = JSON.toJSONString(refundArticleOrder.getRefundArticleOrderList(), filter);
-        List<RefundArticleOrder> brandIncomeDto = JSON.parseObject(json, new TypeReference<List<RefundArticleOrder>>(){});
-        result.addAll(brandIncomeDto);
+        if (refundArticleOrder.getRefundArticleOrderList() != null && refundArticleOrder.getRefundArticleOrderList().size() != 0) {
+            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+            filter.getExcludes().add("refundArticleOrderList");
+            String json = JSON.toJSONString(refundArticleOrder.getRefundArticleOrderList(), filter);
+            List<RefundArticleOrder> brandIncomeDto = JSON.parseObject(json, new TypeReference<List<RefundArticleOrder>>() {
+            });
+            result.addAll(brandIncomeDto);
+        }
         ExcelUtil<RefundArticleOrder> excelUtil = new ExcelUtil<>();
         try {
             OutputStream out = new FileOutputStream(path);

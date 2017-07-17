@@ -261,6 +261,8 @@
                 try{
                    $.post("refundArticle/createExcel", object, function (result) {
                         if (result.success){
+                            toastr.clear();
+                            toastr.success("下载成功");
                             location.href = "refundArticle/downloadExcel?path=" + result.data;
                         }else {
                             toastr.clear();
