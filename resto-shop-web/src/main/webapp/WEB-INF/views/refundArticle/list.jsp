@@ -24,7 +24,7 @@
                 <button type="button" class="btn btn-primary" @click="week">本周</button>
                 <%--<button type="button" class="btn btn-primary" @click="month">本月</button>--%>
                 <button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-                <button type="button" class="btn btn-primary">下载报表</button>
+                <button type="button" class="btn btn-primary" @click="createExcel">下载报表</button>
             </form>
         </div>
     </div>
@@ -76,7 +76,7 @@
                     </dl>
                 </div>
                 <div class="table-scrollable">
-                    <table class="table table-condensed table-hover">
+                    <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>金额</th>
@@ -94,7 +94,7 @@
                     </table>
                 </div>
                 <div class="table-scrollable">
-                    <table class="table table-condensed table-hover">
+                    <table class="table table-striped table-bordered">
                         <thead>
                         <tr>
                             <th>菜品名称</th>
@@ -247,6 +247,23 @@
                             toastr.error("查询出错");
                         }
                     });
+                }catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            createExcel : function () {
+                toastr.clear();
+                toastr.success("下载中...");
+                try{
+                   $.post("refundArticle/createExcel", {refundArticleOrderList : refundArticleOrderList}, function (result) {
+                        if (result.success){
+                            location.href = "refundArticle/downloadExcel?path=" + result.data;
+                        }else {
+                            toastr.clear();
+                            toastr.error("下载出错");
+                        }
+                   });
                 }catch (e){
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
