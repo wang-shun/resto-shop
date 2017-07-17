@@ -1,4 +1,4 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -39,45 +39,45 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
 
- /**
+/**
  * 菜品销售报表
  * @author lmx
  */
 @Controller
 @RequestMapping("/articleSell")
 public class ArticleSellController extends GenericController{
-	
-	@Resource
-	OrderService orderService;
-	
-	@Resource
-	OrderItemService orderItemService;
-	
-	@Resource
-	ShopDetailService shopDetailService;
-	
-	@Resource
-	BrandService brandServie;
-	
-	@Resource
-	ArticleFamilyService articleFamilyService;
-	
-	@Resource
-	ArticleService articleService;
 
-	@Autowired
+    @Resource
+    OrderService orderService;
+
+    @Resource
+    OrderItemService orderItemService;
+
+    @Resource
+    ShopDetailService shopDetailService;
+
+    @Resource
+    BrandService brandServie;
+
+    @Resource
+    ArticleFamilyService articleFamilyService;
+
+    @Resource
+    ArticleService articleService;
+
+    @Autowired
     MealAttrService mealAttrService;
-	
-	
-	@RequestMapping("/list")
+
+
+    @RequestMapping("/list")
     public void list(){
     }
-	
-	@RequestMapping("/brandList")
+
+    @RequestMapping("/brandList")
     public void brandList(){
     }
-	
-	@RequestMapping("/shopList")
+
+    @RequestMapping("/shopList")
     public void shopList(){
     }
 
@@ -88,11 +88,11 @@ public class ArticleSellController extends GenericController{
      * @param type
      * @return
      */
-	@RequestMapping("/queryOrderArtcile")
-	@ResponseBody
-	public Result queryOrderArtcile(String beginDate, String endDate, Integer type){
+    @RequestMapping("/queryOrderArtcile")
+    @ResponseBody
+    public Result queryOrderArtcile(String beginDate, String endDate, Integer type){
         JSONObject object = new JSONObject();
-	    try {
+        try {
             Map<String, Object> selectMap = new HashMap<String, Object>();
             List<ArticleSellDto> brandArticleType = articleFamilyService.selectByShopId(null);
             BigDecimal brandSellNum = new BigDecimal(0);
@@ -221,8 +221,8 @@ public class ArticleSellController extends GenericController{
             e.printStackTrace();
             return new Result(false);
         }
-		return getSuccessResult(object);
-	}
+        return getSuccessResult(object);
+    }
 
     /**
      * 进入套餐子项详情页面
@@ -232,13 +232,13 @@ public class ArticleSellController extends GenericController{
      * @param endDate
      * @return
      */
-	@RequestMapping("/showMealAttr")
-	public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate){
-		request.setAttribute("articleId", articleId);
-		request.setAttribute("beginDate", beginDate);
-		request.setAttribute("endDate", endDate);
-		return "articleSell/mealAttr";
-	}
+    @RequestMapping("/showMealAttr")
+    public String showMealAttr(HttpServletRequest request, String articleId, String beginDate, String endDate){
+        request.setAttribute("articleId", articleId);
+        request.setAttribute("beginDate", beginDate);
+        request.setAttribute("endDate", endDate);
+        return "articleSell/mealAttr";
+    }
 
     /**
      * 进入店铺菜品销售表详情页面
@@ -248,14 +248,14 @@ public class ArticleSellController extends GenericController{
      * @param shopId
      * @return
      */
-	@RequestMapping("/showShopArticle")
-	public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId, String shopName){
-		request.setAttribute("beginDate", beginDate);
-		request.setAttribute("endDate", endDate);
-		request.setAttribute("shopId", shopId);
+    @RequestMapping("/showShopArticle")
+    public String showShopArticle(HttpServletRequest request, String beginDate, String endDate, String shopId, String shopName){
+        request.setAttribute("beginDate", beginDate);
+        request.setAttribute("endDate", endDate);
+        request.setAttribute("shopId", shopId);
         request.setAttribute("shopName",shopName);
-		return "articleSell/shopArticle";
-	}
+        return "articleSell/shopArticle";
+    }
 
     /**
      * 查询套餐子项销量
@@ -264,42 +264,42 @@ public class ArticleSellController extends GenericController{
      * @param endDate
      * @return
      */
-	@RequestMapping("/queryArticleMealAttr")
-	@ResponseBody
-	public Result queryArticleMealAttr(String articleId, String beginDate, String endDate){
-		Map<String, Object> selectMap = new HashMap<String, Object>();
-		selectMap.put("articleId", articleId);
-		selectMap.put("beginDate", beginDate);
-		selectMap.put("endDate", endDate);
-		List<ArticleSellDto> articleSellDtos = mealAttrService.queryArticleMealAttr(selectMap);
-		return getSuccessResult(articleSellDtos);
-	}
-	
-	/**
-	 * 生成品牌菜品销售表(单品/套餐)
-	 */
-	@RequestMapping("/createBrnadArticle")
-	@ResponseBody
-	public Result createBrnadArticle(HttpServletRequest request, ArticleSellDto articleSellDto,
-			String beginDate, String endDate, Integer type){
-		//导出文件名
-		String fileName = null;
-		//定义读取文件的路径
-		String path = null;
-		Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
-		String[] columns = {"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
-		String[][] headers = {{"品牌名称/菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+    @RequestMapping("/queryArticleMealAttr")
+    @ResponseBody
+    public Result queryArticleMealAttr(String articleId, String beginDate, String endDate){
+        Map<String, Object> selectMap = new HashMap<String, Object>();
+        selectMap.put("articleId", articleId);
+        selectMap.put("beginDate", beginDate);
+        selectMap.put("endDate", endDate);
+        List<ArticleSellDto> articleSellDtos = mealAttrService.queryArticleMealAttr(selectMap);
+        return getSuccessResult(articleSellDtos);
+    }
+
+    /**
+     * 生成品牌菜品销售表(单品/套餐)
+     */
+    @RequestMapping("/createBrnadArticle")
+    @ResponseBody
+    public Result createBrnadArticle(HttpServletRequest request, ArticleSellDto articleSellDto,
+                                     String beginDate, String endDate, Integer type){
+        //导出文件名
+        String fileName = null;
+        //定义读取文件的路径
+        String path = null;
+        Brand brand = brandServie.selectById(getCurrentBrandId());//定义列
+        String[] columns = {"typeName","articleFamilyName","articleName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
+        String[][] headers = {{"品牌名称/菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[] columnsType = {"articleFamilyName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"品牌名称/菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
-		//获取店铺名称
-		List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-		String shopName="";
-		for (ShopDetail shopDetail : shops) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
+        //获取店铺名称
+        List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
+        String shopName="";
+        for (ShopDetail shopDetail : shops) {
+            shopName += shopDetail.getName()+",";
+        }
+        //去掉最后一个逗号
         shopName = shopName.substring(0, shopName.length()-1);
-		//定义数据
+        //定义数据
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandReport");
         filter.getExcludes().add("brandArticleUnit");
@@ -308,7 +308,7 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
-		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
+        List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
             Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
@@ -324,44 +324,44 @@ public class ArticleSellController extends GenericController{
             brandReport.setDiscountMoney(new BigDecimal(brandReportMap.get("discountTotal").toString()));
             result.add(brandReport);
         }
-		Map<String,String> map = new HashMap<>();
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		map.put("brandName", brand.getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("endDate", endDate);
+        Map<String,String> map = new HashMap<>();
+        //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+        map.put("brandName", brand.getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", beginDate);
+        map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
         }else {
             map.put("num","8");
         }
-		map.put("timeType", "yyyy-MM-dd");
-		//如果是单品
-		if(type.equals(ArticleType.SIMPLE_ARTICLE)){
-			//导出文件名
-			fileName = "品牌菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
-			path = request.getSession().getServletContext().getRealPath(fileName);
-			map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
-			map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
-			//定义数据
+        map.put("timeType", "yyyy-MM-dd");
+        //如果是单品
+        if(type.equals(ArticleType.SIMPLE_ARTICLE)){
+            //导出文件名
+            fileName = "品牌菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "品牌菜品销售报表(单品)");//表的头，第一行内容
+            map.put("reportTitle", "品牌菜品销售报表(单品)");//表的名字
+            //定义数据
             if(articleSellDto.getBrandArticleUnit() != null) {
                 String json = JSON.toJSONString(articleSellDto.getBrandArticleUnit(), filter);
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
-		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
-			//导出文件名
-			fileName = "品牌菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
-			path = request.getSession().getServletContext().getRealPath(fileName);
-			map.put("reportType", "品牌菜品销售报表(套餐)");//表的头，第一行内容
-			map.put("reportTitle", "品牌菜品销售报表(套餐)");//表的名字
-			//定义数据
+        }else if(type.equals(ArticleType.TOTAL_ARTICLE)){
+            //导出文件名
+            fileName = "品牌菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "品牌菜品销售报表(套餐)");//表的头，第一行内容
+            map.put("reportTitle", "品牌菜品销售报表(套餐)");//表的名字
+            //定义数据
             if(articleSellDto.getBrandArticleFamily() != null) {
                 String json = JSON.toJSONString(articleSellDto.getBrandArticleFamily(), filter);
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
-		}else{
+        }else{
             //导出文件名
             fileName = "品牌菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -374,23 +374,23 @@ public class ArticleSellController extends GenericController{
                 result.addAll(articleSellDtos);
             }
         }
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
+        //定义excel工具类对象
+        ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
             }else {
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
             }
-			out.close();
-		}catch(Exception e){
-		    log.error("生成菜品销售报表出错！");
-			e.printStackTrace();
+            out.close();
+        }catch(Exception e){
+            log.error("生成菜品销售报表出错！");
+            e.printStackTrace();
             return new Result(false);
-		}
-		return getSuccessResult(path);
-	}
+        }
+        return getSuccessResult(path);
+    }
 
     /**
      * 向报表追加记录
@@ -400,10 +400,10 @@ public class ArticleSellController extends GenericController{
      * @param articleSellDto
      * @return
      */
-	@RequestMapping("/appendToBrandExcel")
+    @RequestMapping("/appendToBrandExcel")
     @ResponseBody
-	public Result appendToBrandExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
-	    try{
+    public Result appendToBrandExcel(String path, Integer startPosition, Integer type, ArticleSellDto articleSellDto){
+        try{
             String[][] items = null;
             int i = 0;
             //如果是单品
@@ -450,25 +450,25 @@ public class ArticleSellController extends GenericController{
             e.printStackTrace();
             return new Result(false);
         }
-	    return getSuccessResult();
+        return getSuccessResult();
     }
 
-	/**
-	 * 下载品牌菜品销售表
-	 */
-	@RequestMapping("/downloadBrnadArticle")
-	@ResponseBody
-	public void downloadBrnadArticle( HttpServletResponse response,String path){
-		//定义excel工具类对象
-		ExcelUtil<Object> excelUtil=new ExcelUtil<>();
-		try{
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+    /**
+     * 下载品牌菜品销售表
+     */
+    @RequestMapping("/downloadBrnadArticle")
+    @ResponseBody
+    public void downloadBrnadArticle( HttpServletResponse response,String path){
+        //定义excel工具类对象
+        ExcelUtil<Object> excelUtil=new ExcelUtil<>();
+        try{
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 查询当前店铺下的菜品销售详情
@@ -477,11 +477,11 @@ public class ArticleSellController extends GenericController{
      * @param shopId
      * @return
      */
-	@RequestMapping("/queryShopOrderArtcile")
-	@ResponseBody
-	public Result queryShopOrderArtcile(String beginDate, String endDate, String shopId){
-	    JSONObject object = new JSONObject();
-	    try {
+    @RequestMapping("/queryShopOrderArtcile")
+    @ResponseBody
+    public Result queryShopOrderArtcile(String beginDate, String endDate, String shopId){
+        JSONObject object = new JSONObject();
+        try {
             Map<String, Object> selectMap = new HashMap<String, Object>();
             selectMap.put("beginDate", beginDate);
             selectMap.put("endDate", endDate);
@@ -494,13 +494,13 @@ public class ArticleSellController extends GenericController{
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
             Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos) {
-                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")) {
+                if (unitMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("sellNum").toString()) == 0) {
                     articleUnitSellDto.setNumRatio("0.00%");
                 } else {
                     articleUnitSellDto.setNumRatio(new BigDecimal(articleUnitSellDto.getShopSellNum()).divide(new BigDecimal(
                             unitMap.get("sellNum").toString()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
                 }
-                if (unitMap.get("salles").toString().equalsIgnoreCase("0")) {
+                if (unitMap.get("salles").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("salles").toString()) == 0) {
                     articleUnitSellDto.setSalesRatio("0.00%");
                 } else {
                     articleUnitSellDto.setSalesRatio(articleUnitSellDto.getSalles().divide(new BigDecimal(
@@ -586,12 +586,12 @@ public class ArticleSellController extends GenericController{
             }
             object.put("shopArticleFamilyDtos", articleFamilySellDtos);
             for (ArticleSellDto articleSellDto : shopArticleType){
-                if (shopSellNum.equals(BigDecimal.ZERO)){
+                if (shopSellNum.equals(BigDecimal.ZERO) || shopSellNum.intValue() == 0){
                     articleSellDto.setNumRatio("0.00%");
                 }else{
                     articleSellDto.setNumRatio(new BigDecimal(articleSellDto.getShopSellNum()).divide(shopSellNum,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString().concat("%"));
                 }
-                if (salles.equals(BigDecimal.ZERO)){
+                if (salles.equals(BigDecimal.ZERO) || salles.intValue() == 0){
                     articleSellDto.setSalesRatio("0.00%");
                 }else{
                     articleSellDto.setSalesRatio(articleSellDto.getSalles().divide(salles,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString().concat("%"));
@@ -603,27 +603,27 @@ public class ArticleSellController extends GenericController{
             e.printStackTrace();
             return new Result(false);
         }
-		return getSuccessResult(object);
-	}
-	
-	/**
-	 * 生成店铺菜品销售表(单品/套餐)
-	 */
-	@RequestMapping("/createShopArticle")
-	@ResponseBody
-	public Result createShopArticle(HttpServletRequest request, ArticleSellDto articleSellDto,
-			String beginDate, String endDate, Integer type, String shopId){
-		//导出文件名
-		String fileName = null;
-		//定义读取文件的路径
-		String path = null;
-		//定义列
-		String[]columns={"typeName","articleFamilyName","articleName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
-		String[][] headers = {{"菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        return getSuccessResult(object);
+    }
+
+    /**
+     * 生成店铺菜品销售表(单品/套餐)
+     */
+    @RequestMapping("/createShopArticle")
+    @ResponseBody
+    public Result createShopArticle(HttpServletRequest request, ArticleSellDto articleSellDto,
+                                    String beginDate, String endDate, Integer type, String shopId){
+        //导出文件名
+        String fileName = null;
+        //定义读取文件的路径
+        String path = null;
+        //定义列
+        String[]columns={"typeName","articleFamilyName","articleName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
+        String[][] headers = {{"菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[]columnsType={"articleFamilyName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
-		String shopName= shopDetailService.selectById(shopId).getName();
-		//定义数据
+        String shopName= shopDetailService.selectById(shopId).getName();
+        //定义数据
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandReport");
         filter.getExcludes().add("brandArticleUnit");
@@ -632,43 +632,43 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
-		List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
-		Map<String,String> map = new HashMap<>();
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		map.put("brandName", getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("endDate", endDate);
+        List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
+        Map<String,String> map = new HashMap<>();
+        //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", beginDate);
+        map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
         } else{
             map.put("num", "8");//显示的位置
         }
-		map.put("timeType", "yyyy-MM-dd");
-		//如果是单品
-		if(type.equals(ArticleType.SIMPLE_ARTICLE)){
-			//导出文件名
-			fileName = "店铺菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
-			path = request.getSession().getServletContext().getRealPath(fileName);
-			map.put("reportType", "店铺菜品销售报表(单品)");//表的头，第一行内容
-			map.put("reportTitle", "店铺菜品销售报表(单品)");//表的名字
-			//定义数据
+        map.put("timeType", "yyyy-MM-dd");
+        //如果是单品
+        if(type.equals(ArticleType.SIMPLE_ARTICLE)){
+            //导出文件名
+            fileName = "店铺菜品销售报表(单品)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "店铺菜品销售报表(单品)");//表的头，第一行内容
+            map.put("reportTitle", "店铺菜品销售报表(单品)");//表的名字
+            //定义数据
             if (articleSellDto.getShopArticleUnit() != null){
                 String json = JSON.toJSONString(articleSellDto.getShopArticleUnit(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
-		}else if(type.equals(ArticleType.TOTAL_ARTICLE)){
-			//导出文件名
-			fileName = "店铺菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
-			path = request.getSession().getServletContext().getRealPath(fileName);
-			map.put("reportType", "店铺菜品销售报表(套餐)");//表的头，第一行内容
-			map.put("reportTitle", "店铺菜品销售报表(套餐)");//表的名字
-			//定义数据
+        }else if(type.equals(ArticleType.TOTAL_ARTICLE)){
+            //导出文件名
+            fileName = "店铺菜品销售报表(套餐)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "店铺菜品销售报表(套餐)");//表的头，第一行内容
+            map.put("reportTitle", "店铺菜品销售报表(套餐)");//表的名字
+            //定义数据
             if (articleSellDto.getShopArticleFamily() != null){
                 String json = JSON.toJSONString(articleSellDto.getShopArticleFamily(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
-		}else{
+        }else{
             //导出文件名
             fileName = "店铺菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -680,23 +680,23 @@ public class ArticleSellController extends GenericController{
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
         }
-		//定义excel工具类对象
-		ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
+        //定义excel工具类对象
+        ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
             }else {
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
             }
-			out.close();
-		}catch(Exception e){
-		    log.error("生成店铺菜品销售报表出错！");
-			e.printStackTrace();
+            out.close();
+        }catch(Exception e){
+            log.error("生成店铺菜品销售报表出错！");
+            e.printStackTrace();
             return new Result(false);
-		}
-		return getSuccessResult(path);
-	}
+        }
+        return getSuccessResult(path);
+    }
 
     /**
      * 下载具体店铺菜品销售报表
@@ -704,12 +704,12 @@ public class ArticleSellController extends GenericController{
      * @param response
      */
     @RequestMapping("/downloadShopArticle")
-	public void downloadShopArticle(String path, HttpServletResponse response){
+    public void downloadShopArticle(String path, HttpServletResponse response){
         ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
-	    try{
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
-			log.info("excel导出成功");
+        try{
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
+            log.info("excel导出成功");
         }catch (Exception e){
             JOptionPane.showMessageDialog(null, "导出失败！");
             log.error("下载店铺菜品销售报表出错！");
@@ -723,10 +723,10 @@ public class ArticleSellController extends GenericController{
      * @param endDate
      * @return
      */
-	@RequestMapping("/list_shop")
-	@ResponseBody
-	public Result list_shop(String beginDate,String endDate){
-	    JSONObject object = new JSONObject();
+    @RequestMapping("/list_shop")
+    @ResponseBody
+    public Result list_shop(String beginDate,String endDate){
+        JSONObject object = new JSONObject();
         try {
             List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate, endDate, getCurrentBrandId(), getCurrentShopDetails());
             object.put("list",list);
@@ -735,8 +735,8 @@ public class ArticleSellController extends GenericController{
             e.printStackTrace();
             return new Result(false);
         }
-		return getSuccessResult(object);
-	}
+        return getSuccessResult(object);
+    }
 
     /**
      * 生成店铺销售报表
@@ -744,33 +744,33 @@ public class ArticleSellController extends GenericController{
      * @param endDate
      * @param request
      */
-	@RequestMapping("/create_shop_article_excel")
-	@ResponseBody
-	public Result createShopArticleExcel(String beginDate,String endDate,ShopArticleReportDto shopArticleReportDto,
-                                       HttpServletRequest request){
-		//导出文件名
-		String fileName = "店铺菜品销售记录报表"+beginDate+"至"+endDate+".xls";
-		//定义读取文件的路径
-		String path = request.getSession().getServletContext().getRealPath(fileName);
-		//定义列
-		String[]columns={"shopName","totalNum","sellIncome","occupy","refundCount","refundTotal"};
-		//定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
-		Map<String,String> map = new HashMap<>();
-		//获取店铺名称
-		String shopName="";
-		for (ShopDetail shopDetail : getCurrentShopDetails()) {
-			shopName += shopDetail.getName()+",";
-		}
-		//去掉最后一个逗号
+    @RequestMapping("/create_shop_article_excel")
+    @ResponseBody
+    public Result createShopArticleExcel(String beginDate,String endDate,ShopArticleReportDto shopArticleReportDto,
+                                         HttpServletRequest request){
+        //导出文件名
+        String fileName = "店铺菜品销售记录报表"+beginDate+"至"+endDate+".xls";
+        //定义读取文件的路径
+        String path = request.getSession().getServletContext().getRealPath(fileName);
+        //定义列
+        String[]columns={"shopName","totalNum","sellIncome","occupy","refundCount","refundTotal"};
+        //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
+        Map<String,String> map = new HashMap<>();
+        //获取店铺名称
+        String shopName="";
+        for (ShopDetail shopDetail : getCurrentShopDetails()) {
+            shopName += shopDetail.getName()+",";
+        }
+        //去掉最后一个逗号
         shopName = shopName.substring(0, shopName.length()-1);
-		map.put("brandName", getBrandName());
-		map.put("shops", shopName);
-		map.put("beginDate", beginDate);
-		map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
-		map.put("endDate", endDate);
-		map.put("num", "5");//显示的位置
-		map.put("reportTitle", "店铺菜品销售");//表的名字
-		map.put("timeType", "yyyy-MM-dd");
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", beginDate);
+        map.put("reportType", "店铺菜品销售报表");//表的头，第一行内容
+        map.put("endDate", endDate);
+        map.put("num", "5");//显示的位置
+        map.put("reportTitle", "店铺菜品销售");//表的名字
+        map.put("timeType", "yyyy-MM-dd");
         //定义数据
         List<ShopArticleReportDto> result = new ArrayList<>();
         if (shopArticleReportDto.getShopArticleReportDtos() != null) {
@@ -780,31 +780,31 @@ public class ArticleSellController extends GenericController{
             result = JSON.parseObject(json, new TypeReference<List<ShopArticleReportDto>>() {});
         }
         String[][] headers = {{"店铺名称","25"},{"菜品销量(份)","25"},{"菜品销售额","25"},{"销售额占比","25"},{"退菜总数","25"},{"退菜金额","25"}};
-		//定义excel工具类对象
-		ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
-		try{
-			OutputStream out = new FileOutputStream(path);
-			excelUtil.ExportExcel(headers, columns, result, out, map);
-			out.close();
-		}catch(Exception e){
-		    log.error("生成菜品销售报表出错！");
-			e.printStackTrace();
+        //定义excel工具类对象
+        ExcelUtil<ShopArticleReportDto> excelUtil=new ExcelUtil<ShopArticleReportDto>();
+        try{
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportExcel(headers, columns, result, out, map);
+            out.close();
+        }catch(Exception e){
+            log.error("生成菜品销售报表出错！");
+            e.printStackTrace();
             return new Result(false);
-		}
-		return getSuccessResult(path);
-	}
+        }
+        return getSuccessResult(path);
+    }
 
     /**
      * 下载店铺菜品销售报表
      * @param path
      * @param response
      */
-	@RequestMapping("/downloadShopArticleExcel")
-	public void downloadShopArticleExcel(String path, HttpServletResponse response){
-	    ExcelUtil<Object> excelUtil = new ExcelUtil<>();
-	    try{
-			excelUtil.download(path, response);
-			JOptionPane.showMessageDialog(null, "导出成功！");
+    @RequestMapping("/downloadShopArticleExcel")
+    public void downloadShopArticleExcel(String path, HttpServletResponse response){
+        ExcelUtil<Object> excelUtil = new ExcelUtil<>();
+        try{
+            excelUtil.download(path, response);
+            JOptionPane.showMessageDialog(null, "导出成功！");
         }catch (Exception e){
             JOptionPane.showMessageDialog(null, "导出失败！");
             log.error("下载菜品销售报表出错！");

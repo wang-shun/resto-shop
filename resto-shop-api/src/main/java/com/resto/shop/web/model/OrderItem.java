@@ -372,4 +372,14 @@ public class OrderItem implements Serializable {
     public void setPackageNumber(Integer packageNumber) {
         this.packageNumber = packageNumber;
     }
+
+    private OrderRefundRemark orderRefundRemark;
+
+    public OrderRefundRemark getOrderRefundRemark() {
+        return orderRefundRemark;
+    }
+
+    public void setOrderRefundRemark(OrderRefundRemark orderRefundRemark) {
+        this.orderRefundRemark = orderRefundRemark;
+    }
 }

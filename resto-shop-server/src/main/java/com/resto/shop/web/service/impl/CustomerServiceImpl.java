@@ -117,6 +117,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		customer.setBindPhoneShop(shopId);
 		if(!currentCustomerId.equals(shareCustomer)){
 			customer.setShareCustomer(shareCustomer);
+			customer.setShareLink("clearShareLink");
 		}
 //		customer.setRegisterShopId(shopId);
 //		update(customer);

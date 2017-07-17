@@ -164,6 +164,11 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     }
 
     @Override
+    public List<GetNumber> selectAfterNumberByCodeId(String shopId, String codeId, Date time) {
+        return getNumberMapper.selectAfterNumberByCodeId(shopId, codeId, time);
+    }
+
+    @Override
     public GetNumber selectNowNumberByCodeId(String shopId, String codeId) {
         return getNumberMapper.selectNowNumberByCodeId(shopId, codeId);
     }

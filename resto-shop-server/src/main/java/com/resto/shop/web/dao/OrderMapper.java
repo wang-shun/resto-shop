@@ -329,24 +329,24 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	Boolean setEmpty(String articleId);
 
-	
+
 	/**
 	 * 库存为0时设置沽清	---	tb_article_price
 	 * @param articleId
 	 * @return
 	 */
 	Boolean setArticlePriceEmpty(String articleId);
-	
-	
+
+
 	/**
-	 * 还原库存时重置售罄状态	---	tb_article	
+	 * 还原库存时重置售罄状态	---	tb_article
 	 * @param articleId
 	 * @return
      */
 	Boolean setEmptyFail(String articleId);
-	
+
 	/**
-	 * 还原库存时重置售罄状态	---	tb_article_price	
+	 * 还原库存时重置售罄状态	---	tb_article_price
 	 * @param articleId
 	 * @return
      */
@@ -446,7 +446,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 
     /**
-     * 根据订单状态和生产状态查询指定店铺的订单 (不包含外卖)
+     * 根据订单状态和生产状态查询指定店铺的订单
      * @param shopId
      * @param orderStates
      * @param productionStates
@@ -706,4 +706,12 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> getAllowAppraise();
 	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
     void colseOrder(String orderId);
+
+	/**
+	 * 查询退菜报表list
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
 }

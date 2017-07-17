@@ -286,4 +286,8 @@
         and top.result_data is not null and top.pay_value > 0
         and td.shop_detail_id = #{shopId} LIMIT 1
     </select>
+
+    <select id="selectRefundPayMent" resultType="com.resto.shop.web.model.OrderPaymentItem">
+        select * from tb_order_payment_item where order_id = #{orderId} and pay_value &lt; 0
+    </select>
 </mapper>
