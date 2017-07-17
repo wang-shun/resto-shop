@@ -254,10 +254,12 @@
             },
             createExcel : function () {
                 var that = this;
+                var object = that.getDate();
+                object.refundArticleOrderList = that.refundArticleOrderList;
                 toastr.clear();
                 toastr.success("下载中...");
                 try{
-                   $.post("refundArticle/createExcel", {refundArticleOrderList : that.refundArticleOrderList}, function (result) {
+                   $.post("refundArticle/createExcel", object, function (result) {
                         if (result.success){
                             location.href = "refundArticle/downloadExcel?path=" + result.data;
                         }else {
