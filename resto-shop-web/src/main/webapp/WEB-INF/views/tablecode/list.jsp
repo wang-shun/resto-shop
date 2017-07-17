@@ -172,7 +172,7 @@
                 },
                 checkNumber: function (m) {
                     if(m.minNumber!=undefined&&m.maxNumber!=undefined){
-                        if(m.minNumber>m.maxNumber){
+                        if(parseInt(m.minNumber)>parseInt(m.maxNumber)){
                             toastr.error("最小人数不能大于最大人数");
                         }
                     }

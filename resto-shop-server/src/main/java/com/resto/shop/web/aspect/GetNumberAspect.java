@@ -13,6 +13,7 @@ import com.resto.shop.web.constant.WaitModerState;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.GetNumberService;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
@@ -47,6 +49,9 @@ public class GetNumberAspect {
 
     @Resource
     private ShopDetailService shopDetailService;
+
+    @Resource
+    private GetNumberService getNumberService;
 
     @Pointcut("execution(* com.resto.shop.web.service.GetNumberService.updateGetNumber(..))")
     public void updateGetNumber(){};
@@ -78,7 +83,8 @@ public class GetNumberAspect {
                 StringBuffer msg = new StringBuffer();
 //                msg.append("亲，您一共获得"+getNumber.getFinalMoney().setScale(2,   BigDecimal.ROUND_HALF_UP)+"元等位红包，红包金额在本次消费中将直接使用哦。\n");
 //                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=tangshi&shopId=" + getNumber.getShopDetailId() + " '>立即点餐</a>");
-                msg.append(shop.getWaitJiucan());
+                msg.append(shop.getWaitJiucan() + "\n");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?dialog=waitScan'>点击此处，扫一扫桌位二维码，开启美食之旅！</a>");
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", setting.getBrandName());
@@ -98,6 +104,18 @@ public class GetNumberAspect {
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
+            }
+
+            if(shop.getWaitRemindSwitch() == 1 && shop.getWaitRemindNumber() > 0 &&
+                    (getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE || getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO)){
+                List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
+                if(getNumberList.size() > 0 && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
+                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);
+                    Customer c = customerService.selectById(gn.getCustomerId());
+                    StringBuffer msg = new StringBuffer();
+                    msg.append(shop.getWaitRemindText());
+                    WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
+                }
             }
         }
     }

@@ -78,4 +78,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
 
 
     OrderPaymentItem selectWeChatPayResultData(String shopId);
+
+    List<OrderPaymentItem> selectRefundPayMent(String orderId);
 }

@@ -33,6 +33,7 @@
         <result column="birthday_coupon_ids" property="birthdayCouponIds"/>
         <result column="share_coupon_ids" property="shareCouponIds"/>
         <result column="serial_number" property="serialNumber"/>
+        <result column="share_link" property="shareLink"/>
         <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
             <id column="id" property="id"/>
             <result column="birth_date" property="birthDate"/>
@@ -50,7 +51,7 @@
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
     city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
     bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,
-    share_coupon_ids,serial_number
+    share_coupon_ids,serial_number,share_link
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select <include refid="Base_Column_List"/> from tb_customer where id = #{id,jdbcType=VARCHAR}
@@ -67,7 +68,7 @@
       sex, province, city, 
       country, last_order_shop, new_notice_time,
       share_customer,is_now_register, customer_detail_id, bind_phone_time, bind_phone_shop, real_time_coupon_ids,
-      subscribe, last_table_number, birthday_coupon_ids, share_coupon_ids)
+      subscribe, last_table_number, birthday_coupon_ids, share_coupon_ids, share_link)
     values (#{id,jdbcType=VARCHAR}, #{wechatId,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
       #{telephone,jdbcType=VARCHAR}, #{headPhoto,jdbcType=VARCHAR}, #{defaultDeliveryPoint,jdbcType=INTEGER}, 
       #{isBindPhone,jdbcType=BIT}, #{regiestTime,jdbcType=TIMESTAMP}, #{firstOrderTime,jdbcType=TIMESTAMP}, 
@@ -75,7 +76,7 @@
       #{sex,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{lastOrderShop,jdbcType=VARCHAR}, #{newNoticeTime,jdbcType=TIMESTAMP}, 
       #{shareCustomer,jdbcType=VARCHAR},#{isNowRegister},#{customerDetailId},#{bindPhoneTime},#{bindPhoneShop},#{realTimeCouponIds},
-      #{subscribe},#{lastTableNumber},#{birthdayCouponIds},#{shareCouponIds})
+      #{subscribe},#{lastTableNumber},#{birthdayCouponIds},#{shareCouponIds},#{shareLink})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Customer">
         insert into tb_customer
@@ -170,6 +171,9 @@
             <if test="shareCouponIds != null">
                 share_coupon_ids,
             </if>
+            <if test="shareLink != null">
+                share_link,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -262,6 +266,9 @@
             <if test="shareCouponIds != null">
                 #{shareCouponIds},
             </if>
+            <if test="shareLink != null">
+                #{shareLink},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Customer">
@@ -344,6 +351,9 @@
             </if>
             <if test="shareCouponIds != null">
                 share_coupon_ids = #{shareCouponIds},
+            </if>
+            <if test="shareLink != null">
+                share_link = #{shareLink},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -437,6 +447,9 @@
             </if>
             <if test="shareCouponIds != null">
                 share_coupon_ids = #{shareCouponIds},
+            </if>
+            <if test="shareLink != null">
+                share_link = #{shareLink},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}

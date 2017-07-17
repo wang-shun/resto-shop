@@ -25,7 +25,7 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     GetNumber updateGetNumber(GetNumber getNumber, Integer state);
 
-    GetNumber getWaitInfoByCustomerId(String customerId,String shopId);
+    GetNumber getWaitInfoByCustomerId(String customerId, String shopId);
 
     void refundWaitMoney(Order order);
 
@@ -38,6 +38,8 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
     Integer selectWaitCountByCodeId(String shopId, String codeId);
 
     List<GetNumber> selectBeforeNumberByCodeId(String shopId, String codeId, Date time);
+
+    List<GetNumber> selectAfterNumberByCodeId(String shopId, String codeId, Date time);
 
     GetNumber selectNowNumberByCodeId(String shopId, String codeId);
 }
