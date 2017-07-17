@@ -486,6 +486,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
+    public List<Article> getSingoArticleAll(String shopId) {
+        return articleMapper.getSingoArticleAll(shopId);
+    }
+
+    @Override
     public void deleteRecommendId(String recommendId) {
         articleMapper.deleteRecommendId(recommendId);
     }

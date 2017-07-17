@@ -68,6 +68,8 @@ public interface ArticleService extends GenericService<Article, String> {
 
 	List<Article> getSingoArticle(String shopId);
 
+	List<Article> getSingoArticleAll(String shopId);
+
 	void deleteRecommendId(String recommendId);
 
 
