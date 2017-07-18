@@ -604,6 +604,7 @@
         AND a.id = f.article_id
         AND a.shop_detail_id = #{0}
         AND f.recommend_category_id = #{1}
+        AND a.state=1 AND a.activated=1
         ORDER BY
         -- IF(o.type = 0, a.likes, f.recommend_sort)
         CASE
