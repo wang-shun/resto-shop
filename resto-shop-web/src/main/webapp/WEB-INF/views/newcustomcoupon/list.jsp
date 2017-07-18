@@ -443,11 +443,40 @@
                 },
                 save:function(e){
                     var that = this;
+                    var url = that.m.id?'newcustomcoupon/modify':'newcustomcoupon/create';
                     var formDom = e.target;
-                    C.ajaxFormEx(formDom,function(){
-                        that.cancel();
-                        tb.ajax.reload();
-                    });
+//                    C.ajaxFormEx(formDom,function(){
+//                        that.cancel();
+//                        tb.ajax.reload();
+//                    });
+                    if(that.m.couponMinMoney < that.m.couponValue){
+                        toastr.clear();
+                        toastr.error("优惠券最低消费额度不得小于优惠券价值！");
+                        return;
+                    }
+                    $.ajax({
+                        url : url,
+                        data : $(formDom).serialize(),
+                        success : function(result) {
+                            if (result.success) {
+                                that.cancel();
+                                tb.ajax.reload();
+                                toastr.clear();
+                                toastr.success("保存成功！");
+                            } else {
+                                that.cancel();
+                                tb.ajax.reload();
+                                toastr.clear();
+                                toastr.error("保存失败");
+                            }
+                        },
+                        error : function() {
+                            that.cancel();
+                            tb.ajax.reload();
+                            toastr.clear();
+                            toastr.error("保存失败");
+                        }
+                    })
                 },
                 initdistributionMode :function(){
                     $.ajax({

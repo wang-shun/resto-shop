@@ -151,6 +151,8 @@
 </div>
 <script>
 	(function(){
+		var C;
+		var vueObj;
 		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
@@ -233,12 +235,54 @@
 					}
 				}],
 		});
-		var C = new Controller(cid,tb);
-		var vueObj = C.vueObj();
-		
-	}());
-	
-	
+		C = new Controller(cid,tb);
 
-	
+		var option = {
+			el:cid,
+			mixins:[C.formVueMix],
+			methods:{
+				save:function(e){
+					var that = this;
+					var url = that.m.id?'redconfig/modify':'redconfig/create';
+					var formDom = e.target;
+//                    C.ajaxFormEx(formDom,function(){
+//                        that.cancel();
+//                        tb.ajax.reload();
+//                    });
+					if(that.m.maxRatio < that.m.minRatio){
+						toastr.clear();
+						toastr.error("最大比例不得小于最小比例！");
+						return;
+					}
+					$.ajax({
+						url : url,
+						data : $(formDom).serialize(),
+						success : function(result) {
+							if (result.success) {
+								that.cancel();
+								tb.ajax.reload();
+								toastr.clear();
+								toastr.success("保存成功！");
+							} else {
+								that.cancel();
+								tb.ajax.reload();
+								toastr.clear();
+								toastr.error("保存失败");
+							}
+						},
+						error : function() {
+							that.cancel();
+							tb.ajax.reload();
+							toastr.clear();
+							toastr.error("保存失败");
+						}
+					})
+				}
+			},
+		};
+
+		vueObj = C.vueObj(option);
+
+	}());
+
 </script>
