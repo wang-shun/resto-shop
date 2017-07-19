@@ -443,6 +443,10 @@
                 },
                 save:function(e){
                     var that = this;
+                    if (that.m.couponMinMoney < that.m.couponValue){
+                        toastr.error("最低消费额度应大于等于优惠卷价值");
+                        return;
+                    }
                     var formDom = e.target;
                     C.ajaxFormEx(formDom,function(){
                         that.cancel();
