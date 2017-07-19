@@ -353,21 +353,32 @@ public class OrderAspect {
 //                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息
 //            sendPaySuccessMsg(order);
 //        }
+
+        //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
+        if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
+                order.getOrderState().equals(OrderState.PAYMENT)&& order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)&&order.getDistributionModeId()==2){
+
+            MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            return;
+        }
+
+        //订单不为空 支付模式不为空  支付为支付宝支付  已支付  已下单
         if (order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
                 order.getOrderState().equals(OrderState.PAYMENT)
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)) {
             if (order.getPayType() == PayType.NOPAY) {
-                order.setPrintTimes(1);
+                order.setPrintTimes(1);//打印次数
                 orderService.update(order);
             }
-            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+            /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
-            }else{
+            }else{*/
                 MQMessageProducer.sendPlaceOrderMessage(order);
-            }
+            //}
         }
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        //订单不为空  已支付   桌号不为空或者外带   坐下点餐模式或者大Boss模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
                 && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER)) {
@@ -382,16 +393,19 @@ public class OrderAspect {
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
         }
 
+        //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
+
+        //稍后支付  大Boss模式  支付宝或微信支付
         if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
-            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+            /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
-            }else{
+            }else{*/
                 MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
-            }
+            //}
             Order o = orderService.getOrderAccount(order.getShopDetailId());
             RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
             RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
