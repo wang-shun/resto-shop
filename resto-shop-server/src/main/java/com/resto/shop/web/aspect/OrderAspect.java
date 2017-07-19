@@ -355,7 +355,7 @@ public class OrderAspect {
 //        }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
-        if(order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
+        if(order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
                 order.getOrderState().equals(OrderState.PAYMENT)&& order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)&&order.getDistributionModeId()==2){
 
             MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
