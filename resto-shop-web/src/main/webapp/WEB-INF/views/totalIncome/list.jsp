@@ -59,11 +59,11 @@
                         <h4 align="center"><b>下载月报表</b></h4>
                     </div>
                     <div class="modal-body" align="center">
-                        <select style="padding: 5px 12px;" :value="selectYear" v-model="selectYear">
+                        <select style="padding: 5px 12px;" v-model="selectYear">
                             <option :value="year" v-for="year in years">{{year}}</option>
                         </select>
                         <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">年</span>
-                        <select style="padding: 5px 12px;" :value="selectMonth" v-model="selectMonth">
+                        <select style="padding: 5px 12px;" v-model="selectMonth">
                             <option :value="month" v-for="month in months">{{month}}</option>
                         </select>
                         <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">月</span>
