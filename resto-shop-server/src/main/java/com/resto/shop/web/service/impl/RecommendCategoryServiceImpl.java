@@ -53,7 +53,7 @@ public class RecommendCategoryServiceImpl extends GenericServiceImpl<RecommendCa
     @Override
     public List<RecommendCategory> selectListSortShopId(String shopId) {
         ShopDetail shopDetail = shopDetailService.selectById(shopId);
-        if(shopDetail.getIsRecommendCategory()==1){
+        if(shopDetail!=null&&shopDetail.getIsRecommendCategory()==1){
             List<RecommendCategory> recommendCategorys = recommendCategoryMapper.selectListSortShopId(shopId);
             return recommendCategorys;
         }
