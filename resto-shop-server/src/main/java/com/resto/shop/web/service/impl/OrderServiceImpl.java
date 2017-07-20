@@ -3524,6 +3524,47 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
+    public Order confirmWaiMaiOrder(Order order) {
+        order = selectById(order.getId());
+        if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
+            return null;
+        }
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        log.info("开始确认订单:" + order.getId());
+        Integer orginState = order.getOrderState();//订单开始确认的状体
+        if (order.getConfirmTime() == null && !order.getClosed()) {
+            order.setOrderState(OrderState.CONFIRM);
+            order.setConfirmTime(new Date());
+            order.setAllowCancel(false);
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            if (order.getParentOrderId() == null) {
+                log.info("如果订单金额大于 评论金额 则允许评论" + order.getId());
+                if (setting.getAppraiseMinMoney().compareTo(order.getOrderMoney()) <= 0 || setting.getAppraiseMinMoney().compareTo(order.getAmountWithChildren()) <= 0) {
+                    order.setAllowAppraise(true);
+                }
+            } else {
+                log.info("最小评论金额为:" + setting.getAppraiseMinMoney() + ", oid:" + order.getId());
+                order.setAllowAppraise(false);
+            }
+            update(order);
+            //Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPostAnsc(url, orderMap);
+            /**
+             * 记录订单自动确认2-10过程
+             */
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(), order, orginState, "confirmOrder");
+
+            return order;
+        }
+        return null;
+    }
+
+    @Override
     public Order confirmBossOrder(Order order) {
         order = selectById(order.getId());
         if (order.getOrderState() != OrderState.PAYMENT) {

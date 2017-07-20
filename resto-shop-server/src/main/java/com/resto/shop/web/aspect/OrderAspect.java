@@ -126,7 +126,9 @@ public class OrderAspect {
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
             if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+                MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
             }
 
             //自动取消订单，大boss模式下  先付2小时未付款 自动取消订单
@@ -357,8 +359,9 @@ public class OrderAspect {
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
         if(order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
                 order.getOrderState().equals(OrderState.PAYMENT)&& !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId()==2){
-
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
             return;
         }
 
@@ -586,6 +589,12 @@ public class OrderAspect {
 
     ;
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmWaiMaiOrder(..))")
+    public void confirmWaiMaiOrder() {
+    }
+
+    ;
+
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmBossOrder(..))")
     public void confirmBossOrder() {
     }
@@ -733,7 +742,7 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());

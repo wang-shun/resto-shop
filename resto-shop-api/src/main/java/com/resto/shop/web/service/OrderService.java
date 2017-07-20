@@ -90,6 +90,8 @@ public interface OrderService extends GenericService<Order, String> {
 	 
 	public Order confirmOrder(Order order);
 
+	public Order confirmWaiMaiOrder(Order order);
+
 	public Order confirmBossOrder(Order order);
 
 	public Order getOrderInfo(String orderId);
