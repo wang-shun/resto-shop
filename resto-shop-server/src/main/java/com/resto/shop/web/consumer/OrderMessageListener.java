@@ -401,6 +401,9 @@ public class OrderMessageListener implements MessageListener {
             Order order = JSON.parseObject(msg, Order.class);
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             log.info("执行自动确认逻辑" + order.getId());
+            if(order.getProductionStatus()==4){
+                orderService.confirmWaiMaiOrder(order);
+            }else
             orderService.confirmOrder(order);
         }catch (Exception e){
             e.printStackTrace();
