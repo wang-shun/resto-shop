@@ -127,7 +127,7 @@ public class OrderAspect {
             }
             if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
                 MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
             }
 
@@ -360,7 +360,7 @@ public class OrderAspect {
         if(order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
                 order.getOrderState().equals(OrderState.PAYMENT)&& !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId()==2){
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+            MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
             MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
             return;
         }
