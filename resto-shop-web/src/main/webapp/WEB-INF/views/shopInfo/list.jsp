@@ -521,6 +521,18 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label" >转台是否开启：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="isTurntable"v-model="m.isTurntable" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="isTurntable" v-model="m.isTurntable" value="0">否
+							</label>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
@@ -638,6 +650,7 @@
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
 								success : function(result) {
+									debugger;
 									console.log(result+"----");
 									if (result.success) {
 										toastr.clear();
