@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.AppendToExcelUtil;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,6 +217,24 @@ public class ArticleSellController extends GenericController{
                 }
             }
             object.put("brandArticleType",brandArticleType);
+            ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+            ArticleSellDto mealSales = orderService.selectMealSales(selectMap);
+            List<ArticleSellDto> mealSellList = new ArrayList<>();
+            if ((StringUtils.isNotBlank(shopDetail.getMealFeeName()) && shopDetail.getIsMealFee().equals(Common.YES))){
+                if (mealSales == null){
+                    mealSales = new ArticleSellDto();
+                    mealSales.setArticleName(shopDetail.getMealFeeName());
+                    mealSales.setBrandSellNum(0);
+                    mealSales.setSalles(BigDecimal.ZERO);
+                }else {
+                    mealSales.setArticleName(shopDetail.getMealFeeName());
+                }
+                mealSellList.add(mealSales);
+            }else if (mealSales != null && mealSales.getBrandSellNum() != null && mealSales.getBrandSellNum() != 0){
+                mealSales.setArticleName(shopDetail.getMealFeeName());
+                mealSellList.add(mealSales);
+            }
+            object.put("brandMealSalesDtos", mealSellList);
         }catch (Exception e){
             log.error("查询菜品销售报表出错！");
             e.printStackTrace();
@@ -291,6 +310,8 @@ public class ArticleSellController extends GenericController{
         String[][] headers = {{"品牌名称/菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[] columnsType = {"articleFamilyName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"品牌名称/菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        String[] columnsMeal = {"articleName","brandSellNum","salles"};
+        String[][] headersMeal = {{"品牌名称/菜品名称","25"},{"销量(份)","25"},{"销售额(元)","25"}};
         //获取店铺名称
         List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
         String shopName="";
@@ -308,14 +329,18 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
+        filter.getExcludes().add("shopMealSeals");
+        filter.getExcludes().add("brandMealSeals");
         List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
             Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 brandReport.setTypeName(brandReportMap.get("brandName").toString());
-            }else {
+            }else if (type.equals(3)){
                 brandReport.setArticleFamilyName(brandReportMap.get("brandName").toString());
+            }else {
+                brandReport.setArticleName(brandReportMap.get("brandName").toString());
             }
             brandReport.setBrandSellNum(Integer.valueOf(brandReportMap.get("totalNum").toString()));
             brandReport.setSalles(new BigDecimal(brandReportMap.get("sellIncome").toString()));
@@ -332,8 +357,10 @@ public class ArticleSellController extends GenericController{
         map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
-        }else {
+        }else if (type.equals(3)){
             map.put("num","8");
+        }else {
+            map.put("num","2");
         }
         map.put("timeType", "yyyy-MM-dd");
         //如果是单品
@@ -361,7 +388,7 @@ public class ArticleSellController extends GenericController{
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
-        }else{
+        }else if (type.equals(3)){
             //导出文件名
             fileName = "品牌菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -373,6 +400,18 @@ public class ArticleSellController extends GenericController{
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
+        }else {
+            //导出文件名
+            fileName = "品牌菜品销售报表(其他销量)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "品牌菜品销售报表(其他销量)");//表的头，第一行内容
+            map.put("reportTitle", "品牌菜品销售报表(其他销量)");//表的名字
+            //定义数据
+            if (articleSellDto.getBrandMealSeals() != null){
+                String json = JSON.toJSONString(articleSellDto.getBrandMealSeals(), filter);
+                List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+                result.addAll(articleSellDtos);
+            }
         }
         //定义excel工具类对象
         ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -380,8 +419,10 @@ public class ArticleSellController extends GenericController{
             OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
-            }else {
+            }else if (type.equals(3)){
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
+            }else {
+                excelUtil.ExportExcel(headersMeal, columnsMeal, result, out, map);
             }
             out.close();
         }catch(Exception e){
@@ -598,6 +639,27 @@ public class ArticleSellController extends GenericController{
                 }
             }
             object.put("shopArticleTypeDtos",shopArticleType);
+            ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+            ArticleSellDto mealSales = orderService.selectMealSales(selectMap);
+            List<ArticleSellDto> mealSellList = new ArrayList<>();
+            //判断是否有开启餐盒费，如有开启餐盒费无论有没有产生餐盒费都显示出来
+            if ((StringUtils.isNotBlank(shopDetail.getMealFeeName()) && shopDetail.getIsMealFee().equals(Common.YES))){
+                if (mealSales == null){
+                    mealSales = new ArticleSellDto();
+                    mealSales.setArticleName(shopDetail.getMealFeeName());
+                    mealSales.setShopSellNum(0);
+                    mealSales.setSalles(BigDecimal.ZERO);
+                }else {
+                    mealSales.setArticleName(shopDetail.getMealFeeName());
+                }
+                mealSellList.add(mealSales);
+            }
+            //如没有开启餐盒费判断是否有产生过餐盒数量，如产生过餐盒数量则显示出来
+            else if (mealSales != null && mealSales.getShopSellNum() != null && mealSales.getShopSellNum() != 0){
+                mealSales.setArticleName(shopDetail.getMealFeeName());
+                mealSellList.add(mealSales);
+            }
+            object.put("shopMealSalesDtos", mealSellList);
         }catch (Exception e){
             log.error("查询店铺菜品销售报表出错！");
             e.printStackTrace();
@@ -622,6 +684,8 @@ public class ArticleSellController extends GenericController{
         String[][] headers = {{"菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[]columnsType={"articleFamilyName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        String[]columnsMeals={"articleName","shopSellNum","salles"};
+        String[][] headersMeals = {{"菜品名称","25"},{"销量(份)","25"},{"销售额(元)","25"}};
         String shopName= shopDetailService.selectById(shopId).getName();
         //定义数据
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
@@ -632,6 +696,8 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
+        filter.getExcludes().add("shopMealSeals");
+        filter.getExcludes().add("brandMealSeals");
         List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         Map<String,String> map = new HashMap<>();
         //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -641,8 +707,10 @@ public class ArticleSellController extends GenericController{
         map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
-        } else{
-            map.put("num", "8");//显示的位置
+        }else if (type.equals(3)){
+            map.put("num","8");
+        }else {
+            map.put("num","2");
         }
         map.put("timeType", "yyyy-MM-dd");
         //如果是单品
@@ -668,7 +736,7 @@ public class ArticleSellController extends GenericController{
                 String json = JSON.toJSONString(articleSellDto.getShopArticleFamily(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
-        }else{
+        }else if(type.equals(3)){
             //导出文件名
             fileName = "店铺菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -679,6 +747,17 @@ public class ArticleSellController extends GenericController{
                 String json = JSON.toJSONString(articleSellDto.getShopArticleType(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
+        }else{
+            //导出文件名
+            fileName = "店铺菜品销售报表(其他销量)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "店铺菜品销售报表(其他销量)");//表的头，第一行内容
+            map.put("reportTitle", "店铺菜品销售报表(其他销量)");//表的名字
+            //定义数据
+            if (articleSellDto.getShopMealSeals() != null){
+                String json = JSON.toJSONString(articleSellDto.getShopMealSeals(), filter);
+                result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+            }
         }
         //定义excel工具类对象
         ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -686,8 +765,10 @@ public class ArticleSellController extends GenericController{
             OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
-            }else {
+            }else if (type.equals(3)){
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
+            }else {
+                excelUtil.ExportExcel(headersMeals, columnsMeals, result, out, map);
             }
             out.close();
         }catch(Exception e){

@@ -8660,4 +8660,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
         return orderMapper.addRefundArticleDto(beginDate, endDate);
     }
+
+    @Override
+    public ArticleSellDto selectMealSales(Map<String, Object> selectMap) {
+        return orderMapper.selectMealSales(selectMap);
+    }
 }
