@@ -522,7 +522,7 @@
 					</div>
 
 					<div class="form-group">
-						<label class="col-md-4 control-label" >转台是否开启：</label>
+						<label class="col-md-4 control-label" >换桌是否开启：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
 								<input type="radio" name="isTurntable"v-model="m.isTurntable" value="1">是
