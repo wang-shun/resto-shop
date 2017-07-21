@@ -1432,7 +1432,7 @@
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
         SELECT
         IFNULL(sum(oi.final_price) + IFNULL(o.meal_fee_price,0),0.00) sellIncome,
-        IFNULL(sum(oi.refund_count),0)refundCount,
+        IFNULL(sum(IF(oi.type != 4,oi.refund_count,0)),0)refundCount,
         IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
         FROM
