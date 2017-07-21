@@ -388,7 +388,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             jsonResult.setMessage("请输入就餐人数！");
             return jsonResult;
         }
-
+        if(order.getPayMode() == OrderPayMode.YUE_PAY){
+            //如果是余额支付判断 用户余额是否买足当前支付金额
+            Account account = accountService.selectById(customer.getAccountId());
+            if(account.getRemain().compareTo(order.getPaymentAmount()) < 0){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("您的余额不足，请重新支付！");
+                return jsonResult;
+            }
+        }
 
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
