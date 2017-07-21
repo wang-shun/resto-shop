@@ -15,6 +15,7 @@
  import javax.servlet.http.HttpServletRequest;
  import javax.servlet.http.HttpServletResponse;
  import javax.validation.Valid;
+ import java.io.IOException;
  import java.math.BigDecimal;
  import java.util.List;
  import java.util.Map;
@@ -66,20 +67,34 @@
 
      @RequestMapping("charge")
      @ResponseBody
-     public void accountCharge(BigDecimal chargeMoney, Integer payType, HttpServletRequest request, HttpServletResponse response){
+     public void accountCharge(String chargeMoney, String payType, HttpServletRequest request, HttpServletResponse response){
          String returnHtml = "<h1>参数错误！</h1>";
-
-         AccountChargeOrder accountChargeOrder =accountchargeorderService.saveChargeOrder(getCurrentBrandId(), chargeMoney,payType);//创建充值订单
+         AccountChargeOrder accountChargeOrder =accountchargeorderService.saveChargeOrder(getCurrentBrandId(),chargeMoney);//创建充值订单
          String out_trade_no = accountChargeOrder.getId();
          String show_url = "";///商品展示页面
-         String notify_url = getBaseUrl()+"paynotify/alipay_notify";
-         String return_url = getBaseUrl()+"paynotify/alipay_return";
+         String notify_url = getBaseUrl()+"account_paynotify/alipay_notify";
+         String return_url = getBaseUrl()+"account_paynotify/alipay_return";
          String subject = "【餐加】短信充值";
-         Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney.toString(), show_url, notify_url, return_url, null);
+         Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
          returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
-
+         outprint(returnHtml, response);
      }
 
+     /**
+      * 输出到页面
+      * @param body
+      * @param response
+      */
+     public void outprint(String body,HttpServletResponse response){
+         try {
+             //页面输出
+             response.setContentType("text/html;charset=utf-8");
+             response.getWriter().write(body);
+             response.getWriter().flush();
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+     }
 
 
  }

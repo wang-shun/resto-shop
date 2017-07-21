@@ -57,25 +57,62 @@
 	</div>
 
 	<div>
-        <div>
-            <label>账户余额：</label>
-            <label>199.8元</label>
-        </div>
-        <div>
-            <label>充值金额</label>
-            <input type="text" name = "chargeMoney" placeHolder="测试可以用0.01" v-model="order.chargeMoney"/>
-        </div>
 
-          <div>
-            <input type="text" name = "payType" placeHolder="测试微信支付用1,支付宝支付2" v-model="order.payType" />
-        </div>
+        <form role="form" class="form-horizontal"
+              action="accountchargeorder/charge" method="post" target="_blank" @submit="showChargeModal('createChargeOrder')">
+            <div class="form-body">
 
-        <button class="btn btn-default" type="submit" @click="chargeMoney" >确认充值</button>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">充值金额：</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   placeholder="请输入要充值的金额"  name="chargeMoney"  v-model="chargeMoney">
+                            <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5 text-center">
+                        <a class="btn btn-info" @click="changeMoney(500)">500</a>&nbsp;
+                        <a class="btn btn-info" @click="changeMoney(1000)">1000</a>&nbsp;
+                        <a class="btn btn-info" @click="changeMoney(2000)">2000</a>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">支付方式：</label>
+                    <div class="col-sm-8">
+                        <div class="md-radio-list">
+                            <div class="md-radio">
+                                <input type="radio" id="alipay" name="payType"
+                                       checked="checked" class="md-radiobtn" value="1"> <label
+                                    for="alipay"> <span></span> <span class="check"></span>
+                                <span class="box"></span>&nbsp;<img alt="支付宝支付"
+                                                                    src="assets/pages/img/alipay.png" width="23px" height="23px">&nbsp;支付宝支付
+                            </label>
+                            </div>
+                            <div class="md-radio">
+                                <input type="radio" id="wxpay" name="payType"
+                                       class="md-radiobtn" value="2"> <label for="wxpay">
+                                <span></span> <span class="check"></span> <span class="box"></span>&nbsp;<img
+                                    alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
+                                    height="23px">&nbsp;微信支付
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <a class="btn default" data-dismiss="modal">取消</a> <input
+                    class="btn green" type="submit" value="充值"/>
+            </div>
+        </form>
+
 
     </div>
 
-	
-	<div class="table-div">
+
+    <div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="accountchargeorder/add">
 			<button class="btn green pull-right" @click="create">新建</button>
@@ -146,18 +183,9 @@
 			},
 			mixins:[C.formVueMix],
 			methods:{
-			    chargeMoney:function(){
-	                var that = this;
-			        $.ajax({
-			            url:"accountchargeorder/charge",
-                        type:"post",
-                        data:that.order,
-                        success:function(){
-                            console.log("-----------");
-                        }
-			        })
+                showChargeModal:function (createChargeOrder) {
 
-			    }
+                }
 
 			}
 		});
