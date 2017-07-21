@@ -1366,12 +1366,11 @@
 
     <!--查询品牌菜品的总数 -->
     <select id="selectBrandArticleNum" resultType="java.lang.Integer">
-        SELECT IFNULL(SUM(oi.count) + o.meal_all_number,0)totalNum from tb_article ta
+        SELECT IFNULL(SUM(IF(oi.type != 4,oi.count,0)) + IFNULL(o.meal_all_number,0),0)totalNum from tb_article ta
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
-        INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
-        INNER JOIN  tb_order o ON o.id=oi.order_id
+        LEFT JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
+        LEFT JOIN  tb_order o ON o.id=oi.order_id
         WHERE o.order_state in (10,2,11,12) AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3))
-        and oi.type != 4
         AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}
         GROUP BY o.id
@@ -1432,7 +1431,7 @@
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
         SELECT
-        IFNULL(sum(oi.final_price) + o.meal_fee_price,0.00) sellIncome,
+        IFNULL(sum(oi.final_price) + IFNULL(o.meal_fee_price,0),0.00) sellIncome,
         IFNULL(sum(oi.refund_count),0)refundCount,
         IFNULL(SUM(oi.refund_count*oi.unit_price),0.00)refundTotal,
         IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
