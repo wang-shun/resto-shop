@@ -189,6 +189,16 @@
 			<artifactId>jedis</artifactId>
 			<version>2.7.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.taobao.api</groupId>
+			<artifactId>sdk</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.taobao.sms</groupId>
+			<artifactId>sdk</artifactId>
+			<version>1.6</version>
+		</dependency>
 		<!--Redis end -->
 	</dependencies>
 </project>
