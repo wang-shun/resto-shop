@@ -191,8 +191,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.taobao.api</groupId>
-			<artifactId>sdk</artifactId>
-			<version>1.6</version>
+			<artifactId>sms-sdk</artifactId>
+			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.taobao.sms</groupId>
