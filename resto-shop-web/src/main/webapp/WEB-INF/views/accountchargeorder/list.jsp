@@ -140,6 +140,9 @@
 				{
                     title : "创建时间",
                     data : "createTime",
+                    createdCell:function (td,tdData) {
+                        $(td).html(vueObj.formatDate(tdData));
+                    }
                 },
 
                 {
@@ -185,8 +188,16 @@
 			methods:{
                 showChargeModal:function (createChargeOrder) {
 
+                },
+                //格式化时间
+                formatDate:function (date) {
+                    var temp = "";
+                    if (date != null && date != "") {
+                        temp = new Date(date);
+                        temp = temp.format("yyyy-MM-dd hh:mm:ss");
+                    }
+                    return temp;
                 }
-
 			}
 		});
 		C.vue=vueObj;

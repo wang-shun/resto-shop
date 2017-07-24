@@ -1,11 +1,14 @@
  package com.resto.shop.web.controller.business;
 
+ import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.alipay.util.AlipaySubmit;
  import com.resto.brand.core.entity.Result;
- import com.resto.brand.core.enums.PayType;
+ import com.resto.brand.core.enums.ChargePayType;
+ import com.resto.brand.core.payUtil.PayConfigUtil;
  import com.resto.brand.web.model.AccountChargeOrder;
- import com.resto.brand.web.model.SmsChargeOrder;
+ import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.AccountChargeOrderService;
+ import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +18,7 @@
  import javax.servlet.http.HttpServletRequest;
  import javax.servlet.http.HttpServletResponse;
  import javax.validation.Valid;
- import java.io.IOException;
- import java.math.BigDecimal;
+ import java.util.HashMap;
  import java.util.List;
  import java.util.Map;
 
@@ -26,6 +28,9 @@
 
      @Resource
      AccountChargeOrderService accountchargeorderService;
+
+     @Resource
+     ShopDetailService shopDetailService;
 
      @RequestMapping("/list")
      public void list(){
@@ -39,7 +44,7 @@
 
      @RequestMapping("list_one")
      @ResponseBody
-     public Result list_one(Long id){
+     public Result list_one(String id){
          AccountChargeOrder accountchargeorder = accountchargeorderService.selectById(id);
          return getSuccessResult(accountchargeorder);
      }
@@ -60,7 +65,7 @@
 
      @RequestMapping("delete")
      @ResponseBody
-     public Result delete(Long id){
+     public Result delete(String id){
          accountchargeorderService.delete(id);
          return Result.getSuccess();
      }
@@ -68,33 +73,31 @@
      @RequestMapping("charge")
      @ResponseBody
      public void accountCharge(String chargeMoney, String payType, HttpServletRequest request, HttpServletResponse response){
-         String returnHtml = "<h1>参数错误！</h1>";
+         StringBuilder sb = new StringBuilder();
+         sb.append(getCurrentShopId());
+         sb.append(",");
+         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
+         sb.append(shopDetail.getName());
+         sb.append(",");
+         sb.append(getCurrentBrandId());
+         sb.append(",");
+         sb.append(getBrandName());
+
+         String returnHtml = PayConfigUtil.RETURNHTML;
          AccountChargeOrder accountChargeOrder =accountchargeorderService.saveChargeOrder(getCurrentBrandId(),chargeMoney);//创建充值订单
-         String out_trade_no = accountChargeOrder.getId();
-         String show_url = "";///商品展示页面
-         String notify_url = getBaseUrl()+"account_paynotify/alipay_notify";
-         String return_url = getBaseUrl()+"account_paynotify/alipay_return";
-         String subject = "【餐加】短信充值";
-         Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url, null);
-         returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
-         outprint(returnHtml, response);
+         if((ChargePayType.ALI_PAY+"").equals(payType)){
+             String out_trade_no = accountChargeOrder.getId();
+             String show_url = "";///商品展示页面
+             String notify_url = getBaseUrl()+PayConfigUtil.ACCOUNT_ALIPAY_NOTIFY_URL;
+             String return_url = getBaseUrl()+PayConfigUtil.ACCOUNT_ALIPAY_RETURN_URL;
+             String subject = PayConfigUtil.ACCOUNT_SUBJECT;
+             Map<String, String> formParame = AlipaySubmit.createFormParame(out_trade_no, subject, chargeMoney, show_url, notify_url, return_url,sb.toString());
+             returnHtml = AlipaySubmit.buildRequest(formParame, "post", "确认");
+         }
+        PayConfigUtil.outprint(returnHtml, response);
      }
 
-     /**
-      * 输出到页面
-      * @param body
-      * @param response
-      */
-     public void outprint(String body,HttpServletResponse response){
-         try {
-             //页面输出
-             response.setContentType("text/html;charset=utf-8");
-             response.getWriter().write(body);
-             response.getWriter().flush();
-         } catch (IOException e) {
-             e.printStackTrace();
-         }
-     }
+
 
 
  }

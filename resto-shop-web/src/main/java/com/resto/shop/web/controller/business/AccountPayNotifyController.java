@@ -4,6 +4,7 @@ import com.resto.brand.core.alipay.util.AlipayNotify;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.service.AccountChargeOrderService;
 import com.resto.brand.web.service.SmsChargeOrderService;
+import com.resto.shop.web.controller.GenericController;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 账户zhifu
+ * 账户pay回调
  *
  */
 @Controller
 @RequestMapping("account_paynotify")
-public class AccountPayNotifyController {
+public class AccountPayNotifyController{
 	
 	@Resource
 	AccountChargeOrderService accountChargeOrderService;
@@ -36,7 +37,7 @@ public class AccountPayNotifyController {
 	
 	@RequestMapping("alipay_notify")
 	public void alipayNotify(HttpServletRequest request,HttpServletResponse response){
-		log.info("支付宝---->  异步    发来贺电");
+		log.info("支付宝账户充值---->  异步    发来贺电");
 		//获取支付宝返回的所有参数
 		Map<String, String> resultMap = AlipayNotify.getNotifyParams(request, response);
 		//返回值
