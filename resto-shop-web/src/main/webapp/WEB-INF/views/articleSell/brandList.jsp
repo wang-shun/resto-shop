@@ -445,6 +445,14 @@ var vueObj = new Vue({
 					{
 						title : "销售额(元)",
 						data : "salles"
+					},
+					{
+						title:"退菜数量" ,
+						data:"refundCount"
+					},
+					{
+						title:"退菜金额" ,
+						data:"refundTotal"
 					}
 				],
 				initComplete: function () {

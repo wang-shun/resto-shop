@@ -665,5 +665,5 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 */
 	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
 
-	ArticleSellDto selectMealSales(Map<String, Object> selectMap);
+	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 }

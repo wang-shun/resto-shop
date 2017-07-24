@@ -8661,7 +8661,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public ArticleSellDto selectMealSales(Map<String, Object> selectMap) {
-        return orderMapper.selectMealSales(selectMap);
+    public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
+        return orderMapper.selectMealServiceSales(selectMap);
     }
 }

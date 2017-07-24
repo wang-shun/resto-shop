@@ -3102,12 +3102,17 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         call proc_refund_article_report(#{beginDate},#{endDate})
     </select>
 
-    <select id="selectMealSales" resultType="com.resto.brand.web.dto.ArticleSellDto">
+    <select id="selectMealServiceSales" resultType="java.util.Map">
         SELECT
-        SUM(td.meal_all_number)
-        <if test="shopDetailId != null and shopDetailId !=''">shopSellNum</if>
-        <if test="shopDetailId == null or shopDetailId ==''">brandSellNum</if>,
-        SUM(td.meal_fee_price) salles
+        td.shop_detail_id shopId,
+        IFNULL(SUM(td.meal_all_number),0) mealSellNum,
+        IFNULL(SUM(td.meal_fee_price),0) mealSalles,
+        IFNULL(SUM(td.customer_count),0) serviceSellNum,
+        IFNULL(SUM(td.service_price),0) serviceSalles,
+        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
+        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
+        IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
+        IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
         FROM
         tb_order td
         WHERE
@@ -3118,5 +3123,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         <if test="shopDetailId != null">
             AND td.shop_detail_id = #{shopDetailId}
         </if>
+        AND td.parent_order_id is null
+        GROUP BY td.shop_detail_id
     </select>
 </mapper>
