@@ -389,7 +389,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
-
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
             if (orderCount > 0) {
