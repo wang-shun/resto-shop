@@ -5096,14 +5096,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             selectOrderMap.clear();
             selectOrderMap.put("orderIds", orderIds);
-            selectOrderMap.put("count", "refund_count != 0");
+            selectOrderMap.put("count", "refund_count != 0 and type != 4");
             List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
             for (OrderItem orderItem : canceledOrderItems) {
-                canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
-                Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                itemMap.put("SUBTOTAL", orderItem.getRefundCount());
-                canceledProducts.add(itemMap);
+                if (!orderItem.getType().equals(OrderItemType.MEALS_CHILDREN)) {
+                    canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
+                    Map<String, Object> itemMap = new HashMap<>();
+                    itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                    itemMap.put("SUBTOTAL", orderItem.getRefundCount());
+                    canceledProducts.add(itemMap);
+                }
             }
             if (!nowService.equals(BigDecimal.ZERO) || !nowMeal.equals(BigDecimal.ZERO)) {
                 Map<String, Object> itemMap = new HashMap<>();
