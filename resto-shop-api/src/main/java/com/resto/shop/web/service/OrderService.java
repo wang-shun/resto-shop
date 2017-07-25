@@ -663,4 +663,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
     void fixErrorOrder();
 
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
+
+	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 }

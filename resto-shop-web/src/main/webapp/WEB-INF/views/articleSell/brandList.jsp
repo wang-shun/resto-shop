@@ -90,6 +90,11 @@
                   <strong>类别</strong>
               </a>
           </li>
+		  <li role="presentation" @click="chooseType(4)">
+			  <a href="#mealSeals" aria-controls="mealSeals" role="tab" data-toggle="tab">
+				  <strong>其他销量</strong>
+			  </a>
+		  </li>
 	  </ul>
 	  <div class="tab-content">
 	  	<!-- 单品 -->
@@ -140,6 +145,22 @@
                   </div>
               </div>
           </div>
+		  <!-- 其他销量 -->
+		  <div role="tabpanel" class="tab-pane" id="mealSeals">
+			  <div class="panel panel-info" style="border-color:white;">
+				  <!-- 品牌菜品销售表(其他销量) -->
+				  <div class="panel panel-success">
+					  <div class="panel-heading text-center">
+						  <strong style="margin-right:100px;font-size:22px">品牌菜品销售表(其他销量)</strong>
+					  </div>
+					  <div class="panel-body">
+						  <table id="brandMealSealsTable" class="table table-striped table-bordered table-hover"
+								 style="width: 100%;">
+						  </table>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
 	    </div>
 	  </div>
 	    </div>
@@ -181,6 +202,7 @@ var sort = "desc";
 var brandUnitAPI = null;
 var brandFamilyAPI = null;
 var brandTypeAPI = null;
+var brandMealSealsAPI = null;
 var vueObj = new Vue({
     el : "#control",
     data : {
@@ -194,6 +216,7 @@ var vueObj = new Vue({
         brandArticleUnitTable:{},//单品dataTables对象
         brandArticleFamilyTable:{},//套餐datatables对象
         brandArticleTypeTable:{},//类别datatablees对象
+		brandMealSealsTable : {}, //其他销量datatable对象
         api:{},
         resultData:[],
         state : 1,
@@ -202,6 +225,7 @@ var vueObj = new Vue({
         brandArticleType : [],
         brandArticleUnitList :[],
         brandArticleFamilyList　:[],
+		brandMealSealsDtos:[],
         object : {},
         length : 0,
         start : 0,
@@ -404,6 +428,37 @@ var vueObj = new Vue({
                     brandTypeAPI = this.api();
                 }
             });
+			//其他销量datatable对象
+			that.brandMealSealsTable=$("#brandMealSealsTable").DataTable({
+				lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+				order: [[ 2, "desc" ]],
+				columns : [
+					{
+						title : "菜品名称",
+						data : "articleName",
+						orderable : false
+					},
+					{
+						title : "销量(份)",
+						data : "brandSellNum",
+					},
+					{
+						title : "销售额(元)",
+						data : "salles"
+					},
+					{
+						title:"退菜数量" ,
+						data:"refundCount"
+					},
+					{
+						title:"退菜金额" ,
+						data:"refundTotal"
+					}
+				],
+				initComplete: function () {
+					brandMealSealsAPI = this.api();
+				}
+			});
         },
         //切换单品、套餐 type 1:单品 2:套餐 3:类别
         chooseType:function (type) {
@@ -427,6 +482,7 @@ var vueObj = new Vue({
 	            var api1 = brandUnitAPI;
 	            var api2 = brandFamilyAPI;
                 var api3 = brandTypeAPI;
+				var api4 = brandMealSealsAPI;
                 $.post("articleSell/queryOrderArtcile", this.getDate(), function(result) {
                     if(result.success == true){
                         toastr.clear();
@@ -435,6 +491,7 @@ var vueObj = new Vue({
                         that.brandArticleUnit = result.data.brandArticleUnit;
                         that.brandArticleFamily = result.data.brandArticleFamily;
                         that.brandArticleType = result.data.brandArticleType;
+						that.brandMealSealsDtos = result.data.brandMealSalesDtos;
                         //清空brandUnitDatatable的column搜索条件
                         api1.search('');
                         var column1 = api1.column(1);
@@ -454,6 +511,10 @@ var vueObj = new Vue({
                         that.brandFamilyTable();
                         that.brandArticleTypeTable.clear();
                         that.brandArticleTypeTable.rows.add(result.data.brandArticleType).draw();
+						//其他销量
+						api4.search('');
+						that.brandMealSealsTable.clear();
+						that.brandMealSealsTable.rows.add(result.data.brandMealSalesDtos).draw();
                     }else{
 						toastr.clear();
                         toastr.error("查询失败");
@@ -569,6 +630,17 @@ var vueObj = new Vue({
                                 }
                             });
                         break;
+					case 4:
+						that.object.brandMealSeals = that.brandMealSealsDtos;
+						$.post("articleSell/createBrnadArticle",that.object,function (result) {
+							if(result.success){
+								window.location.href="articleSell/downloadBrnadArticle?path="+result.data+"";
+							}else{
+								toastr.clear();
+								toastr.error("下载报表出错");
+							}
+						});
+						break;
                 }
             }catch (e){
                 that.state = 1;
