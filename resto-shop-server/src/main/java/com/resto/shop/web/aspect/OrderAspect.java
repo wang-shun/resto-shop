@@ -973,4 +973,27 @@ public class OrderAspect {
         sb.append("订单金额：" + order.getOrderMoney() + "\n");
         WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
+
+    /**
+     * 切到评论方法
+     */
+    @Pointcut("execution(* com.resto.shop.web.service.AppraiseService.saveAppraise(..))")
+    public void saveAppraise() {
+    }
+
+
+    /**
+     * 订单评论完成后执行， 如是差评则发送消息队列执行打单操作
+     * @param appraise
+     */
+    @AfterReturning(value = "saveAppraise()", returning = "appraise")
+    public void saveAppraise(Appraise appraise) {
+        if (appraise != null){
+            //如满足差评条件则打印订单
+            if (appraise.getLevel() <= 4){
+                //发送队列消息
+                MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(),appraise.getShopDetailId());
+            }
+        }
+    }
 }
