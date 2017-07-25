@@ -8133,6 +8133,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal articleCount = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
         for (OrderItem article : orderItems) {
+            Article a = articleService.selectById(article.getId());
             Map<String, Object> refundItem = new HashMap<>();
             refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
             refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
@@ -8143,13 +8144,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (article.getType() != OrderItemType.MEALS_CHILDREN && order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
-                        new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
+                        new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))).doubleValue());
                 refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
-                refundItem.put("ARTICLE_COUNT", -(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))).doubleValue());
+                refundItem.put("ARTICLE_COUNT", -(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))).doubleValue());
                 refundItems.add(refundItem);
-                articleCount = articleCount.add(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber())));
+                articleCount = articleCount.add(new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber())));
                 orderMoney = orderMoney.add(shopDetail.getMealFeePrice().multiply(
-                        new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(article.getMealFeeNumber()))));
+                        new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))));
             }
         }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
