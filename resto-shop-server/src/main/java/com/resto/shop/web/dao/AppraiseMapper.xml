@@ -152,7 +152,8 @@
      a.article_id,
      a.shop_detail_id,
      c.nickname,
-     c.head_photo
+     c.head_photo,
+     c.sex
      FROM
      tb_appraise a
      LEFT JOIN tb_customer c

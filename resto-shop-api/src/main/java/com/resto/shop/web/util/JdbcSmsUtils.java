@@ -185,7 +185,7 @@ public class JdbcSmsUtils {
             e.printStackTrace();
         }
 
-        String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name) values (?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name,sex) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         List<Object> params = new ArrayList<>();
         params.add(ApplicationUtils.randomUUID());
         params.add(a.getPictureUrl());
@@ -205,6 +205,7 @@ public class JdbcSmsUtils {
             a.setNickName("");
         }
         params.add(EmojiFilter.filterEmoji(a.getNickName()));
+        params.add(a.getSex());
         try{
           updateByPreparedStatement(sql,params);
 

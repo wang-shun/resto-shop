@@ -7,6 +7,7 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
+import com.resto.shop.web.service.PosUserService;
 import com.resto.shop.web.service.ShowPhotoService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
