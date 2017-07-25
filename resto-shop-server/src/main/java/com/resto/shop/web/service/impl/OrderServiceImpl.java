@@ -7079,7 +7079,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderitemMapper.deleteByPrimaryKey(zpOrderItem.getId());
                 }
             }
-
             update(order);
             updateCount = baseArticleCount.subtract(new BigDecimal(count));
             String message = "";
