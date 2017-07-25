@@ -720,7 +720,7 @@ public class OrderAspect {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
-            if(customer != null){
+            if(customer == null){
                 return;
             }
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
