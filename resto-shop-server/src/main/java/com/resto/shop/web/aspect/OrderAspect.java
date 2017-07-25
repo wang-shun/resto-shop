@@ -988,8 +988,8 @@ public class OrderAspect {
      */
     @AfterReturning(value = "saveAppraise()", returning = "appraise")
     public void saveAppraise(Appraise appraise) {
+        log.info("订单评论完成");
         if (appraise != null){
-            log.info("订单评论完成");
             //如满足差评条件则打印订单
             if (appraise.getLevel() <= 4){
                 log.info("订单评论满足差评推送消息队列");
