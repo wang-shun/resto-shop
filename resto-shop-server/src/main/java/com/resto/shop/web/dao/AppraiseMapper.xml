@@ -154,7 +154,7 @@
         WHEN 5 THEN '五星'
         END levelName,
         ta.feedback feedBack,
-        DATE_FORMAT(ta.create_time,'%Y-%m-%d %H:%I:%s') createTime,
+        ta.create_time createTime,
         IFNULL(tc.telephone,'--') telephone,
         td.order_money orderMoney,
         ta.red_money redMoney,
