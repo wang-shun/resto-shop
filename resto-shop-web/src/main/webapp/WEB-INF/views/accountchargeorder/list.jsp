@@ -146,33 +146,39 @@
                 },
 
                 {
-                    title : "充值金额",
-                    data : "chargeMoney",
+                    title : "流水号",
+                    data : "id",
                 },
+
                 {
-                    title : "交易号",
-                    data : "tradeNo",
+                    title : "充值金额",
+                    data : "chargeMoney"
                 },
                 {
                     title : "支付方式",
                     data : "payType",
+                    createdCell:function (td,tdData) {
+                        $(td).html(vueObj.getPayType(tdData))
+                    }
+                },
+                {
+                    title : "交易号",
+                    data : "tradeNo"
                 },
 
 				{
-					title : "操作",
-					data : "id",
-					createdCell:function(td,tdData,rowData,row){
-						var operator=[
-							<s:hasPermission name="accountchargeorder/delete">
-							C.createDelBtn(tdData,"accountchargeorder/delete"),
-							</s:hasPermission>
-							<s:hasPermission name="accountchargeorder/modify">
-							C.createEditBtn(rowData),
-							</s:hasPermission>
-						];
-						$(td).html(operator);
-					}
-				}],
+					title : "进度",
+					data : "orderStatus",
+                    createdCell:function (td,tdData) {
+					    var temp = "";
+					    if(tdData==1){
+					        temp = "充值成功";
+                        }else if(temp==2){
+					        temp = "审核中"
+                        }
+                        $(td).html(temp);
+                    }
+				}]
 		});
 		
 		var C = new Controller(null,tb);
@@ -197,6 +203,19 @@
                         temp = temp.format("yyyy-MM-dd hh:mm:ss");
                     }
                     return temp;
+                },
+                getPayType : function(type){
+                    var str = ""
+                    if(type==1){
+                        str = "<img alt=\"支付宝支付\" src=\"assets/pages/img/alipay.png\" width=\"23px\" height=\"23px\">&nbsp;支 付 宝";
+                    }else if(type==2){
+                        str = "<img alt=\"微信支付\" src=\"assets/pages/img/wxpay.png\" width=\"23px\" height=\"23px\">&nbsp;微&nbsp;&nbsp;信";
+                    }else if(type==3){
+                        str = "<img alt=\"银行转账\" src=\"assets/pages/img/bank.png\" width=\"23px\" height=\"18px\">&nbsp;银行转账";
+                    }else{
+                        str = type;
+                    }
+                    return str;
                 }
 			}
 		});

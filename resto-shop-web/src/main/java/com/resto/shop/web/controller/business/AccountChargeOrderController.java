@@ -39,7 +39,7 @@
      @RequestMapping("/list_all")
      @ResponseBody
      public List<AccountChargeOrder> listData(){
-         return accountchargeorderService.selectList();
+         return accountchargeorderService.selectHasPayList();
      }
 
      @RequestMapping("list_one")
