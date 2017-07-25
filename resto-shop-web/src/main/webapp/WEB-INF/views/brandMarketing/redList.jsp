@@ -8,14 +8,14 @@
                     <label>
                         <span>红包类型：</span>
                         <select id="redType" class="form-control" style="width: 173px;"
-                                :value="redType" v-model="redType" @change="selectRedType">
+                                :value="redType" v-model="redType">
                             <option v-for="type in redTypeList" value="{{type.typeValue}}">{{type.typeName}}</option>
                         </select>
                     </label>
                 </div>
                 <div class="form-group" style="margin-right: 50px;">
                     <label>发放周期：
-                        <input type="text" class="form-control form_datetime" :disabled="redType == 1 || redType == 2 || redType == 3" :value="grantSearchDate.beginDate" v-model="grantSearchDate.beginDate" readonly="readonly">
+                        <input type="text" class="form-control form_datetime" :value="grantSearchDate.beginDate" v-model="grantSearchDate.beginDate" readonly="readonly">
                     </label>
                     &nbsp;至&nbsp;
                     <label>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="form-group" style="margin-right: 50px;">
                     <label>使用周期：
-                        <input type="text" class="form-control form_datetime" :disabled="redType == 1 || redType == 2 || redType == 3" :value="useSearchDate.beginDate" v-model="useSearchDate.beginDate" readonly="readonly">
+                        <input type="text" class="form-control form_datetime" :value="useSearchDate.beginDate" v-model="useSearchDate.beginDate" readonly="readonly">
                     </label>
                     &nbsp;至&nbsp;
                     <label>
@@ -212,6 +212,8 @@
             searchInfo : function() {
                 var timeCha1 = new Date(this.grantSearchDate.endDate).getTime() - new Date(this.grantSearchDate.beginDate).getTime();
                 var timeCha2 = new Date(this.useSearchDate.endDate).getTime() - new Date(this.useSearchDate.beginDate).getTime();
+                var grantSearchDate = new Date(this.grantSearchDate.beginDate).getTime();
+                var useSearchDate = new Date(this.useSearchDate.beginDate).getTime();
                 if(timeCha1 < 0){
                     toastr.clear();
                     toastr.error("发放周期开始时间应该少于结束时间！");
@@ -227,6 +229,14 @@
                 }else if(timeCha2 > 604800000){
                     toastr.clear();
                     toastr.error("使用周期暂时未开放大于一周以内的查询！");
+                    return false;
+                }else if(grantSearchDate < new Date("2017-02-22").getTime()){
+                    toastr.clear();
+                    toastr.error("发放周期开始时间必须大于等于2017-02-22");
+                    return false;
+                }else if(useSearchDate < new Date("2017-02-22").getTime()){
+                    toastr.clear();
+                    toastr.error("使用周期开始时间必须大于等于2017-02-22");
                     return false;
                 }
                 toastr.clear();
@@ -305,13 +315,6 @@
                 this.grantSearchDate.beginDate  = getMonthStartDate();
                 this.grantSearchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
-            },
-            selectRedType : function(){
-                var redType = this.redType;
-                if (redType == 1 || redType == 2 || redType == 3){
-                    this.useSearchDate.beginDate  = "2017-02-22";
-                    this.grantSearchDate.beginDate  = "2017-02-22";
-                }
             }
         }
     });
