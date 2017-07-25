@@ -8132,7 +8132,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal articleCount = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
         for (OrderItem article : orderItems) {
-            Article a = articleService.selectById(article.getArticleId());
+            Article a = articleService.selectById(article.getArticleId().indexOf("@") > -1 ? article.getArticleId().substring(0, article.getArticleId().indexOf("@")) : article.getArticleId());
             Map<String, Object> refundItem = new HashMap<>();
             refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
             refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
