@@ -108,6 +108,7 @@ public class JdbcSmsUtils {
      */
     public  static  void saveDayDataMessage(DayDataMessage dayDataMessage,String shopId) {
         //初始化连接
+        log.info("开始插入日结短信数据---");
         getConnection();
         //删除今日数据
         String deleteSql = "delete from tb_day_data_message where shop_id = ? and date = ?";

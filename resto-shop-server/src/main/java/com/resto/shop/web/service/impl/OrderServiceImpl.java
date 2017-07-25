@@ -6710,11 +6710,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
             String[] tels = telephones.split(",");
             for (String s : tels) {
-                String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+               // String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
 
-                System.err.println("短信返回内容："+smsResult);
+                //System.err.println("短信返回内容："+smsResult);
                 //记录日志
-                LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
+               // LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
                 Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
