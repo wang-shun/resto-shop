@@ -5996,11 +5996,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
                     //1.resto订单总额
                     todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-                    //3.resto的订单总数
-                    //                    if (o.getParentOrderId() == null) {
-                    //                        todayRestoCount.add(o.getId());
-                    //                    }
-                    //   todayRestoCount.add(o.getId());
+
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         //订单支付项
@@ -6353,6 +6349,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+
+
         //查询回头用户的
         List<BackCustomerDto> todayBackCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
         //回头用户
@@ -6403,7 +6401,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //2定义resto订单
         //本日resto订单总数
-        Set<String> todayRestoCount = new HashSet<>();
+        int todayRestoCount = todayNewCustomerOrderNum+todayBackCustomerOrderNum;
+
         //本日resto订单总额
         BigDecimal todayRestoTotal = BigDecimal.ZERO;
         //本月resto订单总数
@@ -6443,11 +6442,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (getTime.contains(2)) {//今日内订单
                     //1.resto订单总额
                     todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-                    //3.resto的订单总数
-//                    if (o.getParentOrderId() == null) {
-//                        todayRestoCount.add(o.getId());
-//                    }
-                    todayRestoCount.add(o.getId());
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         //订单支付项
@@ -6476,10 +6470,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //本日用户消费比率 R+线下+外卖
         //到店总笔数 线上+线下
-        double dmax = todayEnterCount + todayRestoCount.size();
+        double dmax = todayEnterCount + todayRestoCount;
         if (dmax != 0) {
             //本日用户消费比率
-            todayCustomerRatio = formatDouble((todayRestoCount.size() / dmax) * 100);
+            todayCustomerRatio = formatDouble((todayRestoCount / dmax) * 100);
             //本日新增用户利率
             todayNewCustomerRatio = formatDouble((todayNewCustomerOrderNum / dmax) * 100);
             //本日回头用户的消费比率
@@ -6644,9 +6638,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ds.setTimes(times);//当日结店次数
         ds.setWether(wether.getDayWeather());
         ds.setTemperature(wether.getDayTemperature());
-        ds.setOrderNumber(todayEnterCount + todayRestoCount.size());//到店总笔数
+        ds.setOrderNumber(todayEnterCount + todayRestoCount);//到店总笔数
         ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));//到店消费总额
-        ds.setCustomerOrderNumber(todayRestoCount.size());
+        ds.setCustomerOrderNumber(todayRestoCount);
         ds.setCustomerOrderSum(todayRestoTotal);
         ds.setCustomerOrderRatio(todayCustomerRatio+"%");
         ds.setNewCustomerOrderRatio(todayNewCustomerRatio+"%");
@@ -6810,11 +6804,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
             String[] tels = telephones.split(",");
             for (String s : tels) {
-               // String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
+                String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
 
-                //System.err.println("短信返回内容："+smsResult);
+                System.err.println("短信返回内容："+smsResult);
                 //记录日志
-               // LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
+                LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
                 Customer c = customerService.selectByTelePhone(s);
                 /**
                  发送客服消息
