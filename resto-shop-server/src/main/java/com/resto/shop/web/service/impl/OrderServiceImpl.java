@@ -2069,6 +2069,146 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+    @Override
+    public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber){
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        List<Printer> ticketPrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.RECEPTION);
+        for (Printer printer : ticketPrinter) {
+            if (shopDetail.getIsPosNew() == Common.YES) {
+                getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
+            } else {
+                getTurnTableModel(order, printer, printTask,oldtableNumber);
+            }
+        }
+        Brand brand = brandService.selectById(order.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "返回打印厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        return printTask;
+    }
+
+    private void getTurnTableModel(Order order, Printer printer, List<Map<String, Object>> printTask,String oldtableNumber) {
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";//桌号
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = "转台";
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", oldtableNumber);
+        //添加当天打印订单的序号
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        if (tableQrcode == null) {
+            data.put("ORDER_NUMBER",  "---");
+        } else {
+            if (tableQrcode.getAreaId() == null) {
+                data.put("ORDER_NUMBER", "---");
+            } else {
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                if (area == null) {
+                    data.put("ORDER_NUMBER", "---");
+                } else {
+                    data.put("ORDER_NUMBER", area.getName());
+                }
+            }
+
+        }
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        Map<String, Object> item = new HashMap<String, Object>();
+        Map<String, Object> itemOld = new HashMap<String, Object>();
+        itemOld.put("ARTICLE_COUNT","台号");
+        itemOld.put("ARTICLE_NAME","               "+oldtableNumber);
+        items.add(itemOld);
+        Map<String, Object> itemNew = new HashMap<String, Object>();
+        itemNew.put("ARTICLE_COUNT","转至");
+        itemNew.put("ARTICLE_NAME","               "+tableNumber);
+        items.add(itemNew);
+        data.put("ITEMS", items);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_PROPERTY", "");
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketType.KITCHEN);
+        //添加到 打印集合
+        printTask.add(print);
+        RedisUtil.set(print_id, print);
+    }
+
+    private void getTurnTableModelNew(Order order, Printer printer,ShopDetail shopDetail, List<Map<String, Object>> printTask,String oldtableNumber) {
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";//桌号
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = "转台";
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID",print_id);
+        print.put("TASK_ID", "");
+        print.put("TASK_ORDER_ID", order.getId());
+        print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", oldtableNumber);
+        //添加当天打印订单的序号
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        if (tableQrcode == null) {
+            data.put("ORDER_NUMBER", "---");
+        } else {
+            if (tableQrcode.getAreaId() == null) {
+                data.put("ORDER_NUMBER", "---");
+            } else {
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                if (area == null) {
+                    data.put("ORDER_NUMBER", "---");
+                } else {
+                    data.put("ORDER_NUMBER", area.getName());
+                }
+            }
+
+        }
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        Map<String, Object> itemOld = new HashMap<String, Object>();
+        itemOld.put("ARTICLE_COUNT","台号");
+        itemOld.put("ARTICLE_NAME","               "+oldtableNumber);
+        items.add(itemOld);
+        Map<String, Object> itemNew = new HashMap<String, Object>();
+        itemNew.put("ARTICLE_COUNT","转至");
+        itemNew.put("ARTICLE_NAME","               "+tableNumber);
+        items.add(itemNew);
+        data.put("ITEMS", items);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_PROPERTY", "");
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+        print.put("TICKET_MODE", TicketTypeNew.KITCHEN_TICKET);
+        //添加到 打印集合
+        printTask.add(print);
+        RedisUtil.set(print_id, print);
+    }
+
+
     private void getRecommendModel(String recommendId, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
         //桌号
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
