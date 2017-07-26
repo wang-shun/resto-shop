@@ -9,6 +9,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
@@ -89,6 +90,12 @@ public class ShopInfoController extends GenericController{
         }
         if (shopDetail.getModifyOrderPrintKitchen() == null){
             shopDetail.setModifyOrderPrintKitchen(0);
+        }
+        if (shopDetail.getBadAppraisePrintKitchen() == null){
+            shopDetail.setBadAppraisePrintKitchen(false);
+        }
+        if (shopDetail.getBadAppraisePrintReceipt() == null){
+            shopDetail.setBadAppraisePrintReceipt(false);
         }
         if(shopDetail.getIsOpenSms()==0){//表示是关闭日短信通知
             shopDetail.setnoticeTelephone("");
