@@ -78,4 +78,6 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
     Customer getCustomerLimitOne();
 
     List<Customer> selectByTelePhones(List<String> telePhones);
+
+    List<Customer> getCommentCustomer(@Param("startTime") String startTime,@Param("time") Integer time);
 }
