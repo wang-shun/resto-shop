@@ -9410,4 +9410,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
         return orderMapper.addRefundArticleDto(beginDate, endDate);
     }
+
+    @Override
+    public List<Map<String, Object>> badAppraisePrintOrder(String orderId) {
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        Order order = selectById(orderId);
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        List<Printer> printerList = new ArrayList<>();
+        if (shopDetail.getBadAppraisePrintReceipt()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 2));
+        }
+        if (shopDetail.getBadAppraisePrintKitchen()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 1));
+        }
+        return printTask;
+    }
 }
