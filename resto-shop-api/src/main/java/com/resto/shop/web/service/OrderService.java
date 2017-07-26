@@ -87,6 +87,13 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<Map<String,Object>> printKitchen(Order order, List<OrderItem> articleList);
 
+    /**
+     * 打印换桌的小票
+     * @param order
+     * @return
+     */
+	public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber);
+
 	 
 	public Order confirmOrder(Order order);
 
