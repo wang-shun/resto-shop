@@ -990,11 +990,15 @@ public class OrderAspect {
     public void saveAppraise(Appraise appraise) {
         if (appraise != null){
             log.info("订单评论完成");
-            //如满足差评条件则打印订单
-            if (appraise.getLevel() <= 4){
-                log.info("订单评论满足差评推送消息队列");
-                //发送队列消息
-                MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(),appraise.getShopDetailId());
+            ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
+            //判断是否开启差评打单
+            if (shopDetail.getOpenBadAppraisePrintOrder()) {
+                //如满足差评条件则打印订单
+                if (appraise.getLevel() <= 4) {
+                    log.info("订单评论满足差评推送消息队列");
+                    //发送队列消息
+                    MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(), appraise.getShopDetailId());
+                }
             }
         }
     }
