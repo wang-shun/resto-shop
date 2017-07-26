@@ -9,8 +9,10 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.RefundArticleOrder;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.OrderItemService;
@@ -46,6 +48,9 @@ public class RefundArticleController extends GenericController{
 
     @Resource
     OrderItemService orderItemService;
+
+    @Resource
+    ShopDetailService shopDetailService;
 
     @RequestMapping("/list")
     public void list(){}
@@ -83,6 +88,10 @@ public class RefundArticleController extends GenericController{
     public Result getRefundArticleDetail(String orderId){
         try{
             JSONObject jsonObject = new JSONObject();
+            //得到订单项
+            Order order = orderService.selectById(orderId);
+            //得到该订单所在店铺
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             //得到退款支付项
             List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectRefundPayMent(orderId);
             //得到退菜的明细
@@ -110,6 +119,32 @@ public class RefundArticleController extends GenericController{
                 if (StringUtils.isNotBlank(orderItem.getOrderRefundRemark().getRemarkSupply())){
                     jsonObject.put("refundRemark", jsonObject.get("refundRemark").toString().concat("、").concat(orderItem.getOrderRefundRemark().getRemarkSupply()));
                 }
+                array.add(jsonObject);
+            }
+            //查看是否有退服务费
+            if (order.getBaseCustomerCount() != null && order.getCustomerCount() != null
+                    && order.getBaseCustomerCount() != order.getCustomerCount()
+                    && order.getBaseCustomerCount() > order.getCustomerCount()){
+                jsonObject = new JSONObject();
+                jsonObject.put("articleName", shopDetail.getServiceName());
+                jsonObject.put("unitPrice", order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())));
+                jsonObject.put("refundCount", order.getBaseCustomerCount() - order.getCustomerCount());
+                jsonObject.put("refundMoney", new BigDecimal(order.getBaseCustomerCount() - order.getCustomerCount()).multiply(new BigDecimal(jsonObject.get("unitPrice").toString())));
+                jsonObject.put("refundTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.getCreateTime()));
+                jsonObject.put("refundRemark", "--");
+                array.add(jsonObject);
+            }
+            //查看是否有退餐盒费
+            if (order.getBaseMealAllCount() != null && order.getMealAllNumber() != null
+                    && order.getBaseMealAllCount() != order.getMealAllNumber()
+                    && order.getBaseMealAllCount() > order.getMealAllNumber()){
+                jsonObject = new JSONObject();
+                jsonObject.put("articleName", shopDetail.getMealFeeName());
+                jsonObject.put("unitPrice", order.getMealFeePrice().divide(new BigDecimal(order.getMealAllNumber())));
+                jsonObject.put("refundCount", order.getBaseMealAllCount() - order.getMealAllNumber());
+                jsonObject.put("refundMoney", new BigDecimal(order.getBaseMealAllCount() - order.getMealAllNumber()).multiply(new BigDecimal(jsonObject.get("unitPrice").toString())));
+                jsonObject.put("refundTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.getCreateTime()));
+                jsonObject.put("refundRemark", "--");
                 array.add(jsonObject);
             }
             jsonObject = new JSONObject();

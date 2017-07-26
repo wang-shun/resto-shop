@@ -676,4 +676,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
+
+	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 }

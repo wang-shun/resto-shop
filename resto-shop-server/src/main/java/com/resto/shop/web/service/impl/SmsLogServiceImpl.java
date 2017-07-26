@@ -72,24 +72,26 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		smsLog.setPhone(phone);
 		smsLog.setSmsResult(string);
 		JSONObject obj = new JSONObject(string);
-		
-		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
-			if(obj.getBoolean("success")){ //返回成功
-				try{
-					insert(smsLog);
-					//更新短信账户的信息
-					smsAcountService.updateByBrandId(brandId);
-					//判断是否要提醒商家充值短信账户
-					sendNotice(brandUser,logMap);
-				}catch(Exception e){
-					log.error("发送短信失败:"+e.getMessage());
-				}
-			}else {
-				//短信发送失败不更新短信账户
-				insert(smsLog);
-			}
-
-		log.info("短信发送结果:"+string);
+		try{
+			insert(smsLog);
+			//更新短信账户的信息
+			smsAcountService.updateByBrandId(brandId);
+			//判断是否要提醒商家充值短信账户
+			sendNotice(b,brandUser,logMap);
+		}catch(Exception e){
+			log.error("发送短信失败:"+e.getMessage());
+		}
+//		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
+//		if(obj.optBoolean("success", true)){
+//			//
+//			if(obj.getBoolean("success")){
+//
+//			}else{
+//				//短信发送失败不更新短信账户
+//				insert(smsLog);
+//			}
+//		}
+//		log.info("短信发送结果:"+string);
 		return string;
 	}
 
