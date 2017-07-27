@@ -320,4 +320,16 @@ public class MQMessageProducer {
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PRINT_SUCCESS,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
+
+	/**
+	 * 发送打印差评订单的消息队列
+	 * @param orderId
+	 */
+	public static void sendBadAppraisePrintOrderMessage(String orderId, String shopId){
+		JSONObject obj  = new JSONObject();
+		obj.put("orderId",orderId);
+		obj.put("shopId",shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_BAD_APPRAISE_PRINT_ORDER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
 }

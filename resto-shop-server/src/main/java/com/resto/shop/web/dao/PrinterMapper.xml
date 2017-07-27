@@ -102,4 +102,8 @@
     select * from tb_printer where shop_detail_id = #{shopId} and ticket_type = 1
     GROUP BY port
   </select>
+
+  <select id="selectPrintByType" resultType="com.resto.shop.web.model.Printer">
+    select * from tb_printer where shop_detail_id = #{shopId} and print_type = #{type} and ticket_type = 0
+  </select>
 </mapper>

@@ -678,4 +678,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	List<Map<String, Object>> badAppraisePrintOrder(String orderId);
 }
