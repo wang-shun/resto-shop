@@ -9434,9 +9434,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String[] articleIds = appraise.getArticleId().split(",");
         //得到差评菜品的订单信息
         List<OrderItem> orderItems = orderItemService.selectByArticleIds(articleIds);
+        OrderItem[] orderItemList  = new OrderItem[orderItems.size()];
+        for (int i = 0; i < orderItems.size() ; i++){
+            orderItemList[i] = orderItems.get(i);
+        }
         //封装打印模板
         for (Printer printer : printerList) {
-            badAppraiseOrderGetKitchenModel(orderItems, order, printer, appraise, tableQrcode, printTask);
+            badAppraiseOrderGetKitchenModel(orderItemList, order, printer, appraise, tableQrcode, printTask);
         }
         return printTask;
     }
@@ -9444,20 +9448,43 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     /**
      * 得到差评订单的打印模板
-     * @param orderItems
+     * @param orderItemList
      * @param order
      * @param printer
      * @param appraise
      * @param tableQrcode
      * @param printTask
      */
-    private void badAppraiseOrderGetKitchenModel(List<OrderItem> orderItems, Order order, Printer printer, Appraise appraise, TableQrcode tableQrcode, List<Map<String, Object>> printTask) {
+    private void badAppraiseOrderGetKitchenModel(OrderItem[] orderItemList, Order order, Printer printer, Appraise appraise, TableQrcode tableQrcode, List<Map<String, Object>> printTask) {
         //保存 菜品的名称和数量
         List<Map<String, Object>> items = new ArrayList<>();
-        Map<String, Object> item = new HashMap<>();
         //封装菜品信息
-        for (OrderItem article : orderItems) {
-            item.put("ARTICLE_NAME", article.getCount());
+        OrderItem orderItem;
+        for (int i = 1; i < orderItemList.length; i++) {
+            for (int j = 0; j < orderItemList.length - i; j++) {
+                if (orderItemList[j].getArticleName().length() > orderItemList[j+1].getArticleName().length()){
+                    orderItem = new OrderItem();
+                    orderItemList[j] = orderItemList[j+1];
+                    orderItemList[j+1] = orderItem;
+                }
+            }
+        }
+        //初始空格数
+        Integer spaceNumber = 10;
+        //当前菜品跟最小的菜品名称长度的差值
+        Integer difference;
+        //初始化空格字符串
+        String space;
+        Integer minLength = orderItemList[0].getArticleName().length();
+        Map<String, Object> item = new HashMap<>();
+        for (OrderItem article : orderItemList){
+            if (article.getArticleName().length() > minLength){
+                difference = article.getArticleName().length() - minLength;
+                space = getSpaceNumber(spaceNumber - (difference * 2));
+            }else{
+                space = getSpaceNumber(spaceNumber);
+            }
+            item.put("ARTICLE_NAME", space.concat(article.getCount().toString()));
             item.put("ARTICLE_COUNT", article.getArticleName());
             items.add(item);
             item = new HashMap<>();
@@ -9517,5 +9544,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("TICKET_TYPE", TicketType.KITCHEN);
         //添加到 打印集合
         printTask.add(print);
+    }
+
+    /**
+     * 得到空格字符串
+     * @param spaceNumber
+     * @return
+     */
+    private String getSpaceNumber(Integer spaceNumber){
+        StringBuilder builder = new StringBuilder();
+        for (int i =0; i < spaceNumber; i++){
+            builder.append(" ");
+        }
+        return builder.toString();
     }
 }
