@@ -515,7 +515,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
                     if(a.getDiscount() != 100){
-                        org_price = item.getPrice();
+                        org_price = a.getPrice();
                     }else if (a.getFansPrice() != null) {
                         org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
                     } else {
