@@ -56,8 +56,8 @@
                                         <div class="input-group date form_datetime">
                                             <input type="text" readonly class="form-control" name="beginDateTime" v-model="m.beginDateTime" @focus="initCouponTime"> <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
-													<i class="fa fa-calendar" @click="initCouponTime"></i>
-												</button>
+                                                    <i class="fa fa-calendar" @click="initCouponTime"></i>
+                                                </button>
 											</span>
                                         </div>
                                     </div>
@@ -66,8 +66,8 @@
                                         <div class="input-group date form_datetime">
                                             <input type="text" readonly class="form-control" @focus="initCouponTime" name="endDateTime" v-model="m.endDateTime"> <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
-													<i class="fa fa-calendar" @click="initCouponTime"></i>
-												</button>
+                                                    <i class="fa fa-calendar" @click="initCouponTime"></i>
+                                                </button>
 											</span>
                                         </div>
                                     </div>
@@ -97,8 +97,8 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control timepicker timepicker-no-seconds" name="beginTime" v-model="m.beginTime" @focus="initTime" readonly> <span class="input-group-btn">
 										<button class="btn default" type="button">
-											<i class="fa fa-clock-o"></i>
-										</button>
+                                            <i class="fa fa-clock-o"></i>
+                                        </button>
 									</span>
                                 </div>
                             </div>
@@ -107,8 +107,8 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control timepicker timepicker-no-seconds" name="endTime" v-model="m.endTime" @focus="initTime" readonly>	<span class="input-group-btn">
 										<button class="btn default" type="button">
-											<i class="fa fa-clock-o"></i>
-										</button>
+                                            <i class="fa fa-clock-o"></i>
+                                        </button>
 									</span>
                                 </div>
                             </div>
@@ -182,8 +182,8 @@
                                             <input type="text" readonly class="form-control" name="realTimeCouponBeginTime" v-model="m.realTimeCouponBeginTimeString" @focus="initCouponTime">
                                             <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
-													<i class="fa fa-calendar" @click="initCouponTime"></i>
-												</button>
+                                                    <i class="fa fa-calendar" @click="initCouponTime"></i>
+                                                </button>
 											</span>
                                         </div>
                                     </div>
@@ -193,8 +193,8 @@
                                             <input type="text" readonly class="form-control" name="realTimeCouponEndTime" v-model="m.realTimeCouponEndTimeString" @focus="initCouponTime">
                                             <span class="input-group-btn">
 												<button class="btn default date-set" type="button">
-													<i class="fa fa-calendar" @click="initCouponTime"></i>
-												</button>
+                                                    <i class="fa fa-calendar" @click="initCouponTime"></i>
+                                                </button>
 											</span>
                                         </div>
                                     </div>
@@ -443,11 +443,40 @@
                 },
                 save:function(e){
                     var that = this;
+                    var url = that.m.id?'newcustomcoupon/modify':'newcustomcoupon/create';
                     var formDom = e.target;
-                    C.ajaxFormEx(formDom,function(){
-                        that.cancel();
-                        tb.ajax.reload();
-                    });
+//                    C.ajaxFormEx(formDom,function(){
+//                        that.cancel();
+//                        tb.ajax.reload();
+//                    });
+                    if(that.m.couponMinMoney < that.m.couponValue){
+                        toastr.clear();
+                        toastr.error("优惠券最低消费额度不得小于优惠券价值！");
+                        return;
+                    }
+                    $.ajax({
+                        url : url,
+                        data : $(formDom).serialize(),
+                        success : function(result) {
+                            if (result.success) {
+                                that.cancel();
+                                tb.ajax.reload();
+                                toastr.clear();
+                                toastr.success("保存成功！");
+                            } else {
+                                that.cancel();
+                                tb.ajax.reload();
+                                toastr.clear();
+                                toastr.error("保存失败");
+                            }
+                        },
+                        error : function() {
+                            that.cancel();
+                            tb.ajax.reload();
+                            toastr.clear();
+                            toastr.error("保存失败");
+                        }
+                    })
                 },
                 initdistributionMode :function(){
                     $.ajax({
