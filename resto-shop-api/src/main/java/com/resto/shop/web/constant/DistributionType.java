@@ -25,7 +25,7 @@ public class DistributionType {
         case REMINDER_ORDER:
             return "催菜";
 		case BAD_APPRAISE_ORDER:
-			return "差评通知";
+			return "差评";
 		default:
 			return "未知";
 		}
