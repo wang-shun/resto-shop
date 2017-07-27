@@ -628,15 +628,16 @@
 
     <select id="getCommentCustomer" resultType="Customer">
 
-select t.id,wechat_id,telephone,t2.id as order_id,t2.shop_detail_id from tb_customer t
+select t.id,wechat_id,telephone,t2.id as orderId,t2.shop_detail_id as shopDetailId from tb_customer t
 left join tb_order t2 on t2.customer_id = t.id
 where order_state in (2,10) and production_status in (2,3) and allow_appraise = 1
 
 and (UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(t2.create_time))/(60*60*24) > #{time}
 and t2.create_time >= CONCAT(#{startTime},'00:00:00')
 and wechat_id != '0'
-
-
+<if test="type == 0">
+    GROUP BY wechat_id
+</if>
 
 
     </select>

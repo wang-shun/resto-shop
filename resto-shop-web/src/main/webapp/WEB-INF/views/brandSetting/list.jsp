@@ -241,7 +241,17 @@
                                            v-model="m.commentTime" required="required" min="0">
                                 </div>
                             </div>
-
+                            <div class="form-group">
+                                <div class="control-label" >是否推送短信</div>
+                                <label>
+                                    <input type="radio" name="isPushSms" v-model="m.isPushSms" value="1">
+                                    是
+                                </label>
+                                <label>
+                                    <input type="radio" name="isPushSms" v-model="m.isPushSms" value="0">
+                                    否
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>

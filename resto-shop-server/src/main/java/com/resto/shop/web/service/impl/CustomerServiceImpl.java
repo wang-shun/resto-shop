@@ -260,7 +260,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     }
 
 	@Override
-	public List<Customer> getCommentCustomer(String startTime, Integer time) {
-		return customerMapper.getCommentCustomer(startTime,time);
+	public List<Customer> getCommentCustomer(String startTime, Integer time,Integer type) {
+		return customerMapper.getCommentCustomer(startTime,time,type);
 	}
 }
