@@ -9457,13 +9457,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> item = new HashMap<>();
         //封装菜品信息
         for (OrderItem article : orderItems) {
-            item.put("ARTICLE_NAME", article.getArticleName());
-            item.put("ARTICLE_COUNT", article.getCount());
+            item.put("ARTICLE_NAME", "          " + article.getCount());
+            item.put("ARTICLE_COUNT", article.getArticleName());
             items.add(item);
             item = new HashMap<>();
         }
         String serialNumber = order.getSerialNumber();//序列号
-        String modeText = DistributionType.getModeText(order.getDistributionModeId());//就餐模式
+        String modeText = DistributionType.getModeText(DistributionType.BAD_APPRAISE_ORDER);//就餐模式
         //保存打印信息
         Map<String, Object> print = new HashMap<>();
         print.put("PORT", printer.getPort());
