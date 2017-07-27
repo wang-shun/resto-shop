@@ -9469,22 +9469,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
-        //初始空格数
-        Integer spaceNumber = 10;
-        //当前菜品跟最小的菜品名称长度的差值
-        Integer difference;
-        //初始化空格字符串
-        String space;
+        //得到最小的菜品名称的长度
         Integer minLength = orderItemList[0].getArticleName().length();
         Map<String, Object> item = new HashMap<>();
         for (OrderItem article : orderItemList){
             if (article.getArticleName().length() > minLength){
-                difference = article.getArticleName().length() - minLength;
-                space = getSpaceNumber(spaceNumber - (difference * 2));
+                item.put("ARTICLE_NAME", getSpaceNumber(10 - ((article.getArticleName().length() - minLength) * 2)).concat(article.getCount().toString()));
             }else{
-                space = getSpaceNumber(spaceNumber);
+                item.put("ARTICLE_NAME", getSpaceNumber(10).concat(article.getCount().toString()));
             }
-            item.put("ARTICLE_NAME", space.concat(article.getCount().toString()));
             item.put("ARTICLE_COUNT", article.getArticleName());
             items.add(item);
             item = new HashMap<>();
