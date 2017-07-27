@@ -9503,13 +9503,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //评价内容
         String[] feedBacks = appraise.getFeedback().split(",");
         StringBuilder builder = new StringBuilder();
+        builder.append("(");
         for (String feedBack : feedBacks){
             if (feedBack.indexOf("差") != -1){
                 builder.append(feedBack).append(",");
             }
         }
-        builder.append(appraise.getContent());
-        data.put("MEMO", "评价内容：" + builder.toString());
+        builder.append(")");
+        String content = builder.toString();
+        content = content.substring(0, content.length() - 1).concat(appraise.getContent());
+        data.put("MEMO", "评价内容：" + content);
         print.put("DATA", data);
         print.put("STATUS", "0");
         print.put("TICKET_TYPE", TicketType.KITCHEN);
