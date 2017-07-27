@@ -415,7 +415,7 @@ order by t.print_sort asc
     </select>
 
     <select id="selectByArticleIds" resultType="com.resto.shop.web.model.OrderItem">
-        select * from tb_order_item where article_id in
+        select * from tb_order_item where id in
         <foreach collection="array" item="articleId" open="(" separator="," close=")">
             #{articleId}
         </foreach>
