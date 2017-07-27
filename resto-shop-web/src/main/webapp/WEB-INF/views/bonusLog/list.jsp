@@ -304,6 +304,9 @@
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
                             }
+                            if (result.message){
+                                toastr.error(result.message);
+                            }
                         } else{
                             that.disabled = false;
                             toastr.clear();
