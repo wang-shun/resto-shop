@@ -82,8 +82,37 @@ public class AccountPayNotifyController{
 		request.setAttribute("returnParams", params);
 		return "smschargeorder/alipayReturn";
 	}
-	
-	
+
+
+	@RequestMapping("wxpay_notify")
+	@ResponseBody
+	public String wx_notify(HttpServletRequest request) throws IOException, DocumentException{
+		//微信支付异步通知 参数 详情：https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_7
+		log.info("(账户充值)微信---->  异步    发来贺电");
+		Map<String,String> resultMap = getResultMap(request);
+		Map<String,String> wxResult = new HashMap<>();
+		wxResult.put("return_code", "FAIL");
+		if("SUCCESS".equals(resultMap.get("return_code"))&&"SUCCESS".equals(resultMap.get("result_code"))){
+			if(WeChatPayUtils.validSign(resultMap,WeChatPayUtils.RESTO_MCHKEY)){
+				try{
+					log.info("微信充值成功返回的参数为:"+resultMap);
+					accountChargeOrderService.checAccountChargeOrder_WxPay(resultMap);
+					wxResult.put("return_code", "SUCCESS");
+				}catch(Exception e){
+					log.info("接受微信支付请求失败:"+e.getMessage());
+					e.printStackTrace();
+					wxResult.put("return_msg", e.toString());
+				}
+			}else{
+				accountChargeOrderService.saveResultParam(resultMap, "微信支付");//保存参数
+				wxResult.put("return_msg", "签名失败");
+			}
+		}
+		String wxResultXml = WeChatPayUtils.mapToXml(wxResult);
+		log.info("微信支付返回成功信息 id:"+resultMap.get("transaction_id")+" 返回信息："+wxResultXml);
+		return wxResultXml;
+	}
+
 
 	
 	private Map<String, String> getResultMap(HttpServletRequest request) throws IOException, DocumentException {

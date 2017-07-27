@@ -135,7 +135,9 @@
 			ajax : {
 				url : "accountchargeorder/list_all",
 				dataSrc : ""
+
 			},
+            "order": [[ 0, "desc" ]],
 			columns : [
 				{
                     title : "创建时间",

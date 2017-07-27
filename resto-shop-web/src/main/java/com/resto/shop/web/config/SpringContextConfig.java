@@ -481,7 +481,7 @@ public class SpringContextConfig {
     public PlatformOrderService platformOrderService(){return  proxy.create(PlatformOrderService.class);}
 
 
-    //yz 2017-07-19
+    //yz 2017-07-19-----------------
     @Bean
     public BrandAccountService brandAccountService(){
         return proxy.create(BrandAccountService.class);
@@ -491,6 +491,13 @@ public class SpringContextConfig {
     public AccountChargeOrderService accountChargeOrderService(){
         return proxy.create(AccountChargeOrderService.class);
     }
+
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+    	return proxy.create(BrandAccountLogService.class);
+	}
+
+	//-----------------------
 
 
     public <T> T getProxy(Class<T> clazz) {

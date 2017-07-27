@@ -33,6 +33,8 @@ import com.resto.shop.web.controller.GenericController;
 
 import cn.restoplus.rpc.common.util.StringUtil;
 
+import static com.resto.brand.core.payUtil.PayConfigUtil.getWxPayHtml;
+
 @Controller
 @RequestMapping("smschargeorder")
 public class SmsChargeOrderController extends GenericController {
@@ -177,67 +179,8 @@ public class SmsChargeOrderController extends GenericController {
 	@RequestMapping("/createWxPayCode")
 	@ResponseBody
 	public void createWxPayCode(HttpServletResponse response,HttpServletRequest request){
-		FileInputStream fis = null;
-		File file = null;
-	    response.setContentType("image/gif");
-	    String fileName = System.currentTimeMillis()+"";
-	    try {
-	    	String content = (String) request.getSession().getAttribute("wxPayCode");
-	    	QRCodeUtil.createQRCode(content, getFilePath(request, null), fileName);
-	        OutputStream out = response.getOutputStream();
-	        file = new File(getFilePath(request, fileName));
-	        fis = new FileInputStream(file);
-	        byte[] b = new byte[fis.available()];
-	        fis.read(b);
-	        out.write(b);
-	        out.flush();
-	    } catch (Exception e) {
-	         e.printStackTrace();
-	    } finally {
-	        if (fis != null) {
-	            try {
-	               fis.close();
-	            } catch (IOException e) {
-	            	e.printStackTrace();
-	            }   
-	        }
-	        System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
-	        file.delete();
-	    }
+		PayConfigUtil.createWxPayCode(response,request);
 	}
 	
-	/**
-	 * 得到文件路径
-	 * @param request
-	 * @param fileName
-	 * @return
-	 */
-	public String getFilePath(HttpServletRequest request,String fileName){
-		String systemPath = request.getServletContext().getRealPath("");
-		systemPath = systemPath.replaceAll("\\\\", "/");
-		int lastR = systemPath.lastIndexOf("/");
-		systemPath = systemPath.substring(0,lastR)+"/";
-		String filePath = "qrCodeFiles/";
-		if(fileName!=null){
-			filePath += fileName;
-		}
-		return systemPath+filePath;
-	}
-	
-	/**
-	 * 生成微信支付的页面
-	 * @return
-	 */
-	public String getWxPayHtml(){
-		StringBuffer str = new StringBuffer();
-		str.append("<style>.closeBtn{line-height:30px; height:30px; width:163px; color:#ffffff; background-color:#d9534f; font-size:16px; font-weight:normal; font-family:Arial; border:0px solid #dcdcdc; -webkit-border-top-left-radius:3px; -moz-border-radius-topleft:3px; border-top-left-radius:3px; -webkit-border-top-right-radius:3px; -moz-border-radius-topright:3px; border-top-right-radius:3px; -webkit-border-bottom-left-radius:3px; -moz-border-radius-bottomleft:3px; border-bottom-left-radius:3px; -webkit-border-bottom-right-radius:3px; -moz-border-radius-bottomright:3px; border-bottom-right-radius:3px; -moz-box-shadow: inset 0px 0px 0px 0px #ffffff; -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff; box-shadow: inset 0px 0px 0px 0px #ffffff; text-align:center; display:inline-block; text-decoration:none;}.closeBtn:hover{background-color:#c9302c; cursor:pointer;}</style>");
-		str.append("<body style='height:100%;overflow:hidden;'>");
-		str.append("<div style='position:absolute; left:0; top:0px; width:100%; height:100%; background:#BBB;text-align: center;'>");
-		str.append("<img src = 'createWxPayCode' style='margin-top:150px;'>");
-		str.append("<p><span style='color:#FFF;'><strong>扫码即可使用微信支付</strong></span></p>");
-		str.append("<button class=\"closeBtn\" onclick=\"javascript:window.opener=null;window.open('','_self');window.close();\">关闭页面</button>");
-		str.append("</div></body>");
-		return str.toString();
-	}
 
 }
