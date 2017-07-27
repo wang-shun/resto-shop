@@ -9463,7 +9463,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (int i = 1; i < orderItemList.length; i++) {
             for (int j = 0; j < orderItemList.length - i; j++) {
                 if (orderItemList[j].getArticleName().length() > orderItemList[j+1].getArticleName().length()){
-                    orderItem = new OrderItem();
+                    orderItem = orderItemList[j];
                     orderItemList[j] = orderItemList[j+1];
                     orderItemList[j+1] = orderItem;
                 }
