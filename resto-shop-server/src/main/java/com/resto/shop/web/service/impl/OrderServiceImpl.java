@@ -9457,7 +9457,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> item = new HashMap<>();
         //封装菜品信息
         for (OrderItem article : orderItems) {
-            item.put("ARTICLE_NAME", "          " + article.getCount());
+            item.put("ARTICLE_NAME", article.getCount());
             item.put("ARTICLE_COUNT", article.getArticleName());
             items.add(item);
             item = new HashMap<>();
