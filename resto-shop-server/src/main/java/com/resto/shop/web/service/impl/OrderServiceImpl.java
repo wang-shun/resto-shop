@@ -9509,9 +9509,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 builder.append(feedBack).append(",");
             }
         }
-        builder.append(")");
         String content = builder.toString();
-        content = content.substring(0, content.length() - 1).concat(appraise.getContent());
+        content = content.substring(0, content.length() - 1).concat(")").concat(appraise.getContent());
         data.put("MEMO", "评价内容：" + content);
         print.put("DATA", data);
         print.put("STATUS", "0");
