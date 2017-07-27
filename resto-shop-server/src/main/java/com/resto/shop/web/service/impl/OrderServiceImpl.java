@@ -2138,7 +2138,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         items.add(itemNew);
         data.put("ITEMS", items);
         data.put("CUSTOMER_SATISFACTION", "");
-        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", "");
         data.put("CUSTOMER_PROPERTY", "");
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -2197,7 +2197,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         items.add(itemNew);
         data.put("ITEMS", items);
         data.put("CUSTOMER_SATISFACTION", "");
-        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", "");
         data.put("CUSTOMER_PROPERTY", "");
         print.put("DATA", data);
         print.put("STATUS", "0");
