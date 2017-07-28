@@ -88,6 +88,7 @@
                 url : "brandaccountlog/list_all",
                 dataSrc : ""
             },
+			"order":[[0,"desc"]],
             columns : [
 				{
 				  title:"时间",

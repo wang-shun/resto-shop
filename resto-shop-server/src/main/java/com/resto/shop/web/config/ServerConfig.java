@@ -132,4 +132,30 @@ public class ServerConfig {
     public DayAppraiseMessageService dayAppraiseMessageService(){
         return proxy.create(DayAppraiseMessageService.class);
     }
+
+    //品牌账户
+	@Bean
+	public BrandAccountService brandAccountService(){
+
+    	return proxy.create(BrandAccountService.class);
+	}
+
+	//品牌账户日志(流水)
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+		return proxy.create(BrandAccountLogService.class);
+	}
+
+	//品牌账户设置
+	@Bean
+	public AccountSettingService accountSettingService(){
+
+		return proxy.create(AccountSettingService.class);
+	}
+
+
+
+
+
+
 }
