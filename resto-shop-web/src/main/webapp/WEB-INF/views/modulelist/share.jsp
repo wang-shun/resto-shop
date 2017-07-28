@@ -1,5 +1,10 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@include file="../tag-head.jsp" %>
+<style>
+	.formBox{
+		color: #5bc0de;
+	}
+</style>
 <form id="share-form" role="form" class="form-horizontal" action="modulelist/edit_share">
 	<div class="form-body">
 		<div class="form-group">
@@ -78,19 +83,36 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label  class="col-sm-3 control-label">是否开启多次获得分享返利</label>
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">是否开启多次获得分享返利</label>
 			<div class="col-sm-8">
 				<div class="radio-list">
 					<label class="radio-inline">
-						<input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 开启多次返利
+						<input type="radio" name="openMultipleRebates" v-model="m.openMultipleRebates" value="1"> 开启多次返利
 					</label>
 					<label class="radio-inline">
-						<input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 仅首单返利
+						<input type="radio" name="openMultipleRebates" v-model="m.openMultipleRebates" value="0"> 仅首单返利
 					</label>
 				</div>
 			</div>
 		</div>
-
+		<div class="form-group" v-if="m.openMultipleRebates==1">
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单返利(%)</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="afterRebate" v-model="m.afterRebate">
+			</div>
+		</div>
+		<div class="form-group" v-if="m.openMultipleRebates==1">
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单最小金额</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="afterMinMoney" v-model="m.afterMinMoney">
+			</div>
+		</div>
+		<div class="form-group" v-if="m.openMultipleRebates==1">
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单最大金额</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="afterMaxMoney" v-model="m.afterMaxMoney">
+			</div>
+		</div>
 	</div>
 </form>
 <script>
