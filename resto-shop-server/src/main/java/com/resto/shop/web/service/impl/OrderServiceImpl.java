@@ -7370,6 +7370,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
@@ -7445,6 +7446,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map accountMap = new HashMap(4);
                                 accountMap.put("brandName", brand.getBrandName());
@@ -7500,6 +7502,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(order.getRefundMoney());
             redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());

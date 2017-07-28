@@ -763,6 +763,18 @@ public class OrderAspect {
                             }
                         }
                     }
+                }else{
+                    if (customer.getShareCustomer() != null){
+                        Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
+                        if (shareCustomer != null) {
+                            ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+                            if (shareSetting != null && shareSetting.getOpenMultipleRebates() == 1) {
+                                BigDecimal rewardMoney = customerService.rewareShareCustomerAgain(shareSetting, order, shareCustomer, customer);
+                                log.info("准备发送返利通知");
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney, order);
+                            }
+                        }
+                    }
                 }
             } catch (Exception e) {
                 log.error("分享功能出错:" + e.getMessage());
