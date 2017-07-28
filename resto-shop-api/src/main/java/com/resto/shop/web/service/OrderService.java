@@ -273,7 +273,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 
-	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
+	public Map<String,Object> callMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
 	/**
@@ -655,9 +655,9 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     List<Map<String, Object>> reminder(String orderItemId);
 
-	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 
-	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
 
     //修复加菜时间过后 任然允许加菜的bug
     void fixErrorOrder();

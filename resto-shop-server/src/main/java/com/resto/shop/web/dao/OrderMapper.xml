@@ -3057,53 +3057,14 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and create_time >= '2017-06-29'
     </select>
 
-    <select id="selectDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        select td.shop_detail_id shopDetailId, td.parent_order_id parentOrderId, td.create_time createTime,
-        SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
-        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price totalIncome from tb_order td
-        inner join tb_order_item toi
-        on td.id = toi.order_id
-        where td.order_state in (2,10,11,12)
-        and td.production_status in (2,3)
-        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        <if test="shopId != null">
-            and td.shop_detail_id = #{shopId}
-        </if>
-        GROUP BY td.id
-        ORDER BY td.create_time asc
-        LIMIT #{pageNo},1000
+    <select id="callProcDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
+        CALL <if test="shopId == null">proc_day_all_order_item(#{beginDate},#{endDate},#{pageNo})</if>
+        <if test="shopId != null">proc_day_all_order_item_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
     </select>
 
-    <select id="selectDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        select td.shop_detail_id shopDetailId,td.id orderId, td.create_time createTime,
-        SUM(IF(top.payment_mode_id = 1, top.pay_value, 0)) wechatIncome,
-        SUM(IF(top.payment_mode_id = 2, top.pay_value, 0)) redIncome,
-        SUM(IF(top.payment_mode_id = 3, top.pay_value, 0)) couponIncome,
-        SUM(IF(top.payment_mode_id = 4, top.pay_value, 0)) otherPayment,
-        SUM(IF(top.payment_mode_id = 5, top.pay_value, 0)) backCartPay,
-        SUM(IF(top.payment_mode_id = 6, top.pay_value, 0)) chargeAccountIncome,
-        SUM(IF(top.payment_mode_id = 7, top.pay_value, 0)) chargeGifAccountIncome,
-        SUM(IF(top.payment_mode_id = 8, top.pay_value, 0)) waitNumberIncome,
-        SUM(IF(top.payment_mode_id = 10, top.pay_value, 0)) aliPayment,
-        ABS(SUM(IF(top.payment_mode_id = 11, top.pay_value, 0))) articleBackPay,
-        SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) + SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
-        SUM(IF(top.payment_mode_id = 16, top.pay_value, 0)) shanhuiPayment,
-        SUM(IF(top.payment_mode_id = 17, top.pay_value, 0)) integralPayment
-        from tb_order td
-        left join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and td.production_status in (2,3)
-        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        and top.payment_mode_id not in (13,14,15)
-        <if test="shopId != null">
-            and td.shop_detail_id = #{shopId}
-        </if>
-        GROUP BY td.id
-        ORDER BY td.create_time asc
-        LIMIT #{pageNo},1000
+    <select id="callProcDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
+        CALL <if test="shopId == null">proc_day_all_order_payment(#{beginDate},#{endDate},#{pageNo})</if>
+        <if test="shopId != null">proc_day_all_order_payment_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
     </select>
 
     <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">

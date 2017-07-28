@@ -109,8 +109,8 @@ public class TotalIncomeController extends GenericController {
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                 || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
             selectMap.put("pageNo", pageNo * 1000);
-            shopIncomeDtosItem = orderService.selectDayAllOrderItem(selectMap);
-            shopIncomeDtosPayMent = orderService.selectDayAllOrderPayMent(selectMap);
+            shopIncomeDtosItem = orderService.callProcDayAllOrderItem(selectMap);
+            shopIncomeDtosPayMent = orderService.callProcDayAllOrderPayMent(selectMap);
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
         }
@@ -295,8 +295,8 @@ public class TotalIncomeController extends GenericController {
                     for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                             || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
                         selectMap.put("pageNo", pageNo * 1000);
-                        shopIncomeDtosItem = orderService.selectDayAllOrderItem(selectMap);
-                        shopIncomeDtosPayMent = orderService.selectDayAllOrderPayMent(selectMap);
+                        shopIncomeDtosItem = orderService.callProcDayAllOrderItem(selectMap);
+                        shopIncomeDtosPayMent = orderService.callProcDayAllOrderPayMent(selectMap);
                         shopIncomeDtosItems.addAll(shopIncomeDtosItem);
                         shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
                     }
@@ -354,8 +354,8 @@ public class TotalIncomeController extends GenericController {
                 for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                         || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
                     selectMap.put("pageNo", pageNo * 1000);
-                    shopIncomeDtosItem = orderService.selectDayAllOrderItem(selectMap);
-                    shopIncomeDtosPayMent = orderService.selectDayAllOrderPayMent(selectMap);
+                    shopIncomeDtosItem = orderService.callProcDayAllOrderItem(selectMap);
+                    shopIncomeDtosPayMent = orderService.callProcDayAllOrderPayMent(selectMap);
                     shopIncomeDtosItems.addAll(shopIncomeDtosItem);
                     shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
                 }

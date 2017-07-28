@@ -76,7 +76,7 @@ public class OrderController extends GenericController{
 	}
 
 	private Map<String,Object> getResult(String beginDate,String endDate){
-		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
+		return orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 	}
 
 

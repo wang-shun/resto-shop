@@ -4222,7 +4222,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
+    public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
         OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
         //封装店铺的数据
@@ -4247,8 +4247,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                 || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
             selectMap.put("pageNo", pageNo * 1000);
-            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(selectMap);
-            shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(selectMap);
+            shopIncomeDtosItem = orderMapper.callProcDayAllOrderItem(selectMap);
+            shopIncomeDtosPayMent = orderMapper.callProcDayAllOrderPayMent(selectMap);
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
         }
@@ -8647,13 +8647,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap) {
-        return orderMapper.selectDayAllOrderItem(selectMap);
+    public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
+        return orderMapper.callProcDayAllOrderItem(selectMap);
     }
 
     @Override
-    public List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap) {
-        return orderMapper.selectDayAllOrderPayMent(selectMap);
+    public List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap) {
+        return orderMapper.callProcDayAllOrderPayMent(selectMap);
     }
 
     @Override
