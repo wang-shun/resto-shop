@@ -4401,7 +4401,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //    }
 
     @Override
-    public List<Order> selectListByTime(String beginDate, String endDate, String shopId, String customerId) {
+    public List<Order> callListByTime(String beginDate, String endDate, String shopId, String customerId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return orderMapper.selectListByTime(begin, end, shopId, customerId);

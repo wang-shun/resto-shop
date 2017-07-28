@@ -299,7 +299,7 @@ public interface OrderService extends GenericService<Order, String> {
 			String sort);
 
 //	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
-public List<Order> selectListByTime(String beginDate, String endDate, String shopId,String customerId);
+public List<Order> callListByTime(String beginDate, String endDate, String shopId,String customerId);
 
 	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
 
