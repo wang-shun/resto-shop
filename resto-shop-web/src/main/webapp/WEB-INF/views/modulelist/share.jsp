@@ -9,6 +9,19 @@
 			</div>
 		</div>
 		<div class="form-group">
+			<label  class="col-sm-3 control-label">是否启用</label>
+			<div class="col-sm-8">
+				<div class="radio-list">
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 启用
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 不启用
+					</label>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
 			<label  class="col-sm-3 control-label">分享图标</label>
 			<div class="col-sm-8">
 				<input type="hidden" class="form-control" name="shareIcon" v-model="m.shareIcon">
@@ -28,19 +41,19 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label  class="col-sm-3 control-label">返利(%)</label>
+			<label  class="col-sm-3 control-label">首单返利(%)</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="rebate" v-model="m.rebate">
 			</div>
 		</div>
 		<div class="form-group">
-			<label  class="col-sm-3 control-label">最小金额</label>
+			<label  class="col-sm-3 control-label">首单最小金额</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="minMoney" v-model="m.minMoney">
 			</div>
 		</div>
 		<div class="form-group">
-			<label  class="col-sm-3 control-label">最大金额</label>
+			<label  class="col-sm-3 control-label">首单最大金额</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="maxMoney" v-model="m.maxMoney">
 			</div>
@@ -58,25 +71,26 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label  class="col-sm-3 control-label">是否启用</label>
-			<div class="col-sm-8">
-				<div class="radio-list">
-					<label class="radio-inline">
-						<input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 启用
-					</label>
-					<label class="radio-inline">
-						<input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 不启用
-					</label>
-				</div>
-			</div>
-		</div>
-		<div class="form-group">
 			<label  class="col-sm-3 control-label">分享弹窗文本</label>
 			<div class="col-sm-8">
 				<textarea id="dialogText" name="dialogText" style="height:300px;" v-model="m.dialogText">
 				</textarea>
 			</div>
 		</div>
+		<div class="form-group">
+			<label  class="col-sm-3 control-label">是否开启多次获得分享返利</label>
+			<div class="col-sm-8">
+				<div class="radio-list">
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="1"> 开启多次返利
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="isActivity" v-model="m.isActivity" value="0"> 仅首单返利
+					</label>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </form>
 <script>
