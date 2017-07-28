@@ -16,10 +16,8 @@
                     <br></div>
                 <button type="button" class="btn btn-primary" id="today"> 今日</button>
                 <button type="button" class="btn btn-primary" id="yesterDay">昨日</button>
-                <!--              <button type="button" class="btn yellow" id="benxun">本询</button> -->
                 <button type="button" class="btn btn-primary" id="week">本周</button>
-                <%--<button type="button" class="btn btn-primary" id="month">本月</button>--%>
-
+                <button type="button" class="btn btn-primary" id="month">本月</button>
                 <button type="button" class="btn btn-primary" id="searchReport">查询报表</button>&nbsp;
                 <button type="button" class="btn btn-primary" id="brandreportExcel">下载报表</button><br/>
                 <form>
@@ -378,9 +376,9 @@
             toastr.clear();
             toastr.error("开始时间应该少于结束时间！");
             return false;
-        }else if(timeCha > 604800000){
+        }else if(timeCha > 2678400000){
             toastr.clear();
-            toastr.error("暂时未开放大于一周以内的查询！");
+            toastr.error("暂时未开放大于一月以内的查询！");
             return false;
         }
         toastr.clear();
